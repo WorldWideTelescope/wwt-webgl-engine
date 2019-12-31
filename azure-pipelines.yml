@@ -1,5 +1,4 @@
-# This is the configuration for Azure pipelines. It currently runs a build of
-# the web client SDK and publishes the wwtsdk.js file as a build artifact.
+# Azure Pipelines: build the WebGL engine and wwtsdk.js files as build artifacts.
 
 jobs:
 - job: BuildSDK
@@ -9,57 +8,50 @@ jobs:
   steps:
 
   - task: MSBuild@1
-    displayName: Building web client
+    displayName: Build WebGL Engine with ScriptSharp
     inputs:
-      solution: 'Html5Sdk.sln'
+      solution: 'WebGlEngine.sln'
       msbuildVersion: '14.0'
       msbuildArchitecture: 'x64'
       clean: true
 
   - task: NodeTool@0
-    displayName: Setting up node
+    displayName: Set up node
 
   - script: npm install
-    workingDirectory: 'webclient'
     displayName: Install NPM dependencies
 
-  - script: npm install -g grunt-cli
-    workingDirectory: 'webclient'
-    displayName: Installing grunt
-
   - task: Grunt@0
-    displayName: Running grunt
+    displayName: Build final JavaScript files
     inputs:
-      gruntFile: 'webclient\Gruntfile.js'
-      targets: sdk
-      workingDirectory: 'webclient'
+      gruntFile: 'Gruntfile.js'
+      targets: dist-js
 
   - task: CopyFiles@2
-    displayName: Copying SDK file to staging directory
+    displayName: Stage WebGL engine artifacts
     inputs:
-      sourceFolder: 'webclient\sdk'
-      contents: 'wwtsdk.js'
+      sourceFolder: '.'
+      contents: ['wwtsdk.js', 'wwtsdk.min.js']
       targetFolder: $(Build.ArtifactStagingDirectory)
       cleanTargetFolder: true
 
   - task: PublishPipelineArtifact@0
     displayName: Publishing SDK artifact
     inputs:
-      artifactName: wwtsdk.js
+      artifactName: wwt-webgl-engine
       targetPath: $(Build.ArtifactStagingDirectory)
 
-  - script: npm install mocha chai mocha-headless-chrome --save-dev
-    workingDirectory: tests
-    displayName: Installing mocha testing framework
-
-  - script: node_modules/.bin/mocha-headless-chrome -f tests.html -r xunit > test_results.xml
-    workingDirectory: tests
-    displayName: Running tests against JS SDK
-
-  # NOTE: The file produced above is actually in JUnit format, not xUnit!
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: 'tests/test_results.xml'
-
+  # - script: npm install mocha chai mocha-headless-chrome --save-dev
+  #   workingDirectory: tests
+  #   displayName: Installing mocha testing framework
+  #
+  # - script: node_modules/.bin/mocha-headless-chrome -f tests.html -r xunit > test_results.xml
+  #   workingDirectory: tests
+  #   displayName: Running tests against JS SDK
+  #
+  # # NOTE: The file produced above is actually in JUnit format, not xUnit!
+  # - task: PublishTestResults@2
+  #   condition: succeededOrFailed()
+  #   inputs:
+  #     testResultsFormat: 'JUnit'
+  #     testResultsFiles: 'tests/test_results.xml'
