@@ -31,7 +31,9 @@ jobs:
     displayName: Stage WebGL engine artifacts
     inputs:
       sourceFolder: '.'
-      contents: ['wwtsdk.js', 'wwtsdk.min.js']
+      contents: |
+        wwtsdk.js
+        wwtsdk.min.js
       targetFolder: $(Build.ArtifactStagingDirectory)
       cleanTargetFolder: true
 
