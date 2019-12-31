@@ -16,7 +16,7 @@ jobs:
       clean: true
 
   - task: NodeTool@0
-    displayName: Set up node
+    displayName: Set up node.js
 
   - script: npm install
     displayName: Install NPM dependencies
@@ -47,7 +47,7 @@ jobs:
     workingDirectory: 'tests'
     displayName: Installing mocha testing framework
 
-  - script: node_modules/.bin/mocha-headless-chrome -f tests.html -r xunit > test_results.xml
+  - script: ../node_modules/.bin/mocha-headless-chrome -f tests.html -r xunit > test_results.xml
     workingDirectory: 'tests'
     displayName: Running tests against JS SDK
 
