@@ -44,11 +44,9 @@ jobs:
       targetPath: $(Build.ArtifactStagingDirectory)
 
   - script: npm install mocha chai mocha-headless-chrome --save-dev
-    workingDirectory: 'tests'
     displayName: Installing mocha testing framework
 
-  - script: ../node_modules/.bin/mocha-headless-chrome -f tests.html -r xunit > test_results.xml
-    workingDirectory: 'tests'
+  - script: node_modules/.bin/mocha-headless-chrome -f tests/tests.html -r xunit >test_results.xml
     displayName: Running tests against JS SDK
 
   # NOTE: The file produced above is actually in JUnit format, not xUnit!
@@ -56,4 +54,4 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: 'tests/test_results.xml'
+      testResultsFiles: 'test_results.xml'
