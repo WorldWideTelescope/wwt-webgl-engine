@@ -15,13 +15,14 @@ module.exports = function (grunt) {
     //remove the AMD dependency from the ScriptSharp output.
     replace: {
       wwtlib: {
-        src: ['sdk/wwtlib.js'],
-        dest: 'sdk/wwtlib.js',
+        src: ['wwtlib/bin/wwtlib.js'],
+        dest: 'wwtlib-replaced.js',
         replacements: [
           {
             from: "define('wwtlib', ['ss'], function(ss) {",
             to: 'window.wwtlib = function(){'
-          }, {
+          },
+          {
             from: 'return $exports;\n});',
             to: 'return $exports;\n}();'
           }
@@ -36,17 +37,17 @@ module.exports = function (grunt) {
 
       sdk: {
         src: [
-          'sdk/ss.js',
-          'sdk/wwtlib.js'
+          'scriptsharp-0.8.0/ss.js',
+          '<%= replace.wwtlib.dest %>'
         ],
-        dest: 'sdk/wwtsdk.js'
+        dest: 'wwtsdk.js'
       },
     },
 
     uglify: {
       sdk: {
         src: '<%= concat.sdk.dest %>',
-        dest: 'sdk/wwtsdk.min.js'
+        dest: 'wwtsdk.min.js'
       },
     }
   });
