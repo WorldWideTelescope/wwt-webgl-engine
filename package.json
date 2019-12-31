@@ -1,0 +1,34 @@
+{
+  "name": "wwt_webgl_engine",
+  "description": "AAS WorldWide Telescope WebGL Engine",
+  "version": "6.0.0",
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "homepage": "http://worldwidetelescope.org",
+  "author": "The WorldWide Telescope Team",
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
+  "bugs": {
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/master/LICENSE"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-concat": "~0.5.0",
+    "grunt-contrib-uglify": "~0.6.0",
+    "grunt-exec": "~0.4.6",
+    "grunt-text-replace": "^0.4.0",
+    "load-grunt-tasks": "~1.0.0",
+    "npm-shrinkwrap": "~5.1.0",
+    "time-grunt": "~1.0.0"
+  },
+  "engines": {
+    "node": "~0.10.1"
+  },
+  "buildConfig": {
+    "uglify": true
+  }
+}
