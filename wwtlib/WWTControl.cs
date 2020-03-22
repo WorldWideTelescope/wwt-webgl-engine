@@ -717,7 +717,7 @@ namespace wwtlib
             Script.SetTimeout(delegate () { Render(); }, 10);
         }
 
-        
+
         private string GetCurrentReferenceFrame()
         {
             if (RenderContext.BackgroundImageset == null)
@@ -894,7 +894,7 @@ namespace wwtlib
                 {
                     constellationsBoundries = Constellations.Create(
                         "Constellations",
-                        URLHelpers.singleton.engineAssetUrl("constellations.txt"), 
+                        URLHelpers.singleton.engineAssetUrl("constellations.txt"),
                         true,  // "boundry"
                         false,  // "noInterpollation"
                         false  // "resource"
@@ -933,7 +933,7 @@ namespace wwtlib
 
         private const double DragCoefficient = 0.8;
 
-       
+
         private void UpdateViewParameters()
         {
             if (RenderContext.Space && tracking && trackingObject != null)
@@ -1014,8 +1014,8 @@ namespace wwtlib
                 //    }
                 //}
                 //else
-                
-               
+
+
                     //if (!Settings.Current.SmoothPan)
                     //{
                     //    this.viewCamera.Lat = this.targetCamera.Lat;
@@ -1396,9 +1396,9 @@ namespace wwtlib
             canvas.AddEventListener("touchend", OnTouchEnd, false);
             canvas.AddEventListener("gesturechange", OnGestureChange, false);
             canvas.AddEventListener("gesturestart", OnGestureStart, false);
-            canvas.AddEventListener("gestureend", OnGestureEnd, false);  
-            Document.Body.AddEventListener("keydown", OnKeyDown, false); 
-            //canvas.AddEventListener("MSGestureChange", OnGestureChange, false);  
+            canvas.AddEventListener("gestureend", OnGestureEnd, false);
+            Document.Body.AddEventListener("keydown", OnKeyDown, false);
+            //canvas.AddEventListener("MSGestureChange", OnGestureChange, false);
             //canvas.AddEventListener("mouseout", OnMouseUp, false);
 
             // MS Touch code
@@ -1427,7 +1427,7 @@ namespace wwtlib
 
             webFolder = new Folder();
             webFolder.LoadFromUrl(
-                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"), 
+                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
                 SetupComplete
             );
         }
@@ -1495,7 +1495,7 @@ namespace wwtlib
         {
             GestureEvent g = (GestureEvent)e;
             mouseDown = false;
-         
+
         }
 
         private bool Annotationclicked(double ra, double dec, double x, double y)
@@ -1598,7 +1598,7 @@ namespace wwtlib
 
 
             mouseDown = true;
-    
+
         }
 
         int[] pointerIds = new int[2];
@@ -1778,7 +1778,7 @@ namespace wwtlib
 
         Vector2d[] rect = new Vector2d[2];
         public void pinchStart(TouchEvent ev)
-        {        
+        {
             TouchInfo t0 = ev.Touches[0];
             TouchInfo t1 = ev.Touches[1];
             rect[0] = Vector2d.Create( t0.PageX,  t0.PageY );
@@ -1812,7 +1812,7 @@ namespace wwtlib
 
         public double GetDistance(Vector2d a, Vector2d b)
         {
-            
+
             double x;
             double y;
             x = a.X - b.X;
@@ -1827,7 +1827,7 @@ namespace wwtlib
         public void OnMouseDown(ElementEvent e)
         {
             // Capture mouse
-            
+
 
             Document.AddEventListener("mousemove", OnMouseMove, false);
             Document.AddEventListener("mouseup", OnMouseUp, false);
@@ -1849,13 +1849,13 @@ namespace wwtlib
         {
             e.PreventDefault();
             e.StopPropagation();
-            
+
         }
 
 
         public void OnMouseMove(ElementEvent e)
         {
-           
+
             lastMouseMove = Date.Now;
             hoverTextPoint = Vector2d.Create( Mouse.OffsetX(Canvas, e), Mouse.OffsetY(Canvas, e));
             hoverText = "";
@@ -1908,7 +1908,7 @@ namespace wwtlib
             {
                 RenderContext.TargetCamera.Angle = 0;
             }
-         
+
         }
         bool moved = false;
         public void OnMouseUp(ElementEvent e)
@@ -1935,7 +1935,7 @@ namespace wwtlib
             mouseDown = false;
 
             moved = false;
-            
+
         }
 
         public Vector2d GetCoordinatesForScreenPoint(double x, double y)
@@ -1946,7 +1946,7 @@ namespace wwtlib
             Vector2d pt = Vector2d.Create(x, y);
             PickRayDir = TransformPickPointToWorldSpace(pt, RenderContext.Width, RenderContext.Height);
             result = Coordinates.CartesianToSphericalSky(PickRayDir);
-            
+
             return result;
         }
 
@@ -2046,7 +2046,7 @@ namespace wwtlib
 
 
                 //todo remove this line to turn WebGL on...
-                webGL = true; 
+                webGL = true;
 
                 if (webGL)
                 {
@@ -2070,7 +2070,7 @@ namespace wwtlib
                 {
                     Tile.PrepDevice = gl;
                     Singleton.RenderContext.gl = gl;
-                 
+
                     RenderContext.UseGl = true;
                 }
 
@@ -2569,7 +2569,7 @@ namespace wwtlib
             RenderContext.ViewCamera = RenderContext.TargetCamera.Copy();
             Mover = null;
         }
-        
+
 
         internal IViewMover Mover
         {
@@ -2710,10 +2710,10 @@ namespace wwtlib
 
             tour = new TourDocument();
             tour.Title = name;
-          
+
             SetupTour();
             tour.EditMode = true;
-    
+
             return tour;
         }
 
@@ -2744,12 +2744,12 @@ namespace wwtlib
                         //uiController = player;
                         //WWTControl.scriptInterface.FireTourReady();
                         //player.Play();
-                        
+
                         SetupTour();
                         TourEdit.PlayNow(true);
                         WWTControl.scriptInterface.FireTourReady();
                     });
-            
+
         }
 
         public void PlayCurrentTour()
@@ -2851,11 +2851,11 @@ namespace wwtlib
             }
         }
 
- 
+
         public void CaptureThumbnail(BlobReady blobReady)
         {
             Render();
-           
+
             ImageElement image = (ImageElement)Document.CreateElement("img");
             image.AddEventListener("load", delegate (ElementEvent e)
             {
