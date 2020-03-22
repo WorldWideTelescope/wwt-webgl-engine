@@ -79,7 +79,7 @@ namespace wwtlib
                 {
                     if (!ImageElement.HasAttribute("proxyattempt"))
                     {
-                        ImageElement.Src = URLHelpers.singleton.rewrite(URL);
+                        ImageElement.Src = URLHelpers.singleton.activateProxy(URL);
                         ImageElement.SetAttribute("proxyattempt", true);
                     }
                     else

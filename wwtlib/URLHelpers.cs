@@ -191,6 +191,12 @@ namespace wwtlib
                     return url;
 
                 case DomainHandling.Proxy:
+                    if (lcproto == "") {
+                        // Make sure that we give the proxy a real absolute
+                        // URL. Guess http, and if the proxy is forced to
+                        // upgrade, so be it.
+                        url = "http://" + url;
+                    }
                     return this.core_dynamic_baseurl + "/webserviceproxy.aspx?targeturl=" + url.EncodeUriComponent();
 
                 case DomainHandling.WWTFlagship:
@@ -211,6 +217,40 @@ namespace wwtlib
                         return this.core_static_baseurl + rest;
                     return this.core_dynamic_baseurl + rest;
             }
+        }
+
+        // Call this when you have tried to load a url via XMLHttpRequest or
+        // something along those lines, and the attempt has failed. We will mark the
+        // domain as needing proxying, and will return a new proxy-enabled URL to try.
+        public string activateProxy(string url) {
+            // Get the domain. XXX copy/pastey from the above.
+
+            string lc = url.ToLowerCase();
+            string url_no_protocol;
+
+            if (lc.StartsWith("http://")) {
+                url_no_protocol = url.Substring(7);
+            } else if (lc.StartsWith("https://")) {
+                url_no_protocol = url.Substring(8);
+            } else if (lc.StartsWith("//")) {
+                url_no_protocol = url.Substring(2);
+            } else {
+                url_no_protocol = url;
+            }
+
+            string lcdomain;
+            int slash_index = url_no_protocol.IndexOf('/');
+
+            if (slash_index < 0) {
+                lcdomain = url_no_protocol;
+            } else {
+                lcdomain = url_no_protocol.Substring(0, slash_index).ToLowerCase();
+            }
+
+            // OK, the rest of this is simple:
+
+            this.domain_handling[lcdomain] = DomainHandling.Proxy;
+            return this.rewrite(url);
         }
 
         public string engineAssetUrl(string subpath)

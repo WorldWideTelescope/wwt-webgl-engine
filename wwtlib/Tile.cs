@@ -207,7 +207,7 @@ namespace wwtlib
                 {
                     if (!texture.HasAttribute("proxyattempt"))
                     {
-                        texture.Src = URLHelpers.singleton.rewrite(URL);
+                        texture.Src = URLHelpers.singleton.activateProxy(this.URL);
                         texture.SetAttribute("proxyattempt", true);
                     }
                     else
