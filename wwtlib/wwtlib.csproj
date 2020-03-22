@@ -45,6 +45,7 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="URLHelpers.cs" />
     <Compile Include="Annotation.cs" />
     <Compile Include="AstroCalc\AAAberration.cs" />
     <Compile Include="AstroCalc\AAAngularSeparation.cs" />
