@@ -121,7 +121,7 @@ namespace wwtlib
                             {
                                 triedOnce = true;
                                 xhr.OnReadyStateChange = null;
-                                _url = URLHelpers.singleton.rewrite(_url);
+                                _url = URLHelpers.singleton.activateProxy(_url);
                                 CORS();
                             }
                         }

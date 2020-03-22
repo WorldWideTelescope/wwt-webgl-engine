@@ -20,13 +20,20 @@ namespace wwtlib
     {
         String origin_protocol;  // this will be "http:" or "https:"
         String origin_domain;  // host name, no port number
+        bool force_https;
         String core_static_baseurl;  // baseurl for core static assets: NB, includes things like wwt.o/wwtweb/dss.aspx
         String core_dynamic_baseurl;  // baseurl for core dynamic services
         Dictionary<String, DomainHandling> domain_handling;
 
+        // Note: I wanted to use a HashSet here, but that made ScriptSharp crash without giving
+        // an explicit error message of any kind. Oh well.
+        Dictionary<String, bool> flagship_static_lcpaths;
+
         public URLHelpers() {
             this.origin_protocol = (string) Script.Literal("window.location.protocol");
             this.origin_domain = (string) Script.Literal("window.location.hostname");
+            this.force_https = (this.origin_protocol == "https:");
+
             this.domain_handling = new Dictionary<string, DomainHandling>();
             this.domain_handling["worldwidetelescope.org"] = DomainHandling.WWTFlagship;
             this.domain_handling["www.worldwidetelescope.org"] = DomainHandling.WWTFlagship;
@@ -58,6 +65,68 @@ namespace wwtlib
                     this.core_dynamic_baseurl = this.origin_protocol + "//beta.worldwidetelescope.org";
                     break;
             }
+
+            this.flagship_static_lcpaths = new Dictionary<String, bool>();
+            this.flagship_static_lcpaths["/wwtweb/2massoct.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/bingdemtile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/bingdemtile2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/catalog.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/catalog2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dembath.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/demmars.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/demtile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dss.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dsstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dusttoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/earthblend.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/earthmerbath.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/fixedaltitudedemtile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/g360.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/galex4far.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/galex4near.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/galextoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/gettile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/gettour.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/gettourfile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/gettours.aspx"] = true; // maybe not?
+            this.flagship_static_lcpaths["/wwtweb/glimpse.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/halphatoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/hirise.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/hirisedem2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/hirisedem3.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/jupiter.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/mandel.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/mandel1.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/mars.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/marsdem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/marshirise.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/marsmoc.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/martiantile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/martiantile2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/mipsgal.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/moondem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/moonoct.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/moontoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/moontoastdem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/postmars.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/postmarsdem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/postmarsdem2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/rasstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/sdsstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/sdsstoast2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/sdsstoast2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/thumbnail.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/tiles.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/tiles2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/tilesthumb.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/twomasstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/tychooct.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/veblend.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/vlsstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/wmap.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/wmsmoon.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/wmstoast.aspx"] = true;
         }
 
         public String rewrite(String url) {
@@ -88,18 +157,18 @@ namespace wwtlib
             }
 
             string lcdomain;
-            string path;
+            string rest; // potentially "/foo/CASE/bar?q=1&b=1#fragment"
             int slash_index = url_no_protocol.IndexOf('/');
 
             if (slash_index < 0) {
                 lcdomain = url_no_protocol;
-                path = "/";
+                rest = "/";
             } else {
                 lcdomain = url_no_protocol.Substring(0, slash_index).ToLowerCase();
-                path = url_no_protocol.Substring(slash_index); // starts with "/"
+                rest = url_no_protocol.Substring(slash_index); // starts with "/"
             }
 
-            string lcpath = path.ToLowerCase();
+            string lcpath = rest.ToLowerCase().Split('?')[0];
 
             if (!this.domain_handling.ContainsKey(lcdomain))
                 this.domain_handling[lcdomain] = DomainHandling.TryNoProxy;
@@ -108,21 +177,80 @@ namespace wwtlib
 
             switch (mode)
             {
-                case DomainHandling.TryNoProxy:
                 case DomainHandling.Localhost:
+                    return url;  // can't proxy, so we'll just have to hope it works
+
+                case DomainHandling.TryNoProxy:
                 default:
+                    if (this.force_https && lcproto != "https:") {
+                        // Force HTTPS and we'll see what happens. If
+                        // downloading fails, we'll set a flag and use our
+                        // proxy to launder the security.
+                        return "https://" + lcdomain + rest;
+                    }
                     return url;
 
                 case DomainHandling.Proxy:
+                    if (lcproto == "") {
+                        // Make sure that we give the proxy a real absolute
+                        // URL. Guess http, and if the proxy is forced to
+                        // upgrade, so be it.
+                        url = "http://" + url;
+                    }
                     return this.core_dynamic_baseurl + "/webserviceproxy.aspx?targeturl=" + url.EncodeUriComponent();
 
                 case DomainHandling.WWTFlagship:
-                    if (lcpath.StartsWith("/wwtweb/"))
-                    {
-                        return this.core_static_baseurl + path;
+                    // Rewrite "flagship"/core URLs to go through whatever our
+                    // core bases are. Assume that URLs are dynamic (=> are
+                    // not loaded through the CDN) unless proven otherwise.
+                    bool is_static = false;
+
+                    if (lcpath.StartsWith("/data/")) {
+                        is_static = true;
+                    } else if (this.flagship_static_lcpaths.ContainsKey(lcpath)) {
+                        is_static = true;
+                    } else if (lcpath.StartsWith("/content/")) {
+                        is_static = true;
                     }
-                    return url;
+
+                    if (is_static)
+                        return this.core_static_baseurl + rest;
+                    return this.core_dynamic_baseurl + rest;
             }
+        }
+
+        // Call this when you have tried to load a url via XMLHttpRequest or
+        // something along those lines, and the attempt has failed. We will mark the
+        // domain as needing proxying, and will return a new proxy-enabled URL to try.
+        public string activateProxy(string url) {
+            // Get the domain. XXX copy/pastey from the above.
+
+            string lc = url.ToLowerCase();
+            string url_no_protocol;
+
+            if (lc.StartsWith("http://")) {
+                url_no_protocol = url.Substring(7);
+            } else if (lc.StartsWith("https://")) {
+                url_no_protocol = url.Substring(8);
+            } else if (lc.StartsWith("//")) {
+                url_no_protocol = url.Substring(2);
+            } else {
+                url_no_protocol = url;
+            }
+
+            string lcdomain;
+            int slash_index = url_no_protocol.IndexOf('/');
+
+            if (slash_index < 0) {
+                lcdomain = url_no_protocol;
+            } else {
+                lcdomain = url_no_protocol.Substring(0, slash_index).ToLowerCase();
+            }
+
+            // OK, the rest of this is simple:
+
+            this.domain_handling[lcdomain] = DomainHandling.Proxy;
+            return this.rewrite(url);
         }
 
         public string engineAssetUrl(string subpath)

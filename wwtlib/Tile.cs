@@ -207,7 +207,7 @@ namespace wwtlib
                 {
                     if (!texture.HasAttribute("proxyattempt"))
                     {
-                        texture.Src = URLHelpers.singleton.rewrite(URL);
+                        texture.Src = URLHelpers.singleton.activateProxy(this.URL);
                         texture.SetAttribute("proxyattempt", true);
                     }
                     else
@@ -222,6 +222,7 @@ namespace wwtlib
                 }, false);
 
                 xdomimg.crossOrigin = "anonymous";
+                texture.Src = this.URL;
             }
         }
 
@@ -958,14 +959,15 @@ namespace wwtlib
         {
             get
             {
-            string returnUrl = dataset.Url;  
+                string rewritten_url = URLHelpers.singleton.rewrite(dataset.Url);
+                string returnUrl = rewritten_url;
                 
-                if (dataset.Url.IndexOf("{1}") > -1)
+                if (rewritten_url.IndexOf("{1}") > -1)
                 {
                     // Old style URL
                     if (dataset.Projection == ProjectionType.Mercator && !string.IsNullOrEmpty(dataset.QuadTreeTileMap))
                     {
-                        returnUrl = String.Format(dataset.Url, this.GetServerID(), GetTileID());
+                        returnUrl = String.Format(rewritten_url, this.GetServerID(), GetTileID());
                         if (returnUrl.IndexOf("virtualearth.net") > -1)
                         {
                             returnUrl += "&n=z";
@@ -974,9 +976,10 @@ namespace wwtlib
                     }
                     else
                     {
-                        return String.Format(dataset.Url, dataset.ImageSetID, Level, tileX, tileY);
+                        return String.Format(rewritten_url, dataset.ImageSetID, Level, tileX, tileY);
                     }
                 }
+
                 returnUrl = returnUrl.Replace("{X}", this.tileX.ToString());
                 returnUrl = returnUrl.Replace("{Y}", this.tileY.ToString());
                 returnUrl = returnUrl.Replace("{L}", this.Level.ToString());
@@ -1052,24 +1055,26 @@ namespace wwtlib
         {
             get
             {
+                string rewritten_url = URLHelpers.singleton.rewrite(dataset.DemUrl);
+
                 if (dataset.Projection == ProjectionType.Mercator)
                 {
                     string baseUrl = "//cdn.worldwidetelescope.org/wwtweb/demtile.aspx?q={0},{1},{2},M";
-                    if (!String.IsNullOrEmpty(dataset.DemUrl))
+                    if (!String.IsNullOrEmpty(rewritten_url))
                     {
-                        baseUrl = dataset.DemUrl;
+                        baseUrl = rewritten_url;
                     }
 
                     //return string.Format(baseUrl, level.ToString(), x.ToString(), y.ToString());
                 }
 
 
-                if (dataset.DemUrl.IndexOf("{1}") > -1)
+                if (rewritten_url.IndexOf("{1}") > -1)
                 {
-                    return String.Format(dataset.DemUrl + "&new", Level, tileX, tileY);
+                    return String.Format(rewritten_url + "&new", Level, tileX, tileY);
                 }
 
-                string returnUrl = dataset.DemUrl;
+                string returnUrl = rewritten_url;
 
                 returnUrl = returnUrl.Replace("{X}", tileX.ToString());
                 returnUrl = returnUrl.Replace("{Y}", tileY.ToString());
