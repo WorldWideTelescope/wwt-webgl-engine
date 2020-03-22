@@ -95,6 +95,11 @@ namespace wwtlib
             return String.Format("{0}/engine/assets/{1}", this.core_static_baseurl, subpath);
         }
 
+        public string coreDynamicUrl(string subpath)
+        {
+            return String.Format("{0}/{1}", this.core_dynamic_baseurl, subpath);
+        }
+
         public static URLHelpers singleton;
 
         static URLHelpers() {

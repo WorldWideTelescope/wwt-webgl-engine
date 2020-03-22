@@ -205,7 +205,7 @@ namespace wwtlib
                 string[] isstle = new string[0];
 
                 //This is downloaded now on startup
-                string url = "http://worldwidetelescope.org/wwtweb/isstle.aspx";
+                string url = URLHelpers.singleton.coreDynamicUrl("wwtweb/isstle.aspx");
 
                 WebFile webFile;
 
