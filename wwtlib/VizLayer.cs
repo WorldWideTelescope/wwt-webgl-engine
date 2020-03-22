@@ -24,11 +24,11 @@ namespace wwtlib
             string[] lines = data.Split("\r\n");
 
             starProfile = (ImageElement)Document.CreateElement("img");
-            starProfile.AddEventListener("load", delegate(ElementEvent e)
-            {
+            starProfile.AddEventListener("load", delegate(ElementEvent e) {
                 imageReady = true;
             }, false);
-            starProfile.Src = "images/StarProfileAlpha.png";
+            starProfile.Src = URLHelpers.singleton.engineAssetUrl("StarProfileAlpha.png");
+
             bool gotHeader = false;
             foreach (string line in lines)
             {
