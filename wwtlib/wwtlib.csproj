@@ -45,6 +45,7 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="URLHelpers.cs" />
     <Compile Include="Annotation.cs" />
     <Compile Include="AstroCalc\AAAberration.cs" />
     <Compile Include="AstroCalc\AAAngularSeparation.cs" />
@@ -169,7 +170,6 @@
     <Compile Include="Tours\Undo.cs" />
     <Compile Include="Triangle.cs" />
     <Compile Include="UiTools.cs" />
-    <Compile Include="URLHelpers.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Utilities\BinaryReader.cs" />
     <Compile Include="Utilities\Bitmap.cs" />
