@@ -887,8 +887,13 @@ namespace wwtlib
             {
                 if (constellationsBoundries == null)
                 {
-                    constellationsBoundries = Constellations.Create("Constellations", "//worldwidetelescope.org/data/constellations.txt", true, false, false);
-                    //constellationsBoundries = Constellations.Create("Constellations", "//localhost/data/constellations.txt", true, false, false);
+                    constellationsBoundries = Constellations.Create(
+                        "Constellations",
+                        URLHelpers.singleton.engineAssetUrl("constellations.txt"), 
+                        true,  // "boundry"
+                        false,  // "noInterpollation"
+                        false  // "resource"
+                    );
                 }
                 constellationsBoundries.Draw(RenderContext, Settings.Active.ShowConstellationSelection, Constellation, false);
             }
@@ -1409,14 +1414,17 @@ namespace wwtlib
 
             if (RenderContext.gl == null)
             {
-
                 foregroundCanvas = (CanvasElement)Document.CreateElement("canvas");
                 foregroundCanvas.Width = canvas.Width;
                 foregroundCanvas.Height = canvas.Height;
                 fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
             }
+
             webFolder = new Folder();
-            webFolder.LoadFromUrl("//worldwidetelescope.org/wwtweb/catalog.aspx?X=ImageSets5", SetupComplete);
+            webFolder.LoadFromUrl(
+                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"), 
+                SetupComplete
+            );
         }
 
         public void SetupComplete()
