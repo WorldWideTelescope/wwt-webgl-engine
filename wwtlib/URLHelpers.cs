@@ -156,18 +156,19 @@ namespace wwtlib
                 url_no_protocol = url;
             }
 
-            string lcdomain;
+            string domain;
             string rest; // potentially "/foo/CASE/bar?q=1&b=1#fragment"
             int slash_index = url_no_protocol.IndexOf('/');
 
             if (slash_index < 0) {
-                lcdomain = url_no_protocol;
+                domain = url_no_protocol;
                 rest = "/";
             } else {
-                lcdomain = url_no_protocol.Substring(0, slash_index).ToLowerCase();
+                domain = url_no_protocol.Substring(0, slash_index);
                 rest = url_no_protocol.Substring(slash_index); // starts with "/"
             }
 
+            string lcdomain = domain.ToLowerCase();
             string lcpath = rest.ToLowerCase().Split('?')[0];
 
             if (!this.domain_handling.ContainsKey(lcdomain))
@@ -186,7 +187,14 @@ namespace wwtlib
                         // Force HTTPS and we'll see what happens. If
                         // downloading fails, we'll set a flag and use our
                         // proxy to launder the security.
-                        return "https://" + lcdomain + rest;
+                        //
+                        // NOTE: it is important that we use `domain` and not
+                        // `lcdomain`, even though domain names are
+                        // case-insensitive, because we might be processing a
+                        // template URL containing text like `{S}`, and WWT's
+                        // replacements *are* case-sensitive. Yes, I did learn
+                        // this the hard way.
+                        return "https://" + domain + rest;
                     }
                     return url;
 
