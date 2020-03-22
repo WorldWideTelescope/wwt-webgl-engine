@@ -222,6 +222,7 @@ namespace wwtlib
                 }, false);
 
                 xdomimg.crossOrigin = "anonymous";
+                texture.Src = this.URL;
             }
         }
 
