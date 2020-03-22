@@ -20,6 +20,7 @@ namespace wwtlib
     {
         String origin_protocol;  // this will be "http:" or "https:"
         String origin_domain;  // host name, no port number
+        bool force_https;
         String core_static_baseurl;  // baseurl for core static assets: NB, includes things like wwt.o/wwtweb/dss.aspx
         String core_dynamic_baseurl;  // baseurl for core dynamic services
         Dictionary<String, DomainHandling> domain_handling;
@@ -27,6 +28,8 @@ namespace wwtlib
         public URLHelpers() {
             this.origin_protocol = (string) Script.Literal("window.location.protocol");
             this.origin_domain = (string) Script.Literal("window.location.hostname");
+            this.force_https = (this.origin_protocol == "https:");
+
             this.domain_handling = new Dictionary<string, DomainHandling>();
             this.domain_handling["worldwidetelescope.org"] = DomainHandling.WWTFlagship;
             this.domain_handling["www.worldwidetelescope.org"] = DomainHandling.WWTFlagship;
@@ -108,9 +111,17 @@ namespace wwtlib
 
             switch (mode)
             {
-                case DomainHandling.TryNoProxy:
                 case DomainHandling.Localhost:
+                    return url;  // can't proxy, so we'll just have to hope it works
+
+                case DomainHandling.TryNoProxy:
                 default:
+                    if (this.force_https && lcproto != "https:") {
+                        // Force HTTPS and we'll see what happens. If
+                        // downloading fails, we'll set a flag and use our
+                        // proxy to launder the security.
+                        return "https://" + lcdomain + path;
+                    }
                     return url;
 
                 case DomainHandling.Proxy:
