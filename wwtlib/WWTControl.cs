@@ -825,8 +825,13 @@ namespace wwtlib
             {
                 if (constellationsFigures == null)
                 {
-                    constellationsFigures = Constellations.Create("Constellations", "//worldwidetelescope.org/data/figures.txt", false, false, false);
-                    //constellationsFigures = Constellations.Create("Constellations", "//localhost/data/figures.txt", false, false, false);
+                    constellationsFigures = Constellations.Create(
+                        "Constellations",
+                        URLHelpers.singleton.engineAssetUrl("figures.txt"),
+                        false,  // "boundry"
+                        false,  // "noInterpollation"
+                        false  // "resource"
+                    );
                 }
 
                 constellationsFigures.Draw(RenderContext, false, "UMA", false);
@@ -2075,63 +2080,62 @@ namespace wwtlib
                 Singleton.Setup(canvas);
 
 
-                Singleton.RenderContext.BackgroundImageset =
-                    Imageset.Create(
+                Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                     "DSS",
-                    "//cdn.worldwidetelescope.org/wwtweb/dss.aspx?q={1},{2},{3}",
-                    ImageSetType.Sky, BandPass.Visible, ProjectionType.Toast, 100,
-                    0, 12, 256, 180, ".png", false, "", 0, 0, 0, false,
-                    "//worldwidetelescope.org/thumbnails/DSS.png",
-                    true, false, 0, 0, 0, "", "", "", "", 1, "Sky");
-
+                    URLHelpers.singleton.coreStaticUrl("/wwtweb/dss.aspx?q={1},{2},{3}"),
+                    ImageSetType.Sky,
+                    BandPass.Visible,
+                    ProjectionType.Toast,
+                    100,
+                    0,
+                    12,
+                    256,
+                    180,
+                    ".png",
+                    false,
+                    "",
+                    0,
+                    0,
+                    0,
+                    false,
+                    URLHelpers.singleton.coreStaticUrl("thumbnails/DSS.png"),
+                    true,
+                    false,
+                    0,
+                    0,
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    1,
+                    "Sky"
+                );
 
                 if (StartMode == "earth")
                 {
-                    Singleton.RenderContext.BackgroundImageset =
-                        Imageset.Create(
+                    Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                         "Blue Marble",
-                        "//worldwidetelescope.org/wwtweb/tiles.aspx?q={1},{2},{3},bm200407",
+                        URLHelpers.singleton.coreStaticUrl("/wwtweb/tiles.aspx?q={1},{2},{3},bm200407"),
                         ImageSetType.Earth, BandPass.Visible, ProjectionType.Toast, 101,
                         0, 7, 256, 180, ".png", false, "", 0, 0, 0, false,
-                        "//worldwidetelescope.org/wwtweb/thumbnail.aspx?name=bm200407",
+                        URLHelpers.singleton.coreStaticUrl("/wwtweb/thumbnail.aspx?name=bm200407"),
                         true, false, 0, 0, 0, "", "", "", "", 6371000, "Earth");
-
-
                 }
-                if (StartMode == "bing")
+                else if (StartMode == "bing")
                 {
-                    Singleton.RenderContext.BackgroundImageset =
-                     Imageset.Create(
+                    Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                      "Virtual Earth Aerial",
                      "//a{0}.ortho.tiles.virtualearth.net/tiles/a{1}.jpeg?g=15",
                      ImageSetType.Earth, BandPass.Visible, ProjectionType.Mercator, 102,
                      1, 20, 256, 360, ".png", false, "0123", 0, 0, 0, false,
-                     "//worldwidetelescope.org/wwtweb/thumbnail.aspx?name=earth",
+                     URLHelpers.singleton.coreStaticUrl("/wwtweb/thumbnail.aspx?name=earth"),
                      true, false, 0, 0, 0, "", "", "", "", 6371000, "Earth");
                 }
-               
-                //if (StartMode == "bing")
-                //{
-                //    Singleton.RenderContext.BackgroundImageset =
-                //     Imageset.Create(
-                //     "3D Solar System View",
-                //     "",
-                //     ImageSetType.SolarSystem, BandPass.Visible, ProjectionType.Toast, 10112,
-                //     1, 20, 256, 360, ".png", false, "0123", 0, 0, 0, false,
-                //     "//worldwidetelescope.org/wwtweb/thumbnail.aspx?name=SolarSytem",
-                //     true, false, 0, 0, 0, "", "", "", "", 6371000, "3D Solar System View");
-                //}
-
             }
 
-            //UseUserLocation()
-
             Singleton.RenderContext.ViewCamera.Lng += 0;
-
-            
             Singleton.RenderContext.InitGL();
-
-
             Singleton.Render();
 
             return scriptInterface;
