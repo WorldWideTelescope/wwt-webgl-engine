@@ -1,5 +1,11 @@
 # Azure Pipelines: build the WebGL engine and wwtsdk.js files as build artifacts.
 
+trigger:
+  branches:
+    include:
+      - master
+      - "refs/tags/v*"
+
 jobs:
 - job: BuildSDK
   pool:

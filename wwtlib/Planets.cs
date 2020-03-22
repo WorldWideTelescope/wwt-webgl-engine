@@ -809,7 +809,7 @@ namespace wwtlib
             //        fs.Close();
             //    }
             //}
-            return true;
+            //return true;
         }
 
 
