@@ -7,6 +7,17 @@ jobs:
 
   steps:
 
+  - powershell: |
+      $branch = "$(Build.SourceBranch)"
+      if($branch.StartsWith("refs/tags/v")) {
+        $version = $branch.Substring(11)
+        Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/$version"
+      } else {
+        # Won't actually get published on PRs, etc.
+        Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/latest"
+      }
+    displayName: Set deployment parameters
+
   - task: MSBuild@1
     displayName: Build WebGL Engine with ScriptSharp
     inputs:
@@ -55,3 +66,12 @@ jobs:
     inputs:
       testResultsFormat: 'JUnit'
       testResultsFiles: 'test_results.xml'
+
+  - task: AzureFileCopy@3
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: $(pub_prefix)
