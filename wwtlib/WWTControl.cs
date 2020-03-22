@@ -1417,9 +1417,6 @@ namespace wwtlib
             }
             webFolder = new Folder();
             webFolder.LoadFromUrl("//worldwidetelescope.org/wwtweb/catalog.aspx?X=ImageSets5", SetupComplete);
-
-            WebFile webFile = new WebFile("//worldwidetelescope.org/wwtweb/weblogin.aspx?user=12345678-03D2-4935-8D0F-DCE54C9113E5&Version=HTML5&webkey=AX2011Gqqu&platform=web");
-            webFile.Send();
         }
 
         public void SetupComplete()
