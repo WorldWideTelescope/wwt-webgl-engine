@@ -388,8 +388,13 @@ namespace wwtlib
         }
 
 
-        public static Constellations Containment = Constellations.Create("Constellations", "//worldwidetelescope.org/data/constellations.txt", true, true, true);
-        //public static Constellations Containment = Constellations.Create("Constellations", "//localhost/data/constellations.txt", true, true, true);
+        public static Constellations Containment = Constellations.Create(
+            "Constellations",
+            URLHelpers.singleton.engineAssetUrl("constellations.txt"),
+            true,  // "boundry"
+            true,  // "noInterpollation"
+            true  // "resource"
+        );
 
         static string constToDraw = "";
 
@@ -548,13 +553,10 @@ namespace wwtlib
 
         static Constellations()
         {
-            //string url = "//worldwidetelescope.org/data/constellationNames_RADEC_EN.txt";
-            //string url = "//localhost/data/constellationNames_RADEC_EN.txt";
-            string url = "//worldwidetelescope.org/wwtweb/catalog.aspx?q=ConstellationNamePositions_EN";
+            string url = URLHelpers.singleton.engineAssetUrl("ConstellationNamePositions_EN.txt");
             webFileConstNames = new WebFile(url);
             webFileConstNames.OnStateChange = LoadNames;
             webFileConstNames.Send();
-
         }
 
         static void LoadNames()

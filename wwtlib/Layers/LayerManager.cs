@@ -173,9 +173,10 @@ namespace wwtlib
         //static List<Layer> layers = new List<Layer>();
         static LayerManager()
         {
-            GetMoonFile("//worldwidetelescope.org/wwtweb/catalog.aspx?Q=moons");
+            GetMoonFile(URLHelpers.singleton.engineAssetUrl("moons.txt"));
             //InitLayers();
         }
+
         static string moonfile = "";
         static public void InitLayers()
         {
