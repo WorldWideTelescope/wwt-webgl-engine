@@ -25,10 +25,6 @@ namespace wwtlib
 
         public WebFile(string url)
         {
-            //_url = url.Replace("www.worldwidetelescope.org", "worldwidetelescope.org")
-            //    .Replace("cdn.worldwidetelescope.org", "worldwidetelescope.org")
-            //    .Replace("http://", "//");
-
             _url = url;
         }
 
@@ -125,7 +121,7 @@ namespace wwtlib
                             {
                                 triedOnce = true;
                                 xhr.OnReadyStateChange = null;
-                                _url = Util.GetProxiedUrl(_url);
+                                _url = URLHelpers.singleton.rewrite(_url);
                                 CORS();
                             }
                         }
