@@ -222,10 +222,6 @@ namespace wwtlib
                 }, false);
 
                 xdomimg.crossOrigin = "anonymous";
-                texture.Src = this.URL.Replace("cdn.","www.");
-                //texture.Src = "dss.png";
-                
-                // TODO add event listener for failed!
             }
         }
 
@@ -307,10 +303,9 @@ namespace wwtlib
                     TileCache.RemoveFromQueue(this.Key, true);
                 }, false);
 
-                xhr.Open(HttpVerb.Get, DemURL/*.Replace("cdn.", "www.")*/, true);
+                xhr.Open(HttpVerb.Get, DemURL, true);
                 xhr.ResponseType = "arraybuffer";
                 xhr.Send();
-                // TODO add event listener for failed!
             }
         }
 

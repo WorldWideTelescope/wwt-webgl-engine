@@ -100,6 +100,11 @@ namespace wwtlib
             return String.Format("{0}/{1}", this.core_dynamic_baseurl, subpath);
         }
 
+        public string coreStaticUrl(string subpath)
+        {
+            return String.Format("{0}/{1}", this.core_static_baseurl, subpath);
+        }
+
         public static URLHelpers singleton;
 
         static URLHelpers() {
