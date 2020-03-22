@@ -97,25 +97,6 @@ namespace wwtlib
             return Math.Log(num) / Math.Log(b);
         }
 
-        public static String GetUrlParam(string name)
-        {
-            //Document.URL
-
-
-            //    return RegularExpression.Parse(name + "=" + "(.+?)(&|$)").Exec(Document.URL.Search)||[,null])[1]
-            //           function getURLParameter(name) {
-            //    return decodeURI(
-            //        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
-            //    );
-            //}
-
-            //            RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
-
-            //                "[?&]"+name+"=([^&]*)"
-
-            return "";
-        }
-
         static readonly string[] WWTHOSTS = {
             "worldwidetelescope.org",
             "cdn.worldwidetelescope.org",
