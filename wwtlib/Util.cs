@@ -97,57 +97,6 @@ namespace wwtlib
             return Math.Log(num) / Math.Log(b);
         }
 
-        static readonly string[] WWTHOSTS = {
-            "worldwidetelescope.org",
-            "cdn.worldwidetelescope.org",
-            "www.worldwidetelescope.org",
-            "wwtstaging.azurewebsites.net"
-        };
-
-        public static string GetProxiedUrl(string url)
-        {
-            string lc = url.ToLowerCase();
-            string lcproto, lchost;
-
-            if (lc.StartsWith("http://")) {
-                lcproto = "http:";
-                lchost = lc.Substring(7).Split("/", 2)[0];
-            } else if (lc.StartsWith("https://")) {
-                lcproto = "https:";
-                lchost = lc.Substring(8).Split("/", 2)[0];
-            } else if (lc.StartsWith("//")) {
-                lcproto = "";
-                lchost = lc.Substring(2).Split("/", 2)[0];
-            } else {
-                return url;
-            }
-
-            // This function used to have logic that would turn standard
-            // worldwidetelescope.org URLs into relative URLs, under the
-            // assumption that the SDK code would be served from some machine
-            // also hosting WWT static data. But first that logic got broken,
-            // and nowadays the SDK might be hosted from a variety of
-            // locations. We should re-add comparable logic, but for now the
-            // only special-casing is that we don't proxy wwt.o URLs since we
-            // know they have the CORS headers we might need.
-
-            foreach (string host in WWTHOSTS) {
-                if (lchost == host) {
-                    return url;
-                }
-            }
-
-            // Otherwise, presume that the proxy is needed.
-
-            if (lcproto == "")
-                url = "http:" + url;
-            else if (lcproto == "https:")
-                // Current proxy can't do HTTPS. Cross fingers that straight HTTP will work.
-                url = "http://" + url.Split("//", 2)[1];
-
-            return "//worldwidetelescope.org/webserviceproxy.aspx?targeturl=" + url.EncodeUriComponent();
-        }
-
         // Parse timespan into int with milliseconds
         public static int ParseTimeSpan(string timespan)
         {

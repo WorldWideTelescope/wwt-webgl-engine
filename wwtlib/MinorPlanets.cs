@@ -85,7 +85,7 @@ namespace wwtlib
             {
                 if (starTexture == null)
                 {
-                    starTexture = Planets.LoadPlanetTexture("//cdn.worldwidetelescope.org/webclient/images/starProfileAlpha.png");
+                    starTexture = Planets.LoadPlanetTexture(URLHelpers.singleton.engineAssetUrl("StarProfileAlpha.png"));
                 }
                 for (int i = 0; i < 7; i++)
                 {

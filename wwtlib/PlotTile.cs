@@ -53,7 +53,7 @@ namespace wwtlib
             {
                 Downloading = true;
 
-                webFile = new WebFile(Util.GetProxiedUrl(this.URL));
+                webFile = new WebFile(URLHelpers.singleton.rewrite(this.URL));
                 webFile.OnStateChange = FileStateChange;
                 webFile.Send();
             }

@@ -58,7 +58,7 @@ namespace wwtlib
         {
             onComplete = complete;
 
-            webFile = new WebFile(Util.GetProxiedUrl(url));
+            webFile = new WebFile(URLHelpers.singleton.rewrite(url));
             webFile.OnStateChange = LoadData;
             webFile.Send();
 

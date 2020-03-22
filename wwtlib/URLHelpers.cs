@@ -43,19 +43,19 @@ namespace wwtlib
                 case "worldwidetelescope.org":
                 case "www.worldwidetelescope.org":
                 case "cdn.worldwidetelescope.org":
-                    this.core_static_baseurl = "//cdn.worldwidetelescope.org";
-                    this.core_dynamic_baseurl = "//worldwidetelescope.org";
+                    this.core_static_baseurl = this.origin_protocol + "//cdn.worldwidetelescope.org";
+                    this.core_dynamic_baseurl = this.origin_protocol + "//worldwidetelescope.org";
                     break;
 
                 case "beta.worldwidetelescope.org":
                 case "beta-cdn.worldwidetelescope.org":
-                    this.core_static_baseurl = "//beta-cdn.worldwidetelescope.org";
-                    this.core_dynamic_baseurl = "//beta.worldwidetelescope.org";
+                    this.core_static_baseurl = this.origin_protocol + "//beta-cdn.worldwidetelescope.org";
+                    this.core_dynamic_baseurl = this.origin_protocol + "//beta.worldwidetelescope.org";
                     break;
 
                 default:
-                    this.core_static_baseurl = "//beta-cdn.worldwidetelescope.org"; // TEMPORARY
-                    this.core_dynamic_baseurl = "//beta.worldwidetelescope.org";
+                    this.core_static_baseurl = this.origin_protocol + "//beta-cdn.worldwidetelescope.org"; // TEMPORARY
+                    this.core_dynamic_baseurl = this.origin_protocol + "//beta.worldwidetelescope.org";
                     break;
             }
         }
@@ -93,6 +93,11 @@ namespace wwtlib
         public string engineAssetUrl(string subpath)
         {
             return String.Format("{0}/engine/assets/{1}", this.core_static_baseurl, subpath);
+        }
+
+        public string coreDynamicUrl(string subpath)
+        {
+            return String.Format("{0}/{1}", this.core_dynamic_baseurl, subpath);
         }
 
         public static URLHelpers singleton;

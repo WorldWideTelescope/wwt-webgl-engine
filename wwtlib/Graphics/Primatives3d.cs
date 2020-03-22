@@ -909,7 +909,7 @@ namespace wwtlib
                         imageReady = true;
                     }, false);
 
-                    starProfile.Src = "/webclient/images/StarProfileAlpha.png";
+                    starProfile.Src = URLHelpers.singleton.engineAssetUrl("StarProfileAlpha.png");
 
                     worldList = new Vector3d[points.Count];
                     transformedList = new Vector3d[points.Count];
@@ -935,7 +935,7 @@ namespace wwtlib
                     {
                         if (starTexture == null)
                         {
-                            starTexture = Planets.LoadPlanetTexture("//cdn.worldwidetelescope.org/webclient/images/StarProfileAlpha.png");
+                            starTexture = Planets.LoadPlanetTexture(URLHelpers.singleton.engineAssetUrl("StarProfileAlpha.png"));
                         }
 
                         int count = this.points.Count;
