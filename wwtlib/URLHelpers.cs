@@ -24,7 +24,7 @@ namespace wwtlib
         String core_static_baseurl;  // baseurl for core static assets: NB, includes things like wwt.o/wwtweb/dss.aspx
         String core_dynamic_baseurl;  // baseurl for core dynamic services
         Dictionary<String, DomainHandling> domain_handling;
-        HashSet<String> flagship_static_lcpaths;
+        Dictionary<String, bool> flagship_static_lcpaths;
 
         public URLHelpers() {
             this.origin_protocol = (string) Script.Literal("window.location.protocol");
@@ -63,67 +63,67 @@ namespace wwtlib
                     break;
             }
 
-            this.flagship_static_lcpaths = new HashSet<String>();
-            this.flagship_static_lcpaths.Add("/wwtweb/2massoct.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/bingdemtile.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/bingdemtile2.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/catalog.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/catalog2.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/dem.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/dembath.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/demmars.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/demtile.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/dss.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/dsstoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/dusttoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/earthblend.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/earthmerbath.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/fixedaltitudedemtile.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/g360.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/galex4far.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/galex4near.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/galextoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/gettile.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/gettour.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/gettourfile.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/gettours.aspx"); // maybe not?
-            this.flagship_static_lcpaths.Add("/wwtweb/glimpse.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/halphatoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/hirise.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/hirisedem2.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/hirisedem3.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/jupiter.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/mandel.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/mandel1.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/mars.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/marsdem.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/marshirise.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/marsmoc.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/martiantile.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/martiantile2.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/mipsgal.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/moondem.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/moonoct.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/moontoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/moontoastdem.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/postmars.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/postmarsdem.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/postmarsdem2.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/rasstoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/sdsstoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/sdsstoast2.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/sdsstoast2.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/thumbnail.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/tiles.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/tiles2.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/tilesthumb.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/twomasstoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/tychooct.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/veblend.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/vlsstoast.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/wmap.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/wmsmoon.aspx");
-            this.flagship_static_lcpaths.Add("/wwtweb/wmstoas.aspx");
+            this.flagship_static_lcpaths = new Dictionary<String, bool>();
+            this.flagship_static_lcpaths["/wwtweb/2massoct.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/bingdemtile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/bingdemtile2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/catalog.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/catalog2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dembath.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/demmars.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/demtile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dss.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dsstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/dusttoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/earthblend.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/earthmerbath.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/fixedaltitudedemtile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/g360.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/galex4far.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/galex4near.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/galextoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/gettile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/gettour.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/gettourfile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/gettours.aspx"] = true; // maybe not?
+            this.flagship_static_lcpaths["/wwtweb/glimpse.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/halphatoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/hirise.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/hirisedem2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/hirisedem3.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/jupiter.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/mandel.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/mandel1.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/mars.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/marsdem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/marshirise.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/marsmoc.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/martiantile.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/martiantile2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/mipsgal.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/moondem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/moonoct.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/moontoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/moontoastdem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/postmars.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/postmarsdem.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/postmarsdem2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/rasstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/sdsstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/sdsstoast2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/sdsstoast2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/thumbnail.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/tiles.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/tiles2.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/tilesthumb.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/twomasstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/tychooct.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/veblend.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/vlsstoast.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/wmap.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/wmsmoon.aspx"] = true;
+            this.flagship_static_lcpaths["/wwtweb/wmstoast.aspx"] = true;
         }
 
         public String rewrite(String url) {
@@ -198,7 +198,7 @@ namespace wwtlib
 
                     if (lcpath.StartsWith("/data/")) {
                         is_static = true;
-                    } else if (this.flagship_static_lcpaths.Contains(lcpath)) {
+                    } else if (this.flagship_static_lcpaths.ContainsKey(lcpath)) {
                         is_static = true;
                     } else if (lcpath.StartsWith("/content/")) {
                         is_static = true;
