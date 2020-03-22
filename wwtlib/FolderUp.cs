@@ -31,7 +31,7 @@ namespace wwtlib
             }
             set
             {
-                thumbnail = value; ;
+                thumbnail = value;
             }
         }
 
@@ -41,10 +41,8 @@ namespace wwtlib
             {
                 return "//worldwidetelescope.org/wwtweb/thumbnail.aspx?Name=folderup";
             }
-            set
-            {
-                return;
-            }
+
+            set {}
         }
         Rectangle bounds = new Rectangle();
         public Rectangle Bounds
