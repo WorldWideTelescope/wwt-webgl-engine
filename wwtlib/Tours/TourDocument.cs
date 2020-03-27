@@ -34,6 +34,7 @@ namespace wwtlib
         {
             id = Guid.NewGuid().ToString();
         }
+
         string workingDirectory = "";
         public string WorkingDirectory
         {
@@ -43,11 +44,6 @@ namespace wwtlib
                 {
                     workingDirectory = TourDocument.BaseWorkingDirectory + id.ToString() + @"\";
                 }
-
-                //if (!Directory.Exists(workingDirectory))
-                //{
-                //    Directory.CreateDirectory(workingDirectory);
-                //}
 
                 return workingDirectory;
             }
@@ -67,6 +63,8 @@ namespace wwtlib
         }
 
         FileCabinet cabinet;
+        public string Url = "";
+        private Action callMe;
 
         public static TourDocument FromUrl(string url, Action callMe)
         {         
@@ -109,37 +107,6 @@ namespace wwtlib
                 WWTControl.scriptInterface.FireTourError(ex);
             }
         }
-
-        public string Url = "";
-        //private WebFile webFile;
-        private Action callMe;
-        //public static TourDocument FromUrl(string url, Action callMe)
-        //{
-
-        //    TourDocument temp = new TourDocument();
-        //    temp.Url = url;
-        //    temp.callMe = callMe;
-
-        //    temp.webFile = new WebFile(Util.GetTourComponent(url, "master"));
-        //    temp.webFile.OnStateChange = temp.LoadXmlDocument;
-        //    temp.webFile.Send();
-
-        //    return temp;
-        //}
-
-        //private void LoadXmlDocument()
-        //{
-        //    if (webFile.State == StateType.Error)
-        //    {
-        //        Script.Literal("alert({0})", webFile.Message);
-        //    }
-        //    else if (webFile.State == StateType.Received)
-        //    {
-        //        FromXml(webFile.GetXml());
-        //        callMe();
-        //    }
-        //}
-
 
         public void FromXml(XmlDocument doc)
         {

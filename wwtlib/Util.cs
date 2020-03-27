@@ -125,11 +125,6 @@ namespace wwtlib
             return string.Format("{0}:{1}:{2}", hours, min, sec);
         }
 
-        public static string GetTourComponent(string url, string name)
-        {
-            return "//worldwidetelescope.org/GetTourFile.aspx?targeturl=" + url.EncodeUriComponent() + "&filename=" + name;
-        }
-
         public static string XMLDate(Date d)
         {
             int hours = d.GetHours();
