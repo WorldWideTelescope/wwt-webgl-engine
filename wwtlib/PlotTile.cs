@@ -53,7 +53,7 @@ namespace wwtlib
             {
                 Downloading = true;
 
-                webFile = new WebFile(URLHelpers.singleton.rewrite(this.URL));
+                webFile = new WebFile(URLHelpers.singleton.rewrite(this.URL, URLRewriteMode.AsIfAbsolute));
                 webFile.OnStateChange = FileStateChange;
                 webFile.Send();
             }

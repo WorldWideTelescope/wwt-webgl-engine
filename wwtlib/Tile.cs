@@ -961,7 +961,7 @@ namespace wwtlib
         {
             get
             {
-                string rewritten_url = URLHelpers.singleton.rewrite(dataset.Url);
+                string rewritten_url = URLHelpers.singleton.rewrite(dataset.Url, URLRewriteMode.AsIfAbsolute);
                 string returnUrl = rewritten_url;
                 
                 if (rewritten_url.IndexOf("{1}") > -1)
@@ -1057,7 +1057,7 @@ namespace wwtlib
         {
             get
             {
-                string rewritten_url = URLHelpers.singleton.rewrite(dataset.DemUrl);
+                string rewritten_url = URLHelpers.singleton.rewrite(dataset.DemUrl, URLRewriteMode.AsIfAbsolute);
 
                 if (dataset.Projection == ProjectionType.Mercator)
                 {

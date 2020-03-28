@@ -16,6 +16,12 @@ namespace wwtlib
         Proxy = 3, // none of the above, and we need to proxy it for HTTPS/CORS reasons
     }
 
+    public enum URLRewriteMode
+    {
+        AsIfAbsolute = 0, // act as if this URL is absolute even if it is missing a domain
+        OriginRelative = 1, // if this URL is relative, treat it as relative to the browser origin
+    }
+
     public class URLHelpers
     {
         String origin_protocol;  // this will be "http:" or "https:"
@@ -129,7 +135,7 @@ namespace wwtlib
             this.flagship_static_lcpaths["/wwtweb/wmstoast.aspx"] = true;
         }
 
-        public String rewrite(String url) {
+        public String rewrite(String url, URLRewriteMode rwmode) {
             // Sadly, we can't take advantage of JS/browser URL parsing
             // because this function might be passed template URLs like
             // "http://r{S:2}.ortho.tiles.virtualearth.net/..." that won't
@@ -149,11 +155,28 @@ namespace wwtlib
                 lcproto = "";
                 url_no_protocol = url.Substring(2);
             } else {
-                // TODO: we're assuming that we got something like
-                // 'example.com/foo', but we might have gotten a relative URL
-                // like 'path/subdir'. Or "ftp://..."?
-                lcproto = "";
-                url_no_protocol = url;
+                switch (rwmode) {
+                    case URLRewriteMode.AsIfAbsolute:
+                    default:
+                        // Treat `foo/bar` as a domain name of `foo` and a
+                        // path of `/bar`. Really we should demand that the
+                        // caller always pass us an absolute URL, but URLs
+                        // will be coming from random data sources and we're
+                        // not currently rigorous enough to guarantee that
+                        // this function will get validated inputs -- and in
+                        // such cases, throwing exceptions won't help.
+                        lcproto = "";
+                        url_no_protocol = url;
+                        break;
+
+                    case URLRewriteMode.OriginRelative:
+                        // Treat `foo/bar` as a URL relative to the window
+                        // origin. Since it looks relative, any weird
+                        // templating stuff in the URL text *ought* not cause
+                        // problems for the browser URL parsing ...
+                        url = (String) Script.Literal("(new URL({0}, window.location.href)).toString()", url);
+                        return this.rewrite(url, URLRewriteMode.AsIfAbsolute);
+                }
             }
 
             string domain;
@@ -283,7 +306,7 @@ namespace wwtlib
             // OK, we should try proxying. So:
 
             this.domain_handling[lcdomain] = DomainHandling.Proxy;
-            return this.rewrite(url);
+            return this.rewrite(url, URLRewriteMode.AsIfAbsolute);
         }
 
         public string engineAssetUrl(string subpath)

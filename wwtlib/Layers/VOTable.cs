@@ -60,7 +60,7 @@ namespace wwtlib
 
             temp.onComplete = complete;
 
-            temp.webFile = new WebFile(URLHelpers.singleton.rewrite(url));
+            temp.webFile = new WebFile(URLHelpers.singleton.rewrite(url, URLRewriteMode.OriginRelative));
             temp.webFile.OnStateChange = temp.LoadData;
             temp.webFile.Send();
 
