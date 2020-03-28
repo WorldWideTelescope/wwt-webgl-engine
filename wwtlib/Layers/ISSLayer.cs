@@ -100,7 +100,7 @@ namespace wwtlib
             }
 
             loading = true;
-            string url = "http://www.worldwidetelescope.org/data/iss.wtt";
+            string url = URLHelpers.singleton.coreStaticUrl("data/iss.wtt");
 
             doc = TourDocument.FromUrlRaw(url,
                 delegate

@@ -1059,7 +1059,7 @@ namespace wwtlib
 
                 if (dataset.Projection == ProjectionType.Mercator)
                 {
-                    string baseUrl = "//cdn.worldwidetelescope.org/wwtweb/demtile.aspx?q={0},{1},{2},M";
+                    string baseUrl = URLHelpers.singleton.coreStaticUrl("wwtweb/demtile.aspx?q={0},{1},{2},M");
                     if (!String.IsNullOrEmpty(rewritten_url))
                     {
                         baseUrl = rewritten_url;
