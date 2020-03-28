@@ -243,7 +243,6 @@ namespace wwtlib
 
         public void Render()
         {
-
             if (RenderContext.BackgroundImageset != null)
             {
                 RenderType = RenderContext.BackgroundImageset.DataSetType;
@@ -254,26 +253,35 @@ namespace wwtlib
             }
 
             bool sizeChange = false;
-            if (Canvas.Width != int.Parse(Canvas.ParentNode.Style.Width))
+
+            if (Canvas.Width != Canvas.ParentNode.ClientWidth)
             {
-                Canvas.Width = int.Parse(Canvas.ParentNode.Style.Width);
+                Canvas.Width = Canvas.ParentNode.ClientWidth;
                 sizeChange = true;
             }
 
-            if (Canvas.Height != int.Parse(Canvas.ParentNode.Style.Height))
+            if (Canvas.Height != Canvas.ParentNode.ClientHeight)
             {
-                Canvas.Height = int.Parse(Canvas.ParentNode.Style.Height);
+                Canvas.Height = Canvas.ParentNode.ClientHeight;
                 sizeChange = true;
             }
 
-            if (sizeChange)
-            {
-                if (Explorer != null)
-                {
-                    Explorer.Refresh();
-                }
-            }
+            if (sizeChange && Explorer != null)
+                Explorer.Refresh();
 
+            if (Canvas.Width < 1 || Canvas.Height < 1) {
+                // This can happen during initialization if perhaps some
+                // HTML/JavaScript interaction hasn't happened to set the
+                // canvas size correctly. We want to set a timeout to try to
+                // render again soon -- hopefully the canvas will get sized
+                // correctly and we can proceed. But if we don't exit this
+                // function early, we get NaNs in our transformation matrices
+                // that lead IsTileBigEnough to say "no" for everything so
+                // that we spin out of control downloading maximum-resolution
+                // DSS tiles for an enormous viewport. That's bad!
+                Script.SetTimeout(delegate () { Render(); }, 10);
+                return;
+            }
 
             Tile.lastDeepestLevel = Tile.deepestLevel;
 
@@ -2144,16 +2152,14 @@ namespace wwtlib
 
             }
         }
+
         private static CanvasElement CreateCanvasElement(string DivId)
         {
-            CanvasElement canvas = null;
+            DivElement div = (DivElement) Document.GetElementById(DivId);
 
-            DivElement div = (DivElement)Document.GetElementById(DivId);
-            ElementAttribute style = div.Attributes.GetNamedItem("style");
-            canvas = (CanvasElement)Document.CreateElement("canvas");
-            canvas.Height = int.Parse(div.Style.Height);
-            canvas.Width = int.Parse(div.Style.Width);
-            //canvas.Attributes.SetNamedItem(style);
+            CanvasElement canvas = (CanvasElement) Document.CreateElement("canvas");
+            canvas.Height = div.ClientHeight;
+            canvas.Width = div.ClientWidth;
             div.AppendChild(canvas);
             return canvas;
         }
