@@ -8,38 +8,14 @@ using System.Runtime.CompilerServices;
 using System.Html.Media.Graphics;
 using System.Net;
 using System.Serialization;
+
 namespace wwtlib
-{
-    
+{    
     internal static class MainView
     {
-        
-
         static MainView()
         {
             CanvasElement canvas = (CanvasElement) Document.GetElementById("canvas");
-
-            //Element body = Document.GetElementsByTagName("body")[0];
-
-            //body.AddEventListener("load", delegate(ElementEvent e) { WWTControl.InitControl(); }, false);
-
-            //XmlHttpRequest xhr = new XmlHttpRequest();
-            //xhr.Open(HttpVerb.Get, "quakedata.txt?3");
-            //xhr.OnReadyStateChange = delegate()
-            //{
-            //    if (xhr.ReadyState == ReadyState.Loaded)
-            //    {
-            //        VizLayer layer = new VizLayer();
-            //        layer.Load(xhr.ResponseText);
-            //        layer.Prepare();
-            //        WWTControl.Singleton.Layers.Add(layer);
-            //    }
-            //};
-            //xhr.Send();
-
-            //Wtml.GetWtmlFile("//worldwidetelescope.org/wwtweb/catalog.aspx?W=ExploreRoot");
-            //Wtml.GetWtmlFile("imagesets.xml");
-
         }
 
         static void DrawTest()
@@ -55,11 +31,5 @@ namespace wwtlib
             ctx.FillRect(140, 140, 165, 160);
 
         }
-
-       
-
-
-
-       
     }
 }
