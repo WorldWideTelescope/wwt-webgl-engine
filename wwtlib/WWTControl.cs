@@ -243,7 +243,6 @@ namespace wwtlib
 
         public void Render()
         {
-
             if (RenderContext.BackgroundImageset != null)
             {
                 RenderType = RenderContext.BackgroundImageset.DataSetType;
@@ -269,6 +268,20 @@ namespace wwtlib
 
             if (sizeChange && Explorer != null)
                 Explorer.Refresh();
+
+            if (Canvas.Width < 1 || Canvas.Height < 1) {
+                // This can happen during initialization if perhaps some
+                // HTML/JavaScript interaction hasn't happened to set the
+                // canvas size correctly. We want to set a timeout to try to
+                // render again soon -- hopefully the canvas will get sized
+                // correctly and we can proceed. But if we don't exit this
+                // function early, we get NaNs in our transformation matrices
+                // that lead IsTileBigEnough to say "no" for everything so
+                // that we spin out of control downloading maximum-resolution
+                // DSS tiles for an enormous viewport. That's bad!
+                Script.SetTimeout(delegate () { Render(); }, 10);
+                return;
+            }
 
             Tile.lastDeepestLevel = Tile.deepestLevel;
 
