@@ -207,20 +207,20 @@ namespace wwtlib
                 {
                     if (!texture.HasAttribute("proxyattempt"))
                     {
-                        string new_url = URLHelpers.singleton.activateProxy(this.URL);
-                        if (new_url != null)  // null => don't bother: we know that the proxy won't help
-                            texture.Src = new_url;
                         texture.SetAttribute("proxyattempt", true);
+                        string new_url = URLHelpers.singleton.activateProxy(this.URL);
+
+                        if (new_url != null) {  // null => don't bother: we know that the proxy won't help
+                            texture.Src = new_url;
+                            return;
+                        }
                     }
-                    else
-                    {
-                        Downloading = false;
-                        ReadyToRender = false;
-                        errored = true;
-                        RequestPending = false;
-                        TileCache.RemoveFromQueue(this.Key, true);
-                    }
-                    
+
+                    Downloading = false;
+                    ReadyToRender = false;
+                    errored = true;
+                    RequestPending = false;
+                    TileCache.RemoveFromQueue(this.Key, true);
                 }, false);
 
                 xdomimg.crossOrigin = "anonymous";

@@ -79,17 +79,18 @@ namespace wwtlib
                 {
                     if (!ImageElement.HasAttribute("proxyattempt"))
                     {
-                        string new_url = URLHelpers.singleton.activateProxy(URL);
-                        if (new_url != null)  // null => don't bother: we know that the proxy won't help
-                            ImageElement.Src = new_url;
                         ImageElement.SetAttribute("proxyattempt", true);
+                        string new_url = URLHelpers.singleton.activateProxy(URL);
+
+                        if (new_url != null) {  // null => don't bother: we know that the proxy won't help
+                            ImageElement.Src = new_url;
+                            return;
+                        }
                     }
-                    else
-                    {
-                        Downloading = false;
-                        Ready = false;
-                        Errored = true;
-                    }
+
+                    Downloading = false;
+                    Ready = false;
+                    Errored = true;
                 }, false);
 
                 xdomimg.crossOrigin = "anonymous";
