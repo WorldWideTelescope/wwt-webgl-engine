@@ -205,7 +205,17 @@ namespace wwtlib
                         // upgrade, so be it.
                         url = "http://" + url;
                     }
-                    return this.core_dynamic_baseurl + "/webserviceproxy.aspx?targeturl=" + url.EncodeUriComponent();
+
+                    // We need to encode the URL as a query-string parameter
+                    // to pass to the proxy. However, the encoding will turn
+                    // "{}" into "%7B%7D", so that *if* this URL is then going
+                    // to be fed into the templating system,
+                    // search-and-replace for e.g. "{0}" will break. So we
+                    // un-encode those particular characters, since it ought
+                    // to be safe to do so anyway.
+                    url = url.EncodeUriComponent().Replace("%7B", "{").Replace("%7D", "}");
+
+                    return this.core_dynamic_baseurl + "/webserviceproxy.aspx?targeturl=" + url;
 
                 case DomainHandling.WWTFlagship:
                     // Rewrite "flagship"/core URLs to go through whatever our
