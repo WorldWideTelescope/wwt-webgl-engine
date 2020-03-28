@@ -207,7 +207,9 @@ namespace wwtlib
                 {
                     if (!texture.HasAttribute("proxyattempt"))
                     {
-                        texture.Src = URLHelpers.singleton.activateProxy(this.URL);
+                        string new_url = URLHelpers.singleton.activateProxy(this.URL);
+                        if (new_url != null)  // null => don't bother: we know that the proxy won't help
+                            texture.Src = new_url;
                         texture.SetAttribute("proxyattempt", true);
                     }
                     else
