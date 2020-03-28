@@ -1456,10 +1456,11 @@ namespace wwtlib
 
                 div.InsertBefore(Explorer.Canvas);
 
-
-
+                // This code used to load `wwtweb/catalog.aspx?W=NewExploreRoot`, but for customized
+                // webclient experiences I think it makes more sense to reference an engine asset than
+                // a core data asset. So we have converted it thusly:
                 ExploreRoot = new Folder();
-                ExploreRoot.LoadFromUrl("//worldwidetelescope.org/wwtweb/catalog.aspx?W=NewExploreRoot",
+                ExploreRoot.LoadFromUrl(URLHelpers.singleton.engineAssetUrl("explore-root.wtml"),
                     delegate { Explorer.AddItems(WWTControl.ExploreRoot.Children); Explorer.Refresh(); });
             }
         }
