@@ -543,7 +543,7 @@ namespace wwtlib
             {
                 if (string.IsNullOrEmpty(thumbnailUrlField))
                 {
-                    return URLHelpers.singleton.coreStaticUrl("/wwtweb/thumbnail.aspx?name=folder");
+                    return URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=folder");
                 }
 
                 return this.thumbnailUrlField;

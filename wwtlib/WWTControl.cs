@@ -2082,7 +2082,7 @@ namespace wwtlib
 
                 Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                     "DSS",
-                    URLHelpers.singleton.coreStaticUrl("/wwtweb/dss.aspx?q={1},{2},{3}"),
+                    URLHelpers.singleton.coreStaticUrl("wwtweb/dss.aspx?q={1},{2},{3}"),
                     ImageSetType.Sky,
                     BandPass.Visible,
                     ProjectionType.Toast,
@@ -2116,10 +2116,10 @@ namespace wwtlib
                 {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                         "Blue Marble",
-                        URLHelpers.singleton.coreStaticUrl("/wwtweb/tiles.aspx?q={1},{2},{3},bm200407"),
+                        URLHelpers.singleton.coreStaticUrl("wwtweb/tiles.aspx?q={1},{2},{3},bm200407"),
                         ImageSetType.Earth, BandPass.Visible, ProjectionType.Toast, 101,
                         0, 7, 256, 180, ".png", false, "", 0, 0, 0, false,
-                        URLHelpers.singleton.coreStaticUrl("/wwtweb/thumbnail.aspx?name=bm200407"),
+                        URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=bm200407"),
                         true, false, 0, 0, 0, "", "", "", "", 6371000, "Earth");
                 }
                 else if (StartMode == "bing")
@@ -2129,7 +2129,7 @@ namespace wwtlib
                      "//a{0}.ortho.tiles.virtualearth.net/tiles/a{1}.jpeg?g=15",
                      ImageSetType.Earth, BandPass.Visible, ProjectionType.Mercator, 102,
                      1, 20, 256, 360, ".png", false, "0123", 0, 0, 0, false,
-                     URLHelpers.singleton.coreStaticUrl("/wwtweb/thumbnail.aspx?name=earth"),
+                     URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=earth"),
                      true, false, 0, 0, 0, "", "", "", "", 6371000, "Earth");
                 }
             }

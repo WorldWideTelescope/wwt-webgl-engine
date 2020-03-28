@@ -39,7 +39,7 @@ namespace wwtlib
         {
             get
             {
-                return URLHelpers.singleton.coreStaticUrl("/wwtweb/thumbnail.aspx?name=folderup");
+                return URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=folderup");
             }
 
             set {}

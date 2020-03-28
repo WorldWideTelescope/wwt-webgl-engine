@@ -219,6 +219,8 @@ namespace wwtlib
                         is_static = true;
                     } else if (lcpath.StartsWith("/content/")) {
                         is_static = true;
+                    } else if (lcpath.StartsWith("/engine/assets/")) {
+                        is_static = true;
                     }
 
                     if (is_static)
