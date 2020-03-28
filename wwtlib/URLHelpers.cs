@@ -205,7 +205,17 @@ namespace wwtlib
                         // upgrade, so be it.
                         url = "http://" + url;
                     }
-                    return this.core_dynamic_baseurl + "/webserviceproxy.aspx?targeturl=" + url.EncodeUriComponent();
+
+                    // We need to encode the URL as a query-string parameter
+                    // to pass to the proxy. However, the encoding will turn
+                    // "{}" into "%7B%7D", so that *if* this URL is then going
+                    // to be fed into the templating system,
+                    // search-and-replace for e.g. "{0}" will break. So we
+                    // un-encode those particular characters, since it ought
+                    // to be safe to do so anyway.
+                    url = url.EncodeUriComponent().Replace("%7B", "{").Replace("%7D", "}");
+
+                    return this.core_dynamic_baseurl + "/webserviceproxy.aspx?targeturl=" + url;
 
                 case DomainHandling.WWTFlagship:
                     // Rewrite "flagship"/core URLs to go through whatever our
@@ -232,6 +242,8 @@ namespace wwtlib
         // Call this when you have tried to load a url via XMLHttpRequest or
         // something along those lines, and the attempt has failed. We will mark the
         // domain as needing proxying, and will return a new proxy-enabled URL to try.
+        // The exception is for flagship website URLs, which we know that the proxy
+        // won't help with. For those, null is returned.
         public string activateProxy(string url) {
             // Get the domain. XXX copy/pastey from the above.
 
@@ -257,7 +269,18 @@ namespace wwtlib
                 lcdomain = url_no_protocol.Substring(0, slash_index).ToLowerCase();
             }
 
-            // OK, the rest of this is simple:
+            // Is this a flagship URL? If so, don't bother proxying.
+
+            if (!this.domain_handling.ContainsKey(lcdomain))
+                this.domain_handling[lcdomain] = DomainHandling.TryNoProxy;
+
+            DomainHandling mode = this.domain_handling[lcdomain];
+
+            if (mode == DomainHandling.WWTFlagship) {
+                return null;
+            }
+
+            // OK, we should try proxying. So:
 
             this.domain_handling[lcdomain] = DomainHandling.Proxy;
             return this.rewrite(url);
