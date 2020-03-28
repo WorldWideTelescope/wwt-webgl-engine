@@ -768,74 +768,13 @@ namespace wwtlib
 
         public static bool ReadOrbits()
         {
+            // This function ought to fetch wwtweb/catalog.aspx?Q=orbitsbin and set `orbits`, see Windows client code.
             return false;
-            //string filename = Properties.Settings.Default.CahceDirectory + @"data\orbits.bin";
-            //DataSetManager.DownloadFile("//worldwidetelescope.org/wwtweb/catalog.aspx?Q=orbitsbin", filename, false, true);
-            //FileStream fs = null;
-            //BinaryReader br = null;
-            //long len = 0;
-            //try
-            //{
-            //    fs = new FileStream(filename, FileMode.Open);
-            //    len = fs.Length;
-            //    br = new BinaryReader(fs);
-            //    orbits = new Vector3d[20, orbitalSampleRate];
-
-            //    for (int i = 1; i < 20; i++)
-            //    {
-            //        if (i < 9 || i == 19)
-            //        {
-            //            for (int j = 0; j < orbitalSampleRate; j++)
-            //            {
-
-            //                orbits[i, j] = new Vector3d(br.ReadDouble(), br.ReadDouble(), br.ReadDouble());
-            //            }
-            //        }
-            //    }
-            //}
-            //catch
-            //{
-            //    orbits = null;
-            //    return false;
-            //}
-            //finally
-            //{
-            //    if (br != null)
-            //    {
-            //        br.Close();
-            //    }
-            //    if (fs != null)
-            //    {
-            //        fs.Close();
-            //    }
-            //}
-            //return true;
         }
 
 
         public static void DumpOrbitsFile()
         {
-            //string filename = Properties.Settings.Default.CahceDirectory + @"data\orbits.bin";
-
-            //if (orbits != null)
-            //{
-            //    FileStream fs = new FileStream(filename, FileMode.Create);
-            //    BinaryWriter bw = new BinaryWriter(fs);
-            //    for (int i = 1; i < 20; i++)
-            //    {
-            //        if (i < 9 || i == 19)
-            //        {
-            //            for (int j = 0; j < orbitalSampleRate; j++)
-            //            {
-            //                bw.Write(orbits[i, j].X);
-            //                bw.Write(orbits[i, j].Y);
-            //                bw.Write(orbits[i, j].Z);
-            //            }
-            //        }
-            //    }
-            //    bw.Close();
-            //    fs.Close();
-            //}
         }
 
         public static bool DrawPlanets(RenderContext renderContext, float opacity)
@@ -2103,7 +2042,7 @@ namespace wwtlib
             {
                 return;
             }
-            ringsTexture = Planets.LoadPlanetTexture("//cdn.worldwidetelescope.org/webclient/images/SaturnRingsStrip.png");
+            ringsTexture = Planets.LoadPlanetTexture(URLHelpers.singleton.engineAssetUrl("SaturnRingsStrip.png"));
             double inner = 1.113;
             double outer = 2.25;
 

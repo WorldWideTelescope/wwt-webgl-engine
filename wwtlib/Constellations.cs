@@ -501,8 +501,7 @@ namespace wwtlib
                 if (artFile == null)
                 {
                     artFile = new Folder();
-                    artFile.LoadFromUrl("//worldwidetelescope.org/wwtweb/catalog.aspx?W=hevelius", OnArtReady);
-                    //artFile.LoadFromUrl("//worldwidetelescope.org/wwtweb/catalog.aspx?W=and", OnArtReady);
+                    artFile.LoadFromUrl(URLHelpers.singleton.coreStaticUrl("wwtweb/catalog.aspx?W=hevelius"), OnArtReady);
                 }
 
                 return;

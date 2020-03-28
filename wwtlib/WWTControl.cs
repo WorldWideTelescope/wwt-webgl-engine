@@ -1438,32 +1438,6 @@ namespace wwtlib
             scriptInterface.FireReady();
         }
 
-        public static void ShowExplorerUI()
-        {
-            if (Singleton != null)
-            {
-                Singleton.CreateExplorerUI();
-            }
-        }
-
-        public void CreateExplorerUI()
-        {
-            if (Explorer == null)
-            {
-                Explorer = FolderBrowser.Create();
-
-                DivElement div = (DivElement)Document.GetElementById("UI");
-
-                div.InsertBefore(Explorer.Canvas);
-
-
-
-                ExploreRoot = new Folder();
-                ExploreRoot.LoadFromUrl("//worldwidetelescope.org/wwtweb/catalog.aspx?W=NewExploreRoot",
-                    delegate { Explorer.AddItems(WWTControl.ExploreRoot.Children); Explorer.Refresh(); });
-            }
-        }
-
         public void OnKeyDown(ElementEvent e)
         {
             if (uiController != null)
@@ -2183,21 +2157,6 @@ namespace wwtlib
             div.AppendChild(canvas);
             return canvas;
         }
-
-        public static void ShowFolderUI()
-        {
-            WWTControl.Singleton.CreateExplorerUI();
-        }
-
-        //static void Move(double x, double y)
-        //{
-        //    ViewRenderer.Singleton.Move(x, y);
-        //}
-
-        //static void Zoom(double amount)
-        //{
-        //    ViewRenderer.Singleton.Zoom(amount);
-        //}
 
         public static void Go(string mode, double lat, double lng, double zoom)
         {
