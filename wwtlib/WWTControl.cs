@@ -254,26 +254,21 @@ namespace wwtlib
             }
 
             bool sizeChange = false;
-            if (Canvas.Width != int.Parse(Canvas.ParentNode.Style.Width))
+
+            if (Canvas.Width != Canvas.ParentNode.ClientWidth)
             {
-                Canvas.Width = int.Parse(Canvas.ParentNode.Style.Width);
+                Canvas.Width = Canvas.ParentNode.ClientWidth;
                 sizeChange = true;
             }
 
-            if (Canvas.Height != int.Parse(Canvas.ParentNode.Style.Height))
+            if (Canvas.Height != Canvas.ParentNode.ClientHeight)
             {
-                Canvas.Height = int.Parse(Canvas.ParentNode.Style.Height);
+                Canvas.Height = Canvas.ParentNode.ClientHeight;
                 sizeChange = true;
             }
 
-            if (sizeChange)
-            {
-                if (Explorer != null)
-                {
-                    Explorer.Refresh();
-                }
-            }
-
+            if (sizeChange && Explorer != null)
+                Explorer.Refresh();
 
             Tile.lastDeepestLevel = Tile.deepestLevel;
 
@@ -2144,16 +2139,14 @@ namespace wwtlib
 
             }
         }
+
         private static CanvasElement CreateCanvasElement(string DivId)
         {
-            CanvasElement canvas = null;
+            DivElement div = (DivElement) Document.GetElementById(DivId);
 
-            DivElement div = (DivElement)Document.GetElementById(DivId);
-            ElementAttribute style = div.Attributes.GetNamedItem("style");
-            canvas = (CanvasElement)Document.CreateElement("canvas");
-            canvas.Height = int.Parse(div.Style.Height);
-            canvas.Width = int.Parse(div.Style.Width);
-            //canvas.Attributes.SetNamedItem(style);
+            CanvasElement canvas = (CanvasElement) Document.CreateElement("canvas");
+            canvas.Height = div.ClientHeight;
+            canvas.Width = div.ClientWidth;
             div.AppendChild(canvas);
             return canvas;
         }
