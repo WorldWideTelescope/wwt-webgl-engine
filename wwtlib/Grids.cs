@@ -21,7 +21,7 @@ namespace wwtlib
         {
             if (milkyWayImage == null)
             {
-                milkyWayImage = Planets.LoadPlanetTexture("//cdn.worldwidetelescope.org/webclient/images/milkywaybar.jpg");
+                milkyWayImage = Planets.LoadPlanetTexture(URLHelpers.singleton.engineAssetUrl("milkywaybar.jpg"));
             }
 
 
@@ -328,8 +328,7 @@ namespace wwtlib
                             num = "0" + num;
                         }
 
-
-                        string name = string.Format("//cdn.worldwidetelescope.org/webclient/images/gal_{0}.jpg", num);
+                        string name = string.Format(URLHelpers.singleton.engineAssetUrl("galimg/gal_{0}.jpg"), num);
 
                         galaxyTextures[i] = Planets.LoadPlanetTexture(name);
 

@@ -2042,7 +2042,7 @@ namespace wwtlib
             {
                 return;
             }
-            ringsTexture = Planets.LoadPlanetTexture("//cdn.worldwidetelescope.org/webclient/images/SaturnRingsStrip.png");
+            ringsTexture = Planets.LoadPlanetTexture(URLHelpers.singleton.engineAssetUrl("SaturnRingsStrip.png"));
             double inner = 1.113;
             double outer = 2.25;
 
