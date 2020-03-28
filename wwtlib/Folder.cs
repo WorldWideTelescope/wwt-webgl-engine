@@ -58,7 +58,7 @@ namespace wwtlib
         {
             onComplete = complete;
 
-            webFile = new WebFile(URLHelpers.singleton.rewrite(url));
+            webFile = new WebFile(URLHelpers.singleton.rewrite(url, URLRewriteMode.OriginRelative));
             webFile.OnStateChange = LoadData;
             webFile.Send();
 
