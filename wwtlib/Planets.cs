@@ -1884,7 +1884,7 @@ namespace wwtlib
                 //}, false);
 
                 xdomimg.crossOrigin = "anonymous";
-                ringImage.Src = "/webclient/images/saturnringsshadow.png";
+                ringImage.Src = URLHelpers.singleton.engineAssetUrl("saturnringsshadow.png");
 
                 RingsTriangleLists[0] = new List<RenderTriangle>();
                 RingsTriangleLists[1] = new List<RenderTriangle>();
