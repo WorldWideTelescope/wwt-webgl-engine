@@ -27,6 +27,7 @@ namespace wwtlib
         String origin_protocol;  // this will be "http:" or "https:"
         String origin_domain;  // host name, no port number
         bool force_https;
+        String engine_asset_baseurl;  // baseurl for webgl engine static assets
         String core_static_baseurl;  // baseurl for core static assets: NB, includes things like wwt.o/wwtweb/dss.aspx
         String core_dynamic_baseurl;  // baseurl for core dynamic services
         Dictionary<String, DomainHandling> domain_handling;
@@ -71,6 +72,8 @@ namespace wwtlib
                     this.core_dynamic_baseurl = this.origin_protocol + "//beta.worldwidetelescope.org";
                     break;
             }
+
+            this.engine_asset_baseurl = this.origin_protocol + "//web.wwtassets.org/engine/assets";
 
             this.flagship_static_lcpaths = new Dictionary<String, bool>();
             this.flagship_static_lcpaths["/wwtweb/2massoct.aspx"] = true;
@@ -311,7 +314,7 @@ namespace wwtlib
 
         public string engineAssetUrl(string subpath)
         {
-            return String.Format("{0}/engine/assets/{1}", this.core_static_baseurl, subpath);
+            return String.Format("{0}/{1}", this.engine_asset_baseurl, subpath);
         }
 
         public string coreDynamicUrl(string subpath)
