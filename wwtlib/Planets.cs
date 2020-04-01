@@ -48,7 +48,7 @@ namespace wwtlib
             Texture texture = new Texture();
 
             texture.Load(url);
-    
+
             return texture;
         }
 
@@ -301,7 +301,7 @@ namespace wwtlib
                     return "Ganymede";
                 case 13:
                     return "Callisto";
-                case 19: 
+                case 19:
                     return "Earth";
                 default:
                     return "";
@@ -845,7 +845,7 @@ namespace wwtlib
                 }
 
             }
-            
+
 
             return true;
         }
@@ -853,6 +853,13 @@ namespace wwtlib
         private static void LoadPlanetTextures()
         {
             string baseUrl = URLHelpers.singleton.engineAssetUrl("");
+
+            // Note: these PNG files are fairly large and are loaded at
+            // startup of the web client, adding nontrivially to the needed
+            // network traffic. JPGs are a lot smaller, but unfortunately the
+            // transparency support is important here since we don't want
+            // black boxes surrounding all of our planets when they're viewed
+            // in the sky.
 
             planetTextures = new Texture[20];
             planetTextures[0] = LoadPlanetTexture(baseUrl + @"sun.png");
@@ -1638,7 +1645,7 @@ namespace wwtlib
 //        private static Matrix bias = Matrix.Scaling(new Vector3(.5f, .5f, .5f)) * Matrix.Translation(new Vector3(.5f, .5f, .5f));
         private static void DrawPlanet3d(RenderContext renderContext, int planetID, Vector3d centerPoint)
         {
-            
+
             if (planetID == (int)SolarSystemObjects.Sun)
             {
                 TileShader.MinLightingBrightness = 1.0f;
@@ -1787,7 +1794,7 @@ namespace wwtlib
                             //}
                             // todo saturns rings DrawRings(device);
                         }
-                        
+
                     }
 
                     if (planetID == 0)
@@ -1803,7 +1810,7 @@ namespace wwtlib
                         {
                             renderContext.Lighting = false;
                             DrawSaturnsRings(renderContext, true, dist);
-                            // DRAW FRONT HALF OF RINGS 
+                            // DRAW FRONT HALF OF RINGS
                             //if (Settings.Active.SolarSystemLighting)
                             //{
                             //    SetupRingShadow(device, centerPoint, SolarSystemObjects.Saturn, rotationCurrent);
@@ -1877,7 +1884,7 @@ namespace wwtlib
                 //}, false);
 
                 xdomimg.crossOrigin = "anonymous";
-                ringImage.Src = "/webclient/images/saturnringsshadow.png";
+                ringImage.Src = URLHelpers.singleton.engineAssetUrl("saturnringsshadow.png");
 
                 RingsTriangleLists[0] = new List<RenderTriangle>();
                 RingsTriangleLists[1] = new List<RenderTriangle>();
@@ -2081,7 +2088,7 @@ namespace wwtlib
             }
             ringsVertexBuffer.Unlock();
         }
-    
+
 
         public static void DrawPointPlanet(RenderContext renderContext, Vector3d location, double size, Color color, bool zOrder)
         {
@@ -2356,9 +2363,9 @@ namespace wwtlib
             }
 
 
-         
 
-            // Special Case for Saturn and Eclipse 
+
+            // Special Case for Saturn and Eclipse
             //if (planetID == 18 || planetID == 5)
             //{
             //    double Width = rad*2;
@@ -2415,7 +2422,7 @@ namespace wwtlib
                     planetPoints[1].Tv = 0;
                     planetPoints[1].Color = Colors.White;
 
-                 
+
                     planetPoints[2].Position = Coordinates.RADecTo3dAu((planetPosition.RA + (raRadius / 15)), planetPosition.Dec + radius, 1);
                     planetPoints[2].Tu = 1;
                     planetPoints[2].Tv = 1;
@@ -2489,7 +2496,7 @@ namespace wwtlib
         private static void DrawPlanetPhase(RenderContext renderContext, int planetID, double phase, double angle, int dark)
         {
         }
-            
+
             //            //AstroRaDec planetPosition = planetLocations[planetID];
 
 //            //if (planetID < 10)
@@ -2745,7 +2752,7 @@ namespace wwtlib
 //            //    double lngMax = 180;
 
 
-//            //    // Create a vertex buffer 
+//            //    // Create a vertex buffer
 //            //    CustomVertex.PositionNormalTextured[] verts = (CustomVertex.PositionNormalTextured[])sphereVertexBuffers[sphereIndex].Lock(0, 0); // Lock the buffer (which will return our structs)
 //            //    int x1, y1;
 
