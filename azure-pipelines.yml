@@ -100,3 +100,21 @@ jobs:
       storage: 'wwtwebstatic'
       ContainerName: '$web'
       blobPrefix: $(pub_prefix_2)
+
+  # Note that if we're pushing a release tag, we don't need to unpublish
+  # $(pub_prefix) because it should contain the unique version! Whereas
+  # $(pub_prefix_2) gets rewritten with sequential micro releases.
+
+  - task: AzurePowerShell@4
+    displayName: Purge CDN (maybe)
+    condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtweb-prod `
+          -PurgeContent '/$(pub_prefix_2)/*'
