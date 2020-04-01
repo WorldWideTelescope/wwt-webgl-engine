@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/aasworldwidetelescope/WWT/_apis/build/status/WorldWideTelescope.wwt-webgl-engine?branchName=master)](https://dev.azure.com/aasworldwidetelescope/WWT/_build/latest?definitionId=3&branchName=master)
+
 # The AAS WorldWide Telescope WebGL engine
 
 The “WebGL engine” of the [AAS](https://aas.org/)
