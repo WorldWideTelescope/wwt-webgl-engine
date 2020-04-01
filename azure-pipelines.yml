@@ -18,9 +18,15 @@ jobs:
       if($branch.StartsWith("refs/tags/v")) {
         $version = $branch.Substring(11)
         Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/$version"
+
+        # We also publish under a `major.minor` version for people who want to get
+        # bugfixes (deployted as micro version updates) automatically.
+        $majmin = ($version -Split '\.')[0..1] -Join '.'
+        Write-Host "##vso[task.setvariable variable=pub_prefix_2;]engine/$majmin"
       } else {
         # Won't actually get published on PRs, etc.
         Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/latest"
+        Write-Host "##vso[task.setvariable variable=pub_prefix_2;]skip"
       }
     displayName: Set deployment parameters
 
@@ -68,12 +74,14 @@ jobs:
 
   # NOTE: The file produced above is actually in JUnit format, not xUnit!
   - task: PublishTestResults@2
+    displayName: Publish test results
     condition: succeededOrFailed()
     inputs:
       testResultsFormat: 'JUnit'
       testResultsFiles: 'test_results.xml'
 
   - task: AzureFileCopy@3
+    displayName: Upload artifacts to Azure Storage
     inputs:
       SourcePath: '$(build.artifactStagingDirectory)'
       azureSubscription: 'aas@wwtadmindotnetfoundation'
@@ -81,3 +89,14 @@ jobs:
       storage: 'wwtwebstatic'
       ContainerName: '$web'
       blobPrefix: $(pub_prefix)
+
+  - task: AzureFileCopy@3
+    displayName: Upload artifacts to second Azure Storage location (maybe)
+    condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: $(pub_prefix_2)
