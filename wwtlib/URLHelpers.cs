@@ -68,8 +68,8 @@ namespace wwtlib
                     break;
 
                 default:
-                    this.core_static_baseurl = this.origin_protocol + "//beta-cdn.worldwidetelescope.org"; // TEMPORARY
-                    this.core_dynamic_baseurl = this.origin_protocol + "//beta.worldwidetelescope.org";
+                    this.core_static_baseurl = this.origin_protocol + "//cdn.worldwidetelescope.org";
+                    this.core_dynamic_baseurl = this.origin_protocol + "//worldwidetelescope.org";
                     break;
             }
 
