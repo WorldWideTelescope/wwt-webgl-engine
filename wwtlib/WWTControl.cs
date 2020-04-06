@@ -2806,12 +2806,19 @@ namespace wwtlib
             {
                 if (crossHairs == null)
                 {
+                    // These coordinates are in clip space where the shape of
+                    // the viewport is 1x1, so to get the crosshairs to appear
+                    // square on the screen we have to apply the aspect ratio.
+                    double halfHeight = 0.03;
+                    double halfWidth = halfHeight * context.Height / context.Width;
+
                     crossHairs = new SimpleLineList();
                     crossHairs.DepthBuffered = false;
                     crossHairs.Pure2D = true;
-                    crossHairs.AddLine(Vector3d.Create(-.02, .0, 0), Vector3d.Create(.02, 0, 0));
-                    crossHairs.AddLine(Vector3d.Create(0,-.03, 0), Vector3d.Create(0, .03, 0));
+                    crossHairs.AddLine(Vector3d.Create(-halfWidth, .0, 0), Vector3d.Create(halfWidth, 0, 0));
+                    crossHairs.AddLine(Vector3d.Create(0, -halfHeight, 0), Vector3d.Create(0, halfHeight, 0));
                 }
+
                 crossHairs.DrawLines(context, 1.0f, Colors.White);
             }
         }
