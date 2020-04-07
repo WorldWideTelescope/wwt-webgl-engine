@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCopyright("Copyright © 2012 - 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("6.0.1.0")]
-[assembly: AssemblyFileVersion("6.0.1.0")]
+[assembly: AssemblyVersion("6.0.2.0")]
+[assembly: AssemblyFileVersion("6.0.2.0")]
 
 [assembly: ScriptAssembly("wwtlib")]

@@ -1,12 +1,12 @@
 {
   "name": "wwt_webgl_engine",
   "description": "AAS WorldWide Telescope WebGL Engine",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "keywords": [
     "AAS WorldWide Telescope"
   ],
-  "homepage": "http://worldwidetelescope.org",
-  "author": "The WorldWide Telescope Team",
+  "homepage": "https://worldwidetelescope.org",
+  "author": "The AAS WorldWide Telescope Team",
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "bugs": {
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
