@@ -17,12 +17,14 @@ jobs:
       $branch = "$(Build.SourceBranch)"
       if($branch.StartsWith("refs/tags/v")) {
         $version = $branch.Substring(11)
-        Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/$version"
-
-        # We also publish under a `major.minor` version for people who want to get
-        # bugfixes (deployted as micro version updates) automatically.
         $majmin = ($version -Split '\.')[0..1] -Join '.'
-        Write-Host "##vso[task.setvariable variable=pub_prefix_2;]engine/$majmin"
+
+        # We publish under both the full version string and a `major.minor`
+        # version for people who want to get bugfixes (deployed as micro
+        # version updates) automatically. To ease the CDN purge logic below,
+        # "pub_prefix" is the $majmin version.
+        Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/$majmin"
+        Write-Host "##vso[task.setvariable variable=pub_prefix_2;]engine/$version"
       } else {
         # Won't actually get published on PRs, etc.
         Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/latest"
@@ -101,13 +103,8 @@ jobs:
       ContainerName: '$web'
       blobPrefix: $(pub_prefix_2)
 
-  # Note that if we're pushing a release tag, we don't need to unpublish
-  # $(pub_prefix) because it should contain the unique version! Whereas
-  # $(pub_prefix_2) gets rewritten with sequential micro releases.
-
   - task: AzurePowerShell@4
-    displayName: Purge CDN (maybe)
-    condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
+    displayName: Purge CDN
     inputs:
       azureSubscription: 'aas@wwtadmindotnetfoundation'
       azurePowerShellVersion: 'LatestVersion'
@@ -117,4 +114,4 @@ jobs:
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
-          -PurgeContent '/$(pub_prefix_2)/*'
+          -PurgeContent '/$(pub_prefix)/*'

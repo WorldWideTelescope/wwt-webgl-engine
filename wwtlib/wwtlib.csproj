@@ -145,7 +145,7 @@
     <None Include="Properties\wwtlib.ruleset" />
     <None Include="Properties\wwtlib.script" />
     <Compile Include="RenderContext.cs" />
-    <Compile Include="RenderTrianlge.cs" />
+    <Compile Include="RenderTriangle.cs" />
     <Compile Include="ScriptInterface.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SkyImageTile.cs" />

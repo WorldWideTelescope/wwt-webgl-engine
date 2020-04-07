@@ -122,7 +122,7 @@ namespace wwtlib
             if (imageSet.WcsImage is FitsImage)
             {
                 FitsImage fi = imageSet.WcsImage as FitsImage;
-                xmlWriter.WriteAttributeString("ScaleType", fi.lastScale.ToString());
+                xmlWriter.WriteAttributeString("ScaleType", Enums.ToXml("ScaleTypes", (int)fi.lastScale));
                 xmlWriter.WriteAttributeString("MinValue", fi.lastBitmapMin.ToString());
                 xmlWriter.WriteAttributeString("MaxValue", fi.lastBitmapMax.ToString());
                 if (fi.lastBitmapColorMapperName != null) {

@@ -2778,7 +2778,7 @@ namespace wwtlib
             }
         }
 
-        private SimpleLineList crossHarirs = null;
+        private SimpleLineList crossHairs = null;
 
         private void DrawCrosshairs(RenderContext context)
         {
@@ -2804,15 +2804,22 @@ namespace wwtlib
             }
             else
             {
-                if (crossHarirs == null)
+                if (crossHairs == null)
                 {
-                    crossHarirs = new SimpleLineList();
-                    crossHarirs.DepthBuffered = false;
-                    crossHarirs.Pure2D = true;
-                    crossHarirs.AddLine(Vector3d.Create(-.02, .0, 0), Vector3d.Create(.02, 0, 0));
-                    crossHarirs.AddLine(Vector3d.Create(0,-.03, 0), Vector3d.Create(0, .03, 0));
+                    // These coordinates are in clip space where the shape of
+                    // the viewport is 1x1, so to get the crosshairs to appear
+                    // square on the screen we have to apply the aspect ratio.
+                    double halfHeight = 0.03;
+                    double halfWidth = halfHeight * context.Height / context.Width;
+
+                    crossHairs = new SimpleLineList();
+                    crossHairs.DepthBuffered = false;
+                    crossHairs.Pure2D = true;
+                    crossHairs.AddLine(Vector3d.Create(-halfWidth, .0, 0), Vector3d.Create(halfWidth, 0, 0));
+                    crossHairs.AddLine(Vector3d.Create(0, -halfHeight, 0), Vector3d.Create(0, halfHeight, 0));
                 }
-                crossHarirs.DrawLines(context, 1.0f, Colors.White);
+
+                crossHairs.DrawLines(context, 1.0f, Colors.White);
             }
         }
 

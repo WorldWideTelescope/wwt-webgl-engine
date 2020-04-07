@@ -1468,7 +1468,7 @@ namespace wwtlib
             xmlWriter.WriteAttributeString("PlotType", Enums.ToXml("PlotTypes", (int)PlotType));
             xmlWriter.WriteAttributeString("MarkerIndex", MarkerIndex.ToString());
             xmlWriter.WriteAttributeString("MarkerScale", Enums.ToXml("MarkerScales",(int)MarkerScale));
-            xmlWriter.WriteAttributeString("AltUnit", AltUnit.ToString());
+            xmlWriter.WriteAttributeString("AltUnit", Enums.ToXml("AltUnits", (int)AltUnit));
             xmlWriter.WriteAttributeString("AltColumn", AltColumn.ToString());
             xmlWriter.WriteAttributeString("StartDateColumn", StartDateColumn.ToString());
             xmlWriter.WriteAttributeString("EndDateColumn", EndDateColumn.ToString());

@@ -178,8 +178,15 @@ namespace wwtlib
 
         public virtual bool UpdateData(object data, bool purgeOld, bool purgeAll, bool hasHeader)
         {
-
             return true;
+        }
+
+        // "UpdateData" used to be named this. We add this function as a
+        // compatibility shim just in case there's some JavaScript out there
+        // still using the old name.
+        public bool UpadteData(object data, bool purgeOld, bool purgeAll, bool hasHeader)
+        {
+            return UpdateData(data, purgeOld, purgeAll, hasHeader);
         }
 
         public virtual bool CanCopyToClipboard()

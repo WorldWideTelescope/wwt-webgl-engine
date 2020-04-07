@@ -157,6 +157,12 @@ namespace wwtlib
             } else if (lc.StartsWith("//")) {
                 lcproto = "";
                 url_no_protocol = url.Substring(2);
+            } else if (lc.StartsWith("blob:")) {
+                // The web client uses URL.createObjectURL() to ingest local
+                // disk files into the web app. That function creates blob
+                // URLs, and it turns out that we definitely don't want to
+                // rewrite them!
+                return url;
             } else {
                 switch (rwmode) {
                     case URLRewriteMode.AsIfAbsolute:
