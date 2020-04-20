@@ -17,8 +17,5 @@
     "grunt-contrib-concat": "~1.0.1",
     "grunt-exec": "~3.0.0",
     "load-grunt-tasks": "~5.1.0"
-  },
-  "engines": {
-    "node": "~0.10.1"
   }
 }

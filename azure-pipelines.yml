@@ -40,6 +40,8 @@ jobs:
 
   - task: NodeTool@0
     displayName: Set up node.js
+    inputs:
+      versionSpec: '>=12'
 
   - script: npm install
     displayName: Install NPM dependencies
