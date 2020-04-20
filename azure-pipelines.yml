@@ -3,8 +3,7 @@
 trigger:
   branches:
     include:
-      - master
-      - "refs/tags/v*"
+      - 7series
 
 jobs:
 - job: BuildSDK
@@ -13,24 +12,23 @@ jobs:
 
   steps:
 
-  - powershell: |
-      $branch = "$(Build.SourceBranch)"
-      if($branch.StartsWith("refs/tags/v")) {
-        $version = $branch.Substring(11)
-        $majmin = ($version -Split '\.')[0..1] -Join '.'
-
-        # We publish under both the full version string and a `major.minor`
-        # version for people who want to get bugfixes (deployed as micro
-        # version updates) automatically. To ease the CDN purge logic below,
-        # "pub_prefix" is the $majmin version.
-        Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/$majmin"
-        Write-Host "##vso[task.setvariable variable=pub_prefix_2;]engine/$version"
-      } else {
-        # Won't actually get published on PRs, etc.
-        Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/latest"
-        Write-Host "##vso[task.setvariable variable=pub_prefix_2;]skip"
-      }
-    displayName: Set deployment parameters
+  # - powershell: |
+  #     $branch = "$(Build.SourceBranch)"
+  #     if($branch.StartsWith("refs/tags/v")) {
+  #       $version = $branch.Substring(11)
+  #       $majmin = ($version -Split '\.')[0..1] -Join '.'
+  #       # We publish under both the full version string and a `major.minor`
+  #       # version for people who want to get bugfixes (deployed as micro
+  #       # version updates) automatically. To ease the CDN purge logic below,
+  #       # "pub_prefix" is the $majmin version.
+  #       Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/$majmin"
+  #       Write-Host "##vso[task.setvariable variable=pub_prefix_2;]engine/$version"
+  #     } else {
+  #       # Won't actually get published on PRs, etc.
+  #       Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/latest"
+  #       Write-Host "##vso[task.setvariable variable=pub_prefix_2;]skip"
+  #     }
+  #   displayName: Set deployment parameters
 
   - task: MSBuild@1
     displayName: Build WebGL Engine with ScriptSharp
@@ -58,7 +56,6 @@ jobs:
       sourceFolder: '.'
       contents: |
         wwtsdk.js
-        wwtsdk.min.js
       targetFolder: $(Build.ArtifactStagingDirectory)
       cleanTargetFolder: true
 
@@ -68,50 +65,50 @@ jobs:
       artifactName: wwt-webgl-engine
       targetPath: $(Build.ArtifactStagingDirectory)
 
-  - script: npm install mocha chai mocha-headless-chrome --save-dev
-    displayName: Installing mocha testing framework
+  # - script: npm install mocha chai mocha-headless-chrome --save-dev
+  #   displayName: Installing mocha testing framework
 
-  - script: node_modules/.bin/mocha-headless-chrome -f tests/tests.html -r xunit >test_results.xml
-    displayName: Running tests against JS SDK
+  # - script: node_modules/.bin/mocha-headless-chrome -f tests/tests.html -r xunit >test_results.xml
+  #   displayName: Running tests against JS SDK
 
   # NOTE: The file produced above is actually in JUnit format, not xUnit!
-  - task: PublishTestResults@2
-    displayName: Publish test results
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: 'test_results.xml'
+  # - task: PublishTestResults@2
+  #   displayName: Publish test results
+  #   condition: succeededOrFailed()
+  #   inputs:
+  #     testResultsFormat: 'JUnit'
+  #     testResultsFiles: 'test_results.xml'
 
-  - task: AzureFileCopy@3
-    displayName: Upload artifacts to Azure Storage
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: $(pub_prefix)
+  # - task: AzureFileCopy@3
+  #   displayName: Upload artifacts to Azure Storage
+  #   inputs:
+  #     SourcePath: '$(build.artifactStagingDirectory)'
+  #     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  #     Destination: 'AzureBlob'
+  #     storage: 'wwtwebstatic'
+  #     ContainerName: '$web'
+  #     blobPrefix: $(pub_prefix)
+ 
+  # - task: AzureFileCopy@3
+  #   displayName: Upload artifacts to second Azure Storage location (maybe)
+  #   condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
+  #   inputs:
+  #     SourcePath: '$(build.artifactStagingDirectory)'
+  #     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  #     Destination: 'AzureBlob'
+  #     storage: 'wwtwebstatic'
+  #     ContainerName: '$web'
+  #     blobPrefix: $(pub_prefix_2)
 
-  - task: AzureFileCopy@3
-    displayName: Upload artifacts to second Azure Storage location (maybe)
-    condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: $(pub_prefix_2)
-
-  - task: AzurePowerShell@4
-    displayName: Purge CDN
-    inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      azurePowerShellVersion: 'LatestVersion'
-      scriptType: 'inlineScript'
-      inline: |
-        Unpublish-AzCdnEndpointContent `
-          -ProfileName wwt-cdn-01 `
-          -ResourceGroupName wwt-web01 `
-          -EndpointName wwtweb-prod `
-          -PurgeContent '/$(pub_prefix)/*'
+  # - task: AzurePowerShell@4
+  #   displayName: Purge CDN
+  #   inputs:
+  #     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  #     azurePowerShellVersion: 'LatestVersion'
+  #     scriptType: 'inlineScript'
+  #     inline: |
+  #       Unpublish-AzCdnEndpointContent `
+  #         -ProfileName wwt-cdn-01 `
+  #         -ResourceGroupName wwt-web01 `
+  #         -EndpointName wwtweb-prod `
+  #         -PurgeContent '/$(pub_prefix)/*'
