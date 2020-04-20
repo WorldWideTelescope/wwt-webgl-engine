@@ -46,11 +46,8 @@ jobs:
   - script: npm install
     displayName: Install NPM dependencies
 
-  - task: Grunt@0
+  - script: npm run concat-index && npm run build && npm run doc
     displayName: Build final JavaScript files
-    inputs:
-      gruntFile: 'Gruntfile.js'
-      targets: dist-js
 
   - task: CopyFiles@2
     displayName: Stage WebGL engine artifacts
@@ -58,7 +55,8 @@ jobs:
       sourceFolder: '.'
       contents: |
         wwtlib/bin/wwtlib.js
-        wwtsdk.js
+        src/index.js
+        docs
       targetFolder: $(Build.ArtifactStagingDirectory)
       cleanTargetFolder: true
 

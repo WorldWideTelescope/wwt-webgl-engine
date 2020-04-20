@@ -12,10 +12,19 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "license": "MIT",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "scripts": {
+    "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
+    "build": "tsc",
+    "doc": "typedoc --includeDeclarations --excludeExternals --out docs src"
+  },
   "devDependencies": {
-    "grunt": "~1.1.0",
-    "grunt-contrib-concat": "~1.0.1",
-    "grunt-exec": "~3.0.0",
-    "load-grunt-tasks": "~5.1.0"
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "concat-cli": "^4.0.0",
+    "eslint": "^6.7.2",
+    "typedoc": "^0.17.4",
+    "typescript": "~3.8.3"
   }
 }
