@@ -55,6 +55,7 @@ jobs:
     inputs:
       sourceFolder: '.'
       contents: |
+        wwtlib/bin/wwtlib.js
         wwtsdk.js
       targetFolder: $(Build.ArtifactStagingDirectory)
       cleanTargetFolder: true
