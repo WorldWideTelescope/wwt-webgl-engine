@@ -14,7 +14,8 @@ module.exports = function (grunt) {
           'scriptsharp-0.8.0/ss.js',
           'wwtlib/bin/wwtlib.js'
         ],
-        dest: 'wwtsdk.js'
+        dest: 'wwtsdk.js',
+        nonull: true
       },
     }
   });
