@@ -8,7 +8,6 @@
 
 (function (global) {
   function _ss() {
-
     // Various Helpers/Utilities
 
     function _nop() {
@@ -26,6 +25,7 @@
       }
       return null;
     }
+
     function value(a, b) {
       return isValue(a) ? a : isValue(b) ? b : _value(arguments);
     }
@@ -145,6 +145,7 @@
     function toArray(obj) {
       return obj ? (typeof obj == 'string' ? JSON.parse('(' + obj + ')') : Array.prototype.slice.call(obj)) : null;
     }
+
     function removeItem(a, item) {
       var index = a.indexOf(item);
       return index >= 0 ? (a.splice(index, 1), true) : false;
@@ -155,9 +156,11 @@
         delete obj[key];
       }
     }
+
     function keyExists(obj, key) {
       return obj[key] !== undefined;
     }
+
     function keys(obj) {
       if (Object.keys) {
         return Object.keys(obj);
@@ -168,6 +171,7 @@
       }
       return keys;
     }
+
     function keyCount(obj) {
       return keys(obj).length;
     }
@@ -189,6 +193,7 @@
         this.current = null;
       };
     }
+
     var _nopEnumerator = {
       current: null,
       moveNext: function () { return false; },
@@ -212,8 +217,8 @@
       this.count = 0;
       this._items = [];
     }
-    var Stack$ = {
 
+    var Stack$ = {
       clear: function () {
         this._items.length = 0;
         this.count = 0;
@@ -250,12 +255,13 @@
       this._items = [];
       this._offset = 0;
     }
+
     function _cleanQueue(q) {
       q._items = q._items.slice(q._offset);
       q._offset = 0;
     }
-    var Queue$ = {
 
+    var Queue$ = {
       clear: function () {
         this._items.length = 0;
         this._offset = 0;
@@ -363,14 +369,17 @@
       }
       return s.trim();
     }
+
     function trimStart(s, tc) {
       var r = tc ? new RegExp('^[' + tc.join('') + ']+') : /^\s+/;
       return s.replace(r, '');
     }
+
     function trimEnd(s, tc) {
       var r = tc ? new RegExp('[' + tc.join('') + ']+$') : /\s+$/;
       return s.replace(r, '');
     }
+
     function startsWith(s, prefix) {
       if (emptyString(prefix)) {
         return true;
@@ -380,6 +389,7 @@
       }
       return s.substr(0, prefix.length) == prefix;
     }
+
     function endsWith(s, suffix) {
       if (emptyString(suffix)) {
         return true;
@@ -389,18 +399,22 @@
       }
       return s.substr(-suffix.length) == suffix;
     }
+
     function padLeft(s, totalWidth, ch) {
       return (s.length < totalWidth) ? string(ch || ' ', totalWidth - s.length) + s : s;
     }
+
     function padRight(s, totalWidth, ch) {
       return (s.length < totalWidth) ? s + string(ch || ' ', totalWidth - s.length) : s;
     }
+
     function removeString(s, index, count) {
       if (!count || ((index + count) > s.length)) {
         return s.substr(0, index);
       }
       return s.substr(0, index) + s.substr(index + count);
     }
+
     function insertString(s, index, value) {
       if (!value) {
         return s;
@@ -410,6 +424,7 @@
       }
       return s.substr(0, index) + value + s.substr(index);
     }
+
     function replaceString(s, oldValue, newValue) {
       return s.split(oldValue).join(newValue || '');
     }
@@ -487,7 +502,6 @@
       return binding;
     }
 
-
     function bindExport(fn, multiUse, name, root) {
       // Generate a unique name if one is not specified
       name = name || '__' + (new Date()).valueOf();
@@ -520,6 +534,7 @@
 
     function EventArgs() {
     }
+
     EventArgs.Empty = new EventArgs();
 
     function CancelEventArgs() {
@@ -544,6 +559,7 @@
       this._parts = isValue(s) && s !== '' ? [s] : [];
       this.isEmpty = this._parts.length == 0;
     }
+
     var StringBuilder$ = {
       append: function (s) {
         if (isValue(s) && s !== '') {
@@ -578,6 +594,7 @@
         _observerStack.pop();
       }
     }
+
     function _captureObservers(observers) {
       var registeredObservers = _observerStack;
       var observerCount = registeredObservers.length;
@@ -594,6 +611,7 @@
       }
       return null;
     }
+
     function _invalidateObservers(observers) {
       for (var i = 0, len = observers.length; i < len; i++) {
         observers[i].invalidateObserver();
@@ -604,8 +622,8 @@
       this._v = v;
       this._observers = null;
     }
-    var Observable$ = {
 
+    var Observable$ = {
       getValue: function () {
         this._observers = _captureObservers(this._observers);
         return this._v;
@@ -622,18 +640,18 @@
         }
       }
     };
+
     Observable.registerObserver = function (o) {
       _observerStack.push(o);
       return _observerRegistration;
     }
 
-
     function ObservableCollection(items) {
       this._items = items || [];
       this._observers = null;
     }
-    var ObservableCollection$ = {
 
+    var ObservableCollection$ = {
       get_item: function (index) {
         this._observers = _captureObservers(this._observers);
         return this._items[index];
@@ -701,6 +719,7 @@
       this.result = result;
       this.error = null;
     }
+
     var Task$ = {
       get_completed: function () {
         return this.status != 'pending';
@@ -1078,7 +1097,6 @@
       return s;
     }
 
-
     var _dateFormatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z/g;
 
     _formatters['Date'] = function (dt, format, culture) {
@@ -1327,6 +1345,7 @@
       RegExp, 'RegExp',
       Function, 'Function'
     ];
+
     function typeName(type) {
       if (!(type instanceof Function)) {
         type = type.constructor;
@@ -1416,7 +1435,6 @@
       return api;
     }
 
-
     return extend(module('ss', null, {
       IDisposable: [IDisposable],
       IEnumerable: [IEnumerable],
@@ -1499,7 +1517,6 @@
       fail: fail
     });
   }
-
 
   function _export() {
     var ss = _ss();
