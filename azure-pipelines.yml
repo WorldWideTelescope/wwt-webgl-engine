@@ -34,7 +34,7 @@ jobs:
     displayName: Build WebGL Engine with ScriptSharp
     inputs:
       solution: 'WebGlEngine.sln'
-      msbuildVersion: '14.0'
+      msbuildVersion: '16.0'
       msbuildArchitecture: 'x64'
       clean: true
 
