@@ -56,7 +56,7 @@ jobs:
       contents: |
         wwtlib/bin/wwtlib.js
         src/index.js
-        docs
+        docs/
       targetFolder: $(Build.ArtifactStagingDirectory)
       cleanTargetFolder: true
 
