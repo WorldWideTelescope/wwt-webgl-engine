@@ -2010,10 +2010,10 @@ namespace wwtlib
         public static ScriptInterface scriptInterface;
         public static ScriptInterface InitControl(string DivId)
         {
-            return InitControlParam(DivId, false);
+            return InitControlParam(DivId, true);
         }
 
-        public static ScriptInterface InitControlParam(string DivId, bool webGL)
+        public static ScriptInterface InitControlParam(string DivId, bool ignored)
         {
             if (Singleton.RenderContext.Device == null)
             {
@@ -2022,37 +2022,20 @@ namespace wwtlib
 
                 CanvasElement canvas = CreateCanvasElement(DivId);
 
-
                 String webgltext = "webgl";
-                GL gl = null;
+                GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
 
-
-                //todo remove this line to turn WebGL on...
-                webGL = true;
-
-                if (webGL)
-                {
-                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
-                }
-                if (gl == null)
-                {
+                if (gl == null) {
                     webgltext = "experimental-webgl";
                     gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
                 }
 
-                if (gl == null)
-                {
-
+                if (gl == null) {
                     CanvasContext2D ctx = (CanvasContext2D)canvas.GetContext(Rendering.Render2D);
-
                     Singleton.RenderContext.Device = ctx;
-
-                }
-                else
-                {
+                } else {
                     Tile.PrepDevice = gl;
                     Singleton.RenderContext.gl = gl;
-
                     RenderContext.UseGl = true;
                 }
 
@@ -2060,7 +2043,6 @@ namespace wwtlib
                 Singleton.RenderContext.Width = canvas.Width;
                 Singleton.RenderContext.Height = canvas.Height;
                 Singleton.Setup(canvas);
-
 
                 Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                     "DSS",
