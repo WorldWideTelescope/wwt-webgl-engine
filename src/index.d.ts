@@ -15,8 +15,10 @@ export class WWTControl {
 }
 
 export class ScriptInterface {
-  /** Get the current RA, IN WHAT UNITS? */
+  /** Get the current right ascension of the view, in hours. */
   getRA(): number;
+
+  /** Get the current declination of the view, in degrees. */
   getDec(): number;
 }
 
