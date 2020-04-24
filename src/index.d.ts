@@ -13,5 +13,13 @@ export class ScriptInterface {
 }
 
 export namespace WWTControl {
-  export function initControlParam(divId: string, use_webgl: boolean): ScriptInterface;
+  /** Initialize the WWT engine and launch its rendering loop.
+   * 
+   * @param divId The `id` of the DOM element into which the WWT WebGL surface will be inserted.
+   * @return A handle to a [[ScriptInterface]] associated with this engine instance.
+   * 
+   * The engine is not immediately usable since it must perform initialization that
+   * includes fetching resources from the network.
+   */
+  export function initControl(divId: string): ScriptInterface;
 }
