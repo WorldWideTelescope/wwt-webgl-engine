@@ -50,4 +50,7 @@ export namespace WWTControl {
    * compatibility.
    */
   export function initControl2(divId: string, startRenderLoop: boolean): ScriptInterface;
+
+  /** The global WWTControl singleton instance. */
+  export const singleton: WWTControl;
 }
