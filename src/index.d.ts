@@ -7,6 +7,7 @@ export class WWTControl {
 }
 
 export class ScriptInterface {
+  /** Get the current RA, IN WHAT UNITS? */
   getRA(): number;
   getDec(): number;
 }
