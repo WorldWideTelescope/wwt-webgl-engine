@@ -1,6 +1,19 @@
-// TypeScript definitions for the WWT WebGL engine
+// Copyright 2020 the .NET Foundation
+// Licensed under the MIT License
+//
+// TypeScript definitions for the WWT WebGL engine.
+//
+// Try to keep everything alphabetized.
 
 export as namespace wwtlib;
+
+export class ScriptInterface {
+  /** Get the current right ascension of the view, in hours. */
+  getRA(): number;
+
+  /** Get the current declination of the view, in degrees. */
+  getDec(): number;
+}
 
 export class WWTControl {
   /** Render the view.
@@ -12,14 +25,6 @@ export class WWTControl {
   renderOneFrame(): void;
 
   gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean): void;
-}
-
-export class ScriptInterface {
-  /** Get the current right ascension of the view, in hours. */
-  getRA(): number;
-
-  /** Get the current declination of the view, in degrees. */
-  getDec(): number;
 }
 
 export namespace WWTControl {
