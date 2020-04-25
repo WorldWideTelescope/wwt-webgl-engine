@@ -2150,8 +2150,6 @@ namespace wwtlib
             {
                 WWTControl.StartLat = lat;
                 WWTControl.StartLng = lng;
-
-
                 WWTControl.StartZoom = zoom * 6;
             }
         }
@@ -2164,7 +2162,21 @@ namespace wwtlib
 
             tracking = false;
             trackingObject = null;
-            GotoTargetFull(false, instant, CameraParameters.Create(dec, WWTControl.Singleton.RenderContext.RAtoViewLng(ra), zoom, WWTControl.Singleton.RenderContext.ViewCamera.Rotation, WWTControl.Singleton.RenderContext.ViewCamera.Angle, (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity), WWTControl.Singleton.RenderContext.ForegroundImageset, WWTControl.Singleton.RenderContext.BackgroundImageset);
+
+            GotoTargetFull(
+                false,  // noZoom
+                instant,
+                CameraParameters.Create(
+                    dec,
+                    WWTControl.Singleton.RenderContext.RAtoViewLng(ra),
+                    zoom,
+                    WWTControl.Singleton.RenderContext.ViewCamera.Rotation,
+                    WWTControl.Singleton.RenderContext.ViewCamera.Angle,
+                    (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity
+                ),
+                WWTControl.Singleton.RenderContext.ForegroundImageset,
+                WWTControl.Singleton.RenderContext.BackgroundImageset
+            );
         }
 
 
@@ -2426,17 +2438,15 @@ namespace wwtlib
                     trackingObject = place;
                 }
             }
-
         }
-
 
         public void GotoTarget3(CameraParameters camParams, bool noZoom, bool instant)
         {
             tracking = false;
             trackingObject = null;
             GotoTargetFull(noZoom, instant, camParams, RenderContext.ForegroundImageset, RenderContext.BackgroundImageset);
-
         }
+
         public void GotoTargetFull(bool noZoom, bool instant, CameraParameters cameraParams, Imageset studyImageSet, Imageset backgroundImageSet)
         {
             RenderNeeded = true;
@@ -2448,7 +2458,6 @@ namespace wwtlib
             trackingObject = null;
             targetStudyImageset = studyImageSet;
             targetBackgroundImageset = backgroundImageSet;
-
 
             if (noZoom)
             {
@@ -2471,8 +2480,10 @@ namespace wwtlib
                 }
             }
 
-            // if (instant || (Math.Abs(ViewLat - cameraParams.Lat) < .000000000001 && Math.Abs(ViewLong - cameraParams.Lng) < .000000000001 && Math.Abs(ZoomFactor - cameraParams.Zoom) < .000000000001))
-            if (instant || (Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 && Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 && Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001))
+            if (instant ||
+                (Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 &&
+                 Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 &&
+                 Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001))
             {
                 Mover = null;
                 RenderContext.TargetCamera = cameraParams.Copy();
@@ -2481,14 +2492,12 @@ namespace wwtlib
                 if (RenderContext.Space && Settings.Active.GalacticMode)
                 {
                     double[] gPoint = Coordinates.J2000toGalactic(RenderContext.ViewCamera.RA * 15, RenderContext.ViewCamera.Dec);
-
                     RenderContext.targetAlt = RenderContext.alt = gPoint[1];
                     RenderContext.targetAz = RenderContext.az = gPoint[0];
                 }
                 else if (RenderContext.Space && Settings.Active.LocalHorizonMode)
                 {
                     Coordinates currentAltAz = Coordinates.EquitorialToHorizon(Coordinates.FromRaDec(RenderContext.ViewCamera.RA, RenderContext.ViewCamera.Dec), SpaceTimeController.Location, SpaceTimeController.Now);
-
                     RenderContext.targetAlt = RenderContext.alt = currentAltAz.Alt;
                     RenderContext.targetAz = RenderContext.az = currentAltAz.Az;
                 }
@@ -2497,7 +2506,6 @@ namespace wwtlib
             }
             else
             {
-
                 Mover = ViewMoverSlew.Create(RenderContext.ViewCamera, cameraParams);
                 RenderNeeded = true;
                 Mover.Midpoint = mover_Midpoint;
@@ -2520,7 +2528,9 @@ namespace wwtlib
                 RenderNeeded = true;
             }
         }
+
         bool moving = false;
+
         public void FadeInImageSet(Imageset newImageSet)
         {
             if (RenderContext.BackgroundImageset != null &&
@@ -2529,25 +2539,30 @@ namespace wwtlib
                 TileCache.PurgeQueue();
                 TileCache.ClearCache();
             }
+
             RenderContext.BackgroundImageset = newImageSet;
         }
+
         Imageset targetStudyImageset = null;
         Imageset targetBackgroundImageset = null;
 
-
         void mover_Midpoint()
         {
-            if ((targetStudyImageset != null && RenderContext.ForegroundImageset == null) || (RenderContext.ForegroundImageset != null && !RenderContext.ForegroundImageset.Equals(targetStudyImageset)))
+            if ((targetStudyImageset != null &&
+                 RenderContext.ForegroundImageset == null) ||
+                (RenderContext.ForegroundImageset != null &&
+                !RenderContext.ForegroundImageset.Equals(targetStudyImageset)))
             {
                 RenderContext.ForegroundImageset = targetStudyImageset;
             }
 
             //(gonzalo) protect from backgroundImageset being null ...
-            if (RenderContext.BackgroundImageset != null && (targetBackgroundImageset != null && !RenderContext.BackgroundImageset.Equals(targetBackgroundImageset)))
+            if (RenderContext.BackgroundImageset != null &&
+                (targetBackgroundImageset != null &&
+                 !RenderContext.BackgroundImageset.Equals(targetBackgroundImageset)))
             {
                 if (targetBackgroundImageset != null && targetBackgroundImageset.Generic)
                 {
-
                     FadeInImageSet(GetRealImagesetFromGeneric(targetBackgroundImageset));
                 }
                 else
