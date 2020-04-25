@@ -23,6 +23,11 @@ export interface ArrivedEventCallback {
   (si: ScriptInterface, args: ArrivedEventArgs): void;
 }
 
+export interface ReadyEventCallback {
+  /** Called when the WWT engine has finished its initialization. */
+  (si: ScriptInterface): void;
+}
+
 export class ScriptInterface {
   /** Get the current right ascension of the view, in hours. */
   getRA(): number;
@@ -43,6 +48,14 @@ export class ScriptInterface {
    * retrieval.
    */
   remove_arrived(callback: ArrivedEventCallback): void;
+
+  /** Register a callback to be called when the WWT engine has finished its
+   * initialization.
+   */
+  add_ready(callback: ReadyEventCallback): void;
+
+  /** Deregister a "ready" callback. */
+  remove_ready(callback: ReadyEventCallback): void;
 }
 
 export namespace SpaceTimeController {
