@@ -120,6 +120,21 @@ export class WWTControl {
    */
   renderOneFrame(): void;
 
+  /** Start navigating the view to the specified position.
+   *
+   * @param ra_hours The target right ascension, in hours.
+   * @param dec_deg The target declination, in degrees.
+   * @param zoom The target zoom level (see below)
+   * @param instant Whether to snap the view instantly or move gradually.
+   *
+   * If `instant` is true or the commanded camera position is extremely close to the
+   * current camera position, the view will update instantly. Otherwise it will
+   * scroll there smoothly, taking an unpredictable amount of time to arrive.
+   *
+   * The zoom level is the height of the viewport in degrees, times six.
+   *
+   * Navigating the view in this way ends any "tracking" status of the current view.
+   */
   gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean): void;
 }
 
