@@ -141,6 +141,10 @@ export namespace SpaceTimeController {
   export function utcToJulian(date: Date): number;
 }
 
+/** An alias for the type implicitly defined by the static
+ * [[SpaceTimeController]] namespace. */
+export type SpaceTimeControllerObject = typeof SpaceTimeController;
+
 export class WWTControl {
   /** Render the view.
    *
