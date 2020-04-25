@@ -7,12 +7,42 @@
 
 export as namespace wwtlib;
 
+export class ArrivedEventArgs {
+  /** Get the current right ascension of the view, in hours. */
+  get_RA(): number;
+
+  /** Get the current declination of the view, in degrees. */
+  get_dec(): number;
+
+  /** Get the current viewport height, in degrees. */
+  get_zoom(): number;
+}
+
+export interface ArrivedEventCallback {
+  /** Called when the WWT view has arrived at a commanded position. */
+  (si: ScriptInterface, args: ArrivedEventArgs): void;
+}
+
 export class ScriptInterface {
   /** Get the current right ascension of the view, in hours. */
   getRA(): number;
 
   /** Get the current declination of the view, in degrees. */
   getDec(): number;
+
+  /** Register a callback to be called when the WWT view arrives at a commanded
+   * position.
+   * */
+  add_arrived(callback: ArrivedEventCallback): void;
+
+  /** Deregister an "arrive" callback.
+   *
+   * The deregistration is performed by object equality check. Since the
+   * callback in question is a function, if you want to use this function you
+   * probably need to save the callback in some kind of variable for future
+   * retrieval.
+   */
+  remove_arrived(callback: ArrivedEventCallback): void;
 }
 
 export namespace SpaceTimeController {
