@@ -166,18 +166,18 @@ jobs:
       ContainerName: '$web'
       blobPrefix: engine/$(version_text_2)
 
-  # - task: AzurePowerShell@4
-  #   displayName: Purge CDN
-  #   inputs:
-  #     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  #     azurePowerShellVersion: 'LatestVersion'
-  #     scriptType: 'inlineScript'
-  #     inline: |
-  #       Unpublish-AzCdnEndpointContent `
-  #         -ProfileName wwt-cdn-01 `
-  #         -ResourceGroupName wwt-web01 `
-  #         -EndpointName wwtweb-prod `
-  #         -PurgeContent '/engine/$(version_text)/*'
+  - task: AzurePowerShell@4
+    displayName: Purge CDN
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtweb-prod `
+          -PurgeContent '/engine/$(version_text)/*'
 
   # Publish the documentation
 
@@ -191,18 +191,18 @@ jobs:
       ContainerName: '$web'
       blobPrefix: '_docs/webgl-reference/$(version_text)'
 
-  # - task: AzurePowerShell@4
-  #   displayName: Purge CDN
-  #   inputs:
-  #     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  #     azurePowerShellVersion: 'LatestVersion'
-  #     scriptType: 'inlineScript'
-  #     inline: |
-  #       Unpublish-AzCdnEndpointContent `
-  #         -ProfileName wwt-cdn-01 `
-  #         -ResourceGroupName wwt-web01 `
-  #         -EndpointName wwtwebdocs-prod `
-  #         -PurgeContent '/webgl-reference/$(version_text)/*'
+  - task: AzurePowerShell@4
+    displayName: Purge CDN
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtwebdocs-prod `
+          -PurgeContent '/webgl-reference/$(version_text)/*'
 
   # Maybe publish to NPM
 
