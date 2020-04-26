@@ -17,7 +17,7 @@
   "scripts": {
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
     "build": "tsc",
-    "doc": "typedoc --includeDeclarations --excludeExternals --out docs src"
+    "doc": "typedoc"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.26.0",
