@@ -29,10 +29,12 @@ jobs:
         # version for people who want to get bugfixes (deployed as micro
         # version updates) automatically. To ease the CDN purge logic below,
         # "pub_prefix" is the $majmin version.
+        Write-Host "##vso[task.setvariable variable=is_release;]true"
         Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/$majmin"
         Write-Host "##vso[task.setvariable variable=pub_prefix_2;]engine/$version"
       } else {
         # Won't actually get published on PRs, etc.
+        Write-Host "##vso[task.setvariable variable=is_release;]false"
         Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/latest"
         Write-Host "##vso[task.setvariable variable=pub_prefix_2;]skip"
       }
@@ -142,27 +144,27 @@ jobs:
 
   # Publish the hosted JavaScript artifacts
 
-  # - task: AzureFileCopy@3
-  #   displayName: Upload artifacts to Azure Storage
-  #   inputs:
-  #     SourcePath: '$(build.artifactStagingDirectory)/dist'
-  #     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  #     Destination: 'AzureBlob'
-  #     storage: 'wwtwebstatic'
-  #     ContainerName: '$web'
-  #     blobPrefix: $(pub_prefix)
-  #
-  # - task: AzureFileCopy@3
-  #   displayName: Upload artifacts to second Azure Storage location (maybe)
-  #   condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
-  #   inputs:
-  #     SourcePath: '$(build.artifactStagingDirectory)/dist'
-  #     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  #     Destination: 'AzureBlob'
-  #     storage: 'wwtwebstatic'
-  #     ContainerName: '$web'
-  #     blobPrefix: $(pub_prefix_2)
-  #
+  - task: AzureFileCopy@3
+    displayName: Upload artifacts to Azure Storage
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)/dist'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: $(pub_prefix)
+
+  - task: AzureFileCopy@3
+    displayName: Upload artifacts to second Azure Storage location (maybe)
+    condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)/dist'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: $(pub_prefix_2)
+
   # - task: AzurePowerShell@4
   #   displayName: Purge CDN
   #   inputs:
@@ -175,3 +177,11 @@ jobs:
   #         -ResourceGroupName wwt-web01 `
   #         -EndpointName wwtweb-prod `
   #         -PurgeContent '/$(pub_prefix)/*'
+
+  # Maybe publish to NPM
+
+  - task: Npm@1
+    condition: and(succeeded(), eq(variables['is_release'], 'true'))
+    inputs:
+      command: publish
+      publishEndpoint: npm_endpoint
