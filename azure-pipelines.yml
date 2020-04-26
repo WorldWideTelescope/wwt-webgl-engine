@@ -113,12 +113,12 @@ jobs:
   # The check is failing spuriously on Azure Pipelines too often right now (2020 Apr).
   # - powershell: |
   #     cd docs
-  #     .\zola.exe check
+  #     ..\zola.exe check
   #   displayName: Check Zola docs site
 
   - powershell: |
       cd docs
-      .\zola.exe build
+      ..\zola.exe build
       rm public\apiref\index.html
     displayName: Zola docs build
 
