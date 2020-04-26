@@ -29,15 +29,15 @@ jobs:
         # We publish under both the full version string and a `major.minor`
         # version for people who want to get bugfixes (deployed as micro
         # version updates) automatically. To ease the CDN purge logic below,
-        # "pub_prefix" is the $majmin version.
+        # "version_text" is the $majmin version.
         Write-Host "##vso[task.setvariable variable=is_release;]true"
-        Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/$majmin"
-        Write-Host "##vso[task.setvariable variable=pub_prefix_2;]engine/$version"
+        Write-Host "##vso[task.setvariable variable=version_text;]$majmin"
+        Write-Host "##vso[task.setvariable variable=version_text_2;]$version"
       } else {
         # Won't actually get published on PRs, etc.
         Write-Host "##vso[task.setvariable variable=is_release;]false"
-        Write-Host "##vso[task.setvariable variable=pub_prefix;]engine/latest"
-        Write-Host "##vso[task.setvariable variable=pub_prefix_2;]skip"
+        Write-Host "##vso[task.setvariable variable=version_text;]latest"
+        Write-Host "##vso[task.setvariable variable=version_text_2;]skip"
       }
     displayName: Set deployment parameters
 
@@ -153,18 +153,18 @@ jobs:
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
-      blobPrefix: $(pub_prefix)
+      blobPrefix: engine/$(version_text)
 
   - task: AzureFileCopy@3
     displayName: Upload artifacts to second Azure Storage location (maybe)
-    condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
+    condition: and(succeeded(), ne(variables['version_text_2'], 'skip'))
     inputs:
       SourcePath: '$(build.artifactStagingDirectory)/dist'
       azureSubscription: 'aas@wwtadmindotnetfoundation'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
-      blobPrefix: $(pub_prefix_2)
+      blobPrefix: engine/$(version_text_2)
 
   # - task: AzurePowerShell@4
   #   displayName: Purge CDN
@@ -177,7 +177,32 @@ jobs:
   #         -ProfileName wwt-cdn-01 `
   #         -ResourceGroupName wwt-web01 `
   #         -EndpointName wwtweb-prod `
-  #         -PurgeContent '/$(pub_prefix)/*'
+  #         -PurgeContent '/engine/$(version_text)/*'
+
+  # Publish the documentation
+
+  - task: AzureFileCopy@3
+    displayName: Upload to Azure Storage
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)/docs'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: '_docs/webgl-reference/$(version_text)'
+
+  # - task: AzurePowerShell@4
+  #   displayName: Purge CDN
+  #   inputs:
+  #     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  #     azurePowerShellVersion: 'LatestVersion'
+  #     scriptType: 'inlineScript'
+  #     inline: |
+  #       Unpublish-AzCdnEndpointContent `
+  #         -ProfileName wwt-cdn-01 `
+  #         -ResourceGroupName wwt-web01 `
+  #         -EndpointName wwtwebdocs-prod `
+  #         -PurgeContent '/webgl-reference/$(version_text)/*'
 
   # Maybe publish to NPM
 
