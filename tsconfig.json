@@ -35,7 +35,7 @@
   ],
   "typedocOptions": {
     "mode": "file",
-    "readme": "docs/index.md",
+    "readme": "docs/typedoc_index.md",
     "includeDeclarations": true,
     "excludeExternals": true,
     "excludeNotExported": true,
@@ -43,6 +43,6 @@
     "disableSources": true,
     "gaID": "UA-107473046-3",
     "listInvalidSymbolLinks": true,
-    "out": "docs/html"
+    "out": "docs/public/apiref"
   }
 }
