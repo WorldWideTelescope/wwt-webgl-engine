@@ -77,10 +77,10 @@ jobs:
     displayName: Build and check JavaScript files
 
   - script: |
-      mkdir $(Build.ArtifactStagingDirectory)/dist
-      cp src/index.js $(Build.ArtifactStagingDirectory)/dist/wwtlib.js
-      cp src/index.min.js $(Build.ArtifactStagingDirectory)/dist/wwtlib.min.js
-      cp src/index.d.ts $(Build.ArtifactStagingDirectory)/dist/wwtlib.d.ts
+      mkdir $(Build.ArtifactStagingDirectory)\dist
+      cp src\index.js $(Build.ArtifactStagingDirectory)\dist\wwtlib.js
+      cp src\index.min.js $(Build.ArtifactStagingDirectory)\dist\wwtlib.min.js
+      cp src\index.d.ts $(Build.ArtifactStagingDirectory)\dist\wwtlib.d.ts
     displayName: Stage JavaScript hosted artifacts
 
   - task: PublishPipelineArtifact@0
@@ -154,7 +154,7 @@ jobs:
   #     storage: 'wwtwebstatic'
   #     ContainerName: '$web'
   #     blobPrefix: $(pub_prefix)
-  # 
+  #
   # - task: AzureFileCopy@3
   #   displayName: Upload artifacts to second Azure Storage location (maybe)
   #   condition: and(succeeded(), ne(variables['pub_prefix_2'], 'skip'))
@@ -165,7 +165,7 @@ jobs:
   #     storage: 'wwtwebstatic'
   #     ContainerName: '$web'
   #     blobPrefix: $(pub_prefix_2)
-  # 
+  #
   # - task: AzurePowerShell@4
   #   displayName: Purge CDN
   #   inputs:
