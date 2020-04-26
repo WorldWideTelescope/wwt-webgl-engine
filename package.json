@@ -16,7 +16,8 @@
   "types": "./src/index.d.ts",
   "scripts": {
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
-    "build": "tsc",
+    "tscheck": "tsc",
+    "uglify": "uglifyjs src/index.js -c -o src/index.min.js",
     "doc": "typedoc"
   },
   "devDependencies": {
@@ -25,6 +26,7 @@
     "concat-cli": "^4.0.0",
     "eslint": "^6.7.2",
     "typedoc": "^0.17.4",
-    "typescript": "~3.8.3"
+    "typescript": "~3.8.3",
+    "uglify-js": "^3.9.1"
   }
 }
