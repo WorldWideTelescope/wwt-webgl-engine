@@ -81,9 +81,9 @@ jobs:
 
   - script: |
       mkdir $(Build.ArtifactStagingDirectory)\dist
-      cp src\index.js $(Build.ArtifactStagingDirectory)\dist\wwtlib.js
-      cp src\index.min.js $(Build.ArtifactStagingDirectory)\dist\wwtlib.min.js
-      cp src\index.d.ts $(Build.ArtifactStagingDirectory)\dist\wwtlib.d.ts
+      cp src\index.js $(Build.ArtifactStagingDirectory)\dist\wwtsdk.js
+      cp src\index.min.js $(Build.ArtifactStagingDirectory)\dist\wwtsdk.min.js
+      cp src\index.d.ts $(Build.ArtifactStagingDirectory)\dist\wwtsdk.d.ts
     displayName: Stage JavaScript hosted artifacts
 
   - task: PublishPipelineArtifact@0
