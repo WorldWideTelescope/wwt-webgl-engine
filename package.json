@@ -1,19 +1,33 @@
 {
   "name": "@wwtelescope/engine",
-  "description": "AAS WorldWide Telescope WebGL Engine",
   "version": "7.0.0-dev.0",
+  "description": "The AAS WorldWide Telescope WebGL engine",
   "keywords": [
     "AAS WorldWide Telescope"
   ],
-  "homepage": "https://worldwidetelescope.org",
-  "author": "The AAS WorldWide Telescope Team",
+  "homepage": "https://worldwidetelescope.org/home/",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "bugs": {
-    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues",
+    "email": "wwt@aas.org"
   },
   "license": "MIT",
   "main": "./src/index.js",
+  "browser": "./src/index.js",
   "types": "./src/index.d.ts",
+  "files": [
+    "docs/**/*.html",
+    "docs/**/*.md",
+    "docs/**/*.toml",
+    "scriptsharp-0.8.0/ss.js",
+    "src/*.js",
+    "src/*.ts",
+    "tests/*.html",
+    "tests/*.js",
+    "tsconfig.json",
+    "wwtlib/bin/wwtlib.js"
+  ],
   "scripts": {
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
     "tscheck": "tsc",
