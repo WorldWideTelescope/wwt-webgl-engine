@@ -210,4 +210,4 @@ jobs:
     condition: and(succeeded(), eq(variables['is_release'], 'true'))
     inputs:
       command: publish
-      publishEndpoint: npm_endpoint
+      publishEndpoint: 'aas_wwt@npmjs.com'
