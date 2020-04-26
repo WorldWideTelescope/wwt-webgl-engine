@@ -1,8 +1,8 @@
 /.vs/
+/docs/html/
 /node_modules/
 /package-lock.json
-/wwtlib-replaced.js
+/src/index.js
+/src/index.min.js
 /wwtlib/bin/
 /wwtlib/obj/
-/wwtsdk.js
-/wwtsdk.min.js

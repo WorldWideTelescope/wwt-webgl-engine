@@ -240,8 +240,15 @@ namespace wwtlib
 
         private Imageset milkyWayBackground = null;
 
-
+        // To preserve semantic backwards compatibility, this function must requeue itself
+        // to be called again in a timeout.
         public void Render()
+        {
+            RenderOneFrame();
+            Script.SetTimeout(delegate () { Render(); }, 10);
+        }
+
+        public void RenderOneFrame()
         {
             if (RenderContext.BackgroundImageset != null)
             {
@@ -271,15 +278,12 @@ namespace wwtlib
 
             if (Canvas.Width < 1 || Canvas.Height < 1) {
                 // This can happen during initialization if perhaps some
-                // HTML/JavaScript interaction hasn't happened to set the
-                // canvas size correctly. We want to set a timeout to try to
-                // render again soon -- hopefully the canvas will get sized
-                // correctly and we can proceed. But if we don't exit this
-                // function early, we get NaNs in our transformation matrices
-                // that lead IsTileBigEnough to say "no" for everything so
-                // that we spin out of control downloading maximum-resolution
-                // DSS tiles for an enormous viewport. That's bad!
-                Script.SetTimeout(delegate () { Render(); }, 10);
+                // HTML/JavaScript interaction hasn't happened to set the canvas
+                // size correctly. If we don't exit this function early, we get
+                // NaNs in our transformation matrices that lead IsTileBigEnough
+                // to say "no" for everything so that we spin out of control
+                // downloading maximum-resolution DSS tiles for an enormous
+                // viewport. That's bad!
                 return;
             }
 
@@ -326,7 +330,6 @@ namespace wwtlib
 
                         NotifyMoveComplete();
                     }
-
                 }
             }
             else
@@ -336,11 +339,7 @@ namespace wwtlib
                 Planets.UpdatePlanetLocations(SolarSystemMode);
 
                 UpdateViewParameters();
-
-
             }
-
-
 
             RenderContext.Clear();
 
@@ -353,10 +352,7 @@ namespace wwtlib
                         double distance = RenderContext.SolarSystemCameraDistance;
                         double camAngle = RenderContext.FovLocal;
                         //double distrad = distance / (radius * Math.Tan(.5 * camAngle));
-
                     }
-
-
 
                     if (trackingObject == null)
                     {
@@ -364,8 +360,6 @@ namespace wwtlib
                     }
 
                     RenderContext.SetupMatricesSolarSystem(true);
-
-
 
                     //float skyOpacity = 1.0f - Planets.CalculateSkyBrightnessFactor(RenderContext11.View, viewCamera.ViewTarget);
                     //if (float.IsNaN(skyOpacity))
@@ -459,9 +453,6 @@ namespace wwtlib
                     //    }
                     //}
 
-
-
-
                     {
                         Vector3d oldCamera = RenderContext.CameraPosition;
                         Matrix3d matOld = RenderContext.World;
@@ -497,12 +488,10 @@ namespace wwtlib
                             Grids.DrawGalaxyImage(RenderContext, milkyWayBlendIn);
                         }
 
-
                         if (Settings.Active.SolarSystemStars)
                         {
                             Grids.DrawStars3D(RenderContext, 1);
                         }
-
 
                         matLocal = matOld;
                         Vector3d pnt = RenderContext.ViewCamera.ViewTarget;
@@ -517,7 +506,6 @@ namespace wwtlib
                         RenderContext.World = matOld;
                         RenderContext.MakeFrustum();
                     }
-
 
                     if (RenderContext.SolarSystemCameraDistance < 15000)
                     {
@@ -550,9 +538,8 @@ namespace wwtlib
                     //}
                 }
             }
-            else
+            else  // RenderType is not SolarSystem
             {
-
                 if (RenderType == ImageSetType.Earth || RenderType == ImageSetType.Planet)
                 {
                     RenderContext.SetupMatricesLand3d();
@@ -682,7 +669,6 @@ namespace wwtlib
                 }
             }
 
-
             RenderContext.SetupMatricesOverlays();
             FadeFrame();
             //RenderContext.Clear();
@@ -706,7 +692,6 @@ namespace wwtlib
             RenderContext.View = viewSave;
             RenderContext.Projection = projSave;
 
-
             Date now = Date.Now;
 
             int ms = now - lastUpdate;
@@ -717,14 +702,7 @@ namespace wwtlib
                 RenderTriangle.TrianglesRendered = 0;
                 RenderTriangle.TrianglesCulled = 0;
             }
-
-            //  Script.Literal("requestAnimationFrame(this.render);");
-
-
-            //TileCache.PurgeLRU();
-            Script.SetTimeout(delegate () { Render(); }, 10);
         }
-
 
         private string GetCurrentReferenceFrame()
         {
@@ -2007,13 +1985,25 @@ namespace wwtlib
             }
 
         }
+
         public static ScriptInterface scriptInterface;
+
+        // For backwards compatibility, we preserve the semantics that calling
+        // this function kicks off the rendering loop.
         public static ScriptInterface InitControl(string DivId)
         {
-            return InitControlParam(DivId, false);
+            return InitControl2(DivId, true);
         }
 
-        public static ScriptInterface InitControlParam(string DivId, bool webGL)
+        // This function had a parameter to choose whether to use WebGL or HTML5
+        // canvas, but at some point the argument was defused. We preserve it
+        // for backwards compatibility.
+        public static ScriptInterface InitControlParam(string DivId, bool webgl_ignored)
+        {
+            return InitControl2(DivId, true);
+        }
+
+        public static ScriptInterface InitControl2(string DivId, bool startRenderLoop)
         {
             if (Singleton.RenderContext.Device == null)
             {
@@ -2022,37 +2012,20 @@ namespace wwtlib
 
                 CanvasElement canvas = CreateCanvasElement(DivId);
 
-
                 String webgltext = "webgl";
-                GL gl = null;
+                GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
 
-
-                //todo remove this line to turn WebGL on...
-                webGL = true;
-
-                if (webGL)
-                {
-                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
-                }
-                if (gl == null)
-                {
+                if (gl == null) {
                     webgltext = "experimental-webgl";
                     gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
                 }
 
-                if (gl == null)
-                {
-
+                if (gl == null) {
                     CanvasContext2D ctx = (CanvasContext2D)canvas.GetContext(Rendering.Render2D);
-
                     Singleton.RenderContext.Device = ctx;
-
-                }
-                else
-                {
+                } else {
                     Tile.PrepDevice = gl;
                     Singleton.RenderContext.gl = gl;
-
                     RenderContext.UseGl = true;
                 }
 
@@ -2060,7 +2033,6 @@ namespace wwtlib
                 Singleton.RenderContext.Width = canvas.Width;
                 Singleton.RenderContext.Height = canvas.Height;
                 Singleton.Setup(canvas);
-
 
                 Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                     "DSS",
@@ -2118,7 +2090,10 @@ namespace wwtlib
 
             Singleton.RenderContext.ViewCamera.Lng += 0;
             Singleton.RenderContext.InitGL();
-            Singleton.Render();
+
+            if (startRenderLoop) {
+              Singleton.Render();
+            }
 
             return scriptInterface;
         }
@@ -2175,8 +2150,6 @@ namespace wwtlib
             {
                 WWTControl.StartLat = lat;
                 WWTControl.StartLng = lng;
-
-
                 WWTControl.StartZoom = zoom * 6;
             }
         }
@@ -2189,7 +2162,21 @@ namespace wwtlib
 
             tracking = false;
             trackingObject = null;
-            GotoTargetFull(false, instant, CameraParameters.Create(dec, WWTControl.Singleton.RenderContext.RAtoViewLng(ra), zoom, WWTControl.Singleton.RenderContext.ViewCamera.Rotation, WWTControl.Singleton.RenderContext.ViewCamera.Angle, (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity), WWTControl.Singleton.RenderContext.ForegroundImageset, WWTControl.Singleton.RenderContext.BackgroundImageset);
+
+            GotoTargetFull(
+                false,  // noZoom
+                instant,
+                CameraParameters.Create(
+                    dec,
+                    WWTControl.Singleton.RenderContext.RAtoViewLng(ra),
+                    zoom,
+                    WWTControl.Singleton.RenderContext.ViewCamera.Rotation,
+                    WWTControl.Singleton.RenderContext.ViewCamera.Angle,
+                    (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity
+                ),
+                WWTControl.Singleton.RenderContext.ForegroundImageset,
+                WWTControl.Singleton.RenderContext.BackgroundImageset
+            );
         }
 
 
@@ -2451,17 +2438,15 @@ namespace wwtlib
                     trackingObject = place;
                 }
             }
-
         }
-
 
         public void GotoTarget3(CameraParameters camParams, bool noZoom, bool instant)
         {
             tracking = false;
             trackingObject = null;
             GotoTargetFull(noZoom, instant, camParams, RenderContext.ForegroundImageset, RenderContext.BackgroundImageset);
-
         }
+
         public void GotoTargetFull(bool noZoom, bool instant, CameraParameters cameraParams, Imageset studyImageSet, Imageset backgroundImageSet)
         {
             RenderNeeded = true;
@@ -2473,7 +2458,6 @@ namespace wwtlib
             trackingObject = null;
             targetStudyImageset = studyImageSet;
             targetBackgroundImageset = backgroundImageSet;
-
 
             if (noZoom)
             {
@@ -2496,8 +2480,10 @@ namespace wwtlib
                 }
             }
 
-            // if (instant || (Math.Abs(ViewLat - cameraParams.Lat) < .000000000001 && Math.Abs(ViewLong - cameraParams.Lng) < .000000000001 && Math.Abs(ZoomFactor - cameraParams.Zoom) < .000000000001))
-            if (instant || (Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 && Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 && Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001))
+            if (instant ||
+                (Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 &&
+                 Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 &&
+                 Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001))
             {
                 Mover = null;
                 RenderContext.TargetCamera = cameraParams.Copy();
@@ -2506,14 +2492,12 @@ namespace wwtlib
                 if (RenderContext.Space && Settings.Active.GalacticMode)
                 {
                     double[] gPoint = Coordinates.J2000toGalactic(RenderContext.ViewCamera.RA * 15, RenderContext.ViewCamera.Dec);
-
                     RenderContext.targetAlt = RenderContext.alt = gPoint[1];
                     RenderContext.targetAz = RenderContext.az = gPoint[0];
                 }
                 else if (RenderContext.Space && Settings.Active.LocalHorizonMode)
                 {
                     Coordinates currentAltAz = Coordinates.EquitorialToHorizon(Coordinates.FromRaDec(RenderContext.ViewCamera.RA, RenderContext.ViewCamera.Dec), SpaceTimeController.Location, SpaceTimeController.Now);
-
                     RenderContext.targetAlt = RenderContext.alt = currentAltAz.Alt;
                     RenderContext.targetAz = RenderContext.az = currentAltAz.Az;
                 }
@@ -2522,7 +2506,6 @@ namespace wwtlib
             }
             else
             {
-
                 Mover = ViewMoverSlew.Create(RenderContext.ViewCamera, cameraParams);
                 RenderNeeded = true;
                 Mover.Midpoint = mover_Midpoint;
@@ -2545,7 +2528,9 @@ namespace wwtlib
                 RenderNeeded = true;
             }
         }
+
         bool moving = false;
+
         public void FadeInImageSet(Imageset newImageSet)
         {
             if (RenderContext.BackgroundImageset != null &&
@@ -2554,25 +2539,30 @@ namespace wwtlib
                 TileCache.PurgeQueue();
                 TileCache.ClearCache();
             }
+
             RenderContext.BackgroundImageset = newImageSet;
         }
+
         Imageset targetStudyImageset = null;
         Imageset targetBackgroundImageset = null;
 
-
         void mover_Midpoint()
         {
-            if ((targetStudyImageset != null && RenderContext.ForegroundImageset == null) || (RenderContext.ForegroundImageset != null && !RenderContext.ForegroundImageset.Equals(targetStudyImageset)))
+            if ((targetStudyImageset != null &&
+                 RenderContext.ForegroundImageset == null) ||
+                (RenderContext.ForegroundImageset != null &&
+                !RenderContext.ForegroundImageset.Equals(targetStudyImageset)))
             {
                 RenderContext.ForegroundImageset = targetStudyImageset;
             }
 
             //(gonzalo) protect from backgroundImageset being null ...
-            if (RenderContext.BackgroundImageset != null && (targetBackgroundImageset != null && !RenderContext.BackgroundImageset.Equals(targetBackgroundImageset)))
+            if (RenderContext.BackgroundImageset != null &&
+                (targetBackgroundImageset != null &&
+                 !RenderContext.BackgroundImageset.Equals(targetBackgroundImageset)))
             {
                 if (targetBackgroundImageset != null && targetBackgroundImageset.Generic)
                 {
-
                     FadeInImageSet(GetRealImagesetFromGeneric(targetBackgroundImageset));
                 }
                 else
@@ -2823,10 +2813,9 @@ namespace wwtlib
             }
         }
 
-
         public void CaptureThumbnail(BlobReady blobReady)
         {
-            Render();
+            RenderOneFrame(); // NB: this used to be Render() but that was almost surely not what we want
 
             ImageElement image = (ImageElement)Document.CreateElement("img");
             image.AddEventListener("load", delegate (ElementEvent e)

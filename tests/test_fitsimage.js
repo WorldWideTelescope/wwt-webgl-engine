@@ -23,8 +23,8 @@ describe('FitsImage', function() {
     var img = new wwtlib.FitsImage(null, fits_blob, function(wcsImage) {
 
       // Set up image layer with a FITS image
-      var width = ss.truncate(wcsImage.get_sizeX());
-      var height = ss.truncate(wcsImage.get_sizeY());
+      var width = wwtlib.ss.truncate(wcsImage.get_sizeX());
+      var height = wwtlib.ss.truncate(wcsImage.get_sizeY());
       var imageset = wwtlib.Imageset.create(wcsImage.get_description(), wwtlib.Util.getHashCode('test.fits').toString(), 2, 3, 5, wwtlib.Util.getHashCode('test.fits'), 0, 0, 256, wcsImage.get_scaleY(), '.tif', wcsImage.get_scaleX() > 0, '', wcsImage.get_centerX(), wcsImage.get_centerY(), wcsImage.get_rotation(), false, '', false, false, 1, wcsImage.get_referenceX(), wcsImage.get_referenceY(), wcsImage.get_copyright(), wcsImage.get_creditsUrl(), '', '', 0, '');
       imageset.set_wcsImage(wcsImage);
       layer.set_imageSet(imageset);
@@ -59,8 +59,8 @@ describe('FitsImage', function() {
     var fits_blob = new Blob([atob(FITS_FILE_BASE64)])
     var layer = new wwtlib.ImageSetLayer();
     var img = new wwtlib.FitsImage(null, fits_blob, function(wcsImage) {
-      var width = ss.truncate(wcsImage.get_sizeX());
-      var height = ss.truncate(wcsImage.get_sizeY());
+      var width = wwtlib.ss.truncate(wcsImage.get_sizeX());
+      var height = wwtlib.ss.truncate(wcsImage.get_sizeY());
       var imageset = wwtlib.Imageset.create(
         wcsImage.get_description(), // name
         wwtlib.Util.getHashCode('test.fits').toString(), // url

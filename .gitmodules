@@ -1,0 +1,3 @@
+[submodule "docs/themes/wwtguide"]
+	path = docs/themes/wwtguide
+	url = https://github.com/WorldWideTelescope/zola-wwtguide.git
