@@ -166,19 +166,6 @@ jobs:
       ContainerName: '$web'
       blobPrefix: engine/$(version_text_2)
 
-  - task: AzurePowerShell@4
-    displayName: Purge CDN
-    inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      azurePowerShellVersion: 'LatestVersion'
-      scriptType: 'inlineScript'
-      inline: |
-        Unpublish-AzCdnEndpointContent `
-          -ProfileName wwt-cdn-01 `
-          -ResourceGroupName wwt-web01 `
-          -EndpointName wwtweb-prod `
-          -PurgeContent '/engine/$(version_text)/*'
-
   # Publish the documentation
 
   - task: AzureFileCopy@3
@@ -191,8 +178,31 @@ jobs:
       ContainerName: '$web'
       blobPrefix: '_docs/webgl-reference/$(version_text)'
 
+  # Maybe publish to NPM
+
+  - task: Npm@1
+    condition: and(succeeded(), eq(variables['is_release'], 'true'))
+    inputs:
+      command: publish
+      publishEndpoint: 'aas_wwt@npmjs.com'
+
+  # Purge CDNs (last since this is slow and nearly optional)
+
   - task: AzurePowerShell@4
-    displayName: Purge CDN
+    displayName: Purge hosted JS CDN
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtweb-prod `
+          -PurgeContent '/engine/$(version_text)/*'
+
+  - task: AzurePowerShell@4
+    displayName: Purge docs CDN
     inputs:
       azureSubscription: 'aas@wwtadmindotnetfoundation'
       azurePowerShellVersion: 'LatestVersion'
@@ -203,11 +213,3 @@ jobs:
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtwebdocs-prod `
           -PurgeContent '/webgl-reference/$(version_text)/*'
-
-  # Maybe publish to NPM
-
-  - task: Npm@1
-    condition: and(succeeded(), eq(variables['is_release'], 'true'))
-    inputs:
-      command: publish
-      publishEndpoint: 'aas_wwt@npmjs.com'
