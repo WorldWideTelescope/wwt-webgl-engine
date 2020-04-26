@@ -14,7 +14,7 @@ reference on its usage and behavior.
 [WWT web client]: http://www.worldwidetelescope.org/webclient/
 
 {% note() %}
-The TpeScript engine described in this document is also sometimes called the
+The TypeScript engine described in this document is also sometimes called the
 “web control”, “web client”, or the “web SDK”.
 {% end %}
 
