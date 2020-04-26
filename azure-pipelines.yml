@@ -3,7 +3,8 @@
 trigger:
   branches:
     include:
-      - 7series
+      - master
+      - "refs/tags/v*"
 
 parameters:
 - name: 'zolaVersion'
