@@ -198,23 +198,46 @@ export namespace WWTControl {
    */
   export function initControl(divId: string): ScriptInterface;
 
+ /** Initialize the WWT engine with defaults.
+   *
+   * The same as [[initControl6]], with `startLat` and `startLng` defaulting to
+   * 0, `startZoom` defaulting to 360, and `startMode` defaulting to `"Sky"`.
+   */
+  export function initControl2(divId: string, startRenderLoop: boolean): ScriptInterface;
+
  /** Initialize the WWT engine.
    *
    * @param divId The `id` of the DOM element into which the WWT WebGL surface
    * will be inserted.
    * @param startRenderLoop If true, the engine's internal rendering loop will
    * be launched immediately.
+   * @param startLat The starting declination or latitude for the view, in
+   * degrees.
+   * @param startLng The starting longitude or right ascension for the view, in
+   * degrees.
+   * @param startZoom The starting zoom level for the view.
+   * @param startMode The starting mode for the view: one of `"earth"` or
+   * `"Sky"`.
    * @return A handle to a [[ScriptInterface]] associated with this engine
    * instance.
    *
    * The engine is not immediately usable since it must perform initialization
    * that includes fetching resources from the network.
    *
+   * If the value of `startMode` is not recognized, Sky mode is assumed.
+   *
    * Additional variants of this function, taking additional arguments, may be
    * added over time. Existing versions will be preserved to maintain backwards
    * compatibility.
    */
-  export function initControl2(divId: string, startRenderLoop: boolean): ScriptInterface;
+  export function initControl6(
+    divId: string,
+    startRenderLoop: boolean,
+    startLat: number,
+    startLng: number,
+    startZoom: number,
+    startMode: string
+  ): ScriptInterface;
 
   /** The global WWTControl singleton instance. */
   export const singleton: WWTControl;
