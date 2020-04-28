@@ -23,6 +23,90 @@ export interface ArrivedEventCallback {
   (si: ScriptInterface, args: ArrivedEventArgs): void;
 }
 
+/** An imagery layer that can be displayed in WWT. */
+export class Imageset {
+  get_altUrl(): string;
+  set_altUrl(url: string): string;
+
+  get_baseLevel(): number;
+  set_baseLevel(bl: number): number;
+
+  get_baseTileDegrees(): number;
+  set_baseTileDegrees(v: number): number;
+
+  get_bottomsUp(): boolean;
+  set_bottomsUp(bu: boolean): boolean;
+
+  get_centerX(): number;
+  set_centerX(cx: number): number;
+
+  get_centerY(): number;
+  set_centerY(cy: number): number;
+
+  get_creditsText(): string;
+  set_creditsText(ct: string): string;
+
+  get_creditsUrl(): string;
+  set_creditsUrl(cu: string): string;
+
+  get_defaultSet(): boolean;
+  set_defaultSet(ds: boolean): boolean;
+
+  get_demUrl(): string;
+  set_demUrl(url: string): string;
+
+  get_elevationModel(): boolean;
+  set_elevationModel(em: boolean): boolean;
+
+  get_extension(): string;
+  set_extension(ext: string): string;
+
+  get_generic(): boolean;
+  set_generic(g: boolean): boolean;
+
+  get_imageSetID(): number;
+  set_imageSetID(id: number): number;
+
+  get_levels(): number;
+  set_levels(levels: number): number;
+
+  get_meanRadius(): number;
+  set_meanRadius(mr: number): number;
+
+  get_mercator(): boolean;
+  set_mercator(m: boolean): boolean;
+
+  get_name(): string;
+  set_name(name: string): string;
+
+  get_offsetX(): number;
+  set_offsetX(ox: number): number;
+
+  get_offsetY(): number;
+  set_offsetY(oy: number): number;
+
+  get_rotation(): number;
+  set_rotation(r: number): number;
+
+  get_quadTreeTileMap(): string;
+  set_quadTreeTileMap(qttm: string): string;
+
+  get_singleImage(): boolean;
+  set_singleImage(si: boolean): boolean;
+
+  get_sparse(): boolean;
+  set_sparse(s: boolean): boolean;
+
+  get_thumbnailUrl(): string;
+  set_thumbnailUrl(url: string): string;
+
+  get_url(): string;
+  set_url(url: string): string;
+
+  get_widthFactor(): number;
+  set_widthFactor(f: number): number;
+}
+
 export interface ReadyEventCallback {
   /** Called when the WWT engine has finished its initialization. */
   (si: ScriptInterface): void;
@@ -183,6 +267,41 @@ export class WWTControl {
    * Navigating the view in this way ends any "tracking" status of the current view.
    */
   gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean): void;
+
+  /** Look up an imageset by its name.
+   *
+   * The name matching is case-insensitive, matches on substrings, and moves
+   * through a list of imagesets that may be populated in an unpredictable
+   * order. Therefore even if you provide a name that is an exact match for an
+   * existing imageset, you might get a different one than you expect.
+   *
+   * @param imagesetName The name to look up.
+   * @returns An imageset with a matching name, or null if none was found.
+   */
+  getImagesetByName(imagesetName: string): Imageset | null;
+
+  /** Set the background imageset using a name-based lookup.
+   *
+   * This function may change the viewer mode (e.g. sky, panorama, 3D solar
+   * system, etc.). To avoid display artifacts when switching to a planetary
+   * mode, set the foreground imageset to the same value using
+   * [[setForegroundImageByName]].
+   *
+   * The imageset lookup is done using [[getImagesetByName]]. If the imageset is
+   * not found, this function silently does nothing.
+   *
+   * @param imagesetName: The imageset name.
+  */
+  setBackgroundImageByName(imagesetName: string): void;
+
+  /** Set the foreground imageset using a name-based lookup.
+   *
+   * The imageset lookup is done using [[getImagesetByName]]. If the imageset is
+   * not found, this function silently does nothing.
+   *
+   * @param imagesetName: The imageset name.
+  */
+  setForegroundImageByName(imagesetName: string): void;
 }
 
 export namespace WWTControl {
