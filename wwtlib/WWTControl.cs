@@ -30,10 +30,6 @@ namespace wwtlib
 
         public static List<Imageset> ImageSets = new List<Imageset>();
         public static Folder ExploreRoot = new Folder();
-        public static double StartLat = 0;
-        public static double StartLng = 0;
-        public static double StartZoom = 360;
-        public static string StartMode = "Sky";
         public static string ImageSetName = "";
 
         public IUiController uiController = null;
@@ -1364,66 +1360,6 @@ namespace wwtlib
 
         }
 
-        CanvasElement foregroundCanvas = null;
-        CanvasContext2D fgDevice = null;
-        Folder webFolder;
-        public void Setup(CanvasElement canvas)
-        {
-            Window.AddEventListener("contextmenu", OnContextMenu, false);
-            canvas.AddEventListener("dblclick", OnDoubleClick, false);
-            //canvas.AddEventListener("mousemove", OnMouseMove, false);
-            //canvas.AddEventListener("mouseup", OnMouseUp, false);
-            //canvas.AddEventListener("pointerdown", OnPointerDown, false);
-            canvas.AddEventListener("mousedown", OnMouseDown, false);
-            canvas.AddEventListener("mousewheel", OnMouseWheel, false);
-            canvas.AddEventListener("DOMMouseScroll", OnMouseWheel, false);  // this is for firefox as it does not support mousewheel
-            canvas.AddEventListener("touchstart", OnTouchStart, false);
-            canvas.AddEventListener("touchmove", OnTouchMove, false);
-            canvas.AddEventListener("touchend", OnTouchEnd, false);
-            canvas.AddEventListener("gesturechange", OnGestureChange, false);
-            canvas.AddEventListener("gesturestart", OnGestureStart, false);
-            canvas.AddEventListener("gestureend", OnGestureEnd, false);
-            Document.Body.AddEventListener("keydown", OnKeyDown, false);
-            //canvas.AddEventListener("MSGestureChange", OnGestureChange, false);
-            //canvas.AddEventListener("mouseout", OnMouseUp, false);
-
-            // MS Touch code
-            canvas.AddEventListener("pointerdown", OnPointerDown, false);
-
-            canvas.AddEventListener("pointermove", OnPointerMove, false);
-
-            canvas.AddEventListener("pointerup", OnPointerUp, false);
-
-
-            // End MS touch code
-
-            RenderContext.ViewCamera.Lat = StartLat;
-            RenderContext.ViewCamera.Lng = StartLng;
-            RenderContext.ViewCamera.Zoom = StartZoom;
-
-            RenderContext.TargetCamera = RenderContext.ViewCamera.Copy();
-
-            if (RenderContext.gl == null)
-            {
-                foregroundCanvas = (CanvasElement)Document.CreateElement("canvas");
-                foregroundCanvas.Width = canvas.Width;
-                foregroundCanvas.Height = canvas.Height;
-                fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
-            }
-
-            webFolder = new Folder();
-            webFolder.LoadFromUrl(
-                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
-                SetupComplete
-            );
-        }
-
-        public void SetupComplete()
-        {
-            Wtml.LoadImagesets(webFolder);
-            scriptInterface.FireReady();
-        }
-
         public void OnKeyDown(ElementEvent e)
         {
             if (uiController != null)
@@ -1987,6 +1923,9 @@ namespace wwtlib
         }
 
         public static ScriptInterface scriptInterface;
+        CanvasElement foregroundCanvas = null;
+        CanvasContext2D fgDevice = null;
+        Folder webFolder;
 
         // For backwards compatibility, we preserve the semantics that calling
         // this function kicks off the rendering loop.
@@ -2004,6 +1943,25 @@ namespace wwtlib
         }
 
         public static ScriptInterface InitControl2(string DivId, bool startRenderLoop)
+        {
+            return InitControl6(
+                DivId,
+                startRenderLoop,
+                0,
+                0,
+                360,
+                "Sky"
+            );
+        }
+
+        public static ScriptInterface InitControl6(
+            string DivId,
+            bool startRenderLoop,
+            double startLat,
+            double startLng,
+            double startZoom,
+            string startMode
+        )
         {
             if (Singleton.RenderContext.Device == null)
             {
@@ -2032,59 +1990,72 @@ namespace wwtlib
                 Singleton.Canvas = canvas;
                 Singleton.RenderContext.Width = canvas.Width;
                 Singleton.RenderContext.Height = canvas.Height;
-                Singleton.Setup(canvas);
+                Singleton.Setup(canvas, startLat, startLng, startZoom);
 
-                Singleton.RenderContext.BackgroundImageset = Imageset.Create(
-                    "DSS",
-                    URLHelpers.singleton.coreStaticUrl("wwtweb/dss.aspx?q={1},{2},{3}"),
-                    ImageSetType.Sky,
-                    BandPass.Visible,
-                    ProjectionType.Toast,
-                    100,
-                    0,
-                    12,
-                    256,
-                    180,
-                    ".png",
-                    false,
-                    "",
-                    0,
-                    0,
-                    0,
-                    false,
-                    URLHelpers.singleton.coreStaticUrl("thumbnails/DSS.png"),
-                    true,
-                    false,
-                    0,
-                    0,
-                    0,
-                    "",
-                    "",
-                    "",
-                    "",
-                    1,
-                    "Sky"
-                );
-
-                if (StartMode == "earth")
-                {
+                if (startMode == "earth") {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                         "Blue Marble",
                         URLHelpers.singleton.coreStaticUrl("wwtweb/tiles.aspx?q={1},{2},{3},bm200407"),
-                        ImageSetType.Earth, BandPass.Visible, ProjectionType.Toast, 101,
-                        0, 7, 256, 180, ".png", false, "", 0, 0, 0, false,
+                        ImageSetType.Earth,
+                        BandPass.Visible,
+                        ProjectionType.Toast,
+                        101,
+                        0,
+                        7,
+                        256,
+                        180,
+                        ".png",
+                        false,
+                        "",
+                        0,
+                        0,
+                        0,
+                        false,
                         URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=bm200407"),
-                        true, false, 0, 0, 0, "", "", "", "", 6371000, "Earth");
-                }
-                else if (StartMode == "bing")
-                {
+                        true,
+                        false,
+                        0,
+                        0,
+                        0,
+                        "",
+                        "",
+                        "",
+                        "",
+                        6371000,
+                        "Earth"
+                    );
+                } else {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
-                     "Virtual Earth Aerial",
-                     "//a{0}.ortho.tiles.virtualearth.net/tiles/a{1}.jpeg?g=15",
-                     ImageSetType.Earth, BandPass.Visible, ProjectionType.Mercator, 102,
-                     1, 20, 256, 360, ".png", false, "0123", 0, 0, 0, false,
-                     URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=earth"),
-                     true, false, 0, 0, 0, "", "", "", "", 6371000, "Earth");
+                        "DSS",
+                        URLHelpers.singleton.coreStaticUrl("wwtweb/dss.aspx?q={1},{2},{3}"),
+                        ImageSetType.Sky,
+                        BandPass.Visible,
+                        ProjectionType.Toast,
+                        100,
+                        0,
+                        12,
+                        256,
+                        180,
+                        ".png",
+                        false,
+                        "",
+                        0,
+                        0,
+                        0,
+                        false,
+                        URLHelpers.singleton.coreStaticUrl("thumbnails/DSS.png"),
+                        true,
+                        false,
+                        0,
+                        0,
+                        0,
+                        "",
+                        "",
+                        "",
+                        "",
+                        1,
+                        "Sky"
+                    );
                 }
             }
 
@@ -2096,6 +2067,68 @@ namespace wwtlib
             }
 
             return scriptInterface;
+        }
+
+        private static CanvasElement CreateCanvasElement(string DivId)
+        {
+            DivElement div = (DivElement) Document.GetElementById(DivId);
+
+            CanvasElement canvas = (CanvasElement) Document.CreateElement("canvas");
+            canvas.Height = div.ClientHeight;
+            canvas.Width = div.ClientWidth;
+            div.AppendChild(canvas);
+            return canvas;
+        }
+
+        // Note that due to limitations of ScriptSharp, this method must be
+        // public even though it should really be private.
+        public void Setup(
+            CanvasElement canvas,
+            double startLat,
+            double startLng,
+            double startZoom
+        ) {
+            Window.AddEventListener("contextmenu", OnContextMenu, false);
+            Document.Body.AddEventListener("keydown", OnKeyDown, false);
+            canvas.AddEventListener("dblclick", OnDoubleClick, false);
+            canvas.AddEventListener("mousedown", OnMouseDown, false);
+            canvas.AddEventListener("mousewheel", OnMouseWheel, false);
+            canvas.AddEventListener("DOMMouseScroll", OnMouseWheel, false);  // Firefox
+            canvas.AddEventListener("touchstart", OnTouchStart, false);
+            canvas.AddEventListener("touchmove", OnTouchMove, false);
+            canvas.AddEventListener("touchend", OnTouchEnd, false);
+            canvas.AddEventListener("gesturechange", OnGestureChange, false);
+            canvas.AddEventListener("gesturestart", OnGestureStart, false);
+            canvas.AddEventListener("gestureend", OnGestureEnd, false);
+            canvas.AddEventListener("pointerdown", OnPointerDown, false);
+            canvas.AddEventListener("pointermove", OnPointerMove, false);
+            canvas.AddEventListener("pointerup", OnPointerUp, false);
+
+            RenderContext.ViewCamera.Lat = startLat;
+            RenderContext.ViewCamera.Lng = startLng;
+            RenderContext.ViewCamera.Zoom = startZoom;
+
+            RenderContext.TargetCamera = RenderContext.ViewCamera.Copy();
+
+            if (RenderContext.gl == null)
+            {
+                foregroundCanvas = (CanvasElement)Document.CreateElement("canvas");
+                foregroundCanvas.Width = canvas.Width;
+                foregroundCanvas.Height = canvas.Height;
+                fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
+            }
+
+            webFolder = new Folder();
+            webFolder.LoadFromUrl(
+                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
+                SetupComplete
+            );
+        }
+
+        void SetupComplete()
+        {
+            Wtml.LoadImagesets(webFolder);
+            scriptInterface.FireReady();
         }
 
         public static void UseUserLocation()
@@ -2125,32 +2158,6 @@ namespace wwtlib
                 double lat = pos.Coords.Latitude;
                 double lng = pos.Coords.Longitude;
 
-            }
-        }
-
-        private static CanvasElement CreateCanvasElement(string DivId)
-        {
-            DivElement div = (DivElement) Document.GetElementById(DivId);
-
-            CanvasElement canvas = (CanvasElement) Document.CreateElement("canvas");
-            canvas.Height = div.ClientHeight;
-            canvas.Width = div.ClientWidth;
-            div.AppendChild(canvas);
-            return canvas;
-        }
-
-        public static void Go(string mode, double lat, double lng, double zoom)
-        {
-            if (mode != null && mode.Length > 0)
-            {
-                WWTControl.StartMode = mode;
-            }
-
-            if (zoom != 0)
-            {
-                WWTControl.StartLat = lat;
-                WWTControl.StartLng = lng;
-                WWTControl.StartZoom = zoom * 6;
             }
         }
 
