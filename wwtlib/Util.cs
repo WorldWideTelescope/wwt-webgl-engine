@@ -430,16 +430,17 @@ namespace wwtlib
 
             string val = value.Substr(0, 1).ToLowerCase() + value.Substr(1);
 
-            return (int)Script.Literal("wwtlib[{0}][{1}]", enumType, val);
-
-            // Script.Literal(" var x; var p = Object.keys(wwtlib[{0}]); for (var i in p)\n {{ if ( p[i].toLowerCase() == {1}.toLowerCase() ) {{\n x = wwtlib[{0}][p[i]]; break; \n}}\n }}", enumType, value);
-
-            // return (int)Script.Literal(" x");
+            // To keep the C# compilation tractable, we need to pass the enum
+            // type as a string value. Unfortunately this means that we have to
+            // somehow dynamically look up the enum type. The JS framework
+            // has a hack to set `Enums._wwtlib` to point to the wwtlib namespace
+            // object, making the lookup hack possible.
+            return (int)Script.Literal("this._wwtlib[{0}][{1}]", enumType, val);
         }
 
         public static string ToXml(string enumType, int value)
         {
-            Script.Literal(" var x = \"0\"; var p = Object.keys(wwtlib[{0}]); for (var i in p)\n {{ if ( wwtlib[{0}][p[i]] == {1} ) {{\n x = p[i]; break; \n}}\n }}", enumType, value);
+            Script.Literal(" var x = \"0\"; var p = Object.keys(this._wwtlib[{0}]); for (var i in p)\n {{ if ( this._wwtlib[{0}][p[i]] == {1} ) {{\n x = p[i]; break; \n}}\n }}", enumType, value);
             string val = (string)Script.Literal(" x");
 
             string enumString  = val.Substr(0, 1).ToUpperCase() + val.Substr(1);
