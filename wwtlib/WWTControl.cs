@@ -1364,66 +1364,6 @@ namespace wwtlib
 
         }
 
-        CanvasElement foregroundCanvas = null;
-        CanvasContext2D fgDevice = null;
-        Folder webFolder;
-        public void Setup(CanvasElement canvas)
-        {
-            Window.AddEventListener("contextmenu", OnContextMenu, false);
-            canvas.AddEventListener("dblclick", OnDoubleClick, false);
-            //canvas.AddEventListener("mousemove", OnMouseMove, false);
-            //canvas.AddEventListener("mouseup", OnMouseUp, false);
-            //canvas.AddEventListener("pointerdown", OnPointerDown, false);
-            canvas.AddEventListener("mousedown", OnMouseDown, false);
-            canvas.AddEventListener("mousewheel", OnMouseWheel, false);
-            canvas.AddEventListener("DOMMouseScroll", OnMouseWheel, false);  // this is for firefox as it does not support mousewheel
-            canvas.AddEventListener("touchstart", OnTouchStart, false);
-            canvas.AddEventListener("touchmove", OnTouchMove, false);
-            canvas.AddEventListener("touchend", OnTouchEnd, false);
-            canvas.AddEventListener("gesturechange", OnGestureChange, false);
-            canvas.AddEventListener("gesturestart", OnGestureStart, false);
-            canvas.AddEventListener("gestureend", OnGestureEnd, false);
-            Document.Body.AddEventListener("keydown", OnKeyDown, false);
-            //canvas.AddEventListener("MSGestureChange", OnGestureChange, false);
-            //canvas.AddEventListener("mouseout", OnMouseUp, false);
-
-            // MS Touch code
-            canvas.AddEventListener("pointerdown", OnPointerDown, false);
-
-            canvas.AddEventListener("pointermove", OnPointerMove, false);
-
-            canvas.AddEventListener("pointerup", OnPointerUp, false);
-
-
-            // End MS touch code
-
-            RenderContext.ViewCamera.Lat = StartLat;
-            RenderContext.ViewCamera.Lng = StartLng;
-            RenderContext.ViewCamera.Zoom = StartZoom;
-
-            RenderContext.TargetCamera = RenderContext.ViewCamera.Copy();
-
-            if (RenderContext.gl == null)
-            {
-                foregroundCanvas = (CanvasElement)Document.CreateElement("canvas");
-                foregroundCanvas.Width = canvas.Width;
-                foregroundCanvas.Height = canvas.Height;
-                fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
-            }
-
-            webFolder = new Folder();
-            webFolder.LoadFromUrl(
-                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
-                SetupComplete
-            );
-        }
-
-        public void SetupComplete()
-        {
-            Wtml.LoadImagesets(webFolder);
-            scriptInterface.FireReady();
-        }
-
         public void OnKeyDown(ElementEvent e)
         {
             if (uiController != null)
@@ -2096,6 +2036,67 @@ namespace wwtlib
             }
 
             return scriptInterface;
+        }
+
+        CanvasElement foregroundCanvas = null;
+        CanvasContext2D fgDevice = null;
+        Folder webFolder;
+
+        public void Setup(CanvasElement canvas)
+        {
+            Window.AddEventListener("contextmenu", OnContextMenu, false);
+            canvas.AddEventListener("dblclick", OnDoubleClick, false);
+            //canvas.AddEventListener("mousemove", OnMouseMove, false);
+            //canvas.AddEventListener("mouseup", OnMouseUp, false);
+            //canvas.AddEventListener("pointerdown", OnPointerDown, false);
+            canvas.AddEventListener("mousedown", OnMouseDown, false);
+            canvas.AddEventListener("mousewheel", OnMouseWheel, false);
+            canvas.AddEventListener("DOMMouseScroll", OnMouseWheel, false);  // this is for firefox as it does not support mousewheel
+            canvas.AddEventListener("touchstart", OnTouchStart, false);
+            canvas.AddEventListener("touchmove", OnTouchMove, false);
+            canvas.AddEventListener("touchend", OnTouchEnd, false);
+            canvas.AddEventListener("gesturechange", OnGestureChange, false);
+            canvas.AddEventListener("gesturestart", OnGestureStart, false);
+            canvas.AddEventListener("gestureend", OnGestureEnd, false);
+            Document.Body.AddEventListener("keydown", OnKeyDown, false);
+            //canvas.AddEventListener("MSGestureChange", OnGestureChange, false);
+            //canvas.AddEventListener("mouseout", OnMouseUp, false);
+
+            // MS Touch code
+            canvas.AddEventListener("pointerdown", OnPointerDown, false);
+
+            canvas.AddEventListener("pointermove", OnPointerMove, false);
+
+            canvas.AddEventListener("pointerup", OnPointerUp, false);
+
+
+            // End MS touch code
+
+            RenderContext.ViewCamera.Lat = StartLat;
+            RenderContext.ViewCamera.Lng = StartLng;
+            RenderContext.ViewCamera.Zoom = StartZoom;
+
+            RenderContext.TargetCamera = RenderContext.ViewCamera.Copy();
+
+            if (RenderContext.gl == null)
+            {
+                foregroundCanvas = (CanvasElement)Document.CreateElement("canvas");
+                foregroundCanvas.Width = canvas.Width;
+                foregroundCanvas.Height = canvas.Height;
+                fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
+            }
+
+            webFolder = new Folder();
+            webFolder.LoadFromUrl(
+                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
+                SetupComplete
+            );
+        }
+
+        public void SetupComplete()
+        {
+            Wtml.LoadImagesets(webFolder);
+            scriptInterface.FireReady();
         }
 
         public static void UseUserLocation()
