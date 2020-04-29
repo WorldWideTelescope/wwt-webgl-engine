@@ -1994,67 +1994,67 @@ namespace wwtlib
 
                 if (startMode == "earth") {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
-                        "Blue Marble",
-                        URLHelpers.singleton.coreStaticUrl("wwtweb/tiles.aspx?q={1},{2},{3},bm200407"),
-                        ImageSetType.Earth,
-                        BandPass.Visible,
-                        ProjectionType.Toast,
-                        101,
-                        0,
-                        7,
-                        256,
-                        180,
-                        ".png",
-                        false,
-                        "",
-                        0,
-                        0,
-                        0,
-                        false,
-                        URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=bm200407"),
-                        true,
-                        false,
-                        0,
-                        0,
-                        0,
-                        "",
-                        "",
-                        "",
-                        "",
-                        6371000,
-                        "Earth"
+                        "Blue Marble",  // name
+                        URLHelpers.singleton.coreStaticUrl("wwtweb/tiles.aspx?q={1},{2},{3},bm200407"),  // url
+                        ImageSetType.Earth,  // dataSetType
+                        BandPass.Visible,  // bandPass
+                        ProjectionType.Toast,  // projectionType
+                        101,  // imageSetID
+                        0,  // baseLevel
+                        7,  // levels
+                        256,  // tileSize (unused)
+                        180,  // baseTileDegrees
+                        ".png",  // extension
+                        false,  // bottomsUp
+                        "",  // quadTreeMap
+                        0,  // centerX
+                        0,  // centerY
+                        0,  // rotation
+                        false,  // sparse
+                        URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=bm200407"),  // thumbnailUrl
+                        true,  // defaultSet
+                        false,  // elevationModel
+                        0,  // widthFactor
+                        0,  // offsetX
+                        0,  // offsetY
+                        "",  // creditsText
+                        "",  // creditsUrl
+                        "",  // demUrl
+                        "",  // altUrl
+                        6371000,  // meanRadius
+                        "Earth"  // referenceFrame
                     );
                 } else {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
-                        "DSS",
-                        URLHelpers.singleton.coreStaticUrl("wwtweb/dss.aspx?q={1},{2},{3}"),
-                        ImageSetType.Sky,
-                        BandPass.Visible,
-                        ProjectionType.Toast,
-                        100,
-                        0,
-                        12,
-                        256,
-                        180,
-                        ".png",
-                        false,
-                        "",
-                        0,
-                        0,
-                        0,
-                        false,
-                        URLHelpers.singleton.coreStaticUrl("thumbnails/DSS.png"),
-                        true,
-                        false,
-                        0,
-                        0,
-                        0,
-                        "",
-                        "",
-                        "",
-                        "",
-                        1,
-                        "Sky"
+                        "DSS",  // name
+                        URLHelpers.singleton.coreStaticUrl("wwtweb/dss.aspx?q={1},{2},{3}"), // url
+                        ImageSetType.Sky,  // dataSetType
+                        BandPass.Visible,  // bandPass
+                        ProjectionType.Toast,  // projectionType
+                        100,  // imageSetId
+                        0,   // baseLevel
+                        12,  // levels
+                        256,  // tileSize (unused)
+                        180,  // baseTileDegrees
+                        ".png",  // extension
+                        false,  // bottomsUp
+                        "",  // quadTreeMap
+                        0,  // centerX
+                        0,  // centerY
+                        0,  // rotation
+                        false,  // sparse
+                        URLHelpers.singleton.coreStaticUrl("thumbnails/DSS.png"),  // thumbnailUrl
+                        true,  // defaultSet
+                        false,  // elevationModel
+                        0,  // widthFactor
+                        0,  // offsetX
+                        0,  // offsetY
+                        "",  // creditsText
+                        "",  // creditsUrl
+                        "",  // demUrl
+                        "",  // altUrl
+                        1,  // meanRadius
+                        "Sky"  // referenceFrame
                     );
                 }
             }
