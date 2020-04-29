@@ -95,10 +95,47 @@ declare enum Classification {
   other = 436207616
 }
 
+export namespace Imageset {
+  export function create(
+    name: string,
+    url: string,
+    dataSetType: ImageSetType,
+    bandPass: BandPass,
+    projection: ProjectionType,
+    imageSetID: number,
+    baseLevel: number,
+    levels: number,
+    unused_tileSize: null,
+    baseTileDegrees: number,
+    extension: string,
+    bottomsUp: boolean,
+    quadTreeMap: string,
+    centerX: number,
+    centerY: number,
+    rotation: number,
+    sparse: boolean,
+    thumbnailUrl: string,
+    defaultSet: boolean,
+    elevationModel: boolean,
+    widthFactor: number,
+    offsetX: number,
+    offsetY: number,
+    creditsText: string,
+    creditsUrl: string,
+    demUrl: string,
+    altUrl: string,
+    meanRadius: number,
+    referenceFrame: string
+  ): Imageset;
+}
+
 /** An imagery layer that can be displayed in WWT. */
 export class Imageset {
   get_altUrl(): string;
   set_altUrl(url: string): string;
+
+  get_bandPass(): BandPass;
+  set_bandPass(bp: BandPass): BandPass;
 
   get_baseLevel(): number;
   set_baseLevel(bl: number): number;
@@ -120,6 +157,9 @@ export class Imageset {
 
   get_creditsUrl(): string;
   set_creditsUrl(cu: string): string;
+
+  get_dataSetType(): ImageSetType;
+  set_dataSetType(st: ImageSetType): ImageSetType;
 
   get_defaultSet(): boolean;
   set_defaultSet(ds: boolean): boolean;
@@ -157,6 +197,12 @@ export class Imageset {
   get_offsetY(): number;
   set_offsetY(oy: number): number;
 
+  get_projection(): ProjectionType;
+  set_projection(pt: ProjectionType): ProjectionType;
+
+  get_referenceFrame(): string;
+  set_referenceFrame(rf: string): string;
+
   get_rotation(): number;
   set_rotation(r: number): number;
 
@@ -177,6 +223,8 @@ export class Imageset {
 
   get_widthFactor(): number;
   set_widthFactor(f: number): number;
+
+  getHashCode(): number;
 }
 
 declare enum ImageSetType {
