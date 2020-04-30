@@ -1,0 +1,20 @@
+{
+  "name": "@wwtelescope/engine-types",
+  "version": "7.0.0",
+  "description": "Types used by the AAS WorldWide Telescope.",
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "homepage": "https://worldwidetelescope.org/home/",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
+  "bugs": {
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues",
+    "email": "wwt@aas.org"
+  },
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  }
+}

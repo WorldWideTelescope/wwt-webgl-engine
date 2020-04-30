@@ -1,8 +1,13 @@
 {
   "private": true,
   "name": "wwt-webgl-engine-monorepo",
+  "scripts": {
+    "build": "lerna exec --concurrency 1 -- npm run build",
+    "semantic-release": "lerna exec --concurrency 1 -- semantic-release -e semantic-release-monorepo --tag-format='${LERNA_PACKAGE_NAME}-v\\${version}'"
+  },
   "dependencies": {
-    "@wwtelescope/engine": "file:engine"
+    "@wwtelescope/engine": "file:engine",
+    "@wwtelescope/engine-types": "file:engine-types"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.26.0",
