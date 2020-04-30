@@ -5,7 +5,7 @@
 //
 // Try to keep everything alphabetized.
 
-enum AltTypes {
+export enum AltTypes {
   depth = 0,
   altitude = 1,
   distance = 2,
@@ -13,7 +13,7 @@ enum AltTypes {
   terrain = 4
 }
 
-enum AltUnits {
+export enum AltUnits {
   meters = 1,
   feet = 2,
   inches = 3,
@@ -26,7 +26,7 @@ enum AltUnits {
   custom = 10
 }
 
-enum BandPass {
+export enum BandPass {
   gamma = 0,
   xRay = 1,
   ultraviolet = 2,
@@ -38,7 +38,7 @@ enum BandPass {
   visibleNight = 6
 }
 
-enum Classification {
+export enum Classification {
   star = 1,
   supernova = 2,
   blackHole = 4,
@@ -77,7 +77,7 @@ enum Classification {
   other = 436207616
 }
 
-enum ImageSetType {
+export enum ImageSetType {
   earth = 0,
   planet = 1,
   sky = 2,
@@ -86,7 +86,7 @@ enum ImageSetType {
   sandbox = 5
 }
 
-enum ProjectionType {
+export enum ProjectionType {
   mercator = 0,
   equirectangular = 1,
   tangent = 2,
@@ -97,7 +97,7 @@ enum ProjectionType {
   plotted = 6
 }
 
-enum ReferenceFrames {
+export enum ReferenceFrames {
   sky = 0,
   ecliptic = 1,
   galactic = 2,
@@ -121,14 +121,14 @@ enum ReferenceFrames {
   sandbox = 20
 }
 
-enum ReferenceFrameTypes {
+export enum ReferenceFrameTypes {
   fixedSherical = 0,
   orbital = 1,
   trajectory = 2,
   synodic = 3
 }
 
-enum SolarSystemObjects {
+export enum SolarSystemObjects {
   sun = 0,
   mercury = 1,
   venus = 2,
