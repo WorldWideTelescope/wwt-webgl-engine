@@ -4,7 +4,8 @@
     "astro",
     "engine",
     "engine-helpers",
-    "engine-vuex"
+    "engine-vuex",
+    "embed-common"
   ],
   "version": "independent",
   "npmClient": "npm",

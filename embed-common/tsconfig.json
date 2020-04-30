@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "typedocOptions": {
+    "out": "../docs/static/apiref/embed-common",
+    "mode": "library",
+    "gaID": "UA-107473046-3",
+    "excludeNotExported": true,
+    "excludePrivate": true,
+    "listInvalidSymbolLinks": true
+  }
+}
