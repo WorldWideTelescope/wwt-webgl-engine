@@ -1,8 +1,2 @@
+node_modules/
 /.vs/
-/docs/html/
-/node_modules/
-/package-lock.json
-/src/index.js
-/src/index.min.js
-/wwtlib/bin/
-/wwtlib/obj/
