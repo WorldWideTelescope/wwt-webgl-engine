@@ -41,15 +41,11 @@ namespace wwtlib
             Canvas.AddEventListener("mousemove", OnMouseMove, false);
             Canvas.AddEventListener("mouseup", OnMouseUp, false);
             Canvas.AddEventListener("mousedown", OnMouseDown, false);
-            Canvas.AddEventListener("mousewheel", OnMouseWheel, false);
             Canvas.AddEventListener("touchstart", OnTouchStart, false);
             Canvas.AddEventListener("touchmove", OnTouchMove, false);
             Canvas.AddEventListener("touchend", OnTouchEnd, false);
-            //Document.Body.AddEventListener("gesturechange", OnGestureChange, false);
             Canvas.AddEventListener("mouseout", OnMouseUp, false);
-
         }
-   
 
         int indexTouchDown = -1;
         public void OnTouchStart(ElementEvent e)
@@ -317,39 +313,6 @@ namespace wwtlib
             Refresh();
 
         }
-
-        public void OnMouseWheel(ElementEvent e)
-        {
-            WheelEvent ev = (WheelEvent)(object)e;
-            //firefox
-            //    double delta = event.detail ? event.detail * (-120) : event.wheelDelta;
-            double delta = ev.WheelDelta;
-
-        }
-        //int imageCount = 0;
-        //int imageLoadCount = 0;
-        //bool imagesLoaded = false;
-        //bool downloading = false;
-        //ImageElement LoadImageElement(string url)
-        //{
-        //    imageCount++;
-        //    imagesLoaded = false;
-        //    downloading = true;
-        //    ImageElement temp = (ImageElement)Document.CreateElement("img");
-        //    temp.Src = url;
-        //    temp.AddEventListener("load", delegate(ElementEvent e)
-        //    {
-        //        ImageLoadCount++;
-        //        if (imageLoadCount == imageCount)
-        //        {
-        //            downloading = false;
-        //            ImagesLoaded = true;
-        //           // Refresh();
-        //        }
-        //    }, false);
-
-        //    return temp;
-        //}
 
         public void LoadImages()
         {
