@@ -1,21 +1,6 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "lib": [
       "esnext",
       "dom",
@@ -24,25 +9,16 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/index.d.ts"
   ],
   "exclude": [
     "node_modules"
   ],
   "typedocOptions": {
     "mode": "file",
-    "readme": "docs/typedoc_index.md",
     "includeDeclarations": true,
     "excludeExternals": true,
     "excludeNotExported": true,
     "excludePrivate": true,
-    "disableSources": true,
-    "gaID": "UA-107473046-3",
-    "listInvalidSymbolLinks": true,
-    "out": "docs/public/apiref"
   }
 }

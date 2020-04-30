@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/engine",
-  "version": "7.0.2-dev.0",
+  "version": "7.0.2",
   "description": "The AAS WorldWide Telescope WebGL engine",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -33,6 +33,10 @@
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
     "tscheck": "tsc",
     "uglify": "uglifyjs src/index.js -c -o src/index.min.js",
+    "build": "npm run concat-index && npm run uglify",
     "doc": "typedoc"
+  },
+  "dependencies": {
+    "@wwtelescope/engine-types": "^7.0.0"
   }
 }
