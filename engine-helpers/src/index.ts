@@ -25,7 +25,7 @@ import {
 export const enum InitControlViewType {
   Sky = "Sky",
   Earth = "earth",
-};
+}
 
 /** Options for the [[WWTInstance]] constructor. */
 export interface InitControlSettings {
@@ -48,7 +48,7 @@ export interface InitControlSettings {
 
   /** The starting mode of the WWT view. */
   startMode?: InitControlViewType;
-};
+}
 
 const initControlDefaults: InitControlSettings = {
   elId: "wwt",
@@ -64,7 +64,7 @@ interface ResolveFunction<T> {
 }
 
 interface RejectFunction {
-  (reason?: any): void;
+  (reason?: any): void;  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 class SavedPromise<T> {
@@ -115,75 +115,75 @@ export class WWTInstance {
     this.applySetting([WWTBooleanSetting.showCrosshairs, false]);
 
     // Ready promise initialization:
-    this.si.add_ready((si) => {
-      for (let p of this.ready_promises) {
+    this.si.add_ready((_si) => {
+      for (const p of this.readyPromises) {
         p.resolve();
       }
 
-      this.ready_fired = true;
-      this.ready_promises = [];
+      this.readyFired = true;
+      this.readyPromises = [];
     });
 
     // Arrival promise initialization:
-    this.si.add_arrived((si, args) => {
-      for (let p of this.arrive_promises) {
-        if (p.seqnum < this.arrive_seqnum) {
+    this.si.add_arrived((_si, _args) => {
+      for (const p of this.arrivePromises) {
+        if (p.seqnum < this.arriveSeqnum) {
           p.reject("superseded");
         } else {
           p.resolve();
         }
       }
 
-      this.arrive_promises = [];
+      this.arrivePromises = [];
     });
   }
 
   // Ready promises
 
-  private ready_promises: SavedPromise<void>[] = [];
-  private ready_fired: boolean = false;
+  private readyPromises: SavedPromise<void>[] = [];
+  private readyFired = false;
 
   async waitForReady(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (this.ready_fired) {
+      if (this.readyFired) {
         resolve();
       } else {
-        this.ready_promises.push(new SavedPromise(0, resolve, reject));
+        this.readyPromises.push(new SavedPromise(0, resolve, reject));
       }
     });
   }
 
   // Arrival promises
 
-  private arrive_promises: SavedPromise<void>[] = [];
-  private arrive_seqnum: number = 0;
+  private arrivePromises: SavedPromise<void>[] = [];
+  private arriveSeqnum = 0;
 
-  private makeArrivePromise(instant_resolve: boolean): Promise<void> {
-    this.arrive_seqnum += 1;
-    let seq = this.arrive_seqnum;
+  private makeArrivePromise(instantResolve: boolean): Promise<void> {
+    this.arriveSeqnum += 1;
+    const seq = this.arriveSeqnum;
 
-    for (let p of this.arrive_promises) {
+    for (const p of this.arrivePromises) {
       p.reject("superseded");
     }
 
-    this.arrive_promises = [];
+    this.arrivePromises = [];
 
     return new Promise((resolve, reject) => {
-      if (this.arrive_seqnum > seq) {
+      if (this.arriveSeqnum > seq) {
         reject("superseded");
-      } else if (instant_resolve) {
+      } else if (instantResolve) {
         resolve();
       } else {
-        this.arrive_promises.push(new SavedPromise(seq, resolve, reject));
+        this.arrivePromises.push(new SavedPromise(seq, resolve, reject));
       }
     });
   }
 
-  async gotoRADecZoom(ra_rad: number, dec_rad: number, zoom_deg: number, instant: boolean) {
+  async gotoRADecZoom(raRad: number, decRad: number, zoomDeg: number, instant: boolean): Promise<void> {
     this.ctl.gotoRADecZoom(
-      ra_rad * R2H,
-      dec_rad * R2D,
-      zoom_deg,
+      raRad * R2H,
+      decRad * R2D,
+      zoomDeg,
       instant
     );
     return this.makeArrivePromise(instant);
@@ -191,8 +191,8 @@ export class WWTInstance {
 
   // "Mutator" type operations -- not async.
 
-  applySetting(setting: WWTSetting) {
-    let value: any = setting[1];
+  applySetting(setting: WWTSetting): void {
+    const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
     let sname: string;
 
     if (typeof value === "boolean") {
@@ -209,14 +209,14 @@ export class WWTInstance {
       throw new Error("can't happen");
     }
 
-    (this.si.settings as any)["set_" + sname](value);
+    (this.si.settings as any)["set_" + sname](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 
-  setBackgroundImageByName(imagesetName: string) {
+  setBackgroundImageByName(imagesetName: string): void {
     this.ctl.setBackgroundImageByName(imagesetName);
   }
 
-  setForegroundImageByName(imagesetName: string) {
+  setForegroundImageByName(imagesetName: string): void {
     this.ctl.setForegroundImageByName(imagesetName);
   }
 }
