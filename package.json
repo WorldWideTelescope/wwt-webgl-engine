@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "wwt-webgl-engine-monorepo",
+  "dependencies": {
+    "@wwtelescope/engine": "file:engine"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "concat-cli": "^4.0.0",
+    "eslint": "^6.7.2",
+    "lerna": "^3.20.2",
+    "typedoc": "^0.17.4",
+    "typescript": "~3.8.3",
+    "uglify-js": "^3.9.1"
+  }
+}
