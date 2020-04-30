@@ -2,7 +2,8 @@
   "packages": [
     "engine-types",
     "astro",
-    "engine"
+    "engine",
+    "engine-helpers"
   ],
   "version": "independent",
   "npmClient": "npm",

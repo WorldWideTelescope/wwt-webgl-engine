@@ -1,0 +1,25 @@
+{
+  "name": "@wwtelescope/engine-helpers",
+  "version": "0.1.0",
+  "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "homepage": "https://worldwidetelescope.org/home/",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
+  "bugs": {
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues",
+    "email": "wwt@aas.org"
+  },
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@wwtelescope/astro": "file:../astro",
+    "@wwtelescope/engine": "file:../engine",
+    "@wwtelescope/engine-types": "file:../engine-types"
+  }
+}
