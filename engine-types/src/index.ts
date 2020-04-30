@@ -152,3 +152,108 @@ export enum SolarSystemObjects {
   custom = 20,
   undefined = 65536
 }
+
+
+// TypeScript-ification of the engine settings
+
+export enum WWTBooleanSetting {
+  actualPlanetScale,
+  constellations,
+  earthCutawayView,
+  localHorizonMode,
+  galacticMode,
+  milkyWayModel,
+  showAltAzGrid,
+  showAltAzGridText,
+  showClouds,
+  showConstellations,
+  showConstellationBoundries,
+  showConstellationFigures,
+  showConstellationLabels,
+  showConstellationPictures,
+  showConstellationSelection,
+  showCrosshairs,
+  showEarthSky,
+  showEcliptic,
+  showEclipticGrid,
+  showEclipticGridText,
+  showEclipticOverviewText,
+  showElevationModel,
+  showEquatorialGridText,
+  showFieldOfView,
+  showGalacticGrid,
+  showGalacticGridText,
+  showGrid,
+  showHorizon,
+  showHorizonPanorama,
+  showISSModel,
+  showMoonsAsPointSource,
+  showPrecessionChart,
+  showSkyGrids,
+  showSkyNode,
+  showSkyOverlays,
+  showSkyOverlaysIn3d,
+  showSolarSystem,
+  smoothPan,
+  solarSystemCMB,
+  solarSystemCosmos,
+  solarSystemMilkyWay,
+  solarSystemOrbits,
+  solarSystemOverlays,
+  solarSystemLighting,
+  solarSystemMultiRes,
+  solarSystemMinorPlanets,
+  solarSystemMinorOrbits,
+  solarSystemPlanets,
+  solarSystemStars,
+}
+
+export enum WWTColorSetting {
+  constellationBoundryColor,
+  constellationFigureColor,
+  constellationSelectionColor,
+  crosshairsColor
+}
+
+export enum WWTConstellationFilterSetting {
+  constellationArtFilter,
+  constellationBoundariesFilter,
+  constellationFiguresFilter,
+  constellationNamesFilter
+}
+
+export enum WWTNumberSetting {
+  fovCamera,
+  fovEyepiece,
+  fovTelescope,
+  locationAltitude,
+  locationLat,
+  locationLng,
+  minorPlanetsFilter,
+  plantOrbitsFilter,
+  solarSystemScale
+}
+
+export enum WWTStringSetting {
+  constellationsEnabled
+}
+
+/** TODO: does wwtlib expose a better color type that we should be using? In the
+ * Settings class, colors are just straight strings.
+ */
+export class WWTColor {
+  c: string;
+
+  constructor(c: string) {
+    this.c = c;
+  }
+}
+
+export class ConstellationFilter {}
+
+export type WWTSetting =
+  [WWTBooleanSetting, boolean] |
+  [WWTColorSetting, WWTColor] |
+  [WWTConstellationFilterSetting, ConstellationFilter] |
+  [WWTNumberSetting, number] |
+  [WWTStringSetting, string];
