@@ -1,1 +1,4 @@
 /public/
+
+# for now -- this could be refined to /static/apiref/:
+/static/

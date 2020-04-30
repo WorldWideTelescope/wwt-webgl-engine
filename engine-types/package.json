@@ -15,6 +15,7 @@
   "license": "MIT",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "doc": "typedoc"
   }
 }

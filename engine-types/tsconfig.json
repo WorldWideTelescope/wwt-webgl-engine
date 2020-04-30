@@ -5,5 +5,11 @@
   },
   "include": [
     "src/**/*.ts"
-  ]
+  ],
+  "typedocOptions": {
+    "out": "../docs/static/apiref/engine-types",
+    "mode": "library",
+    "gaID": "UA-107473046-3",
+    "listInvalidSymbolLinks": true
+  }
 }

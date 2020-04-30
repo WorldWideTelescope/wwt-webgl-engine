@@ -18,17 +18,5 @@
         "src/*"
       ]
     },
-  },
-  "typedocOptions": {
-    "mode": "file",
-    "readme": "docs/typedoc_index.md",
-    "includeDeclarations": true,
-    "excludeExternals": true,
-    "excludeNotExported": true,
-    "excludePrivate": true,
-    "disableSources": true,
-    "gaID": "UA-107473046-3",
-    "listInvalidSymbolLinks": true,
-    "out": "docs/public/apiref"
   }
 }
