@@ -1920,6 +1920,8 @@ namespace wwtlib
                 Zoom(1.1);
             }
 
+            e.StopPropagation();
+            e.PreventDefault();
         }
 
         public static ScriptInterface scriptInterface;
