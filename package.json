@@ -4,6 +4,7 @@
   "scripts": {
     "build": "lerna exec --concurrency 1 -- npm run build",
     "doc": "lerna exec -- npm run doc",
+    "lint": "lerna exec -- npm run lint",
     "semantic-release": "lerna exec --concurrency 1 -- semantic-release -e semantic-release-monorepo --tag-format='${LERNA_PACKAGE_NAME}-v\\${version}'"
   },
   "dependencies": {
@@ -13,10 +14,10 @@
     "@wwtelescope/engine-types": "file:engine-types"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.26.0",
-    "@typescript-eslint/parser": "^2.26.0",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
     "concat-cli": "^4.0.0",
-    "eslint": "^6.7.2",
+    "eslint": "^6.8.0",
     "lerna": "^3.20.2",
     "typedoc": "^0.17.0-3",
     "typescript": "~3.8.3",

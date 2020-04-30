@@ -34,7 +34,8 @@
     "tscheck": "tsc",
     "uglify": "uglifyjs src/index.js -c -o src/index.min.js",
     "build": "npm run concat-index && npm run uglify",
-    "doc": "typedoc"
+    "doc": "typedoc",
+    "lint": "tsc"
   },
   "dependencies": {
     "@wwtelescope/engine-types": "file:../engine-types"

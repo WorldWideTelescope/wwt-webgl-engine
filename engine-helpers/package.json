@@ -16,7 +16,8 @@
   "main": "./src/index.ts",
   "scripts": {
     "build": "tsc",
-    "doc": "typedoc"
+    "doc": "typedoc",
+    "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
   "dependencies": {
     "@wwtelescope/astro": "file:../astro",
