@@ -1,6 +1,7 @@
 {
   "packages": [
     "engine-types",
+    "astro",
     "engine"
   ],
   "version": "independent",
