@@ -95,6 +95,9 @@ declare enum Classification {
   other = 436207616
 }
 
+/** TODO: expose interfaces and document them. */
+export class ConstellationFilter {}
+
 export namespace Imageset {
   export function create(
     name: string,
@@ -284,6 +287,9 @@ declare enum ReferenceFrameTypes {
 }
 
 export class ScriptInterface {
+  /** The rendering settings associated with the viewer. */
+  settings: Settings;
+
   /** Get the current right ascension of the view, in hours. */
   getRA(): number;
 
@@ -311,6 +317,137 @@ export class ScriptInterface {
 
   /** Deregister a "ready" callback. */
   remove_ready(callback: ReadyEventCallback): void;
+}
+
+/** A variety of settings for the WWT rendering engine. */
+export class Settings {
+  get_constellationFigureColor(): string;
+  set_constellationFigureColor(v: string): string;
+  get_constellationBoundryColor(): string;
+  set_constellationBoundryColor(v: string): string;
+  get_constellationSelectionColor(): string;
+  set_constellationSelectionColor(v: string): string;
+  get_showCrosshairs(): boolean;
+  set_showCrosshairs(v: boolean): boolean;
+  get_smoothPan(): boolean;
+  set_smoothPan(v: boolean): boolean;
+  get_crosshairsColor(): string;
+  set_crosshairsColor(v: string): string;
+  get_actualPlanetScale(): boolean;
+  set_actualPlanetScale(v: boolean): boolean;
+  get_fovCamera(): number;
+  get_fovEyepiece(): number;
+  get_fovTelescope(): number;
+  get_locationAltitude(): number;
+  set_locationAltitude(v: number): number;
+  get_locationLat(): number;
+  set_locationLat(v: number): number;
+  get_locationLng(): number;
+  set_locationLng(v: number): number;
+  get_showClouds(): boolean;
+  get_showConstellationBoundries(): boolean;
+  set_showConstellationBoundries(v: boolean): boolean;
+  get_showConstellationFigures(): boolean;
+  set_showConstellationFigures(v: boolean): boolean;
+  get_showConstellationSelection(): boolean;
+  set_showConstellationSelection(v: boolean): boolean;
+  get_showEcliptic(): boolean;
+  set_showEcliptic(v: boolean): boolean;
+  get_showElevationModel(): boolean;
+  set_showElevationModel(v: boolean): boolean;
+  get_showFieldOfView(): boolean;
+  get_showGrid(): boolean;
+  set_showGrid(v: boolean): boolean;
+  get_showHorizon(): boolean;
+  set_showHorizon(v: boolean): boolean;
+  get_showHorizonPanorama(): boolean;
+  get_showMoonsAsPointSource(): boolean;
+  get_showSolarSystem(): boolean;
+  set_showSolarSystem(v: boolean): boolean;
+  get_localHorizonMode(): boolean;
+  set_localHorizonMode(v: boolean): boolean;
+  get_galacticMode(): boolean;
+  set_galacticMode(v: boolean): boolean;
+  get_solarSystemStars(): boolean;
+  set_solarSystemStars(v: boolean): boolean;
+  get_solarSystemMilkyWay(): boolean;
+  set_solarSystemMilkyWay(v: boolean): boolean;
+  get_solarSystemCosmos(): boolean;
+  set_solarSystemCosmos(v: boolean): boolean;
+  get_solarSystemOrbits(): boolean;
+  set_solarSystemOrbits(v: boolean): boolean;
+  get_solarSystemOverlays(): boolean;
+  set_solarSystemOverlays(v: boolean): boolean;
+  get_solarSystemLighting(): boolean;
+  set_solarSystemLighting(v: boolean): boolean;
+  get_solarSystemMultiRes(): boolean;
+  set_solarSystemMultiRes(v: boolean): boolean;
+  get_solarSystemScale(): number;
+  set_solarSystemScale(v: number): number;
+  get_showEquatorialGridText(): boolean;
+  set_showEquatorialGridText(v: boolean): boolean;
+  get_showGalacticGrid(): boolean;
+  set_showGalacticGrid(v: boolean): boolean;
+  get_showGalacticGridText(): boolean;
+  set_showGalacticGridText(v: boolean): boolean;
+  get_showEclipticGrid(): boolean;
+  set_showEclipticGrid(v: boolean): boolean;
+  get_showEclipticGridText(): boolean;
+  set_showEclipticGridText(v: boolean): boolean;
+  get_showEclipticOverviewText(): boolean;
+  set_showEclipticOverviewText(v: boolean): boolean;
+  get_showAltAzGrid(): boolean;
+  set_showAltAzGrid(v: boolean): boolean;
+  get_showAltAzGridText(): boolean;
+  set_showAltAzGridText(v: boolean): boolean;
+  get_showPrecessionChart(): boolean;
+  set_showPrecessionChart(v: boolean): boolean;
+  get_showConstellationPictures(): boolean;
+  set_showConstellationPictures(v: boolean): boolean;
+  get_showConstellationLabels(): boolean;
+  set_showConstellationLabels(v: boolean): boolean;
+  get_solarSystemCMB(): boolean;
+  set_solarSystemCMB(v: boolean): boolean;
+  get_solarSystemMinorPlanets(): boolean;
+  set_solarSystemMinorPlanets(v: boolean): boolean;
+  get_solarSystemPlanets(): boolean;
+  set_solarSystemPlanets(v: boolean): boolean;
+  get_showEarthSky(): boolean;
+  set_showEarthSky(v: boolean): boolean;
+  get_solarSystemMinorOrbits(): boolean;
+  set_solarSystemMinorOrbits(v: boolean): boolean;
+  get_constellationsEnabled(): string;
+  set_constellationsEnabled(v: string): string;
+  get_constellationFiguresFilter(): ConstellationFilter;
+  set_constellationFiguresFilter(v: ConstellationFilter): ConstellationFilter;
+  get_constellationBoundariesFilter(): ConstellationFilter;
+  set_constellationBoundariesFilter(v: ConstellationFilter): ConstellationFilter;
+  get_constellationNamesFilter(): ConstellationFilter;
+  set_constellationNamesFilter(v: ConstellationFilter): ConstellationFilter;
+  get_constellationArtFilter(): ConstellationFilter;
+  set_constellationArtFilter(v: ConstellationFilter): ConstellationFilter;
+  get_showSkyOverlays(): boolean;
+  set_showSkyOverlays(v: boolean): boolean;
+  get_showConstellations(): boolean;
+  set_showConstellations(v: boolean): boolean;
+  get_showSkyNode(): boolean;
+  set_showSkyNode(v: boolean): boolean;
+  get_showSkyGrids(): boolean;
+  set_showSkyGrids(v: boolean): boolean;
+  get_showSkyOverlaysIn3d(): boolean;
+  set_showSkyOverlaysIn3d(v: boolean): boolean;
+  get_earthCutawayView(): boolean;
+  set_earthCutawayView(v: boolean): boolean;
+  get_showISSModel(): boolean;
+  set_showISSModel(v: boolean): boolean;
+  get_milkyWayModel(): boolean;
+  set_milkyWayModel(v: boolean): boolean;
+  get_minorPlanetsFilter(): number;
+  set_minorPlanetsFilter(v: number): number;
+  get_planetOrbitsFilter(): number;
+  set_planetOrbitsFilter(v: number): number;
+  get_constellations(): boolean;
+  set_constellations(v: boolean): boolean;
 }
 
 declare enum SolarSystemObjects {
