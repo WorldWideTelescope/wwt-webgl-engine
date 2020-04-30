@@ -85,18 +85,18 @@ function _formatSexagesimal(
     prefix = "+";
   }
 
-  let whole = Math.floor(value);
+  const whole = Math.floor(value);
   value = (value - whole) * 60;
-  let minutes = Math.floor(value);
+  const minutes = Math.floor(value);
   value = (value - minutes) * 60;
-  let seconds = Math.floor(value);
-  let remainder = value - seconds;
+  const seconds = Math.floor(value);
+  const remainder = value - seconds;
 
-  let w_text = String(whole).padStart(padWhole, '0');
-  let m_text = String(minutes).padStart(2, '0');
-  let s_text = String(seconds).padStart(2, '0');
-  let r_text = remainder.toFixed(precision).slice(1);  // drop the leading "0"
-  return `${prefix}${w_text}${sep1}${m_text}${sep2}${s_text}${r_text}`
+  const wText = String(whole).padStart(padWhole, '0');
+  const mText = String(minutes).padStart(2, '0');
+  const sText = String(seconds).padStart(2, '0');
+  const rText = remainder.toFixed(precision).slice(1);  // drop the leading "0"
+  return `${prefix}${wText}${sep1}${mText}${sep2}${sText}${rText}`
 }
 
 /** Format an angle, measured in radians, as sexagesimal hours.
