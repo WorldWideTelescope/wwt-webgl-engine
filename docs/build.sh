@@ -6,6 +6,11 @@
 
 set -euo pipefail
 cd "$(dirname "$0")"
+
+if [ ! -f themes/wwtguide/theme.toml ] ; then
+    git submodule update --init
+fi
+
 zola build
 rm -rf public/apiref
 cd ..
