@@ -37,6 +37,6 @@
     "doc": "typedoc"
   },
   "dependencies": {
-    "@wwtelescope/engine-types": "^7.0.0"
+    "@wwtelescope/engine-types": "file:../engine-types"
   }
 }

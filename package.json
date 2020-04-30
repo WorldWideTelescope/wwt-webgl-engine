@@ -6,7 +6,9 @@
     "semantic-release": "lerna exec --concurrency 1 -- semantic-release -e semantic-release-monorepo --tag-format='${LERNA_PACKAGE_NAME}-v\\${version}'"
   },
   "dependencies": {
+    "@wwtelescope/astro": "file:astro",
     "@wwtelescope/engine": "file:engine",
+    "@wwtelescope/engine-helpers": "file:engine-helpers",
     "@wwtelescope/engine-types": "file:engine-types"
   },
   "devDependencies": {
