@@ -1900,25 +1900,24 @@ namespace wwtlib
 
         public void OnMouseWheel(ElementEvent e)
         {
-            WheelEvent ev = (WheelEvent)(object)e;
+            // WheelEvent is a WWT-specific binding (see WheelEvent.cs) that we
+            // use to abstract across the different wheel-motion events that
+            // browsers provide: "wheel", "mousewheel", "DOMMouseScroll".
 
-            // different browsers use different data variable
+            WheelEvent ev = (WheelEvent)(object)e;
             double delta;
-            if (ev.detail != 0)
+
+            if (ev.deltaY != 0)
+                delta = -ev.deltaY;
+            else if (ev.detail != 0)
                 delta = ev.detail * -1;
             else
-                delta = ev.WheelDelta / 40;
-
-            //cancelEvent(e);
+                delta = ev.WheelDelta;
 
             if (delta > 0)
-            {
                 Zoom(0.9);
-            }
             else
-            {
                 Zoom(1.1);
-            }
 
             e.StopPropagation();
             e.PreventDefault();
@@ -2094,8 +2093,9 @@ namespace wwtlib
             Document.Body.AddEventListener("keydown", OnKeyDown, false);
             canvas.AddEventListener("dblclick", OnDoubleClick, false);
             canvas.AddEventListener("mousedown", OnMouseDown, false);
+            canvas.AddEventListener("wheel", OnMouseWheel, false);
             canvas.AddEventListener("mousewheel", OnMouseWheel, false);
-            canvas.AddEventListener("DOMMouseScroll", OnMouseWheel, false);  // Firefox
+            canvas.AddEventListener("DOMMouseScroll", OnMouseWheel, false);  // old Firefox
             canvas.AddEventListener("touchstart", OnTouchStart, false);
             canvas.AddEventListener("touchmove", OnTouchMove, false);
             canvas.AddEventListener("touchend", OnTouchEnd, false);

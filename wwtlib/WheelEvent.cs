@@ -27,6 +27,14 @@ namespace System.Html
                 return 0;
             }
         }
+        [ScriptField]
+        public double deltaY
+        {
+            get
+            {
+                return 0;
+            }
+        }
     }
 
     [ScriptIgnoreNamespace]
