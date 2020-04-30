@@ -3,7 +3,8 @@
     "engine-types",
     "astro",
     "engine",
-    "engine-helpers"
+    "engine-helpers",
+    "engine-vuex"
   ],
   "version": "independent",
   "npmClient": "npm",
