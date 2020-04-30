@@ -5,7 +5,8 @@
     "engine",
     "engine-helpers",
     "engine-vuex",
-    "embed-common"
+    "embed-common",
+    "embed"
   ],
   "version": "independent",
   "npmClient": "npm",

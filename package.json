@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@wwtelescope/astro": "file:astro",
+    "@wwtelescope/embed": "file:embed",
     "@wwtelescope/embed-common": "file:embed-common",
     "@wwtelescope/engine": "file:engine",
     "@wwtelescope/engine-helpers": "file:engine-helpers",
