@@ -4,7 +4,7 @@
   "main": "dist/index.common.js",
   "browser": "dist/index.umd.js",
   "module": "dist/",
-  "types": "dist/",
+  "types": "dist/engine-vuex/src/index.d.ts",
   "license": "MIT",
   "scripts": {
     "build": "vue-cli-service build --target lib --name index src/index.ts",
