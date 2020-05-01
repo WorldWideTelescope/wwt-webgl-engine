@@ -34,6 +34,7 @@
     "tscheck": "tsc",
     "uglify": "uglifyjs src/index.js -c -o src/index.min.js",
     "build": "npm run concat-index && npm run uglify",
+    "test": "mocha-headless-chrome -f tests/tests.html -r xunit >tests/results.xml",
     "doc": "typedoc",
     "lint": "tsc"
   },

@@ -3,8 +3,9 @@
   "name": "wwt-webgl-engine-monorepo",
   "scripts": {
     "build": "lerna exec --concurrency 1 -- npm run build",
-    "doc": "lerna exec -- npm run doc",
-    "lint": "lerna exec -- npm run lint",
+    "doc": "lerna run doc",
+    "lint": "lerna run lint",
+    "test": "lerna run test",
     "semantic-release": "lerna exec --concurrency 1 -- semantic-release -e semantic-release-monorepo --tag-format='${LERNA_PACKAGE_NAME}/\\${version}'"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "@vue/cli-service": "~4.3.0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "1.0.0-beta.31",
+    "chai": "^4.2.0",
     "concat-cli": "^4.0.0",
     "copyfiles": "^2.2.0",
     "eslint": "^6.8.0",
@@ -37,6 +39,7 @@
     "lerna": "^3.20.2",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
+    "mocha-headless-chrome": "^2.0.3",
     "mutationobserver-shim": "^0.3.3",
     "sass": "^1.26.3",
     "sass-loader": "^8.0.2",
