@@ -2,7 +2,7 @@
   "private": true,
   "name": "wwt-webgl-engine-monorepo",
   "scripts": {
-    "build": "lerna exec --concurrency 1 -- npm run build",
+    "build": "lerna run build",
     "doc": "lerna run doc",
     "lint": "lerna run lint",
     "test": "lerna run test",
