@@ -3,7 +3,7 @@ title = "Getting Started"
 weight = 100
 +++
 
-Test api link: {{api(i="ArrivedEventCallback")}}.
+Test api link: {{engineapi(i="ArrivedEventCallback")}}.
 
 While the WWT WebGL engine is a sophisticated piece of code, its external
 interface resembles that of many other Web libraries. Here is a simple HTML
