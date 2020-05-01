@@ -1,0 +1,23 @@
+{
+  "name": "@wwtelescope/embed-creator",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint src",
+    "doc": "echo OK - no API docs"
+  },
+  "dependencies": {
+    "@wwtelescope/embed-common": "file:../embed-common",
+    "bootstrap-vue": "^2.13.0",
+    "vue": "^2.6.11",
+    "vue-class-component": "^7.2.3",
+    "vue-clipboard2": "^0.3.1",
+    "vue-property-decorator": "^8.4.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-plugin-typescript": "~4.3.0"
+  }
+}

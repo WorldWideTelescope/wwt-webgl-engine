@@ -11,12 +11,15 @@
     "@wwtelescope/astro": "file:astro",
     "@wwtelescope/embed": "file:embed",
     "@wwtelescope/embed-common": "file:embed-common",
+    "@wwtelescope/embed-creator": "file:embed-creator",
     "@wwtelescope/engine": "file:engine",
     "@wwtelescope/engine-helpers": "file:engine-helpers",
     "@wwtelescope/engine-types": "file:engine-types",
-    "@wwtelescope/engine-vuex": "file:engine-vuex"
+    "@wwtelescope/engine-vuex": "file:engine-vuex",
+    "bootstrap-vue": "^2.13.0"
   },
   "devDependencies": {
+    "@babel/polyfill": "^7.7.0",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "@vue/cli-plugin-e2e-cypress": "~4.3.0",
@@ -33,6 +36,9 @@
     "lerna": "^3.20.2",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
+    "mutationobserver-shim": "^0.3.3",
+    "sass": "^1.26.3",
+    "sass-loader": "^8.0.2",
     "semantic-release": "^17.0.7",
     "semantic-release-monorepo": "^7.0.2",
     "typedoc": "^0.17.0-3",
