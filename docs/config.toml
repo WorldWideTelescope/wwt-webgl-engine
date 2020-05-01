@@ -6,3 +6,4 @@ theme = "wwtguide"
 [extra]
 github_base = "//github.com/WorldWideTelescope/wwt-webgl-engine"
 google_analytics_id = "UA-107473046-3"
+stylesheets = ["extras.css"]

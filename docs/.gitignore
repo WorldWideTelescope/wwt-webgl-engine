@@ -1,4 +1,3 @@
 /public/
-
-# for now -- this could be refined to /static/{apiref,embed}/:
-/static/
+/static/apiref/
+/static/embed/
