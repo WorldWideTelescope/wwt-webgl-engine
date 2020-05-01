@@ -1,3 +1,2 @@
-# The WWT WebGL Engine API Reference
-
-Welcome!
+This package is the core WWT WebGL engine, transpiled from C# and decorated with
+TypeScript annotations.

@@ -7,6 +7,7 @@
     "src/**/*.ts"
   ],
   "typedocOptions": {
+    "readme": "../docs/engine-types-index.md",
     "out": "../docs/static/apiref/engine-types",
     "mode": "library",
     "gaID": "UA-107473046-3",

@@ -7,6 +7,7 @@
     "src/**/*.ts"
   ],
   "typedocOptions": {
+    "readme": "../docs/embed-common-index.md",
     "out": "../docs/static/apiref/embed-common",
     "mode": "library",
     "gaID": "UA-107473046-3",
