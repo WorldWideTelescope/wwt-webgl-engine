@@ -1,6 +1,17 @@
 {
-  "name": "@wwtelescope/embed-creator",
+  "name": "@pkgw/embed-creator",
   "version": "0.1.0",
+  "description": "An web app for creating AAS WorldWide Telescope embeds",
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "homepage": "https://worldwidetelescope.org/home/",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "repository": "github:pkgw/wwt-webgl-engine",
+  "bugs": {
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
+    "email": "wwt@aas.org"
+  },
   "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,7 +20,7 @@
     "doc": "echo OK - no API docs"
   },
   "dependencies": {
-    "@wwtelescope/embed-common": "file:../embed-common",
+    "@pkgw/embed-common": "file:../embed-common",
     "bootstrap-vue": "^2.13.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",

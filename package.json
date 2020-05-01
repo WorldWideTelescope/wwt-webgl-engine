@@ -9,14 +9,14 @@
     "semantic-release": "lerna exec --concurrency 1 -- semantic-release -e semantic-release-monorepo --tag-format='${LERNA_PACKAGE_NAME}/\\${version}'"
   },
   "dependencies": {
-    "@wwtelescope/astro": "file:astro",
-    "@wwtelescope/embed": "file:embed",
-    "@wwtelescope/embed-common": "file:embed-common",
-    "@wwtelescope/embed-creator": "file:embed-creator",
-    "@wwtelescope/engine": "file:engine",
-    "@wwtelescope/engine-helpers": "file:engine-helpers",
-    "@wwtelescope/engine-types": "file:engine-types",
-    "@wwtelescope/engine-vuex": "file:engine-vuex",
+    "@pkgw/astro": "file:astro",
+    "@pkgw/embed": "file:embed",
+    "@pkgw/embed-common": "file:embed-common",
+    "@pkgw/embed-creator": "file:embed-creator",
+    "@pkgw/engine": "file:engine",
+    "@pkgw/engine-helpers": "file:engine-helpers",
+    "@pkgw/engine-types": "file:engine-types",
+    "@pkgw/engine-vuex": "file:engine-vuex",
     "bootstrap-vue": "^2.13.0"
   },
   "devDependencies": {

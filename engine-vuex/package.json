@@ -1,19 +1,30 @@
 {
-  "name": "@wwtelescope/engine-vuex",
+  "name": "@pkgw/engine-vuex",
   "version": "0.1.0",
+  "description": "The AAS WorldWide Telescope WebGL engine wrapped into a Vue/Vuex component",
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "homepage": "https://worldwidetelescope.org/home/",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "repository": "github:pkgw/wwt-webgl-engine",
+  "bugs": {
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
+    "email": "wwt@aas.org"
+  },
+  "license": "MIT",
   "main": "dist/index.common.js",
   "browser": "dist/index.umd.js",
   "module": "dist/",
   "types": "dist/engine-vuex/src/index.d.ts",
-  "license": "MIT",
   "scripts": {
     "build": "vue-cli-service build --target lib --name index src/index.ts",
     "doc": "typedoc",
     "lint": "vue-cli-service lint src"
   },
   "dependencies": {
-    "@wwtelescope/engine": "file:../engine",
-    "@wwtelescope/engine-helpers": "file:../engine-helpers",
+    "@pkgw/engine": "file:../engine",
+    "@pkgw/engine-helpers": "file:../engine-helpers",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
   },

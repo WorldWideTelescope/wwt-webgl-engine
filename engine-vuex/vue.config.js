@@ -21,10 +21,10 @@ module.exports = {
 
     // Keep the very big WWT engine external
     config.externals({
-      '@wwtelescope/engine': {
-        'amd': '@wwtelescope/engine', // typeof define === 'function' && define.amd
-        'commonjs2': '@wwtelescope/engine', // typeof exports === 'object' && typeof module === 'object'
-        'commonjs': '@wwtelescope/engine', // typeof exports === 'object'
+      '@pkgw/engine': {
+        'amd': '@pkgw/engine', // typeof define === 'function' && define.amd
+        'commonjs2': '@pkgw/engine', // typeof exports === 'object' && typeof module === 'object'
+        'commonjs': '@pkgw/engine', // typeof exports === 'object'
         'root': 'wwtlib' // none of the above: browser mode using global variables
       }
     });

@@ -19,9 +19,9 @@
 <script lang="ts">
 import { Component, Prop } from "vue-property-decorator";
 
-import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
-import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
-import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
+import { fmtDegLat, fmtHours } from "@pkgw/astro";
+import { WWTAwareComponent } from "@pkgw/engine-vuex";
+import { CreditMode, EmbedSettings } from "@pkgw/embed-common";
 
 @Component
 export default class Embed extends WWTAwareComponent {

@@ -1,7 +1,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
-import { WWTSetting } from "@wwtelescope/engine-types";
+import { WWTSetting } from "@pkgw/engine-types";
 
 import { GotoRADecZoomParams, WWTEngineVuexState } from "./store";
 

@@ -4,8 +4,8 @@
 import Vue from "vue";
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
-import { WWTSetting } from "@wwtelescope/engine-types";
-import { WWTInstance } from "@wwtelescope/engine-helpers";
+import { WWTSetting } from "@pkgw/engine-types";
+import { WWTInstance } from "@pkgw/engine-helpers";
 
 interface WWTLinkedCallback {
   (): void;

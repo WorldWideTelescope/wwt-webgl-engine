@@ -3,7 +3,7 @@
 //
 // TypeScript definitions for the WWT WebGL engine. Base data types that do not
 // strictly depend on the engine implementation should go in the
-// `@wwtelescope/engine-types` package.
+// `@pkgw/engine-types` package.
 //
 // Try to keep everything alphabetized.
 
@@ -20,7 +20,7 @@ import {
   // ReferenceFrames,
   // ReferenceFrameTypes,
   // SolarSystemObjects
-} from "@wwtelescope/engine-types";
+} from "@pkgw/engine-types";
 
 export class ArrivedEventArgs {
   /** Get the current right ascension of the view, in hours. */

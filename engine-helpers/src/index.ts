@@ -1,7 +1,7 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-import { R2D, R2H } from "@wwtelescope/astro";
+import { R2D, R2H } from "@pkgw/astro";
 
 import {
   ConstellationFilter,
@@ -12,14 +12,14 @@ import {
   WWTNumberSetting,
   WWTSetting,
   WWTStringSetting,
-} from "@wwtelescope/engine-types";
+} from "@pkgw/engine-types";
 
 import {
   ScriptInterface,
   SpaceTimeControllerObject,
   WWTControl,
   SpaceTimeController
-} from "@wwtelescope/engine";
+} from "@pkgw/engine";
 
 
 export const enum InitControlViewType {

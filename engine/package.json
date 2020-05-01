@@ -1,5 +1,5 @@
 {
-  "name": "@wwtelescope/engine",
+  "name": "@pkgw/engine",
   "version": "7.0.2",
   "description": "The AAS WorldWide Telescope WebGL engine",
   "keywords": [
@@ -7,9 +7,9 @@
   ],
   "homepage": "https://worldwidetelescope.org/home/",
   "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
-  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
+  "repository": "github:pkgw/wwt-webgl-engine",
   "bugs": {
-    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues",
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
     "email": "wwt@aas.org"
   },
   "license": "MIT",
@@ -39,6 +39,6 @@
     "lint": "tsc"
   },
   "dependencies": {
-    "@wwtelescope/engine-types": "file:../engine-types"
+    "@pkgw/engine-types": "file:../engine-types"
   }
 }
