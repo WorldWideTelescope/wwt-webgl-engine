@@ -1,4 +1,4 @@
 /public/
 
-# for now -- this could be refined to /static/apiref/:
+# for now -- this could be refined to /static/{apiref,embed}/:
 /static/
