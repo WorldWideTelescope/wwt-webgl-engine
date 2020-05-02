@@ -133,6 +133,7 @@ jobs:
     displayName: semantic-release processing
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
+      NPM_TOKEN: $(NPM_TOKEN)
 
   # Publish the hosted JavaScript artifacts
 
