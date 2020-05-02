@@ -132,6 +132,8 @@ jobs:
 
   - script: npm run semantic-release-win
     displayName: semantic-release processing
+    env:
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
 
   # Publish the hosted JavaScript artifacts
 
