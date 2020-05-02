@@ -2,5 +2,8 @@
   "branches": [
     "monorepo",
     "master"
+  ],
+  "plugins": [
+    "@pkgw/semantic-release-ado-monorepo"
   ]
 }

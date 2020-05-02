@@ -17,6 +17,7 @@
     "@pkgw/engine-helpers": "file:engine-helpers",
     "@pkgw/engine-types": "file:engine-types",
     "@pkgw/engine-vuex": "file:engine-vuex",
+    "@pkgw/semantic-release-ado-monorepo": "file:semantic-release-ado-monorepo",
     "bootstrap-vue": "^2.13.0"
   },
   "devDependencies": {
