@@ -56,7 +56,7 @@ jobs:
   - script: npm cache verify
     displayName: npm cache verify
 
-  - script: npx lerna bootstrap
+  - script: npx lerna bootstrap --concurrency=1
     displayName: Lerna NPM setup
 
   - script: npm run build
