@@ -3,7 +3,12 @@
     "master",
     {"name": "beta", "prerelease": true}
   ],
+  "extends": "semantic-release-monorepo",
   "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/npm",
+    "@semantic-release/github",
     "@pkgw/semantic-release-ado-monorepo"
   ]
 }
