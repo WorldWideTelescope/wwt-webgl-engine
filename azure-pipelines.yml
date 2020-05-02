@@ -53,6 +53,9 @@ jobs:
     inputs:
       versionSpec: '>=12'
 
+  - script: npm cache verify
+    displayName: npm cache verify
+
   - script: npx lerna bootstrap
     displayName: Lerna NPM setup
 
