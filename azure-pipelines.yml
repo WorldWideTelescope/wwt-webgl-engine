@@ -130,7 +130,7 @@ jobs:
 
   # semantic-release ahoy
 
-  - script: npm run semantic-release
+  - script: npm run semantic-release-win
     displayName: semantic-release processing
 
   # Publish the hosted JavaScript artifacts

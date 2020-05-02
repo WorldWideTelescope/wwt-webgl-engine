@@ -6,7 +6,7 @@
     "doc": "lerna run doc",
     "lint": "lerna run lint",
     "test": "lerna run test",
-    "semantic-release": "lerna exec --concurrency 1 -- semantic-release -e semantic-release-monorepo --tag-format='${LERNA_PACKAGE_NAME}/\\${version}'"
+    "semantic-release-win": "lerna exec --concurrency 1 -- semantic-release -e semantic-release-monorepo --tag-format=%LERNA_PACKAGE_NAME%/${version}"
   },
   "dependencies": {
     "@pkgw/astro": "file:astro",
