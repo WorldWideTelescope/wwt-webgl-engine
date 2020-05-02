@@ -81,13 +81,12 @@ jobs:
   - script: npm run test
     displayName: NPM test
 
-  # NOTE: The file produced above is actually in JUnit format, not xUnit!
   - task: PublishTestResults@2
     displayName: Publish test results
     condition: succeededOrFailed()
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: 'test_results.xml'
+      testResultsFiles: 'engine/tests/results.xml'
 
   # Docs
 
