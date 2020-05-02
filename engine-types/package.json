@@ -19,5 +19,8 @@
     "build": "tsc",
     "doc": "typedoc",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
