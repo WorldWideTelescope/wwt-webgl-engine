@@ -109,23 +109,14 @@ jobs:
 
   - powershell: |
       cd docs
-      ..\zola.exe build
+      ..\zola.exe build -o $(Build.ArtifactStagingDirectory)/docs
     displayName: Zola docs build
-
-  - task: CopyFiles@2
-    displayName: Stage docs artifacts
-    inputs:
-      sourceFolder: '.'
-      contents: |
-        docs/public/**
-      targetFolder: $(Build.ArtifactStagingDirectory)
-      cleanTargetFolder: false
 
   - task: PublishPipelineArtifact@0
     displayName: Publish docs artifacts
     inputs:
       artifactName: docs
-      targetPath: $(Build.ArtifactStagingDirectory)/docs/public
+      targetPath: $(Build.ArtifactStagingDirectory)/docs
 
   # Release processes. The semantic-release stage evaluates the Git history for
   # each package in this repo, decides if a release needs to be made and what
@@ -166,28 +157,29 @@ jobs:
   ###     ContainerName: '$web'
   ###     blobPrefix: engine/$(engineVersionText)
 
-  ## - task: AzureFileCopy@3
-  ##   displayName: Upload artifacts to second Azure Storage location (maybe)
-  ##   condition: and(succeeded(), ne(variables['version_text_2'], 'skip'))
-  ##   inputs:
-  ##     SourcePath: '$(build.artifactStagingDirectory)/dist'
-  ##     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##     Destination: 'AzureBlob'
-  ##     storage: 'wwtwebstatic'
-  ##     ContainerName: '$web'
-  ##     blobPrefix: engine/$(version_text_2)
+  # We always release new documentation, with a version tracking the engine
+  # package.
 
-  # Publish the documentation
+  - powershell: |
+      $branch = "$(Build.SourceBranch)"
+      if ($branch -eq "beta") {
+        Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
+      } elseif ($branch -eq "master") {
+        $version = "$(node -pe "require('./engine/package.json').version")"
+        $majmin = ($version -Split '\.')[0..1] -Join '.'
+        Write-Host "##vso[task.setvariable variable=docsVersionText;]$(majmin)"
+      }
+    displayName: Set docs release version text
 
-  ## - task: AzureFileCopy@3
-  ##   displayName: Upload docs to Azure Storage
-  ##   inputs:
-  ##     SourcePath: '$(build.artifactStagingDirectory)/docs/public'
-  ##     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##     Destination: 'AzureBlob'
-  ##     storage: 'wwtwebstatic'
-  ##     ContainerName: '$web'
-  ##     blobPrefix: '_docs/webgl-reference/$(version_text)'
+  ### - task: AzureFileCopy@3
+  ###   displayName: Release updated documentation
+  ###   inputs:
+  ###     SourcePath: '$(build.artifactStagingDirectory)/docs'
+  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ###     Destination: 'AzureBlob'
+  ###     storage: 'wwtwebstatic'
+  ###     ContainerName: '$web'
+  ###     blobPrefix: '_docs/webgl-reference/$(docsVersionText)'
 
   # CDN purges - last since they are slow and close to optional
 
@@ -205,15 +197,15 @@ jobs:
   ###         -EndpointName wwtweb-prod `
   ###         -PurgeContent '/engine/$(engineVersionText)/*'
 
-  ## - task: AzurePowerShell@4
-  ##   displayName: Purge docs CDN
-  ##   inputs:
-  ##     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##     azurePowerShellVersion: 'LatestVersion'
-  ##     scriptType: 'inlineScript'
-  ##     inline: |
-  ##       Unpublish-AzCdnEndpointContent `
-  ##         -ProfileName wwt-cdn-01 `
-  ##         -ResourceGroupName wwt-web01 `
-  ##         -EndpointName wwtwebdocs-prod `
-  ##         -PurgeContent '/webgl-reference/$(version_text)/*'
+  ### - task: AzurePowerShell@4
+  ###   displayName: CDN purge - docs
+  ###   inputs:
+  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ###     azurePowerShellVersion: 'LatestVersion'
+  ###     scriptType: 'inlineScript'
+  ###     inline: |
+  ###       Unpublish-AzCdnEndpointContent `
+  ###         -ProfileName wwt-cdn-01 `
+  ###         -ResourceGroupName wwt-web01 `
+  ###         -EndpointName wwtwebdocs-prod `
+  ###         -PurgeContent '/webgl-reference/$(docsVersionText)/*'
