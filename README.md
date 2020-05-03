@@ -1,12 +1,19 @@
 [![Build Status](https://dev.azure.com/aasworldwidetelescope/WWT/_apis/build/status/WorldWideTelescope.wwt-webgl-engine?branchName=master)](https://dev.azure.com/aasworldwidetelescope/WWT/_build/latest?definitionId=3&branchName=master)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/engine)](https://www.npmjs.com/package/@wwtelescope/engine)
+[![npm](https://img.shields.io/npm/v/@pkgw/astro)](https://www.npmjs.com/package/@pkgw/astro)
+[![npm](https://img.shields.io/npm/v/@pkgw/embed)](https://www.npmjs.com/package/@pkgw/embed)
+[![npm](https://img.shields.io/npm/v/@pkgw/embed-common)](https://www.npmjs.com/package/@pkgw/embed-common)
+[![npm](https://img.shields.io/npm/v/@pkgw/embed-creator)](https://www.npmjs.com/package/@pkgw/embed-creator)
+[![npm](https://img.shields.io/npm/v/@pkgw/engine)](https://www.npmjs.com/package/@pkgw/engine)
+[![npm](https://img.shields.io/npm/v/@pkgw/engine-helpers)](https://www.npmjs.com/package/@pkgw/engine-helpers)
+[![npm](https://img.shields.io/npm/v/@pkgw/engine-types)](https://www.npmjs.com/package/@pkgw/engine-types)
+[![npm](https://img.shields.io/npm/v/@pkgw/engine-vuex)](https://www.npmjs.com/package/@pkgw/engine-vuex)
+[![npm](https://img.shields.io/npm/v/@pkgw/semantic-release-ado-monorepo)](https://www.npmjs.com/package/@pkgw/semantic-release-ado-monorepo)
 
 # The AAS WorldWide Telescope WebGL engine
 
 The “WebGL engine” of the [AAS] [WorldWide Telescope][wwt-home] (WWT) is a
-JavaScript/[TypeScript] library that powers the Web-based versions of the WWT
-visualization software, as exemplified by the [WWT web client][webclient]. It is
-published on NPM as [@wwtelescope/engine].
+JavaScript/[TypeScript] framework that powers the Web-based versions of the WWT
+visualization software, as exemplified by the [WWT web client][webclient].
 
 Learn more about WWT [here][wwt-home].
 
@@ -14,51 +21,121 @@ Learn more about WWT [here][wwt-home].
 [TypeScript]: https://www.typescriptlang.org/
 [wwt-home]: https://worldwidetelescope.org/home/
 [webclient]: https://worldwidetelescope.org/webclient/
-[@wwtelescope/engine]: https://www.npmjs.com/package/@wwtelescope/engine
 
-## Building the engine
 
-The process to build the engine is a bit unusual because the bulk of the code is
-actually C# code (in the directory `wwtlib/`, forked from [wwt-windows-client])
-that is transpiled into JavaScript using an unreleased version of [ScriptSharp],
-an unmaintained package.
+## Developers’ quick start
+
+1. Check out this repository to a machine with [Node.js] and [npm].
+1. `git submodule update --init`
+1. `npx lerna bootstrap`
+1. Either build or obtain the file `engine/wwtlib/bin/wwtlib.js` as described
+   below.
+1. `npm run lint` (uses [ESLint])
+1. `npm run build` creates:
+   1. The core engine package in the `engine/` package.
+   1. The engine tidied up into a [Vue]/[Vuex] module in `engine-vuex/`
+   1. The WWT embed app intended for iframe inclusion in `embed/`
+   1. The user-facing app for creating embed iframe code in `embed-creator/`
+1. `npm run test` (mainly uses [mocha] and [chai])
+1. `npm run doc` (uses [TypeDoc])
+
+[Node.js]: https://nodejs.org/en/
+[npm]: https://www.npmjs.com/get-npm
+[Vue]: https://vuejs.org/
+[Vuex]: https://vuex.vuejs.org/
+[ESLint]: https://eslint.org/
+[mocha]: https://mochajs.org/
+[chai]: https://www.chaijs.com/
+[TypeDoc]: https://typedoc.org/
+
+
+## Repository structure
+
+This repository is a [monorepo] containing the source for several interlocking
+TypeScript packages that together comprise the core of the WWT web framework.
+The most important subdirectories are:
+
+[monorepo]: https://en.wikipedia.org/wiki/Monorepo
+
+- `@pkgw/engine` in `engine/`, the core engine code transpiled from C# and
+  wrapped in TypeScript annotations
+- `@pkgw/engine-vuex` in `engine-vuex/`, a higher-level package that turns the
+  engine into a reusable [Vue]/[Vuex] component
+- `@pkgw/embed` in `embed/`, a web application that turns WWT into a
+  configurable, embeddable iframe
+- The narrative documentation in `docs/`
+
+README files inside the individual subdirectories give more information about
+their contents and development workflows.
+
+
+## The `engine/wwtlib/bin/wwtlib.js` file
+
+There’s one big wrinkle to the build process: the bulk of the engine code is
+actually C# code in the directory `engine/wwtlib/`. It’s forked from
+[wwt-windows-client] and is transpiled into JavaScript using an unreleased
+version of [ScriptSharp], an unmaintained tool. Fortunately, that build process
+results in a single file, `engine/wwtlib/bin/wwtlib.js`, that you can download
+from our CI systems if you’re not able to perform a Visual Stdio build.
 
 [wwt-windows-client]: https://github.com/WorldWideTelescope/wwt-windows-client
 [ScriptSharp]: https://github.com/nikhilk/scriptsharp
 
-1. To build the engine starting from the C# source, you need a Windows machine
-   with Visual Studio 2017. Other versions of Visual Studio might also work.
-1. Open the `WebGLEngine.sln` file and build the project. This should create
-   the file `wwtlib/bin/wwtlib.js`
-1. The continuous integration infrastructure for this repository will publish
-   the `wwtlib.js` file as a build artifact, so if you're not positioned to
-   build on a Windows machine, you can obtain this file by looking up the build
-   artifacts associated with the latest update to the `master` branch, or
-   issuing a pull request if you want to make changes to the C# code.
+To build the engine library starting from C#:
 
-Once you have obtained the file `wwtlib/bin/wwtlib.js`, the remaining
-development tasks all use standard JavaScript tooling, namely [npm]. You need to
-install it if it is not already available on your machine.
+1. You need a Windows machine with Visual Studio 2017. Other versions of Visual
+   Studio might also work.
+1. Open the `engine/WebGLEngine.sln` solution and build the project it contains.
+   This should create the file `engine/wwtlib/bin/wwtlib.js`.
 
-[npm]: https://www.npmjs.com/get-npm
+Otherwise, check out the latest continuous integration build of this repository,
+download the `scriptsharp` artifact, and copy the `wwtlib.js` file to the
+location given above. If you want to change the C# code, you can file a pull
+request and access the artifacts associated with your pull request builds.
 
-1. On the first build, run `npm install` to install dependencies.
-1. The command `npm run concat-index` will create `src/index.js`, which takes
-   the WWT library and turns it into a [UMD-style] JavaScript module.
-1. The command `npm run uglify` will create a minified `src/index.min.js`.
-1. [TypeScript] definitions are manually maintained in `src/index.d.ts`, so that
-   you can use the module with type-checking if you want. The command `npm run
-   tscheck` will run the TypeScript compiler, which in this case just checks the
-   syntactic validity of the annotations.
 
-[UMD-style]: https://github.com/umdjs/umd
+## Building the rest of the code
 
-There is a modest but growing test suite in `tests/`.
+Besides the creation of the file `engine/wwtlib/bin/wwtlib.js`, virtually
+everything in this repository is built using standard [Node.js]/[npm] tooling.
+These tools must be installed before you can do anything else.
+
+The multi-package structure of this repository is dealt with using [Lerna]. This
+means that once you’ve checked out the code and install [npm], the setup
+sequence is:
+
+[Lerna]: https://lerna.js.org/
+
+1. Run `git submodule update --init` to pull in needed Git submodules, namely
+   the documentation theme in `docs/themes/wwtguide`.
+1. Run `npx lerna bootstrap` to install all of the project dependencies and set
+   up the necessary cross-links between individual packages in this repository.
+
+Once setup is complete, the following commands will be useful:
+
+- `npm run build` to build the subpackages
+- `npm run lint` to lint the subpackages (using [eslint] with TypeScript extensions)
+- `npm run test` to run the tests (mainly using [mocha] and [chai])
+- `npm run doc` to build most of the documentation (using [TypeDoc]) — but see below
+
+Running these commands from inside package subdirectories unfortunately *will
+not* work due to the centralized `node_modules` directory we use with Lerna. To
+run the `lint` command only for the `engine-types` submodule, run:
+
+```
+npx lerna run --scope @pkgw/engine-types lint
+```
+
+(The `--scope` argument can be a glob expression if you want to run on a subset
+of packages.)
+
+
+## Building the full documentation
 
 Documentation is maintained in the `docs/` subdirectory. The documentation is a
-Frankenstein combination of narrative material written in [CommonMark Markdown]
-and built with the static site generator [Zola], and autogenerated API
-documentation created with [TypeDoc].
+Frankenstein combination of the autogenerated API documentation and narrative
+material written in [CommonMark Markdown]. The final HTML is assembled with the
+static site generator [Zola],
 
 [CommonMark Markdown]: https://commonmark.org/
 [Zola]: https://getzola.org/
@@ -66,45 +143,82 @@ documentation created with [TypeDoc].
 
 1. Zola is fast and self-contained and [ridiculously easy to
    install][install-zola].
-1. Before first building the narrative material, you’ll have to run `git
-   submodule update --init` to pull in the files for the [zola-wwtguide] theme.
-1. Then run `zola build` in the `docs` subdirectory. This will place the
-   resulting HTML in `docs/public/`.
+1. The `npm run doc` command will install the autogenerated documentation into
+   `docs/static/`
+1. Running `zola build` in the `docs` subdirectory will assembled the final HTML
+   into `docs/public/`.
 1. The command `zola check` will check the narrative docs for broken links.
-1. To build the API reference, run `npm run doc`, which will place HTML in
-   `docs/public/apiref/`.
-1. To build both, you need to do a little dance automated in `docs/build.sh`:
-   1. Run the Zola build.
-   1. Delete `docs/public/apiref/index.html`.
-   1. Run the TypeDoc build.
-1. To view the documentation, we recommend using a local static file server such
-   as `npx http-serve docs/public`.
-1. Zola has a built-in server command with auto-reloading, `zola serve`.
-   However, since the command deletes and rebuilds the `docs/public` directory,
-   if you use it your TypeDoc documentation will be deleted.
+1. The command `zola serve` will serve the documentation using a local server
+   with autoreload.
 
 [install-zola]: https://www.getzola.org/documentation/getting-started/installation/
-[zola-wwtguide]: https://github.com/WorldWideTelescope/zola-wwtguide
 
 
 ## Continuous Integration and Deployment
 
-Merges to the `master` branch will:
+This repository uses [semantic-release] with the [semantic-release-monorepo]
+extension to automate release workflows. This automation is essential to the
+smooth and reproducible deployment of the WWT web services.
 
-- Build and publish the browser-importable engine module to
-  <https://web.wwtassets.org/engine/latest/wwtsdk.js>.
-- Build and publish the documentation to
-  <https://docs.worldwidetelescope.org/webgl-reference/latest/>.
+[semantic-release]: https://semantic-release.gitbook.io/semantic-release/
+[semantic-release-monorepo]: https://github.com/pmowrer/semantic-release-monorepo
 
-Pushes of Git version tags, having names of the form `vX.Y.Z`, will:
+The basic paradigm is that merges to the `beta` or `master` branches will
+automatically trigger processing by [semantic-release] that will determine if
+any changes have been made that require a new release in any of the subpackages.
+If so, [semantic-release] will create a new Git commit that updates the package
+version and changelog, publish an NPM package, create a Git tag, publish
+everything to GitHub, and create a GitHub release record.
 
-- Build and publish the browser-importable engine module to
-  `https://web.wwtassets.org/engine/X.Y.Z/wwtsdk.js`.
-- Publish an additional copy of the module to
-  `https://web.wwtassets.org/engine/X.Y/wwtsdk.js`
-- Build and publish the documentation to
-  `https://docs.worldwidetelescope.org/webgl-reference/X.Y/`.
-- Publish a new version of [the package][@wwtelescope/engine] on NPM.
+New releases are triggered by looking at Git commit messages, which should
+follow the [Angular guidelines][angular-guidelines]. The first line of each
+commit should have the format `{type}({scope}): {subject}`, with one of the
+following types:
+
+[angular-guidelines]: https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit
+
+- `build`
+- `chore`
+- `ci`
+- `docs`
+- `feat`
+- `fix`
+- `perf`
+- `refactor`
+- `style`
+- `test`
+
+Breaking changes are indicated by a line starting with `BREAKING CHANGE: ` in
+the commit message body.
+
+Versioning on the `master` branch follows [semantic versioning][semver]
+strictly:
+
+[semver]: https://semver.org/
+
+- `fix` changes force a bump in the micro version number
+- `feat` changes force a bump in the minor version number (and reset of the micro)
+- Breaking changes force a bump in the major version number.
+
+On the `beta` branch, versions are given sequence numbers of the form
+`1.0.0-beta.3`. This allows series of candidate changes to be deployed
+individually without causing the version numbers to increase ridiculously
+quickly.
+
+In addition to core automation provided by [semantic-release], the following
+steps happen automatically:
+
+- If a new release of `engine` occurs on the `beta` branch, the
+  browser-importable engine module at
+  <https://web.wwtassets.org/engine/latest/wwtsdk.js> is updated.
+- If one occurs on the `master` branch, the corresponding module at
+  `https://web.wwtassets.org/engine/X.Y/wwtsdk.js` is updated, where `X.Y` is
+  the first two components of the current engine version.
+- On every merge to the `beta` branch, the documentation at
+  <https://docs.worldwidetelescope.org/webgl-reference/latest/> is updated.
+- On every merge to the `master` branch, the documentation at
+  `https://docs.worldwidetelescope.org/webgl-reference/X.Y/` is updated, where
+  `X.Y` is the first two components of the current engine version.
 
 
 ## Getting involved
