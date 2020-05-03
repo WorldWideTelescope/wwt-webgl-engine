@@ -21,6 +21,8 @@
   },
   "devDependencies": {
     "@babel/polyfill": "^7.7.0",
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/git": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "@vue/cli-plugin-e2e-cypress": "~4.3.0",
