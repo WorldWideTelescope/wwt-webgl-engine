@@ -42,6 +42,7 @@ install it if it is not already available on your machine.
 
 [npm]: https://www.npmjs.com/get-npm
 
+1. On the first build, run `npm install` to install dependencies.
 1. The command `npm run concat-index` will create `src/index.js`, which takes
    the WWT library and turns it into a [UMD-style] JavaScript module.
 1. The command `npm run uglify` will create a minified `src/index.min.js`.

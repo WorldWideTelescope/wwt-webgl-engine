@@ -17,6 +17,7 @@
   "browser": "./src/index.js",
   "types": "./src/index.d.ts",
   "files": [
+    ".eslintrc.json",
     "docs/**/*.html",
     "docs/**/*.md",
     "docs/**/*.toml",
