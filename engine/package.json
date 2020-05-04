@@ -1,6 +1,6 @@
 {
   "name": "@pkgw/engine",
-  "version": "0.0.0-dev",
+  "version": "7.0.0-beta.1",
   "description": "The AAS WorldWide Telescope WebGL engine",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -39,6 +39,6 @@
     "lint": "tsc"
   },
   "dependencies": {
-    "@pkgw/engine-types": "0.0.0-dev"
+    "@pkgw/engine-types": ">=1.0.1-beta.1"
   }
 }
