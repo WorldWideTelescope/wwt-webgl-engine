@@ -1,6 +1,6 @@
 {
   "name": "@pkgw/embed-common",
-  "version": "1.0.0-beta.1",
+  "version": "0.0.0-dev",
   "description": "Basic types and classes for the WWT embed framework.",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -20,7 +20,7 @@
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
   "dependencies": {
-    "@pkgw/engine-types": "^7.0.0"
+    "@pkgw/engine-types": "0.0.0-dev"
   },
   "publishConfig": {
     "access": "public"

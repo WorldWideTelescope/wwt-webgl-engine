@@ -1,6 +1,6 @@
 {
   "name": "@pkgw/semantic-release-ado-monorepo",
-  "version": "0.1.0",
+  "version": "0.0.0-dev",
   "description": "semantic-release plugin for Azure Pipelines and monorepos",
   "keywords": [
     "AAS WorldWide Telescope"
