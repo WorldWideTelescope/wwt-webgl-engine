@@ -249,11 +249,14 @@ export class WWTColor {
   }
 }
 
-export class ConstellationFilter {}
+/** Placeholder for the engine ConstellationFilter type. */
+export interface ConstellationFilterInterface {
+  clone(): ConstellationFilterInterface;
+}
 
 export type WWTSetting =
   [WWTBooleanSetting, boolean] |
   [WWTColorSetting, WWTColor] |
-  [WWTConstellationFilterSetting, ConstellationFilter] |
+  [WWTConstellationFilterSetting, ConstellationFilterInterface] |
   [WWTNumberSetting, number] |
   [WWTStringSetting, string];

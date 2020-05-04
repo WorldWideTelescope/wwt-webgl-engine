@@ -4,7 +4,6 @@
 import { R2D, R2H } from "@pkgw/astro";
 
 import {
-  ConstellationFilter,
   WWTBooleanSetting,
   WWTColor,
   WWTColorSetting,
@@ -15,6 +14,7 @@ import {
 } from "@pkgw/engine-types";
 
 import {
+  ConstellationFilter,
   ScriptInterface,
   SpaceTimeControllerObject,
   WWTControl,
