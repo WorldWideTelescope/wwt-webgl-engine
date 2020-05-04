@@ -20,8 +20,8 @@
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
   "dependencies": {
-    "@pkgw/astro": "file:../astro",
-    "@pkgw/engine": "file:../engine",
-    "@pkgw/engine-types": "file:../engine-types"
+    "@pkgw/astro": "^1.0.0",
+    "@pkgw/engine": "^7.0.0",
+    "@pkgw/engine-types": "^7.0.0"
   }
 }

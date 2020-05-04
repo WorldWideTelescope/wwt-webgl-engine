@@ -20,7 +20,7 @@
     "doc": "echo OK - no API docs"
   },
   "dependencies": {
-    "@pkgw/embed-common": "file:../embed-common",
+    "@pkgw/embed-common": "^0.1.0",
     "bootstrap-vue": "^2.13.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",

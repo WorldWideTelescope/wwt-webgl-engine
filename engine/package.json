@@ -39,6 +39,6 @@
     "lint": "tsc"
   },
   "dependencies": {
-    "@pkgw/engine-types": "file:../engine-types"
+    "@pkgw/engine-types": "^7.0.0"
   }
 }

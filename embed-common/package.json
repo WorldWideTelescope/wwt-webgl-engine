@@ -20,7 +20,7 @@
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
   "dependencies": {
-    "@pkgw/engine-types": "file:../engine-types"
+    "@pkgw/engine-types": "^7.0.0"
   },
   "publishConfig": {
     "access": "public"
