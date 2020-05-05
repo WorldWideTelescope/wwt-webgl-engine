@@ -1,10 +1,10 @@
-# Azure Pipelines: build the WebGL engine and wwtsdk.js files as build artifacts.
+# Copyright 2020 the .NET Foundation
+# Licensed under the MIT License
 
 trigger:
   branches:
     include:
       - master
-      - beta
 
 parameters:
 - name: 'zolaVersion'
@@ -12,14 +12,38 @@ parameters:
   type: string
 
 jobs:
-- job: BuildSDK
+- job: Main
   pool:
     vmImage: windows-latest
 
   steps:
 
+  # Setup
+
   - checkout: self
     submodules: recursive
+
+  - task: NodeTool@0
+    displayName: Set up node.js
+    inputs:
+      versionSpec: '>=12'
+
+  - script: npm cache verify
+    displayName: npm cache verify
+
+  # On `master`, we immediately simulate the merge with `beta` that will assign
+  # version numbers.
+
+  - powershell: |
+      echo TEMP INFO
+      git branch -a
+      echo GO GO GO
+      git tag temp-checkout-head HEAD
+      git switch beta
+      git merge --no-commit --no-ff -m "Merge update to beta" temp-checkout-head
+      npx lerna version --no-push --conventional-commits --conventional-prerelease
+    condition: and(succeeded(), eq(variables.Build.SourceBranch, 'master'))
+    displayName: Merge into beta branch
 
   # ScriptSharp build
 
@@ -46,15 +70,7 @@ jobs:
       artifactName: scriptsharp
       targetPath: $(Build.ArtifactStagingDirectory)/engine/wwtlib
 
-  # JavaScript/TypeScript build and test
-
-  - task: NodeTool@0
-    displayName: Set up node.js
-    inputs:
-      versionSpec: '>=12'
-
-  - script: npm cache verify
-    displayName: npm cache verify
+  # JavaScript/TypeScript build process can begin in earnest
 
   - script: npx lerna bootstrap --concurrency=1
     displayName: Lerna NPM setup
@@ -118,33 +134,7 @@ jobs:
       artifactName: docs
       targetPath: $(Build.ArtifactStagingDirectory)/docs
 
-  # Release processes. The semantic-release stage evaluates the Git history for
-  # each package in this repo, decides if a release needs to be made and what
-  # the new version number should be, creates and pushes Git tags, publishes NPM
-  # packages, logs the releases on GitHub, and sets `newVersion*` and
-  # `newMajMin*` pipelines variables that we can use for additional release
-  # processing.
-
-  - script: npm run semantic-release-win
-    displayName: semantic-release processing
-    env:
-      GITHUB_TOKEN: $(GITHUB_TOKEN)
-      NPM_TOKEN: $(NPM_TOKEN)
-
-  # If we just made a release of the engine on the beta branch, release new
-  # hosted artifacts in the /latest/ subdirectory. If we did it on the master
-  # branch, release new hosted artifacts in the majMin subdirectory. At the
-  # end we'll also do a CDN purge.
-
-  - powershell: |
-      $branch = "$(Build.SourceBranch)"
-      if ($branch -eq "beta") {
-        Write-Host "##vso[task.setvariable variable=engineVersionText;]latest"
-      } elseif ($branch -eq "master") {
-        Write-Host "##vso[task.setvariable variable=engineVersionText;]$(newMajMin_pkgw_engine)"
-      }
-    condition: and(succeeded(), contains(variables['newVersion_pkgw_engine'], '.'))
-    displayName: Set engine release version text
+  # Release processes
 
   ### - task: AzureFileCopy@3
   ###   condition: and(succeeded(), contains(variables['newVersion_pkgw_engine'], '.'))
@@ -160,16 +150,16 @@ jobs:
   # We always release new documentation, with a version tracking the engine
   # package.
 
-  - powershell: |
-      $branch = "$(Build.SourceBranch)"
-      if ($branch -eq "beta") {
-        Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
-      } elseif ($branch -eq "master") {
-        $version = "$(node -pe "require('./engine/package.json').version")"
-        $majmin = ($version -Split '\.')[0..1] -Join '.'
-        Write-Host "##vso[task.setvariable variable=docsVersionText;]$(majmin)"
-      }
-    displayName: Set docs release version text
+  ### - powershell: |
+  ###     $branch = "$(Build.SourceBranch)"
+  ###     if ($branch -eq "beta") {
+  ###       Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
+  ###     } elseif ($branch -eq "master") {
+  ###       $version = "$(node -pe "require('./engine/package.json').version")"
+  ###       $majmin = ($version -Split '\.')[0..1] -Join '.'
+  ###       Write-Host "##vso[task.setvariable variable=docsVersionText;]$(majmin)"
+  ###     }
+  ###   displayName: Set docs release version text
 
   ### - task: AzureFileCopy@3
   ###   displayName: Release updated documentation
