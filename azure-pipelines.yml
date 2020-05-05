@@ -32,9 +32,12 @@ jobs:
     displayName: npm cache verify
 
   # On `master`, we immediately simulate the merge with `beta` that will assign
-  # version numbers.
+  # version numbers. See
+  # https://github.com/microsoft/azure-pipelines-image-generation/issues/740
+  # about the GIT_REDIRECT_STDERR line.
 
   - powershell: |
+      $env:GIT_REDIRECT_STDERR = '2>&1'
       echo TEMPINFO
       git branch -a
       echo NEXT_GIT_TAG
