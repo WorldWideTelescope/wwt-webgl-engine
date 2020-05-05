@@ -28,8 +28,8 @@ jobs:
     inputs:
       versionSpec: '>=12'
 
-  - script: npm cache verify
-    displayName: npm cache verify
+  - script: npm cache clean -f
+    displayName: npm cache clean
 
   # On `master`, we immediately perform the merge with `beta` that assigns
   # version numbers.
@@ -153,16 +153,22 @@ jobs:
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
 
-  - script: |
+  - bash: |
       echo BEFORE_CONFIG
-      npm config set "//registry.npmjs.org/:_authToken=%NPM_TOKEN%"
+      npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
+      echo AFTER_CONFIG
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: Set up NPM auth
+    failOnStderr: false
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
+
+  - script: |
       echo BEFORE_PUBLISH
       npx lerna --loglevel=debug publish --yes --dist-tag=beta from-package
       echo AFTER_PUBLISH
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Publish new beta packages to NPM
-    env:
-      NPM_TOKEN: $(NPM_TOKEN)
 
   ### - task: AzureFileCopy@3
   ###   displayName: Release hosted engine artifacts
