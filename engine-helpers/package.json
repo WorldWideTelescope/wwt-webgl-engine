@@ -23,5 +23,8 @@
     "@pkgw/astro": "0.0.0-dev",
     "@pkgw/engine": "0.0.0-dev",
     "@pkgw/engine-types": "0.0.0-dev"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
