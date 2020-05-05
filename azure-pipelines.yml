@@ -154,8 +154,11 @@ jobs:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
 
   - script: |
-      npm config set //registry.npmjs.org/:_authToken=%NPM_TOKEN%
-      npx lerna publish --yes --dist-tag=beta from-package
+      echo BEFORE_CONFIG
+      npm config set "//registry.npmjs.org/:_authToken=%NPM_TOKEN%"
+      echo BEFORE_PUBLISH
+      npx lerna --loglevel=debug publish --yes --dist-tag=beta from-package
+      echo AFTER_PUBLISH
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Publish new beta packages to NPM
     env:
