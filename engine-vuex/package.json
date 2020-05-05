@@ -32,5 +32,8 @@
     "@vue/cli-plugin-eslint": "~4.3.0",
     "@vue/cli-plugin-typescript": "~4.3.0",
     "@vue/cli-plugin-vuex": "~4.3.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

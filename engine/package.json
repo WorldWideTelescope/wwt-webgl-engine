@@ -40,5 +40,8 @@
   },
   "dependencies": {
     "@pkgw/engine-types": "^1.0.1-beta.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
