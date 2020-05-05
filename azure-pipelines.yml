@@ -28,8 +28,8 @@ jobs:
     inputs:
       versionSpec: '>=12'
 
-  - script: npm cache verify
-    displayName: npm cache verify
+  - script: npm cache clean -f
+    displayName: npm cache clean
 
   # On `master`, we immediately perform the merge with `beta` that assigns
   # version numbers.
