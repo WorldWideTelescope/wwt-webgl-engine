@@ -153,10 +153,9 @@ jobs:
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
 
+  # I can only get this step to work using bash. No error message when running in cmd.
   - bash: |
-      echo BEFORE_CONFIG
       npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
-      echo AFTER_CONFIG
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Set up NPM auth
     failOnStderr: false
@@ -164,9 +163,7 @@ jobs:
       NPM_TOKEN: $(NPM_TOKEN)
 
   - script: |
-      echo BEFORE_PUBLISH
-      npx lerna --loglevel=debug publish --yes --dist-tag=beta from-package
-      echo AFTER_PUBLISH
+      npx lerna publish --yes --dist-tag=beta from-package
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Publish new beta packages to NPM
 
