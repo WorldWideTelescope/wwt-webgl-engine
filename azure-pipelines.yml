@@ -39,9 +39,9 @@ jobs:
       git config --global user.name "wwt-pipelines-bot"
       git tag temp-checkout-head HEAD
       git switch beta
-      git merge --no-commit --no-ff -m "Merge update to beta" temp-checkout-head
+      git merge --no-ff -m "Merge update to beta" temp-checkout-head
       git tag -d temp-checkout-HEAD
-      npx lerna version --no-push --conventional-commits --conventional-prerelease
+      npx lerna version --amend --no-push --conventional-commits --conventional-prerelease
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Merge into beta branch
 
