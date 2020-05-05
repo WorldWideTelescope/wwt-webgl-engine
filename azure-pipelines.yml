@@ -147,7 +147,7 @@ jobs:
     displayName: Set release version text variables
 
   - script: |
-      git -c http.extraheader="AUTHORIZATION: bearer %GITHUB_TOKEN%" push --tags origin beta:beta
+      git -c "credential.helper=!f() { echo username=token; echo password=%GITHUB_TOKEN%; };f" push --tags origin beta:beta
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Update beta branch
     env:
