@@ -35,12 +35,15 @@ jobs:
   # version numbers.
 
   - powershell: |
-      echo TEMP INFO
+      echo TEMPINFO
       git branch -a
-      echo GO GO GO
+      echo NEXT_GIT_TAG
       git tag temp-checkout-head HEAD
+      echo NEXT_GIT_SWITCH
       git switch beta
+      echo NEXT_GIT_MERGE
       git merge --no-commit --no-ff -m "Merge update to beta" temp-checkout-head
+      echo NEXT_NPX_LERNA
       npx lerna version --no-push --conventional-commits --conventional-prerelease
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Merge into beta branch
