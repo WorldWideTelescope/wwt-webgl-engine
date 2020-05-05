@@ -42,7 +42,7 @@ jobs:
       git switch beta
       git merge --no-commit --no-ff -m "Merge update to beta" temp-checkout-head
       npx lerna version --no-push --conventional-commits --conventional-prerelease
-    condition: and(succeeded(), eq(variables.Build.SourceBranch, 'master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Merge into beta branch
 
   # ScriptSharp build
