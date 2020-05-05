@@ -32,12 +32,9 @@ jobs:
     displayName: npm cache verify
 
   # On `master`, we immediately simulate the merge with `beta` that will assign
-  # version numbers. See
-  # https://github.com/microsoft/azure-pipelines-image-generation/issues/740
-  # about the GIT_REDIRECT_STDERR line.
+  # version numbers.
 
-  - powershell: |
-      $env:GIT_REDIRECT_STDERR = '2>&1'
+  - script: |
       git config --global user.email "wwt@aas.org"
       git config --global user.name "wwt-pipelines-bot"
       git tag temp-checkout-head HEAD
