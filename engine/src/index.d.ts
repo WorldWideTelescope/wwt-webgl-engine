@@ -14,9 +14,9 @@ import {
   // AltUnits,
   BandPass,
   // Classification,
-  ConstellationFilter,
+  ConstellationFilterInterface,
   ImageSetType,
-  ProjectionType
+  ProjectionType,
   // ReferenceFrames,
   // ReferenceFrameTypes,
   // SolarSystemObjects
@@ -36,6 +36,10 @@ export class ArrivedEventArgs {
 export interface ArrivedEventCallback {
   /** Called when the WWT view has arrived at a commanded position. */
   (si: ScriptInterface, args: ArrivedEventArgs): void;
+}
+
+export class ConstellationFilter implements ConstellationFilterInterface {
+  clone(): ConstellationFilter;
 }
 
 export namespace Imageset {

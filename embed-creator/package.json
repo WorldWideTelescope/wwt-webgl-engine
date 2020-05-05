@@ -1,6 +1,6 @@
 {
   "name": "@pkgw/embed-creator",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "An web app for creating AAS WorldWide Telescope embeds",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -20,7 +20,7 @@
     "doc": "echo OK - no API docs"
   },
   "dependencies": {
-    "@pkgw/embed-common": ">=1.0.1-beta.1",
+    "@pkgw/embed-common": "^1.0.1-beta.2",
     "bootstrap-vue": "^2.13.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
