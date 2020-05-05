@@ -31,7 +31,7 @@ jobs:
   - script: npm cache verify
     displayName: npm cache verify
 
-  # On `master`, we immediately simulate the merge with `beta` that will assign
+  # On `master`, we immediately perform the merge with `beta` that assigns
   # version numbers.
 
   - script: |
@@ -80,6 +80,7 @@ jobs:
 
   - script: |
       mkdir $(Build.ArtifactStagingDirectory)\engine-hosted
+      cp engine\wwtlib\bin\wwtlib.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtlib.js
       cp engine\src\index.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.js
       cp engine\src\index.min.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.min.js
       cp engine\src\index.d.ts $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.d.ts
@@ -134,10 +135,34 @@ jobs:
       artifactName: docs
       targetPath: $(Build.ArtifactStagingDirectory)/docs
 
-  # Release processes
+  # Release processes. If we've made it this far on `master`, we should publish our beta
+  # releases and update the `latest` forms of the web assets.
+
+  - powershell: |
+      $branch = "$(Build.SourceBranch)"
+      if ($branch -eq "refs/heads/master") {
+        Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
+        Write-Host "##vso[task.setvariable variable=engineVersionText;]latest"
+      }
+    displayName: Set release version text variables
+
+  - script: |
+      git -c http.extraheader="AUTHORIZATION: bearer $env:GITHUB_TOKEN" push --tags origin beta:beta
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: Update beta branch
+    env:
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
+
+  - script: |
+      echo "//registry.npmjs.org/:_authToken=%NPM_TOKEN%" >.npmrc
+      npx lerna publish --yes --dist-tag=beta from-package
+      del .npmrc
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: Publish new beta packages to NPM
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
 
   ### - task: AzureFileCopy@3
-  ###   condition: and(succeeded(), contains(variables['newVersion_pkgw_engine'], '.'))
   ###   displayName: Release hosted engine artifacts
   ###   inputs:
   ###     SourcePath: '$(build.artifactStagingDirectory)/engine-hosted'
@@ -147,22 +172,8 @@ jobs:
   ###     ContainerName: '$web'
   ###     blobPrefix: engine/$(engineVersionText)
 
-  # We always release new documentation, with a version tracking the engine
-  # package.
-
-  ### - powershell: |
-  ###     $branch = "$(Build.SourceBranch)"
-  ###     if ($branch -eq "beta") {
-  ###       Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
-  ###     } elseif ($branch -eq "master") {
-  ###       $version = "$(node -pe "require('./engine/package.json').version")"
-  ###       $majmin = ($version -Split '\.')[0..1] -Join '.'
-  ###       Write-Host "##vso[task.setvariable variable=docsVersionText;]$(majmin)"
-  ###     }
-  ###   displayName: Set docs release version text
-
   ### - task: AzureFileCopy@3
-  ###   displayName: Release updated documentation
+  ###   displayName: Release documentation
   ###   inputs:
   ###     SourcePath: '$(build.artifactStagingDirectory)/docs'
   ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
@@ -174,7 +185,6 @@ jobs:
   # CDN purges - last since they are slow and close to optional
 
   ### - task: AzurePowerShell@4
-  ###   condition: and(succeeded(), contains(variables['newVersion_pkgw_engine'], '.'))
   ###   displayName: CDN purge - hosted engine artifacts
   ###   inputs:
   ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
