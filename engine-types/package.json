@@ -1,6 +1,6 @@
 {
   "name": "@pkgw/engine-types",
-  "version": "1.0.1-beta.2",
+  "version": "1.0.1",
   "description": "Types used by the AAS WorldWide Telescope.",
   "keywords": [
     "AAS WorldWide Telescope",
