@@ -105,6 +105,23 @@ jobs:
       testResultsFormat: 'JUnit'
       testResultsFiles: 'engine/tests/results.xml'
 
+  # TEMP TESTING POSTPUBLISH IDEA
+
+  - script: lerna run postpublish
+    displayName: TEMP FORCE POSTPUBLISH
+
+  - bash: |
+      echo pub astro $publishedAstroVersion qqq
+    displayName: TEMP TEST1 POSTPUB
+
+  - script: running it
+    condition: and(succeeded(), ne(variables['publishedAstroVersion'], ''))
+    displayName: TEMP TEST2 POSTPUB
+
+  - script: running this thing
+    condition: and(succeeded(), ne(variables['publishedSomeOtherVersion'], ''))
+    displayName: TEMP TEST3 POSTPUB
+
   # Docs
 
   - script: npm run doc

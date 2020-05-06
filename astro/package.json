@@ -17,7 +17,8 @@
   "scripts": {
     "build": "tsc",
     "doc": "typedoc",
-    "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
+    "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts",
+    "postpublish": "node -p '\"##vso[task.setvariable variable=publishedAstroVersion];\" + process.env.npm_package_version'"
   },
   "publishConfig": {
     "access": "public"
