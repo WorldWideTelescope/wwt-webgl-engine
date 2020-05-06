@@ -2,8 +2,7 @@
   <div id="app">
     <WorldWideTelescope wwt-namespace="wwt-embed"></WorldWideTelescope>
     <div id="overlays">
-      <p>RA: {{ raText }}</p>
-      <p>Dec: {{ decText }}</p>
+      <p>{{ coordText }}</p>
       <p>Time: {{ wwtCurrentTime }}</p>
     </div>
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
@@ -19,7 +18,8 @@
 <script lang="ts">
 import { Component, Prop } from "vue-property-decorator";
 
-import { fmtDegLat, fmtHours } from "@pkgw/astro";
+import { fmtDegLat, fmtDegLon, fmtHours } from "@pkgw/astro";
+import { ImageSetType } from "@pkgw/engine-types";
 import { WWTAwareComponent } from "@pkgw/engine-vuex";
 import { CreditMode, EmbedSettings } from "@pkgw/embed-common";
 
@@ -29,12 +29,12 @@ export default class Embed extends WWTAwareComponent {
 
   @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
 
-  get raText() {
-    return fmtHours(this.wwtRARad);
-  }
+  get coordText() {
+    if (this.wwtRenderType == ImageSetType.sky) {
+      return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+    }
 
-  get decText() {
-    return fmtDegLat(this.wwtDecRad);
+    return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
   }
 
   created() {
