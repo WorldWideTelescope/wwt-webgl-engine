@@ -1,6 +1,6 @@
 {
   "name": "@pkgw/embed",
-  "version": "0.1.0-beta.4",
+  "version": "0.1.0-beta.5",
   "description": "The AAS WorldWide Telescope as an embeddable iframe.",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -17,11 +17,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint src",
-    "doc": "copyfiles -u 1 \"dist/**/*\" ../docs/static/embed"
+    "doc": "copyfiles -u 1 \"dist/**/*\" ../docs/static/embed",
+    "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEmbedVersion];$npm_package_version\""
   },
   "dependencies": {
-    "@pkgw/engine": "^7.0.0-beta.3",
-    "@pkgw/engine-vuex": "^0.1.0-beta.4",
+    "@pkgw/engine": "^7.0.0-beta.4",
+    "@pkgw/engine-vuex": "^0.1.0-beta.5",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
   },
