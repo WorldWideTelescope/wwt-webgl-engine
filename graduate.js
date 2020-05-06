@@ -3,15 +3,23 @@
 
 "use strict";
 
+const dedent = require("dedent");
 const fs = require("fs-extra");
 const log = require("npmlog");
 const semver = require("semver");
 
+const childProcess = require("@lerna/child-process");
 const cli = require("@lerna/cli");
 const Command = require("@lerna/command");
 const ConventionalCommitUtilities = require("@lerna/conventional-commits");
 const ValidationError = require("@lerna/validation-error");
 
+
+/** Add a very simple changelog entry indicating that we've graduated
+ * a prerelease to a "full" release. The standardized formatting is done
+ * using the conventional-commits-* packages, which we're not using here
+ * due to laziness.
+ */
 function addChangeLog(pkg, oldVers, newVers, bumpType) {
   const { BLANK_LINE, CHANGELOG_HEADER, EOL } = require("@lerna/conventional-commits/lib/constants");
   const readExistingChangelog = require("@lerna/conventional-commits/lib/read-existing-changelog");
@@ -38,6 +46,49 @@ function addChangeLog(pkg, oldVers, newVers, bumpType) {
   });
 }
 
+
+/** Find the earliest full-release version of one of our packages that includes
+ * the given committish. This is how we determine dependency version
+ * requirements.
+ */
+function findMinimumAcceptableVersion(packageName, committish) {
+  const stdout = childProcess.execSync(
+    "git",
+    [
+      "describe",
+      "--always",
+      "--contains",
+      "--match", `${packageName}@*`,
+      "--exclude", "*-beta*",
+      committish
+    ]
+  );
+
+  const minimalShaRegex = /^([0-9a-f]{7,40})(-dirty)?$/;
+  if (minimalShaRegex.test(stdout)) {
+    return null;
+  }
+
+  if (!stdout.startsWith(packageName + "@")) {
+    log.warn("findMinimumAcceptableVersion", `unexpected describe result: ${stdout}`);
+    return null;
+  }
+
+  const versionText = stdout.slice(packageName.length + 1).split('~')[0];
+
+  // Check that the text parses as a non-pre-release semver in case something
+  // unexpected happened.
+
+  const parsed = semver.parse(versionText);
+  if (parsed.prerelease.length) {
+    log.warn("findMinimumAcceptableVersion", `bad prerelease-looking describe result: ${stdout}`);
+    return null;
+  }
+
+  return versionText;
+}
+
+/** The command implementation, using the lerna framework. */
 class WWTGraduateCommand extends Command {
   configureProperties() {
     super.configureProperties();
@@ -74,8 +125,46 @@ class WWTGraduateCommand extends Command {
     // expressed as Git commit IDs to make them independent of the assigned
     // version numbering.
 
+    const gitreqs = node.pkg.get('localDepRequiredCommits') || {};
+
     for (const [depName, depNode] of node.localDependencies) {
-      throw new Error("TODO: implement local dep version checking");
+      const gitReq = gitreqs[depName];
+      if (!gitReq) {
+        throw new Error(dedent`
+          Cannot graduate ${this.packageName}: its "localDepRequiredCommits" table does
+          not have an entry for local dependency ${depName}, so I cannot determine
+          the minimum required version needed for publishing.`
+        );
+      }
+
+      const v = findMinimumAcceptableVersion(depName, gitReq);
+      if (!v) {
+        throw new Error(dedent`
+          Cannot graduate ${this.packageName}: its local dependency ${depName} does not have
+          a new enough non-pre-release.`
+        );
+      }
+
+      const oldNumReq = node.pkg.dependencies[depName];
+      if (!oldNumReq) {
+        throw new Error(dedent`
+          Consistency problem with ${this.packageName}: expected local dependency
+          ${depName} but found no numerical version requirement?`
+        );
+      }
+
+      const newNumReq = "^" + v;
+
+      if (oldNumReq == newNumReq) {
+        this.logger.info("graduate", dedent`
+          Local dependency "${depName}" version requirement: ${newNumReq}, unchanged`
+        );
+      } else {
+        this.logger.info("graduate", dedent`
+          Local dependency "${depName}" version requirement: ${oldNumReq} => ${newNumReq}`
+        );
+        node.pkg.dependencies[depName] = newNumReq;
+      }
     }
 
     // Time to graduate this package.
@@ -112,7 +201,7 @@ class WWTGraduateCommand extends Command {
 
       const tag = `${this.packageName}@${newVers}`;
       console.log(`\nYou *must* create an annotated Git tag after committing:\n`);
-      console.log(`   git tag ${tag} -m ${tag}\n`);
+      console.log(`    git tag ${tag} -m ${tag}\n`);
     });
 
     return chain;
