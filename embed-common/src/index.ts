@@ -1,8 +1,6 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-import { WWTSetting } from "@pkgw/engine-types";
-
 // TypeScript magic to allow fallible reverse mapping of string-valued enums.
 // https://stackoverflow.com/q/57922745/3760486
 type StringEnum = {[key: string]: string};
@@ -49,105 +47,82 @@ export class EmbedSettings {
   backgroundImagesetName = "Digitized Sky Survey (Color)";
   foregroundImagesetName = "";
   creditMode = CreditMode.Default;
-  wwtSettings: WWTSetting[] = [];
 
-  constructor(options: EmbedOptions) {
-    Object.assign(this, options);
-  }
+  static fromQueryParams(qp: IterableIterator<[string, string]>): EmbedSettings {
+    const s = new EmbedSettings();
 
-  static fromQueryString(qs: string): EmbedSettings {
-    const queryParams = new URLSearchParams(qs);
-    const o: EmbedOptions = {};
-
-    // seeming bug that `for (let x of queryParams) {}` doesn't work in TypeScript
-    queryParams.forEach((value, key) => {
+    for (const [key, value] of qp) {
       switch (key) {
         case "bg":
-          o.backgroundImagesetName = value;
-          break;
-
-        case "fg":
-          o.foregroundImagesetName = value;
+          s.backgroundImagesetName = value;
           break;
 
         case "cred":
-          o.creditMode = enumLookup(CreditMode, value);
+          {
+            const m = enumLookup(CreditMode, value);
+            if (m !== undefined)
+              s.creditMode = m;
+          }
+          break;
+
+        case "fg":
+          s.foregroundImagesetName = value;
           break;
 
         case "planet":
           if (value == "mars") {
             // Gnarly historical thing that the default Mars imageset
             // is named thusly:
-            o.backgroundImagesetName = "Visible Imagery";
-            o.foregroundImagesetName = "Visible Imagery";
+            s.backgroundImagesetName = "Visible Imagery";
+            s.foregroundImagesetName = "Visible Imagery";
           } else if (value == "earth") {
-            o.backgroundImagesetName = "Bing Maps Aerial";
-            o.foregroundImagesetName = "Bing Maps Aerial";
+            s.backgroundImagesetName = "Bing Maps Aerial";
+            s.foregroundImagesetName = "Bing Maps Aerial";
           } else {
-            o.backgroundImagesetName = value;
-            o.foregroundImagesetName = value;
+            s.backgroundImagesetName = value;
+            s.foregroundImagesetName = value;
           }
           break;
 
         case "threed":
-          o.backgroundImagesetName = "3D Solar System View";
-          o.foregroundImagesetName = "";
+          s.backgroundImagesetName = "3D Solar System View";
+          s.foregroundImagesetName = "";
           break;
       }
-    });
+    }
 
-    return new EmbedSettings(o);
+    return s;
   }
 }
-
-/** This has the same fields as [[EmbedSettings]], but they are all optional. */
-export type EmbedOptions = Partial<EmbedSettings>;
 
 /** A class to help building query strings that get parsed into EmbedSettings
  * objects. There are a few shorthands for setups where the "implementation
  * details" are a bit weird or might change.
  */
 export class EmbedQueryStringBuilder {
-  o: EmbedOptions = {};
+  s: EmbedSettings = new EmbedSettings();
   threeDMode = false;
   planetaryBody: PlanetaryBodies | null = null;
 
-  constructor() {
-    // Get the associated checkbox to appear checked at startup:
-    this.o.creditMode = CreditMode.Default;
-  }
-
   toQueryItems(): Array<[string, string]> {
     const result: Array<[string, string]> = [];
+    const defaults = new EmbedSettings();
 
     if (this.threeDMode) {
       result.push(["threed", ""]);
     } else if (this.planetaryBody !== null) {
       result.push(["planet", this.planetaryBody]);
     } else {
-      if (this.o.backgroundImagesetName !== undefined && this.o.backgroundImagesetName.length)
-        result.push(["bg", this.o.backgroundImagesetName]);
-      if (this.o.foregroundImagesetName !== undefined && this.o.foregroundImagesetName.length)
-        result.push(["fg", this.o.foregroundImagesetName]);
+      if (this.s.backgroundImagesetName.length && this.s.backgroundImagesetName != defaults.backgroundImagesetName)
+        result.push(["bg", this.s.backgroundImagesetName]);
+      if (this.s.foregroundImagesetName.length && this.s.foregroundImagesetName != defaults.foregroundImagesetName)
+        result.push(["fg", this.s.foregroundImagesetName]);
     }
 
-    if (this.o.creditMode && this.o.creditMode != CreditMode.Default) {
-      result.push(["cred", this.o.creditMode]);
+    if (this.s.creditMode && this.s.creditMode != CreditMode.Default) {
+      result.push(["cred", this.s.creditMode]);
     }
 
     return result;
-  }
-
-  /** Compile these settings to an embed query string.
-   *
-   * If it is not empty, the returned query string begins with a question mark.
-   *
-   * @returns A query string such as `"?bg=foo&fg=bar"`.
-   */
-  toQueryString(): string {
-    const qs = new URLSearchParams(this.toQueryItems()).toString();
-    if (qs.length)
-      return "?" + qs;
-    return "";
   }
 }

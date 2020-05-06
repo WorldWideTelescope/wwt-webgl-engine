@@ -27,7 +27,7 @@ import { CreditMode, EmbedSettings } from "@pkgw/embed-common";
 export default class Embed extends WWTAwareComponent {
   CreditMode = CreditMode
 
-  @Prop({ default: new EmbedSettings({}) }) readonly embedSettings!: EmbedSettings;
+  @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
 
   get raText() {
     return fmtHours(this.wwtRARad);

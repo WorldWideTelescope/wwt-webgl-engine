@@ -46,7 +46,7 @@
               label="Here are some generic settings that you can alter:"
             >
               <b-form-checkbox
-                v-model="qsb.o.creditMode"
+                v-model="qsb.s.creditMode"
                 name="credit-mode-checkbox"
                 :value="CreditMode.Default"
                 :unchecked-value="CreditMode.None"
@@ -293,7 +293,10 @@ export default class Creator extends Vue {
   clipboardNoticeText = "";
 
   get queryString() {
-    return this.qsb.toQueryString();
+    const qs = new URLSearchParams(this.qsb.toQueryItems()).toString();
+    if (qs.length)
+      return "?" + qs;
+    return "";
   }
 
   get iframeBaseUrl() {
