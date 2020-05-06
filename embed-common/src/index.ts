@@ -49,6 +49,7 @@ export class EmbedSettings {
   backgroundImagesetName = "Digitized Sky Survey (Color)";
   foregroundImagesetName = "";
   creditMode = CreditMode.Default;
+  showCoordinateReadout = false;
   showCrosshairs = false;
 
   static fromQueryParams(qp: IterableIterator<[string, string]>): EmbedSettings {
@@ -62,6 +63,10 @@ export class EmbedSettings {
 
         case "ch":
           s.showCrosshairs = true;
+          break;
+
+        case "cro":
+          s.showCoordinateReadout = true;
           break;
 
         case "cred":
@@ -134,6 +139,10 @@ export class EmbedQueryStringBuilder {
 
     if (this.s.creditMode && this.s.creditMode != CreditMode.Default) {
       result.push(["cred", this.s.creditMode]);
+    }
+
+    if (this.s.showCoordinateReadout) {
+      result.push(["cro", ""]);
     }
 
     if (this.s.showCrosshairs) {

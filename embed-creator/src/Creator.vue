@@ -46,16 +46,21 @@
               label="Here are some generic settings that you can alter:"
             >
               <b-form-checkbox
+                v-model="qsb.s.showCrosshairs"
+                name="crosshairs-checkbox"
+                >Show crosshairs in view center</b-form-checkbox
+              >
+              <b-form-checkbox
+                v-model="qsb.s.showCoordinateReadout"
+                name="coordinate-readout-checkbox"
+                >Show coordinate readout</b-form-checkbox
+              >
+              <b-form-checkbox
                 v-model="qsb.s.creditMode"
                 name="credit-mode-checkbox"
                 :value="CreditMode.Default"
                 :unchecked-value="CreditMode.None"
                 >Show “Powered by” credit overlay</b-form-checkbox
-              >
-              <b-form-checkbox
-                v-model="qsb.s.showCrosshairs"
-                name="crosshairs-checkbox"
-                >Show crosshairs in view center</b-form-checkbox
               >
             </b-form-group>
           </b-tab>

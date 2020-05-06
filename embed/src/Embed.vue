@@ -2,8 +2,7 @@
   <div id="app">
     <WorldWideTelescope wwt-namespace="wwt-embed"></WorldWideTelescope>
     <div id="overlays">
-      <p>{{ coordText }}</p>
-      <p>Time: {{ wwtCurrentTime }}</p>
+      <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
       <p>Powered by <a href="https://worldwidetelescope.org/home/">AAS WorldWide
