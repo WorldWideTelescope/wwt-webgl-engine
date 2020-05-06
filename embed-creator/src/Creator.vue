@@ -62,6 +62,11 @@
                 :unchecked-value="CreditMode.None"
                 >Show “Powered by” credit overlay</b-form-checkbox
               >
+              <b-form-checkbox
+                v-model="suggestDefaultStyling"
+                name="default-styling-checkbox"
+                >Include CSS style suggestion in sample embed code</b-form-checkbox
+              >
             </b-form-group>
           </b-tab>
 
@@ -217,7 +222,16 @@
                 >{{ clipboardNoticeText }}</span
               >
             </div>
-            <p class="mt-4">You will need to add appropriate CSS to control the size of the iframe. For instance: <code>.wwt-embed { width: 100%; height: 360px; }</code></p>
+            <p class="mt-4" v-show="suggestDefaultStyling">
+              You should apply CSS <code>style</code> settings to control the
+              size of the iframe. The settings suggested above can safely be
+              changed.
+            </p>
+            <p class="mt-4" v-show="!suggestDefaultStyling">
+              You will need to add appropriate CSS to control the size of the
+              iframe. For instance: <code>.wwt-embed { width: 100%; height:
+              360px; }</code>
+            </p>
           </b-col>
         </b-row>
       </main>
@@ -302,6 +316,7 @@ export default class Creator extends Vue {
   currentTabIndex = 0;
   clipboardNoticeFadeOut = false;
   clipboardNoticeText = "";
+  suggestDefaultStyling = true;
 
   get queryString() {
     const qs = new URLSearchParams(this.qsb.toQueryItems()).toString();
@@ -324,7 +339,8 @@ export default class Creator extends Vue {
   }
 
   get embedCode() {
-    return `<iframe class="wwt-embed" src="${escapeHtml(this.iframeSource)}">
+    const style = this.suggestDefaultStyling ? " style=\"width: 100%; height: 360px;\"" : "";
+    return `<iframe class="wwt-embed" src="${escapeHtml(this.iframeSource)}" ${style}>
   <p>Cannot display WorldWide Telescope because your browser does not support iframes.</p>
 </iframe>`;
   }
