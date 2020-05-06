@@ -124,7 +124,7 @@
               <b-form-radio
                 v-model="qsb.planetaryBody"
                 name="planetary-imagery"
-                :value="PlanetaryBodies.Mars"
+                :value="PlanetaryBodies.Jupiter"
                 >Jupiter</b-form-radio
               >
               <b-form-radio
