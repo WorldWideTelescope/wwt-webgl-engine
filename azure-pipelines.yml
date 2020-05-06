@@ -32,18 +32,18 @@ jobs:
   - script: npm cache clean -f
     displayName: npm cache clean
 
-  # On `master`, we immediately create the merge commit that updates the
-  # `release` branch with version bumps from the new changes.
+  # On `master` or pull requests thereto, we immediately create the merge commit
+  # that would update the `release` branch with version bumps from the new changes.
 
   - script: |
       git config --global user.email "wwt@aas.org"
       git config --global user.name "wwt-pipelines-bot"
       git tag temp-checkout-head HEAD
       git switch release
-      git merge --no-ff -m "Update release to master with version bumps" temp-checkout-head
+      git merge --no-ff -m "Automated prereleases from latest master" temp-checkout-head
       git tag -d temp-checkout-head
       npx lerna version --yes --amend --no-push --conventional-commits --conventional-prerelease --preid=beta
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['System.PullRequest.TargetBranch'], 'master')))
     displayName: Create merged release branch
 
   # ScriptSharp build
@@ -145,6 +145,10 @@ jobs:
   # positioned to publish any new beta packages. Besides decreasing turnaround
   # time, in this scheme we can use the source branch to choose which dist-tag
   # to use for the NPM publication.
+  #
+  # Note that if an NPM release fails on `master`, we might get `release` trying
+  # to upload a prerelease to NPM, which I think would assign it to the wrong
+  # dist-tag.
 
   - powershell: |
       $branch = "$(Build.SourceBranch)"
@@ -155,10 +159,16 @@ jobs:
       }
     displayName: Set npmDistTagFlag variables
 
-  # I can only get this step to work using bash. No error message when running in cmd.
+  # I can only get this step to work using bash. No error message when running
+  # in cmd.
+  #
+  # Also, note that even though secret variables are not made available to pull
+  # requests from external forks, it seems that they are made available to pull
+  # requests from the same user/org, which is why we have our `condition:` line.
   - bash: |
       npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
     displayName: Set up NPM auth
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/'))
     failOnStderr: false
     env:
       NPM_TOKEN: $(NPM_TOKEN)
@@ -166,6 +176,7 @@ jobs:
   - script: |
       npx lerna publish --yes $(npmDistTagFlag) from-package
     displayName: Publish new packages to NPM
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/'))
     env:
       NPM_TOKEN: $(NPM_TOKEN)
 

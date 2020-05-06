@@ -24,6 +24,11 @@
     "@pkgw/engine": "0.0.0-dev",
     "@pkgw/engine-types": "0.0.0-dev"
   },
+  "localDepRequiredCommits": {
+    "@pkgw/astro": "f67c4bb8bbe05af1eb2b20c26a575374c53d3d01",
+    "@pkgw/engine": "020de599379d176e11f9e7132d1c00ede70bfea0",
+    "@pkgw/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
+  },
   "publishConfig": {
     "access": "public"
   }

@@ -33,6 +33,10 @@
     "@vue/cli-plugin-typescript": "~4.3.0",
     "@vue/cli-plugin-vuex": "~4.3.0"
   },
+  "localDepRequiredCommits": {
+    "@pkgw/engine": "020de599379d176e11f9e7132d1c00ede70bfea0",
+    "@pkgw/engine-helpers": "ede054e4235cf7223be10636fba0403bc3d976cd"
+  },
   "publishConfig": {
     "access": "public"
   }
