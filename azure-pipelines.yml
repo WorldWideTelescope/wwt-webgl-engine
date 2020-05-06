@@ -34,6 +34,10 @@ jobs:
 
   # On `master`, we immediately create the merge commit that updates the
   # `release` branch with version bumps from the new changes.
+  #
+  # (Build.SourceBranch can look like "refs/heads/master" or
+  # "refs/pull/2/merge", while Build.SourceBranchName will be "master" for CI
+  # both on the master branch and pull requests to it.)
 
   - script: |
       git config --global user.email "wwt@aas.org"
@@ -43,7 +47,7 @@ jobs:
       git merge --no-ff -m "Automated prereleases from latest master" temp-checkout-head
       git tag -d temp-checkout-head
       npx lerna version --yes --amend --no-push --conventional-commits --conventional-prerelease --preid=beta
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
     displayName: Create merged release branch
 
   # ScriptSharp build
