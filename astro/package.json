@@ -1,6 +1,6 @@
 {
   "name": "@pkgw/astro",
-  "version": "1.0.1-beta.1",
+  "version": "1.0.1-beta.2",
   "description": "Basic astronomy utilities for the AAS WorldWide Telescope framework.",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -17,7 +17,8 @@
   "scripts": {
     "build": "tsc",
     "doc": "typedoc",
-    "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
+    "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts",
+    "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedAstroVersion];$npm_package_version\""
   },
   "publishConfig": {
     "access": "public"
