@@ -4,7 +4,7 @@
 import Vue from "vue";
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
-import { WWTSetting } from "@pkgw/engine-types";
+import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
 import { WWTInstance } from "@pkgw/engine-helpers";
 
 interface WWTLinkedCallback {
@@ -45,6 +45,9 @@ export interface WWTEngineVuexState {
 
   /** The current WWT clock time of the view, as a UTC Date. */
   currentTime: Date;
+
+  /** The current mode of the renderer */
+  renderType: ImageSetType;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -76,6 +79,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   raRad = 0.0;
   decRad = 0.0;
   currentTime = new Date();
+  renderType = ImageSetType.sky;
 
   @Mutation
   internalLinkToInstance(wwt: WWTInstance): void {
@@ -100,6 +104,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   @Mutation
   internalUpdateCurrentTime(newTime: Date): void {
     this.currentTime = newTime;
+  }
+
+  @Mutation
+  internalUpdateRenderType(newType: ImageSetType): void {
+    this.renderType = newType;
   }
 
   @Mutation

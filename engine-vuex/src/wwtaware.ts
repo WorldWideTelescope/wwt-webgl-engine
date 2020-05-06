@@ -1,7 +1,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
-import { WWTSetting } from "@pkgw/engine-types";
+import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
 
 import { GotoRADecZoomParams, WWTEngineVuexState } from "./store";
 
@@ -22,6 +22,7 @@ export class WWTAwareComponent extends Vue {
         wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
+        wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
       }),
       ...this.$options.computed,
     };
@@ -48,6 +49,7 @@ export class WWTAwareComponent extends Vue {
   wwtRARad!: number;
   wwtDecRad!: number;
   wwtCurrentTime!: Date;
+  wwtRenderType!: ImageSetType;
 
   applySetting(_s: WWTSetting): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
   setBackgroundImageByName(_n: string): void {}  // eslint-disable-line @typescript-eslint/no-empty-function

@@ -7,6 +7,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
 import { D2R, H2R } from "@pkgw/astro";
+import { ImageSetType } from "@pkgw/engine-types";
 import { WWTInstance } from "@pkgw/engine-helpers";
 
 import { WWTEngineVuexState } from "./store";
@@ -33,6 +34,7 @@ export default class WWTComponent extends Vue {
         raRad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         decRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         currentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
+        renderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
       }),
     };
 
@@ -43,6 +45,7 @@ export default class WWTComponent extends Vue {
         "internalUpdateRA",
         "internalUpdateDec",
         "internalUpdateCurrentTime",
+        "internalUpdateRenderType",
       ]),
       ...mapActions([
         "waitForReady",
@@ -82,6 +85,9 @@ export default class WWTComponent extends Vue {
       const time = wwt.stc.get_now();
       if (this.currentTime != time)
         this.internalUpdateCurrentTime(time);
+
+      if (this.renderType != wwt.ctl.renderType)
+        this.internalUpdateRenderType(wwt.ctl.renderType);
     };
 
     // Wait for the WWT engine to signal readiness, then wait another tick, then
@@ -108,11 +114,13 @@ export default class WWTComponent extends Vue {
   raRad!: number;
   decRad!: number;
   currentTime!: Date;
+  renderType!: ImageSetType;
   internalLinkToInstance(_wwt: WWTInstance): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
   internalUnlinkFromInstance(): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
   internalUpdateRA(_newRARad: number): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
   internalUpdateDec(_newDecRad: number): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
   internalUpdateCurrentTime(_newTime: Date): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
+  internalUpdateRenderType(_newType: ImageSetType): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
   waitForReady(): Promise<void> { throw new Error("unreachable (?)"); }
 }
 </script>

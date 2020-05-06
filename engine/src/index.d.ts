@@ -444,6 +444,14 @@ export namespace SpaceTimeController {
 export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
 export class WWTControl {
+  /** The current mode that the renderer is in.
+   *
+   * This value tracks the type of the background imageset. It is updated at the
+   * beginning of [[renderOneFrame]], not immediately upon alteration of the
+   * background image set.
+   */
+  renderType: ImageSetType;
+
   /** Render the view.
    *
    * Note that there also exists a similar method named `render`, but it
