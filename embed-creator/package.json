@@ -32,6 +32,9 @@
     "@vue/cli-plugin-eslint": "~4.3.0",
     "@vue/cli-plugin-typescript": "~4.3.0"
   },
+  "localDepRequiredCommits": {
+    "@pkgw/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3"
+  },
   "publishConfig": {
     "access": "public"
   }

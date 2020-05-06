@@ -21,6 +21,7 @@
     "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEmbedVersion];$npm_package_version\""
   },
   "dependencies": {
+    "@pkgw/embed-common": "^1.0.1-beta.2",
     "@pkgw/engine": "^7.0.0-beta.4",
     "@pkgw/engine-vuex": "^0.1.0-beta.5",
     "vue": "^2.6.11",
@@ -30,6 +31,11 @@
     "@vue/cli-plugin-eslint": "~4.3.0",
     "@vue/cli-plugin-typescript": "~4.3.0",
     "@vue/cli-plugin-vuex": "~4.3.0"
+  },
+  "localDepRequiredCommits": {
+    "@pkgw/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3",
+    "@pkgw/engine": "020de599379d176e11f9e7132d1c00ede70bfea0",
+    "@pkgw/engine-vuex": "ede054e4235cf7223be10636fba0403bc3d976cd"
   },
   "publishConfig": {
     "access": "public"
