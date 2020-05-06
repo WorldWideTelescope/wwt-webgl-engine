@@ -87,14 +87,13 @@ class WWTGraduateCommand extends Command {
     node.pkg.version = newVers;
     chain = chain.then(() => node.pkg.serialize());
     chain = chain.then(() => addChangeLog(node.pkg, oldVers, newVers, this.bumpType));
-
-    // By definition, a release of a package is an event that concerns only that
-    // package itself. But, since packages in the monorepo are related, if there
-    // are local packages that depend on the one that we've just scheduled for
-    // release, it is certainly possible that it might be time to make a new
-    // release of one or more of them as well. Suggest this to the user.
-
     chain = chain.then(() => {
+      // By definition, a release of a package is an event that concerns only that
+      // package itself. But, since packages in the monorepo are related, if there
+      // are local packages that depend on the one that we've just scheduled for
+      // release, it is certainly possible that it might be time to make a new
+      // release of one or more of them as well. Suggest this to the user.
+
       if (node.localDependents.size) {
         console.log("\nConsider also making releases of immediate local dependents:\n");
 
@@ -102,6 +101,11 @@ class WWTGraduateCommand extends Command {
           console.log(`    ${dependentName} (currently ${dependentNode.version})`);
         }
       }
+
+      // We expect that it will be common to want to make multiple releases in
+      // one batch. The easiest way to implement that is to do individual
+      // packages atomically with guidance about the Git operations to stitch
+      // everything together.
 
       console.log("\nPotential Git commit command:\n");
       console.log(`    git commit -am "Release ${this.packageName} ${newVers} (same as ${oldVers})"`);
