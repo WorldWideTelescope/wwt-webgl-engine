@@ -163,10 +163,16 @@ jobs:
       }
     displayName: Set npmDistTagFlag variables
 
-  # I can only get this step to work using bash. No error message when running in cmd.
+  # I can only get this step to work using bash. No error message when running
+  # in cmd.
+  #
+  # Also, note that even though secret variables are not made available to pull
+  # requests from external forks, it seems that they are made available to pull
+  # requests from the same user/org, which is why we have our `condition:` line.
   - bash: |
       npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
     displayName: Set up NPM auth
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/'))
     failOnStderr: false
     env:
       NPM_TOKEN: $(NPM_TOKEN)
@@ -174,6 +180,7 @@ jobs:
   - script: |
       npx lerna publish --yes $(npmDistTagFlag) from-package
     displayName: Publish new packages to NPM
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/'))
     env:
       NPM_TOKEN: $(NPM_TOKEN)
 
