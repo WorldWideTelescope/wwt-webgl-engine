@@ -5,6 +5,7 @@ trigger:
   branches:
     include:
       - master
+      - release
 
 parameters:
 - name: 'zolaVersion'
@@ -31,19 +32,19 @@ jobs:
   - script: npm cache clean -f
     displayName: npm cache clean
 
-  # On `master`, we immediately perform the merge with `beta` that assigns
-  # version numbers.
+  # On `master`, we immediately create the merge commit that updates the
+  # `release` branch with version bumps from the new changes.
 
   - script: |
       git config --global user.email "wwt@aas.org"
       git config --global user.name "wwt-pipelines-bot"
       git tag temp-checkout-head HEAD
-      git switch beta
-      git merge --no-ff -m "Merge update to beta" temp-checkout-head
-      git tag -d temp-checkout-HEAD
-      npx lerna version --yes --amend --no-push --conventional-commits --conventional-prerelease
+      git switch release
+      git merge --no-ff -m "Update release to master with version bumps" temp-checkout-head
+      git tag -d temp-checkout-head
+      npx lerna version --yes --amend --no-push --conventional-commits --conventional-prerelease --preid=beta
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    displayName: Merge into beta branch
+    displayName: Create merged release branch
 
   # ScriptSharp build
 
@@ -105,23 +106,6 @@ jobs:
       testResultsFormat: 'JUnit'
       testResultsFiles: 'engine/tests/results.xml'
 
-  # TEMP TESTING POSTPUBLISH IDEA
-
-  - script: lerna run postpublish
-    displayName: TEMP FORCE POSTPUBLISH
-
-  - bash: |
-      echo pub astro $publishedAstroVersion qqq
-    displayName: TEMP TEST1 POSTPUB
-
-  - script: echo running it
-    condition: and(succeeded(), ne(variables['publishedAstroVersion'], ''))
-    displayName: TEMP TEST2 POSTPUB
-
-  - script: echo running this thing
-    condition: and(succeeded(), ne(variables['publishedSomeOtherVersion'], ''))
-    displayName: TEMP TEST3 POSTPUB
-
   # Docs
 
   - script: npm run doc
@@ -152,37 +136,54 @@ jobs:
       artifactName: docs
       targetPath: $(Build.ArtifactStagingDirectory)/docs
 
-  # Release processes. If we've made it this far on `master`, we should publish our beta
-  # releases and update the `latest` forms of the web assets.
+  # Release processes.
+  #
+  # We release NPM packages on both the `master` and `release` branches. New
+  # pushes to `release` might declare non-prerelease versions that we've just
+  # built and should publish. On `master`, we started off by merging the new
+  # changes into `release` and doing any needed version bumps, so we're
+  # positioned to publish any new beta packages. Besides decreasing turnaround
+  # time, in this scheme we can use the source branch to choose which dist-tag
+  # to use for the NPM publication.
 
   - powershell: |
       $branch = "$(Build.SourceBranch)"
       if ($branch -eq "refs/heads/master") {
-        Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
-        Write-Host "##vso[task.setvariable variable=engineVersionText;]latest"
+        Write-Host "##vso[task.setvariable variable=npmDistTagFlag;]--dist-tag=beta"
+      } else {
+        Write-Host "##vso[task.setvariable variable=npmDistTagFlag;]"
       }
-    displayName: Set release version text variables
-
-  - script: |
-      git -c "credential.helper=!f() { echo username=token; echo password=%GITHUB_TOKEN%; };f" push --tags origin beta:beta
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    displayName: Update beta branch
-    env:
-      GITHUB_TOKEN: $(GITHUB_TOKEN)
+    displayName: Set npmDistTagFlag variables
 
   # I can only get this step to work using bash. No error message when running in cmd.
   - bash: |
       npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Set up NPM auth
     failOnStderr: false
     env:
       NPM_TOKEN: $(NPM_TOKEN)
 
   - script: |
-      npx lerna publish --yes --dist-tag=beta from-package
+      npx lerna publish --yes $(npmDistTagFlag) from-package
+    displayName: Publish new packages to NPM
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
+
+  # On `master`, now let's update the `release` branch with our new versions.
+  # This will trigger a CI run there that should hopefully have nothing new to
+  # do.
+
+  - script: |
+      git -c "credential.helper=!f() { echo username=token; echo password=%GITHUB_TOKEN%; };f" push --tags origin release:release
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    displayName: Publish new beta packages to NPM
+    displayName: Update release branch (master only)
+    env:
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
+
+  # Some of the packages have "postpublish" stages that will have been run by
+  # lerna if a new version of the package was indeed published. These stages use
+  # the ##vso syntax to set variables that we can then use to orchestrate other
+  # aspects of the continuous deployment pipeline.
 
   ### - task: AzureFileCopy@3
   ###   displayName: Release hosted engine artifacts
