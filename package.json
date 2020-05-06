@@ -6,6 +6,7 @@
     "doc": "lerna run doc",
     "lint": "lerna run lint",
     "test": "lerna run test",
+    "graduate": "node graduate.js",
     "semantic-release-win": "lerna exec --concurrency 1 -- semantic-release --tag-format=%LERNA_PACKAGE_NAME%/${version}"
   },
   "dependencies": {
