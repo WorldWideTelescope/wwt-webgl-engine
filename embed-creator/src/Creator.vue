@@ -67,7 +67,7 @@
 
           <b-tab title="Show an Image">
             <p>
-              Yay images.
+              <b>Coming soon!</b> Not yet wired up.
             </p>
           </b-tab>
 
