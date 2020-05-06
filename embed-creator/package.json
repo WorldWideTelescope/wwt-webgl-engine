@@ -17,8 +17,9 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint src",
-    "doc": "echo OK - no API docs"
-  },
+    "doc": "echo OK - no API docs",
+    "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEmbedCreatorVersion];$npm_package_version\""
+    },
   "dependencies": {
     "@pkgw/embed-common": "0.0.0-dev",
     "bootstrap-vue": "^2.13.0",
