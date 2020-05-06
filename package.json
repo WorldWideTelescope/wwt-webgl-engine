@@ -7,6 +7,7 @@
     "lint": "lerna run lint",
     "test": "lerna run test",
     "graduate": "node graduate.js",
+    "serve-creator": "concurrently \"cd embed && npm run serve -- --port=23000\" \"cd embed-creator && cross-env EMBED_BASEURL=http://localhost:23000/ npm run serve -- --port=8080\"",
     "semantic-release-win": "lerna exec --concurrency 1 -- semantic-release --tag-format=%LERNA_PACKAGE_NAME%/${version}"
   },
   "dependencies": {
@@ -36,6 +37,7 @@
     "@vue/test-utils": "1.0.0-beta.31",
     "chai": "^4.2.0",
     "concat-cli": "^4.0.0",
+    "concurrently": "^5.2.0",
     "copyfiles": "^2.2.0",
     "cross-env": "^7.0.2",
     "eslint": "^6.8.0",

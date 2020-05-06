@@ -296,8 +296,17 @@ export default class Creator extends Vue {
     return this.qsb.toQueryString();
   }
 
+  get iframeBaseUrl() {
+    // note: in production, the environment variable will be replaced with a literal value
+    if (process.env.NODE_ENV == "development") {
+      return "http://localhost:23000/";
+    }
+
+    return "https://web.wwtassets.org/embed/1/wwt/";
+  }
+
   get iframeSource() {
-    return `https://web.wwtassets.org/embed/1/wwt/${this.queryString}`;
+    return `${this.iframeBaseUrl}${this.queryString}`;
   }
 
   get embedCode() {
