@@ -19,7 +19,7 @@
     "lint": "vue-cli-service lint src",
     "doc": "copyfiles -u 1 \"dist/**/*\" ../docs/static/embed",
     "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEmbedVersion];$npm_package_version\""
-    },
+  },
   "dependencies": {
     "@pkgw/engine": "0.0.0-dev",
     "@pkgw/engine-vuex": "0.0.0-dev",
@@ -30,6 +30,11 @@
     "@vue/cli-plugin-eslint": "~4.3.0",
     "@vue/cli-plugin-typescript": "~4.3.0",
     "@vue/cli-plugin-vuex": "~4.3.0"
+  },
+  "localDepRequiredCommits": {
+    "@pkgw/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3",
+    "@pkgw/engine": "020de599379d176e11f9e7132d1c00ede70bfea0",
+    "@pkgw/engine-vuex": "ede054e4235cf7223be10636fba0403bc3d976cd"
   },
   "publishConfig": {
     "access": "public"
