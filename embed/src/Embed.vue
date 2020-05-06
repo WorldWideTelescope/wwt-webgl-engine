@@ -39,6 +39,10 @@ export default class Embed extends WWTAwareComponent {
 
   created() {
     this.waitForReady().then(() => {
+      for (const s of this.embedSettings.asSettings()) {
+        this.applySetting(s);
+      }
+
       this.setBackgroundImageByName(this.embedSettings.backgroundImagesetName);
 
       if (this.embedSettings.foregroundImagesetName.length)

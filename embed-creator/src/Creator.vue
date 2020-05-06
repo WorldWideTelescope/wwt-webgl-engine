@@ -52,6 +52,11 @@
                 :unchecked-value="CreditMode.None"
                 >Show “Powered by” credit overlay</b-form-checkbox
               >
+              <b-form-checkbox
+                v-model="qsb.s.showCrosshairs"
+                name="crosshairs-checkbox"
+                >Show crosshairs in view center</b-form-checkbox
+              >
             </b-form-group>
           </b-tab>
 

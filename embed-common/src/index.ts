@@ -1,6 +1,8 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
+import { WWTSetting, WWTBooleanSetting } from "@pkgw/engine-types";
+
 // TypeScript magic to allow fallible reverse mapping of string-valued enums.
 // https://stackoverflow.com/q/57922745/3760486
 type StringEnum = {[key: string]: string};
@@ -47,6 +49,7 @@ export class EmbedSettings {
   backgroundImagesetName = "Digitized Sky Survey (Color)";
   foregroundImagesetName = "";
   creditMode = CreditMode.Default;
+  showCrosshairs = false;
 
   static fromQueryParams(qp: IterableIterator<[string, string]>): EmbedSettings {
     const s = new EmbedSettings();
@@ -55,6 +58,10 @@ export class EmbedSettings {
       switch (key) {
         case "bg":
           s.backgroundImagesetName = value;
+          break;
+
+        case "ch":
+          s.showCrosshairs = true;
           break;
 
         case "cred":
@@ -93,6 +100,12 @@ export class EmbedSettings {
 
     return s;
   }
+
+  asSettings(): WWTSetting[] {
+    const s: WWTSetting[] = [];
+    s.push([WWTBooleanSetting.showCrosshairs, this.showCrosshairs]);
+    return s;
+  }
 }
 
 /** A class to help building query strings that get parsed into EmbedSettings
@@ -121,6 +134,10 @@ export class EmbedQueryStringBuilder {
 
     if (this.s.creditMode && this.s.creditMode != CreditMode.Default) {
       result.push(["cred", this.s.creditMode]);
+    }
+
+    if (this.s.showCrosshairs) {
+      result.push(["ch", ""]);
     }
 
     return result;
