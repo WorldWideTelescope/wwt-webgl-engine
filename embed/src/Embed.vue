@@ -87,8 +87,15 @@ body {
 
 #overlays {
   position: absolute;
-  top: 1rem;
+  top: 0.5rem;
+  left: 0.5rem;
   color: #FFF;
+
+  p {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+  }
 }
 
 #credits {
