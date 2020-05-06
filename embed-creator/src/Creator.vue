@@ -212,6 +212,7 @@
                 >{{ clipboardNoticeText }}</span
               >
             </div>
+            <p class="mt-4">You will need to add appropriate CSS to control the size of the iframe. For instance: <code>.wwt-embed { width: 100%; height: 360px; }</code></p>
           </b-col>
         </b-row>
       </main>
@@ -318,8 +319,8 @@ export default class Creator extends Vue {
   }
 
   get embedCode() {
-    return `<iframe src="${escapeHtml(this.iframeSource)}">
-  <p>Cannot display WWT because your browser does not support iframes.</p>
+    return `<iframe class="wwt-embed" src="${escapeHtml(this.iframeSource)}">
+  <p>Cannot display WorldWide Telescope because your browser does not support iframes.</p>
 </iframe>`;
   }
 
