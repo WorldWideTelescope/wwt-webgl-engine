@@ -3,7 +3,11 @@ import { createNamespacedHelpers } from "vuex";
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
 
-import { GotoRADecZoomParams, WWTEngineVuexState } from "./store";
+import {
+  GotoRADecZoomParams,
+  LoadImageCollectionParams,
+  WWTEngineVuexState
+} from "./store";
 
 @Component
 export class WWTAwareComponent extends Vue {
@@ -35,6 +39,7 @@ export class WWTAwareComponent extends Vue {
       ...this.$options.methods,
       ...mapActions([
         "gotoRADecZoom",
+        "loadImageCollection",
         "waitForReady",
       ]),
       ...mapMutations([
@@ -56,5 +61,6 @@ export class WWTAwareComponent extends Vue {
   setForegroundImageByName(_n: string): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
 
   gotoRADecZoom(_o: GotoRADecZoomParams): Promise<void> { throw new Error("unreachable(?)"); }
+  loadImageCollection(_o: LoadImageCollectionParams): Promise<void> { throw new Error("unreachable(?)"); }
   waitForReady(): Promise<void> { throw new Error("unreachable(?)"); }
 }

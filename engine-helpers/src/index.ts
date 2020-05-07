@@ -67,13 +67,13 @@ interface RejectFunction {
   (reason?: any): void;  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-class SavedPromise<T> {
-  readonly seqnum: number;
+class SavedPromise<P, T> {
+  readonly payload: P;
   readonly resolve: ResolveFunction<T>;
   readonly reject: RejectFunction;
 
-  constructor(seqnum: number, resolve: ResolveFunction<T>, reject: RejectFunction) {
-    this.seqnum = seqnum;
+  constructor(payload: P, resolve: ResolveFunction<T>, reject: RejectFunction) {
+    this.payload = payload;
     this.resolve = resolve;
     this.reject = reject;
   }
@@ -127,7 +127,7 @@ export class WWTInstance {
     // Arrival promise initialization:
     this.si.add_arrived((_si, _args) => {
       for (const p of this.arrivePromises) {
-        if (p.seqnum < this.arriveSeqnum) {
+        if (p.payload < this.arriveSeqnum) {
           p.reject("superseded");
         } else {
           p.resolve();
@@ -136,11 +136,26 @@ export class WWTInstance {
 
       this.arrivePromises = [];
     });
+
+    // Collection-loaded promise initialization:
+    this.si.add_collectionLoaded((_si, args) => {
+      const url = args.get_url();
+      this.requestedCollectionUrls.set(url, true);
+
+      this.collectionLoadedPromises = this.collectionLoadedPromises.filter((p) => {
+        if (p.payload == url) {
+          p.resolve();
+          return false;
+        }
+
+        return true;
+      });
+    });
   }
 
   // Ready promises
 
-  private readyPromises: SavedPromise<void>[] = [];
+  private readyPromises: SavedPromise<null, void>[] = [];
   private readyFired = false;
 
   async waitForReady(): Promise<void> {
@@ -148,14 +163,14 @@ export class WWTInstance {
       if (this.readyFired) {
         resolve();
       } else {
-        this.readyPromises.push(new SavedPromise(0, resolve, reject));
+        this.readyPromises.push(new SavedPromise(null, resolve, reject));
       }
     });
   }
 
   // Arrival promises
 
-  private arrivePromises: SavedPromise<void>[] = [];
+  private arrivePromises: SavedPromise<number, void>[] = [];
   private arriveSeqnum = 0;
 
   private makeArrivePromise(instantResolve: boolean): Promise<void> {
@@ -187,6 +202,59 @@ export class WWTInstance {
       instant
     );
     return this.makeArrivePromise(instant);
+  }
+
+  // Collection-loaded promises. To simplify the handling, we never load the
+  // same URL more than once. Otherwise, all of the timing issues about multiple
+  // requests for the same URL get gnarly to handle. And as far as the engine is
+  // concerned, collection loads are idempotent.
+
+  private collectionLoadedPromises: SavedPromise<string, void>[] = [];
+  private requestedCollectionUrls: Map<string, boolean> = new Map();
+
+   /** Load a WTML collection and the imagesets that it contains.
+   *
+   * This function triggers a download of the specified URL, which should return
+   * an XML document in the [WTML collection][wtml] format. Any `ImageSet`
+   * entries in the collection, or `Place` entries containing image sets, will
+   * be added to the WWT instance’s list of available imagery. Subsequent calls
+   * to functions like [[setForegroundImageByName]] will be able to locate the
+   * new imagesets and display them to the user.
+   *
+   * Each unique URL is only requested once. Once a given URL has been
+   * successfully loaded, the promise returned by additional calls will resolve
+   * immediately. URL uniqueness is tested with simple string equality, so if
+   * you really want to load the same URL more than once you could add a
+   * fragment specifier.
+   *
+   * If the URL is not accessible due to CORS restrictions, the request will
+   * automatically be routed through the WWT’s CORS proxying service.
+   *
+   * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
+   *
+   * @param url: The URL of the WTML collection file to load.
+   * @returns: A promise that resolves when the collection is loaded. The
+   * promise returns no value.
+   */
+  async loadImageCollection(url: string): Promise<void> {
+    const curState = this.requestedCollectionUrls.get(url);
+
+    if (curState === true) {
+      return Promise.resolve();
+    }
+
+    if (curState === undefined) {
+      this.requestedCollectionUrls.set(url, false);
+      this.si.loadImageCollection(url);
+    }
+
+    return new Promise((resolve, reject) => {
+      if (this.requestedCollectionUrls.get(url) === true) {
+        resolve();
+      } else {
+        this.collectionLoadedPromises.push(new SavedPromise(url, resolve, reject));
+      }
+    });
   }
 
   // "Mutator" type operations -- not async.

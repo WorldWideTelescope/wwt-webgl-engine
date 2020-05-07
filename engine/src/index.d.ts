@@ -38,6 +38,20 @@ export interface ArrivedEventCallback {
   (si: ScriptInterface, args: ArrivedEventArgs): void;
 }
 
+export class CollectionLoadedEventArgs {
+  /** Get the URL of the collection that was just loaded. */
+  get_url(): string;
+}
+
+export interface CollectionLoadedEventCallback {
+  /** Called when the WWT engine has loaded a new collection.
+   *
+   * The collection is associated with a `Folder` object in the engine, but this
+   * callback only provides the URL that was loaded.
+   */
+  (si: ScriptInterface, args: CollectionLoadedEventArgs): void;
+}
+
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
 }
@@ -203,6 +217,20 @@ export class ScriptInterface {
    */
   remove_arrived(callback: ArrivedEventCallback): void;
 
+  /** Register a callback to be called when the engine completes loading a
+   * WTML collection document that it was told to download.
+   */
+  add_collectionLoaded(callback: CollectionLoadedEventCallback): void;
+
+  /** Deregister a "collectionLoaded" callback.
+   *
+   * The deregistration is performed by object equality check. Since the
+   * callback in question is a function, if you want to use this function you
+   * probably need to save the callback in some kind of variable for future
+   * retrieval.
+   */
+  remove_collectionLoaded(callback: CollectionLoadedEventCallback): void;
+
   /** Register a callback to be called when the WWT engine has finished its
    * initialization.
    */
@@ -210,6 +238,28 @@ export class ScriptInterface {
 
   /** Deregister a "ready" callback. */
   remove_ready(callback: ReadyEventCallback): void;
+
+  /** Load a WTML collection and the imagesets that it contains.
+   *
+   * This function triggers a download of the specified URL, which should return
+   * an XML document in the [WTML collection][wtml] format. Any `ImageSet`
+   * entries in the collection, or `Place` entries containing image sets, will
+   * be added to the WWT instance’s list of available imagery. Subsequent calls
+   * to functions like [[WWTControl.setForegroundImageByName]] will be able to
+   * locate the new imagesets and display them to the user.
+   *
+   * If the URL is not accessible due to CORS restrictions, the request will
+   * automatically be routed through the WWT’s CORS proxying service.
+   *
+   * After the collection is successfully loaded, a `collectionLoaded` event
+   * will be issued, which you can listen for using the [[add_collectionLoaded]]
+   * method.
+   *
+   * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
+   *
+   * @param url: The URL of the WTML collection file to load.
+   */
+  loadImageCollection(url: string): void;
 }
 
 /** A variety of settings for the WWT rendering engine. */
@@ -507,6 +557,10 @@ export class WWTControl {
    *
    * The imageset lookup is done using [[getImagesetByName]]. If the imageset is
    * not found, this function silently does nothing.
+   *
+   * Note that this function does not alter the camera in any way. You will need
+   * to use additional API calls if you want to navigate the view to the
+   * imageset in question.
    *
    * @param imagesetName: The imageset name.
   */

@@ -51,6 +51,7 @@ export class EmbedSettings {
   creditMode = CreditMode.Default;
   showCoordinateReadout = false;
   showCrosshairs = false;
+  wtmlUrl = "";
 
   static fromQueryParams(qp: IterableIterator<[string, string]>): EmbedSettings {
     const s = new EmbedSettings();
@@ -100,6 +101,10 @@ export class EmbedSettings {
           s.backgroundImagesetName = "3D Solar System View";
           s.foregroundImagesetName = "";
           break;
+
+        case "wtml":
+          s.wtmlUrl = value;
+          break;
       }
     }
 
@@ -147,6 +152,10 @@ export class EmbedQueryStringBuilder {
 
     if (this.s.showCrosshairs) {
       result.push(["ch", ""]);
+    }
+
+    if (this.s.wtmlUrl.length) {
+      result.push(["wtml", this.s.wtmlUrl]);
     }
 
     return result;

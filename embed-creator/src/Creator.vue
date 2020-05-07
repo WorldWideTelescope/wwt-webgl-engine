@@ -68,6 +68,19 @@
                 >Include CSS style suggestion in sample embed code</b-form-checkbox
               >
             </b-form-group>
+
+            <h5 class="mt-4">Custom Data Loading</h5>
+
+            <b-form-group
+              label="URL of additional WTML collection to load:"
+            >
+              <b-form-input
+                v-model="qsb.s.wtmlUrl"
+                name="wtml-input"
+                type="url"
+                placeholder="http://example.com/data.wtml"
+                ></b-form-input>
+            </b-form-group>
           </b-tab>
 
           <b-tab title="Show an Image">
@@ -257,6 +270,7 @@ import {
   BContainer,
   BFormCheckbox,
   BFormGroup,
+  BFormInput,
   BFormRadio,
   BFormTextarea,
   BNavbar,
@@ -295,6 +309,7 @@ function escapeHtml(source: string) {
     BContainer,
     BFormCheckbox,
     BFormGroup,
+    BFormInput,
     BFormRadio,
     BFormTextarea,
     BNavbar,

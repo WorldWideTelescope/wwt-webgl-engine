@@ -71,6 +71,12 @@ export interface GotoRADecZoomParams {
   instant: boolean;
 }
 
+/** The parameters for the [[WWTEngineVuexModule.loadImageCollection]] action. */
+export interface LoadImageCollectionParams {
+  /** The WTML URL to load. */
+  url: string;
+}
+
 @Module({
   namespaced: true,
   stateFactory: true,
@@ -157,6 +163,15 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   ): Promise<void> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
-    await Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant);
+    return Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant);
+  }
+
+  @Action({ rawError: true })
+  async loadImageCollection(
+    {url}: LoadImageCollectionParams
+  ): Promise<void> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot loadImageCollection without linking to WWTInstance');
+    return Vue.$wwt.inst.loadImageCollection(url);
   }
 }

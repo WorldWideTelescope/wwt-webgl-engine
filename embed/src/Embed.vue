@@ -37,11 +37,19 @@ export default class Embed extends WWTAwareComponent {
   }
 
   created() {
-    this.waitForReady().then(() => {
+    let prom = this.waitForReady().then(() => {
       for (const s of this.embedSettings.asSettings()) {
         this.applySetting(s);
       }
+    });
 
+    if (this.embedSettings.wtmlUrl.length) {
+      prom = prom.then(() => this.loadImageCollection({
+        url: this.embedSettings.wtmlUrl
+      }));
+    }
+
+    prom.then(() => {
       this.setBackgroundImageByName(this.embedSettings.backgroundImagesetName);
 
       if (this.embedSettings.foregroundImagesetName.length)
