@@ -3,7 +3,7 @@
     <b-container>
       <header>
         <b-navbar toggleble="lg" variant="info" type="dark" sticky>
-          <b-navbar-brand href="#">WWT Embed Creator</b-navbar-brand>
+          <b-navbar-brand href="#">WWT Embed Creator — <i>beta</i></b-navbar-brand>
           <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
           <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav class="ml-auto">
