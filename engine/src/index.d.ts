@@ -777,6 +777,23 @@ export class WWTControl {
   setForegroundImageByName(imagesetName: string): void;
 }
 
+export namespace Wtml {
+  /** Load a WTML collection and register its imagesets with the [[WWTControl]].
+   *
+   * This function launches an asychronous operation to retrieve the collection
+   * data from the specified URL. As such, the returned [[Folder]] object will
+   * start out blank and unpopulated. Its contents will be filled in from the
+   * parsed data at some point in the future, at which point the `complete`
+   * callback will be called.
+   *
+   * @param url The URL from which to retrieve the WTML data.
+   * @param complete A callback to be called after the folder is successfully
+   * loaded.
+   * @returns A folder object that will be populated asynchronously.
+   */
+  export function getWtmlFile(url: string, complete: Action): Folder;
+}
+
 export namespace WWTControl {
   /** Initialize the WWT engine and launch its rendering loop.
    *

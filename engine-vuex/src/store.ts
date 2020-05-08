@@ -5,6 +5,7 @@ import Vue from "vue";
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
+import { Folder } from "@pkgw/engine";
 import { WWTInstance } from "@pkgw/engine-helpers";
 
 interface WWTLinkedCallback {
@@ -169,7 +170,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   @Action({ rawError: true })
   async loadImageCollection(
     {url}: LoadImageCollectionParams
-  ): Promise<void> {
+  ): Promise<Folder> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
     return Vue.$wwt.inst.loadImageCollection(url);

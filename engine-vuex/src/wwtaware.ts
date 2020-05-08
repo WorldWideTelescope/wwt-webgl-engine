@@ -2,6 +2,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
+import { Folder } from "@pkgw/engine";
 
 import {
   GotoRADecZoomParams,
@@ -61,6 +62,6 @@ export class WWTAwareComponent extends Vue {
   setForegroundImageByName(_n: string): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
 
   gotoRADecZoom(_o: GotoRADecZoomParams): Promise<void> { throw new Error("unreachable(?)"); }
-  loadImageCollection(_o: LoadImageCollectionParams): Promise<void> { throw new Error("unreachable(?)"); }
+  loadImageCollection(_o: LoadImageCollectionParams): Promise<Folder> { throw new Error("unreachable(?)"); }
   waitForReady(): Promise<void> { throw new Error("unreachable(?)"); }
 }

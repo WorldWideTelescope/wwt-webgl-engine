@@ -15,8 +15,10 @@ import {
 
 import {
   ConstellationFilter,
+  Folder,
   ScriptInterface,
   SpaceTimeControllerObject,
+  Wtml,
   WWTControl,
   SpaceTimeController
 } from "@pkgw/engine";
@@ -136,21 +138,6 @@ export class WWTInstance {
 
       this.arrivePromises = [];
     });
-
-    // Collection-loaded promise initialization:
-    this.si.add_collectionLoaded((_si, args) => {
-      const url = args.get_url();
-      this.requestedCollectionUrls.set(url, true);
-
-      this.collectionLoadedPromises = this.collectionLoadedPromises.filter((p) => {
-        if (p.payload == url) {
-          p.resolve();
-          return false;
-        }
-
-        return true;
-      });
-    });
   }
 
   // Ready promises
@@ -209,8 +196,8 @@ export class WWTInstance {
   // requests for the same URL get gnarly to handle. And as far as the engine is
   // concerned, collection loads are idempotent.
 
-  private collectionLoadedPromises: SavedPromise<string, void>[] = [];
-  private requestedCollectionUrls: Map<string, boolean> = new Map();
+  private collectionLoadedPromises: SavedPromise<string, Folder>[] = [];
+  private collectionRequests: Map<string, Folder | null> = new Map();
 
    /** Load a WTML collection and the imagesets that it contains.
    *
@@ -233,25 +220,53 @@ export class WWTInstance {
    * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
    *
    * @param url: The URL of the WTML collection file to load.
-   * @returns: A promise that resolves when the collection is loaded. The
-   * promise returns no value.
+   * @returns: A promise that resolves to an initialized [[Folder]] object.
    */
-  async loadImageCollection(url: string): Promise<void> {
-    const curState = this.requestedCollectionUrls.get(url);
+  async loadImageCollection(url: string): Promise<Folder> {
+    const curState = this.collectionRequests.get(url);
 
-    if (curState === true) {
-      return Promise.resolve();
+    // If we've already loaded the folder, insta-resolve to it.
+    if (curState !== undefined && curState !== null) {
+      return Promise.resolve(curState);
     }
 
+    // If we haven't even issued the request, do so.
     if (curState === undefined) {
-      this.requestedCollectionUrls.set(url, false);
-      this.si.loadImageCollection(url);
+      // Mark this URL as having an in-flight request.
+      this.collectionRequests.set(url, null);
+
+      // We need some internal mutability here to allow the getWtmlFile callback
+      // to find the Folder variable, which we only get as a return value from
+      // the function.
+      const holder: { f: Folder | null } = { f: null };
+
+      holder.f = Wtml.getWtmlFile(url, () => {
+        // The folder at this URL is now fully loaded.
+        const f = holder.f as Folder;
+        this.collectionRequests.set(url, f);
+
+        this.collectionLoadedPromises = this.collectionLoadedPromises.filter((p) => {
+          if (p.payload == url) {
+            p.resolve(f);
+            return false;
+          }
+
+          // Don't filter out promises for other URLs.
+          return true;
+        });
+      });
     }
 
     return new Promise((resolve, reject) => {
-      if (this.requestedCollectionUrls.get(url) === true) {
-        resolve();
+      const curState = this.collectionRequests.get(url);
+
+      // By the time this promise callback is called, maybe the Folder has fully
+      // loaded?
+      if (curState !== undefined && curState !== null) {
+        resolve(curState);
       } else {
+        // If not, queue ourselves up to be resolved when the data finally come
+        // through.
         this.collectionLoadedPromises.push(new SavedPromise(url, resolve, reject));
       }
     });

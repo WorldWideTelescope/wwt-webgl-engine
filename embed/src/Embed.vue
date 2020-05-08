@@ -44,9 +44,11 @@ export default class Embed extends WWTAwareComponent {
     });
 
     if (this.embedSettings.wtmlUrl.length) {
-      prom = prom.then(() => this.loadImageCollection({
-        url: this.embedSettings.wtmlUrl
-      }));
+      prom = prom.then(async () => {
+        /*const folder =*/ await this.loadImageCollection({
+          url: this.embedSettings.wtmlUrl
+        });
+      });
     }
 
     prom.then(() => {
