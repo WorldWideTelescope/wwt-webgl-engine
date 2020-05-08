@@ -48,6 +48,25 @@ export interface ArrivedEventCallback {
   (si: ScriptInterface, args: ArrivedEventArgs): void;
 }
 
+export class CameraParameters {
+  lat: number;
+  lng: number;
+  zoom: number;
+  rotation: number;
+  angle: number;
+  raDec: boolean;
+  opacity: number;
+  target: SolarSystemObjects;
+  targetReferenceFrame: string | null;
+  //viewTarget: Vector3d;
+
+  copy(): CameraParameters;
+  get_RA(): number;
+  set_RA(v: number): number;
+  get_dec(): number;
+  set_dec(v: number): number;
+}
+
 export class CollectionLoadedEventArgs {
   /** Get the URL of the collection that was just loaded. */
   get_url(): string;
@@ -319,6 +338,52 @@ export class Place implements Thumbnail {
 export interface ReadyEventCallback {
   /** Called when the WWT engine has finished its initialization. */
   (si: ScriptInterface): void;
+}
+
+export class RenderContext {
+  height: number;
+  width: number;
+  lighting: boolean;
+  space: boolean;
+  viewCamera: CameraParameters;
+  targetCamera: CameraParameters;
+  alt: number;
+  az: number;
+  targetAlt: number;
+  targetAz: number;
+  targetAltitude: number;
+  customTrackingParams: CameraParameters;
+  perspectiveFov: number;
+  nearPlane: number;
+
+  get_backgroundImageset(): Imageset | null;
+  set_backgroundImageset(v: Imageset | null): Imageset | null;
+  get_dec(): number;
+  get_foregroundImageset(): Imageset | null;
+  set_foregroundImageset(v: Imageset | null): Imageset | null;
+  get_fovAngle(): number;
+  get_fovLocal(): number;
+  set_fovLocal(): number;
+  get_fovScale(): number;
+  set_fovScale(v: number): number;
+  get_nominalRadius(): number;
+  set_nominalRadius(v: number): number;
+  get_RA(): number;
+  get_sandboxMode(): boolean;
+  get_solarSystemCameraDistance(): number;
+  get_solarSystemTrack(): SolarSystemObjects;
+  set_solarSystemTrack(v: SolarSystemObjects): SolarSystemObjects;
+  get_trackingFrame(): string;
+  set_trackingFrame(v: string): string;
+  get_twoSidedLighting(): boolean;
+  set_twoSidedLighting(v: boolean): boolean;
+
+  getAltitudeForLatLongForPlanet(
+    planetID: number,
+    viewLat: number,
+    viewLong: number
+    ): number;
+  onTarget(place: Place): boolean;
 }
 
 export class ScriptInterface {
@@ -622,6 +687,9 @@ export namespace SpaceTimeController {
 export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
 export class WWTControl {
+  /** State of the WWT rendering engine. */
+  renderContext: RenderContext;
+
   /** The current mode that the renderer is in.
    *
    * This value tracks the type of the background imageset. It is updated at the
