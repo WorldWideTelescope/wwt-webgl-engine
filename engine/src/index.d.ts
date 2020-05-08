@@ -13,14 +13,24 @@ import {
   // AltTypes,
   // AltUnits,
   BandPass,
-  // Classification,
+  Classification,
   ConstellationFilterInterface,
+  FolderGroup,
+  FolderRefreshType,
+  FolderType,
   ImageSetType,
   ProjectionType,
   // ReferenceFrames,
   // ReferenceFrameTypes,
   // SolarSystemObjects
+  Thumbnail,
+  SolarSystemObjects,
 } from "@pkgw/engine-types";
+
+/** A generic callback type. */
+export interface Action {
+  (): void;
+}
 
 export class ArrivedEventArgs {
   /** Get the current right ascension of the view, in hours. */
@@ -54,6 +64,66 @@ export interface CollectionLoadedEventCallback {
 
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
+}
+
+export class Folder implements Thumbnail {
+  get_browseable(): boolean;
+  set_browseable(v: boolean): boolean;
+  get_browseableSpecified(): boolean;
+  set_browseableSpecified(v: boolean): boolean;
+  get_children(): Thumbnail[] | null;
+  get_dirty(): boolean;
+  set_dirty(v: boolean): boolean;
+  get_folders(): Folder[];
+  set_folders(v: Folder[]): Folder[];
+  get_group(): FolderGroup;
+  set_group(v: FolderGroup): FolderGroup;
+  get_imagesets(): Imageset[];
+  set_imagesets(v: Imageset[]): Imageset[];
+  get_isCloudCommunityItem(): boolean;
+  get_isFolder(): boolean;
+  get_isImage(): boolean;
+  get_isTour(): boolean;
+  get_msrCommunityId(): number;
+  set_msrCommunityId(v: number): number;
+  get_msrComponentId(): number;
+  set_msrComponentId(v: number): number;
+  get_name(): string;
+  set_name(name: string): string;
+  get_permission(): number;
+  set_permission(v: number): number;
+  get_places(): Place[];
+  set_places(v: Place[]): Place[];
+  get_readOnly(): boolean;
+  set_readOnly(v: boolean): boolean;
+  get_refreshInterval(): string;
+  set_refreshInterval(v: string): string;
+  get_refreshType(): FolderRefreshType;
+  set_refreshType(v: FolderRefreshType): FolderRefreshType;
+  get_refreshTypeSpecified(): boolean;
+  set_refreshTypeSpecified(v: boolean): boolean;
+  get_searchable(): boolean;
+  set_searchable(v: boolean): boolean;
+  get_subType(): string;
+  set_subType(v: string): string;
+  get_thumbnailUrl(): string;
+  set_thumbnailUrl(url: string): string;
+  //get_tours()
+  //set_tours()
+  get_type(): FolderType;
+  set_type(v: FolderType): FolderType;
+  get_url(): string;
+  set_url(url: string): string;
+  get_versionDependent(): boolean;
+  set_versionDependent(v: boolean): boolean;
+
+  loadFromUrl(url: string, complete: Action): void;
+  addChildFolder(child: Folder): void;
+  removeChildFolder(child: Folder): void;
+  addChildPlace(place: Place): void;
+  removeChildPlace(place: Place): void;
+  refresh(): void;
+  childLoadCallback(callback: Action): void;
 }
 
 export namespace Imageset {
@@ -186,6 +256,64 @@ export class Imageset {
   set_widthFactor(f: number): number;
 
   getHashCode(): number;
+}
+
+export class Place implements Thumbnail {
+  annotation: string;
+  angularSize: number;
+  htmlDescription: string;
+
+  get_annotation(): string;
+  set_annotation(v: string): string;
+  get_backgroundImageset(): Imageset | null;
+  set_backgroundImageset(v: Imageset | null): Imageset | null;
+  get_children(): Thumbnail[];
+  get_classification(): Classification;
+  set_classification(v: Classification): Classification;
+  get_constellation(): string;
+  set_constellation(v: string): string;
+  get_dec(): number;
+  set_dec(v: number): number;
+  get_distance(): number;
+  set_distance(v: number): number;
+  get_elevation(): number;
+  set_elevation(v: number): number;
+  get_isCloudCommunityItem(): boolean;
+  get_isFolder(): boolean;
+  get_isImage(): boolean;
+  get_isTour(): boolean;
+  get_lat(): number;
+  set_lat(v: number): number;
+  get_lng(): number;
+  set_lng(v: number): number;
+  get_magnitude(): number;
+  set_magnitude(v: number): number;
+  get_name(): string;
+  get_names(): string[];
+  set_names(v: string[]): string[];
+  get_opacity(): number;
+  set_opacity(v: number): number;
+  get_RA(): number;
+  set_RA(v: number): number;
+  get_readOnly(): boolean;
+  get_searchDistance(): number;
+  set_searchDistance(v: number): number;
+  get_studyImageset(): Imageset | null;
+  set_studyImageset(v: Imageset | null): Imageset | null;
+  //get_tag()
+  //set_tag()
+  get_target(): SolarSystemObjects;
+  set_target(v: SolarSystemObjects): SolarSystemObjects;
+  get_thumbnailUrl(): string;
+  set_thumbnailUrl(v: string): string;
+  get_type(): ImageSetType;
+  set_type(v: ImageSetType): ImageSetType;
+  get_url(): string;
+  set_url(v: string): string;
+  get_zoomLevel(): number;
+  set_zoomLevel(v: number): number;
+
+  updatePlanetLocation(jNow: number): void;
 }
 
 export interface ReadyEventCallback {
@@ -526,6 +654,20 @@ export class WWTControl {
    * Navigating the view in this way ends any "tracking" status of the current view.
    */
   gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean): void;
+
+  /** Start navigating the view to the specified [[Place]].
+   *
+   * @param place The destination of the view
+   * @param noZoom If true, the zoom, angle, and rotation of the target camera
+   * position will be set to match the current camera position. Otherwise, these
+   * parameters will be reset to reasonable defaults.
+   * @param instant If true, the view camera will immediately snap to the
+   * destination position. Otherwise, it will gradually move.
+   * @param trackObject If true, the camera will continue tracking the view
+   * target as it moves with the progression of the WWT internal clock.
+   *
+   */
+  gotoTarget(place: Place, noZoom: boolean, instant: boolean, trackObject: boolean): void;
 
   /** Look up an imageset by its name.
    *
