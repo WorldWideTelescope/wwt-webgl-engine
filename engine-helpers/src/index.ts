@@ -1,7 +1,7 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-import { R2D, R2H } from "@pkgw/astro";
+import { D2H, R2D, R2H } from "@pkgw/astro";
 
 import {
   WWTBooleanSetting,
@@ -11,11 +11,14 @@ import {
   WWTNumberSetting,
   WWTSetting,
   WWTStringSetting,
+  ImageSetType,
 } from "@pkgw/engine-types";
 
 import {
   ConstellationFilter,
   Folder,
+  Imageset,
+  Place,
   ScriptInterface,
   SpaceTimeControllerObject,
   Wtml,
@@ -301,5 +304,66 @@ export class WWTInstance {
 
   setForegroundImageByName(imagesetName: string): void {
     this.ctl.setForegroundImageByName(imagesetName);
+  }
+
+  /** Set up the view to instantaneously display the specified imageset.
+   *
+   * This function aspires to provide a one-stop shop for configuring the engine
+   * to show one arbitrary imageset. It aims to automatically choose the right,
+   * or at least justifiable, values for things like the background imageset,
+   * the camera position, and the zoom level.
+   *
+   * Because this function makes instantaneous changes, it is not appropriate
+   * for interactive use. It is intended to be used as a WWT view is being
+   * initialized.
+   *
+   * @param imageset The imageset to display.
+   */
+  setupForImageset(imageset: Imageset): void {
+    const bkg = this.ctl.getDefaultImageset(imageset.get_dataSetType(), imageset.get_bandPass());
+
+    let imageHeightDeg;
+
+    if (imageset.get_levels() > 0) {
+      // For tiled images, baseTileDegrees gives the image angular height
+      // directly, modulo a factor of two uncertainty depending on how the image
+      // pixel height rounds up to a power of two.
+      imageHeightDeg = imageset.get_baseTileDegrees();
+    } else {
+      // Unfortunately, for untiled images we don't have the information needed
+      // to assess the image's angular height reliably. In many cases offsetY
+      // will be about half of the pixel height, but it could be anything.
+      imageHeightDeg = imageset.get_baseTileDegrees() * imageset.get_offsetY() * 2;
+    }
+
+    const place = new Place();
+    place.set_type(imageset.get_dataSetType());
+    place.set_backgroundImageset(bkg);
+    place.set_studyImageset(imageset);
+
+    let noZoom = false;
+
+    if (imageHeightDeg == 180) {
+      // All-sky image -- special behavior
+      noZoom = true;
+    } else {
+      if (imageset.get_dataSetType() == ImageSetType.sky) {
+        place.set_RA(imageset.get_centerX() * D2H);
+        place.set_dec(imageset.get_centerY());
+      } else {
+        // need to verify that this is right
+        place.set_lng(imageset.get_centerX());
+        place.set_lat(imageset.get_centerY());
+      }
+
+      place.set_zoomLevel(imageHeightDeg * 6);
+    }
+
+    this.ctl.gotoTarget(
+      place,
+      noZoom,
+      true, // instant
+      true // trackObject
+    );
   }
 }

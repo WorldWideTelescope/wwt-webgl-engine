@@ -5,7 +5,7 @@ import Vue from "vue";
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
-import { Folder } from "@pkgw/engine";
+import { Folder, Imageset } from "@pkgw/engine";
 import { WWTInstance } from "@pkgw/engine-helpers";
 
 interface WWTLinkedCallback {
@@ -88,6 +88,15 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   currentTime = new Date();
   renderType = ImageSetType.sky;
 
+  get lookupImageset() {
+    // This is how you create a parametrized getter in vuex-module-decorators:
+    return function (imagesetName: string): Imageset | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot lookupImageset without linking to WWTInstance');
+      return Vue.$wwt.inst.ctl.getImagesetByName(imagesetName);
+    }
+  }
+
   @Mutation
   internalLinkToInstance(wwt: WWTInstance): void {
     Vue.$wwt.link(wwt);
@@ -137,6 +146,13 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setForegroundImageByName without linking to WWTInstance');
     Vue.$wwt.inst.setForegroundImageByName(imagesetName);
+  }
+
+  @Mutation
+  setupForImageset(imageset: Imageset): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setupForImageset without linking to WWTInstance');
+    Vue.$wwt.inst.setupForImageset(imageset);
   }
 
   @Action({ rawError: true })

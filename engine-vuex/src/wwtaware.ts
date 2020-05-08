@@ -2,7 +2,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
-import { Folder } from "@pkgw/engine";
+import { Folder, Imageset } from "@pkgw/engine";
 
 import {
   GotoRADecZoomParams,
@@ -20,7 +20,7 @@ export class WWTAwareComponent extends Vue {
     // namespace we'll be using. TODO: would like to be able to validate that
     // the namespace actually exists
     const namespace = this.$options.propsData ? (this.$options.propsData as any).wwtNamespace : "wwt";  // eslint-disable-line @typescript-eslint/no-explicit-any
-    const { mapActions, mapMutations, mapState } = createNamespacedHelpers(namespace);
+    const { mapActions, mapGetters, mapMutations, mapState } = createNamespacedHelpers(namespace);
 
     this.$options.computed = {
       ...mapState({
@@ -29,6 +29,9 @@ export class WWTAwareComponent extends Vue {
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
       }),
+      ...mapGetters([
+        "lookupImageset",
+      ]),
       ...this.$options.computed,
     };
 
@@ -47,20 +50,27 @@ export class WWTAwareComponent extends Vue {
         "applySetting",
         "setBackgroundImageByName",
         "setForegroundImageByName",
+        "setupForImageset",
       ]),
     };
   }
 
-  // Teach TypeScript about everything we wired up.
+  // Teach TypeScript about everything we wired up. State:
   wwtRARad!: number;
   wwtDecRad!: number;
   wwtCurrentTime!: Date;
   wwtRenderType!: ImageSetType;
 
+  // Getters
+  lookupImageset!: (_n: string) => Imageset | null;
+
+  // Mutations
   applySetting(_s: WWTSetting): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
   setBackgroundImageByName(_n: string): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
   setForegroundImageByName(_n: string): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
+  setupForImageset(_i: Imageset): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
 
+  // Actions
   gotoRADecZoom(_o: GotoRADecZoomParams): Promise<void> { throw new Error("unreachable(?)"); }
   loadImageCollection(_o: LoadImageCollectionParams): Promise<Folder> { throw new Error("unreachable(?)"); }
   waitForReady(): Promise<void> { throw new Error("unreachable(?)"); }

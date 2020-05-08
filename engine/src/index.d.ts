@@ -758,6 +758,24 @@ export class WWTControl {
    */
   getImagesetByName(imagesetName: string): Imageset | null;
 
+  /** Find a "default" imageset for the specified type and bandpass.
+   *
+   * This function searches the control’s database of imagery and returns a
+   * "default" imageset for the given settings. First preference is given to an
+   * imageset with matching `type` and `bandpass` that has a
+   * [[ImageSet.get_defaultSet]] of true (corresponding to the `StockSet` XML
+   * attribute). If no such set exists, the first set with matching `type` and
+   * `bandpass` is returned, regardless of its `defaultSet` setting. If there is
+   * still no such result, the first imageset with the same `type`, ignoring
+   * `bandpass`, is returned. Finally if all else fails, the first imageset in
+   * the database is returned.
+   *
+   * @param type The type of imageset to search.
+   * @param bandpass The bandpass to prefer.
+   * @returns The chosen default imageset.
+   */
+  getDefaultImageset(type: ImageSetType, bandpass: BandPass): Imageset;
+
   /** Set the background imageset using a name-based lookup.
    *
    * This function may change the viewer mode (e.g. sky, panorama, 3D solar

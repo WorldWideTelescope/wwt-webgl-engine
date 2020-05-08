@@ -46,7 +46,7 @@ export enum CreditMode {
 }
 
 export class EmbedSettings {
-  backgroundImagesetName = "Digitized Sky Survey (Color)";
+  backgroundImagesetName = "";
   foregroundImagesetName = "";
   creditMode = CreditMode.Default;
   showCoordinateReadout = false;

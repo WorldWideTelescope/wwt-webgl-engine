@@ -52,10 +52,31 @@ export default class Embed extends WWTAwareComponent {
     }
 
     prom.then(() => {
-      this.setBackgroundImageByName(this.embedSettings.backgroundImagesetName);
+      // setupForImageset() will apply a default background that is appropriate
+      // for the foreground, but we want to be able to override it.
 
-      if (this.embedSettings.foregroundImagesetName.length)
-        this.setForegroundImageByName(this.embedSettings.foregroundImagesetName);
+      let backgroundWasDefaulted = false;
+
+      if (this.embedSettings.foregroundImagesetName.length) {
+        const img = this.lookupImageset(this.embedSettings.foregroundImagesetName);
+
+        if (img !== null) {
+          this.setupForImageset(img);
+          backgroundWasDefaulted = true;
+        }
+      }
+
+      let bgName = this.embedSettings.backgroundImagesetName;
+
+      if (!bgName.length && !backgroundWasDefaulted) {
+        // Empty bgname implies that we should choose a default background. If
+        // setupForImageset() didn't do that for us, go with:
+        bgName = "Digitized Sky Survey (Color)";
+      }
+
+      if (bgName.length) {
+        this.setBackgroundImageByName(bgName);
+      }
     });
   }
 }
