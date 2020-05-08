@@ -91,6 +91,9 @@ export class EmbedSettings {
           } else if (value == "earth") {
             s.backgroundImagesetName = "Bing Maps Aerial";
             s.foregroundImagesetName = "Bing Maps Aerial";
+          } else if (value == "pluto") {
+            s.backgroundImagesetName = "Pluto (New Horizons)";
+            s.foregroundImagesetName = "Pluto (New Horizons)";
           } else {
             s.backgroundImagesetName = value;
             s.foregroundImagesetName = value;
