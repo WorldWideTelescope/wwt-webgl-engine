@@ -180,7 +180,7 @@ export namespace Imageset {
 }
 
 /** An imagery layer that can be displayed in WWT. */
-export class Imageset {
+export class Imageset implements Thumbnail {
   get_altUrl(): string;
   set_altUrl(url: string): string;
 
@@ -201,6 +201,8 @@ export class Imageset {
 
   get_centerY(): number;
   set_centerY(cy: number): number;
+
+  get_children(): Thumbnail[];
 
   get_creditsText(): string;
   set_creditsText(ct: string): string;
@@ -229,6 +231,11 @@ export class Imageset {
   get_imageSetID(): number;
   set_imageSetID(id: number): number;
 
+  get_isCloudCommunityItem(): boolean;
+  get_isFolder(): boolean;
+  get_isImage(): boolean;
+  get_isTour(): boolean;
+
   get_levels(): number;
   set_levels(levels: number): number;
 
@@ -249,6 +256,8 @@ export class Imageset {
 
   get_projection(): ProjectionType;
   set_projection(pt: ProjectionType): ProjectionType;
+
+  get_readOnly(): boolean;
 
   get_referenceFrame(): string;
   set_referenceFrame(rf: string): string;
