@@ -64,6 +64,16 @@ const initControlDefaults: InitControlSettings = {
   startMode: InitControlViewType.Sky,
 };
 
+/** Options for [[WWTInstance.setupForImageset]]. */
+export interface SetupForImagesetOptions {
+  /** The imageset to foreground. */
+  foreground: Imageset;
+
+  /** The background imageset to use. If unspecified, a sensible default is
+   * chosen. */
+  background?: Imageset;
+}
+
 interface ResolveFunction<T> {
   (value?: T): void;
 }
@@ -319,45 +329,66 @@ export class WWTInstance {
    *
    * @param imageset The imageset to display.
    */
-  setupForImageset(imageset: Imageset): void {
-    const bkg = this.ctl.getDefaultImageset(imageset.get_dataSetType(), imageset.get_bandPass());
+  setupForImageset(options: SetupForImagesetOptions): void {
+    let bkg;
+
+    if (options.background) {
+      bkg = options.background;
+    } else {
+      bkg = this.ctl.getDefaultImageset(options.foreground.get_dataSetType(), options.foreground.get_bandPass())
+    }
 
     let imageHeightDeg;
 
-    if (imageset.get_levels() > 0) {
+    if (options.foreground.get_levels() > 0) {
       // For tiled images, baseTileDegrees gives the image angular height
       // directly, modulo a factor of two uncertainty depending on how the image
       // pixel height rounds up to a power of two.
-      imageHeightDeg = imageset.get_baseTileDegrees();
+      imageHeightDeg = options.foreground.get_baseTileDegrees();
     } else {
       // Unfortunately, for untiled images we don't have the information needed
       // to assess the image's angular height reliably. In many cases offsetY
       // will be about half of the pixel height, but it could be anything.
-      imageHeightDeg = imageset.get_baseTileDegrees() * imageset.get_offsetY() * 2;
+      imageHeightDeg = options.foreground.get_baseTileDegrees() * options.foreground.get_offsetY() * 2;
     }
 
     const place = new Place();
-    place.set_type(imageset.get_dataSetType());
+    place.set_type(options.foreground.get_dataSetType());
     place.set_backgroundImageset(bkg);
-    place.set_studyImageset(imageset);
+    place.set_studyImageset(options.foreground);
 
     let noZoom = false;
 
-    if (imageHeightDeg == 180) {
-      // All-sky image -- special behavior
-      noZoom = true;
-    } else {
-      if (imageset.get_dataSetType() == ImageSetType.sky) {
-        place.set_RA(imageset.get_centerX() * D2H);
-        place.set_dec(imageset.get_centerY());
-      } else {
-        // need to verify that this is right
-        place.set_lng(imageset.get_centerX());
-        place.set_lat(imageset.get_centerY());
+    switch (options.foreground.get_dataSetType()) {
+    case ImageSetType.sky:
+      if (imageHeightDeg == 180) {
+        // All-sky image -- special behavior
+        noZoom = true;
+      } else  {
+        place.set_RA(options.foreground.get_centerX() * D2H);
+        place.set_dec(options.foreground.get_centerY());
+        place.set_zoomLevel(imageHeightDeg * 6);
       }
+      break;
 
-      place.set_zoomLevel(imageHeightDeg * 6);
+    case ImageSetType.earth:
+    case ImageSetType.planet:
+      place.set_zoomLevel(120); // a pleasing default, according to me
+
+      if (imageHeightDeg != 180) {
+        // need to verify that this is right
+        place.set_lng(options.foreground.get_centerX());
+        place.set_lat(options.foreground.get_centerY());
+      }
+      break;
+
+    default:
+      // TODO: more cases ...
+      place.set_zoomLevel(360);
+      break;
     }
+
+    this.ctl.renderContext.set_backgroundImageset(bkg);
 
     this.ctl.gotoTarget(
       place,

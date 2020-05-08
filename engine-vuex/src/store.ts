@@ -6,7 +6,7 @@ import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
 import { Folder, Imageset } from "@pkgw/engine";
-import { WWTInstance } from "@pkgw/engine-helpers";
+import { SetupForImagesetOptions, WWTInstance } from "@pkgw/engine-helpers";
 
 interface WWTLinkedCallback {
   (): void;
@@ -149,10 +149,10 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
-  setupForImageset(imageset: Imageset): void {
+  setupForImageset(options: SetupForImagesetOptions): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setupForImageset without linking to WWTInstance');
-    Vue.$wwt.inst.setupForImageset(imageset);
+    Vue.$wwt.inst.setupForImageset(options);
   }
 
   @Action({ rawError: true })

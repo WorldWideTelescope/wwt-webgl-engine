@@ -3,6 +3,7 @@ import { createNamespacedHelpers } from "vuex";
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
 import { Folder, Imageset } from "@pkgw/engine";
+import { SetupForImagesetOptions } from "@pkgw/engine-helpers";
 
 import {
   GotoRADecZoomParams,
@@ -65,13 +66,13 @@ export class WWTAwareComponent extends Vue {
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
-  applySetting(_s: WWTSetting): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  setBackgroundImageByName(_n: string): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  setForegroundImageByName(_n: string): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  setupForImageset(_i: Imageset): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
+  applySetting!: (_s: WWTSetting) => void;
+  setBackgroundImageByName!: (_n: string) => void;
+  setForegroundImageByName!: (_n: string) => void;
+  setupForImageset!: (o: SetupForImagesetOptions) => void;
 
   // Actions
-  gotoRADecZoom(_o: GotoRADecZoomParams): Promise<void> { throw new Error("unreachable(?)"); }
-  loadImageCollection(_o: LoadImageCollectionParams): Promise<Folder> { throw new Error("unreachable(?)"); }
-  waitForReady(): Promise<void> { throw new Error("unreachable(?)"); }
+  gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
+  loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
+  waitForReady!: () => Promise<void>;
 }

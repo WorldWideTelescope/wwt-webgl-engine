@@ -115,12 +115,12 @@ export default class WWTComponent extends Vue {
   decRad!: number;
   currentTime!: Date;
   renderType!: ImageSetType;
-  internalLinkToInstance(_wwt: WWTInstance): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  internalUnlinkFromInstance(): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  internalUpdateRA(_newRARad: number): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  internalUpdateDec(_newDecRad: number): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  internalUpdateCurrentTime(_newTime: Date): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  internalUpdateRenderType(_newType: ImageSetType): void {}  // eslint-disable-line @typescript-eslint/no-empty-function
-  waitForReady(): Promise<void> { throw new Error("unreachable (?)"); }
+  internalLinkToInstance!: (_wwt: WWTInstance) => void;
+  internalUnlinkFromInstance!: () => void;
+  internalUpdateRA!: (_newRARad: number) => void;
+  internalUpdateDec!: (_newDecRad: number) => void;
+  internalUpdateCurrentTime!: (_newTime: Date) => void;
+  internalUpdateRenderType!: (_newType: ImageSetType) => void;
+  waitForReady!: () => Promise<void>;
 }
 </script>

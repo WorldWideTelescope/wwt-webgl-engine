@@ -19,7 +19,7 @@ import { Component, Prop } from "vue-property-decorator";
 
 import { fmtDegLat, fmtDegLon, fmtHours } from "@pkgw/astro";
 import { ImageSetType } from "@pkgw/engine-types";
-import { WWTAwareComponent } from "@pkgw/engine-vuex";
+import { SetupForImagesetOptions, WWTAwareComponent } from "@pkgw/engine-vuex";
 import { CreditMode, EmbedSettings } from "@pkgw/embed-common";
 
 @Component
@@ -55,26 +55,37 @@ export default class Embed extends WWTAwareComponent {
       // setupForImageset() will apply a default background that is appropriate
       // for the foreground, but we want to be able to override it.
 
-      let backgroundWasDefaulted = false;
+      let backgroundWasInitialized = false;
+      let bgName = this.embedSettings.backgroundImagesetName;
 
       if (this.embedSettings.foregroundImagesetName.length) {
         const img = this.lookupImageset(this.embedSettings.foregroundImagesetName);
 
         if (img !== null) {
-          this.setupForImageset(img);
-          backgroundWasDefaulted = true;
+          const options: SetupForImagesetOptions = { foreground: img };
+
+          // For setup of planetary modes to work, we need to pass the specified
+          // background imageset to setupForImageset().
+          if (bgName.length) {
+            const bkg = this.lookupImageset(bgName);
+            if (bkg !== null) {
+              options.background = bkg;
+              backgroundWasInitialized = true;
+            }
+          }
+
+          this.setupForImageset(options);
         }
+        //this.setForegroundImageByName(this.embedSettings.foregroundImagesetName);
       }
 
-      let bgName = this.embedSettings.backgroundImagesetName;
+      if (!backgroundWasInitialized) {
+        if (!bgName.length) {
+          // Empty bgname implies that we should choose a default background. If
+          // setupForImageset() didn't do that for us, go with:
+          bgName = "Digitized Sky Survey (Color)";
+        }
 
-      if (!bgName.length && !backgroundWasDefaulted) {
-        // Empty bgname implies that we should choose a default background. If
-        // setupForImageset() didn't do that for us, go with:
-        bgName = "Digitized Sky Survey (Color)";
-      }
-
-      if (bgName.length) {
         this.setBackgroundImageByName(bgName);
       }
     });
