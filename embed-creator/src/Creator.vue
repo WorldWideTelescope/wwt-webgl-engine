@@ -85,8 +85,45 @@
 
           <b-tab title="Show an Image">
             <p>
-              <b>Coming soon!</b> Not yet wired up.
+              WWT can showcase an image of your choosing. In order to do so, it
+              has to be told both where to find the image data <b>and</b>
+              where the image should be placed on the sky.
             </p>
+
+            <p>
+              <b>Note:</b> this section is a work in progress — loading images
+              turns out to be more complicated than you might think!
+            </p>
+
+            <b-tabs no-fade content-class="mt-3">
+              <b-tab title="Manual WTML Specification" active>
+                <p>If you know what you’re doing — show an image from a <a
+                href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/">WTML
+                collection</a>.</p>
+
+                <b-form-group
+                  label="WTML collection URL:"
+                >
+                  <b-form-input
+                    v-model="qsb.s.wtmlUrl"
+                    name="img-wtml-input"
+                    type="url"
+                    placeholder="http://example.com/data.wtml"
+                  ></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                  label="Imageset name inside WTML:"
+                >
+                  <b-form-input
+                    v-model="qsb.s.foregroundImagesetName"
+                    name="img-imgsetname-input"
+                    type="text"
+                    placeholder="My Image Name"
+                  ></b-form-input>
+                </b-form-group>
+              </b-tab>
+            </b-tabs>
           </b-tab>
 
           <b-tab title="Planetary Body View">
