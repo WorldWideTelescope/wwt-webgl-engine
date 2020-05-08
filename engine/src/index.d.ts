@@ -763,7 +763,7 @@ export class WWTControl {
    * This function searches the control’s database of imagery and returns a
    * "default" imageset for the given settings. First preference is given to an
    * imageset with matching `type` and `bandpass` that has a
-   * [[ImageSet.get_defaultSet]] of true (corresponding to the `StockSet` XML
+   * [[Imageset.get_defaultSet]] of true (corresponding to the `StockSet` XML
    * attribute). If no such set exists, the first set with matching `type` and
    * `bandpass` is returned, regardless of its `defaultSet` setting. If there is
    * still no such result, the first imageset with the same `type`, ignoring

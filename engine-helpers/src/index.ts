@@ -233,7 +233,7 @@ export class WWTInstance {
    * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
    *
    * @param url: The URL of the WTML collection file to load.
-   * @returns: A promise that resolves to an initialized [[Folder]] object.
+   * @returns: A promise that resolves to an initialized Folder object.
    */
   async loadImageCollection(url: string): Promise<Folder> {
     const curState = this.collectionRequests.get(url);
