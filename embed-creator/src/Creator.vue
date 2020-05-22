@@ -102,7 +102,8 @@
                 <ol>
                   <li>Navigate to the AstroPix page for the image you want, with
                   a URL looking like: <a
-                  href="https://astropix.ipac.caltech.edu/image/eso/potw2003a">https://astropix.ipac.caltech.edu/image/...</a>.</li>
+                  href="https://astropix.ipac.caltech.edu/image/eso/potw2003a">https://astropix.ipac.caltech.edu/image/...</a>.
+                  (Click the link for a sample.)</li>
                   <li>In the “View Options” section at the top-right, find the
                   link labeled “View in WorldWide Telescope”. <i>If you don’t
                   see such a link, the image doesn’t come tagged with enough
@@ -132,9 +133,10 @@
                 even if they’re completely unlabeled. To embed an image from Astrometry.net:</p>
 
                 <ol>
-                  <li>Navigate to the page for the image you want, with
-                  a URL looking like: <a
-                  href="http://nova.astrometry.net/user_images/3437740">http://nova.astrometry.net/user_images/...</a>.</li>
+                  <li>Navigate to the page for the image you want, with a URL
+                  looking like: <a
+                  href="http://nova.astrometry.net/user_images/3437740">http://nova.astrometry.net/user_images/...</a>.
+                  (Click the link for a sample.)</li>
                   <li>In the “Calibration” section to the right, find the link
                   labeled “view in WorldWide Telescope”.</li>
                   <li>Copy the URL of that WWT link. In most browsers, you
@@ -148,6 +150,43 @@
                 >
                   <b-form-input
                     name="img-astrometry-showimage-url-input"
+                    type="url"
+                    :state="showImageUrlValidity"
+                    @input="onShowImageUrlInput"
+                    placeholder="http://www.worldwidetelescope.org/wwtweb/ShowImage.aspx?..."
+                  ></b-form-input>
+                </b-form-group>
+              </b-tab>
+
+              <b-tab title="Astronomy Image Explorer">
+                <p>The <a href="http://www.astroexplorer.org/">Astronomy Image
+                Explorer</a> (AIE) is a comprehensive database of images
+                published in the astronomical research literature. That database
+                includes images of the sky with the coordinate information
+                needed to display in WWT.</p>
+
+                <ol>
+                  <li>To search for a usable image from <a
+                  href="http://www.astroexplorer.org/">the AIE homepage</a>,
+                  click the “Images with astrometry” selector in the “Content
+                  Type” section of search filters in the left-hand column.</li>
+                  <li>Navigate to the page for the image you want, with a URL
+                  looking like: <a
+                  href="http://www.astroexplorer.org/details/308158864287067800170087_0002101.000/eyJjb250ZW50VHlwZXMiOlsiSW1hZ2VzIl0sImFzdHJvbWV0cmljYWxseVRhZ2dlZCI6dHJ1ZSwicGFnZSI6MSwic2hvdyI6MjV9">http://www.astroexplorer.org/details/...</a>.
+                  (Click the link for a sample.)</li>
+                  <li>Find the button link labeled “View in WWT” in the
+                  header.</li>
+                  <li>Copy the URL of that WWT link. In most browsers, you
+                  should right- or control-click the link and select the menu
+                  item labeled something like “Copy Link Location”.</li>
+                  <li>Paste the WWT URL in the box below!</li>
+                </ol>
+
+                <b-form-group
+                  label="“View in WWT link URL:"
+                >
+                  <b-form-input
+                    name="img-aie-showimage-url-input"
                     type="url"
                     :state="showImageUrlValidity"
                     @input="onShowImageUrlInput"
