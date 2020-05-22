@@ -87,16 +87,46 @@
             <p>
               WWT can showcase an image of your choosing. In order to do so, it
               has to be told both where to find the image data <b>and</b>
-              where the image should be placed on the sky.
+              where the image should be placed on the sky. Different web
+              services can analyze images to extract the necessary information.
+              <i>Choose one of the follow tabs for instructions</i>:
             </p>
 
-            <p>
-              <b>Note:</b> this section is a work in progress — loading images
-              turns out to be more complicated than you might think!
-            </p>
+            <b-tabs no-fade class="ml-4 mr-4" content-class="mt-3">
+              <b-tab title="AstroPix" active>
+                <p><a href="https://astropix.ipac.caltech.edu/">AstroPix</a>
+                from <a href="https://www.ipac.caltech.edu/">IPAC</a> collects
+                astronomical imagery from observatories across the world and in
+                space. To embed an image from AstroPix:</p>
 
-            <b-tabs no-fade content-class="mt-3">
-              <b-tab title="Manual WTML Specification" active>
+                <ol>
+                  <li>Navigate to the AstroPix page for the image you want, with
+                  a URL looking like: <a
+                  href="https://astropix.ipac.caltech.edu/image/eso/potw2003a">https://astropix.ipac.caltech.edu/image/...</a>.</li>
+                  <li>In the “View Options” section at the top-right, find the
+                  link labeled “View in WorldWide Telescope”. <i>If you don’t
+                  see such a link, the image doesn’t come tagged with enough
+                  positional information to be shown in WWT</i>, unfortunately.</li>
+                  <li>Copy the URL of that WWT link. In most browsers, you
+                  should right- or control-click the link and select the menu
+                  item labeled something like “Copy Link Location”.</li>
+                  <li>Paste the WWT URL in the box below!</li>
+                </ol>
+
+                <b-form-group
+                  label="“View in WorldWide Telescope” link URL:"
+                >
+                  <b-form-input
+                    name="img-astropix-showimage-url-input"
+                    type="url"
+                    :state="astropixShowImageUrlValidity"
+                    @input="onShowImageUrlInput"
+                    placeholder="http://www.worldwidetelescope.org/wwtweb/ShowImage.aspx?..."
+                  ></b-form-input>
+                </b-form-group>
+              </b-tab>
+
+              <b-tab title="Manual WTML Specification">
                 <p>If you know what you’re doing — show an image from a <a
                 href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/">WTML
                 collection</a>.</p>
@@ -120,6 +150,17 @@
                     name="img-imgsetname-input"
                     type="text"
                     placeholder="My Image Name"
+                  ></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                  label="Place inside WTML:"
+                >
+                  <b-form-input
+                    v-model="qsb.s.wtmlPlace"
+                    name="img-placename-input"
+                    type="text"
+                    placeholder="My Place Name"
                   ></b-form-input>
                 </b-form-group>
               </b-tab>
@@ -365,6 +406,7 @@ export default class Creator extends Vue {
 
   qsb = new EmbedQueryStringBuilder();
 
+  astropixShowImageUrlValidity: boolean | null = null;
   currentTabIndex = 0;
   clipboardNoticeFadeOut = false;
   clipboardNoticeText = "";
@@ -395,6 +437,29 @@ export default class Creator extends Vue {
     return `<iframe class="wwt-embed" src="${escapeHtml(this.iframeSource)}" ${style}>
   <p>Cannot display WorldWide Telescope because your browser does not support iframes.</p>
 </iframe>`;
+  }
+
+  onShowImageUrlInput(url: string) {
+    let urlIsOk = false;
+
+    try {
+      const parsed = new URL(url);
+      const queryParams = new URLSearchParams(parsed.search);
+
+      if (parsed.pathname.toLowerCase() == "/wwtweb/showimage.aspx") {
+        const name = (queryParams.get("name") || "").replace(",", "");
+        queryParams.set("wtml", "true");
+        parsed.search = "?" + queryParams.toString();
+        this.qsb.s.wtmlUrl = parsed.toString();
+        this.qsb.s.wtmlPlace = name;
+        urlIsOk = true;
+      }
+    } catch {
+      // We get an exception if `url` can't be parsed in the `new URL()` call.
+      urlIsOk = false;
+    }
+
+    this.astropixShowImageUrlValidity = urlIsOk;
   }
 
   onClipboardSuccess() {
