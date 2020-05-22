@@ -2476,20 +2476,20 @@ namespace wwtlib
 
         protected Date baseDate = new Date(2010, 0, 1, 12, 00, 00);
 
-        static ImageElement circleTexture = null;
+        static Texture circleTexture = null;
 
-        static ImageElement CircleTexture
+        static Texture CircleTexture
         {
-            get
-            {
-                //if (circleTexture == null)
-                //{
-                //    circleTexture = UiTools.LoadTextureFromBmp(Tile.prepDevice, Properties.Resources.circle, 0);
-                //}
+            get {
+                if (circleTexture == null) {
+                    string url = URLHelpers.singleton.engineAssetUrl("circle.png");
+                    circleTexture = Planets.LoadPlanetTexture(url);
+                }
 
                 return circleTexture;
             }
         }
+
         public bool dirty = true;
 
         public int lastVersion = 0;
@@ -2562,6 +2562,8 @@ namespace wwtlib
                         pointList.Draw(renderContext, opacity * Opacity, false);
                         break;
                     case PlotTypes.Circle:
+                        pointList.DrawTextured(renderContext, CircleTexture.Texture2d, opacity * Opacity);
+                        break;
                     case PlotTypes.Point:
                         pointList.DrawTextured(renderContext, PushPin.GetPushPinTexture(35), opacity * Opacity);
                         break;
