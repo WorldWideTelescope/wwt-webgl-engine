@@ -119,7 +119,37 @@
                   <b-form-input
                     name="img-astropix-showimage-url-input"
                     type="url"
-                    :state="astropixShowImageUrlValidity"
+                    :state="showImageUrlValidity"
+                    @input="onShowImageUrlInput"
+                    placeholder="http://www.worldwidetelescope.org/wwtweb/ShowImage.aspx?..."
+                  ></b-form-input>
+                </b-form-group>
+              </b-tab>
+
+              <b-tab title="Astrometry.net">
+                <p><a href="http://nova.astrometry.net/">Astrometry.net</a>
+                is a brilliant service that can derive astrometric solutions for sky images
+                even if they’re completely unlabeled. To embed an image from Astrometry.net:</p>
+
+                <ol>
+                  <li>Navigate to the page for the image you want, with
+                  a URL looking like: <a
+                  href="http://nova.astrometry.net/user_images/3437740">http://nova.astrometry.net/user_images/...</a>.</li>
+                  <li>In the “Calibration” section to the right, find the link
+                  labeled “view in WorldWide Telescope”.</li>
+                  <li>Copy the URL of that WWT link. In most browsers, you
+                  should right- or control-click the link and select the menu
+                  item labeled something like “Copy Link Location”.</li>
+                  <li>Paste the WWT URL in the box below!</li>
+                </ol>
+
+                <b-form-group
+                  label="“View in WorldWide Telescope” link URL:"
+                >
+                  <b-form-input
+                    name="img-astrometry-showimage-url-input"
+                    type="url"
+                    :state="showImageUrlValidity"
                     @input="onShowImageUrlInput"
                     placeholder="http://www.worldwidetelescope.org/wwtweb/ShowImage.aspx?..."
                   ></b-form-input>
@@ -406,10 +436,10 @@ export default class Creator extends Vue {
 
   qsb = new EmbedQueryStringBuilder();
 
-  astropixShowImageUrlValidity: boolean | null = null;
   currentTabIndex = 0;
   clipboardNoticeFadeOut = false;
   clipboardNoticeText = "";
+  showImageUrlValidity: boolean | null = null;
   suggestDefaultStyling = true;
 
   get queryString() {
@@ -459,7 +489,7 @@ export default class Creator extends Vue {
       urlIsOk = false;
     }
 
-    this.astropixShowImageUrlValidity = urlIsOk;
+    this.showImageUrlValidity = urlIsOk;
   }
 
   onClipboardSuccess() {
