@@ -45,9 +45,23 @@ export default class Embed extends WWTAwareComponent {
 
     if (this.embedSettings.wtmlUrl.length) {
       prom = prom.then(async () => {
-        /*const folder =*/ await this.loadImageCollection({
+        const folder = await this.loadImageCollection({
           url: this.embedSettings.wtmlUrl
         });
+
+        if (this.embedSettings.wtmlPlace) {
+          for (const pl of folder.get_places()) {
+            if (pl.get_name() == this.embedSettings.wtmlPlace) {
+              /* This is nominally an async Action, but with `instant: true` it's ... instant */
+              this.gotoTarget({
+                place: pl,
+                noZoom: false,
+                instant: true,
+                trackObject: true
+              })
+            }
+          }
+        }
       });
     }
 

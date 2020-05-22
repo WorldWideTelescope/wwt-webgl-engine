@@ -52,6 +52,7 @@ export class EmbedSettings {
   showCoordinateReadout = false;
   showCrosshairs = false;
   wtmlUrl = "";
+  wtmlPlace = "";
 
   static fromQueryParams(qp: IterableIterator<[string, string]>): EmbedSettings {
     const s = new EmbedSettings();
@@ -80,6 +81,10 @@ export class EmbedSettings {
 
         case "fg":
           s.foregroundImagesetName = value;
+          break;
+
+        case "p":
+          s.wtmlPlace = value;
           break;
 
         case "planet":
@@ -155,6 +160,10 @@ export class EmbedQueryStringBuilder {
 
     if (this.s.showCrosshairs) {
       result.push(["ch", ""]);
+    }
+
+    if (this.s.wtmlPlace.length) {
+      result.push(["p", this.s.wtmlPlace]);
     }
 
     if (this.s.wtmlUrl.length) {
