@@ -64,6 +64,25 @@ const initControlDefaults: InitControlSettings = {
   startMode: InitControlViewType.Sky,
 };
 
+/** Options for [[WWTInstance.gotoTarget]]. */
+export interface GotoTargetOptions {
+  /** The destination of the view. */
+  place: Place;
+
+  /** If true, the zoom, angle, and rotation of the target camera position will
+   * be set to match the current camera position. Otherwise, these parameters
+   * will be reset to reasonable defaults. */
+  noZoom: boolean;
+
+  /** If true, the view camera will immediately snap to the destination
+   * position. Otherwise, it will gradually move. */
+  instant: boolean;
+
+  /** If true, the camera will continue tracking the view target as it moves
+   * with the progression of the WWT internal clock. */
+  trackObject: boolean;
+}
+
 /** Options for [[WWTInstance.setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
@@ -200,6 +219,20 @@ export class WWTInstance {
       decRad * R2D,
       zoomDeg,
       instant
+    );
+    return this.makeArrivePromise(instant);
+  }
+
+  /** Command the view to show a Place.
+   *
+   * @param options The options for the goto command.
+   */
+  async gotoTarget(options: GotoTargetOptions): Promise<void> {
+    this.ctl.gotoTarget(
+      options.place,
+      options.noZoom,
+      options.instant,
+      options.trackObject
     );
     return this.makeArrivePromise(instant);
   }

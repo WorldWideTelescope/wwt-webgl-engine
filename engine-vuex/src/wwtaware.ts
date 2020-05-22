@@ -3,7 +3,7 @@ import { createNamespacedHelpers } from "vuex";
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
 import { Folder, Imageset } from "@pkgw/engine";
-import { SetupForImagesetOptions } from "@pkgw/engine-helpers";
+import { GotoTargetOptions, SetupForImagesetOptions } from "@pkgw/engine-helpers";
 
 import {
   GotoRADecZoomParams,
@@ -44,6 +44,7 @@ export class WWTAwareComponent extends Vue {
       ...this.$options.methods,
       ...mapActions([
         "gotoRADecZoom",
+        "gotoTarget",
         "loadImageCollection",
         "waitForReady",
       ]),
@@ -73,6 +74,7 @@ export class WWTAwareComponent extends Vue {
 
   // Actions
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
+  gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
   waitForReady!: () => Promise<void>;
 }

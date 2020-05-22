@@ -6,7 +6,7 @@ import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
 import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
 import { Folder, Imageset } from "@pkgw/engine";
-import { SetupForImagesetOptions, WWTInstance } from "@pkgw/engine-helpers";
+import { GotoTargetOptions, SetupForImagesetOptions, WWTInstance } from "@pkgw/engine-helpers";
 
 interface WWTLinkedCallback {
   (): void;
@@ -181,6 +181,13 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
     return Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant);
+  }
+
+  @Action({ rawError: true })
+  async gotoTarget(options: GotoTargetOptions): Promise<void> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot gotoTarget without linking to WWTInstance');
+    return Vue.$wwt.inst.gotoTarget(options);
   }
 
   @Action({ rawError: true })
