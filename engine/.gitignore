@@ -1,5 +1,6 @@
 /src/index.js
 /src/index.min.js
 /tests/results.xml
+/tsconfig.tsbuildinfo
 /wwtlib/bin/
 /wwtlib/obj/
