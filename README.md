@@ -7,7 +7,6 @@
 [![npm](https://img.shields.io/npm/v/@pkgw/engine-helpers)](https://www.npmjs.com/package/@pkgw/engine-helpers)
 [![npm](https://img.shields.io/npm/v/@pkgw/engine-types)](https://www.npmjs.com/package/@pkgw/engine-types)
 [![npm](https://img.shields.io/npm/v/@pkgw/engine-vuex)](https://www.npmjs.com/package/@pkgw/engine-vuex)
-[![npm](https://img.shields.io/npm/v/@pkgw/semantic-release-ado-monorepo)](https://www.npmjs.com/package/@pkgw/semantic-release-ado-monorepo)
 
 # The AAS WorldWide Telescope WebGL engine
 
