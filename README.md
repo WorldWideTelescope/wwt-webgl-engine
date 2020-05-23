@@ -1,13 +1,12 @@
 [![Build Status](https://dev.azure.com/aasworldwidetelescope/WWT/_apis/build/status/WorldWideTelescope.wwt-webgl-engine?branchName=master)](https://dev.azure.com/aasworldwidetelescope/WWT/_build/latest?definitionId=3&branchName=master)
-[![npm](https://img.shields.io/npm/v/@pkgw/astro)](https://www.npmjs.com/package/@pkgw/astro)
-[![npm](https://img.shields.io/npm/v/@pkgw/embed)](https://www.npmjs.com/package/@pkgw/embed)
-[![npm](https://img.shields.io/npm/v/@pkgw/embed-common)](https://www.npmjs.com/package/@pkgw/embed-common)
-[![npm](https://img.shields.io/npm/v/@pkgw/embed-creator)](https://www.npmjs.com/package/@pkgw/embed-creator)
-[![npm](https://img.shields.io/npm/v/@pkgw/engine)](https://www.npmjs.com/package/@pkgw/engine)
-[![npm](https://img.shields.io/npm/v/@pkgw/engine-helpers)](https://www.npmjs.com/package/@pkgw/engine-helpers)
-[![npm](https://img.shields.io/npm/v/@pkgw/engine-types)](https://www.npmjs.com/package/@pkgw/engine-types)
-[![npm](https://img.shields.io/npm/v/@pkgw/engine-vuex)](https://www.npmjs.com/package/@pkgw/engine-vuex)
-[![npm](https://img.shields.io/npm/v/@pkgw/semantic-release-ado-monorepo)](https://www.npmjs.com/package/@pkgw/semantic-release-ado-monorepo)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/astro)](https://www.npmjs.com/package/@wwtelescope/astro)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/embed)](https://www.npmjs.com/package/@wwtelescope/embed)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/embed-common)](https://www.npmjs.com/package/@wwtelescope/embed-common)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/embed-creator)](https://www.npmjs.com/package/@wwtelescope/embed-creator)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine)](https://www.npmjs.com/package/@wwtelescope/engine)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-helpers)](https://www.npmjs.com/package/@wwtelescope/engine-helpers)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-types)](https://www.npmjs.com/package/@wwtelescope/engine-types)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-vuex)](https://www.npmjs.com/package/@wwtelescope/engine-vuex)
 
 # The AAS WorldWide Telescope WebGL engine
 
@@ -57,11 +56,11 @@ The most important subdirectories are:
 
 [monorepo]: https://en.wikipedia.org/wiki/Monorepo
 
-- `@pkgw/engine` in `engine/`, the core engine code transpiled from C# and
+- `@wwtelescope/engine` in `engine/`, the core engine code transpiled from C# and
   wrapped in TypeScript annotations
-- `@pkgw/engine-vuex` in `engine-vuex/`, a higher-level package that turns the
+- `@wwtelescope/engine-vuex` in `engine-vuex/`, a higher-level package that turns the
   engine into a reusable [Vue]/[Vuex] component
-- `@pkgw/embed` in `embed/`, a web application that turns WWT into a
+- `@wwtelescope/embed` in `embed/`, a web application that turns WWT into a
   configurable, embeddable iframe
 - The narrative documentation in `docs/`
 
@@ -123,7 +122,7 @@ not* work due to the centralized `node_modules` directory we use with Lerna. To
 run the `lint` command only for the `engine-types` submodule, run:
 
 ```
-npx lerna run --scope @pkgw/engine-types lint
+npx lerna run --scope @wwtelescope/engine-types lint
 ```
 
 (The `--scope` argument can be a glob expression if you want to run on a subset

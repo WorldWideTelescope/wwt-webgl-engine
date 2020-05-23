@@ -4,6 +4,8 @@
 import { VueConstructor, PluginObject } from "vue/types";
 import { Store } from "vuex/types";
 
+export { SetupForImagesetOptions } from "@wwtelescope/engine-helpers";
+
 export {
   GotoRADecZoomParams,
   WWTEngineVuexModule,

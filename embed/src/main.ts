@@ -1,8 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { createPlugin } from "@pkgw/engine-vuex";
-import { EmbedSettings } from "@pkgw/embed-common";
+import { createPlugin } from "@wwtelescope/engine-vuex";
+import { EmbedSettings } from "@wwtelescope/embed-common";
 
 import Embed from "./Embed.vue";
 
@@ -17,7 +17,8 @@ Vue.use(createPlugin(), {
   namespace: "wwt-embed"
 });
 
-const settings = EmbedSettings.fromQueryString(window.location.search);
+const queryParams = new URLSearchParams(window.location.search);
+const settings = EmbedSettings.fromQueryParams(queryParams.entries());
 
 new Vue({
   store,

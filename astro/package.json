@@ -1,6 +1,6 @@
 {
-  "name": "@pkgw/astro",
-  "version": "1.0.1",
+  "name": "@wwtelescope/astro",
+  "version": "0.1.0-alpha.0",
   "description": "Basic astronomy utilities for the AAS WorldWide Telescope framework.",
   "keywords": [
     "AAS WorldWide Telescope"

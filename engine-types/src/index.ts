@@ -5,6 +5,8 @@
 //
 // Try to keep everything alphabetized.
 
+/* eslint-disable @typescript-eslint/camelcase */
+
 export enum AltTypes {
   depth = 0,
   altitude = 1,
@@ -75,6 +77,32 @@ export enum Classification {
   nebulae = 523264,
   galactic = 133693440,
   other = 436207616
+}
+
+export enum FolderGroup {
+  explorer = 0,
+  tour = 1,
+  search = 2,
+  constellation = 3,
+  view = 4,
+  goTo = 5,
+  community = 6,
+  context = 7,
+  voTable = 8,
+  imageStack = 9
+}
+
+export enum FolderRefreshType {
+  interval = 0,
+  conditionalGet = 1,
+  viewChange = 2,
+}
+
+export enum FolderType {
+  earth = 0,
+  planet = 1,
+  sky = 2,
+  panorama = 3,
 }
 
 export enum ImageSetType {
@@ -151,6 +179,21 @@ export enum SolarSystemObjects {
   earth = 19,
   custom = 20,
   undefined = 65536
+}
+
+/** Items implementing IThumbnail in WWT can be exposed in its folder explorer
+ * interface, or equivalently can be contained in its Folder objects.
+ */
+export interface Thumbnail {
+  get_name(): string;
+  get_thumbnailUrl(): string;
+  set_thumbnailUrl(url: string): string;
+  get_isImage(): boolean;
+  get_isTour(): boolean;
+  get_isFolder(): boolean;
+  get_isCloudCommunityItem(): boolean;
+  get_readOnly(): boolean;
+  get_children(): Thumbnail[] | null;
 }
 
 

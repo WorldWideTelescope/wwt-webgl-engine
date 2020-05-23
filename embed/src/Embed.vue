@@ -2,9 +2,7 @@
   <div id="app">
     <WorldWideTelescope wwt-namespace="wwt-embed"></WorldWideTelescope>
     <div id="overlays">
-      <p>RA: {{ raText }}</p>
-      <p>Dec: {{ decText }}</p>
-      <p>Time: {{ wwtCurrentTime }}</p>
+      <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
       <p>Powered by <a href="https://worldwidetelescope.org/home/">AAS WorldWide
@@ -19,30 +17,91 @@
 <script lang="ts">
 import { Component, Prop } from "vue-property-decorator";
 
-import { fmtDegLat, fmtHours } from "@pkgw/astro";
-import { WWTAwareComponent } from "@pkgw/engine-vuex";
-import { CreditMode, EmbedSettings } from "@pkgw/embed-common";
+import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { ImageSetType } from "@wwtelescope/engine-types";
+import { SetupForImagesetOptions, WWTAwareComponent } from "@wwtelescope/engine-vuex";
+import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
 
 @Component
 export default class Embed extends WWTAwareComponent {
   CreditMode = CreditMode
 
-  @Prop({ default: new EmbedSettings({}) }) readonly embedSettings!: EmbedSettings;
+  @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
 
-  get raText() {
-    return fmtHours(this.wwtRARad);
-  }
+  get coordText() {
+    if (this.wwtRenderType == ImageSetType.sky) {
+      return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+    }
 
-  get decText() {
-    return fmtDegLat(this.wwtDecRad);
+    return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
   }
 
   created() {
-    this.waitForReady().then(() => {
-      this.setBackgroundImageByName(this.embedSettings.backgroundImagesetName);
+    let prom = this.waitForReady().then(() => {
+      for (const s of this.embedSettings.asSettings()) {
+        this.applySetting(s);
+      }
+    });
 
-      if (this.embedSettings.foregroundImagesetName.length)
-        this.setForegroundImageByName(this.embedSettings.foregroundImagesetName);
+    if (this.embedSettings.wtmlUrl.length) {
+      prom = prom.then(async () => {
+        const folder = await this.loadImageCollection({
+          url: this.embedSettings.wtmlUrl
+        });
+
+        if (this.embedSettings.wtmlPlace) {
+          for (const pl of folder.get_places()) {
+            if (pl.get_name() == this.embedSettings.wtmlPlace) {
+              /* This is nominally an async Action, but with `instant: true` it's ... instant */
+              this.gotoTarget({
+                place: pl,
+                noZoom: false,
+                instant: true,
+                trackObject: true
+              })
+            }
+          }
+        }
+      });
+    }
+
+    prom.then(() => {
+      // setupForImageset() will apply a default background that is appropriate
+      // for the foreground, but we want to be able to override it.
+
+      let backgroundWasInitialized = false;
+      let bgName = this.embedSettings.backgroundImagesetName;
+
+      if (this.embedSettings.foregroundImagesetName.length) {
+        const img = this.lookupImageset(this.embedSettings.foregroundImagesetName);
+
+        if (img !== null) {
+          const options: SetupForImagesetOptions = { foreground: img };
+
+          // For setup of planetary modes to work, we need to pass the specified
+          // background imageset to setupForImageset().
+          if (bgName.length) {
+            const bkg = this.lookupImageset(bgName);
+            if (bkg !== null) {
+              options.background = bkg;
+              backgroundWasInitialized = true;
+            }
+          }
+
+          this.setupForImageset(options);
+        }
+        //this.setForegroundImageByName(this.embedSettings.foregroundImagesetName);
+      }
+
+      if (!backgroundWasInitialized) {
+        if (!bgName.length) {
+          // Empty bgname implies that we should choose a default background. If
+          // setupForImageset() didn't do that for us, go with:
+          bgName = "Digitized Sky Survey (Color)";
+        }
+
+        this.setBackgroundImageByName(bgName);
+      }
     });
   }
 }
@@ -83,8 +142,15 @@ body {
 
 #overlays {
   position: absolute;
-  top: 1rem;
+  top: 0.5rem;
+  left: 0.5rem;
   color: #FFF;
+
+  p {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+  }
 }
 
 #credits {

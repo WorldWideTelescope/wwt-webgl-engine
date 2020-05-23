@@ -4,8 +4,9 @@
 import Vue from "vue";
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
-import { WWTSetting } from "@pkgw/engine-types";
-import { WWTInstance } from "@pkgw/engine-helpers";
+import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
+import { Folder, Imageset } from "@wwtelescope/engine";
+import { GotoTargetOptions, SetupForImagesetOptions, WWTInstance } from "@wwtelescope/engine-helpers";
 
 interface WWTLinkedCallback {
   (): void;
@@ -45,6 +46,9 @@ export interface WWTEngineVuexState {
 
   /** The current WWT clock time of the view, as a UTC Date. */
   currentTime: Date;
+
+  /** The current mode of the renderer */
+  renderType: ImageSetType;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -68,6 +72,12 @@ export interface GotoRADecZoomParams {
   instant: boolean;
 }
 
+/** The parameters for the [[WWTEngineVuexModule.loadImageCollection]] action. */
+export interface LoadImageCollectionParams {
+  /** The WTML URL to load. */
+  url: string;
+}
+
 @Module({
   namespaced: true,
   stateFactory: true,
@@ -76,6 +86,16 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   raRad = 0.0;
   decRad = 0.0;
   currentTime = new Date();
+  renderType = ImageSetType.sky;
+
+  get lookupImageset() {
+    // This is how you create a parametrized getter in vuex-module-decorators:
+    return function (imagesetName: string): Imageset | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot lookupImageset without linking to WWTInstance');
+      return Vue.$wwt.inst.ctl.getImagesetByName(imagesetName);
+    }
+  }
 
   @Mutation
   internalLinkToInstance(wwt: WWTInstance): void {
@@ -103,6 +123,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
+  internalUpdateRenderType(newType: ImageSetType): void {
+    this.renderType = newType;
+  }
+
+  @Mutation
   applySetting(setting: WWTSetting): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot applySetting without linking to WWTInstance');
@@ -121,6 +146,13 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setForegroundImageByName without linking to WWTInstance');
     Vue.$wwt.inst.setForegroundImageByName(imagesetName);
+  }
+
+  @Mutation
+  setupForImageset(options: SetupForImagesetOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setupForImageset without linking to WWTInstance');
+    Vue.$wwt.inst.setupForImageset(options);
   }
 
   @Action({ rawError: true })
@@ -148,6 +180,22 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   ): Promise<void> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
-    await Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant);
+    return Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant);
+  }
+
+  @Action({ rawError: true })
+  async gotoTarget(options: GotoTargetOptions): Promise<void> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot gotoTarget without linking to WWTInstance');
+    return Vue.$wwt.inst.gotoTarget(options);
+  }
+
+  @Action({ rawError: true })
+  async loadImageCollection(
+    {url}: LoadImageCollectionParams
+  ): Promise<Folder> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot loadImageCollection without linking to WWTInstance');
+    return Vue.$wwt.inst.loadImageCollection(url);
   }
 }

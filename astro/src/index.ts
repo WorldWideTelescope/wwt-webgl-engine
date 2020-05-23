@@ -101,7 +101,7 @@ function _formatSexagesimal(
 
 /** Format an angle, measured in radians, as sexagesimal hours.
  *
- * Before formatting, the angle is normalized to lie within 0-2pi
+ * Before formatting, the angle is normalized to lie within 0-2pi.
  *
  * @param angleRad The angle in radians.
  * @param sep1 The text to put between the hours and the minutes. Defaults to
@@ -135,4 +135,22 @@ export function fmtDegLat(angleRad: number, sep1 = ":", sep2 = ":", precision = 
     return ` ??${sep1}??${sep2}??`;
 
   return _formatSexagesimal(angleRad * R2D, true, 2, sep1, sep2, precision);
+}
+
+/** Format a longitudinal angle, measured in radians, as sexagesimal degrees.
+ *
+ * Before formatting, the angle is normalized to lie within 0-2pi. The output
+ * will be zero-padded to three digits, e.g. `"000:01:30"` or `"359:59:59.123"`.
+ *
+ * @param angleRad The longitude in radians.
+ * @param sep1 The text to put between the degrees and the arcminutes. Defaults
+ * to `":"`.
+ * @param sep2 The text to put between the arcminutes and the arcseconds.
+ * Defaults to `":"`.
+ * @param precision The number of places of decimal precision to include in the
+ * result. Defaults to 0.
+ * @returns The formatted angle.
+ */
+export function fmtDegLon(angleRad: number, sep1 = ":", sep2 = ":", precision = 0): string {
+  return _formatSexagesimal(angnorm(angleRad) * R2D, false, 3, sep1, sep2, precision);
 }

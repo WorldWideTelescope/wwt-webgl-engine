@@ -1,6 +1,5 @@
 {
   "packages": [
-    "semantic-release-ado-monorepo",
     "engine-types",
     "astro",
     "engine",
