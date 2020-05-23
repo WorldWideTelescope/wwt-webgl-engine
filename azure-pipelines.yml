@@ -136,53 +136,9 @@ jobs:
       artifactName: docs
       targetPath: $(Build.ArtifactStagingDirectory)/docs
 
-  # Release processes.
-  #
-  # We release NPM packages on both the `master` and `release` branches. New
-  # pushes to `release` might declare non-prerelease versions that we've just
-  # built and should publish. On `master`, we started off by merging the new
-  # changes into `release` and doing any needed version bumps, so we're
-  # positioned to publish any new beta packages. Besides decreasing turnaround
-  # time, in this scheme we can use the source branch to choose which dist-tag
-  # to use for the NPM publication.
-  #
-  # Note that if an NPM release fails on `master`, we might get `release` trying
-  # to upload a prerelease to NPM, which I think would assign it to the wrong
-  # dist-tag.
-
-  - powershell: |
-      $branch = "$(Build.SourceBranch)"
-      if ($branch -eq "refs/heads/master") {
-        Write-Host "##vso[task.setvariable variable=npmDistTagFlag;]--dist-tag=beta"
-      } else {
-        Write-Host "##vso[task.setvariable variable=npmDistTagFlag;]"
-      }
-    displayName: Set npmDistTagFlag variables
-
-  # I can only get this step to work using bash. No error message when running
-  # in cmd.
-  #
-  # Also, note that even though secret variables are not made available to pull
-  # requests from external forks, it seems that they are made available to pull
-  # requests from the same user/org, which is why we have our `condition:` line.
-  - bash: |
-      npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
-    displayName: Set up NPM auth
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/'))
-    failOnStderr: false
-    env:
-      NPM_TOKEN: $(NPM_TOKEN)
-
-  - script: |
-      npx lerna publish --yes $(npmDistTagFlag) from-package
-    displayName: Publish new packages to NPM
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/'))
-    env:
-      NPM_TOKEN: $(NPM_TOKEN)
-
   # On `master`, now let's update the `release` branch with our new versions.
-  # This will trigger a CI run there that should hopefully have nothing new to
-  # do.
+  # This will trigger a CI run there that will actually execute the releases
+  # and deployments.
 
   - script: |
       git -c "credential.helper=!f() { echo username=token; echo password=%GITHUB_TOKEN%; };f" push --tags origin release:release
@@ -191,11 +147,27 @@ jobs:
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
 
-  # Time for additional deployment steps, beyond any NPM publishing. Merges to
-  # `master` will generally trigger merges to `release` that create new beta
-  # prereleases, so we can achieve continuous deployment of `master` by making
-  # sure that our deployment processes also run, and do the right thing, for
-  # prereleases as well as mainline releases.
+  # Release processes.
+  #
+  # First, publishing NPM packages.I can only get this step to work using bash.
+  # No error message when running in cmd.
+
+  - bash: |
+      npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
+    displayName: Set up NPM auth
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
+    failOnStderr: false
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
+
+  - script: |
+      npx lerna publish --yes --pre-dist-tag=beta from-package
+    displayName: Publish new packages to NPM
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
+
+  # Time for additional deployment steps, beyond any NPM publishing.
   #
   # Some of the packages have "postpublish" stages that will have been run by
   # lerna if a new version of the package was indeed published. These stages use
@@ -203,15 +175,11 @@ jobs:
   # aspects of the continuous deployment pipeline.
   #
   # Since the docs combine outputs from nearly every submodule, we deploy new
-  # versions on every update of `release`. Unlike the NPM uploads, we don't take
-  # action on updates to `master`, since we don't have the issue of wanting
-  # different settings for the --dist-tag argument.
-  #
-  # Because the docs combine many different submodules, that raises the question
-  # of what version number to assign. As a heuristic, we track
-  # @wwtelescope/engine. If a new non-prelease version of the engine is
-  # published, we deploy the docs in a versioned directory; otherwise we deploy
-  # under `latest`.
+  # versions on every update of `release`. Because the docs combine many
+  # different submodules, that raises the question of what version number to
+  # assign. As a heuristic, we track @wwtelescope/engine. If a new non-prelease
+  # version of the engine is published, we deploy the docs in a versioned
+  # directory; otherwise we deploy under `latest`.
 
   - powershell: |
       $engineVers = "$(publishedEngineVersion)"
@@ -244,7 +212,7 @@ jobs:
     displayName: Set docs deployment variables
 
   - task: AzureFileCopy@3
-    condition: and(succeeded(), ne(variables['publishedEngineVersion'], ''))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
     displayName: Deploy hosted engine artifacts
     inputs:
       SourcePath: '$(build.artifactStagingDirectory)/engine-hosted'
@@ -268,7 +236,7 @@ jobs:
   # CDN purges - last since they are slow and close to optional
 
   - task: AzurePowerShell@4
-    condition: and(succeeded(), ne(variables['publishedEngineVersion'], ''))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
     displayName: CDN purge - hosted engine artifacts
     inputs:
       azureSubscription: 'aas@wwtadmindotnetfoundation'
@@ -282,6 +250,7 @@ jobs:
           -PurgeContent '/engine/$(engineVersionText)/*'
 
   - task: AzurePowerShell@4
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
     displayName: CDN purge - docs
     inputs:
       azureSubscription: 'aas@wwtadmindotnetfoundation'
