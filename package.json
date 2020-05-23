@@ -7,8 +7,7 @@
     "lint": "lerna run lint",
     "test": "lerna run test",
     "graduate": "node graduate.js",
-    "serve-creator": "concurrently \"cd embed && npm run serve -- --port=23000\" \"cd embed-creator && cross-env EMBED_BASEURL=http://localhost:23000/ npm run serve -- --port=8080\"",
-    "semantic-release-win": "lerna exec --concurrency 1 -- semantic-release --tag-format=%LERNA_PACKAGE_NAME%/${version}"
+    "serve-creator": "concurrently \"cd embed && npm run serve -- --port=23000\" \"cd embed-creator && npm run serve -- --port=8080\""
   },
   "dependencies": {
     "@pkgw/astro": "file:astro",
