@@ -42,7 +42,7 @@ jobs:
       git switch release
       git merge --no-ff -m "Automated prereleases from latest master" temp-checkout-head
       git tag -d temp-checkout-head
-      npx lerna version --yes --amend --no-push --conventional-commits --conventional-prerelease --preid=beta
+      npx lerna version --yes --amend --no-push --no-changelog --conventional-commits --conventional-prerelease --preid=beta
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['System.PullRequest.TargetBranch'], 'master')))
     displayName: Create merged release branch
 
