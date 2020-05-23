@@ -203,9 +203,15 @@ jobs:
   # aspects of the continuous deployment pipeline.
   #
   # Since the docs combine outputs from nearly every submodule, we deploy new
-  # versions unconditionally. As a heuristic, if a new non-prelease version of
-  # the @wwtelescope/engine is published, we deploy the docs in a versioned
-  # directory; otherwise we deploy under `latest`.
+  # versions on every update of `release`. Unlike the NPM uploads, we don't take
+  # action on updates to `master`, since we don't have the issue of wanting
+  # different settings for the --dist-tag argument.
+  #
+  # Because the docs combine many different submodules, that raises the question
+  # of what version number to assign. As a heuristic, we track
+  # @wwtelescope/engine. If a new non-prelease version of the engine is
+  # published, we deploy the docs in a versioned directory; otherwise we deploy
+  # under `latest`.
 
   - powershell: |
       $engineVers = "$(publishedEngineVersion)"
@@ -226,7 +232,6 @@ jobs:
     condition: and(succeeded(), eq(variables['publishedEngineVersion'], ''))
     displayName: Default @wwtelescope/engine deployment variables
 
-  # Note that this step has no `condition`:
   - powershell: |
       $engineVers = "$(maybePublishedEngineVersion)"
       if ($engineVers.IndexOf("-beta") -ne -1) {
@@ -235,6 +240,7 @@ jobs:
         $majmin = ($engineVers -Split '\.')[0..1] -Join '.'
         Write-Host "##vso[task.setvariable variable=docsVersionText;]$majmin"
       }
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
     displayName: Set docs deployment variables
 
   - task: AzureFileCopy@3
@@ -249,6 +255,7 @@ jobs:
       blobPrefix: engine/$(engineVersionText)
 
   - task: AzureFileCopy@3
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
     displayName: Deploy documentation
     inputs:
       SourcePath: '$(build.artifactStagingDirectory)/docs'
