@@ -209,6 +209,8 @@ jobs:
 
   - powershell: |
       $engineVers = "$(publishedEngineVersion)"
+      Write-Host "##vso[task.setvariable variable=maybePublishedEngineVersion;]$publishedEngineVersion"
+
       if ($engineVers.IndexOf("-beta") -ne -1) {
         Write-Host "##vso[task.setvariable variable=engineVersionText;]latest"
       } else {
@@ -218,9 +220,15 @@ jobs:
     condition: and(succeeded(), ne(variables['publishedEngineVersion'], ''))
     displayName: Set @wwtelescope/engine deployment variables
 
+  # An awkward hack for convenient setup of the docs deployment variables.
+  - powershell: |
+      Write-Host "##vso[task.setvariable variable=maybePublishedEngineVersion;]nochange-beta"
+    condition: and(succeeded(), eq(variables['publishedEngineVersion'], ''))
+    displayName: Default @wwtelescope/engine deployment variables
+
   # Note that this step has no `condition`:
   - powershell: |
-      $engineVers = "$(publishedEngineVersion)"
+      $engineVers = "$(maybePublishedEngineVersion)"
       if ($engineVers.IndexOf("-beta") -ne -1) {
         Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
       } else {
