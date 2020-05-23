@@ -1,0 +1,41 @@
+{
+  "name": "@wwtelescope/embed-creator",
+  "version": "0.0.0-dev",
+  "description": "An web app for creating AAS WorldWide Telescope embeds",
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "homepage": "https://worldwidetelescope.org/home/",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "repository": "github:pkgw/wwt-webgl-engine",
+  "bugs": {
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
+    "email": "wwt@aas.org"
+  },
+  "license": "MIT",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint src",
+    "doc": "echo OK - no API docs",
+    "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEmbedCreatorVersion];$npm_package_version\""
+  },
+  "dependencies": {
+    "@wwtelescope/embed-common": "0.0.0-dev",
+    "bootstrap-vue": "^2.13.0",
+    "vue": "^2.6.11",
+    "vue-class-component": "^7.2.3",
+    "vue-clipboard2": "^0.3.1",
+    "vue-property-decorator": "^8.4.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-plugin-typescript": "~4.3.0"
+  },
+  "localDepRequiredCommits": {
+    "@wwtelescope/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

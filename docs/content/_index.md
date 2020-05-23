@@ -5,18 +5,18 @@ insert_anchor_links = "right"
 +++
 
 The [WebGL] engine of the [AAS](https://aas.org/) [WorldWide Telescope] puts
-essentially the entire power of the [WWT web client] in a JavaScript package
-that can be embedded in your own applications. This document is the detailed
-reference on its usage and behavior.
+essentially the entire power of the [WWT web client] in a [TypeScript] package
+that can be embedded in webpages or your own applications. Like this!
 
 [WebGL]: https://www.khronos.org/webgl/
 [WorldWide Telescope]: http://www.worldwidetelescope.org/
-[WWT web client]: http://www.worldwidetelescope.org/webclient/
+[WWT web client]: https://www.worldwidetelescope.org/webclient/
+[TypeScript]: https://www.typescriptlang.org/
 
-{% note() %}
-The TypeScript engine described in this document is also sometimes called the
-“web control”, “web client”, or the “web SDK”.
-{% end %}
+<iframe src="embed/?planet=mars" class="wwt-embed">
+</iframe>
+
+This manual is the detailed reference on its usage and behavior.
 
 
 ## Historical Note

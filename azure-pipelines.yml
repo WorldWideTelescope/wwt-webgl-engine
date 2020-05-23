@@ -1,10 +1,11 @@
-# Azure Pipelines: build the WebGL engine and wwtsdk.js files as build artifacts.
+# Copyright 2020 the .NET Foundation
+# Licensed under the MIT License
 
 trigger:
   branches:
     include:
       - master
-      - "refs/tags/v*"
+      - release
 
 parameters:
 - name: 'zolaVersion'
@@ -12,41 +13,45 @@ parameters:
   type: string
 
 jobs:
-- job: BuildSDK
+- job: Main
   pool:
     vmImage: windows-latest
 
   steps:
 
+  # Setup
+
   - checkout: self
     submodules: recursive
 
-  - powershell: |
-      $branch = "$(Build.SourceBranch)"
-      if($branch.StartsWith("refs/tags/v")) {
-        $version = $branch.Substring(11)
-        $majmin = ($version -Split '\.')[0..1] -Join '.'
-        # We publish under both the full version string and a `major.minor`
-        # version for people who want to get bugfixes (deployed as micro
-        # version updates) automatically. To ease the CDN purge logic below,
-        # "version_text" is the $majmin version.
-        Write-Host "##vso[task.setvariable variable=is_release;]true"
-        Write-Host "##vso[task.setvariable variable=version_text;]$majmin"
-        Write-Host "##vso[task.setvariable variable=version_text_2;]$version"
-      } else {
-        # Won't actually get published on PRs, etc.
-        Write-Host "##vso[task.setvariable variable=is_release;]false"
-        Write-Host "##vso[task.setvariable variable=version_text;]latest"
-        Write-Host "##vso[task.setvariable variable=version_text_2;]skip"
-      }
-    displayName: Set deployment parameters
+  - task: NodeTool@0
+    displayName: Set up node.js
+    inputs:
+      versionSpec: '>=12'
+
+  - script: npm cache clean -f
+    displayName: npm cache clean
+
+  # On `master` or pull requests thereto, we immediately create the merge commit
+  # that would update the `release` branch with version bumps from the new changes.
+
+  - script: |
+      git config --global user.email "wwt@aas.org"
+      git config --global user.name "wwt-pipelines-bot"
+      git tag temp-checkout-head HEAD
+      git switch release
+      git merge --no-ff -m "Automated prereleases from latest master" temp-checkout-head
+      git tag -d temp-checkout-head
+      npx lerna version --yes --amend --no-push --no-changelog --conventional-commits --conventional-prerelease --preid=beta
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['System.PullRequest.TargetBranch'], 'master')))
+    displayName: Create merged release branch
 
   # ScriptSharp build
 
   - task: MSBuild@1
     displayName: Build WebGL Engine with ScriptSharp
     inputs:
-      solution: 'WebGlEngine.sln'
+      solution: 'engine/WebGlEngine.sln'
       msbuildVersion: '16.0'
       msbuildArchitecture: 'x64'
       clean: true
@@ -56,7 +61,7 @@ jobs:
     inputs:
       sourceFolder: '.'
       contents: |
-        wwtlib/bin/wwtlib.js
+        engine/wwtlib/bin/wwtlib.js
       targetFolder: $(Build.ArtifactStagingDirectory)
       cleanTargetFolder: true
 
@@ -64,46 +69,47 @@ jobs:
     displayName: Publish ScriptSharp artifacts
     inputs:
       artifactName: scriptsharp
-      targetPath: $(Build.ArtifactStagingDirectory)/wwtlib
+      targetPath: $(Build.ArtifactStagingDirectory)/engine/wwtlib
 
-  # JaveScript/TypeScript build and test
+  # JavaScript/TypeScript build process can begin in earnest
 
-  - task: NodeTool@0
-    displayName: Set up node.js
-    inputs:
-      versionSpec: '>=12'
+  - script: npx lerna bootstrap --concurrency=1
+    displayName: Lerna NPM setup
 
-  - script: npm install
-    displayName: Install NPM dependencies
-
-  - script: npm run concat-index && npm run tscheck && npm run uglify
-    displayName: Build and check JavaScript files
+  - script: npm run build
+    displayName: NPM build
 
   - script: |
-      mkdir $(Build.ArtifactStagingDirectory)\dist
-      cp src\index.js $(Build.ArtifactStagingDirectory)\dist\wwtsdk.js
-      cp src\index.min.js $(Build.ArtifactStagingDirectory)\dist\wwtsdk.min.js
-      cp src\index.d.ts $(Build.ArtifactStagingDirectory)\dist\wwtsdk.d.ts
+      mkdir $(Build.ArtifactStagingDirectory)\engine-hosted
+      cp engine\wwtlib\bin\wwtlib.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtlib.js
+      cp engine\src\index.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.js
+      cp engine\src\index.min.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.min.js
+      cp engine\src\index.d.ts $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.d.ts
     displayName: Stage JavaScript hosted artifacts
 
   - task: PublishPipelineArtifact@0
     displayName: Publish JavaScript hosted artifacts
     inputs:
-      artifactName: hosted
-      targetPath: $(Build.ArtifactStagingDirectory)/dist
+      artifactName: engine-hosted
+      targetPath: $(Build.ArtifactStagingDirectory)/engine-hosted
 
-  - script: npx mocha-headless-chrome -f tests/tests.html -r xunit >test_results.xml
-    displayName: Run tests against JS SDK
+  - script: npm run lint
+    displayName: NPM lint
 
-  # NOTE: The file produced above is actually in JUnit format, not xUnit!
+  - script: npm run test
+    displayName: NPM test
+
   - task: PublishTestResults@2
     displayName: Publish test results
     condition: succeededOrFailed()
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: 'test_results.xml'
+      testResultsFiles: 'engine/tests/results.xml'
 
   # Docs
+
+  - script: npm run doc
+    displayName: NPM doc
 
   - powershell: |
       $u = 'https://github.com/getzola/zola/releases/download/v${{ parameters.zolaVersion }}/zola-v${{ parameters.zolaVersion }}-x86_64-pc-windows-msvc.zip'
@@ -121,95 +127,119 @@ jobs:
 
   - powershell: |
       cd docs
-      ..\zola.exe build
-      rm public\apiref\index.html
+      ..\zola.exe build -o $(Build.ArtifactStagingDirectory)/docs
     displayName: Zola docs build
-
-  - script: npm run doc
-    displayName: TypeDoc docs build
-
-  - task: CopyFiles@2
-    displayName: Stage docs artifacts
-    inputs:
-      sourceFolder: '.'
-      contents: |
-        docs/public/**
-      targetFolder: $(Build.ArtifactStagingDirectory)
-      cleanTargetFolder: false
 
   - task: PublishPipelineArtifact@0
     displayName: Publish docs artifacts
     inputs:
       artifactName: docs
-      targetPath: $(Build.ArtifactStagingDirectory)/docs/public
+      targetPath: $(Build.ArtifactStagingDirectory)/docs
 
-  # Publish the hosted JavaScript artifacts
+  # Release processes.
+  #
+  # We release NPM packages on both the `master` and `release` branches. New
+  # pushes to `release` might declare non-prerelease versions that we've just
+  # built and should publish. On `master`, we started off by merging the new
+  # changes into `release` and doing any needed version bumps, so we're
+  # positioned to publish any new beta packages. Besides decreasing turnaround
+  # time, in this scheme we can use the source branch to choose which dist-tag
+  # to use for the NPM publication.
+  #
+  # Note that if an NPM release fails on `master`, we might get `release` trying
+  # to upload a prerelease to NPM, which I think would assign it to the wrong
+  # dist-tag.
 
-  - task: AzureFileCopy@3
-    displayName: Upload artifacts to Azure Storage
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)/dist'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: engine/$(version_text)
+  - powershell: |
+      $branch = "$(Build.SourceBranch)"
+      if ($branch -eq "refs/heads/master") {
+        Write-Host "##vso[task.setvariable variable=npmDistTagFlag;]--dist-tag=beta"
+      } else {
+        Write-Host "##vso[task.setvariable variable=npmDistTagFlag;]"
+      }
+    displayName: Set npmDistTagFlag variables
 
-  - task: AzureFileCopy@3
-    displayName: Upload artifacts to second Azure Storage location (maybe)
-    condition: and(succeeded(), ne(variables['version_text_2'], 'skip'))
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)/dist'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: engine/$(version_text_2)
+  # I can only get this step to work using bash. No error message when running
+  # in cmd.
+  #
+  # Also, note that even though secret variables are not made available to pull
+  # requests from external forks, it seems that they are made available to pull
+  # requests from the same user/org, which is why we have our `condition:` line.
+  - bash: |
+      npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
+    displayName: Set up NPM auth
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/'))
+    failOnStderr: false
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
 
-  # Publish the documentation
+  - script: |
+      npx lerna publish --yes $(npmDistTagFlag) from-package
+    displayName: Publish new packages to NPM
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/'))
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
 
-  - task: AzureFileCopy@3
-    displayName: Upload docs to Azure Storage
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)/docs/public'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: '_docs/webgl-reference/$(version_text)'
+  # On `master`, now let's update the `release` branch with our new versions.
+  # This will trigger a CI run there that should hopefully have nothing new to
+  # do.
 
-  # Maybe publish to NPM
+  - script: |
+      git -c "credential.helper=!f() { echo username=token; echo password=%GITHUB_TOKEN%; };f" push --tags origin release:release
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: Update release branch (master only)
+    env:
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
 
-  - task: Npm@1
-    condition: and(succeeded(), eq(variables['is_release'], 'true'))
-    inputs:
-      command: publish
-      publishEndpoint: 'aas_wwt@npmjs.com'
+  # Some of the packages have "postpublish" stages that will have been run by
+  # lerna if a new version of the package was indeed published. These stages use
+  # the ##vso syntax to set variables that we can then use to orchestrate other
+  # aspects of the continuous deployment pipeline.
 
-  # Purge CDNs (last since this is slow and nearly optional)
+  ### - task: AzureFileCopy@3
+  ###   displayName: Release hosted engine artifacts
+  ###   inputs:
+  ###     SourcePath: '$(build.artifactStagingDirectory)/engine-hosted'
+  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ###     Destination: 'AzureBlob'
+  ###     storage: 'wwtwebstatic'
+  ###     ContainerName: '$web'
+  ###     blobPrefix: engine/$(engineVersionText)
 
-  - task: AzurePowerShell@4
-    displayName: Purge hosted JS CDN
-    inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      azurePowerShellVersion: 'LatestVersion'
-      scriptType: 'inlineScript'
-      inline: |
-        Unpublish-AzCdnEndpointContent `
-          -ProfileName wwt-cdn-01 `
-          -ResourceGroupName wwt-web01 `
-          -EndpointName wwtweb-prod `
-          -PurgeContent '/engine/$(version_text)/*'
+  ### - task: AzureFileCopy@3
+  ###   displayName: Release documentation
+  ###   inputs:
+  ###     SourcePath: '$(build.artifactStagingDirectory)/docs'
+  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ###     Destination: 'AzureBlob'
+  ###     storage: 'wwtwebstatic'
+  ###     ContainerName: '$web'
+  ###     blobPrefix: '_docs/webgl-reference/$(docsVersionText)'
 
-  - task: AzurePowerShell@4
-    displayName: Purge docs CDN
-    inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      azurePowerShellVersion: 'LatestVersion'
-      scriptType: 'inlineScript'
-      inline: |
-        Unpublish-AzCdnEndpointContent `
-          -ProfileName wwt-cdn-01 `
-          -ResourceGroupName wwt-web01 `
-          -EndpointName wwtwebdocs-prod `
-          -PurgeContent '/webgl-reference/$(version_text)/*'
+  # CDN purges - last since they are slow and close to optional
+
+  ### - task: AzurePowerShell@4
+  ###   displayName: CDN purge - hosted engine artifacts
+  ###   inputs:
+  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ###     azurePowerShellVersion: 'LatestVersion'
+  ###     scriptType: 'inlineScript'
+  ###     inline: |
+  ###       Unpublish-AzCdnEndpointContent `
+  ###         -ProfileName wwt-cdn-01 `
+  ###         -ResourceGroupName wwt-web01 `
+  ###         -EndpointName wwtweb-prod `
+  ###         -PurgeContent '/engine/$(engineVersionText)/*'
+
+  ### - task: AzurePowerShell@4
+  ###   displayName: CDN purge - docs
+  ###   inputs:
+  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ###     azurePowerShellVersion: 'LatestVersion'
+  ###     scriptType: 'inlineScript'
+  ###     inline: |
+  ###       Unpublish-AzCdnEndpointContent `
+  ###         -ProfileName wwt-cdn-01 `
+  ###         -ResourceGroupName wwt-web01 `
+  ###         -EndpointName wwtwebdocs-prod `
+  ###         -PurgeContent '/webgl-reference/$(docsVersionText)/*'

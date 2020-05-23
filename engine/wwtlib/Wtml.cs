@@ -6,12 +6,13 @@ using System.Net;
 
 namespace wwtlib
 {
-    class Wtml
+    public class Wtml
     {
-        static public void GetWtmlFile(string url, Action complete)
+        static public Folder GetWtmlFile(string url, Action complete)
         {
             Folder temp = new Folder();
             temp.LoadFromUrl(url, delegate { LoadImagesets(temp); complete(); });
+            return temp;
         }
 
         static public void LoadImagesets(Folder folder)

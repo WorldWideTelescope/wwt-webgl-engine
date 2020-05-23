@@ -1,0 +1,51 @@
+{
+  "name": "@wwtelescope/engine",
+  "version": "0.0.0-dev",
+  "description": "The AAS WorldWide Telescope WebGL engine",
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "homepage": "https://worldwidetelescope.org/home/",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "repository": "github:pkgw/wwt-webgl-engine",
+  "bugs": {
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
+    "email": "wwt@aas.org"
+  },
+  "license": "MIT",
+  "main": "./src/index.js",
+  "browser": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "files": [
+    ".eslintrc.json",
+    "docs/**/*.html",
+    "docs/**/*.md",
+    "docs/**/*.toml",
+    "scriptsharp-0.8.0/ss.js",
+    "src/*.js",
+    "src/*.ts",
+    "tests/*.html",
+    "tests/*.js",
+    "tsconfig.json",
+    "wwtlib/bin/wwtlib.js"
+  ],
+  "scripts": {
+    "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
+    "tscheck": "tsc",
+    "uglify": "uglifyjs src/index.js -c -o src/index.min.js",
+    "build": "npm run concat-index && npm run uglify",
+    "test": "mocha-headless-chrome -f tests/tests.html -r xunit >tests/results.xml",
+    "doc": "typedoc",
+    "lint": "tsc",
+    "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEngineVersion];$npm_package_version\""
+  },
+  "dependencies": {
+    "@wwtelescope/engine-types": "0.0.0-dev"
+  },
+  "localDepRequiredCommits": {
+    "@wwtelescope/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

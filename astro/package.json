@@ -1,0 +1,26 @@
+{
+  "name": "@wwtelescope/astro",
+  "version": "0.0.0-dev",
+  "description": "Basic astronomy utilities for the AAS WorldWide Telescope framework.",
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "homepage": "https://worldwidetelescope.org/home/",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "repository": "github:pkgw/wwt-webgl-engine",
+  "bugs": {
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
+    "email": "wwt@aas.org"
+  },
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "doc": "typedoc",
+    "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts",
+    "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedAstroVersion];$npm_package_version\""
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

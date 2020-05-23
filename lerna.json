@@ -1,0 +1,19 @@
+{
+  "packages": [
+    "engine-types",
+    "astro",
+    "engine",
+    "engine-helpers",
+    "engine-vuex",
+    "embed-common",
+    "embed",
+    "embed-creator"
+  ],
+  "version": "independent",
+  "npmClient": "npm",
+  "command": {
+    "bootstrap": {
+      "npmClientArgs": ["--no-package-lock"]
+    }
+  }
+}

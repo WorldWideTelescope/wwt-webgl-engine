@@ -19,5 +19,17 @@
         "src/*"
       ]
     },
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "typedocOptions": {
+    "readme": "../docs/astro-index.md",
+    "out": "../docs/static/apiref/astro",
+    "mode": "library",
+    "gaID": "UA-107473046-3",
+    "excludeNotExported": true,
+    "excludePrivate": true,
+    "listInvalidSymbolLinks": true
   }
 }
