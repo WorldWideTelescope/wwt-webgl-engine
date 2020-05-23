@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/engine-helpers",
-  "version": "0.1.0",
+  "version": "0.1.1-beta.0",
   "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
   "keywords": [
     "AAS WorldWide Telescope"

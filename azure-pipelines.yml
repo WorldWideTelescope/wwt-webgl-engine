@@ -93,6 +93,18 @@ jobs:
       artifactName: engine-hosted
       targetPath: $(Build.ArtifactStagingDirectory)/engine-hosted
 
+  - task: CopyFiles@2
+    displayName: Stage embed app artifacts
+    inputs:
+      sourceFolder: embed/dist
+      targetFolder: $(Build.ArtifactStagingDirectory)/embed
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish embed app artifacts
+    inputs:
+      artifactName: embed
+      targetPath: $(Build.ArtifactStagingDirectory)/embed
+
   - script: npm run lint
     displayName: NPM lint
 
@@ -201,6 +213,18 @@ jobs:
     displayName: Default @wwtelescope/engine deployment variables
 
   - powershell: |
+      $embedVers = "$(publishedEmbedVersion)"
+
+      if ($embedVers.IndexOf("-beta") -ne -1) {
+        Write-Host "##vso[task.setvariable variable=embedVersionText;]latest"
+      } else {
+        $major = ($embedVers -Split '\.')[0]
+        Write-Host "##vso[task.setvariable variable=embedVersionText;]$major"
+      }
+    condition: and(succeeded(), ne(variables['publishedEmbedVersion'], ''))
+    displayName: Set @wwtelescope/embed deployment variables
+
+  - powershell: |
       $engineVers = "$(maybePublishedEngineVersion)"
       if ($engineVers.IndexOf("-beta") -ne -1) {
         Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
@@ -221,6 +245,17 @@ jobs:
       storage: 'wwtwebstatic'
       ContainerName: '$web'
       blobPrefix: engine/$(engineVersionText)
+
+  - task: AzureFileCopy@3
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedVersion'], ''))
+    displayName: Deploy embed web application
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)/embed'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: embed/$(embedVersionText)/wwt
 
   - task: AzureFileCopy@3
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
@@ -248,6 +283,20 @@ jobs:
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
           -PurgeContent '/engine/$(engineVersionText)/*'
+
+  - task: AzurePowerShell@4
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedVersion'], ''))
+    displayName: CDN purge - embed web app
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtweb-prod `
+          -PurgeContent '/embed/$(embedVersionText)/wwt/*'
 
   - task: AzurePowerShell@4
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))

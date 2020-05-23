@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/engine-vuex",
-  "version": "0.1.0",
+  "version": "0.1.1-beta.0",
   "description": "The AAS WorldWide Telescope WebGL engine wrapped into a Vue/Vuex component",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@wwtelescope/engine": "^7.1.0",
-    "@wwtelescope/engine-helpers": "^0.1.0",
+    "@wwtelescope/engine-helpers": "^0.1.1-beta.0",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
   },
