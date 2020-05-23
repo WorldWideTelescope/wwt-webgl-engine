@@ -1,7 +1,7 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-import { D2H, R2D, R2H } from "@pkgw/astro";
+import { D2H, R2D, R2H } from "@wwtelescope/astro";
 
 import {
   WWTBooleanSetting,
@@ -12,7 +12,7 @@ import {
   WWTSetting,
   WWTStringSetting,
   ImageSetType,
-} from "@pkgw/engine-types";
+} from "@wwtelescope/engine-types";
 
 import {
   ConstellationFilter,
@@ -24,7 +24,7 @@ import {
   Wtml,
   WWTControl,
   SpaceTimeController
-} from "@pkgw/engine";
+} from "@wwtelescope/engine";
 
 
 export const enum InitControlViewType {

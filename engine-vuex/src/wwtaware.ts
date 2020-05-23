@@ -1,9 +1,9 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
-import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
-import { Folder, Imageset } from "@pkgw/engine";
-import { GotoTargetOptions, SetupForImagesetOptions } from "@pkgw/engine-helpers";
+import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
+import { Folder, Imageset } from "@wwtelescope/engine";
+import { GotoTargetOptions, SetupForImagesetOptions } from "@wwtelescope/engine-helpers";
 
 import {
   GotoRADecZoomParams,

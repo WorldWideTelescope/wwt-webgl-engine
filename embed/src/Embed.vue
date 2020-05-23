@@ -17,10 +17,10 @@
 <script lang="ts">
 import { Component, Prop } from "vue-property-decorator";
 
-import { fmtDegLat, fmtDegLon, fmtHours } from "@pkgw/astro";
-import { ImageSetType } from "@pkgw/engine-types";
-import { SetupForImagesetOptions, WWTAwareComponent } from "@pkgw/engine-vuex";
-import { CreditMode, EmbedSettings } from "@pkgw/embed-common";
+import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { ImageSetType } from "@wwtelescope/engine-types";
+import { SetupForImagesetOptions, WWTAwareComponent } from "@wwtelescope/engine-vuex";
+import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
 
 @Component
 export default class Embed extends WWTAwareComponent {

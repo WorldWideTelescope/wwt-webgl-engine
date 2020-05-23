@@ -4,9 +4,9 @@
 import Vue from "vue";
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
-import { ImageSetType, WWTSetting } from "@pkgw/engine-types";
-import { Folder, Imageset } from "@pkgw/engine";
-import { GotoTargetOptions, SetupForImagesetOptions, WWTInstance } from "@pkgw/engine-helpers";
+import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
+import { Folder, Imageset } from "@wwtelescope/engine";
+import { GotoTargetOptions, SetupForImagesetOptions, WWTInstance } from "@wwtelescope/engine-helpers";
 
 interface WWTLinkedCallback {
   (): void;

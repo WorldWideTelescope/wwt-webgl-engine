@@ -1,5 +1,5 @@
 {
-  "name": "@pkgw/embed-creator",
+  "name": "@wwtelescope/embed-creator",
   "version": "0.0.0-dev",
   "description": "An web app for creating AAS WorldWide Telescope embeds",
   "keywords": [
@@ -21,7 +21,7 @@
     "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEmbedCreatorVersion];$npm_package_version\""
   },
   "dependencies": {
-    "@pkgw/embed-common": "0.0.0-dev",
+    "@wwtelescope/embed-common": "0.0.0-dev",
     "bootstrap-vue": "^2.13.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
@@ -33,7 +33,7 @@
     "@vue/cli-plugin-typescript": "~4.3.0"
   },
   "localDepRequiredCommits": {
-    "@pkgw/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3"
+    "@wwtelescope/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3"
   },
   "publishConfig": {
     "access": "public"

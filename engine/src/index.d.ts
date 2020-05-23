@@ -3,7 +3,7 @@
 //
 // TypeScript definitions for the WWT WebGL engine. Base data types that do not
 // strictly depend on the engine implementation should go in the
-// `@pkgw/engine-types` package.
+// `@wwtelescope/engine-types` package.
 //
 // Try to keep everything alphabetized.
 
@@ -25,7 +25,7 @@ import {
   // SolarSystemObjects
   Thumbnail,
   SolarSystemObjects,
-} from "@pkgw/engine-types";
+} from "@wwtelescope/engine-types";
 
 /** A generic callback type. */
 export interface Action {

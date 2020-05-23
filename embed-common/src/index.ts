@@ -1,7 +1,7 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-import { WWTSetting, WWTBooleanSetting } from "@pkgw/engine-types";
+import { WWTSetting, WWTBooleanSetting } from "@wwtelescope/engine-types";
 
 // TypeScript magic to allow fallible reverse mapping of string-valued enums.
 // https://stackoverflow.com/q/57922745/3760486

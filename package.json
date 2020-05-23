@@ -10,14 +10,14 @@
     "serve-creator": "concurrently \"cd embed && npm run serve -- --port=23000\" \"cd embed-creator && npm run serve -- --port=8080\""
   },
   "dependencies": {
-    "@pkgw/astro": "file:astro",
-    "@pkgw/embed": "file:embed",
-    "@pkgw/embed-common": "file:embed-common",
-    "@pkgw/embed-creator": "file:embed-creator",
-    "@pkgw/engine": "file:engine",
-    "@pkgw/engine-helpers": "file:engine-helpers",
-    "@pkgw/engine-types": "file:engine-types",
-    "@pkgw/engine-vuex": "file:engine-vuex"
+    "@wwtelescope/astro": "file:astro",
+    "@wwtelescope/embed": "file:embed",
+    "@wwtelescope/embed-common": "file:embed-common",
+    "@wwtelescope/embed-creator": "file:embed-creator",
+    "@wwtelescope/engine": "file:engine",
+    "@wwtelescope/engine-helpers": "file:engine-helpers",
+    "@wwtelescope/engine-types": "file:engine-types",
+    "@wwtelescope/engine-vuex": "file:engine-vuex"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.7.0",

@@ -434,7 +434,7 @@ import {
   CreditMode,
   EmbedQueryStringBuilder,
   PlanetaryBodies
-} from "@pkgw/embed-common";
+} from "@wwtelescope/embed-common";
 
 // From Tom Gruner @ http://stackoverflow.com/a/12034334/1660815 (without forward-slash subst)
 const entityMap: { [index: string]: string } = {

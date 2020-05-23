@@ -6,9 +6,9 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
-import { D2R, H2R } from "@pkgw/astro";
-import { ImageSetType } from "@pkgw/engine-types";
-import { WWTInstance } from "@pkgw/engine-helpers";
+import { D2R, H2R } from "@wwtelescope/astro";
+import { ImageSetType } from "@wwtelescope/engine-types";
+import { WWTInstance } from "@wwtelescope/engine-helpers";
 
 import { WWTEngineVuexState } from "./store";
 

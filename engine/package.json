@@ -1,5 +1,5 @@
 {
-  "name": "@pkgw/engine",
+  "name": "@wwtelescope/engine",
   "version": "0.0.0-dev",
   "description": "The AAS WorldWide Telescope WebGL engine",
   "keywords": [
@@ -40,10 +40,10 @@
     "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEngineVersion];$npm_package_version\""
   },
   "dependencies": {
-    "@pkgw/engine-types": "0.0.0-dev"
+    "@wwtelescope/engine-types": "0.0.0-dev"
   },
   "localDepRequiredCommits": {
-    "@pkgw/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
+    "@wwtelescope/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
   },
   "publishConfig": {
     "access": "public"
