@@ -191,55 +191,90 @@ jobs:
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
 
+  # Time for additional deployment steps, beyond any NPM publishing. Merges to
+  # `master` will generally trigger merges to `release` that create new beta
+  # prereleases, so we can achieve continuous deployment of `master` by making
+  # sure that our deployment processes also run, and do the right thing, for
+  # prereleases as well as mainline releases.
+  #
   # Some of the packages have "postpublish" stages that will have been run by
   # lerna if a new version of the package was indeed published. These stages use
   # the ##vso syntax to set variables that we can then use to orchestrate other
   # aspects of the continuous deployment pipeline.
+  #
+  # Since the docs combine outputs from nearly every submodule, we deploy new
+  # versions unconditionally. As a heuristic, if a new non-prelease version of
+  # the @wwtelescope/engine is published, we deploy the docs in a versioned
+  # directory; otherwise we deploy under `latest`.
 
-  ### - task: AzureFileCopy@3
-  ###   displayName: Release hosted engine artifacts
-  ###   inputs:
-  ###     SourcePath: '$(build.artifactStagingDirectory)/engine-hosted'
-  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ###     Destination: 'AzureBlob'
-  ###     storage: 'wwtwebstatic'
-  ###     ContainerName: '$web'
-  ###     blobPrefix: engine/$(engineVersionText)
+  - powershell: |
+      $engineVers = "$(publishedEngineVersion)"
+      if ($engineVers.IndexOf("-beta") -ne -1) {
+        Write-Host "##vso[task.setvariable variable=engineVersionText;]latest"
+      } else {
+        $majmin = ($engineVers -Split '\.')[0..1] -Join '.'
+        Write-Host "##vso[task.setvariable variable=engineVersionText;]$majmin"
+      }
+    condition: and(succeeded(), ne(variables['publishedEngineVersion'], ''))
+    displayName: Set @wwtelescope/engine deployment variables
 
-  ### - task: AzureFileCopy@3
-  ###   displayName: Release documentation
-  ###   inputs:
-  ###     SourcePath: '$(build.artifactStagingDirectory)/docs'
-  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ###     Destination: 'AzureBlob'
-  ###     storage: 'wwtwebstatic'
-  ###     ContainerName: '$web'
-  ###     blobPrefix: '_docs/webgl-reference/$(docsVersionText)'
+  # Note that this step has no `condition`:
+  - powershell: |
+      $engineVers = "$(publishedEngineVersion)"
+      if ($engineVers.IndexOf("-beta") -ne -1) {
+        Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
+      } else {
+        $majmin = ($engineVers -Split '\.')[0..1] -Join '.'
+        Write-Host "##vso[task.setvariable variable=docsVersionText;]$majmin"
+      }
+    displayName: Set docs deployment variables
+
+  - task: AzureFileCopy@3
+    condition: and(succeeded(), ne(variables['publishedEngineVersion'], ''))
+    displayName: Deploy hosted engine artifacts
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)/engine-hosted'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: engine/$(engineVersionText)
+
+  - task: AzureFileCopy@3
+    displayName: Deploy documentation
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)/docs'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: '_docs/webgl-reference/$(docsVersionText)'
 
   # CDN purges - last since they are slow and close to optional
 
-  ### - task: AzurePowerShell@4
-  ###   displayName: CDN purge - hosted engine artifacts
-  ###   inputs:
-  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ###     azurePowerShellVersion: 'LatestVersion'
-  ###     scriptType: 'inlineScript'
-  ###     inline: |
-  ###       Unpublish-AzCdnEndpointContent `
-  ###         -ProfileName wwt-cdn-01 `
-  ###         -ResourceGroupName wwt-web01 `
-  ###         -EndpointName wwtweb-prod `
-  ###         -PurgeContent '/engine/$(engineVersionText)/*'
+  - task: AzurePowerShell@4
+    condition: and(succeeded(), ne(variables['publishedEngineVersion'], ''))
+    displayName: CDN purge - hosted engine artifacts
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtweb-prod `
+          -PurgeContent '/engine/$(engineVersionText)/*'
 
-  ### - task: AzurePowerShell@4
-  ###   displayName: CDN purge - docs
-  ###   inputs:
-  ###     azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ###     azurePowerShellVersion: 'LatestVersion'
-  ###     scriptType: 'inlineScript'
-  ###     inline: |
-  ###       Unpublish-AzCdnEndpointContent `
-  ###         -ProfileName wwt-cdn-01 `
-  ###         -ResourceGroupName wwt-web01 `
-  ###         -EndpointName wwtwebdocs-prod `
-  ###         -PurgeContent '/webgl-reference/$(docsVersionText)/*'
+  - task: AzurePowerShell@4
+    displayName: CDN purge - docs
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtwebdocs-prod `
+          -PurgeContent '/webgl-reference/$(docsVersionText)/*'
