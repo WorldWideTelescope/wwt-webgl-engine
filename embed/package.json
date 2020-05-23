@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/embed",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-beta.0",
   "description": "The AAS WorldWide Telescope as an embeddable iframe.",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -21,8 +21,8 @@
     "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEmbedVersion];$npm_package_version\""
   },
   "dependencies": {
-    "@wwtelescope/engine": "7.1.0-alpha.0",
-    "@wwtelescope/engine-vuex": "0.1.0-alpha.0",
+    "@wwtelescope/engine": "^7.1.0-beta.0",
+    "@wwtelescope/engine-vuex": "^0.1.0-beta.0",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
   },
