@@ -234,7 +234,7 @@ export class WWTInstance {
       options.instant,
       options.trackObject
     );
-    return this.makeArrivePromise(instant);
+    return this.makeArrivePromise(options.instant);
   }
 
   // Collection-loaded promises. To simplify the handling, we never load the
