@@ -183,7 +183,7 @@ jobs:
 
   - powershell: |
       $engineVers = "$(publishedEngineVersion)"
-      Write-Host "##vso[task.setvariable variable=maybePublishedEngineVersion;]$publishedEngineVersion"
+      Write-Host "##vso[task.setvariable variable=maybePublishedEngineVersion;]$engineVers"
 
       if ($engineVers.IndexOf("-beta") -ne -1) {
         Write-Host "##vso[task.setvariable variable=engineVersionText;]latest"
