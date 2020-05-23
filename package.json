@@ -21,8 +21,6 @@
   },
   "devDependencies": {
     "@babel/polyfill": "^7.7.0",
-    "@semantic-release/changelog": "^5.0.1",
-    "@semantic-release/git": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "@vue/cli-plugin-e2e-cypress": "~4.3.0",
@@ -47,8 +45,6 @@
     "mutationobserver-shim": "^0.3.3",
     "sass": "^1.26.3",
     "sass-loader": "^8.0.2",
-    "semantic-release": "^17.0.7",
-    "semantic-release-monorepo": "^7.0.2",
     "typedoc": "^0.17.0-3",
     "typescript": "~3.8.3",
     "uglify-js": "^3.9.1",
