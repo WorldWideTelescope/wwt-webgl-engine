@@ -15,34 +15,15 @@ const ConventionalCommitUtilities = require("@lerna/conventional-commits");
 const ValidationError = require("@lerna/validation-error");
 
 
-/** Add a very simple changelog entry indicating that we've graduated
- * a prerelease to a "full" release. The standardized formatting is done
- * using the conventional-commits-* packages, which we're not using here
- * due to laziness.
+/** Add changelog entries. We tell Lerna not to create changelogs for
+ * prereleases, since the chatter would be excessive, so the changelog generated
+ * here should include everything since the last non-pre-release.
  */
 function addChangeLog(pkg, oldVers, newVers, bumpType) {
-  const { BLANK_LINE, CHANGELOG_HEADER, EOL } = require("@lerna/conventional-commits/lib/constants");
-  const readExistingChangelog = require("@lerna/conventional-commits/lib/read-existing-changelog");
-
-  const dateObj = new Date();
-  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-  const day = String(dateObj.getDate()).padStart(2, '0');
-  const year = dateObj.getFullYear();
-  const date = `${year}-${month}-${day}`;
-
-  const pfx = bumpType == "patch" ? "##" : "#";
-
-  const newEntry = `${pfx} ${newVers} (${date})\n\nGraduating pre-release version ${oldVers} to full release ${newVers}.`;
-
-  return readExistingChangelog(pkg).then(([changelogFileLoc, changelogContents]) => {
-    const content = [CHANGELOG_HEADER, newEntry, changelogContents].join(BLANK_LINE);
-
-    return fs.writeFile(changelogFileLoc, content.trim() + EOL).then(() => {
-      return {
-        logPath: changelogFileLoc,
-        newEntry,
-      };
-    });
+  return ConventionalCommitUtilities.updateChangelog(pkg, "independent", {
+    changelogPreset: "angular",
+    rootPath: ".",
+    tagPrefix: "v"
   });
 }
 
