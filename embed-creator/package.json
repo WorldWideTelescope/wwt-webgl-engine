@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/embed-creator",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "An web app for creating AAS WorldWide Telescope embeds",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -18,7 +18,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint src",
     "doc": "echo OK - no API docs",
-    "postpublish": "cross-env echo \"##vso[task.setvariable variable=publishedEmbedCreatorVersion];$npm_package_version\""
+    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEmbedCreatorVersion];'+process.env.npm_package_version)\""
   },
   "dependencies": {
     "@wwtelescope/embed-common": "^0.1.1-beta.0",
