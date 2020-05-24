@@ -18,7 +18,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint src",
     "doc": "copyfiles -u 1 \"dist/**/*\" ../docs/static/embed",
-    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEmbedVersion];'+process.env.npm_package_version)\""
+    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEmbedVersion;]'+process.env.npm_package_version)\""
   },
   "dependencies": {
     "@wwtelescope/embed-common": "0.0.0-dev",
