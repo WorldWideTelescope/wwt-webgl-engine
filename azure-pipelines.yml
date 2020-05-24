@@ -79,6 +79,7 @@ jobs:
   - script: npm run build
     displayName: NPM build
 
+  # No reason not to stage artifacts ASAP -- it could help debug build problems.
   - script: |
       mkdir $(Build.ArtifactStagingDirectory)\engine-hosted
       cp engine\wwtlib\bin\wwtlib.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtlib.js
@@ -104,6 +105,18 @@ jobs:
     inputs:
       artifactName: embed
       targetPath: $(Build.ArtifactStagingDirectory)/embed
+
+  - task: CopyFiles@2
+    displayName: Stage embed-creator app artifacts
+    inputs:
+      sourceFolder: embed-creator/dist
+      targetFolder: $(Build.ArtifactStagingDirectory)/embed-creator
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish embed-creator app artifacts
+    inputs:
+      artifactName: embed-creator
+      targetPath: $(Build.ArtifactStagingDirectory)/embed-creator
 
   - script: npm run lint
     displayName: NPM lint
@@ -161,7 +174,7 @@ jobs:
 
   # Release processes.
   #
-  # First, publishing NPM packages.I can only get this step to work using bash.
+  # First, publishing NPM packages. I can only get the config step to work using bash.
   # No error message when running in cmd.
 
   - bash: |
@@ -258,6 +271,17 @@ jobs:
       blobPrefix: embed/$(embedVersionText)/wwt
 
   - task: AzureFileCopy@3
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedCreatorVersion'], ''))
+    displayName: Deploy embed-creator web application
+    inputs:
+      SourcePath: '$(build.artifactStagingDirectory)/embed-creator'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: _embedui
+
+  - task: AzureFileCopy@3
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
     displayName: Deploy documentation
     inputs:
@@ -297,6 +321,24 @@ jobs:
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
           -PurgeContent '/embed/$(embedVersionText)/wwt/*'
+
+  # People say the docs are misleading about how to purge a CDN endpoint from
+  # the root; try the all-of-the-above approach.
+  # https://stackoverflow.com/questions/50591959/how-to-full-purge-the-azure-cdn-through-powershell
+  - task: AzurePowerShell@4
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedCreatorVersion'], ''))
+    displayName: CDN purge - embed-creator web app
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        $names = @('/', '/*', '/css/*', '/js/*')
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtwebembed-prod `
+          -PurgeContent $names
 
   - task: AzurePowerShell@4
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))

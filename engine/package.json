@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/engine",
-  "version": "7.1.1-beta.0",
+  "version": "7.1.1-beta.1",
   "description": "The AAS WorldWide Telescope WebGL engine",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -37,7 +37,7 @@
     "test": "mocha-headless-chrome -f tests/tests.html -r xunit >tests/results.xml",
     "doc": "typedoc",
     "lint": "tsc",
-    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEngineVersion];'+process.env.npm_package_version)\""
+    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEngineVersion;]'+process.env.npm_package_version)\""
   },
   "dependencies": {
     "@wwtelescope/engine-types": "^0.1.0"
