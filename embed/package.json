@@ -21,6 +21,7 @@
     "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEmbedVersion];'+process.env.npm_package_version)\""
   },
   "dependencies": {
+    "@wwtelescope/embed-common": "0.0.0-dev",
     "@wwtelescope/engine": "0.0.0-dev",
     "@wwtelescope/engine-vuex": "0.0.0-dev",
     "vue": "^2.6.11",
