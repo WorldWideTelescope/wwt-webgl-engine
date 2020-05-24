@@ -140,9 +140,24 @@ class WWTGraduateCommand extends Command {
         this.logger.info("graduate", dedent`
           Local dependency "${depName}" version requirement: ${newNumReq}, unchanged`
         );
+      } else if (oldNumReq.indexOf("-beta") !== -1) {
+        // If the current requirement is for a prerelease, we need to preserve
+        // that requirement to allow the build internal to this repo to succeed.
+        // This is because NPM's semver behavior treats prereleases specially:
+        // `0.1.1-beta.0` is not viewed as satisfying `^0.1.0`, while it does
+        // satisy `^0.1.0-beta.0`. So, without the `|| beta` clause, lerna won't
+        // believe that the local package satisfies the dependency requirement,
+        // leading to build problems. We can't mutate the dependency version
+        // just-in-time or anything because the publishing logic all happens
+        // inside `lerna publish`.
+        const newReq = `${newNumReq} || ${oldNumReq}`
+        this.logger.info("graduate", dedent`
+          Mutating local dependency "${depName}" version requirement: ${oldNumReq} => ${newReq}`
+        );
+        node.pkg.dependencies[depName] = newReq;
       } else {
         this.logger.info("graduate", dedent`
-          Local dependency "${depName}" version requirement: ${oldNumReq} => ${newNumReq}`
+          Replacing local dependency "${depName}" version requirement: ${oldNumReq} => ${newNumReq}`
         );
         node.pkg.dependencies[depName] = newNumReq;
       }
