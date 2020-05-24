@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/embed",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "The AAS WorldWide Telescope as an embeddable iframe.",
   "keywords": [
     "AAS WorldWide Telescope"
