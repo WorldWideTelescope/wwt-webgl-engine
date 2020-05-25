@@ -1,7 +1,7 @@
 declare module "v-tooltip" {
   import Vue, { VueConstructor, DirectiveOptions, PluginFunction } from 'vue';
 
-  export const vToolTip: PluginFunction<any>;
+  export const vToolTip: PluginFunction<any>;  // eslint-disable-line @typescript-eslint/no-explicit-any
   export default vToolTip;
 
   export const VPopover: VueConstructor<Vue>;
