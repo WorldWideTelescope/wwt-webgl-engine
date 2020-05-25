@@ -1,17 +1,34 @@
 <template>
   <div id="app">
     <WorldWideTelescope wwt-namespace="wwt-embed"></WorldWideTelescope>
+
     <div id="overlays">
       <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
-    <div id="tools">
-      <v-popover open>
+
+    <div id="tool-menu">
+      <v-popover>
         <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
         <template slot="popover">
-          <p class="tooltip-content">Some text?</p>
+          <ul class="tooltip-content tool-menu">
+            <li><a href="#" @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
+            <li><a href="#" @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
+          </ul>
         </template>
       </v-popover>
     </div>
+
+    <div id="tools">
+      <div class="tool-container">
+      <template v-if="currentTool == 'crossfade'">
+        <p>Crossfade!</p>
+      </template>
+      <template v-else-if="currentTool == 'choose-background'">
+        <p>Choose background!</p>
+      </template>
+      </div>
+    </div>
+
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
       <p>Powered by <a href="https://worldwidetelescope.org/home/">AAS WorldWide
       Telescope</a>
@@ -30,11 +47,15 @@ import { ImageSetType } from "@wwtelescope/engine-types";
 import { SetupForImagesetOptions, WWTAwareComponent } from "@wwtelescope/engine-vuex";
 import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
 
+type ToolType = "crossfade" | "choose-background" | null;
+
 @Component
 export default class Embed extends WWTAwareComponent {
   CreditMode = CreditMode
 
   @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
+
+  @Prop({ default: null }) currentTool!: ToolType;
 
   get coordText() {
     if (this.wwtRenderType == ImageSetType.sky) {
@@ -112,6 +133,14 @@ export default class Embed extends WWTAwareComponent {
       }
     });
   }
+
+  selectTool(name: ToolType) {
+    if (this.currentTool == name) {
+      this.currentTool = null;
+    } else {
+      this.currentTool = name;
+    }
+  }
 }
 </script>
 
@@ -161,11 +190,27 @@ body {
   }
 }
 
-#tools {
+#tool-menu {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   color: #FFF;
+
+  .tooltip-target {
+    cursor: pointer;
+  }
+}
+
+#tools {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  color: #FFF;
+
+  .tool-container {
+    position: relative;
+    left: -50%;
+  }
 }
 
 #credits {
@@ -278,9 +323,8 @@ body {
     .popover-inner {
       background: #f9f9f9;
       color: black;
-      padding: 24px;
+      padding: 8px;
       border-radius: 5px;
-      box-shadow: 0 5px 30px rgba(black, .1);
     }
 
     .popover-arrow {
@@ -300,4 +344,31 @@ body {
     transition: opacity .15s;
   }
 }
+
+/* Specialized styling for popups */
+
+ul.tool-menu {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+
+  li {
+    padding: 3px;
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    svg.svg-inline--fa {
+      width: 1.5em;
+    }
+
+    &:hover {
+      background-color: #000;
+      color: #FFF;
+    }
+  }
+}
+
 </style>
