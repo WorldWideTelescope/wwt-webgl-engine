@@ -21,7 +21,7 @@
     <div id="tools">
       <div class="tool-container">
       <template v-if="currentTool == 'crossfade'">
-        <p>Crossfade!</p>
+        <span>Foreground opacity:</span> <input class="opacity-range" type="range" v-model="foregroundOpacity">
       </template>
       <template v-else-if="currentTool == 'choose-background'">
         <p>Choose background!</p>
@@ -55,7 +55,7 @@ export default class Embed extends WWTAwareComponent {
 
   @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
 
-  @Prop({ default: null }) currentTool!: ToolType;
+  currentTool: ToolType = null;
 
   get coordText() {
     if (this.wwtRenderType == ImageSetType.sky) {
@@ -63,6 +63,14 @@ export default class Embed extends WWTAwareComponent {
     }
 
     return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+  }
+
+  get foregroundOpacity() {
+    return this.wwtForegroundOpacity;
+  }
+
+  set foregroundOpacity(o: number) {
+    this.setForegroundOpacity(o);
   }
 
   created() {
@@ -203,13 +211,17 @@ body {
 
 #tools {
   position: absolute;
-  bottom: 2rem;
+  bottom: 3rem;
   left: 50%;
   color: #FFF;
 
   .tool-container {
     position: relative;
     left: -50%;
+  }
+
+  .opacity-range {
+    width: 50vw;
   }
 }
 
@@ -219,6 +231,12 @@ body {
   right: 1rem;
   color: #ddd;
   font-size: 70%;
+
+  p {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+  }
 
   a {
     text-decoration: none;
@@ -358,6 +376,8 @@ ul.tool-menu {
     a {
       text-decoration: none;
       color: inherit;
+      display: block;
+      width: 100%;
     }
 
     svg.svg-inline--fa {
