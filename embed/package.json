@@ -21,6 +21,9 @@
     "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEmbedVersion;]'+process.env.npm_package_version)\""
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-solid-svg-icons": "^5.13.0",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/embed-common": "0.0.0-dev",
     "@wwtelescope/engine": "0.0.0-dev",
     "@wwtelescope/engine-vuex": "0.0.0-dev",

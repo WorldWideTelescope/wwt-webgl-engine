@@ -4,6 +4,9 @@
     <div id="overlays">
       <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
+    <div id="tools">
+      <font-awesome-icon icon="sliders-h" size="lg"/>
+    </div>
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
       <p>Powered by <a href="https://worldwidetelescope.org/home/">AAS WorldWide
       Telescope</a>
@@ -151,6 +154,13 @@ body {
     padding: 0;
     line-height: 1;
   }
+}
+
+#tools {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #FFF;
 }
 
 #credits {
