@@ -1,4 +1,5 @@
 import Vue from "vue";
+import VTooltip from "v-tooltip";
 import Vuex from "vuex";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSlidersH } from '@fortawesome/free-solid-svg-icons'
@@ -11,6 +12,7 @@ import Embed from "./Embed.vue";
 
 Vue.config.productionTip = false;
 
+Vue.use(VTooltip);
 Vue.use(Vuex);
 
 const store = new Vuex.Store({});
