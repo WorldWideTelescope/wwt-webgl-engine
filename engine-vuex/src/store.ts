@@ -49,6 +49,11 @@ export interface WWTEngineVuexState {
 
   /** The current mode of the renderer */
   renderType: ImageSetType;
+
+  /** The opacity with which the foreground imageset is rendered; valid
+   * values are between 0 and 100 (inclusive).
+   */
+  foregroundOpacity: number;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -87,6 +92,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   decRad = 0.0;
   currentTime = new Date();
   renderType = ImageSetType.sky;
+  foregroundOpacity = 100;
 
   get lookupImageset() {
     // This is how you create a parametrized getter in vuex-module-decorators:
@@ -146,6 +152,14 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setForegroundImageByName without linking to WWTInstance');
     Vue.$wwt.inst.setForegroundImageByName(imagesetName);
+  }
+
+  @Mutation
+  setForegroundOpacity(opacity: number): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setForegroundOpacity without linking to WWTInstance');
+    Vue.$wwt.inst.setForegroundOpacity(opacity);
+    this.foregroundOpacity = opacity;
   }
 
   @Mutation

@@ -28,6 +28,7 @@ export class WWTAwareComponent extends Vue {
         wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
+        wwtForegroundOpacity: (state, _getters) => (state as WWTEngineVuexState).foregroundOpacity,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
       }),
       ...mapGetters([
@@ -52,6 +53,7 @@ export class WWTAwareComponent extends Vue {
         "applySetting",
         "setBackgroundImageByName",
         "setForegroundImageByName",
+        "setForegroundOpacity",
         "setupForImageset",
       ]),
     };
@@ -61,6 +63,7 @@ export class WWTAwareComponent extends Vue {
   wwtRARad!: number;
   wwtDecRad!: number;
   wwtCurrentTime!: Date;
+  wwtForegroundOpacity!: number;
   wwtRenderType!: ImageSetType;
 
   // Getters
@@ -70,6 +73,7 @@ export class WWTAwareComponent extends Vue {
   applySetting!: (_s: WWTSetting) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setForegroundImageByName!: (_n: string) => void;
+  setForegroundOpacity!: (o: number) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
 
   // Actions
