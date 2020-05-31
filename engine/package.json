@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/engine",
-  "version": "7.1.1-beta.1",
+  "version": "7.1.1",
   "description": "The AAS WorldWide Telescope WebGL engine",
   "keywords": [
     "AAS WorldWide Telescope"
