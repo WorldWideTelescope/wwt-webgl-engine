@@ -6,13 +6,13 @@
       <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
 
-    <div id="tool-menu">
+    <div id="tool-menu" v-show="showToolMenu">
       <v-popover>
         <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
         <template slot="popover">
           <ul class="tooltip-content tool-menu">
             <li v-show="showCrossfader"><a href="#" v-close-popover @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
-            <li><a href="#" v-close-popover @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
+            <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
           </ul>
         </template>
       </v-popover>
@@ -109,11 +109,21 @@ export default class Embed extends WWTAwareComponent {
     this.setForegroundOpacity(o);
   }
 
+  get showBackgroundChooser() {
+    // TODO: we should wire in choices for other modes!
+    return this.wwtRenderType == ImageSetType.sky;
+  }
+
   get showCrossfader() {
     if (this.wwtForegroundImageset == null || this.wwtForegroundImageset === undefined)
       return false;
 
     return this.wwtForegroundImageset != this.wwtBackgroundImageset;
+  }
+
+  get showToolMenu() {
+    // This should return true if there are any tools to show.
+    return this.showBackgroundChooser || this.showCrossfader;
   }
 
   created() {
