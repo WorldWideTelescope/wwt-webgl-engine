@@ -59,7 +59,11 @@ export default class WWTComponent extends Vue {
   mounted() {
     this.wwt = new WWTInstance({
       elId: this.uniqueId,
-      startInternalRenderLoop: false
+      startInternalRenderLoop: false,
+
+      // Start at the Galactic Center by default. RA of the GC ~= 266.4 deg; in WWT, lng = 360 - RA.
+      startLatDeg: -28.9,
+      startLngDeg: 93.6,
     });
 
     this.internalLinkToInstance(this.wwt);
