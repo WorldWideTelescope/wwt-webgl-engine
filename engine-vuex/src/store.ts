@@ -4,6 +4,7 @@
 import Vue from "vue";
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
+import { D2R, H2R } from "@wwtelescope/astro";
 import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
 import { Folder, Imageset } from "@wwtelescope/engine";
 import { GotoTargetOptions, SetupForImagesetOptions, WWTInstance } from "@wwtelescope/engine-helpers";
@@ -38,22 +39,34 @@ export class WWTGlobalState {
  * Vuex store module.
  */
 export interface WWTEngineVuexState {
-  /** The current right ascension of the view, in radians. */
-  raRad: number;
-
-  /** The current declination of the view, in radians. */
-  decRad: number;
+  /** The current imageset acting as the background imagery, if defined. */
+  backgroundImageset: Imageset | null;
 
   /** The current WWT clock time of the view, as a UTC Date. */
   currentTime: Date;
 
-  /** The current mode of the renderer */
-  renderType: ImageSetType;
+  /** The current right ascension of the view, in radians.
+   *
+   * TODO: define this properly for planetary lat/lng views!
+   */
+  raRad: number;
+
+  /** The current declination of the view, in radians.
+   *
+   * TODO: define this properly for planetary lat/lng views!
+   */
+  decRad: number;
+
+  /** The current imageset acting as the foreground imagery, if defined. */
+  foregroundImageset: Imageset | null;
 
   /** The opacity with which the foreground imageset is rendered; valid
    * values are between 0 and 100 (inclusive).
    */
   foregroundOpacity: number;
+
+  /** The current mode of the renderer */
+  renderType: ImageSetType;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -90,9 +103,11 @@ export interface LoadImageCollectionParams {
 export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexState {
   raRad = 0.0;
   decRad = 0.0;
+  backgroundImageset: Imageset | null = null;
   currentTime = new Date();
-  renderType = ImageSetType.sky;
+  foregroundImageset: Imageset | null = null;
   foregroundOpacity = 100;
+  renderType = ImageSetType.sky;
 
   get lookupImageset() {
     // This is how you create a parametrized getter in vuex-module-decorators:
@@ -114,23 +129,37 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
-  internalUpdateRA(newRARad: number): void {
-    this.raRad = newRARad;
-  }
+  internalUpdate(): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot internalUpdate without linking to WWTInstance');
 
-  @Mutation
-  internalUpdateDec(newDecRad: number): void {
-    this.decRad = newDecRad;
-  }
+    const wwt = Vue.$wwt.inst;
 
-  @Mutation
-  internalUpdateCurrentTime(newTime: Date): void {
-    this.currentTime = newTime;
-  }
+    const raRad = wwt.si.getRA() * H2R;
+    if (this.raRad != raRad)
+      this.raRad = raRad;
 
-  @Mutation
-  internalUpdateRenderType(newType: ImageSetType): void {
-    this.renderType = newType;
+    const decRad = wwt.si.getDec() * D2R;
+    if (this.decRad != decRad)
+      this.decRad = decRad;
+
+    const bg = wwt.ctl.renderContext.get_backgroundImageset() || null; // TEMP
+    if (this.backgroundImageset != bg)
+      this.backgroundImageset = bg;
+
+    const time = wwt.stc.get_now();
+    if (this.currentTime != time)
+      this.currentTime = time;
+
+    const fg = wwt.ctl.renderContext.get_foregroundImageset() || null; // TEMP
+    if (this.foregroundImageset != fg)
+      this.foregroundImageset = fg;
+
+    if (this.foregroundOpacity != wwt.ctl.renderContext.viewCamera.opacity)
+      this.foregroundOpacity = wwt.ctl.renderContext.viewCamera.opacity;
+
+    if (this.renderType != wwt.ctl.renderType)
+      this.renderType = wwt.ctl.renderType;
   }
 
   @Mutation

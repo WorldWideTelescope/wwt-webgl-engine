@@ -27,7 +27,9 @@ export class WWTAwareComponent extends Vue {
       ...mapState({
         wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
+        wwtBackgroundImageset: (state, _getters) => (state as WWTEngineVuexState).backgroundImageset,
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
+        wwtForegroundImageset: (state, _getters) => (state as WWTEngineVuexState).foregroundImageset,
         wwtForegroundOpacity: (state, _getters) => (state as WWTEngineVuexState).foregroundOpacity,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
       }),
@@ -62,7 +64,9 @@ export class WWTAwareComponent extends Vue {
   // Teach TypeScript about everything we wired up. State:
   wwtRARad!: number;
   wwtDecRad!: number;
+  wwtBackgroundImageset!: Imageset | null;
   wwtCurrentTime!: Date;
+  wwtForegroundImageset!: Imageset | null;
   wwtForegroundOpacity!: number;
   wwtRenderType!: ImageSetType;
 
