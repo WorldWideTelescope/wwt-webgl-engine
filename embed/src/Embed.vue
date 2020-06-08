@@ -81,7 +81,6 @@ export default class Embed extends WWTAwareComponent {
   @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
 
   backgroundImagesets: BackgroundImageset[] = [];
-  _curBackgroundImagesetName: string = "";
   currentTool: ToolType = null;
 
   get coordText() {
@@ -93,12 +92,13 @@ export default class Embed extends WWTAwareComponent {
   }
 
   get curBackgroundImagesetName() {
-    return this._curBackgroundImagesetName;
+    if (this.wwtBackgroundImageset == null)
+      return "";
+    return this.wwtBackgroundImageset.get_name();
   }
 
   set curBackgroundImagesetName(name: string) {
     this.setBackgroundImageByName(name);
-    this._curBackgroundImagesetName = name;
   }
 
   get foregroundOpacity() {
@@ -190,8 +190,6 @@ export default class Embed extends WWTAwareComponent {
       if (!foundBG) {
         this.backgroundImagesets.unshift(new BackgroundImageset(bgName, bgName));
       }
-
-      this._curBackgroundImagesetName = bgName;
     });
   }
 
