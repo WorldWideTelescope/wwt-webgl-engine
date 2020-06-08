@@ -4,6 +4,14 @@
     <div id="overlays">
       <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
+    <div id="tools">
+      <v-popover open>
+        <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
+        <template slot="popover">
+          <p class="tooltip-content">Some text?</p>
+        </template>
+      </v-popover>
+    </div>
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
       <p>Powered by <a href="https://worldwidetelescope.org/home/">AAS WorldWide
       Telescope</a>
@@ -153,6 +161,13 @@ body {
   }
 }
 
+#tools {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #FFF;
+}
+
 #credits {
   position: absolute;
   bottom: 0.5rem;
@@ -173,6 +188,116 @@ body {
     height: 24px;
     vertical-align: middle;
     margin: 2px;
+  }
+}
+
+/* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */
+
+.tooltip {
+  display: block !important;
+  z-index: 10000;
+
+  .tooltip-inner {
+    background: black;
+    color: white;
+    border-radius: 16px;
+    padding: 5px 10px 4px;
+  }
+
+  .tooltip-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+    margin: 5px;
+    border-color: black;
+    z-index: 1;
+  }
+
+  &[x-placement^="top"] {
+    margin-bottom: 5px;
+
+    .tooltip-arrow {
+      border-width: 5px 5px 0 5px;
+      border-left-color: transparent !important;
+      border-right-color: transparent !important;
+      border-bottom-color: transparent !important;
+      bottom: -5px;
+      left: calc(50% - 5px);
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  &[x-placement^="bottom"] {
+    margin-top: 5px;
+
+    .tooltip-arrow {
+      border-width: 0 5px 5px 5px;
+      border-left-color: transparent !important;
+      border-right-color: transparent !important;
+      border-top-color: transparent !important;
+      top: -5px;
+      left: calc(50% - 5px);
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  &[x-placement^="right"] {
+    margin-left: 5px;
+
+    .tooltip-arrow {
+      border-width: 5px 5px 5px 0;
+      border-left-color: transparent !important;
+      border-top-color: transparent !important;
+      border-bottom-color: transparent !important;
+      left: -5px;
+      top: calc(50% - 5px);
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  &[x-placement^="left"] {
+    margin-right: 5px;
+
+    .tooltip-arrow {
+      border-width: 5px 0 5px 5px;
+      border-top-color: transparent !important;
+      border-right-color: transparent !important;
+      border-bottom-color: transparent !important;
+      right: -5px;
+      top: calc(50% - 5px);
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  &.popover {
+    .popover-inner {
+      background: #f9f9f9;
+      color: black;
+      padding: 24px;
+      border-radius: 5px;
+      box-shadow: 0 5px 30px rgba(black, .1);
+    }
+
+    .popover-arrow {
+      border-color: #f9f9f9;
+    }
+  }
+
+  &[aria-hidden='true'] {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s, visibility .15s;
+  }
+
+  &[aria-hidden='false'] {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .15s;
   }
 }
 </style>
