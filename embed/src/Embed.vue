@@ -11,8 +11,8 @@
         <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
         <template slot="popover">
           <ul class="tooltip-content tool-menu">
-            <li><a href="#" @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
-            <li><a href="#" @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
+            <li v-show="showCrossfader"><a href="#" v-close-popover @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
+            <li><a href="#" v-close-popover @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
           </ul>
         </template>
       </v-popover>
@@ -26,7 +26,7 @@
       <template v-else-if="currentTool == 'choose-background'">
         <span>Background imagery:</span>
         <select v-model="curBackgroundImagesetName">
-          <option v-for="bg in backgroundImagesets" v-bind:value="bg.imagesetName">
+          <option v-for="bg in backgroundImagesets" v-bind:value="bg.imagesetName" v-bind:key="bg.imagesetName">
             {{ bg.displayName }}
           </option>
         </select>
@@ -107,6 +107,13 @@ export default class Embed extends WWTAwareComponent {
 
   set foregroundOpacity(o: number) {
     this.setForegroundOpacity(o);
+  }
+
+  get showCrossfader() {
+    if (this.wwtForegroundImageset == null || this.wwtForegroundImageset === undefined)
+      return false;
+
+    return this.wwtForegroundImageset != this.wwtBackgroundImageset;
   }
 
   created() {
