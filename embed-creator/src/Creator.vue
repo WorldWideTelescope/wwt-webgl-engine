@@ -529,6 +529,11 @@ export default class Creator extends Vue {
     }
 
     this.showImageUrlValidity = urlIsOk;
+
+    if (urlIsOk) {
+      // Clear out state for other modes with which we're mutually exclusive.
+      this.qsb.planetaryBody = null;
+    }
   }
 
   onClipboardSuccess() {

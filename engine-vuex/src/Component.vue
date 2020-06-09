@@ -6,7 +6,6 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
-import { D2R, H2R } from "@wwtelescope/astro";
 import { ImageSetType } from "@wwtelescope/engine-types";
 import { WWTInstance } from "@wwtelescope/engine-helpers";
 
@@ -42,10 +41,7 @@ export default class WWTComponent extends Vue {
       ...mapMutations([
         "internalLinkToInstance",
         "internalUnlinkFromInstance",
-        "internalUpdateRA",
-        "internalUpdateDec",
-        "internalUpdateCurrentTime",
-        "internalUpdateRenderType",
+        "internalUpdate",
       ]),
       ...mapActions([
         "waitForReady",
@@ -63,7 +59,11 @@ export default class WWTComponent extends Vue {
   mounted() {
     this.wwt = new WWTInstance({
       elId: this.uniqueId,
-      startInternalRenderLoop: false
+      startInternalRenderLoop: false,
+
+      // Start at the Galactic Center by default. RA of the GC ~= 266.4 deg; in WWT, lng = 360 - RA.
+      startLatDeg: -28.9,
+      startLngDeg: 93.6,
     });
 
     this.internalLinkToInstance(this.wwt);
@@ -73,21 +73,7 @@ export default class WWTComponent extends Vue {
 
       this.renderLoopId = window.requestAnimationFrame(render);
       wwt.ctl.renderOneFrame();
-
-      const raRad = wwt.si.getRA() * H2R;
-      if (this.raRad != raRad)
-        this.internalUpdateRA(raRad);
-
-      const decRad = wwt.si.getDec() * D2R;
-      if (this.decRad != decRad)
-        this.internalUpdateDec(decRad);
-
-      const time = wwt.stc.get_now();
-      if (this.currentTime != time)
-        this.internalUpdateCurrentTime(time);
-
-      if (this.renderType != wwt.ctl.renderType)
-        this.internalUpdateRenderType(wwt.ctl.renderType);
+      this.internalUpdate();
     };
 
     // Wait for the WWT engine to signal readiness, then wait another tick, then
@@ -117,10 +103,7 @@ export default class WWTComponent extends Vue {
   renderType!: ImageSetType;
   internalLinkToInstance!: (_wwt: WWTInstance) => void;
   internalUnlinkFromInstance!: () => void;
-  internalUpdateRA!: (_newRARad: number) => void;
-  internalUpdateDec!: (_newDecRad: number) => void;
-  internalUpdateCurrentTime!: (_newTime: Date) => void;
-  internalUpdateRenderType!: (_newType: ImageSetType) => void;
+  internalUpdate!: () => void;
   waitForReady!: () => Promise<void>;
 }
 </script>
