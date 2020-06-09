@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/embed",
-  "version": "1.1.0-beta.0",
+  "version": "1.1.0",
   "description": "The AAS WorldWide Telescope as an embeddable iframe.",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -25,8 +25,8 @@
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/embed-common": "^0.1.0 || ^0.1.1-beta.0",
-    "@wwtelescope/engine": "^7.2.0-beta.0",
-    "@wwtelescope/engine-vuex": "^0.2.0-beta.0",
+    "@wwtelescope/engine": "^7.1.0 || ^7.2.0-beta.0",
+    "@wwtelescope/engine-vuex": "^0.1.0 || ^0.2.0-beta.0",
     "v-tooltip": "=2.0.2",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"

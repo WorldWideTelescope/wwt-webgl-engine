@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/embed@1.1.0-beta.0...@wwtelescope/embed@1.1.0) (2020-06-09)
+
+- Add some tools to the embed user interface, including an opacity control for
+  the foreground image and a background chooser.
+
+
 # [1.0.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/embed@0.1.1...@wwtelescope/embed@1.0.0) (2020-05-24)
 
 - Version-only bump to 1.0 — we are going to try very hard to avoid breakage since we want
