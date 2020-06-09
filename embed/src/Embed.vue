@@ -1,17 +1,39 @@
 <template>
   <div id="app">
     <WorldWideTelescope wwt-namespace="wwt-embed"></WorldWideTelescope>
+
     <div id="overlays">
       <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
-    <div id="tools">
-      <v-popover open>
+
+    <div id="tool-menu" v-show="showToolMenu">
+      <v-popover>
         <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
         <template slot="popover">
-          <p class="tooltip-content">Some text?</p>
+          <ul class="tooltip-content tool-menu">
+            <li v-show="showCrossfader"><a href="#" v-close-popover @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
+            <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
+          </ul>
         </template>
       </v-popover>
     </div>
+
+    <div id="tools">
+      <div class="tool-container">
+      <template v-if="currentTool == 'crossfade'">
+        <span>Foreground opacity:</span> <input class="opacity-range" type="range" v-model="foregroundOpacity">
+      </template>
+      <template v-else-if="currentTool == 'choose-background'">
+        <span>Background imagery:</span>
+        <select v-model="curBackgroundImagesetName">
+          <option v-for="bg in backgroundImagesets" v-bind:value="bg.imagesetName" v-bind:key="bg.imagesetName">
+            {{ bg.displayName }}
+          </option>
+        </select>
+      </template>
+      </div>
+    </div>
+
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
       <p>Powered by <a href="https://worldwidetelescope.org/home/">AAS WorldWide
       Telescope</a>
@@ -30,11 +52,36 @@ import { ImageSetType } from "@wwtelescope/engine-types";
 import { SetupForImagesetOptions, WWTAwareComponent } from "@wwtelescope/engine-vuex";
 import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
 
+type ToolType = "crossfade" | "choose-background" | null;
+
+class BackgroundImageset {
+  public imagesetName: string;
+  public displayName: string;
+
+  constructor(displayName: string, imagesetName: string) {
+    this.displayName = displayName;
+    this.imagesetName = imagesetName;
+  }
+}
+
+const skyBackgroundImagesets: BackgroundImageset[] = [
+  new BackgroundImageset("Optical (Terapixel DSS)", "Digitized Sky Survey (Color)"),
+  new BackgroundImageset("Low-frequency radio (VLSS)", "VLSS: VLA Low-frequency Sky Survey (Radio)"),
+  new BackgroundImageset("Infrared (2MASS)", "2Mass: Imagery (Infrared)"),
+  new BackgroundImageset("Infrared (SFD dust map)", "SFD Dust Map (Infrared)"),
+  new BackgroundImageset("Ultraviolet (GALEX)", "GALEX (Ultraviolet)"),
+  new BackgroundImageset("X-Ray (ROSAT RASS)", "RASS: ROSAT All Sky Survey (X-ray)"),
+  new BackgroundImageset("Gamma Rays (FERMI LAT 8-year)", "Fermi LAT 8-year (gamma)"),
+];
+
 @Component
 export default class Embed extends WWTAwareComponent {
   CreditMode = CreditMode
 
   @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
+
+  backgroundImagesets: BackgroundImageset[] = [];
+  currentTool: ToolType = null;
 
   get coordText() {
     if (this.wwtRenderType == ImageSetType.sky) {
@@ -42,6 +89,41 @@ export default class Embed extends WWTAwareComponent {
     }
 
     return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+  }
+
+  get curBackgroundImagesetName() {
+    if (this.wwtBackgroundImageset == null)
+      return "";
+    return this.wwtBackgroundImageset.get_name();
+  }
+
+  set curBackgroundImagesetName(name: string) {
+    this.setBackgroundImageByName(name);
+  }
+
+  get foregroundOpacity() {
+    return this.wwtForegroundOpacity;
+  }
+
+  set foregroundOpacity(o: number) {
+    this.setForegroundOpacity(o);
+  }
+
+  get showBackgroundChooser() {
+    // TODO: we should wire in choices for other modes!
+    return this.wwtRenderType == ImageSetType.sky;
+  }
+
+  get showCrossfader() {
+    if (this.wwtForegroundImageset == null || this.wwtForegroundImageset === undefined)
+      return false;
+
+    return this.wwtForegroundImageset != this.wwtBackgroundImageset;
+  }
+
+  get showToolMenu() {
+    // This should return true if there are any tools to show.
+    return this.showBackgroundChooser || this.showCrossfader;
   }
 
   created() {
@@ -110,7 +192,30 @@ export default class Embed extends WWTAwareComponent {
 
         this.setBackgroundImageByName(bgName);
       }
+
+      // TODO: DTRT in different modes.
+      this.backgroundImagesets = [...skyBackgroundImagesets];
+      let foundBG = false;
+
+      for (const bgi of this.backgroundImagesets) {
+        if (bgi.imagesetName == bgName) {
+          foundBG = true;
+          break;
+        }
+      }
+
+      if (!foundBG) {
+        this.backgroundImagesets.unshift(new BackgroundImageset(bgName, bgName));
+      }
     });
+  }
+
+  selectTool(name: ToolType) {
+    if (this.currentTool == name) {
+      this.currentTool = null;
+    } else {
+      this.currentTool = name;
+    }
   }
 }
 </script>
@@ -161,11 +266,31 @@ body {
   }
 }
 
-#tools {
+#tool-menu {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   color: #FFF;
+
+  .tooltip-target {
+    cursor: pointer;
+  }
+}
+
+#tools {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  color: #FFF;
+
+  .tool-container {
+    position: relative;
+    left: -50%;
+  }
+
+  .opacity-range {
+    width: 50vw;
+  }
 }
 
 #credits {
@@ -174,6 +299,12 @@ body {
   right: 1rem;
   color: #ddd;
   font-size: 70%;
+
+  p {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+  }
 
   a {
     text-decoration: none;
@@ -278,9 +409,8 @@ body {
     .popover-inner {
       background: #f9f9f9;
       color: black;
-      padding: 24px;
+      padding: 8px;
       border-radius: 5px;
-      box-shadow: 0 5px 30px rgba(black, .1);
     }
 
     .popover-arrow {
@@ -300,4 +430,33 @@ body {
     transition: opacity .15s;
   }
 }
+
+/* Specialized styling for popups */
+
+ul.tool-menu {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+
+  li {
+    padding: 3px;
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      width: 100%;
+    }
+
+    svg.svg-inline--fa {
+      width: 1.5em;
+    }
+
+    &:hover {
+      background-color: #000;
+      color: #FFF;
+    }
+  }
+}
+
 </style>

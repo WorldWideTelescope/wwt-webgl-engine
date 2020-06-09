@@ -459,9 +459,15 @@ export class ScriptInterface {
    *
    * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
    *
-   * @param url: The URL of the WTML collection file to load.
+   * @param url The URL of the WTML collection file to load.
    */
   loadImageCollection(url: string): void;
+
+  /** Set the opacity with which the foreground imageset is rendered.
+   *
+   * @param opacity The opacity, between 0 (invisible) and 100 (fully opaque).
+   */
+  setForegroundOpacity(opacity: number): void;
 }
 
 /** A variety of settings for the WWT rendering engine. */

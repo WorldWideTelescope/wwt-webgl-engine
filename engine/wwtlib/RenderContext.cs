@@ -273,7 +273,7 @@ namespace wwtlib
         public double targetAlt = 0;
         public double targetAz = 0;
 
-        Imageset backgroundImageset;
+        Imageset backgroundImageset = null;
 
         public Imageset BackgroundImageset
         {
@@ -290,7 +290,7 @@ namespace wwtlib
             }
         }
 
-        Imageset foregroundImageset;
+        Imageset foregroundImageset = null;
 
         public Imageset ForegroundImageset
         {

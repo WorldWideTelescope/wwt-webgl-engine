@@ -349,6 +349,14 @@ export class WWTInstance {
     this.ctl.setForegroundImageByName(imagesetName);
   }
 
+  /** Set the opacity with which the foreground imageset is rendered.
+   *
+   * @param opacity The opacity, between 0 (invisible) and 100 (fully opaque).
+   */
+  setForegroundOpacity(opacity: number): void {
+    this.si.setForegroundOpacity(opacity);
+  }
+
   /** Set up the view to instantaneously display the specified imageset.
    *
    * This function aspires to provide a one-stop shop for configuring the engine
