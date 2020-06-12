@@ -36,7 +36,7 @@
     "@vue/cli-plugin-typescript": "~4.3.0"
   },
   "localDepRequiredCommits": {
-    "@wwtelescope/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3"
+    "@wwtelescope/embed-common": "a78d6075a59c64fa6e9523a7f6639a75a71c4fdd"
   },
   "publishConfig": {
     "access": "public"

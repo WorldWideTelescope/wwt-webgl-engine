@@ -36,7 +36,10 @@
                 <a href="#" @click="currentTabIndex = 1">Show an Image</a>
               </li>
               <li>
-                <a href="#" @click="currentTabIndex = 2">Planetary Body View</a>
+                <a href="#" @click="currentTabIndex = 2">Play a Guided Tour</a>
+              </li>
+              <li>
+                <a href="#" @click="currentTabIndex = 3">Planetary Body View</a>
               </li>
             </ul>
 
@@ -234,6 +237,31 @@
                 </b-form-group>
               </b-tab>
             </b-tabs>
+          </b-tab>
+
+          <b-tab title="Play a Guided Tour">
+            <p>
+              <a
+              href="https://docs.worldwidetelescope.org/user-manual/1/guidedtours/">Guided
+              Tours</a> are scripted, multimedia experiences that guide the
+              viewer through WWT’s simulated universe. If you have a tour file
+              (extension <code>.wtt</code>) available somewhere online, you can
+              create a WWT embed that plays it automatically.
+            </p>
+
+            <p>Looking for a sample? Copy and paste <a
+            href="http://data1.wwtassets.org/packages/2020/06_ngc6441/NGC6441.WTT">this link URL</a>.</p>
+
+            <b-form-group
+              label="Tour URL:"
+            >
+              <b-form-input
+                name="img-tour-url-input"
+                type="url"
+                v-model="qsb.s.tourUrl"
+                placeholder="http://example.com/tour.wtt"
+              ></b-form-input>
+            </b-form-group>
           </b-tab>
 
           <b-tab title="Planetary Body View">
