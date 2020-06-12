@@ -39,7 +39,7 @@
                 <a href="#" @click="currentTabIndex = 2">Play a Guided Tour</a>
               </li>
               <li>
-                <a href="#" @click="currentTabIndex = 3">Planetary Body View</a>
+                <a href="#" @click="currentTabIndex = 3">View a Planetary Body</a>
               </li>
             </ul>
 
@@ -264,7 +264,7 @@
             </b-form-group>
           </b-tab>
 
-          <b-tab title="Planetary Body View">
+          <b-tab title="View a Planetary Body">
             <p>
               In this mode, the user can explore a spherical body shown in
               isolation: no surrounding stars or other planets.
