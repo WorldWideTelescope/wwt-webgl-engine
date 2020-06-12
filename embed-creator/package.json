@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/embed-creator",
-  "version": "0.2.0-beta.0",
+  "version": "0.2.0-beta.1",
   "description": "An web app for creating AAS WorldWide Telescope embeds",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -36,7 +36,7 @@
     "@vue/cli-plugin-typescript": "~4.3.0"
   },
   "localDepRequiredCommits": {
-    "@wwtelescope/embed-common": "a78d6075a59c64fa6e9523a7f6639a75a71c4fdd"
+    "@wwtelescope/embed-common": "6bd7f0b05da4663f35373f2a422e30fa84bae13b"
   },
   "publishConfig": {
     "access": "public"
