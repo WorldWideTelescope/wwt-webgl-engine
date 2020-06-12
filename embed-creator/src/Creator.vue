@@ -364,7 +364,9 @@
               class="mt-2"
               :href="iframeSource"
               target="_blank"
-              >Open Preview in New Window</b-button
+              >Open Preview in New Window
+                <font-awesome-icon icon="external-link-alt" />
+              </b-button
             >
           </b-col>
           <b-col>
