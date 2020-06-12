@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine-vuex@0.3.0-beta.1...@wwtelescope/engine-vuex@0.3.0) (2020-06-12)
+
+- Export interfaces relating to basic tour playback
+
+
+
 # [0.2.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine-vuex@0.2.0-beta.0...@wwtelescope/engine-vuex@0.2.0) (2020-06-09)
 
 - Expose current foreground and background imagesets, and the foreground
