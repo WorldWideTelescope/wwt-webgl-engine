@@ -126,12 +126,19 @@ class WWTGraduateCommand extends Command {
         );
       }
 
-      const oldNumReq = node.pkg.dependencies[depName];
+      let oldNumReq = node.pkg.dependencies[depName];
       if (!oldNumReq) {
         throw new Error(dedent`
           Consistency problem with ${this.packageName}: expected local dependency
           ${depName} but found no numerical version requirement?`
         );
+      }
+
+      // It can happen that the old requirement is has the `{non-pre} || {pre}`
+      // form that we create below. If so:
+
+      if (oldNumReq.indexOf('||') != -1) {
+        oldNumReq = oldNumReq.split('||')[1].trim();
       }
 
       const newNumReq = "^" + v;
