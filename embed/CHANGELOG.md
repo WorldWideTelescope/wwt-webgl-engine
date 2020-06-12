@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/embed@1.2.0-beta.1...@wwtelescope/embed@1.2.0) (2020-06-12)
+
+- Implement a very basic tour playback mode.
+
+
 # [1.1.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/embed@1.1.0-beta.0...@wwtelescope/embed@1.1.0) (2020-06-09)
 
 - Add some tools to the embed user interface, including an opacity control for
