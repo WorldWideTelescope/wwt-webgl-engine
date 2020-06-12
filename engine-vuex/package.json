@@ -34,8 +34,8 @@
     "@vue/cli-plugin-vuex": "~4.3.0"
   },
   "localDepRequiredCommits": {
-    "@wwtelescope/engine": "5210ecd43527927168236a1eed1a4aac231d6f31",
-    "@wwtelescope/engine-helpers": "7f9a72405bd13f4b64ee1e1986be32dc50b8360a"
+    "@wwtelescope/engine": "07cc74557e8d5448ab125f0f8330abac9323df3a",
+    "@wwtelescope/engine-helpers": "f233bc983967d2825682f6f351780cef25754c59"
   },
   "publishConfig": {
     "access": "public"
