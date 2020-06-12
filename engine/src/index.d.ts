@@ -441,6 +441,14 @@ export class ScriptInterface {
   /** Deregister a "ready" callback. */
   remove_ready(callback: ReadyEventCallback): void;
 
+  /** Register a callback to be called when [[WWTControl.playTour]] has finished
+   * loading a tour.
+   */
+  add_tourReady(callback: ScriptInterfaceCallback): void;
+
+  /** Deregister a "tourReady" callback. */
+  remove_tourReady(callback: ScriptInterfaceCallback): void;
+
   /** Load a WTML collection and the imagesets that it contains.
    *
    * This function triggers a download of the specified URL, which should return
@@ -469,6 +477,13 @@ export class ScriptInterface {
    */
   setForegroundOpacity(opacity: number): void;
 }
+
+
+/** A generic [[ScriptInterface]] callback. */
+export interface ScriptInterfaceCallback {
+  (si: ScriptInterface): void;
+}
+
 
 /** A variety of settings for the WWT rendering engine. */
 export class Settings {
@@ -701,7 +716,45 @@ export namespace SpaceTimeController {
  * [[SpaceTimeController]] namespace. */
 export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
+
+export class TourPlayer implements UiController {
+  // get_tour(): TourDocument
+  // set_tour
+
+  nextSlide(): void;
+  play(): void;
+  stop(ignored: boolean): void;
+  close(): void;
+  pauseTour(): void;
+}
+
+
+// Static TourPlayer methods.
+export namespace TourPlayer {
+  /** Get whether a player is currently actually playing its tour.
+   *
+   * Note that this is a static method on the TourPlayer class, even though most
+   * player state is associated with class instances.
+   */
+  export function get_playing(): boolean;
+
+  //export function set_playing(v: boolean): boolean;
+}
+
+
+/** Items implement IUiController in WWT can, well, control the UI. It's
+ * implemented by Object3d, TourEditor, and TourPlayer.
+ *
+ * This interface doesn't implement any methods that are generically useful to
+ * library consumers.
+ * */
+export interface UiController {}
+
+
 export class WWTControl {
+  /** Special UI state that may be active such as a [[TourPlayer]]. */
+  uiController: UiController | null;
+
   /** State of the WWT rendering engine. */
   renderContext: RenderContext;
 
@@ -808,6 +861,18 @@ export class WWTControl {
    * @param imagesetName: The imageset name.
   */
   setForegroundImageByName(imagesetName: string): void;
+
+  /** Start playing the tour stored at the specified URL. */
+  playTour(url: string): void;
+
+  /** Start playing the currently active tour. */
+  playCurrentTour(): void;
+
+  /** Pause the currently playing tour. */
+  pauseCurrentTour(): void;
+
+  /** Stop the currently playing tour. */
+  stopCurrentTour(): void;
 }
 
 export namespace Wtml {

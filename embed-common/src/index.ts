@@ -51,6 +51,7 @@ export class EmbedSettings {
   creditMode = CreditMode.Default;
   showCoordinateReadout = false;
   showCrosshairs = false;
+  tourUrl = "";
   wtmlUrl = "";
   wtmlPlace = "";
 
@@ -110,6 +111,10 @@ export class EmbedSettings {
           s.foregroundImagesetName = "";
           break;
 
+        case "tour":
+          s.tourUrl = value;
+          break;
+
         case "wtml":
           s.wtmlUrl = value;
           break;
@@ -160,6 +165,10 @@ export class EmbedQueryStringBuilder {
 
     if (this.s.showCrosshairs) {
       result.push(["ch", ""]);
+    }
+
+    if (this.s.tourUrl.length) {
+      result.push(["tour", this.s.tourUrl]);
     }
 
     if (this.s.wtmlPlace.length) {

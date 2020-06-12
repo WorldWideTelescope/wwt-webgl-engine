@@ -65,6 +65,13 @@ export interface WWTEngineVuexState {
    */
   foregroundOpacity: number;
 
+  /** Whether the tour playback mode is active.
+   *
+   * Specifically, this is true if the `WWTControl` has a `uiController` item
+   * that is a `TourPlayer` item.
+   */
+  isTourPlayerActive: boolean;
+
   /** The current mode of the renderer */
   renderType: ImageSetType;
 }
@@ -90,6 +97,12 @@ export interface GotoRADecZoomParams {
   instant: boolean;
 }
 
+/** The parameters for the [[WWTEngineVuexModule.loadAndPlayTour]] action. */
+export interface LoadAndPlayTourParams {
+  /** The tour URL to load. */
+  url: string;
+}
+
 /** The parameters for the [[WWTEngineVuexModule.loadImageCollection]] action. */
 export interface LoadImageCollectionParams {
   /** The WTML URL to load. */
@@ -107,6 +120,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   currentTime = new Date();
   foregroundImageset: Imageset | null = null;
   foregroundOpacity = 100;
+  isTourPlayerActive = false;
   renderType = ImageSetType.sky;
 
   get lookupImageset() {
@@ -160,6 +174,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
     if (this.renderType != wwt.ctl.renderType)
       this.renderType = wwt.ctl.renderType;
+
+    this.isTourPlayerActive = (wwt.getActiveTourPlayer() !== null);
   }
 
   @Mutation
@@ -231,6 +247,15 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot gotoTarget without linking to WWTInstance');
     return Vue.$wwt.inst.gotoTarget(options);
+  }
+
+  @Action({ rawError: true })
+  async loadAndPlayTour(
+    {url}: LoadAndPlayTourParams
+  ): Promise<void> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot loadAndPlayTour without linking to WWTInstance');
+    return Vue.$wwt.inst.loadAndPlayTour(url);
   }
 
   @Action({ rawError: true })

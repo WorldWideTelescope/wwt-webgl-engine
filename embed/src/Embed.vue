@@ -110,11 +110,17 @@ export default class Embed extends WWTAwareComponent {
   }
 
   get showBackgroundChooser() {
+    if (this.wwtIsTourPlayerActive)
+      return false;
+
     // TODO: we should wire in choices for other modes!
     return this.wwtRenderType == ImageSetType.sky;
   }
 
   get showCrossfader() {
+    if (this.wwtIsTourPlayerActive)
+      return false; // maybe show this if tour player is active but not playing?
+
     if (this.wwtForegroundImageset == null || this.wwtForegroundImageset === undefined)
       return false;
 
@@ -133,81 +139,92 @@ export default class Embed extends WWTAwareComponent {
       }
     });
 
-    if (this.embedSettings.wtmlUrl.length) {
+    if (this.embedSettings.tourUrl.length) {
       prom = prom.then(async () => {
-        const folder = await this.loadImageCollection({
-          url: this.embedSettings.wtmlUrl
-        });
+        // TODO: figure out a good thing to do here
+        this.backgroundImagesets = [];
 
-        if (this.embedSettings.wtmlPlace) {
-          for (const pl of folder.get_places()) {
-            if (pl.get_name() == this.embedSettings.wtmlPlace) {
-              /* This is nominally an async Action, but with `instant: true` it's ... instant */
-              this.gotoTarget({
-                place: pl,
-                noZoom: false,
-                instant: true,
-                trackObject: true
-              })
+        await this.loadAndPlayTour({
+          url: this.embedSettings.tourUrl
+        });
+      });
+    } else {
+      // Many more possibilities if we're not playing a tour ...
+      if (this.embedSettings.wtmlUrl.length) {
+        prom = prom.then(async () => {
+          const folder = await this.loadImageCollection({
+            url: this.embedSettings.wtmlUrl
+          });
+
+          if (this.embedSettings.wtmlPlace) {
+            for (const pl of folder.get_places()) {
+              if (pl.get_name() == this.embedSettings.wtmlPlace) {
+                /* This is nominally an async Action, but with `instant: true` it's ... instant */
+                this.gotoTarget({
+                  place: pl,
+                  noZoom: false,
+                  instant: true,
+                  trackObject: true
+                })
+              }
             }
           }
+        });
+      }
+
+      prom.then(() => {
+        // setupForImageset() will apply a default background that is appropriate
+        // for the foreground, but we want to be able to override it.
+
+        let backgroundWasInitialized = false;
+        let bgName = this.embedSettings.backgroundImagesetName;
+
+        if (this.embedSettings.foregroundImagesetName.length) {
+          const img = this.lookupImageset(this.embedSettings.foregroundImagesetName);
+
+          if (img !== null) {
+            const options: SetupForImagesetOptions = { foreground: img };
+
+            // For setup of planetary modes to work, we need to pass the specified
+            // background imageset to setupForImageset().
+            if (bgName.length) {
+              const bkg = this.lookupImageset(bgName);
+              if (bkg !== null) {
+                options.background = bkg;
+                backgroundWasInitialized = true;
+              }
+            }
+
+            this.setupForImageset(options);
+          }
+        }
+
+        if (!backgroundWasInitialized) {
+          if (!bgName.length) {
+            // Empty bgname implies that we should choose a default background. If
+            // setupForImageset() didn't do that for us, go with:
+            bgName = "Digitized Sky Survey (Color)";
+          }
+
+          this.setBackgroundImageByName(bgName);
+        }
+
+        // TODO: DTRT in different modes.
+        this.backgroundImagesets = [...skyBackgroundImagesets];
+        let foundBG = false;
+
+        for (const bgi of this.backgroundImagesets) {
+          if (bgi.imagesetName == bgName) {
+            foundBG = true;
+            break;
+          }
+        }
+
+        if (!foundBG) {
+          this.backgroundImagesets.unshift(new BackgroundImageset(bgName, bgName));
         }
       });
     }
-
-    prom.then(() => {
-      // setupForImageset() will apply a default background that is appropriate
-      // for the foreground, but we want to be able to override it.
-
-      let backgroundWasInitialized = false;
-      let bgName = this.embedSettings.backgroundImagesetName;
-
-      if (this.embedSettings.foregroundImagesetName.length) {
-        const img = this.lookupImageset(this.embedSettings.foregroundImagesetName);
-
-        if (img !== null) {
-          const options: SetupForImagesetOptions = { foreground: img };
-
-          // For setup of planetary modes to work, we need to pass the specified
-          // background imageset to setupForImageset().
-          if (bgName.length) {
-            const bkg = this.lookupImageset(bgName);
-            if (bkg !== null) {
-              options.background = bkg;
-              backgroundWasInitialized = true;
-            }
-          }
-
-          this.setupForImageset(options);
-        }
-        //this.setForegroundImageByName(this.embedSettings.foregroundImagesetName);
-      }
-
-      if (!backgroundWasInitialized) {
-        if (!bgName.length) {
-          // Empty bgname implies that we should choose a default background. If
-          // setupForImageset() didn't do that for us, go with:
-          bgName = "Digitized Sky Survey (Color)";
-        }
-
-        this.setBackgroundImageByName(bgName);
-      }
-
-      // TODO: DTRT in different modes.
-      this.backgroundImagesets = [...skyBackgroundImagesets];
-      let foundBG = false;
-
-      for (const bgi of this.backgroundImagesets) {
-        if (bgi.imagesetName == bgName) {
-          foundBG = true;
-          break;
-        }
-      }
-
-      if (!foundBG) {
-        this.backgroundImagesets.unshift(new BackgroundImageset(bgName, bgName));
-      }
-    });
   }
 
   selectTool(name: ToolType) {

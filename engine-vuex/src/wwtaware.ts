@@ -7,6 +7,7 @@ import { GotoTargetOptions, SetupForImagesetOptions } from "@wwtelescope/engine-
 
 import {
   GotoRADecZoomParams,
+  LoadAndPlayTourParams,
   LoadImageCollectionParams,
   WWTEngineVuexState
 } from "./store";
@@ -31,6 +32,7 @@ export class WWTAwareComponent extends Vue {
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
         wwtForegroundImageset: (state, _getters) => (state as WWTEngineVuexState).foregroundImageset,
         wwtForegroundOpacity: (state, _getters) => (state as WWTEngineVuexState).foregroundOpacity,
+        wwtIsTourPlayerActive: (state, _getters) => (state as WWTEngineVuexState).isTourPlayerActive,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
       }),
       ...mapGetters([
@@ -48,6 +50,7 @@ export class WWTAwareComponent extends Vue {
       ...mapActions([
         "gotoRADecZoom",
         "gotoTarget",
+        "loadAndPlayTour",
         "loadImageCollection",
         "waitForReady",
       ]),
@@ -68,6 +71,7 @@ export class WWTAwareComponent extends Vue {
   wwtCurrentTime!: Date;
   wwtForegroundImageset!: Imageset | null;
   wwtForegroundOpacity!: number;
+  wwtIsTourPlayerActive!: boolean;
   wwtRenderType!: ImageSetType;
 
   // Getters
@@ -83,6 +87,7 @@ export class WWTAwareComponent extends Vue {
   // Actions
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
   gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
+  loadAndPlayTour!: (o: LoadAndPlayTourParams) => Promise<void>;
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
   waitForReady!: () => Promise<void>;
 }
