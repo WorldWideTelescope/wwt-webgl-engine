@@ -358,6 +358,14 @@
                 Cannot preview because your browser does not support iframes.
               </p>
             </iframe>
+
+            <b-button
+              variant="primary"
+              class="mt-2"
+              :href="iframeSource"
+              target="_blank"
+              >Open Preview in New Window</b-button
+            >
           </b-col>
           <b-col>
             <h4>Embed Code</h4>
