@@ -26,7 +26,7 @@
   },
   "localDepRequiredCommits": {
     "@wwtelescope/astro": "f67c4bb8bbe05af1eb2b20c26a575374c53d3d01",
-    "@wwtelescope/engine": "5210ecd43527927168236a1eed1a4aac231d6f31",
+    "@wwtelescope/engine": "07cc74557e8d5448ab125f0f8330abac9323df3a",
     "@wwtelescope/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
   },
   "publishConfig": {
