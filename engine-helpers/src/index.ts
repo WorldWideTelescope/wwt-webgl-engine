@@ -21,6 +21,7 @@ import {
   Place,
   ScriptInterface,
   SpaceTimeControllerObject,
+  TourPlayer,
   Wtml,
   WWTControl,
   SpaceTimeController
@@ -169,6 +170,19 @@ export class WWTInstance {
       }
 
       this.arrivePromises = [];
+    });
+
+    // TourReady promise init:
+    this.si.add_tourReady((_si) => {
+      for (const p of this.tourReadyPromises) {
+        if (p.payload < this.tourReadySeqnum) {
+          p.reject("superseded");
+        } else {
+          p.resolve();
+        }
+      }
+
+      this.tourReadyPromises = [];
     });
   }
 
@@ -437,5 +451,48 @@ export class WWTInstance {
       true, // instant
       true // trackObject
     );
+  }
+
+  // Tours
+
+  /** If the tour playback mode is active, get the active TourPlayer object. */
+  getActiveTourPlayer(): TourPlayer | null {
+    if (this.ctl.uiController === null)
+      return null;
+
+    if (this.ctl.uiController instanceof TourPlayer)
+      return this.ctl.uiController;
+
+    return null;
+  }
+
+  private tourReadyPromises: SavedPromise<number, void>[] = [];
+  private tourReadySeqnum = 0;
+
+  /** Load a tour from a URL and start playing it.
+   *
+   * @params url The URL of the tour to load and play.
+   * @returns A promise that resolves when the tour has loaded and started
+   * playing.
+   */
+  async loadAndPlayTour(url: string): Promise<void> {
+    this.ctl.playTour(url);
+
+    this.tourReadySeqnum += 1;
+    const seq = this.tourReadySeqnum;
+
+    for (const p of this.tourReadyPromises) {
+      p.reject("superseded");
+    }
+
+    this.tourReadyPromises = [];
+
+    return new Promise((resolve, reject) => {
+      if (this.tourReadySeqnum > seq) {
+        reject("superseded");
+      } else {
+        this.tourReadyPromises.push(new SavedPromise(seq, resolve, reject));
+      }
+    });
   }
 }

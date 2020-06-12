@@ -21,6 +21,9 @@
     "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEmbedCreatorVersion;]'+process.env.npm_package_version)\""
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-solid-svg-icons": "^5.13.0",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/embed-common": "0.0.0-dev",
     "bootstrap-vue": "^2.13.0",
     "vue": "^2.6.11",
@@ -33,7 +36,7 @@
     "@vue/cli-plugin-typescript": "~4.3.0"
   },
   "localDepRequiredCommits": {
-    "@wwtelescope/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3"
+    "@wwtelescope/embed-common": "a78d6075a59c64fa6e9523a7f6639a75a71c4fdd"
   },
   "publishConfig": {
     "access": "public"

@@ -36,7 +36,10 @@
                 <a href="#" @click="currentTabIndex = 1">Show an Image</a>
               </li>
               <li>
-                <a href="#" @click="currentTabIndex = 2">Planetary Body View</a>
+                <a href="#" @click="currentTabIndex = 2">Play a Guided Tour</a>
+              </li>
+              <li>
+                <a href="#" @click="currentTabIndex = 3">View a Planetary Body</a>
               </li>
             </ul>
 
@@ -236,7 +239,32 @@
             </b-tabs>
           </b-tab>
 
-          <b-tab title="Planetary Body View">
+          <b-tab title="Play a Guided Tour">
+            <p>
+              <a
+              href="https://docs.worldwidetelescope.org/user-manual/1/guidedtours/">Guided
+              Tours</a> are scripted, multimedia experiences that guide the
+              viewer through WWT’s simulated universe. If you have a tour file
+              (extension <code>.wtt</code>) available somewhere online, you can
+              create a WWT embed that plays it automatically.
+            </p>
+
+            <p>Looking for a sample? Copy and paste <a
+            href="http://data1.wwtassets.org/packages/2020/06_ngc6441/NGC6441.WTT">this link URL</a>.</p>
+
+            <b-form-group
+              label="Tour URL:"
+            >
+              <b-form-input
+                name="img-tour-url-input"
+                type="url"
+                v-model="qsb.s.tourUrl"
+                placeholder="http://example.com/tour.wtt"
+              ></b-form-input>
+            </b-form-group>
+          </b-tab>
+
+          <b-tab title="View a Planetary Body">
             <p>
               In this mode, the user can explore a spherical body shown in
               isolation: no surrounding stars or other planets.
@@ -358,6 +386,16 @@
                 Cannot preview because your browser does not support iframes.
               </p>
             </iframe>
+
+            <b-button
+              variant="primary"
+              class="mt-2"
+              :href="iframeSource"
+              target="_blank"
+              >Open Preview in New Window
+                <font-awesome-icon icon="external-link-alt" />
+              </b-button
+            >
           </b-col>
           <b-col>
             <h4>Embed Code</h4>

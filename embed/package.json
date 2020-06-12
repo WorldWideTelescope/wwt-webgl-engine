@@ -37,9 +37,9 @@
     "@vue/cli-plugin-vuex": "~4.3.0"
   },
   "localDepRequiredCommits": {
-    "@wwtelescope/embed-common": "b0899b370b9883d0cc289a1319fcb0db34a323a3",
-    "@wwtelescope/engine": "020de599379d176e11f9e7132d1c00ede70bfea0",
-    "@wwtelescope/engine-vuex": "ede054e4235cf7223be10636fba0403bc3d976cd"
+    "@wwtelescope/embed-common": "a78d6075a59c64fa6e9523a7f6639a75a71c4fdd",
+    "@wwtelescope/engine": "5210ecd43527927168236a1eed1a4aac231d6f31",
+    "@wwtelescope/engine-vuex": "e56538f26354ec342949e0eadea9e228b985344b"
   },
   "publishConfig": {
     "access": "public"
