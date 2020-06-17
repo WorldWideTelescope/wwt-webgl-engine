@@ -203,8 +203,15 @@ namespace wwtlib
             string lcdomain = domain.ToLowerCase();
             string lcpath = rest.ToLowerCase().Split('?')[0];
 
-            if (!this.domain_handling.ContainsKey(lcdomain))
-                this.domain_handling[lcdomain] = DomainHandling.TryNoProxy;
+            if (!this.domain_handling.ContainsKey(lcdomain)) {
+                // Domains include nonstandard port specifications, so it's
+                // possible that we could get here with a discernably
+                // localhost-y domain.
+                if (lcdomain.StartsWith("localhost:") || lcdomain.StartsWith("127.0.0.1:"))
+                    this.domain_handling[lcdomain] = DomainHandling.Localhost;
+                else
+                    this.domain_handling[lcdomain] = DomainHandling.TryNoProxy;
+            }
 
             DomainHandling mode = this.domain_handling[lcdomain];
 
@@ -301,14 +308,18 @@ namespace wwtlib
                 lcdomain = url_no_protocol.Substring(0, slash_index).ToLowerCase();
             }
 
-            // Is this a flagship URL? If so, don't bother proxying.
+            // Is this a flagship or localhost URL? If so, don't bother proxying.
 
-            if (!this.domain_handling.ContainsKey(lcdomain))
-                this.domain_handling[lcdomain] = DomainHandling.TryNoProxy;
+            if (!this.domain_handling.ContainsKey(lcdomain)) {
+                if (lcdomain.StartsWith("localhost:") || lcdomain.StartsWith("127.0.0.1:"))
+                    this.domain_handling[lcdomain] = DomainHandling.Localhost;
+                else
+                    this.domain_handling[lcdomain] = DomainHandling.TryNoProxy;
+            }
 
             DomainHandling mode = this.domain_handling[lcdomain];
 
-            if (mode == DomainHandling.WWTFlagship) {
+            if (mode == DomainHandling.WWTFlagship || mode == DomainHandling.Localhost) {
                 return null;
             }
 
