@@ -1620,7 +1620,6 @@ namespace wwtlib
         public Vector2d GetCoordinatesForScreenPoint(double x, double y)
         {
             Vector2d result;
-            Vector3d PickRayOrig;
             Vector3d PickRayDir;
             Vector2d pt = Vector2d.Create(x, y);
             PickRayDir = TransformPickPointToWorldSpace(pt, RenderContext.Width, RenderContext.Height);
