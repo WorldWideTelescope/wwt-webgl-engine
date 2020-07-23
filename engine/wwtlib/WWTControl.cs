@@ -1281,29 +1281,24 @@ namespace wwtlib
         //    }
         //}
 
-
         public void Move(double x, double y)
         {
-            double scaleY = RenderContext.FovScale / (3600.0);
+            double scaleY = RenderContext.FovScale / 3600.0;
 
             if (RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
             {
                 scaleY = .06;
             }
 
-
             double scaleX = scaleY / Math.Max(.2, Math.Cos(RenderContext.ViewCamera.Lat / 180.0 * Math.PI));
 
-
-
-
-            if (RenderContext.BackgroundImageset.DataSetType == ImageSetType.Earth || RenderContext.BackgroundImageset.DataSetType == ImageSetType.Planet || RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
+            if (RenderContext.BackgroundImageset.DataSetType == ImageSetType.Earth ||
+                RenderContext.BackgroundImageset.DataSetType == ImageSetType.Planet ||
+                RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
             {
-                scaleX = scaleX * 6.3;
-                scaleY = scaleY * 6.3;
+                scaleX *= 6.3; // XXX don't know where this magic number comes from
+                scaleY *= 6.3;
             }
-
-
 
             if (RenderContext.Space && (Settings.Active.GalacticMode || Settings.Active.LocalHorizonMode))
             {
@@ -1321,13 +1316,9 @@ namespace wwtlib
                 {
                     RenderContext.targetAlt = -90;
                 }
-            }
-            else
-            {
+            } else {
                 RenderContext.TargetCamera.Lng -= x * scaleX;
-
                 RenderContext.TargetCamera.Lng = ((RenderContext.TargetCamera.Lng + 720) % 360);
-
                 RenderContext.TargetCamera.Lat += y * scaleY;
 
                 if (RenderContext.TargetCamera.Lat > 90)
@@ -1345,7 +1336,6 @@ namespace wwtlib
             {
                 RenderContext.ViewCamera = RenderContext.TargetCamera.Copy();
             }
-
 
             if (x != 0 && y != 0)
             {
