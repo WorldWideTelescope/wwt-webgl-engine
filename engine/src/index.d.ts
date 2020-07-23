@@ -391,7 +391,7 @@ export class RenderContext {
     planetID: number,
     viewLat: number,
     viewLong: number
-    ): number;
+  ): number;
   onTarget(place: Place): boolean;
 }
 
@@ -748,7 +748,7 @@ export namespace TourPlayer {
  * This interface doesn't implement any methods that are generically useful to
  * library consumers.
  * */
-export interface UiController {}
+export interface UiController { }
 
 
 export class WWTControl {
@@ -871,6 +871,49 @@ export class WWTControl {
   /** Pause the currently playing tour. */
   pauseCurrentTour(): void;
 
+  /** Set the maximum allowed user zoom level in 3D ("solar system") mode.
+   *
+   * @param limit The new zoom limit.
+   *
+   * This sets how far the user can zoom out when operating in the 3D mode. XXX:
+   * I do not know what units this value is measured in! The default value is
+   * 10^16.
+  */
+  setSolarSystemMaxZoom(limit: number): void;
+
+  /** Set the minimum allowed user zoom level in 3D ("solar system") mode.
+   *
+   * @param limit The new zoom limit.
+   *
+   * This sets how far the user can zoom in when operating in the 3D mode. XXX:
+   * I do not know what units this value is measured in! The default value is
+   * 10^-8.
+  */
+  setSolarSystemMinZoom(limit: number): void;
+
+  /** Set the maximum allowed user zoom level in 2D modes.
+   *
+   * @param limit The new zoom limit.
+   *
+   * This sets how far the user can zoom out when operating in a 2D mode such as Sky mode.
+   * The zoom number is the angular height of the viewport, measured in degrees, times 6.
+   * The default value is 360, corresponding to a viewport height of 60 degrees.
+  */
+  set_zoomMax(limit: number): number;
+
+  /** Set the minimum allowed user zoom level in 2D modes.
+   *
+   * @param limit The new zoom limit.
+   *
+   * *Note*, this limit is not enforced when the user is manually zooming the view in and
+   * out. It is only enforced for programmatic moves such a loading a new Place.
+   *
+   * This sets how far the user can zoom in when operating in a 2D mode such as Sky mode.
+   * The zoom number is the angular height of the viewport, measured in degrees, times 6.
+   * The default value corresponds to a viewport height of 47 arcseconds.
+  */
+  set_zoomMin(limit: number): number;
+
   /** Stop the currently playing tour. */
   stopCurrentTour(): void;
 }
@@ -905,14 +948,14 @@ export namespace WWTControl {
    */
   export function initControl(divId: string): ScriptInterface;
 
- /** Initialize the WWT engine with defaults.
+  /** Initialize the WWT engine with defaults.
    *
    * The same as [[initControl6]], with `startLat` and `startLng` defaulting to
    * 0, `startZoom` defaulting to 360, and `startMode` defaulting to `"Sky"`.
    */
   export function initControl2(divId: string, startRenderLoop: boolean): ScriptInterface;
 
- /** Initialize the WWT engine.
+  /** Initialize the WWT engine.
    *
    * @param divId The `id` of the DOM element into which the WWT WebGL surface
    * will be inserted.

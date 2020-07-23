@@ -53,6 +53,46 @@ namespace wwtlib
             Annotation.BatchDirty = true;
         }
 
+        private bool Annotationclicked(double ra, double dec, double x, double y)
+        {
+            if (annotations != null && annotations.Count > 0)
+            {
+                int index = 0;
+                foreach (Annotation note in annotations)
+                {
+                    if (note.HitTest(RenderContext, ra, dec, x, y))
+                    {
+                        scriptInterface.FireAnnotationclicked(ra, dec, note.ID);
+                        return true;
+                    }
+                    index++;
+                }
+            }
+            return false;
+        }
+
+        string hoverText = "";
+        Vector2d hoverTextPoint = new Vector2d();
+        Date lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
+
+        private bool AnnotationHover(double ra, double dec, double x, double y)
+        {
+            if (annotations != null && annotations.Count > 0)
+            {
+                int index = 0;
+                foreach (Annotation note in annotations)
+                {
+                    if (note.HitTest(RenderContext, ra, dec, x, y))
+                    {
+                        hoverText = note.Label;
+                        hoverTextPoint = Vector2d.Create(x, y);
+                        return true;
+                    }
+                    index++;
+                }
+            }
+            return false;
+        }
 
         public List<VizLayer> Layers = new List<VizLayer>();
         Date lastUpdate;
@@ -60,7 +100,7 @@ namespace wwtlib
 
         double zoomMax = 360;
         double zoomMaxSolarSystem = 10000000000000000;
-        double ZoomMax
+        public double ZoomMax
         {
             get
             {
@@ -73,9 +113,16 @@ namespace wwtlib
                     return zoomMax;
                 }
             }
+            set { zoomMax = value; }
         }
+
+        public void SetSolarSystemMaxZoom(double value)
+        {
+            zoomMaxSolarSystem = value;
+        }
+
         double zoomMin = 0.001373291015625;
-        double zoomMinSolarSystem = 0.0001;
+        double zoomMinSolarSystem = 0.00000001;
 
         public double ZoomMin
         {
@@ -83,7 +130,7 @@ namespace wwtlib
             {
                 if (RenderContext.BackgroundImageset != null && RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
                 {
-                    return zoomMinSolarSystem / 10000;
+                    return zoomMinSolarSystem;
                 }
                 else
                 {
@@ -93,6 +140,10 @@ namespace wwtlib
             set { zoomMin = value; }
         }
 
+        public void SetSolarSystemMinZoom(double value)
+        {
+            zoomMinSolarSystem = value;
+        }
 
         public static bool showDataLayers = false;
 
@@ -1078,221 +1129,42 @@ namespace wwtlib
 
         }
 
-        //public double GetPixelScaleX(bool mouseRelative)
-        //{
-        //    double lat = RenderContext.ViewCamera.Lat;
-
-        //    if (mouseRelative)
-        //    {
-        //        //if (Space && Settings.Active.LocalHorizonMode)
-        //        //{
-        //        //    Point cursor = renderWindow.PointToClient(Cursor.Position);
-        //        //    Coordinates result = GetCoordinatesForScreenPoint(cursor.X, cursor.Y);
-        //        //    Coordinates currentAltAz = Coordinates.EquitorialToHorizon(GetCoordinatesForScreenPoint(cursor.X, cursor.Y), SpaceTimeController.Location, SpaceTimeController.Now);
-
-        //        //    lat = currentAltAz.Alt;
-        //        //}
-        //        //else
-        //        {
-        //            Point cursor = renderWindow.PointToClient(Cursor.Position);
-        //            Coordinates result = GetCoordinatesForScreenPoint(cursor.X, cursor.Y);
-        //            lat = result.Lat;
-        //        }
-        //    }
-
-        //    if (CurrentImageSet != null && (CurrentImageSet.DataSetType == ImageSetType.Sky || CurrentImageSet.DataSetType == ImageSetType.Panorama || SolarSystemMode || CurrentImageSet.DataSetType == ImageSetType.Earth || CurrentImageSet.DataSetType == ImageSetType.Planet))
-        //    {
-        //        double cosLat = 1;
-        //        if (ViewLat > 89.9999)
-        //        {
-        //            cosLat = Math.Cos(89.9999 * RC);
-        //        }
-        //        else
-        //        {
-        //            cosLat = Math.Cos(lat * RC);
-
-        //        }
-
-        //        double zz = (90 - ZoomFactor / 6);
-        //        double zcos = Math.Cos(zz * RC);
-
-        //        return GetPixelScaleY() / Math.Max(zcos, cosLat);
-        //    }
-        //    else
-        //    {
-        //        return (((baseTileDegrees / ((double)Math.Pow(2, viewTileLevel))) / tileSizeX) / 5) / Math.Max(.2, Math.Cos(targetLat));
-        //    }
-
-        //}
-
-        //public double GetPixelScaleY()
-        //{
-        //    if (SolarSystemMode)
-        //    {
-        //        if ((int)SolarSystemTrack < (int)SolarSystemObjects.Custom)
-        //        {
-        //            return Math.Min(.06, 545000 * Math.Tan(Math.PI / 4) * ZoomFactor / renderWindow.ClientRectangle.Height);
-        //        }
-        //        else
-        //        {
-
-        //            return .06;
-        //        }
-        //    }
-        //    else if (CurrentImageSet != null && (CurrentImageSet.DataSetType == ImageSetType.Sky || CurrentImageSet.DataSetType == ImageSetType.Panorama))
-        //    {
-        //        double val = fovAngle / renderWindow.ClientRectangle.Height;
-        //        //if (Properties.Settings.Default.DomeView)
-        //        //{
-        //        //    val = val / 10;
-        //        //}
-        //        return val;
-        //    }
-        //    else
-        //    {
-        //        return ((baseTileDegrees / ((double)Math.Pow(2, viewTileLevel))) / (double)tileSizeY) / 5;
-        //    }
-        //}
-
-
-        //public void MoveView(double amountX, double amountY, bool mouseDrag)
-        //{
-        //    if (CurrentImageSet == null)
-        //    {
-        //        return;
-        //    }
-        //    Tracking = false;
-        //    double angle = Math.Atan2(amountY, amountX);
-        //    double distance = Math.Sqrt(amountY * amountY + amountX * amountX);
-        //    if (SolarSystemMode)
-        //    {
-        //        amountX = Math.Cos(angle - CameraRotate) * distance;
-        //        amountY = Math.Sin(angle - CameraRotate) * distance;
-        //    }
-        //    else if (!PlanetLike)
-        //    {
-        //        amountX = Math.Cos(angle + CameraRotate) * distance;
-        //        amountY = Math.Sin(angle + CameraRotate) * distance;
-        //    }
-        //    else
-        //    {
-        //        amountX = Math.Cos(angle - CameraRotate) * distance;
-        //        amountY = Math.Sin(angle - CameraRotate) * distance;
-        //    }
-
-        //    MoveViewNative(amountX, amountY, mouseDrag);
-        //}
-
-
-        ///// <summary>
-        ///// Move the view relative to screen coordinates without account for the view rotation
-        ///// </summary>
-        ///// <param name="amountX"></param>
-        ///// <param name="amountY"></param>
-        //public void MoveViewNative(double amountX, double amountY, bool mouseDrag)
-        //{
-        //    double scaleY = GetPixelScaleY();
-        //    double scaleX = GetPixelScaleX(mouseDrag);
-
-        //    //if (CurrentImageSet.DataSetType == ImageSetType.SolarSystem)
-        //    //{
-        //    //    if (Settings.Active.ActualPlanetScale)
-        //    //    {
-        //    //        if (ZoomFactor < .0003)
-        //    //        {
-        //    //            scaleX *= 1210 / 300;
-        //    //            scaleY *= 800 / 300;
-        //    //        }
-        //    //        else
-        //    //        {
-        //    //            scaleX = .06;
-        //    //            scaleY = .06;
-        //    //        }
-        //    //    }
-        //    //    else
-        //    //    {
-        //    //        if (ZoomFactor < .05)
-        //    //        {
-        //    //            scaleX *= 1210;
-        //    //            scaleY *= 800;
-        //    //        }
-        //    //        else
-        //    //        {
-        //    //            scaleX = .06;
-        //    //            scaleY = .06;
-        //    //        }
-        //    //    }
-        //    //}
-
-        //    if (CurrentImageSet.DataSetType == ImageSetType.SolarSystem)
-        //    {
-        //        if (scaleY > .05999)
-        //        {
-        //            scaleX = scaleY;
-        //        }
-        //    }
-
-        //    if (Space && Settings.Active.LocalHorizonMode)
-        //    {
-        //        targetAlt += (amountY) * scaleY;
-        //        if (targetAlt > Properties.Settings.Default.MaxLatLimit)
-        //        {
-        //            targetAlt = Properties.Settings.Default.MaxLatLimit;
-        //        }
-        //        if (targetAlt < -Properties.Settings.Default.MaxLatLimit)
-        //        {
-        //            targetAlt = -Properties.Settings.Default.MaxLatLimit;
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        TargetLat += (amountY) * scaleY;
-
-        //        if (TargetLat > Properties.Settings.Default.MaxLatLimit)
-        //        {
-        //            TargetLat = Properties.Settings.Default.MaxLatLimit;
-        //        }
-        //        if (TargetLat < -Properties.Settings.Default.MaxLatLimit)
-        //        {
-        //            TargetLat = -Properties.Settings.Default.MaxLatLimit;
-        //        }
-        //    }
-        //    if (Space && Settings.Active.LocalHorizonMode)
-        //    {
-        //        targetAz = ((targetAz + amountX * scaleX) + 720) % 360;
-        //    }
-        //    else
-        //    {
-        //        TargetLong += (amountX) * scaleX;
-
-        //        TargetLong = ((TargetLong + 900.0) % 360.0) - 180.0;
-        //    }
-        //}
-
-
         public void Move(double x, double y)
         {
-            double scaleY = RenderContext.FovScale / (3600.0);
+            // Emulate MoveView() in the Windows client -- rotate the x and y
+            // offsets if the view is rotated. Our signs are the opposite of
+            // the Windows client.
+
+            double angle = Math.Atan2(y, x);
+            double distance = Math.Sqrt(x * x + y * y);
+
+            if (SolarSystemMode || PlanetLike) {
+                x = Math.Cos(angle + RenderContext.ViewCamera.Rotation) * distance;
+                y = Math.Sin(angle + RenderContext.ViewCamera.Rotation) * distance;
+            } else {
+                x = Math.Cos(angle - RenderContext.ViewCamera.Rotation) * distance;
+                y = Math.Sin(angle - RenderContext.ViewCamera.Rotation) * distance;
+            }
+
+            // Apply the rotated offsets. The following merges up GetPixelScale{X,Y}()
+            // and MoveViewNative() of the Windows client.
+
+            double scaleY = RenderContext.FovScale / 3600.0;
 
             if (RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
             {
                 scaleY = .06;
             }
 
-
             double scaleX = scaleY / Math.Max(.2, Math.Cos(RenderContext.ViewCamera.Lat / 180.0 * Math.PI));
 
-
-
-
-            if (RenderContext.BackgroundImageset.DataSetType == ImageSetType.Earth || RenderContext.BackgroundImageset.DataSetType == ImageSetType.Planet || RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
+            if (RenderContext.BackgroundImageset.DataSetType == ImageSetType.Earth ||
+                RenderContext.BackgroundImageset.DataSetType == ImageSetType.Planet ||
+                RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
             {
-                scaleX = scaleX * 6.3;
-                scaleY = scaleY * 6.3;
+                scaleX *= 6.3; // XXX don't know where this magic number comes from
+                scaleY *= 6.3;
             }
-
-
 
             if (RenderContext.Space && (Settings.Active.GalacticMode || Settings.Active.LocalHorizonMode))
             {
@@ -1310,13 +1182,9 @@ namespace wwtlib
                 {
                     RenderContext.targetAlt = -90;
                 }
-            }
-            else
-            {
+            } else {
                 RenderContext.TargetCamera.Lng -= x * scaleX;
-
                 RenderContext.TargetCamera.Lng = ((RenderContext.TargetCamera.Lng + 720) % 360);
-
                 RenderContext.TargetCamera.Lat += y * scaleY;
 
                 if (RenderContext.TargetCamera.Lat > 90)
@@ -1335,7 +1203,6 @@ namespace wwtlib
                 RenderContext.ViewCamera = RenderContext.TargetCamera.Copy();
             }
 
-
             if (x != 0 && y != 0)
             {
                 tracking = false;
@@ -1345,7 +1212,6 @@ namespace wwtlib
 
         public void Zoom(double factor)
         {
-
             RenderContext.TargetCamera.Zoom *= factor;
 
             if (RenderContext.TargetCamera.Zoom > ZoomMax)
@@ -1357,28 +1223,29 @@ namespace wwtlib
             {
                 RenderContext.ViewCamera = RenderContext.TargetCamera.Copy();
             }
-
         }
 
-        public void OnKeyDown(ElementEvent e)
-        {
-            if (uiController != null)
-            {
-                uiController.KeyDown(this, e);
-            }
-        }
+        // Mouse, touch, gesture controls -- lots of different event listeners for different
+        // devices and browser support.
 
-        public void OnDoubleClick(ElementEvent e)
-        {
-            showDataLayers = true;
-        }
+        double beginZoom = 1;
+        bool dragging = false;
+        bool mouseDown = false;
+        bool isPinching = false;
+        double lastX;
+        double lastY;
+        int[] pointerIds = new int[2];
+        Vector2d[] pinchingZoomRect = new Vector2d[2];
+        bool moved = false;
+
+        // Gesture events
 
         public void OnGestureStart(ElementEvent e)
         {
             mouseDown = false;
             beginZoom = RenderContext.ViewCamera.Zoom;
         }
-        double beginZoom = 1;
+
         public void OnGestureChange(ElementEvent e)
         {
             GestureEvent g = (GestureEvent)e;
@@ -1386,102 +1253,31 @@ namespace wwtlib
             RenderContext.TargetCamera.Zoom = RenderContext.ViewCamera.Zoom = Math.Min(360, beginZoom * (1.0 / g.Scale));
         }
 
-
         public void OnGestureEnd(ElementEvent e)
         {
             GestureEvent g = (GestureEvent)e;
             mouseDown = false;
-
         }
 
-        private bool Annotationclicked(double ra, double dec, double x, double y)
-        {
-            if (annotations != null && annotations.Count > 0)
-            {
-                int index = 0;
-                foreach (Annotation note in annotations)
-                {
-                    if (note.HitTest(RenderContext, ra, dec, x, y))
-                    {
-                        scriptInterface.FireAnnotationclicked(ra, dec, note.ID);
-                        return true;
-                    }
-                    index++;
-                }
-            }
-            return false;
-        }
+        // Touch events
 
-        string hoverText = "";
-        Vector2d hoverTextPoint = new Vector2d();
-        Date lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
-
-        private bool AnnotationHover(double ra, double dec, double x, double y)
-        {
-            if (annotations != null && annotations.Count > 0)
-            {
-                int index = 0;
-                foreach (Annotation note in annotations)
-                {
-                    if (note.HitTest(RenderContext, ra, dec, x, y))
-                    {
-                        hoverText = note.Label;
-                        hoverTextPoint = Vector2d.Create(x, y);
-                        return true;
-                    }
-                    index++;
-                }
-            }
-            return false;
-        }
-
-        //internal void FireAnnotationclicked(double RA, double Dec, string id)
-        //{
-        //    try
-        //    {
-        //        Script.Literal("wwtAnotationclicked({0},{1},{2});", RA * 15, Dec, id);
-        //    }
-        //    catch
-        //    {
-        //    }
-        //}
-
-        //public void OnGestureChange(ElementEvent e)
-        //{
-        //    GestureEvent g = (GestureEvent)e;
-        //    mouseDown = false;
-        //    double delta = g.Scale;
-
-        //    if (delta > 1 && Math.Abs(delta - 1) > .05)
-        //    {
-        //        Zoom(0.95);
-        //    }
-        //    else
-        //    {
-        //        Zoom(1.05);
-        //    }
-        //}
-
-        bool isPintching = false;
         public void OnTouchStart(ElementEvent e)
         {
             TouchEvent ev = (TouchEvent)(object)e;
             ev.PreventDefault();
             ev.StopPropagation();
 
-          //  Document.Title = "touched by an event ";
-
             lastX = ev.TargetTouches[0].PageX;
             lastY = ev.TargetTouches[0].PageY;
 
             if (ev.TargetTouches.Length == 2)
             {
-                isPintching = true;
+                isPinching = true;
                 return;
             }
-            else if (uiController != null)
-            {
 
+            if (uiController != null)
+            {
                 WWTElementEvent ee = new WWTElementEvent(lastX, lastY);
 
                 if (uiController.MouseDown(this, (ElementEvent)(object)ee))
@@ -1492,131 +1288,44 @@ namespace wwtlib
                 }
             }
 
-
             mouseDown = true;
-
         }
 
-        int[] pointerIds = new int[2];
-
-        public void OnPointerDown(ElementEvent e)
+        public void OnTouchMove(ElementEvent e)
         {
-            PointerEvent pe = (PointerEvent)(object)e;
-            int index = 0;
-            //Canvas..SetPointerCapture(pe.PointerId);
+            TouchEvent ev = (TouchEvent)e;
 
-
-            Script.Literal("var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) {cnv.setPointerCapture(evt.pointerId);} else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }");
-            if (pointerIds[0] == 0 )
+            if (isPinching)
             {
-                pointerIds[0] = pe.PointerId;
-                index = 0;
-            }
-            else
-            {
-                if (pointerIds[1] == 0)
-                {
-                    pointerIds[1] = pe.PointerId;
-                    index = 1;
-                }
-                else
-                {
-                    // to many pointers don't track
-                    return;
-                }
-            }
-            rect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
+                TouchInfo t0 = ev.Touches[0];
+                TouchInfo t1 = ev.Touches[1];
+                Vector2d[] newRect = new Vector2d[2];
+                newRect[0] = Vector2d.Create(t0.PageX, t0.PageY);
+                newRect[1] = Vector2d.Create(t1.PageX, t1.PageY);
 
-        }
-
-        public void OnPointerMove(ElementEvent e)
-        {
-            PointerEvent pe = (PointerEvent)(object)e;
-            int index = 0;
-
-            if (pointerIds[0] == pe.PointerId)
-            {
-                index = 0;
-            }
-            else
-            {
-                if (pointerIds[1] == pe.PointerId)
+                if (pinchingZoomRect[0] != null && pinchingZoomRect[1] != null)
                 {
-                    index = 1;
-                }
-                else
-                {
-                    // Not interested in a pointer not on our list
-                    return;
-                }
-            }
-
-            if (pointerIds[0] != 0 && pointerIds[1] != 0)
-            {
-                // Now we know we are zooming...
-                if (rect[0] != null)
-                {
-                    double oldDist = GetDistance(rect[0], rect[1]);
-                    rect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
-                    double newDist = GetDistance(rect[0], rect[1]);
+                    double oldDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
+                    double newDist = GetDistance(newRect[0], newRect[1]);
                     double ratio = oldDist / newDist;
                     Zoom(ratio);
                 }
-                e.StopPropagation();
-                e.PreventDefault();
-            }
 
-            rect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
-
-        }
-
-        public void OnPointerUp(ElementEvent e)
-        {
-            PointerEvent pe = (PointerEvent)(object)e;
-
-            if (pointerIds[0] == pe.PointerId)
-            {
-                pointerIds[0] = 0;
-            }
-            else
-            {
-                if (pointerIds[1] == pe.PointerId)
-                {
-                    pointerIds[1] = 0;
-                }
-                else
-                {
-                    // Not in the list to remove
-                    return;
-                }
-            }
-
-
-        }
-
-
-        bool dragging = false;
-        public void OnTouchMove(ElementEvent e)
-        {
-          //  Document.Title = "touched by an event ";
-            TouchEvent ev = (TouchEvent)e;
-
-            if (isPintching)
-            {
-                PinchMove(ev);
+                pinchingZoomRect = newRect;
+                ev.StopPropagation();
+                ev.PreventDefault();
                 return;
             }
 
-
             ev.PreventDefault();
             ev.StopPropagation();
+
             if (mouseDown)
             {
                 dragging = true;
+
                 double curX = ev.TargetTouches[0].PageX - lastX;
-
                 double curY = ev.TargetTouches[0].PageY - lastY;
-
                 Move(curX, curY);
 
                 lastX = ev.TargetTouches[0].PageX;
@@ -1639,25 +1348,24 @@ namespace wwtlib
 
         public void OnTouchEnd(ElementEvent e)
         {
-      //      Document.Title = "touched by an event ";
             TouchEvent ev = (TouchEvent)e;
             ev.PreventDefault();
             ev.StopPropagation();
 
-            rect = new Vector2d[2];
+            pinchingZoomRect[0] = null;
+            pinchingZoomRect[1] = null;
 
-            if (isPintching)
+            if (isPinching)
             {
                 if (ev.Touches.Length < 2)
                 {
-                    isPintching = false;
+                    isPinching = false;
                 }
                 return;
             }
 
             if (uiController != null)
             {
-
                 WWTElementEvent ee = new WWTElementEvent(lastX, lastY);
 
                 if (uiController.MouseUp(this, (ElementEvent)(object)ee))
@@ -1672,59 +1380,92 @@ namespace wwtlib
             dragging = false;
         }
 
-        Vector2d[] rect = new Vector2d[2];
-        public void pinchStart(TouchEvent ev)
+        // Pointer events
+
+        public void OnPointerDown(ElementEvent e)
         {
-            TouchInfo t0 = ev.Touches[0];
-            TouchInfo t1 = ev.Touches[1];
-            rect[0] = Vector2d.Create( t0.PageX,  t0.PageY );
-            rect[1] = Vector2d.Create( t1.PageX,  t1.PageY );
-            ev.StopPropagation();
-            ev.PreventDefault();
-       //     Document.Title = "pinched by an event ";
+            PointerEvent pe = (PointerEvent)(object)e;
+            int index = 0;
+
+            Script.Literal("var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) {cnv.setPointerCapture(evt.pointerId);} else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }");
+
+            // Check for this pointer already being in the list because as of
+            // July 2020, Chrome/Mac sometimes fails to deliver the pointerUp
+            // event.
+
+            if (pointerIds[0] == pe.PointerId) {
+                index = 0;
+            } else if (pointerIds[1] == pe.PointerId) {
+                index = 1;
+            } else if (pointerIds[0] == 0) {
+                index = 0;
+            } else if (pointerIds[1] == 0) {
+                index = 1;
+            } else {
+                return; // only attempt to track two pointers at once
+            }
+
+            pointerIds[index] = pe.PointerId;
+            pinchingZoomRect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
         }
 
-
-        public void PinchMove(TouchEvent ev)
+        public void OnPointerMove(ElementEvent e)
         {
-            TouchInfo t0 = ev.Touches[0];
-            TouchInfo t1 = ev.Touches[1];
-            Vector2d[] newRect = new Vector2d[2];
+            PointerEvent pe = (PointerEvent)(object)e;
+            int index = 0;
 
-            newRect[0] = Vector2d.Create(t0.PageX, t0.PageY);
-            newRect[1] = Vector2d.Create(t1.PageX, t1.PageY);
-            if (rect[0] != null)
+            if (pointerIds[0] == pe.PointerId)
             {
-                double oldDist = GetDistance(rect[0], rect[1]);
-                double newDist = GetDistance(newRect[0], newRect[1]);
+                index = 0;
+            }
+            else if (pointerIds[1] == pe.PointerId)
+            {
+                index = 1;
+            }
+            else
+            {
+                return;
+            }
+
+            if (pinchingZoomRect[0] != null && pinchingZoomRect[1] != null)
+            {
+                double oldDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
+                pinchingZoomRect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
+                double newDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
                 double ratio = oldDist / newDist;
                 Zoom(ratio);
+            } else {
+                pinchingZoomRect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
             }
-            rect = newRect;
-            ev.StopPropagation();
-            ev.PreventDefault();
+
+            e.StopPropagation();
+            e.PreventDefault();
         }
 
-
-        public double GetDistance(Vector2d a, Vector2d b)
+        // NOTE! As of July 2020, Chrome on Macs seems to sometimes fail to
+        // deliver this event. So our pinch-detection code needs to be robust to
+        // that.
+        public void OnPointerUp(ElementEvent e)
         {
+            PointerEvent pe = (PointerEvent)(object)e;
 
-            double x;
-            double y;
-            x = a.X - b.X;
-            y = a.Y - b.Y;
-            return Math.Sqrt(x * x + y * y);
+            if (pointerIds[0] == pe.PointerId)
+            {
+                pointerIds[0] = 0;
+                pinchingZoomRect[0] = null;
+            }
+
+            if (pointerIds[1] == pe.PointerId)
+            {
+                pointerIds[1] = 0;
+                pinchingZoomRect[1] = null;
+            }
         }
 
+        // Mouse events
 
-        bool mouseDown = false;
-        double lastX;
-        double lastY;
         public void OnMouseDown(ElementEvent e)
         {
-            // Capture mouse
-
-
             Document.AddEventListener("mousemove", OnMouseMove, false);
             Document.AddEventListener("mouseup", OnMouseUp, false);
 
@@ -1741,19 +1482,10 @@ namespace wwtlib
             lastY = Mouse.OffsetY(Canvas, e);
         }
 
-        public void OnContextMenu(ElementEvent e)
-        {
-            e.PreventDefault();
-            e.StopPropagation();
-
-        }
-
-
         public void OnMouseMove(ElementEvent e)
         {
-
             lastMouseMove = Date.Now;
-            hoverTextPoint = Vector2d.Create( Mouse.OffsetX(Canvas, e), Mouse.OffsetY(Canvas, e));
+            hoverTextPoint = Vector2d.Create(Mouse.OffsetX(Canvas, e), Mouse.OffsetY(Canvas, e));
             hoverText = "";
 
             if (mouseDown)
@@ -1788,29 +1520,11 @@ namespace wwtlib
             }
         }
 
-        private void Tilt(double x, double y)
-        {
-
-
-            RenderContext.TargetCamera.Rotation += x * .001;
-            RenderContext.TargetCamera.Angle += y * .001;
-
-            if (RenderContext.TargetCamera.Angle < -1.52)
-            {
-                RenderContext.TargetCamera.Angle = -1.52;
-            }
-
-            if (RenderContext.TargetCamera.Angle > 0)
-            {
-                RenderContext.TargetCamera.Angle = 0;
-            }
-
-        }
-        bool moved = false;
         public void OnMouseUp(ElementEvent e)
         {
             Document.RemoveEventListener("mousemove", OnMouseMove, false);
             Document.RemoveEventListener("mouseup", OnMouseUp, false);
+
             if (uiController != null)
             {
                 if (uiController.MouseUp(this, e))
@@ -1820,6 +1534,7 @@ namespace wwtlib
                     return;
                 }
             }
+
             if (mouseDown && !moved)
             {
                 Vector2d raDecDown = GetCoordinatesForScreenPoint(Mouse.OffsetX(Canvas, e), Mouse.OffsetY(Canvas, e));
@@ -1828,75 +1543,10 @@ namespace wwtlib
                     scriptInterface.FireClick(raDecDown.X, raDecDown.Y);
                 }
             }
+
             mouseDown = false;
-
             moved = false;
-
         }
-
-        public Vector2d GetCoordinatesForScreenPoint(double x, double y)
-        {
-            Vector2d result;
-            Vector3d PickRayOrig;
-            Vector3d PickRayDir;
-            Vector2d pt = Vector2d.Create(x, y);
-            PickRayDir = TransformPickPointToWorldSpace(pt, RenderContext.Width, RenderContext.Height);
-            result = Coordinates.CartesianToSphericalSky(PickRayDir);
-
-            return result;
-        }
-
-        public Vector3d TransformPickPointToWorldSpace(Vector2d ptCursor, double backBufferWidth, double backBufferHeight)
-        {
-
-            Vector3d vPickRayOrig;
-            Vector3d vPickRayDir;
-
-            Vector3d v = new Vector3d();
-            v.X = (((2.0f * ptCursor.X) / backBufferWidth) - 1) / (RenderContext.Projection.M11);// / (backBufferWidth / 2));
-            v.Y = (((2.0f * ptCursor.Y) / backBufferHeight) - 1) / (RenderContext.Projection.M22);// / (backBufferHeight / 2));
-            v.Z = 1.0f;
-
-
-            Matrix3d m = Matrix3d.MultiplyMatrix(RenderContext.View, RenderContext.World);
-
-            m.Invert();
-
-            vPickRayDir = new Vector3d();
-            vPickRayOrig = new Vector3d();
-            // Transform the screen space pick ray into 3D space
-            vPickRayDir.X = v.X * m.M11 + v.Y * m.M21 + v.Z * m.M31;
-            vPickRayDir.Y = v.X * m.M12 + v.Y * m.M22 + v.Z * m.M32;
-            vPickRayDir.Z = v.X * m.M13 + v.Y * m.M23 + v.Z * m.M33;
-
-
-            vPickRayDir.Normalize();
-
-
-            return vPickRayDir;
-        }
-
-        //internal void FireClick(double RA, double Dec)
-        //{
-        //    try
-        //    {
-        //        Script.Literal("wwtClick({0},{1});", RA * 15, Dec);
-        //    }
-        //    catch
-        //    {
-        //    }
-        //}
-
-        //internal void FireArrived(double RA, double Dec)
-        //{
-        //    try
-        //    {
-        //        Script.Literal("wwtArrived({0},{1});", RA * 15, Dec);
-        //    }
-        //    catch
-        //    {
-        //    }
-        //}
 
         public void OnMouseWheel(ElementEvent e)
         {
@@ -1922,6 +1572,89 @@ namespace wwtlib
             e.StopPropagation();
             e.PreventDefault();
         }
+
+        public void OnDoubleClick(ElementEvent e)
+        {
+            showDataLayers = true;
+        }
+
+        public void OnKeyDown(ElementEvent e)
+        {
+            if (uiController != null)
+            {
+                uiController.KeyDown(this, e);
+            }
+        }
+
+        public double GetDistance(Vector2d a, Vector2d b)
+        {
+            double x;
+            double y;
+            x = a.X - b.X;
+            y = a.Y - b.Y;
+            return Math.Sqrt(x * x + y * y);
+        }
+
+        public void OnContextMenu(ElementEvent e)
+        {
+            e.PreventDefault();
+            e.StopPropagation();
+        }
+
+        private void Tilt(double x, double y)
+        {
+            RenderContext.TargetCamera.Rotation += x * .001;
+            RenderContext.TargetCamera.Angle += y * .001;
+
+            if (RenderContext.TargetCamera.Angle < -1.52)
+            {
+                RenderContext.TargetCamera.Angle = -1.52;
+            }
+
+            if (RenderContext.TargetCamera.Angle > 0)
+            {
+                RenderContext.TargetCamera.Angle = 0;
+            }
+        }
+
+        public Vector2d GetCoordinatesForScreenPoint(double x, double y)
+        {
+            Vector2d result;
+            Vector3d PickRayDir;
+            Vector2d pt = Vector2d.Create(x, y);
+            PickRayDir = TransformPickPointToWorldSpace(pt, RenderContext.Width, RenderContext.Height);
+            result = Coordinates.CartesianToSphericalSky(PickRayDir);
+
+            return result;
+        }
+
+        public Vector3d TransformPickPointToWorldSpace(Vector2d ptCursor, double backBufferWidth, double backBufferHeight)
+        {
+            Vector3d vPickRayOrig;
+            Vector3d vPickRayDir;
+
+            Vector3d v = new Vector3d();
+            v.X = (((2.0f * ptCursor.X) / backBufferWidth) - 1) / (RenderContext.Projection.M11);// / (backBufferWidth / 2));
+            v.Y = (((2.0f * ptCursor.Y) / backBufferHeight) - 1) / (RenderContext.Projection.M22);// / (backBufferHeight / 2));
+            v.Z = 1.0f;
+
+            Matrix3d m = Matrix3d.MultiplyMatrix(RenderContext.View, RenderContext.World);
+
+            m.Invert();
+
+            vPickRayDir = new Vector3d();
+            vPickRayOrig = new Vector3d();
+            // Transform the screen space pick ray into 3D space
+            vPickRayDir.X = v.X * m.M11 + v.Y * m.M21 + v.Z * m.M31;
+            vPickRayDir.Y = v.X * m.M12 + v.Y * m.M22 + v.Z * m.M32;
+            vPickRayDir.Z = v.X * m.M13 + v.Y * m.M23 + v.Z * m.M33;
+
+            vPickRayDir.Normalize();
+
+            return vPickRayDir;
+        }
+
+        // Initialization
 
         public static ScriptInterface scriptInterface;
         CanvasElement foregroundCanvas = null;

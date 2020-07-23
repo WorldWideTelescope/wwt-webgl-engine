@@ -373,7 +373,6 @@ namespace wwtlib
             int d = (int)Math.Floor(30.6001 * (month + 1));
 
             double julianDays;
-            double jd2;
             double julianCenturies;
             double mst;
 

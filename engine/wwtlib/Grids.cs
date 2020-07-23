@@ -809,7 +809,6 @@ namespace wwtlib
             {
                 PrecTextBatch = new Text3dBatch(50);
 
-                int index = 0;
                 for (double l = -12000; l < 13000; l += 2000)
                 {
                     double b = 90 - obliquity + 3;

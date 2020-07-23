@@ -181,7 +181,6 @@ namespace wwtlib
             }
             catch
             {
-                int i = 0;
             }
             WWTControl.RenderNeeded = true;
         }

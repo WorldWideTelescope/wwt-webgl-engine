@@ -373,7 +373,7 @@ namespace wwtlib
             Tile.PrepDevice.bufferData(GL.ARRAY_BUFFER, f32array, GL.STATIC_DRAW);
         }
 
-        public void Dispose()
+        public void Dispose() // compiler wants "new" keyword here, but ScriptSharp doesn't support it
         {
             Tile.PrepDevice.bindBuffer(GL.ARRAY_BUFFER, null);
             Tile.PrepDevice.deleteBuffer(VertexBuffer);

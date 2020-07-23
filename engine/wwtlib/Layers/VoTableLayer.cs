@@ -1307,9 +1307,6 @@ namespace wwtlib
         public override void AddFilesToCabinet(FileCabinet fc)
         {
             string fName = filename;
-
-            bool copy = true;
-
             string fileName = fc.TempDirectory + string.Format("{0}\\{1}.txt", fc.PackageID, this.ID.ToString());
             string path = fName.Substring(0, fName.LastIndexOf('\\') + 1);
             string path2 = fileName.Substring(0, fileName.LastIndexOf('\\') + 1);
@@ -1324,8 +1321,6 @@ namespace wwtlib
             //    {
             //        File.Copy(fName, fileName);
             //    }
-
-
             //}
 
             //if (File.Exists(fileName))

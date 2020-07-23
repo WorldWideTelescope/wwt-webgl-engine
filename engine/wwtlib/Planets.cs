@@ -923,7 +923,13 @@ namespace wwtlib
             Vector3d camera = renderContext.CameraPosition.Copy();
             for (int planetId = 0; planetId < 14; planetId++)
             {
-                if (!planetLocations[planetId].Eclipsed)
+                // If we're using realistic lighting and this is an eclipsed
+                // moon, don't draw it at all. This is slightly suboptimal
+                // since, if you're looking at the moon, you'll suddenly be able
+                // to see the stars through it. In principle we should do
+                // something like keep on drawing it, but as an all-black
+                // sphere.
+                if (!(Settings.Active.SolarSystemLighting && planetLocations[planetId].Eclipsed))
                 {
                     Vector3d distVector = Vector3d.SubtractVectors(camera,Vector3d.SubtractVectors(planet3dLocations[planetId],centerPoint));
 

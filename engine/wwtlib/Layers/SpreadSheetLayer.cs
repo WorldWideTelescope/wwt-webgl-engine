@@ -641,8 +641,6 @@ namespace wwtlib
             {
                 try
                 {
-                    bool selected = false;
-
                     if (geometryColumn > -1 || (this.CoordinatesType == CoordinatesTypes.Spherical && (lngColumn > -1 && latColumn > -1)) || ((this.CoordinatesType == CoordinatesTypes.Rectangular) && (XAxisColumn > -1 && YAxisColumn > -1)))
                     {
                         double Xcoord = 0;
@@ -719,12 +717,14 @@ namespace wwtlib
                                 }
 
                             }
-                            double offset = 0; //todo EGM96Geoid.Height(Ycoord, Xcoord);
-                            //   if (altitude != 0)
-                            {
-                                //altitude += offset;
-                                //alt += offset / meanRadius;
-                            }
+
+                            // TODO:
+                            // double offset = EGM96Geoid.Height(Ycoord, Xcoord);
+                            // if (altitude != 0) {
+                            //    altitude += offset;
+                            //    alt += offset / meanRadius;
+                            // }
+
                             Vector3d pos = Coordinates.GeoTo3dDoubleRad(Ycoord, Xcoord, alt);
 
                             if (astronomical && !bufferIsFlat)
@@ -929,7 +929,6 @@ namespace wwtlib
                         //{
                         //    MakeBarChart(device, row, Ycoord, Xcoord, pointSize, factor, Color.FromArgb(lastItem.Color), selected, new Dates(pointStartTime, pointEndTime));
                         //}
-
 
                         currentIndex++;
                     }
