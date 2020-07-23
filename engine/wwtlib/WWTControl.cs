@@ -1089,200 +1089,26 @@ namespace wwtlib
 
         }
 
-        //public double GetPixelScaleX(bool mouseRelative)
-        //{
-        //    double lat = RenderContext.ViewCamera.Lat;
-
-        //    if (mouseRelative)
-        //    {
-        //        //if (Space && Settings.Active.LocalHorizonMode)
-        //        //{
-        //        //    Point cursor = renderWindow.PointToClient(Cursor.Position);
-        //        //    Coordinates result = GetCoordinatesForScreenPoint(cursor.X, cursor.Y);
-        //        //    Coordinates currentAltAz = Coordinates.EquitorialToHorizon(GetCoordinatesForScreenPoint(cursor.X, cursor.Y), SpaceTimeController.Location, SpaceTimeController.Now);
-
-        //        //    lat = currentAltAz.Alt;
-        //        //}
-        //        //else
-        //        {
-        //            Point cursor = renderWindow.PointToClient(Cursor.Position);
-        //            Coordinates result = GetCoordinatesForScreenPoint(cursor.X, cursor.Y);
-        //            lat = result.Lat;
-        //        }
-        //    }
-
-        //    if (CurrentImageSet != null && (CurrentImageSet.DataSetType == ImageSetType.Sky || CurrentImageSet.DataSetType == ImageSetType.Panorama || SolarSystemMode || CurrentImageSet.DataSetType == ImageSetType.Earth || CurrentImageSet.DataSetType == ImageSetType.Planet))
-        //    {
-        //        double cosLat = 1;
-        //        if (ViewLat > 89.9999)
-        //        {
-        //            cosLat = Math.Cos(89.9999 * RC);
-        //        }
-        //        else
-        //        {
-        //            cosLat = Math.Cos(lat * RC);
-
-        //        }
-
-        //        double zz = (90 - ZoomFactor / 6);
-        //        double zcos = Math.Cos(zz * RC);
-
-        //        return GetPixelScaleY() / Math.Max(zcos, cosLat);
-        //    }
-        //    else
-        //    {
-        //        return (((baseTileDegrees / ((double)Math.Pow(2, viewTileLevel))) / tileSizeX) / 5) / Math.Max(.2, Math.Cos(targetLat));
-        //    }
-
-        //}
-
-        //public double GetPixelScaleY()
-        //{
-        //    if (SolarSystemMode)
-        //    {
-        //        if ((int)SolarSystemTrack < (int)SolarSystemObjects.Custom)
-        //        {
-        //            return Math.Min(.06, 545000 * Math.Tan(Math.PI / 4) * ZoomFactor / renderWindow.ClientRectangle.Height);
-        //        }
-        //        else
-        //        {
-
-        //            return .06;
-        //        }
-        //    }
-        //    else if (CurrentImageSet != null && (CurrentImageSet.DataSetType == ImageSetType.Sky || CurrentImageSet.DataSetType == ImageSetType.Panorama))
-        //    {
-        //        double val = fovAngle / renderWindow.ClientRectangle.Height;
-        //        //if (Properties.Settings.Default.DomeView)
-        //        //{
-        //        //    val = val / 10;
-        //        //}
-        //        return val;
-        //    }
-        //    else
-        //    {
-        //        return ((baseTileDegrees / ((double)Math.Pow(2, viewTileLevel))) / (double)tileSizeY) / 5;
-        //    }
-        //}
-
-
-        //public void MoveView(double amountX, double amountY, bool mouseDrag)
-        //{
-        //    if (CurrentImageSet == null)
-        //    {
-        //        return;
-        //    }
-        //    Tracking = false;
-        //    double angle = Math.Atan2(amountY, amountX);
-        //    double distance = Math.Sqrt(amountY * amountY + amountX * amountX);
-        //    if (SolarSystemMode)
-        //    {
-        //        amountX = Math.Cos(angle - CameraRotate) * distance;
-        //        amountY = Math.Sin(angle - CameraRotate) * distance;
-        //    }
-        //    else if (!PlanetLike)
-        //    {
-        //        amountX = Math.Cos(angle + CameraRotate) * distance;
-        //        amountY = Math.Sin(angle + CameraRotate) * distance;
-        //    }
-        //    else
-        //    {
-        //        amountX = Math.Cos(angle - CameraRotate) * distance;
-        //        amountY = Math.Sin(angle - CameraRotate) * distance;
-        //    }
-
-        //    MoveViewNative(amountX, amountY, mouseDrag);
-        //}
-
-
-        ///// <summary>
-        ///// Move the view relative to screen coordinates without account for the view rotation
-        ///// </summary>
-        ///// <param name="amountX"></param>
-        ///// <param name="amountY"></param>
-        //public void MoveViewNative(double amountX, double amountY, bool mouseDrag)
-        //{
-        //    double scaleY = GetPixelScaleY();
-        //    double scaleX = GetPixelScaleX(mouseDrag);
-
-        //    //if (CurrentImageSet.DataSetType == ImageSetType.SolarSystem)
-        //    //{
-        //    //    if (Settings.Active.ActualPlanetScale)
-        //    //    {
-        //    //        if (ZoomFactor < .0003)
-        //    //        {
-        //    //            scaleX *= 1210 / 300;
-        //    //            scaleY *= 800 / 300;
-        //    //        }
-        //    //        else
-        //    //        {
-        //    //            scaleX = .06;
-        //    //            scaleY = .06;
-        //    //        }
-        //    //    }
-        //    //    else
-        //    //    {
-        //    //        if (ZoomFactor < .05)
-        //    //        {
-        //    //            scaleX *= 1210;
-        //    //            scaleY *= 800;
-        //    //        }
-        //    //        else
-        //    //        {
-        //    //            scaleX = .06;
-        //    //            scaleY = .06;
-        //    //        }
-        //    //    }
-        //    //}
-
-        //    if (CurrentImageSet.DataSetType == ImageSetType.SolarSystem)
-        //    {
-        //        if (scaleY > .05999)
-        //        {
-        //            scaleX = scaleY;
-        //        }
-        //    }
-
-        //    if (Space && Settings.Active.LocalHorizonMode)
-        //    {
-        //        targetAlt += (amountY) * scaleY;
-        //        if (targetAlt > Properties.Settings.Default.MaxLatLimit)
-        //        {
-        //            targetAlt = Properties.Settings.Default.MaxLatLimit;
-        //        }
-        //        if (targetAlt < -Properties.Settings.Default.MaxLatLimit)
-        //        {
-        //            targetAlt = -Properties.Settings.Default.MaxLatLimit;
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        TargetLat += (amountY) * scaleY;
-
-        //        if (TargetLat > Properties.Settings.Default.MaxLatLimit)
-        //        {
-        //            TargetLat = Properties.Settings.Default.MaxLatLimit;
-        //        }
-        //        if (TargetLat < -Properties.Settings.Default.MaxLatLimit)
-        //        {
-        //            TargetLat = -Properties.Settings.Default.MaxLatLimit;
-        //        }
-        //    }
-        //    if (Space && Settings.Active.LocalHorizonMode)
-        //    {
-        //        targetAz = ((targetAz + amountX * scaleX) + 720) % 360;
-        //    }
-        //    else
-        //    {
-        //        TargetLong += (amountX) * scaleX;
-
-        //        TargetLong = ((TargetLong + 900.0) % 360.0) - 180.0;
-        //    }
-        //}
-
         public void Move(double x, double y)
         {
+            // Emulate MoveView() in the Windows client -- rotate the x and y
+            // offsets if the view is rotated. Our signs are the opposite of
+            // the Windows client.
+
+            double angle = Math.Atan2(y, x);
+            double distance = Math.Sqrt(x * x + y * y);
+
+            if (SolarSystemMode || PlanetLike) {
+                x = Math.Cos(angle + RenderContext.ViewCamera.Rotation) * distance;
+                y = Math.Sin(angle + RenderContext.ViewCamera.Rotation) * distance;
+            } else {
+                x = Math.Cos(angle - RenderContext.ViewCamera.Rotation) * distance;
+                y = Math.Sin(angle - RenderContext.ViewCamera.Rotation) * distance;
+            }
+
+            // Apply the rotated offsets. The following merges up GetPixelScale{X,Y}()
+            // and MoveViewNative() of the Windows client.
+
             double scaleY = RenderContext.FovScale / 3600.0;
 
             if (RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
