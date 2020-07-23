@@ -1235,7 +1235,7 @@ namespace wwtlib
         double lastX;
         double lastY;
         int[] pointerIds = new int[2];
-        Vector2d[] rect = new Vector2d[2];
+        Vector2d[] pinchingZoomRect = new Vector2d[2];
         bool moved = false;
 
         // Gesture events
@@ -1297,7 +1297,23 @@ namespace wwtlib
 
             if (isPinching)
             {
-                PinchMove(ev);
+                TouchInfo t0 = ev.Touches[0];
+                TouchInfo t1 = ev.Touches[1];
+                Vector2d[] newRect = new Vector2d[2];
+                newRect[0] = Vector2d.Create(t0.PageX, t0.PageY);
+                newRect[1] = Vector2d.Create(t1.PageX, t1.PageY);
+
+                if (pinchingZoomRect[0] != null && pinchingZoomRect[1] != null)
+                {
+                    double oldDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
+                    double newDist = GetDistance(newRect[0], newRect[1]);
+                    double ratio = oldDist / newDist;
+                    Zoom(ratio);
+                }
+
+                pinchingZoomRect = newRect;
+                ev.StopPropagation();
+                ev.PreventDefault();
                 return;
             }
 
@@ -1336,7 +1352,8 @@ namespace wwtlib
             ev.PreventDefault();
             ev.StopPropagation();
 
-            rect = new Vector2d[2];
+            pinchingZoomRect[0] = null;
+            pinchingZoomRect[1] = null;
 
             if (isPinching)
             {
@@ -1372,26 +1389,24 @@ namespace wwtlib
 
             Script.Literal("var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) {cnv.setPointerCapture(evt.pointerId);} else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }");
 
-            if (pointerIds[0] == 0)
-            {
-                pointerIds[0] = pe.PointerId;
+            // Check for this pointer already being in the list because as of
+            // July 2020, Chrome/Mac sometimes fails to deliver the pointerUp
+            // event.
+
+            if (pointerIds[0] == pe.PointerId) {
                 index = 0;
-            }
-            else
-            {
-                if (pointerIds[1] == 0)
-                {
-                    pointerIds[1] = pe.PointerId;
-                    index = 1;
-                }
-                else
-                {
-                    // too many pointers: don't track
-                    return;
-                }
+            } else if (pointerIds[1] == pe.PointerId) {
+                index = 1;
+            } else if (pointerIds[0] == 0) {
+                index = 0;
+            } else if (pointerIds[1] == 0) {
+                index = 1;
+            } else {
+                return; // only attempt to track two pointers at once
             }
 
-            rect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
+            pointerIds[index] = pe.PointerId;
+            pinchingZoomRect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
         }
 
         public void OnPointerMove(ElementEvent e)
@@ -1403,37 +1418,33 @@ namespace wwtlib
             {
                 index = 0;
             }
+            else if (pointerIds[1] == pe.PointerId)
+            {
+                index = 1;
+            }
             else
             {
-                if (pointerIds[1] == pe.PointerId)
-                {
-                    index = 1;
-                }
-                else
-                {
-                    // Not interested in a pointer not on our list
-                    return;
-                }
+                return;
             }
 
-            if (pointerIds[0] != 0 && pointerIds[1] != 0)
+            if (pinchingZoomRect[0] != null && pinchingZoomRect[1] != null)
             {
-                // Now we know we are zooming...
-                if (rect[0] != null)
-                {
-                    double oldDist = GetDistance(rect[0], rect[1]);
-                    rect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
-                    double newDist = GetDistance(rect[0], rect[1]);
-                    double ratio = oldDist / newDist;
-                    Zoom(ratio);
-                }
-                e.StopPropagation();
-                e.PreventDefault();
+                double oldDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
+                pinchingZoomRect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
+                double newDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
+                double ratio = oldDist / newDist;
+                Zoom(ratio);
+            } else {
+                pinchingZoomRect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
             }
 
-            rect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
+            e.StopPropagation();
+            e.PreventDefault();
         }
 
+        // NOTE! As of July 2020, Chrome on Macs seems to sometimes fail to
+        // deliver this event. So our pinch-detection code needs to be robust to
+        // that.
         public void OnPointerUp(ElementEvent e)
         {
             PointerEvent pe = (PointerEvent)(object)e;
@@ -1441,18 +1452,13 @@ namespace wwtlib
             if (pointerIds[0] == pe.PointerId)
             {
                 pointerIds[0] = 0;
+                pinchingZoomRect[0] = null;
             }
-            else
+
+            if (pointerIds[1] == pe.PointerId)
             {
-                if (pointerIds[1] == pe.PointerId)
-                {
-                    pointerIds[1] = 0;
-                }
-                else
-                {
-                    // Not in the list to remove
-                    return;
-                }
+                pointerIds[1] = 0;
+                pinchingZoomRect[1] = null;
             }
         }
 
@@ -1578,26 +1584,6 @@ namespace wwtlib
             {
                 uiController.KeyDown(this, e);
             }
-        }
-
-        public void PinchMove(TouchEvent ev)
-        {
-            TouchInfo t0 = ev.Touches[0];
-            TouchInfo t1 = ev.Touches[1];
-            Vector2d[] newRect = new Vector2d[2];
-
-            newRect[0] = Vector2d.Create(t0.PageX, t0.PageY);
-            newRect[1] = Vector2d.Create(t1.PageX, t1.PageY);
-            if (rect[0] != null)
-            {
-                double oldDist = GetDistance(rect[0], rect[1]);
-                double newDist = GetDistance(newRect[0], newRect[1]);
-                double ratio = oldDist / newDist;
-                Zoom(ratio);
-            }
-            rect = newRect;
-            ev.StopPropagation();
-            ev.PreventDefault();
         }
 
         public double GetDistance(Vector2d a, Vector2d b)
