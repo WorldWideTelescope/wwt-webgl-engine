@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.4.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine@7.4.0-beta.0...@wwtelescope/engine@7.4.0) (2020-07-23)
+
+- Attempt to fix pointer-pinch-zoom freakout on Mac/Chrome (#58)
+- Account for camera rotation when panning (#57)
+- Expose more API control over zoom clamping
+- Draw eclipsed moons if not in realistic-lighting mode (#55)
+- Don't attempt to proxy localhost URLs on nonstandard ports
+
+
 # [7.3.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine@7.3.0-beta.0...@wwtelescope/engine@7.3.0) (2020-06-12)
 
 - Export APIs related to basic tour playback
