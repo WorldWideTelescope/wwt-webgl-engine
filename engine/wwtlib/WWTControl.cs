@@ -60,7 +60,7 @@ namespace wwtlib
 
         double zoomMax = 360;
         double zoomMaxSolarSystem = 10000000000000000;
-        double ZoomMax
+        public double ZoomMax
         {
             get
             {
@@ -73,9 +73,16 @@ namespace wwtlib
                     return zoomMax;
                 }
             }
+            set { zoomMax = value; }
         }
+
+        public void SetSolarSystemMaxZoom(double value)
+        {
+            zoomMaxSolarSystem = value;
+        }
+
         double zoomMin = 0.001373291015625;
-        double zoomMinSolarSystem = 0.0001;
+        double zoomMinSolarSystem = 0.00000001;
 
         public double ZoomMin
         {
@@ -83,7 +90,7 @@ namespace wwtlib
             {
                 if (RenderContext.BackgroundImageset != null && RenderContext.BackgroundImageset.DataSetType == ImageSetType.SolarSystem)
                 {
-                    return zoomMinSolarSystem / 10000;
+                    return zoomMinSolarSystem;
                 }
                 else
                 {
@@ -93,6 +100,10 @@ namespace wwtlib
             set { zoomMin = value; }
         }
 
+        public void SetSolarSystemMinZoom(double value)
+        {
+            zoomMinSolarSystem = value;
+        }
 
         public static bool showDataLayers = false;
 
