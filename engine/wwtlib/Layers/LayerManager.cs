@@ -574,16 +574,8 @@ namespace wwtlib
                 {
                     if (!CollisionChecked)
                     {
-                        //todo add UI in the future
-                        if (true)
-                        // if (UiTools.ShowMessageBox(Language.GetLocalizedText(958, "There are layers with the same name. Overwrite existing layers?"), Language.GetLocalizedText(3, "Microsoft WorldWide Telescope"), System.Windows.Forms.MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes)
-                        {
-                            OverWrite = true;
-                        }
-                        else
-                        {
-                            OverWrite = false;
-                        }
+                        //todo add UI in the future with possibility of OverWrite = false
+                        OverWrite = true;
                         CollisionChecked = true;
                     }
 
