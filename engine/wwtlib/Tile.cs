@@ -208,7 +208,22 @@ namespace wwtlib
                     if (!texture.HasAttribute("proxyattempt"))
                     {
                         texture.SetAttribute("proxyattempt", true);
-                        string new_url = URLHelpers.singleton.activateProxy(this.URL);
+
+                        // NOTE: `this.URL` is dynamically generated using
+                        // URLHelpers.rewrite(). Say that we request tiles from
+                        // example.com, which requires CORS proxying. Say also
+                        // that this callback is called for a request to a tile
+                        // that should in fact be available. If a different
+                        // request fails before this callback is called,
+                        // activateProxy() will be called on the example.com
+                        // domain, making it so that `this.URL` in the following
+                        // call goes through the proxy, making it so that
+                        // `new_url` is null, making it so that this tile is
+                        // erroneously marked as failed when it should not be.
+                        // The solution: make sure to check proxy activation
+                        // with the *original* request URL, `texture.Src`, not
+                        // the one that may have been updated, `this.URL`.
+                        string new_url = URLHelpers.singleton.activateProxy(texture.Src);
 
                         if (new_url != null) {  // null => don't bother: we know that the proxy won't help
                             texture.Src = new_url;
