@@ -1,4 +1,5 @@
-﻿// The helper class for rewriting URLs. This gets complicated, because we
+﻿
+// The helper class for rewriting URLs. This gets complicated, because we
 // might need to proxy for CORS headers and/or HTTPS support, *and* we
 // sometimes also want to change the host and/or path to allow the engine or
 // the webclient to swap out the data backend or the frontend.
@@ -12,8 +13,9 @@ namespace wwtlib
     {
         WWTFlagship = 0, // this host is worldwidetelescope.org or an equivalent
         Localhost = 1, // this host is localhost or an equivalent
-        TryNoProxy = 2,  // none of the above, and we hope that we can get data from it without needing to use our proxy
-        Proxy = 3, // none of the above, and we need to proxy it for HTTPS/CORS reasons
+        NeverProxy = 2, // this host is known to never need proxying
+        TryNoProxy = 3,  // none of the above, and we hope that we can get data from it without needing to use our proxy
+        Proxy = 4, // none of the above, and we need to proxy it for HTTPS/CORS reasons
     }
 
     public enum URLRewriteMode
@@ -49,6 +51,12 @@ namespace wwtlib
             this.domain_handling["beta.worldwidetelescope.org"] = DomainHandling.WWTFlagship;
             this.domain_handling["beta-cdn.worldwidetelescope.org"] = DomainHandling.WWTFlagship;
             this.domain_handling["wwtstaging.azurewebsites.net"] = DomainHandling.WWTFlagship;
+
+            this.domain_handling["wwtfiles.blob.core.windows.net"] = DomainHandling.NeverProxy;
+            this.domain_handling["wwttiles.blob.core.windows.net"] = DomainHandling.NeverProxy;
+            this.domain_handling["web.wwtassets.org"] = DomainHandling.NeverProxy;
+            this.domain_handling["data1.wwtassets.org"] = DomainHandling.NeverProxy;
+
             this.domain_handling["localhost"] = DomainHandling.Localhost;
             this.domain_handling["127.0.0.1"] = DomainHandling.Localhost;
 
@@ -220,6 +228,7 @@ namespace wwtlib
                 case DomainHandling.Localhost:
                     return url;  // can't proxy, so we'll just have to hope it works
 
+                case DomainHandling.NeverProxy:
                 case DomainHandling.TryNoProxy:
                 default:
                     if (this.force_https && lcproto != "https:") {
@@ -308,7 +317,7 @@ namespace wwtlib
                 lcdomain = url_no_protocol.Substring(0, slash_index).ToLowerCase();
             }
 
-            // Is this a flagship or localhost URL? If so, don't bother proxying.
+            // Is this a flagship or never-proxy URL? If so, don't bother proxying.
 
             if (!this.domain_handling.ContainsKey(lcdomain)) {
                 if (lcdomain.StartsWith("localhost:") || lcdomain.StartsWith("127.0.0.1:"))
@@ -319,7 +328,7 @@ namespace wwtlib
 
             DomainHandling mode = this.domain_handling[lcdomain];
 
-            if (mode == DomainHandling.WWTFlagship || mode == DomainHandling.Localhost) {
+            if (mode == DomainHandling.WWTFlagship || mode == DomainHandling.NeverProxy || mode == DomainHandling.Localhost) {
                 return null;
             }
 
