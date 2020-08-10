@@ -1,6 +1,6 @@
 {
   "name": "@wwtelescope/engine-helpers",
-  "version": "0.3.1-beta.1",
+  "version": "0.3.1-beta.2",
   "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
   "keywords": [
     "AAS WorldWide Telescope"
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@wwtelescope/astro": "^0.1.0",
-    "@wwtelescope/engine": "^7.4.0-beta.0",
+    "@wwtelescope/engine": "^7.4.1-beta.0",
     "@wwtelescope/engine-types": "^0.1.0"
   },
   "localDepRequiredCommits": {
