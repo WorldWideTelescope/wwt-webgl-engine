@@ -213,8 +213,8 @@ jobs:
       if ($engineVers.IndexOf("-beta") -ne -1) {
         Write-Host "##vso[task.setvariable variable=engineVersionText;]latest"
       } else {
-        $majmin = ($engineVers -Split '\.')[0..1] -Join '.'
-        Write-Host "##vso[task.setvariable variable=engineVersionText;]$majmin"
+        $major = ($engineVers -Split '\.')[0]
+        Write-Host "##vso[task.setvariable variable=engineVersionText;]$major"
       }
     condition: and(succeeded(), ne(variables['publishedEngineVersion'], ''))
     displayName: Set @wwtelescope/engine deployment variables
