@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.4.1](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine@7.4.1-beta.0...@wwtelescope/engine@7.4.1) (2020-08-19)
+
+**Note:** Version bump only for package @wwtelescope/engine
+
+
+
+
+
 # [7.4.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine@7.4.0-beta.0...@wwtelescope/engine@7.4.0) (2020-07-23)
 
 - Attempt to fix pointer-pinch-zoom freakout on Mac/Chrome (#58)
