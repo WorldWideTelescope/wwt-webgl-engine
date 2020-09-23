@@ -189,7 +189,8 @@ jobs:
       if [[ ${isMainDev} == True ]] ; then
         tag=latest
       else
-        tag="$(cranko show version @wwtelescope/engine |cut -d. -f1)"
+        # Docs release tag is `major.minor`.
+        tag="$(cranko show version @wwtelescope/engine |cut -d. -f1,2)"
       fi
       echo "docs deployment tag: $isMainDev, $isRelease => $tag"
       echo "##vso[task.setvariable variable=DOCS_DEPLOYMENT_TAG;]$tag"
