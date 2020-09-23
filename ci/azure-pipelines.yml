@@ -44,6 +44,8 @@ jobs:
     displayName: Install latest Cranko (Windows)
 
   - bash: |
+      set -xeuo pipefail
+      git status
       cranko release-workflow apply-versions
       git add .
       cranko release-workflow commit
@@ -85,11 +87,12 @@ jobs:
 
   # No reason not to stage artifacts ASAP -- it could help debug build problems.
   - bash: |
-      mkdir $(Build.ArtifactStagingDirectory)\engine-hosted
-      cp engine\wwtlib\bin\wwtlib.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtlib.js
-      cp engine\src\index.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.js
-      cp engine\src\index.min.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.min.js
-      cp engine\src\index.d.ts $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.d.ts
+      set -xeuo pipefail
+      mkdir $(Build.ArtifactStagingDirectory)/engine-hosted
+      cp engine/wwtlib/bin/wwtlib.js $(Build.ArtifactStagingDirectory)/engine-hosted/wwtlib.js
+      cp engine/src/index.js $(Build.ArtifactStagingDirectory)/engine-hosted/wwtsdk.js
+      cp engine/src/index.min.js $(Build.ArtifactStagingDirectory)/engine-hosted/wwtsdk.min.js
+      cp engine/src/index.d.ts $(Build.ArtifactStagingDirectory)/engine-hosted/wwtsdk.d.ts
     displayName: Stage JavaScript hosted artifacts
 
   - task: PublishPipelineArtifact@0
