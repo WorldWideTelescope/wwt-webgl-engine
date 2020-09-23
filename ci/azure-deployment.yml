@@ -36,7 +36,7 @@ jobs:
         tag=skip
       fi
 
-      echo "engine deployment mode: $isMainDev, $isRelease => $tag"
+      echo "engine deployment tag: $isMainDev, $isRelease => $tag"
       echo "##vso[task.setvariable variable=ENGINE_DEPLOYMENT_TAG;]$tag"
     displayName: Determine deployment tag
     env:
@@ -47,7 +47,7 @@ jobs:
     condition: and(succeeded(), ne(variables['ENGINE_DEPLOYMENT_TAG'], 'skip'))
     displayName: Deploy hosted engine artifacts
     inputs:
-      SourcePath: '$(Build.ArtifactStagingDirectory)/engine-hosted'
+      SourcePath: '$(Pipeline.Workspace)/engine-hosted'
       azureSubscription: 'aas@wwtadmindotnetfoundation'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
