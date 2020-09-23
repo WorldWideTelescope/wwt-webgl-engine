@@ -62,7 +62,6 @@ steps:
     set -xeuo pipefail
     git switch -c release
     git pull --ff-only $PIPELINE_WORKSPACE/git-release/release.bundle
-    git show
   displayName: Restore release commit
 
 - ${{ if parameters.setupBuild }}:

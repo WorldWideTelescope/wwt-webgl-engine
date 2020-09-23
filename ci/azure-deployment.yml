@@ -1,18 +1,63 @@
 # Copyright 2020 the .NET Foundation
 # Licensed under the MIT License
 
+parameters:
+- name: isMainDev
+  type: boolean
+  default: false
+- name: isRelease
+  type: boolean
+  default: false
+
 jobs:
 
-# TODO: master-only deployment steps?
-- ${{ if ne(variables['Build.SourceBranchName'], 'rc') }}:
-  - job: dummy_setup_only
-    pool:
-      vmImage: ubuntu-20.04
-    steps:
-    - template: azure-job-setup.yml
+# Deployment jobs that might happen on updates to either `master` *or* `rc`.
+# On updates to master, we deploy everything under the "latest" name. On
+# updates to `rc`, we deploy some subset of the projects that can only be
+# determined at runtime.
 
+- job: deploy_engine_hosted
+  pool:
+    vmImage: windows-latest
+  variables:
+  - group: Deployment Credentials
+  steps:
+  - template: azure-job-setup.yml
 
-- ${{ if eq(variables['Build.SourceBranchName'], 'rc') }}:
+  - bash: |
+      set -euo pipefail
+
+      if [[ ${isMainDev} == True ]] ; then
+        tag=latest
+      elif cranko show if-released --exit-code @wwtelescope/engine ; then
+        # Engine tag is major version only:
+        tag="$(cranko show version @wwtelescope/engine |cut -d. -f1)"
+      else
+        tag=skip
+      fi
+
+      echo "engine deployment mode: $isMainDev, $isRelease => $tag"
+      echo "##vso[task.setvariable variable=ENGINE_DEPLOYMENT_TAG;]$tag"
+    displayName: Determine deployment tag
+    env:
+      isMainDev: ${{ parameters.isMainDev }}
+      isRelease: ${{ parameters.isRelease }}
+
+  - task: AzureFileCopy@3
+    condition: and(succeeded(), ne(variables['ENGINE_DEPLOYMENT_TAG'], 'skip'))
+    displayName: Deploy hosted engine artifacts
+    inputs:
+      SourcePath: '$(Build.ArtifactStagingDirectory)/engine-hosted'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: engine/$(ENGINE_DEPLOYMENT_TAG)
+
+# Deployment jobs that should only happen on updates to `rc`, i.e.
+# primary releases.
+
+- ${{ if parameters.isRelease }}:
   - job: branch_and_tag
     pool:
       vmImage: ubuntu-20.04
@@ -55,13 +100,23 @@ jobs:
     steps:
     - template: azure-job-setup.yml
       parameters:
+        setupBuild: true
         setupNpm: true
+    - bash: npm run build
+      displayName: NPM build
     - bash: |
         set -xeou pipefail
         cranko npm foreach-released npm publish
       displayName: Publish to NPM
     - bash: shred ~/.npmrc
-      displayName: Clean up credentials        
+      displayName: Clean up credentials
+
+
+
+# - deploy engine-hosted
+# - deploy embed
+# - deploy embed-creator
+# - deploy docs
 
   # Time for additional deployment steps, beyond any NPM publishing.
   #
