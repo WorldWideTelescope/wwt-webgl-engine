@@ -37,7 +37,6 @@
     "build": "vue-cli-service build",
     "doc": "echo OK - no API docs",
     "lint": "vue-cli-service lint src",
-    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEmbedCreatorVersion;]'+process.env.npm_package_version)\"",
     "serve": "vue-cli-service serve"
   },
   "version": "0.0.0-dev.0"

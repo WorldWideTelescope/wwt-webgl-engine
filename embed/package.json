@@ -40,7 +40,6 @@
     "build": "vue-cli-service build",
     "doc": "copyfiles -u 1 \"dist/**/*\" ../docs/static/embed",
     "lint": "vue-cli-service lint src",
-    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEmbedVersion;]'+process.env.npm_package_version)\"",
     "serve": "vue-cli-service serve"
   },
   "version": "0.0.0-dev.0"

@@ -4,8 +4,8 @@
 trigger:
   branches:
     include:
-      - master
-      - release
+    - cranko
+    - rc
 
 parameters:
 - name: 'zolaVersion'
@@ -16,6 +16,8 @@ jobs:
 - job: Main
   pool:
     vmImage: windows-latest
+
+  # variables:...
 
   steps:
 
@@ -29,22 +31,21 @@ jobs:
     inputs:
       versionSpec: '>=12'
 
-  - script: npm cache clean -f
+  - bash: npm cache clean -f
     displayName: npm cache clean
 
-  # On `master` or pull requests thereto, we immediately create the merge commit
-  # that would update the `release` branch with version bumps from the new changes.
+  - pwsh: |
+      $d = Join-Path $Env:Temp cranko-$(New-Guid)
+      [void][System.IO.Directory]::CreateDirectory($d)
+      cd $d
+      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+      iex ((New-Object System.Net.WebClient).DownloadString('https://pkgw.github.io/cranko/fetch-latest.ps1'))
+      echo "##vso[task.prependpath]$d"
+    displayName: Install latest Cranko (Windows)
 
-  - script: |
-      git config --global user.email "wwt@aas.org"
-      git config --global user.name "wwt-pipelines-bot"
-      git tag temp-checkout-head HEAD
-      git switch release
-      git merge --no-ff -m "Automated prereleases from latest master" temp-checkout-head
-      git tag -d temp-checkout-head
-      npx lerna version --yes --amend --no-push --no-changelog --conventional-commits --conventional-prerelease --preid=beta
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['System.PullRequest.TargetBranch'], 'master')))
-    displayName: Create merged release branch
+  - bash: |
+      cranko release-workflow apply-versions
+    displayName: cranko release-workflow apply-versions
 
   # ScriptSharp build
 
@@ -73,14 +74,14 @@ jobs:
 
   # JavaScript/TypeScript build process can begin in earnest
 
-  - script: npx lerna bootstrap --concurrency=1
+  - bash: npx lerna bootstrap --concurrency=1
     displayName: Lerna NPM setup
 
-  - script: npm run build
+  - bash: npm run build
     displayName: NPM build
 
   # No reason not to stage artifacts ASAP -- it could help debug build problems.
-  - script: |
+  - bash: |
       mkdir $(Build.ArtifactStagingDirectory)\engine-hosted
       cp engine\wwtlib\bin\wwtlib.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtlib.js
       cp engine\src\index.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.js
@@ -118,10 +119,10 @@ jobs:
       artifactName: embed-creator
       targetPath: $(Build.ArtifactStagingDirectory)/embed-creator
 
-  - script: npm run lint
+  - bash: npm run lint
     displayName: NPM lint
 
-  - script: npm run test
+  - bash: npm run test
     displayName: NPM test
 
   - task: PublishTestResults@2
@@ -136,7 +137,7 @@ jobs:
   - script: npm run doc
     displayName: NPM doc
 
-  - powershell: |
+  - pwsh: |
       $u = 'https://github.com/getzola/zola/releases/download/v${{ parameters.zolaVersion }}/zola-v${{ parameters.zolaVersion }}-x86_64-pc-windows-msvc.zip'
       Invoke-WebRequest -Uri $u -OutFile zola.zip
 
@@ -145,12 +146,12 @@ jobs:
     displayName: Install Zola
 
   # The check is failing spuriously on Azure Pipelines too often right now (2020 Apr).
-  # - powershell: |
+  # - pwsh: |
   #     cd docs
   #     ..\zola.exe check
   #   displayName: Check Zola docs site
 
-  - powershell: |
+  - pwsh: |
       cd docs
       ..\zola.exe build -o $(Build.ArtifactStagingDirectory)/docs
     displayName: Zola docs build
@@ -160,17 +161,6 @@ jobs:
     inputs:
       artifactName: docs
       targetPath: $(Build.ArtifactStagingDirectory)/docs
-
-  # On `master`, now let's update the `release` branch with our new versions.
-  # This will trigger a CI run there that will actually execute the releases
-  # and deployments.
-
-  - script: |
-      git -c "credential.helper=!f() { echo username=token; echo password=%GITHUB_TOKEN%; };f" push --tags origin release:release
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    displayName: Update release branch (master only)
-    env:
-      GITHUB_TOKEN: $(GITHUB_TOKEN)
 
   # Release processes.
   #
