@@ -5,9 +5,9 @@
     "url": "https://github.com/pkgw/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/astro": "0.0.0-dev.0",
-    "@wwtelescope/engine": "0.0.0-dev.0",
-    "@wwtelescope/engine-types": "0.0.0-dev.0"
+    "@wwtelescope/astro": "^0.1.0",
+    "@wwtelescope/engine": "^7.3.0",
+    "@wwtelescope/engine-types": "^0.1.0"
   },
   "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
   "homepage": "https://worldwidetelescope.org/home/",
@@ -31,5 +31,5 @@
     "doc": "typedoc",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "version": "0.0.0-dev.0"
+  "version": "0.3.0"
 }
