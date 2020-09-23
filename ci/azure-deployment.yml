@@ -246,49 +246,49 @@ jobs:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
     displayName: Set docs deployment variables
 
-  - task: AzureFileCopy@3
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
-    displayName: Deploy hosted engine artifacts
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)/engine-hosted'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: engine/$(engineVersionText)
+  ##- task: AzureFileCopy@3
+  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
+  ##  displayName: Deploy hosted engine artifacts
+  ##  inputs:
+  ##    SourcePath: '$(build.artifactStagingDirectory)/engine-hosted'
+  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ##    Destination: 'AzureBlob'
+  ##    storage: 'wwtwebstatic'
+  ##    ContainerName: '$web'
+  ##    blobPrefix: engine/$(engineVersionText)
 
-  - task: AzureFileCopy@3
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedVersion'], ''))
-    displayName: Deploy embed web application
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)/embed'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: embed/$(embedVersionText)/wwt
+  ##- task: AzureFileCopy@3
+  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedVersion'], ''))
+  ##  displayName: Deploy embed web application
+  ##  inputs:
+  ##    SourcePath: '$(build.artifactStagingDirectory)/embed'
+  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ##    Destination: 'AzureBlob'
+  ##    storage: 'wwtwebstatic'
+  ##    ContainerName: '$web'
+  ##    blobPrefix: embed/$(embedVersionText)/wwt
 
-  - task: AzureFileCopy@3
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedCreatorVersion'], ''))
-    displayName: Deploy embed-creator web application
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)/embed-creator'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: _embedui
+  ##- task: AzureFileCopy@3
+  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedCreatorVersion'], ''))
+  ##  displayName: Deploy embed-creator web application
+  ##  inputs:
+  ##    SourcePath: '$(build.artifactStagingDirectory)/embed-creator'
+  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ##    Destination: 'AzureBlob'
+  ##    storage: 'wwtwebstatic'
+  ##    ContainerName: '$web'
+  ##    blobPrefix: _embedui
 
-  - task: AzureFileCopy@3
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
-    displayName: Deploy documentation
-    inputs:
-      SourcePath: '$(build.artifactStagingDirectory)/docs'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      Destination: 'AzureBlob'
-      storage: 'wwtwebstatic'
-      ContainerName: '$web'
-      blobPrefix: '_docs/webgl-reference/$(docsVersionText)'
+  ##- task: AzureFileCopy@3
+  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
+  ##  displayName: Deploy documentation
+  ##  inputs:
+  ##    SourcePath: '$(build.artifactStagingDirectory)/docs'
+  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ##    Destination: 'AzureBlob'
+  ##    storage: 'wwtwebstatic'
+  ##    ContainerName: '$web'
+  ##    blobPrefix: '_docs/webgl-reference/$(docsVersionText)'
 
   # CDN purges - last since they are slow and close to optional
 
