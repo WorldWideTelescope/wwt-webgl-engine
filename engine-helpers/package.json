@@ -1,35 +1,35 @@
 {
-  "name": "@wwtelescope/engine-helpers",
-  "version": "0.0.0-dev",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "bugs": {
+    "email": "wwt@aas.org",
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues"
+  },
+  "dependencies": {
+    "@wwtelescope/astro": "0.0.0-dev.0",
+    "@wwtelescope/engine": "0.0.0-dev.0",
+    "@wwtelescope/engine-types": "0.0.0-dev.0"
+  },
   "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
+  "homepage": "https://worldwidetelescope.org/home/",
+  "internalDepVersions": {
+    "@wwtelescope/astro": "f67c4bb8bbe05af1eb2b20c26a575374c53d3d01",
+    "@wwtelescope/engine": "07cc74557e8d5448ab125f0f8330abac9323df3a",
+    "@wwtelescope/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
+  },
   "keywords": [
     "AAS WorldWide Telescope"
   ],
-  "homepage": "https://worldwidetelescope.org/home/",
-  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
-  "repository": "github:pkgw/wwt-webgl-engine",
-  "bugs": {
-    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
-    "email": "wwt@aas.org"
-  },
   "license": "MIT",
   "main": "./src/index.ts",
+  "name": "@wwtelescope/engine-helpers",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "github:pkgw/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
     "doc": "typedoc",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "dependencies": {
-    "@wwtelescope/astro": "0.0.0-dev",
-    "@wwtelescope/engine": "0.0.0-dev",
-    "@wwtelescope/engine-types": "0.0.0-dev"
-  },
-  "localDepRequiredCommits": {
-    "@wwtelescope/astro": "f67c4bb8bbe05af1eb2b20c26a575374c53d3d01",
-    "@wwtelescope/engine": "07cc74557e8d5448ab125f0f8330abac9323df3a",
-    "@wwtelescope/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+  "version": "0.0.0-dev.0"
 }

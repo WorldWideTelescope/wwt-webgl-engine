@@ -1,21 +1,14 @@
 {
-  "name": "@wwtelescope/engine",
-  "version": "0.0.0-dev",
-  "description": "The AAS WorldWide Telescope WebGL engine",
-  "keywords": [
-    "AAS WorldWide Telescope"
-  ],
-  "homepage": "https://worldwidetelescope.org/home/",
   "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
-  "repository": "github:pkgw/wwt-webgl-engine",
-  "bugs": {
-    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
-    "email": "wwt@aas.org"
-  },
-  "license": "MIT",
-  "main": "./src/index.js",
   "browser": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "bugs": {
+    "email": "wwt@aas.org",
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues"
+  },
+  "dependencies": {
+    "@wwtelescope/engine-types": "0.0.0-dev.0"
+  },
+  "description": "The AAS WorldWide Telescope WebGL engine",
   "files": [
     ".eslintrc.json",
     "docs/**/*.html",
@@ -29,23 +22,30 @@
     "tsconfig.json",
     "wwtlib/bin/wwtlib.js"
   ],
-  "scripts": {
-    "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
-    "tscheck": "tsc",
-    "uglify": "uglifyjs src/index.js -c -o src/index.min.js",
-    "build": "npm run concat-index && npm run uglify",
-    "test": "mocha-headless-chrome -f tests/tests.html -r xunit >tests/results.xml",
-    "doc": "typedoc",
-    "lint": "tsc",
-    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEngineVersion;]'+process.env.npm_package_version)\""
-  },
-  "dependencies": {
-    "@wwtelescope/engine-types": "0.0.0-dev"
-  },
-  "localDepRequiredCommits": {
+  "homepage": "https://worldwidetelescope.org/home/",
+  "internalDepVersions": {
     "@wwtelescope/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
   },
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "license": "MIT",
+  "main": "./src/index.js",
+  "name": "@wwtelescope/engine",
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": "github:pkgw/wwt-webgl-engine",
+  "scripts": {
+    "build": "npm run concat-index && npm run uglify",
+    "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
+    "doc": "typedoc",
+    "lint": "tsc",
+    "postpublish": "node -e \"console.log('##vso[task.setvariable variable=publishedEngineVersion;]'+process.env.npm_package_version)\"",
+    "test": "mocha-headless-chrome -f tests/tests.html -r xunit >tests/results.xml",
+    "tscheck": "tsc",
+    "uglify": "uglifyjs src/index.js -c -o src/index.min.js"
+  },
+  "types": "./src/index.d.ts",
+  "version": "0.0.0-dev.0"
 }

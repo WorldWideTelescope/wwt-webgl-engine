@@ -1,0 +1,55 @@
+[[project]]
+qnames = [
+    '@wwtelescope/engine-types',
+    'npm',
+]
+version = '0.1.0'
+
+[[project]]
+qnames = [
+    '@wwtelescope/engine',
+    'npm',
+]
+version = '7.4.1'
+
+[[project]]
+qnames = [
+    '@wwtelescope/embed-common',
+    'npm',
+]
+version = '0.2.0'
+
+[[project]]
+qnames = [
+    '@wwtelescope/embed-creator',
+    'npm',
+]
+version = '0.2.0'
+
+[[project]]
+qnames = [
+    '@wwtelescope/astro',
+    'npm',
+]
+version = '0.1.0'
+
+[[project]]
+qnames = [
+    '@wwtelescope/engine-helpers',
+    'npm',
+]
+version = '0.3.0'
+
+[[project]]
+qnames = [
+    '@wwtelescope/engine-vuex',
+    'npm',
+]
+version = '0.3.0'
+
+[[project]]
+qnames = [
+    '@wwtelescope/embed',
+    'npm',
+]
+version = '1.2.0'

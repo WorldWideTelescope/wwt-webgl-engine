@@ -1,31 +1,31 @@
 {
-  "name": "@wwtelescope/embed-common",
-  "version": "0.0.0-dev",
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "bugs": {
+    "email": "wwt@aas.org",
+    "url": "https://github.com/pkgw/wwt-webgl-engine/issues"
+  },
+  "dependencies": {
+    "@wwtelescope/engine-types": "0.0.0-dev.0"
+  },
   "description": "Basic types and classes for the WWT embed framework.",
+  "homepage": "https://worldwidetelescope.org/home/",
+  "internalDepVersions": {
+    "@wwtelescope/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
+  },
   "keywords": [
     "AAS WorldWide Telescope"
   ],
-  "homepage": "https://worldwidetelescope.org/home/",
-  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
-  "repository": "github:pkgw/wwt-webgl-engine",
-  "bugs": {
-    "url": "https://github.com/pkgw/wwt-webgl-engine/issues",
-    "email": "wwt@aas.org"
-  },
   "license": "MIT",
   "main": "./src/index.ts",
+  "name": "@wwtelescope/embed-common",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "github:pkgw/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
     "doc": "typedoc",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "dependencies": {
-    "@wwtelescope/engine-types": "0.0.0-dev"
-  },
-  "localDepRequiredCommits": {
-    "@wwtelescope/engine-types": "020de599379d176e11f9e7132d1c00ede70bfea0"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+  "version": "0.0.0-dev.0"
 }
