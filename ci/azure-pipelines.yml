@@ -4,7 +4,7 @@
 trigger:
   branches:
     include:
-    - cranko
+    - master
     - rc
 
 stages:
