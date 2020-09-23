@@ -1,11 +1,10 @@
-# @wwtelescope/engine-types
+# @wwtelescope/engine
 
-The [@wwtelescope/engine-types] package exposes some common [TypeScript] types
-relating to the [AAS] [WorldWide Telescope][wwt-home] (WWT) [WebGL engine]
-stack. Learn more about WWT [here][wwt-home].
+The [@wwtelescope/engine] package is the core rendering engine in the [AAS]
+[WorldWide Telescope][wwt-home] (WWT) [WebGL engine] stack. Learn more about WWT
+[here][wwt-home].
 
-[@wwtelescope/engine-types]: https://www.npmjs.com/package/@wwtelescope/engine-types
-[TypeScript]: https://typescriptlang.org/
+[@wwtelescope/engine]: https://www.npmjs.com/package/@wwtelescope/engine
 [AAS]: https://aas.org/
 [wwt-home]: https://worldwidetelescope.org/home/
 [WebGL engine]: https://github.com/WorldWideTelescope/wwt-webgl-engine/

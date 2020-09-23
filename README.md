@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/aasworldwidetelescope/WWT/_apis/build/status/WorldWideTelescope.wwt-webgl-engine?branchName=master)](https://dev.azure.com/aasworldwidetelescope/WWT/_build/latest?definitionId=3&branchName=master)
+[![Build Status](https://dev.azure.com/aasworldwidetelescope/WWT/_apis/build/status/WorldWideTelescope.wwt-webgl-engine?branchName=cranko)](https://dev.azure.com/aasworldwidetelescope/WWT/_build/latest?definitionId=21&branchName=cranko)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/astro)](https://www.npmjs.com/package/@wwtelescope/astro)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/embed)](https://www.npmjs.com/package/@wwtelescope/embed)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/embed-common)](https://www.npmjs.com/package/@wwtelescope/embed-common)
@@ -155,69 +155,10 @@ static site generator [Zola],
 
 ## Continuous Integration and Deployment
 
-This repository uses [semantic-release] with the [semantic-release-monorepo]
-extension to automate release workflows. This automation is essential to the
-smooth and reproducible deployment of the WWT web services.
+This repository uses [Cranko] to automate release workflows. This automation is
+essential to the smooth and reproducible deployment of the WWT web services.
 
-[semantic-release]: https://semantic-release.gitbook.io/semantic-release/
-[semantic-release-monorepo]: https://github.com/pmowrer/semantic-release-monorepo
-
-The basic paradigm is that merges to the `beta` or `master` branches will
-automatically trigger processing by [semantic-release] that will determine if
-any changes have been made that require a new release in any of the subpackages.
-If so, [semantic-release] will create a new Git commit that updates the package
-version and changelog, publish an NPM package, create a Git tag, publish
-everything to GitHub, and create a GitHub release record.
-
-New releases are triggered by looking at Git commit messages, which should
-follow the [Angular guidelines][angular-guidelines]. The first line of each
-commit should have the format `{type}({scope}): {subject}`, with one of the
-following types:
-
-[angular-guidelines]: https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit
-
-- `build`
-- `chore`
-- `ci`
-- `docs`
-- `feat`
-- `fix`
-- `perf`
-- `refactor`
-- `style`
-- `test`
-
-Breaking changes are indicated by a line starting with `BREAKING CHANGE: ` in
-the commit message body.
-
-Versioning on the `master` branch follows [semantic versioning][semver]
-strictly:
-
-[semver]: https://semver.org/
-
-- `fix` changes force a bump in the micro version number
-- `feat` changes force a bump in the minor version number (and reset of the micro)
-- Breaking changes force a bump in the major version number.
-
-On the `beta` branch, versions are given sequence numbers of the form
-`1.0.0-beta.3`. This allows series of candidate changes to be deployed
-individually without causing the version numbers to increase ridiculously
-quickly.
-
-In addition to core automation provided by [semantic-release], the following
-steps happen automatically:
-
-- If a new release of `engine` occurs on the `beta` branch, the
-  browser-importable engine module at
-  <https://web.wwtassets.org/engine/latest/wwtsdk.js> is updated.
-- If one occurs on the `master` branch, the corresponding module at
-  `https://web.wwtassets.org/engine/X.Y/wwtsdk.js` is updated, where `X.Y` is
-  the first two components of the current engine version.
-- On every merge to the `beta` branch, the documentation at
-  <https://docs.worldwidetelescope.org/webgl-reference/latest/> is updated.
-- On every merge to the `master` branch, the documentation at
-  `https://docs.worldwidetelescope.org/webgl-reference/X.Y/` is updated, where
-  `X.Y` is the first two components of the current engine version.
+[Cranko]: https://pkgw.github.io/cranko/
 
 
 ## Getting involved
