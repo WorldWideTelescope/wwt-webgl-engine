@@ -96,7 +96,7 @@ change the imagery being displayed.
 # Loading Data
 
 WWT is a visual engine, so the odds are good that at some point you’ll want to
-load more data into it. The [WWT Data Files Reference] aims to document the
+load more data into it. The [WWT Data Guide] aims to document the
 kinds of assets used by the WWT ecosystem.
 
-[WWT Data Files Reference]: https://worldwidetelescope.gitbook.io/data-files-reference/
+[WWT Data Guide]: https://docs.worldwidetelescope.org/data-guide/1/
