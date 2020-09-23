@@ -22,7 +22,7 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/embed-common": "6bd7f0b05da4663f35373f2a422e30fa84bae13b"
+    "@wwtelescope/embed-common": "manual:^0.2.0"
   },
   "keywords": [
     "AAS WorldWide Telescope"
