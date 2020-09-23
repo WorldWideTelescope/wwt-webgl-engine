@@ -15,16 +15,18 @@ jobs:
   pool:
     vmImage: ubuntu-20.04
   steps:
-  - template: azure-main-build-setup.yml
+  - template: azure-job-setup.yml
+    parameters:
+      setupBuild: true
 
   - bash: npm run build
     displayName: NPM build
 
+  # Create and stage our panoply of artifacts. (No reason not to do this ASAP --
+  # these can help debug build problems.)
+
   - bash: npm run pack
     displayName: NPM pack
-
-  # Stage our panoply of artifacts. (No reason not to do this ASAP -- these can
-  # help debug build problems.)
 
   - bash: |
       set -xeuo pipefail
@@ -89,12 +91,35 @@ jobs:
       testResultsFormat: 'JUnit'
       testResultsFiles: 'engine/tests/results.xml'
 
+- job: build_macos
+  pool:
+    vmImage: macos-10.15
+  steps:
+  - template: azure-job-setup.yml
+    parameters:
+      setupBuild: true
+
+  - bash: npm run build
+    displayName: NPM build
+
+  - bash: npm run test
+    displayName: NPM test
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'engine/tests/results.xml'
+
 
 - job: lint
   pool:
     vmImage: ubuntu-20.04
   steps:
-  - template: azure-main-build-setup.yml
+  - template: azure-job-setup.yml
+    parameters:
+      setupBuild: true
 
   - bash: npm run build
     displayName: NPM build
@@ -107,7 +132,9 @@ jobs:
   pool:
     vmImage: ubuntu-20.04
   steps:
-  - template: azure-main-build-setup.yml
+  - template: azure-job-setup.yml
+    parameters:
+      setupBuild: true
 
   - bash: npm run build
     displayName: NPM build

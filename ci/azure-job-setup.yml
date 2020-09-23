@@ -1,21 +1,26 @@
 # Copyright 2020 the .NET Foundation
 # Licensed under the MIT License
 
-# Setup steps for the main build process.
+# Setup steps for the build and deployment processes.
+
+parameters:
+- name: setupBuild
+  type: boolean
+  default: false
+
+- name: setupGit
+  type: boolean
+  default: false
+
+- name: setupNpm
+  type: boolean
+  default: false
 
 steps:
 - download: current
 
 - checkout: self
   submodules: recursive
-
-- task: NodeTool@0
-  displayName: Set up node.js
-  inputs:
-    versionSpec: '>=12'
-
-## - bash: npm cache clean -f
-##   displayName: npm cache clean
 
 - bash: |
     set -euo pipefail
@@ -60,11 +65,34 @@ steps:
     git show
   displayName: Restore release commit
 
-- bash: |
-    set -xeuo pipefail
-    mkdir -p engine/wwtlib/bin
-    cp $PIPELINE_WORKSPACE/scriptsharp/wwtlib.js engine/wwtlib/bin/
-  displayName: Restore ScriptSharp wwtlib.js
+- ${{ if parameters.setupBuild }}:
+  - task: NodeTool@0
+    displayName: Set up node.js
+    inputs:
+      versionSpec: '>=12'
 
-- bash: npx lerna bootstrap --concurrency=1
-  displayName: Lerna NPM setup
+  ## - bash: npm cache clean -f
+  ##   displayName: npm cache clean
+
+  - bash: |
+      set -xeuo pipefail
+      mkdir -p engine/wwtlib/bin
+      cp $PIPELINE_WORKSPACE/scriptsharp/wwtlib.js engine/wwtlib/bin/
+    displayName: Restore ScriptSharp wwtlib.js
+
+  - bash: npx lerna bootstrap --concurrency=1
+    displayName: Lerna NPM setup
+
+- ${{ if parameters.setupGit }}:
+  - bash: |
+      cranko github install-credential-helper
+    displayName: Set up Git pushes
+    env:
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
+
+- ${{ if parameters.setupNpm }}:
+  - bash: |
+      cranko npm install-token
+    displayName: Set up NPM authentication
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)

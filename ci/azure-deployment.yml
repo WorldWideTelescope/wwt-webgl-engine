@@ -3,6 +3,15 @@
 
 jobs:
 
+# TODO: master-only deployment steps?
+- ${{ if ne(variables['Build.SourceBranchName'], 'rc') }}:
+  - job: dummy_setup_only
+    pool:
+      vmImage: ubuntu-20.04
+    steps:
+    - template: azure-job-setup.yml
+
+
 - ${{ if eq(variables['Build.SourceBranchName'], 'rc') }}:
   - job: branch_and_tag
     pool:
@@ -10,51 +19,51 @@ jobs:
     variables:
     - group: Deployment Credentials
     steps:
-    - template: azure-deployment-setup.yml
+    - template: azure-job-setup.yml
       parameters:
         setupGit: true
     - bash: |
         set -xeou pipefail
-        ./cranko release-workflow tag
+        cranko release-workflow tag
         git push --tags origin release:release
       displayName: Tag and push
       env:
         GITHUB_TOKEN: $(GITHUB_TOKEN)
 
-- job: Main
-  pool:
-    vmImage: windows-latest
+  - job: github_releases
+    dependsOn: branch_and_tag # otherwise, GitHub creates the tags itself!
+    pool:
+      vmImage: ubuntu-20.04
+    variables:
+    - group: Deployment Credentials
+    steps:
+    - template: azure-job-setup.yml
+      parameters:
+        setupGit: true
+    - bash: |
+        set -xeou pipefail
+        cranko github create-releases
+      displayName: Create GitHub releases
+      env:
+        GITHUB_TOKEN: $(GITHUB_TOKEN)
 
-  # variables:...
-
-  steps:
-
-  # Release processes.
-  #
-  # First, publishing NPM packages. I can only get the config step to work using bash.
-  # No error message when running in cmd.
-
-  - bash: |
-      npm config set "//registry.npmjs.org/:_authToken=$NPM_TOKEN"
-    displayName: Set up NPM auth
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
-    failOnStderr: false
-    env:
-      NPM_TOKEN: $(NPM_TOKEN)
-
-  - script: |
-      npx lerna publish --yes --pre-dist-tag=beta from-package
-    displayName: Publish new packages to NPM
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
-    env:
-      NPM_TOKEN: $(NPM_TOKEN)
+  - job: npm_publish
+    pool:
+      vmImage: ubuntu-20.04
+    variables:
+    - group: Deployment Credentials
+    steps:
+    - template: azure-job-setup.yml
+      parameters:
+        setupNpm: true
+    - bash: |
+        set -xeou pipefail
+        cranko npm foreach-released npm publish
+      displayName: Publish to NPM
+    - bash: shred ~/.npmrc
+      displayName: Clean up credentials        
 
   # Time for additional deployment steps, beyond any NPM publishing.
-  #
-  # Some of the packages have "postpublish" stages that will have been run by
-  # lerna if a new version of the package was indeed published. These stages use
-  # the ##vso syntax to set variables that we can then use to orchestrate other
-  # aspects of the continuous deployment pipeline.
   #
   # Since the docs combine outputs from nearly every submodule, we deploy new
   # versions on every update of `release`. Because the docs combine many
@@ -62,48 +71,6 @@ jobs:
   # assign. As a heuristic, we track @wwtelescope/engine. If a new non-prelease
   # version of the engine is published, we deploy the docs in a versioned
   # directory; otherwise we deploy under `latest`.
-
-  - powershell: |
-      $engineVers = "$(publishedEngineVersion)"
-      Write-Host "##vso[task.setvariable variable=maybePublishedEngineVersion;]$engineVers"
-
-      if ($engineVers.IndexOf("-beta") -ne -1) {
-        Write-Host "##vso[task.setvariable variable=engineVersionText;]latest"
-      } else {
-        $major = ($engineVers -Split '\.')[0]
-        Write-Host "##vso[task.setvariable variable=engineVersionText;]$major"
-      }
-    condition: and(succeeded(), ne(variables['publishedEngineVersion'], ''))
-    displayName: Set @wwtelescope/engine deployment variables
-
-  # An awkward hack for convenient setup of the docs deployment variables.
-  - powershell: |
-      Write-Host "##vso[task.setvariable variable=maybePublishedEngineVersion;]nochange-beta"
-    condition: and(succeeded(), eq(variables['publishedEngineVersion'], ''))
-    displayName: Default @wwtelescope/engine deployment variables
-
-  - powershell: |
-      $embedVers = "$(publishedEmbedVersion)"
-
-      if ($embedVers.IndexOf("-beta") -ne -1) {
-        Write-Host "##vso[task.setvariable variable=embedVersionText;]latest"
-      } else {
-        $major = ($embedVers -Split '\.')[0]
-        Write-Host "##vso[task.setvariable variable=embedVersionText;]$major"
-      }
-    condition: and(succeeded(), ne(variables['publishedEmbedVersion'], ''))
-    displayName: Set @wwtelescope/embed deployment variables
-
-  - powershell: |
-      $engineVers = "$(maybePublishedEngineVersion)"
-      if ($engineVers.IndexOf("-beta") -ne -1) {
-        Write-Host "##vso[task.setvariable variable=docsVersionText;]latest"
-      } else {
-        $majmin = ($engineVers -Split '\.')[0..1] -Join '.'
-        Write-Host "##vso[task.setvariable variable=docsVersionText;]$majmin"
-      }
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
-    displayName: Set docs deployment variables
 
   ##- task: AzureFileCopy@3
   ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
