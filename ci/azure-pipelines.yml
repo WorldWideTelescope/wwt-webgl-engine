@@ -45,7 +45,10 @@ jobs:
 
   - bash: |
       cranko release-workflow apply-versions
-    displayName: cranko release-workflow apply-versions
+      git add .
+      cranko release-workflow commit
+      git show
+    displayName: Apply versions and generate release commit
 
   # ScriptSharp build
 
