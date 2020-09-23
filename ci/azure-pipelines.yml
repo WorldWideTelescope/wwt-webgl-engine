@@ -21,5 +21,5 @@ stages:
   jobs:
     - template: azure-deployment.yml
       parameters:
-        isMainDev: ne(variables['Build.SourceBranchName'], 'rc')
-        isRelease: eq(variables['Build.SourceBranchName'], 'rc')
+        isMainDev: ${{ ne(variables['Build.SourceBranchName'], 'rc') }}
+        isRelease: ${{ eq(variables['Build.SourceBranchName'], 'rc') }}
