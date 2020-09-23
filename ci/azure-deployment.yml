@@ -29,147 +29,6 @@ jobs:
 
   steps:
 
-  # Setup
-
-  - checkout: self
-    submodules: recursive
-
-  - task: NodeTool@0
-    displayName: Set up node.js
-    inputs:
-      versionSpec: '>=12'
-
-  - bash: npm cache clean -f
-    displayName: npm cache clean
-
-  - pwsh: |
-      $d = Join-Path $Env:Temp cranko-$(New-Guid)
-      [void][System.IO.Directory]::CreateDirectory($d)
-      cd $d
-      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-      iex ((New-Object System.Net.WebClient).DownloadString('https://pkgw.github.io/cranko/fetch-latest.ps1'))
-      echo "##vso[task.prependpath]$d"
-    displayName: Install latest Cranko (Windows)
-
-  - bash: |
-      cranko release-workflow apply-versions
-    displayName: cranko release-workflow apply-versions
-
-  # ScriptSharp build
-
-  - task: MSBuild@1
-    displayName: Build WebGL Engine with ScriptSharp
-    inputs:
-      solution: 'engine/WebGlEngine.sln'
-      msbuildVersion: '16.0'
-      msbuildArchitecture: 'x64'
-      clean: true
-
-  - task: CopyFiles@2
-    displayName: Stage ScriptSharp artifacts
-    inputs:
-      sourceFolder: '.'
-      contents: |
-        engine/wwtlib/bin/wwtlib.js
-      targetFolder: $(Build.ArtifactStagingDirectory)
-      cleanTargetFolder: true
-
-  - task: PublishPipelineArtifact@0
-    displayName: Publish ScriptSharp artifacts
-    inputs:
-      artifactName: scriptsharp
-      targetPath: $(Build.ArtifactStagingDirectory)/engine/wwtlib
-
-  # JavaScript/TypeScript build process can begin in earnest
-
-  - bash: npx lerna bootstrap --concurrency=1
-    displayName: Lerna NPM setup
-
-  - bash: npm run build
-    displayName: NPM build
-
-  # No reason not to stage artifacts ASAP -- it could help debug build problems.
-  - bash: |
-      mkdir $(Build.ArtifactStagingDirectory)\engine-hosted
-      cp engine\wwtlib\bin\wwtlib.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtlib.js
-      cp engine\src\index.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.js
-      cp engine\src\index.min.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.min.js
-      cp engine\src\index.d.ts $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.d.ts
-    displayName: Stage JavaScript hosted artifacts
-
-  - task: PublishPipelineArtifact@0
-    displayName: Publish JavaScript hosted artifacts
-    inputs:
-      artifactName: engine-hosted
-      targetPath: $(Build.ArtifactStagingDirectory)/engine-hosted
-
-  - task: CopyFiles@2
-    displayName: Stage embed app artifacts
-    inputs:
-      sourceFolder: embed/dist
-      targetFolder: $(Build.ArtifactStagingDirectory)/embed
-
-  - task: PublishPipelineArtifact@0
-    displayName: Publish embed app artifacts
-    inputs:
-      artifactName: embed
-      targetPath: $(Build.ArtifactStagingDirectory)/embed
-
-  - task: CopyFiles@2
-    displayName: Stage embed-creator app artifacts
-    inputs:
-      sourceFolder: embed-creator/dist
-      targetFolder: $(Build.ArtifactStagingDirectory)/embed-creator
-
-  - task: PublishPipelineArtifact@0
-    displayName: Publish embed-creator app artifacts
-    inputs:
-      artifactName: embed-creator
-      targetPath: $(Build.ArtifactStagingDirectory)/embed-creator
-
-  - bash: npm run lint
-    displayName: NPM lint
-
-  - bash: npm run test
-    displayName: NPM test
-
-  - task: PublishTestResults@2
-    displayName: Publish test results
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: 'engine/tests/results.xml'
-
-  # Docs
-
-  - script: npm run doc
-    displayName: NPM doc
-
-  - pwsh: |
-      $u = 'https://github.com/getzola/zola/releases/download/v${{ parameters.zolaVersion }}/zola-v${{ parameters.zolaVersion }}-x86_64-pc-windows-msvc.zip'
-      Invoke-WebRequest -Uri $u -OutFile zola.zip
-
-      Add-Type -assembly "System.IO.Compression.Filesystem";
-      [IO.Compression.Zipfile]::ExtractToDirectory("zola.zip", ".");
-    displayName: Install Zola
-
-  # The check is failing spuriously on Azure Pipelines too often right now (2020 Apr).
-  # - pwsh: |
-  #     cd docs
-  #     ..\zola.exe check
-  #   displayName: Check Zola docs site
-
-  - pwsh: |
-      cd docs
-      ..\zola.exe build -o $(Build.ArtifactStagingDirectory)/docs
-    displayName: Zola docs build
-
-  - task: PublishPipelineArtifact@0
-    displayName: Publish docs artifacts
-    inputs:
-      artifactName: docs
-      targetPath: $(Build.ArtifactStagingDirectory)/docs
-
   # Release processes.
   #
   # First, publishing NPM packages. I can only get the config step to work using bash.
@@ -292,62 +151,62 @@ jobs:
 
   # CDN purges - last since they are slow and close to optional
 
-  - task: AzurePowerShell@4
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
-    displayName: CDN purge - hosted engine artifacts
-    inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      azurePowerShellVersion: 'LatestVersion'
-      scriptType: 'inlineScript'
-      inline: |
-        Unpublish-AzCdnEndpointContent `
-          -ProfileName wwt-cdn-01 `
-          -ResourceGroupName wwt-web01 `
-          -EndpointName wwtweb-prod `
-          -PurgeContent '/engine/$(engineVersionText)/*'
+  ##- task: AzurePowerShell@4
+  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
+  ##  displayName: CDN purge - hosted engine artifacts
+  ##  inputs:
+  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ##    azurePowerShellVersion: 'LatestVersion'
+  ##    scriptType: 'inlineScript'
+  ##    inline: |
+  ##      Unpublish-AzCdnEndpointContent `
+  ##        -ProfileName wwt-cdn-01 `
+  ##        -ResourceGroupName wwt-web01 `
+  ##        -EndpointName wwtweb-prod `
+  ##        -PurgeContent '/engine/$(engineVersionText)/*'
 
-  - task: AzurePowerShell@4
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedVersion'], ''))
-    displayName: CDN purge - embed web app
-    inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      azurePowerShellVersion: 'LatestVersion'
-      scriptType: 'inlineScript'
-      inline: |
-        Unpublish-AzCdnEndpointContent `
-          -ProfileName wwt-cdn-01 `
-          -ResourceGroupName wwt-web01 `
-          -EndpointName wwtweb-prod `
-          -PurgeContent '/embed/$(embedVersionText)/wwt/*'
+  ##- task: AzurePowerShell@4
+  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedVersion'], ''))
+  ##  displayName: CDN purge - embed web app
+  ##  inputs:
+  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ##    azurePowerShellVersion: 'LatestVersion'
+  ##    scriptType: 'inlineScript'
+  ##    inline: |
+  ##      Unpublish-AzCdnEndpointContent `
+  ##        -ProfileName wwt-cdn-01 `
+  ##        -ResourceGroupName wwt-web01 `
+  ##        -EndpointName wwtweb-prod `
+  ##        -PurgeContent '/embed/$(embedVersionText)/wwt/*'
 
   # People say the docs are misleading about how to purge a CDN endpoint from
   # the root; try the all-of-the-above approach.
   # https://stackoverflow.com/questions/50591959/how-to-full-purge-the-azure-cdn-through-powershell
-  - task: AzurePowerShell@4
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedCreatorVersion'], ''))
-    displayName: CDN purge - embed-creator web app
-    inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      azurePowerShellVersion: 'LatestVersion'
-      scriptType: 'inlineScript'
-      inline: |
-        $names = @('/', '/*', '/css/*', '/js/*')
-        Unpublish-AzCdnEndpointContent `
-          -ProfileName wwt-cdn-01 `
-          -ResourceGroupName wwt-web01 `
-          -EndpointName wwtwebembed-prod `
-          -PurgeContent $names
+  ##- task: AzurePowerShell@4
+  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedCreatorVersion'], ''))
+  ##  displayName: CDN purge - embed-creator web app
+  ##  inputs:
+  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ##    azurePowerShellVersion: 'LatestVersion'
+  ##    scriptType: 'inlineScript'
+  ##    inline: |
+  ##      $names = @('/', '/*', '/css/*', '/js/*')
+  ##      Unpublish-AzCdnEndpointContent `
+  ##        -ProfileName wwt-cdn-01 `
+  ##        -ResourceGroupName wwt-web01 `
+  ##        -EndpointName wwtwebembed-prod `
+  ##        -PurgeContent $names
 
-  - task: AzurePowerShell@4
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
-    displayName: CDN purge - docs
-    inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
-      azurePowerShellVersion: 'LatestVersion'
-      scriptType: 'inlineScript'
-      inline: |
-        Unpublish-AzCdnEndpointContent `
-          -ProfileName wwt-cdn-01 `
-          -ResourceGroupName wwt-web01 `
-          -EndpointName wwtwebdocs-prod `
-          -PurgeContent '/webgl-reference/$(docsVersionText)/*'
+  ##- task: AzurePowerShell@4
+  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
+  ##  displayName: CDN purge - docs
+  ##  inputs:
+  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
+  ##    azurePowerShellVersion: 'LatestVersion'
+  ##    scriptType: 'inlineScript'
+  ##    inline: |
+  ##      Unpublish-AzCdnEndpointContent `
+  ##        -ProfileName wwt-cdn-01 `
+  ##        -ResourceGroupName wwt-web01 `
+  ##        -EndpointName wwtwebdocs-prod `
+  ##        -PurgeContent '/webgl-reference/$(docsVersionText)/*'
