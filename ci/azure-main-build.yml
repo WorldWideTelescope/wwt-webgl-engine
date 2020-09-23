@@ -26,9 +26,10 @@ jobs:
   # Stage our panoply of artifacts. (No reason not to do this ASAP -- these can
   # help debug build problems.)
 
-  - pwsh: |
-      mkdir $(Build.ArtifactStagingDirectory)\npm
-      cp *\*.tgz $(Build.ArtifactStagingDirectory)\npm
+  - bash: |
+      set -xeuo pipefail
+      mkdir -p $ARTIFACT_STAGING/npm
+      cp */*.tgz $ARTIFACT_STAGING/npm
     displayName: Stage NPM package artifacts
 
   - task: PublishPipelineArtifact@0
@@ -37,12 +38,13 @@ jobs:
       artifactName: npm
       targetPath: $(Build.ArtifactStagingDirectory)/npm
 
-  - pwsh: |
-      mkdir $(Build.ArtifactStagingDirectory)\engine-hosted
-      cp engine\wwtlib\bin\wwtlib.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtlib.js
-      cp engine\src\index.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.js
-      cp engine\src\index.min.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.min.js
-      cp engine\src\index.d.ts $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.d.ts
+  - bash: |
+      set -xeuo pipefail
+      mkdir -p $ARTIFACT_STAGING/engine-hosted
+      cp engine/wwtlib/bin/wwtlib.js $ARTIFACT_STAGING/engine-hosted/wwtlib.js
+      cp engine/src/index.js $ARTIFACT_STAGING/engine-hosted/wwtsdk.js
+      cp engine/src/index.min.js $ARTIFACT_STAGING/engine-hosted/wwtsdk.min.js
+      cp engine/src/index.d.ts $ARTIFACT_STAGING/engine-hosted/wwtsdk.d.ts
     displayName: Stage JavaScript hosted artifacts
 
   - task: PublishPipelineArtifact@0
@@ -98,7 +100,7 @@ jobs:
     displayName: NPM build
 
   - bash: npm run lint
-    displayName: NPM build
+    displayName: NPM lint
 
 
 - job: docs
@@ -123,11 +125,13 @@ jobs:
     displayName: Install Zola
 
   - bash: |
+      set -xeuo pipefail
       cd docs
       ../zola check
     displayName: Check Zola docs site
 
   - bash: |
+      set -xeuo pipefail
       cd docs
       ../zola build -o $ARTIFACT_STAGING/docs
     displayName: Zola docs build
