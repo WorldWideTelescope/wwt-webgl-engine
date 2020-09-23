@@ -26,7 +26,6 @@ jobs:
 
   - bash: |
       set -euo pipefail
-
       if [[ ${isMainDev} == True ]] ; then
         tag=latest
       elif cranko show if-released --exit-code @wwtelescope/engine ; then
@@ -35,7 +34,6 @@ jobs:
       else
         tag=skip
       fi
-
       echo "engine deployment tag: $isMainDev, $isRelease => $tag"
       echo "##vso[task.setvariable variable=ENGINE_DEPLOYMENT_TAG;]$tag"
     displayName: Determine deployment tag
@@ -53,6 +51,175 @@ jobs:
       storage: 'wwtwebstatic'
       ContainerName: '$web'
       blobPrefix: engine/$(ENGINE_DEPLOYMENT_TAG)
+
+  - task: AzurePowerShell@4
+    condition: and(succeeded(), ne(variables['ENGINE_DEPLOYMENT_TAG'], 'skip'))
+    displayName: CDN purge - hosted engine artifacts
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtweb-prod `
+          -PurgeContent '/engine/$(ENGINE_DEPLOYMENT_TAG)/*'
+
+- job: deploy_embed
+  pool:
+    vmImage: windows-latest
+  variables:
+  - group: Deployment Credentials
+  steps:
+  - template: azure-job-setup.yml
+
+  - bash: |
+      set -euo pipefail
+      if [[ ${isMainDev} == True ]] ; then
+        tag=latest
+      elif cranko show if-released --exit-code @wwtelescope/embed ; then
+        # Embed tag is major version only:
+        tag="$(cranko show version @wwtelescope/embed |cut -d. -f1)"
+      else
+        tag=skip
+      fi
+      echo "embed deployment tag: $isMainDev, $isRelease => $tag"
+      echo "##vso[task.setvariable variable=EMBED_DEPLOYMENT_TAG;]$tag"
+    displayName: Determine deployment tag
+    env:
+      isMainDev: ${{ parameters.isMainDev }}
+      isRelease: ${{ parameters.isRelease }}
+
+  - task: AzureFileCopy@3
+    condition: and(succeeded(), ne(variables['EMBED_DEPLOYMENT_TAG'], 'skip'))
+    displayName: Deploy embed web application
+    inputs:
+      SourcePath: '$(Pipeline.Workspace)/embed'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: embed/$(EMBED_DEPLOYMENT_TAG)/wwt
+
+  - task: AzurePowerShell@4
+    condition: and(succeeded(), ne(variables['EMBED_DEPLOYMENT_TAG'], 'skip'))
+    displayName: CDN purge - embed web app
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtweb-prod `
+          -PurgeContent '/embed/$(EMBED_DEPLOYMENT_TAG)/wwt/*'
+
+# The embed creator is not versioned - both master and RC deploy to prod. YOLO.
+
+- job: deploy_embed_creator
+  pool:
+    vmImage: windows-latest
+  variables:
+  - group: Deployment Credentials
+  steps:
+  - template: azure-job-setup.yml
+
+  - bash: |
+      set -euo pipefail
+      if [[ ${isMainDev} == True ]] ; then
+        tag=yes
+      elif cranko show if-released --exit-code @wwtelescope/embed-creator ; then
+        tag=yes
+      else
+        tag=skip
+      fi
+      echo "embed-creator deployment tag: $isMainDev, $isRelease => $tag"
+      echo "##vso[task.setvariable variable=CREATOR_DEPLOYMENT_TAG;]$tag"
+    displayName: Determine deployment tag
+    env:
+      isMainDev: ${{ parameters.isMainDev }}
+      isRelease: ${{ parameters.isRelease }}
+
+  - task: AzureFileCopy@3
+    condition: and(succeeded(), ne(variables['CREATOR_DEPLOYMENT_TAG'], 'skip'))
+    displayName: Deploy embed-creator web application
+    inputs:
+      SourcePath: '$(Pipeline.Workspace)/embed-creator'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: _embedui
+
+  # People say the docs are misleading about how to purge a CDN endpoint from
+  # the root; try the all-of-the-above approach.
+  # https://stackoverflow.com/questions/50591959/how-to-full-purge-the-azure-cdn-through-powershell
+  - task: AzurePowerShell@4
+    condition: and(succeeded(), ne(variables['CREATOR_DEPLOYMENT_TAG'], 'skip'))
+    displayName: CDN purge - embed-creator web app
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        $names = @('/', '/*', '/css/*', '/js/*')
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtwebembed-prod `
+          -PurgeContent $names
+
+# Since the docs combine outputs from nearly every submodule, we deploy new
+# versions on every update. Because the docs combine many different submodules,
+# that raises the question of what version number to assign. As a heuristic, we
+# track @wwtelescope/engine.
+
+- job: deploy_docs
+  pool:
+    vmImage: windows-latest
+  variables:
+  - group: Deployment Credentials
+  steps:
+  - template: azure-job-setup.yml
+
+  - bash: |
+      set -euo pipefail
+      if [[ ${isMainDev} == True ]] ; then
+        tag=latest
+      else
+        tag="$(cranko show version @wwtelescope/engine |cut -d. -f1)"
+      fi
+      echo "docs deployment tag: $isMainDev, $isRelease => $tag"
+      echo "##vso[task.setvariable variable=DOCS_DEPLOYMENT_TAG;]$tag"
+    displayName: Determine deployment tag
+    env:
+      isMainDev: ${{ parameters.isMainDev }}
+      isRelease: ${{ parameters.isRelease }}
+
+  - task: AzureFileCopy@3
+    displayName: Deploy documentation
+    inputs:
+      SourcePath: '$(Pipeline.Workspace)/docs'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      Destination: 'AzureBlob'
+      storage: 'wwtwebstatic'
+      ContainerName: '$web'
+      blobPrefix: '_docs/webgl-reference/$(DOCS_DEPLOYMENT_TAG)'
+
+  - task: AzurePowerShell@4
+    displayName: CDN purge - docs
+    inputs:
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azurePowerShellVersion: 'LatestVersion'
+      scriptType: 'inlineScript'
+      inline: |
+        Unpublish-AzCdnEndpointContent `
+          -ProfileName wwt-cdn-01 `
+          -ResourceGroupName wwt-web01 `
+          -EndpointName wwtwebdocs-prod `
+          -PurgeContent '/webgl-reference/$(DOCS_DEPLOYMENT_TAG)/*'
 
 # Deployment jobs that should only happen on updates to `rc`, i.e.
 # primary releases.
@@ -110,125 +277,3 @@ jobs:
       displayName: Publish to NPM
     - bash: shred ~/.npmrc
       displayName: Clean up credentials
-
-
-
-# - deploy engine-hosted
-# - deploy embed
-# - deploy embed-creator
-# - deploy docs
-
-  # Time for additional deployment steps, beyond any NPM publishing.
-  #
-  # Since the docs combine outputs from nearly every submodule, we deploy new
-  # versions on every update of `release`. Because the docs combine many
-  # different submodules, that raises the question of what version number to
-  # assign. As a heuristic, we track @wwtelescope/engine. If a new non-prelease
-  # version of the engine is published, we deploy the docs in a versioned
-  # directory; otherwise we deploy under `latest`.
-
-  ##- task: AzureFileCopy@3
-  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
-  ##  displayName: Deploy hosted engine artifacts
-  ##  inputs:
-  ##    SourcePath: '$(build.artifactStagingDirectory)/engine-hosted'
-  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##    Destination: 'AzureBlob'
-  ##    storage: 'wwtwebstatic'
-  ##    ContainerName: '$web'
-  ##    blobPrefix: engine/$(engineVersionText)
-
-  ##- task: AzureFileCopy@3
-  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedVersion'], ''))
-  ##  displayName: Deploy embed web application
-  ##  inputs:
-  ##    SourcePath: '$(build.artifactStagingDirectory)/embed'
-  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##    Destination: 'AzureBlob'
-  ##    storage: 'wwtwebstatic'
-  ##    ContainerName: '$web'
-  ##    blobPrefix: embed/$(embedVersionText)/wwt
-
-  ##- task: AzureFileCopy@3
-  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedCreatorVersion'], ''))
-  ##  displayName: Deploy embed-creator web application
-  ##  inputs:
-  ##    SourcePath: '$(build.artifactStagingDirectory)/embed-creator'
-  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##    Destination: 'AzureBlob'
-  ##    storage: 'wwtwebstatic'
-  ##    ContainerName: '$web'
-  ##    blobPrefix: _embedui
-
-  ##- task: AzureFileCopy@3
-  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
-  ##  displayName: Deploy documentation
-  ##  inputs:
-  ##    SourcePath: '$(build.artifactStagingDirectory)/docs'
-  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##    Destination: 'AzureBlob'
-  ##    storage: 'wwtwebstatic'
-  ##    ContainerName: '$web'
-  ##    blobPrefix: '_docs/webgl-reference/$(docsVersionText)'
-
-  # CDN purges - last since they are slow and close to optional
-
-  ##- task: AzurePowerShell@4
-  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEngineVersion'], ''))
-  ##  displayName: CDN purge - hosted engine artifacts
-  ##  inputs:
-  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##    azurePowerShellVersion: 'LatestVersion'
-  ##    scriptType: 'inlineScript'
-  ##    inline: |
-  ##      Unpublish-AzCdnEndpointContent `
-  ##        -ProfileName wwt-cdn-01 `
-  ##        -ResourceGroupName wwt-web01 `
-  ##        -EndpointName wwtweb-prod `
-  ##        -PurgeContent '/engine/$(engineVersionText)/*'
-
-  ##- task: AzurePowerShell@4
-  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedVersion'], ''))
-  ##  displayName: CDN purge - embed web app
-  ##  inputs:
-  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##    azurePowerShellVersion: 'LatestVersion'
-  ##    scriptType: 'inlineScript'
-  ##    inline: |
-  ##      Unpublish-AzCdnEndpointContent `
-  ##        -ProfileName wwt-cdn-01 `
-  ##        -ResourceGroupName wwt-web01 `
-  ##        -EndpointName wwtweb-prod `
-  ##        -PurgeContent '/embed/$(embedVersionText)/wwt/*'
-
-  # People say the docs are misleading about how to purge a CDN endpoint from
-  # the root; try the all-of-the-above approach.
-  # https://stackoverflow.com/questions/50591959/how-to-full-purge-the-azure-cdn-through-powershell
-  ##- task: AzurePowerShell@4
-  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'), ne(variables['publishedEmbedCreatorVersion'], ''))
-  ##  displayName: CDN purge - embed-creator web app
-  ##  inputs:
-  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##    azurePowerShellVersion: 'LatestVersion'
-  ##    scriptType: 'inlineScript'
-  ##    inline: |
-  ##      $names = @('/', '/*', '/css/*', '/js/*')
-  ##      Unpublish-AzCdnEndpointContent `
-  ##        -ProfileName wwt-cdn-01 `
-  ##        -ResourceGroupName wwt-web01 `
-  ##        -EndpointName wwtwebembed-prod `
-  ##        -PurgeContent $names
-
-  ##- task: AzurePowerShell@4
-  ##  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/release'))
-  ##  displayName: CDN purge - docs
-  ##  inputs:
-  ##    azureSubscription: 'aas@wwtadmindotnetfoundation'
-  ##    azurePowerShellVersion: 'LatestVersion'
-  ##    scriptType: 'inlineScript'
-  ##    inline: |
-  ##      Unpublish-AzCdnEndpointContent `
-  ##        -ProfileName wwt-cdn-01 `
-  ##        -ResourceGroupName wwt-web01 `
-  ##        -EndpointName wwtwebdocs-prod `
-  ##        -PurgeContent '/webgl-reference/$(docsVersionText)/*'
