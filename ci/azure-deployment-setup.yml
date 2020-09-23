@@ -1,0 +1,35 @@
+# Generic setup in the deployment stage. We download all artifacts, install
+# Cranko, and recover the `release` commit. We assume that we are running on
+# Windows, since some of the deployment steps require it.
+
+parameters:
+- name: setupGit
+  type: boolean
+  default: false
+
+steps:
+- download: current
+
+- checkout: self
+
+- pwsh: |
+    git switch -c release
+    git pull --ff-only $(Pipeline.Workspace)\git-release\release.bundle
+    git show
+  displayName: Restore release commit
+
+- pwsh: |
+    $d = Join-Path $Env:Temp cranko-$(New-Guid)
+    [void][System.IO.Directory]::CreateDirectory($d)
+    cd $d
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+    iex ((New-Object System.Net.WebClient).DownloadString('https://pkgw.github.io/cranko/fetch-latest.ps1'))
+    echo "##vso[task.prependpath]$d"
+  displayName: Install latest Cranko (Windows)
+
+- ${{ if parameters.setupGit }}:
+  - bash: |
+      cranko github install-credential-helper
+    displayName: Set up Git pushes
+    env:
+      GITHUB_TOKEN: $(GITHUB_TOKEN)

@@ -1,0 +1,139 @@
+# Copyright 2020 the .NET Foundation
+# Licensed under the MIT License
+
+# Main build stage. The ScriptSharp stage has already run, creating a Cranko
+# release commit bundle and the magic wwtlib.js JavaScript file. With those in
+# hand, these parts of the build can run on any platform (yay!).
+
+parameters:
+- name: 'zolaVersion'
+  default: '0.10.1'
+  type: string
+
+jobs:
+- job: build_linux
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - template: azure-main-build-setup.yml
+
+  - bash: npm run build
+    displayName: NPM build
+
+  - bash: npm run pack
+    displayName: NPM pack
+
+  # Stage our panoply of artifacts. (No reason not to do this ASAP -- these can
+  # help debug build problems.)
+
+  - pwsh: |
+      mkdir $(Build.ArtifactStagingDirectory)\npm
+      cp *\*.tgz $(Build.ArtifactStagingDirectory)\npm
+    displayName: Stage NPM package artifacts
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish NPM package artifacts
+    inputs:
+      artifactName: npm
+      targetPath: $(Build.ArtifactStagingDirectory)/npm
+
+  - pwsh: |
+      mkdir $(Build.ArtifactStagingDirectory)\engine-hosted
+      cp engine\wwtlib\bin\wwtlib.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtlib.js
+      cp engine\src\index.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.js
+      cp engine\src\index.min.js $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.min.js
+      cp engine\src\index.d.ts $(Build.ArtifactStagingDirectory)\engine-hosted\wwtsdk.d.ts
+    displayName: Stage JavaScript hosted artifacts
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish JavaScript hosted artifacts
+    inputs:
+      artifactName: engine-hosted
+      targetPath: $(Build.ArtifactStagingDirectory)/engine-hosted
+
+  - task: CopyFiles@2
+    displayName: Stage embed app artifacts
+    inputs:
+      sourceFolder: embed/dist
+      targetFolder: $(Build.ArtifactStagingDirectory)/embed
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish embed app artifacts
+    inputs:
+      artifactName: embed
+      targetPath: $(Build.ArtifactStagingDirectory)/embed
+
+  - task: CopyFiles@2
+    displayName: Stage embed-creator app artifacts
+    inputs:
+      sourceFolder: embed-creator/dist
+      targetFolder: $(Build.ArtifactStagingDirectory)/embed-creator
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish embed-creator app artifacts
+    inputs:
+      artifactName: embed-creator
+      targetPath: $(Build.ArtifactStagingDirectory)/embed-creator
+
+  # Test
+
+  - bash: npm run test
+    displayName: NPM test
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'engine/tests/results.xml'
+
+
+- job: lint
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - template: azure-main-build-setup.yml
+
+  - bash: npm run build
+    displayName: NPM build
+
+  - bash: npm run lint
+    displayName: NPM build
+
+
+- job: docs
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - template: azure-main-build-setup.yml
+
+  - bash: npm run build
+    displayName: NPM build
+
+  - script: npm run doc
+    displayName: NPM doc
+
+  - bash: |
+      set -xeuo pipefail
+      fn="zola-v${{ parameters.zolaVersion }}-x86_64-unknown-linux-gnu.tar.gz"
+      u="https://github.com/getzola/zola/releases/download/v${{ parameters.zolaVersion }}/$fn"
+      wget "$u"
+      tar xzf "$fn"
+      rm -rf "$fn"
+    displayName: Install Zola
+
+  - bash: |
+      cd docs
+      ../zola check
+    displayName: Check Zola docs site
+
+  - bash: |
+      cd docs
+      ../zola build -o $ARTIFACT_STAGING/docs
+    displayName: Zola docs build
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish docs artifacts
+    inputs:
+      artifactName: docs
+      targetPath: $(Build.ArtifactStagingDirectory)/docs
