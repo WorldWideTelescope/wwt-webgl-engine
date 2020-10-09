@@ -18,10 +18,10 @@
           </template>
         </v-popover>
       </li>
-      <li>
+      <li v-show="!wwtIsTourPlayerActive">
         <font-awesome-icon icon="search-plus" size="lg" @click="doZoom(true)"></font-awesome-icon>
       </li>
-      <li>
+      <li v-show="!wwtIsTourPlayerActive">
         <font-awesome-icon icon="search-minus" size="lg" @click="doZoom(false)"></font-awesome-icon>
       </li>
       <li v-show="fullscreenAvailable">
