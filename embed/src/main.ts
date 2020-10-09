@@ -1,9 +1,10 @@
 import Vue from "vue";
 import VTooltip from "v-tooltip";
 import Vuex from "vuex";
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faAdjust, faMountain, faSearchMinus, faSearchPlus, faSlidersH } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faAdjust, faCompress, faExpand, faMountain, faSearchMinus, faSearchPlus, faSlidersH } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { createPlugin } from "@wwtelescope/engine-vuex";
 import { EmbedSettings } from "@wwtelescope/embed-common";
@@ -23,6 +24,8 @@ Vue.use(createPlugin(), {
 });
 
 library.add(faAdjust);
+library.add(faCompress);
+library.add(faExpand);
 library.add(faMountain);
 library.add(faSearchMinus);
 library.add(faSearchPlus);

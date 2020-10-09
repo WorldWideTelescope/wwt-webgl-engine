@@ -24,6 +24,10 @@
       <li>
         <font-awesome-icon icon="search-minus" size="lg" @click="doZoom(false)"></font-awesome-icon>
       </li>
+      <li v-show="fullscreenAvailable">
+        <font-awesome-icon v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
+          size="lg" class="nudgeright1" @click="toggleFullscreen()"></font-awesome-icon>
+      </li>
     </ul>
 
     <div id="tools">
@@ -54,6 +58,8 @@
 
 <script lang="ts">
 import { Component, Prop } from "vue-property-decorator";
+
+import * as screenfull from "screenfull";
 
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { ImageSetType } from "@wwtelescope/engine-types";
@@ -90,6 +96,7 @@ export default class Embed extends WWTAwareComponent {
 
   backgroundImagesets: BackgroundImageset[] = [];
   currentTool: ToolType = null;
+  fullscreenModeActive = false;
 
   get coordText() {
     if (this.wwtRenderType == ImageSetType.sky) {
@@ -115,6 +122,10 @@ export default class Embed extends WWTAwareComponent {
 
   set foregroundOpacity(o: number) {
     this.setForegroundOpacity(o);
+  }
+
+  get fullscreenAvailable() {
+    return screenfull.isEnabled;
   }
 
   get showBackgroundChooser() {
@@ -235,6 +246,18 @@ export default class Embed extends WWTAwareComponent {
     }
   }
 
+  mounted() {
+    if (screenfull.isEnabled) {
+      screenfull.on('change', this.onFullscreenEvent);
+    }
+  }
+
+  destroyed() {
+    if (screenfull.isEnabled) {
+      screenfull.off('change', this.onFullscreenEvent);
+    }
+  }
+
   selectTool(name: ToolType) {
     if (this.currentTool == name) {
       this.currentTool = null;
@@ -248,6 +271,20 @@ export default class Embed extends WWTAwareComponent {
       this.zoom(1/1.3);
     } else {
       this.zoom(1.3);
+    }
+  }
+
+  toggleFullscreen() {
+    if (screenfull.isEnabled) {
+      screenfull.toggle();
+    }
+  }
+
+  onFullscreenEvent() {
+    // NB: we need the isEnabled check to make TypeScript happy even though it
+    // is not necesary in practice here.
+    if (screenfull.isEnabled) {
+      this.fullscreenModeActive = screenfull.isFullscreen;
     }
   }
 }
@@ -311,7 +348,12 @@ body {
 
   li {
     padding: 3px;
+    height: 22px;
     cursor: pointer;
+
+    .nudgeright1 {
+      padding-left: 3px;
+    }
   }
 }
 
