@@ -805,6 +805,16 @@ export class WWTControl {
    */
   gotoTarget(place: Place, noZoom: boolean, instant: boolean, trackObject: boolean): void;
 
+  /** Change the zoom of the current view. The change is not necessarily
+   * instantaneous, depending on whether the "smooth pan" setting is activated.
+   *
+   * @param factor The multiplicative factor by which to change the zoom level.
+   * A number larger than one causes the field of view to increase, i.e. a zoom
+   * out.
+   *
+   */
+  zoom(factor: number): void;
+
   /** Look up an imageset by its name.
    *
    * The name matching is case-insensitive, matches on substrings, and moves

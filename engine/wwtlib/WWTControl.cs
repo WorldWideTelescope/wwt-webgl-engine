@@ -334,6 +334,13 @@ namespace wwtlib
                 return;
             }
 
+            if (sizeChange) {
+                // In GL, the crosshairs are in viewport coordinates
+                // ([0,1]x[0,1]), so a size change alters their perceived aspect
+                // ratio.
+                crossHairs = null;
+            }
+
             Tile.lastDeepestLevel = Tile.deepestLevel;
 
             RenderTriangle.Width = RenderContext.Width = Canvas.Width;
@@ -2516,7 +2523,6 @@ namespace wwtlib
         {
             if (context.gl == null)
             {
-
                 CanvasContext2D ctx = context.Device;
                 ctx.Save();
                 ctx.BeginPath();

@@ -13,7 +13,7 @@ that can be embedded in webpages or your own applications. Like this!
 [WWT web client]: https://www.worldwidetelescope.org/webclient/
 [TypeScript]: https://www.typescriptlang.org/
 
-<iframe src="embed/?planet=mars" class="wwt-embed">
+<iframe src="embed/?planet=mars" class="wwt-embed" allow="accelerometer; autoplay; clipboard-write; gyroscope" allowfullscreen>
 </iframe>
 
 This manual is the detailed reference on its usage and behavior.
