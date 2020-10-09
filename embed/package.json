@@ -11,6 +11,7 @@
     "@wwtelescope/embed-common": "0.0.0-dev.0",
     "@wwtelescope/engine": "0.0.0-dev.0",
     "@wwtelescope/engine-vuex": "0.0.0-dev.0",
+    "screenfull": "^5",
     "v-tooltip": "=2.0.2",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
@@ -24,8 +25,8 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/embed-common": "manual:^0.2.0",
-    "@wwtelescope/engine": "manual:^7.3.0",
-    "@wwtelescope/engine-vuex": "manual:^0.3.0"
+    "@wwtelescope/engine": "thiscommit:20201009a",
+    "@wwtelescope/engine-vuex": "thiscommit:20201009b"
   },
   "keywords": [
     "AAS WorldWide Telescope"

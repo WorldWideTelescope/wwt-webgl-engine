@@ -214,6 +214,13 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.$wwt.inst.setupForImageset(options);
   }
 
+  @Mutation
+  zoom(factor: number): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot zoom without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.zoom(factor);
+  }
+
   @Action({ rawError: true })
   async waitForReady(): Promise<void> {
     if (Vue.$wwt.inst !== null) {
