@@ -381,7 +381,7 @@
         <b-row>
           <b-col>
             <h4>Preview</h4>
-            <iframe :src="iframeSource" class="w-100 wwt-preview">
+            <iframe :src="iframeSource" class="w-100 wwt-preview" allow="accelerometer; autoplay; clipboard-write; gyroscope" allowfullscreen>
               <p>
                 Cannot preview because your browser does not support iframes.
               </p>
@@ -540,8 +540,8 @@ export default class Creator extends Vue {
   }
 
   get embedCode() {
-    const style = this.suggestDefaultStyling ? " style=\"width: 100%; height: 360px;\"" : "";
-    return `<iframe class="wwt-embed" src="${escapeHtml(this.iframeSource)}" ${style}>
+    const style = this.suggestDefaultStyling ? " frameborder=\"0\" style=\"width: 100%; height: 360px;\"" : "";
+    return `<iframe class="wwt-embed" src="${escapeHtml(this.iframeSource)}" allow="accelerometer; autoplay; clipboard-write; gyroscope" allowfullscreen ${style}>
   <p>Cannot display WorldWide Telescope because your browser does not support iframes.</p>
 </iframe>`;
   }
