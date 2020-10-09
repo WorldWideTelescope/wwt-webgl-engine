@@ -60,6 +60,7 @@ export class WWTAwareComponent extends Vue {
         "setForegroundImageByName",
         "setForegroundOpacity",
         "setupForImageset",
+        "zoom",
       ]),
     };
   }
@@ -83,6 +84,7 @@ export class WWTAwareComponent extends Vue {
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
+  zoom!: (f: number) => void;
 
   // Actions
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;

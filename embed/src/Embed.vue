@@ -6,17 +6,25 @@
       <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
 
-    <div id="tool-menu" v-show="showToolMenu">
-      <v-popover>
-        <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
-        <template slot="popover">
-          <ul class="tooltip-content tool-menu">
-            <li v-show="showCrossfader"><a href="#" v-close-popover @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
-            <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
-          </ul>
-        </template>
-      </v-popover>
-    </div>
+    <ul id="controls">
+      <li v-show="showToolMenu">
+        <v-popover placement="left">
+          <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
+          <template slot="popover">
+            <ul class="tooltip-content tool-menu">
+              <li v-show="showCrossfader"><a href="#" v-close-popover @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
+              <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
+            </ul>
+          </template>
+        </v-popover>
+      </li>
+      <li>
+        <font-awesome-icon icon="search-plus" size="lg" @click="doZoom(true)"></font-awesome-icon>
+      </li>
+      <li>
+        <font-awesome-icon icon="search-minus" size="lg" @click="doZoom(false)"></font-awesome-icon>
+      </li>
+    </ul>
 
     <div id="tools">
       <div class="tool-container">
@@ -234,6 +242,14 @@ export default class Embed extends WWTAwareComponent {
       this.currentTool = name;
     }
   }
+
+  doZoom(zoomIn: boolean) {
+    if (zoomIn) {
+      this.zoom(1/1.3);
+    } else {
+      this.zoom(1.3);
+    }
+  }
 }
 </script>
 
@@ -283,13 +299,18 @@ body {
   }
 }
 
-#tool-menu {
+#controls {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   color: #FFF;
 
-  .tooltip-target {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    padding: 3px;
     cursor: pointer;
   }
 }
