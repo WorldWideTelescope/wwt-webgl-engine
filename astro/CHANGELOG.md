@@ -1,4 +1,8 @@
-# @wwtelescope/astro 0.1.2 (2020-09-24)
+# See elsewhere for changelog
 
-- Added a README
-- No code changes
+This project’s release notes are curated from the Git history of its main
+branch. You can find them by looking at [the version of this file on the
+`release` branch][branch] or the [GitHub release history][gh-releases].
+
+[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/astro/CHANGELOG.md
+[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases
