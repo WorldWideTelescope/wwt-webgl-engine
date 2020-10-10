@@ -1421,6 +1421,14 @@ namespace wwtlib
             PointerEvent pe = (PointerEvent)(object)e;
             int index = 0;
 
+            // Our pointerIds infrastructure is meant to track adjustments
+            // during a pinch motion. However, as seen in Firefox circa v81 on
+            // Linux and Android, in some cases the browser can just *lie* and
+            // swap pointerIds for the two fingers during a pinch gesture,
+            // leading to catastrophic failures. Therefore, ignore the pointerId
+            // information and infer which location is being updated from
+            // whichever change is smaller.
+
             if (pointerIds[0] == pe.PointerId)
             {
                 index = 0;
@@ -1437,11 +1445,32 @@ namespace wwtlib
             if (pinchingZoomRect[0] != null && pinchingZoomRect[1] != null)
             {
                 double oldDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
-                pinchingZoomRect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
-                double newDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
-                double ratio = oldDist / newDist;
-                Zoom(ratio);
+
+                Vector2d newRect = Vector2d.Create(e.OffsetX, e.OffsetY);
+
+                double newDist0 = GetDistance(newRect, pinchingZoomRect[0]);
+                double ratio0 = oldDist / newDist0;
+                double abslog0 = Math.Abs(Math.Log(ratio0));
+                if (!(bool)Script.Literal("isFinite({0})", abslog0)) {
+                    abslog0 = 1000;
+                }
+
+                double newDist1 = GetDistance(newRect, pinchingZoomRect[1]);
+                double ratio1 = oldDist / newDist1;
+                double abslog1 = Math.Abs(Math.Log(ratio1));
+                if (!(bool)Script.Literal("isFinite({0})", abslog1)) {
+                    abslog1 = 1000;
+                }
+
+                if (abslog1 < abslog0) {
+                    pinchingZoomRect[0] = newRect;
+                    Zoom(ratio1);
+                } else {
+                    pinchingZoomRect[1] = newRect;
+                    Zoom(ratio0);
+                }
             } else {
+                // Before two fingers are available, just trust.
                 pinchingZoomRect[index] = Vector2d.Create(e.OffsetX, e.OffsetY);
             }
 

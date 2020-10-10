@@ -1,12 +1,12 @@
 [![Build Status](https://dev.azure.com/aasworldwidetelescope/WWT/_apis/build/status/WorldWideTelescope.wwt-webgl-engine?branchName=cranko)](https://dev.azure.com/aasworldwidetelescope/WWT/_build/latest?definitionId=21&branchName=cranko)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/astro)](https://www.npmjs.com/package/@wwtelescope/astro)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/embed)](https://www.npmjs.com/package/@wwtelescope/embed)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/embed-common)](https://www.npmjs.com/package/@wwtelescope/embed-common)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/embed-creator)](https://www.npmjs.com/package/@wwtelescope/embed-creator)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/engine)](https://www.npmjs.com/package/@wwtelescope/engine)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-helpers)](https://www.npmjs.com/package/@wwtelescope/engine-helpers)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-types)](https://www.npmjs.com/package/@wwtelescope/engine-types)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-vuex)](https://www.npmjs.com/package/@wwtelescope/engine-vuex)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/astro?label=@wwtelescope/astro)](https://www.npmjs.com/package/@wwtelescope/astro)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/embed?label=@wwtelescope/embed)](https://www.npmjs.com/package/@wwtelescope/embed)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/embed-common?label=@wwtelescope/embed-common)](https://www.npmjs.com/package/@wwtelescope/embed-common)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/embed-creator?label=@wwtelescope/embed-creator)](https://www.npmjs.com/package/@wwtelescope/embed-creator)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine?label=@wwtelescope/engine)](https://www.npmjs.com/package/@wwtelescope/engine)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-helpers?label=@wwtelescope/engine-helpers)](https://www.npmjs.com/package/@wwtelescope/engine-helpers)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-types?label=@wwtelescope/engine-types)](https://www.npmjs.com/package/@wwtelescope/engine-types)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-vuex?label=@wwtelescope/engine-vuex)](https://www.npmjs.com/package/@wwtelescope/engine-vuex)
 
 # The AAS WorldWide Telescope WebGL engine
 
