@@ -1,7 +1,3 @@
-# @wwtelescope/engine-vuex 0.4.0 (2020-10-09)
-
-- Add an API to adjust the zoom level.
-
 # See elsewhere for changelog
 
 This project’s release notes are curated from the Git history of its main
