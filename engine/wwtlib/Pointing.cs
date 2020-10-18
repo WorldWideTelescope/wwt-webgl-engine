@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
-namespace TerraViewer.Healpix
+namespace wwtlib
 {
     public class Pointing
     {
@@ -17,29 +13,50 @@ namespace TerraViewer.Healpix
         /** Default constructor */
         public Pointing() { }
 
-        public Pointing(Pointing ptg)
-        { this.theta = ptg.theta; this.phi = ptg.phi; }
+        //public static Pointing Create(Pointing ptg)
+        //{
+        //    Pointing temp = new Pointing();
+        //    temp.theta = ptg.theta; 
+        //    temp.phi = ptg.phi;
+        //    return temp;
+        //}
 
         /** Simple constructor initializing both values.
             @param theta in radians [0,Pi]
             @param phi in radians [0,2*Pi] */
-        public Pointing(double theta, double phi)
-        { this.theta = theta; this.phi = phi; }
-
-        public Pointing(Vector3d vec)
+        public static Pointing Create(double theta, double phi)
         {
-            theta = FastMath.atan2(Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y), vec.Z);
-            phi = FastMath.atan2(vec.Y, vec.X);
-            if (phi < 0d) phi += 2 * Math.PI;
-            if (phi >= 2 * Math.PI) phi -= 2 * Math.PI;
+            Pointing temp = new Pointing();
+            temp.theta = theta;
+            temp.phi = phi;
+            return temp;
         }
 
+        //public static Pointing Create(Vector3d vec)
+        //{
+        //    Pointing temp = new Pointing();
+        //    temp.theta = FastMath.atan2(Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y), vec.Z);
+        //    temp.phi = FastMath.atan2(vec.Y, vec.X);
+        //    if (temp.phi < 0d)
+        //    {
+        //        temp.phi += 2 * Math.PI;
+        //    }
+        //    if (temp.phi >= 2 * Math.PI)
+        //    {
+        //        temp.phi -= 2 * Math.PI;
+        //    }
+        //    return temp;
+        //}
 
-        public Pointing(Zphi zphi)
-        {
-            double xy = Math.Sqrt((1d - zphi.z) * (1d + zphi.z));
-            theta = FastMath.atan2(xy, zphi.z); phi = zphi.phi;
-        }
+
+        //public static Pointing Create(Zphi zphi)
+        //{
+        //    Pointing temp = new Pointing();
+        //    double xy = Math.Sqrt((1d - zphi.z) * (1d + zphi.z));
+        //    temp.theta = FastMath.atan2(xy, zphi.z); 
+        //    temp.phi = zphi.phi;
+        //    return temp;
+        //}
 
         /** Normalize theta range */
         public void normalizeTheta()
