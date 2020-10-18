@@ -1,30 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-namespace TerraViewer.Healpix
+namespace wwtlib
 {
     /**
      * Code from Healpix Java package
      */
     public class FastMath
     {
-        private static  double mulsign(double x, double y)
-        { return  Math.Sign(y) * x; }
+        private static double mulsign(double x, double y)
+        { return FastMath.sign(y) * x; }
 
         /** Checks if the argument is a NaN or not. */
-        private static  bool isnan(double d)
+        private static bool isnan(double d)
         { return d != d; }
 
         /** Checks if the argument is either positive or negative infinity. */
         private static bool isinf(double d)
         { return Math.Abs(d) == Double.PositiveInfinity; }
 
-        private static  double sign(double d) { return Math.Sign(d); }
+        private static double sign(double d) { 
+            if (d == 0) 
+            {
+                return 0; 
+            } 
+            return d > 0 ? 1 : -1; 
+        }
 
-        private static  double atanhelper(double s)
+        private static double atanhelper(double s)
         {
             double t = s * s;
             double u = -1.88796008463073496563746e-05;
@@ -50,7 +51,7 @@ namespace TerraViewer.Healpix
             return u * t * s + s;
         }
 
-        private static  double atan2k(double y, double x)
+        private static double atan2k(double y, double x)
         {
             double q = 0;
 
@@ -63,7 +64,7 @@ namespace TerraViewer.Healpix
         /** This method calculates the arc tangent of y/x in radians, using
             the signs of the two arguments to determine the quadrant of the
             result. The results may have maximum error of 2 ulps. */
-        public static  double atan2(double y, double x)
+        public static double atan2(double y, double x)
         {
             double r = atan2k(Math.Abs(y), x);
 
@@ -94,7 +95,7 @@ namespace TerraViewer.Healpix
 
         /** Returns the arc tangent of an angle. The results may have
             maximum error of 2 ulps. */
-        public static  double atan(double s)
+        public static double atan(double s)
         {
             int q = 0;
             if (s < 0) { s = -s; q = 2; }
@@ -115,7 +116,7 @@ namespace TerraViewer.Healpix
           = .306161699786838294306516483068750264552437361480769e-16;
         private static readonly double M_1_PI = 0.3183098861837906715377675267450287;
 
-        private  static double sincoshelper(double d)
+        private static double sincoshelper(double d)
         {
             double s = d * d;
             double u = -7.97255955009037868891952e-18;
@@ -132,12 +133,12 @@ namespace TerraViewer.Healpix
 
         /** Returns the trigonometric sine of an angle. The results may
             have maximum error of 2 ulps. */
-        public static  double sin(double d)
+        public static double sin(double d)
         {
             double u = d * M_1_PI;
             long q = (long)(u < 0 ? u - 0.5 : u + 0.5);
 
-            double x = 4d* q;
+            double x = 4d * q;
             d -= x * PI4_A;
             d -= x * PI4_B;
             d -= x * PI4_C;
@@ -149,12 +150,12 @@ namespace TerraViewer.Healpix
 
         /** Returns the trigonometric cosine of an angle. The results may
             have maximum error of 2 ulps. */
-        public static  double cos(double d)
+        public static double cos(double d)
         {
             double u = d * M_1_PI - 0.5;
             long q = 1 + 2 * (long)(u < 0 ? u - 0.5 : u + 0.5);
 
-            double x = 2d* q;
+            double x = 2d * q;
             d -= x * PI4_A;
             d -= x * PI4_B;
             d -= x * PI4_C;
