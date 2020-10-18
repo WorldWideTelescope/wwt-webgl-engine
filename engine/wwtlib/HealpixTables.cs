@@ -1,14 +1,6 @@
-﻿
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-namespace TerraViewer.Healpix
+﻿namespace wwtlib
 {
-   
+
     public class HealpixTables
     {
         static readonly public short[] ctab ={
@@ -54,26 +46,26 @@ namespace TerraViewer.Healpix
 
         static readonly public short[] xoffset = { -1, -1, 0, 1, 1, 1, 0, -1 };
         static readonly public short[] yoffset = { 0, 1, 1, 1, 0, -1, -1, -1 };
-        static readonly public short[,] facearray =
-              { {  8, 9,10,11,-1,-1,-1,-1,10,11, 8, 9 },   // S
-          {  5, 6, 7, 4, 8, 9,10,11, 9,10,11, 8 },   // SE
-          { -1,-1,-1,-1, 5, 6, 7, 4,-1,-1,-1,-1 },   // E
-          {  4, 5, 6, 7,11, 8, 9,10,11, 8, 9,10 },   // SW
-          {  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11 },   // center
-          {  1, 2, 3, 0, 0, 1, 2, 3, 5, 6, 7, 4 },   // NE
-          { -1,-1,-1,-1, 7, 4, 5, 6,-1,-1,-1,-1 },   // W
-          {  3, 0, 1, 2, 3, 0, 1, 2, 4, 5, 6, 7 },   // NW
-          {  2, 3, 0, 1,-1,-1,-1,-1, 0, 1, 2, 3 } }; // N
-        static readonly public byte[,] swaparray =
-              { { 0,0,3 },   // S
-          { 0,0,6 },   // SE
-          { 0,0,0 },   // E
-          { 0,0,5 },   // SW
-          { 0,0,0 },   // center
-          { 5,0,0 },   // NE
-          { 0,0,0 },   // W
-          { 6,0,0 },   // NW
-          { 3,0,0 } }; // N
+        //static readonly public short[,] facearray =
+        //      { {  8, 9,10,11,-1,-1,-1,-1,10,11, 8, 9 },   // S
+        //  {  5, 6, 7, 4, 8, 9,10,11, 9,10,11, 8 },   // SE
+        //  { -1,-1,-1,-1, 5, 6, 7, 4,-1,-1,-1,-1 },   // E
+        //  {  4, 5, 6, 7,11, 8, 9,10,11, 8, 9,10 },   // SW
+        //  {  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11 },   // center
+        //  {  1, 2, 3, 0, 0, 1, 2, 3, 5, 6, 7, 4 },   // NE
+        //  { -1,-1,-1,-1, 7, 4, 5, 6,-1,-1,-1,-1 },   // W
+        //  {  3, 0, 1, 2, 3, 0, 1, 2, 4, 5, 6, 7 },   // NW
+        //  {  2, 3, 0, 1,-1,-1,-1,-1, 0, 1, 2, 3 } }; // N
+        //static readonly public byte[,] swaparray =
+        //      { { 0,0,3 },   // S
+        //  { 0,0,6 },   // SE
+        //  { 0,0,0 },   // E
+        //  { 0,0,5 },   // SW
+        //  { 0,0,0 },   // center
+        //  { 5,0,0 },   // NE
+        //  { 0,0,0 },   // W
+        //  { 6,0,0 },   // NW
+        //  { 3,0,0 } }; // N
 
         //    static readonly protected List<int[]> swap_cycle = new List<int[]>()
         //    {
