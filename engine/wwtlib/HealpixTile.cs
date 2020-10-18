@@ -1,19 +1,13 @@
-﻿namespace wwtlib
+﻿using System;
+using System.Collections.Generic;
+using System.Html;
+
+namespace wwtlib
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Drawing;
-    using System.Drawing.Drawing2D;
-    using System.Drawing.Imaging;
-    using System.Net;
-    using System.IO;
-    using System.Text;
-    using System.Threading;
-    using TerraViewer.Healpix;
 
     public class HealpixTile : Tile
     {
-        protected PositionTexture[,] bounds;
+        protected PositionTexture[] bounds;
         protected bool backslash = false;
         List<PositionTexture> vertexList = null;
 
@@ -24,6 +18,7 @@
         short[] indexArray;
         int step;
         int face;
+
         public int Face
         {
             get
@@ -34,6 +29,14 @@
         int quadIndexStart;
         int quadIndexEnd;
 
+        static protected WebGLBuffer[] slashIndexBuffer = new WebGLBuffer[64];
+        static protected WebGLBuffer[] backSlashIndexBuffer = new WebGLBuffer[64];
+        static protected WebGLBuffer[] rootIndexBuffer = new WebGLBuffer[4];
+
+        //static protected IndexBuffer11[,] slashIndexBuffer = new IndexBuffer11[4, 16];
+        //static protected IndexBuffer11[,] backSlashIndexBuffer = new IndexBuffer11[4, 16];
+        //static protected IndexBuffer11[] rootIndexBuffer = new IndexBuffer11[4];
+
         string url;
         public String URL
         {
@@ -41,7 +44,7 @@
             {
                 if (url == null)
                 {
-                    url = GetUrl(dataset, level, x, y);
+                    url = GetUrl(dataset, Level, tileX, tileY);
                     return url;
                 }
                 else
@@ -51,12 +54,12 @@
             }
         }
 
-        public HealpixTile(int level, int x, int y, IImageSet dataset, Tile parent)
+        public HealpixTile(int level, int x, int y, Imageset dataset, Tile parent)
         {
             HealpixTile.LoadProperties(dataset);
-            this.level = level;
-            this.x = x;
-            this.y = y;
+            this.Level = level;
+            this.tileX = x;
+            this.tileY = y;
             this.dataset = dataset;
 
             if (level == 0)
@@ -114,7 +117,7 @@
             ComputeQuadrant();
 
             // All healpix is inside out
-            insideOut = true;
+            //insideOut = true;
             ComputeBoundingSphere();
         }
 
@@ -126,7 +129,8 @@
                 createGeometry();
             }
 
-            Vector3d[] pointList = BufferPool11.GetVector3dBuffer(vertexList.Count);
+            Vector3d[] pointList = new Vector3d[vertexList.Count];
+            //Vector3d[] pointList = BufferPool11.GetVector3dBuffer(vertexList.Count);
             for (int i = 0; i < vertexList.Count; i++)
             {
                 pointList[i] = vertexList[i].Position;
@@ -138,7 +142,8 @@
 
         private void createGeometry()
         {
-            vertexList = BufferPool11.GetPositionTextureList();
+            //vertexList = BufferPool11.GetPositionTextureList();
+            vertexList = new List<PositionTexture>();
 
             int nQuads = (int)Math.Pow(nside, 2);// quads of one face in a specific order 
             int faceoff = nQuads * face;
@@ -148,7 +153,7 @@
             {
                 int quadIndex = 0;
 
-                if (level == 0)
+                if (Level == 0)
                 {
                     vertexListOfLevel0(vertexList, quadIndexStart, quadIndexEnd, faceoff);
                 }
@@ -185,7 +190,7 @@
                                     u = 0.5 / step * ty;
                                     v = 0.5;
                                 }
-                                vertexList.Add(new PositionTexture(points[i], u, v));
+                                vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                             }
                         }
                         else if (quadIndex == 1)
@@ -215,7 +220,7 @@
                                     u = 0.5 / step * ty;
                                     v = 1;
                                 }
-                                vertexList.Add(new PositionTexture(points[i], u, v));
+                                vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                             }
                         }
                         else if (quadIndex == 2)
@@ -245,7 +250,7 @@
                                     u = 0.5 + 0.5 / step * ty;
                                     v = 0.5;
                                 }
-                                vertexList.Add(new PositionTexture(points[i], u, v));
+                                vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                             }
                         }
                         else if (quadIndex == 3)
@@ -275,7 +280,7 @@
                                     u = 0.5 + 0.5 / step * ty;
                                     v = 1;
                                 }
-                                vertexList.Add(new PositionTexture(points[i], u, v));
+                                vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                             }
                         }
                         quadIndex++;
@@ -285,60 +290,59 @@
             catch (Exception e)
             {
             }
-
             // Convert to galactic points.
-            if (dataset.Projection == ProjectionType.Healpix && dataset.Properties.ContainsKey("hips_frame") && dataset.Properties["hips_frame"] == "galactic")
-            {
-                if (!galMatInit)
-                {
-                    Matrix3d galMatrix = Matrix3d.Identity;
-                    //galMatrix.Multiply(Matrix3d.RotationY(90 +((17.7603329867975 * 15)) / 180.0 * Math.PI));
-                    //galMatrix.Multiply(Matrix3d.RotationX(((-28.9361739586894)) / 180.0 * Math.PI));
-                    //galMatrix.Multiply(Matrix3d.RotationZ(((31.422052860102041270114993238783)) / 180.0 * Math.PI));
-                    //galMatrix.Invert(); 
+            //if (dataset.Projection == ProjectionType.Healpix && dataset.Properties.ContainsKey("hips_frame") && dataset.Properties["hips_frame"] == "galactic")
+            //{
+            //    if (!galMatInit)
+            //    {
+            //        Matrix3d galMatrix = Matrix3d.Identity;
+            //        //galMatrix.Multiply(Matrix3d.RotationY(90 +((17.7603329867975 * 15)) / 180.0 * Math.PI));
+            //        //galMatrix.Multiply(Matrix3d.RotationX(((-28.9361739586894)) / 180.0 * Math.PI));
+            //        //galMatrix.Multiply(Matrix3d.RotationZ(((31.422052860102041270114993238783)) / 180.0 * Math.PI));
+            //        //galMatrix.Invert(); 
 
-                    //Matrix3d galMatrix = new Matrix3d(-.0548755604, -.8734370902, -.4838350155, 0, .4941094279, -.4448296300, .7469822445, 0, -.8676661490, -.1980763734, .4559837762, 0, 0, 0, 0, 1);
-                    //Matrix3d galMatrix = new Matrix3d(-.0548755604, -.8734370902, -.4838350155, 0, .4941094279, -.4448296300, .7469822445, 0, -.8676661490, -.1980763734, .4559837762, 0, 0, 0, 0, 1);
-                    ////galMatrix.Invert();
-                    //galMatrix = Matrix3d.Multiply(galMatrix, Matrix3d.RotationZ( Math.PI));
-                    //galMatrix.Transpose(); 
-                    galacticMatrix = galMatrix;
+            //        //Matrix3d galMatrix = new Matrix3d(-.0548755604, -.8734370902, -.4838350155, 0, .4941094279, -.4448296300, .7469822445, 0, -.8676661490, -.1980763734, .4559837762, 0, 0, 0, 0, 1);
+            //        //Matrix3d galMatrix = new Matrix3d(-.0548755604, -.8734370902, -.4838350155, 0, .4941094279, -.4448296300, .7469822445, 0, -.8676661490, -.1980763734, .4559837762, 0, 0, 0, 0, 1);
+            //        ////galMatrix.Invert();
+            //        //galMatrix = Matrix3d.Multiply(galMatrix, Matrix3d.RotationZ( Math.PI));
+            //        //galMatrix.Transpose(); 
+            //        galacticMatrix = galMatrix;
 
-                    galMatInit = true;
-                }
-                for (int i = 0; i < vertexList.Count; i++)
-                {
-                    var vert = vertexList[i];
-                    var pos = vert.Position;
-                    galacticMatrix.MultiplyVector(ref pos);
-                    vert.Position = pos;
-                    vertexList[i] = vert;
-                }
-            }
+            //        galMatInit = true;
+            //    }
+            //    for (int i = 0; i < vertexList.Count; i++)
+            //    {
+            //        var vert = vertexList[i];
+            //        var pos = vert.Position;
+            //        galacticMatrix.MultiplyVector(ref pos);
+            //        vert.Position = pos;
+            //        vertexList[i] = vert;
+            //    }
+            //}
         }
         static bool galMatInit = false;
         static Matrix3d galacticMatrix = Matrix3d.Identity;
 
-        public string GetDirectory(IImageSet dataset, int level, int x, int y)
+        public string GetDirectory(Imageset dataset, int level, int x, int y)
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(Properties.Settings.Default.CahceDirectory);
-            sb.Append(@"Imagery\HiPS\");
-            sb.Append(ReplaceInvalidChars(dataset.Name));
-            sb.Append(@"\Norder" + (level));
-            sb.Append(@"\Dir");
-            int tileTextureIndex = this.face * nside * nside / 4 + this.tileIndex;
-            int subDirIndex = tileTextureIndex / 10000;
-            if (subDirIndex != 0)
-            {
-                sb.Append(subDirIndex);
-                sb.Append(@"0000\");
-            }
-            else
-            {
-                sb.Append(@"0\");
-            }
+            //sb.Append(Properties.Settings.Default.CahceDirectory);
+            //sb.Append(@"Imagery\HiPS\");
+            //sb.Append(ReplaceInvalidChars(dataset.Name));
+            //sb.Append(@"\Norder" + (level));
+            //sb.Append(@"\Dir");
+            //int tileTextureIndex = this.face * nside * nside / 4 + this.tileIndex;
+            //int subDirIndex = tileTextureIndex / 10000;
+            //if (subDirIndex != 0)
+            //{
+            //    sb.Append(subDirIndex);
+            //    sb.Append(@"0000\");
+            //}
+            //else
+            //{
+            //    sb.Append(@"0\");
+            //}
             return sb.ToString();
         }
 
@@ -347,98 +351,99 @@
             string extention = GetHipsFileExtention();
 
             StringBuilder sb = new StringBuilder();
-            sb.Append(Properties.Settings.Default.CahceDirectory);
-            sb.Append(@"Imagery\HiPS\");
-            sb.Append(ReplaceInvalidChars(dataset.Name));
-            sb.Append("\\");
-            if (level < 0)
-            {
-                if (!System.IO.Directory.Exists(sb.ToString()))
-                {
-                    System.IO.Directory.CreateDirectory(sb.ToString());
-                }
-                sb.Append(@"fake.png");
+            //sb.Append(Properties.Settings.Default.CahceDirectory);
+            //sb.Append(@"Imagery\HiPS\");
+            //sb.Append(ReplaceInvalidChars(dataset.Name));
+            //sb.Append("\\");
+            //if (Level < 0)
+            //{
+            //    if (!System.IO.Directory.Exists(sb.ToString()))
+            //    {
+            //        System.IO.Directory.CreateDirectory(sb.ToString());
+            //    }
+            //    sb.Append(@"fake.png");
 
-                if (!File.Exists(sb.ToString()))
-                {
-                    CreateFakePNG(sb.ToString());
-                }
-            }
-            else
-            {
-                sb.Append(@"Norder" + (level));
-                sb.Append(@"\Dir");
-                int tileTextureIndex = 0;
-                if (level == 0)
-                {
-                    tileTextureIndex = this.face;
-                }
-                else
-                {
-                    tileTextureIndex = this.face * nside * nside / 4 + this.tileIndex;
-                }
-                if (tileTextureIndex == -1)
-                {
-                    tileTextureIndex = 0;
-                }
-                int subDirIndex = tileTextureIndex / 10000;
-                if (subDirIndex != 0)
-                {
-                    sb.Append(subDirIndex);
-                    sb.Append(@"0000\");
-                }
-                else
-                {
-                    sb.Append(@"0\");
-                }
-                sb.Append(@"Npix");
-                sb.Append(tileTextureIndex);
-                sb.Append(extention);
-            }
+            //    if (!File.Exists(sb.ToString()))
+            //    {
+            //        CreateFakePNG(sb.ToString());
+            //    }
+            //}
+            //else
+            //{
+            //    sb.Append(@"Norder" + (Level));
+            //    sb.Append(@"\Dir");
+            //    int tileTextureIndex = 0;
+            //    if (Level == 0)
+            //    {
+            //        tileTextureIndex = this.face;
+            //    }
+            //    else
+            //    {
+            //        tileTextureIndex = this.face * nside * nside / 4 + this.tileIndex;
+            //    }
+            //    if (tileTextureIndex == -1)
+            //    {
+            //        tileTextureIndex = 0;
+            //    }
+            //    int subDirIndex = tileTextureIndex / 10000;
+            //    if (subDirIndex != 0)
+            //    {
+            //        sb.Append(subDirIndex);
+            //        sb.Append(@"0000\");
+            //    }
+            //    else
+            //    {
+            //        sb.Append(@"0\");
+            //    }
+            //    sb.Append(@"Npix");
+            //    sb.Append(tileTextureIndex);
+            //    sb.Append(extention);
+            //}
             return sb.ToString();
         }
 
         private static string ReplaceInvalidChars(string filename)
         {
-            return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
+            return filename;
+            //return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
         }
         private void CreateFakePNG(string path)
         {
-            Bitmap bmp = new Bitmap(512, 512);
-            Graphics g = Graphics.FromImage(bmp);
+            //Bitmap bmp = new Bitmap(512, 512);
+            //Graphics g = Graphics.FromImage(bmp);
 
-            g.Clear(Color.Transparent);
-            g.FillRectangle(Brushes.Red, 100, 100, 100, 100);
+            //g.Clear(Color.Transparent);
+            //g.FillRectangle(Brushes.Red, 100, 100, 100, 100);
 
-            g.Flush();
-            bmp.Save(path, System.Drawing.Imaging.ImageFormat.Png);
+            //g.Flush();
+            //bmp.Save(path, System.Drawing.Imaging.ImageFormat.Png);
         }
 
         public static void GenerateLevel2(string filename)
         {
-            string extention = Path.GetExtension(filename);
-            string path = filename.Replace("Allsky" + extention, "Dir0");
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path);
-            }
-            var imgarray = new Image[27 * 29];
-            var img = Image.FromFile(filename);
-            for (int i = 0; i < 29; i++)
-            {
-                for (int j = 0; j < 27; j++)
-                {
-                    var index = i * 27 + j;
-                    imgarray[index] = new Bitmap(64, 64);
-                    var graphics = Graphics.FromImage(imgarray[index]);
-                    graphics.DrawImage(img, new Rectangle(0, 0, 64, 64), new Rectangle(j * 64, i * 64, 64, 64), GraphicsUnit.Pixel);
-                    graphics.Dispose();
-                    imgarray[index].Save(path + "\\Npix" + index + extention);
-                }
-            }
+            //string extention = Path.GetExtension(filename);
+            //string path = filename.Replace("Allsky" + extention, "Dir0");
+            //if (!System.IO.Directory.Exists(path))
+            //{
+            //    System.IO.Directory.CreateDirectory(path);
+            //}
+            //var imgarray = new Image[27 * 29];
+            //var img = Image.FromFile(filename);
+            //for (int i = 0; i < 29; i++)
+            //{
+            //    for (int j = 0; j < 27; j++)
+            //    {
+            //        var index = i * 27 + j;
+            //        imgarray[index] = new Bitmap(64, 64);
+            //        var graphics = Graphics.FromImage(imgarray[index]);
+            //        graphics.DrawImage(img, new Rectangle(0, 0, 64, 64), new Rectangle(j * 64, i * 64, 64, 64), GraphicsUnit.Pixel);
+            //        graphics.Dispose();
+            //        imgarray[index].Save(path + "\\Npix" + index + extention);
+            //    }
+            //}
         }
 
-        public string GetUrl(IImageSet dataset, int level, int x, int y)
+        public string GetUrl(Imageset dataset, int level, int x, int y)
         {
             string returnUrl = "";
             string extention = GetHipsFileExtention();
@@ -477,26 +482,26 @@
             // The imageset can be set to the perfrered file type if desired IE: FITS will never be chosen if others are avaialbe,
             // unless the FITS only is selected and saved into the extension field of the imageset.
             //prioritize transparent Png over other image formats
-            if (dataset.Extension.Contains("png"))
+            if (dataset.Extension.ToLowerCase().IndexOf("png") > -1)
             {
                 IsCatalogTile = false;
                 return ".png";
             }
 
             // Check for either type
-            if (dataset.Extension.Contains("jpeg") || dataset.Extension.Contains("jpg"))
+            if (dataset.Extension.ToLowerCase().IndexOf("jpeg") > -1 || dataset.Extension.ToLowerCase().IndexOf("jpg") > -1)
             {
                 IsCatalogTile = false;
                 return ".jpg";
             }
 
-            if (dataset.Extension.Contains("tsv"))
+            if (dataset.Extension.ToLowerCase().IndexOf("tsv") > -1)
             {
                 IsCatalogTile = true;
                 return ".tsv";
             }
 
-            if (dataset.Extension.Contains("fits"))
+            if (dataset.Extension.ToLowerCase().IndexOf("fits") > -1)
             {
                 IsCatalogTile = false;
                 return ".fits";
@@ -523,24 +528,24 @@
             double d = 1d / (step * nside);
             for (int i = 0; i < step; ++i)
             {
-                if (insideOut)
-                {
-                    points[i] = new Fxyf(xc + dc - i * d, yc + dc, xyf.face).toVec3();
-                    points[i + step] = new Fxyf(xc - dc, yc + dc - i * d, xyf.face).toVec3();
-                    points[i + 2 * step] = new Fxyf(xc - dc + i * d, yc - dc, xyf.face).toVec3();
-                    points[i + 3 * step] = new Fxyf(xc + dc, yc - dc + i * d, xyf.face).toVec3();
-                }
-                else
-                {
-                    Vector3d tmp = new Fxyf(xc + dc - i * d, yc + dc, xyf.face).toVec3();
-                    points[i] = new Vector3d(-tmp.X, tmp.Y, -tmp.Z);
-                    tmp = new Fxyf(xc - dc, yc + dc - i * d, xyf.face).toVec3();
-                    points[i + step] = new Vector3d(-tmp.X, tmp.Y, -tmp.Z);
-                    tmp = new Fxyf(xc - dc + i * d, yc - dc, xyf.face).toVec3();
-                    points[i + 2 * step] = new Vector3d(-tmp.X, tmp.Y, -tmp.Z);
-                    tmp = new Fxyf(xc + dc, yc - dc + i * d, xyf.face).toVec3();
-                    points[i + 3 * step] = new Vector3d(-tmp.X, tmp.Y, -tmp.Z);
-                }
+                //if (insideOut)
+                //{
+                    points[i] = Fxyf.Create(xc + dc - i * d, yc + dc, xyf.face).toVec3();
+                    points[i + step] = Fxyf.Create(xc - dc, yc + dc - i * d, xyf.face).toVec3();
+                    points[i + 2 * step] = Fxyf.Create(xc - dc + i * d, yc - dc, xyf.face).toVec3();
+                    points[i + 3 * step] = Fxyf.Create(xc + dc, yc - dc + i * d, xyf.face).toVec3();
+                //}
+                //else
+                //{
+                //    Vector3d tmp = new Fxyf(xc + dc - i * d, yc + dc, xyf.face).toVec3();
+                //    points[i] = Vector3d.Create(-tmp.X, tmp.Y, -tmp.Z);
+                //    tmp = new Fxyf(xc - dc, yc + dc - i * d, xyf.face).toVec3();
+                //    points[i + step] = Vector3d.Create(-tmp.X, tmp.Y, -tmp.Z);
+                //    tmp = new Fxyf(xc - dc + i * d, yc - dc, xyf.face).toVec3();
+                //    points[i + 2 * step] = Vector3d.Create(-tmp.X, tmp.Y, -tmp.Z);
+                //    tmp = new Fxyf(xc + dc, yc - dc + i * d, xyf.face).toVec3();
+                //    points[i + 3 * step] = Vector3d.Create(-tmp.X, tmp.Y, -tmp.Z);
+                //}
 
                 if (i == 0)
                 {
@@ -554,198 +559,199 @@
             return points;
         }
 
-        public override bool Draw3D(RenderContext11 renderContext, float transparancy, Tile parent)
+        //public override bool Draw3D(RenderContext11 renderContext, float transparancy, Tile parent)
+        //{
+        //    int tileTextureIndex = -1;
+        //    if (Level == 0)
+        //    {
+        //        tileTextureIndex = this.face;
+        //    }
+        //    else
+        //    {
+        //        tileTextureIndex = this.face * nside * nside / 4 + this.tileIndex;
+        //    }
+
+        //    RenderedGeneration = CurrentRenderGeneration;
+        //    TilesTouched++;
+
+        //    InViewFrustum = true;
+
+        //    if (!ReadyToRender)
+        //    {
+        //        TileCache.AddTileToQueue(this);
+
+        //        return false;
+        //    }
+
+        //    TilesInView++;
+
+        //    if (!CreateGeometry(renderContext, true))
+        //    {
+        //        if (Level > 2)
+        //        {
+        //            return false;
+        //        }
+        //    }
+
+        //    int partCount = this.TriangleCount;
+        //    TrianglesRendered += partCount;
+
+        //    Matrix3d savedWorld = renderContext.World;
+        //    Matrix3d savedView = renderContext.View;
+        //    bool usingLocalCenter = false;
+        //    if (localCenter != Vector3d.Empty)
+        //    {
+        //        usingLocalCenter = true;
+        //        Vector3d temp = localCenter;
+        //        renderContext.World = Matrix3d.Translation(temp) * renderContext.WorldBase * Matrix3d.Translation(-renderContext.CameraPosition);
+        //        renderContext.View = Matrix3d.Translation(renderContext.CameraPosition) * renderContext.ViewBase;
+        //    }
+
+        //    try
+        //    {
+        //        bool anythingToRender = false;
+        //        bool childRendered = false;
+        //        int childIndex = 0;
+
+        //        for (int y1 = 0; y1 < 2; y1++)
+        //        {
+        //            for (int x1 = 0; x1 < 2; x1++)
+        //            {
+        //                if (Level < dataset.Levels)
+        //                {
+        //                    HealpixTile child;
+        //                    child = (HealpixTile)TileCache.GetTile(Level + 1, x1, y1, dataset, this);
+        //                    //childrenId[childIndex] = child.Key;
+        //                    children[childIndex] = child;
+        //                    if (child.IsTileInFrustum(renderContext.Frustum))
+        //                    {
+        //                        InViewFrustum = true;
+        //                        if (child.IsTileBigEnough(renderContext))
+        //                        {
+        //                            renderChildPart[childIndex].TargetState = !child.Draw3D(renderContext, transparancy, this);
+        //                            if (Level > 4)
+        //                            {
+
+        //                                int uvx = 0;
+        //                            }
+
+        //                            if (!renderChildPart[childIndex].TargetState)
+        //                            {
+        //                                childRendered = true;
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            renderChildPart[childIndex].TargetState = true;
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        renderChildPart[childIndex].TargetState = renderChildPart[childIndex].State = false;
+        //                    }
+
+        //                    if (renderChildPart[childIndex].TargetState == true)
+        //                    {
+        //                        renderChildPart[childIndex].State = renderChildPart[childIndex].TargetState;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    renderChildPart[childIndex].State = true;
+        //                }
+        //                if (renderChildPart[childIndex].State == true)
+        //                {
+        //                    anythingToRender = true;
+        //                }
+        //                childIndex++;
+        //            }
+        //        }
+
+        //        if (childRendered || anythingToRender)
+        //        {
+        //            RenderedAtOrBelowGeneration = CurrentRenderGeneration;
+        //            if (parent != null)
+        //            {
+        //                parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
+        //            }
+        //        }
+
+        //        if (!anythingToRender && !(IsCatalogTile && childRendered))
+        //        {
+        //            return true;
+        //        }
+
+        //        if (!CreateGeometry(renderContext, true))
+        //        {
+        //            return false;
+        //        }
+
+        //        TilesInView++;
+
+        //        if (IsCatalogTile)
+        //        {
+        //            //RenderCatalog(renderContext);
+        //        }
+        //        else
+        //        {
+        //            //if (wireFrame)
+        //            //{
+        //            //    renderContext.MainTexture = null;
+        //            //}
+        //            //else
+        //            //{
+        //                renderContext.MainTexture = texture;
+        //            //}
+
+        //            if (dataset.DataSetType == ImageSetType.Sky)
+        //            {
+        //                HDRPixelShader.constants.opacity = transparancy;
+        //                HDRPixelShader.Use(renderContext.devContext);
+        //            }
+
+        //            renderContext.SetVertexBuffer(vertexBuffer);
+
+        //            renderContext.SetIndexBuffer(indexBuffer[0]);
+
+        //            renderContext.devContext.DrawIndexed(indexBuffer[0].Count, 0, 0);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+
+        //    }
+        //    finally
+        //    {
+        //        if (usingLocalCenter)
+        //        {
+        //            renderContext.World = savedWorld;
+        //            renderContext.View = savedView;
+        //        }
+        //    }
+        //    return true;
+        //}
+        //static Mutex propMutex = new Mutex();
+
+        internal static void LoadProperties(Imageset dataset)
         {
-            int tileTextureIndex = -1;
-            if (level == 0)
-            {
-                tileTextureIndex = this.face;
-            }
-            else
-            {
-                tileTextureIndex = this.face * nside * nside / 4 + this.tileIndex;
-            }
+            //propMutex.WaitOne();
+            //if (dataset.Properties.Count == 0)
+            //{
+            //    StringBuilder sb = new StringBuilder();
+            //    sb.Append(Properties.Settings.Default.CahceDirectory);
+            //    sb.Append(@"Imagery\HiPS\");
+            //    sb.Append(ReplaceInvalidChars(dataset.Name));
+            //    sb.Append("\\");
+            //    sb.Append(@"properties");
 
-            RenderedGeneration = CurrentRenderGeneration;
-            TilesTouched++;
+            //    string propFilename = sb.ToString();
 
-            InViewFrustum = true;
+            //    HipsProperties props = HipsProperties.GetProperties(dataset.Url, propFilename);
 
-            if (!ReadyToRender)
-            {
-                TileCache.AddTileToQueue(this);
-
-                return false;
-            }
-
-            TilesInView++;
-
-            if (!CreateGeometry(renderContext, true))
-            {
-                if (level > 2)
-                {
-                    return false;
-                }
-            }
-
-            int partCount = this.TriangleCount;
-            TrianglesRendered += partCount;
-
-            Matrix3d savedWorld = renderContext.World;
-            Matrix3d savedView = renderContext.View;
-            bool usingLocalCenter = false;
-            if (localCenter != Vector3d.Empty)
-            {
-                usingLocalCenter = true;
-                Vector3d temp = localCenter;
-                renderContext.World = Matrix3d.Translation(temp) * renderContext.WorldBase * Matrix3d.Translation(-renderContext.CameraPosition);
-                renderContext.View = Matrix3d.Translation(renderContext.CameraPosition) * renderContext.ViewBase;
-            }
-
-            try
-            {
-                bool anythingToRender = false;
-                bool childRendered = false;
-                int childIndex = 0;
-
-                for (int y1 = 0; y1 < 2; y1++)
-                {
-                    for (int x1 = 0; x1 < 2; x1++)
-                    {
-                        if (level < dataset.Levels)
-                        {
-                            HealpixTile child;
-                            child = (HealpixTile)TileCache.GetTile(level + 1, x1, y1, dataset, this);
-                            childrenId[childIndex] = child.Key;
-                            if (child.IsTileInFrustum(renderContext.Frustum))
-                            {
-                                InViewFrustum = true;
-                                if (child.IsTileBigEnough(renderContext))
-                                {
-                                    renderPart[childIndex].TargetState = !child.Draw3D(renderContext, transparancy, this);
-                                    if (level > 4)
-                                    {
-
-                                        int uvx = 0;
-                                    }
-
-                                    if (!renderPart[childIndex].TargetState)
-                                    {
-                                        childRendered = true;
-                                    }
-                                }
-                                else
-                                {
-                                    renderPart[childIndex].TargetState = true;
-                                }
-                            }
-                            else
-                            {
-                                renderPart[childIndex].TargetState = renderPart[childIndex].State = false;
-                            }
-
-                            if (renderPart[childIndex].TargetState == true)
-                            {
-                                renderPart[childIndex].State = renderPart[childIndex].TargetState;
-                            }
-                        }
-                        else
-                        {
-                            renderPart[childIndex].State = true;
-                        }
-                        if (renderPart[childIndex].State == true)
-                        {
-                            anythingToRender = true;
-                        }
-                        childIndex++;
-                    }
-                }
-
-                if (childRendered || anythingToRender)
-                {
-                    RenderedAtOrBelowGeneration = CurrentRenderGeneration;
-                    if (parent != null)
-                    {
-                        parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
-                    }
-                }
-
-                if (!anythingToRender && !(IsCatalogTile && childRendered))
-                {
-                    return true;
-                }
-
-                if (!CreateGeometry(renderContext, true))
-                {
-                    return false;
-                }
-
-                TilesInView++;
-
-                if (IsCatalogTile)
-                {
-                    RenderCatalog(renderContext);
-                }
-                else
-                {
-                    if (wireFrame)
-                    {
-                        renderContext.MainTexture = null;
-                    }
-                    else
-                    {
-                        renderContext.MainTexture = texture;
-                    }
-
-                    if (dataset.DataSetType == ImageSetType.Sky)
-                    {
-                        HDRPixelShader.constants.opacity = transparancy;
-                        HDRPixelShader.Use(renderContext.devContext);
-                    }
-
-                    renderContext.SetVertexBuffer(vertexBuffer);
-
-                    renderContext.SetIndexBuffer(indexBuffer[0]);
-
-                    renderContext.devContext.DrawIndexed(indexBuffer[0].Count, 0, 0);
-                }
-            }
-            catch (Exception e)
-            {
-
-            }
-            finally
-            {
-                if (usingLocalCenter)
-                {
-                    renderContext.World = savedWorld;
-                    renderContext.View = savedView;
-                }
-            }
-            return true;
-        }
-        static Mutex propMutex = new Mutex();
-
-        internal static void LoadProperties(IImageSet dataset)
-        {
-            propMutex.WaitOne();
-            if (dataset.Properties.Count == 0)
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.Append(Properties.Settings.Default.CahceDirectory);
-                sb.Append(@"Imagery\HiPS\");
-                sb.Append(ReplaceInvalidChars(dataset.Name));
-                sb.Append("\\");
-                sb.Append(@"properties");
-
-                string propFilename = sb.ToString();
-
-                HipsProperties props = HipsProperties.GetProperties(dataset.Url, propFilename);
-
-                dataset.Properties = props.Properties;
-                dataset.TableMetadata = props.VoTable;
-            }
-            propMutex.ReleaseMutex();
+            //    dataset.Properties = props.Properties;
+            //    dataset.TableMetadata = props.VoTable;
+            //}
+            //propMutex.ReleaseMutex();
         }
 
         public int GetTileTextureIndex()
@@ -754,61 +760,61 @@
             return tileTextureIndex;
         }
 
-        public override bool IsTileBigEnough(RenderContext11 renderContext)
+        public override bool IsTileBigEnough(RenderContext renderContext)
         {
-            if (level > 1)
-            {
-                SharpDX.Vector3 topLeftScreen;
-                SharpDX.Vector3 bottomRightScreen;
-                SharpDX.Vector3 topRightScreen;
-                SharpDX.Vector3 bottomLeftScreen;
+            //if (Level > 1)
+            //{
+            //    SharpDX.Vector3 topLeftScreen;
+            //    SharpDX.Vector3 bottomRightScreen;
+            //    SharpDX.Vector3 topRightScreen;
+            //    SharpDX.Vector3 bottomLeftScreen;
 
-                SharpDX.Matrix proj = renderContext.Projection.Matrix11;
-                SharpDX.Matrix view = renderContext.ViewBase.Matrix11;
-                SharpDX.Matrix world = renderContext.WorldBase.Matrix11;
+            //    SharpDX.Matrix proj = renderContext.Projection.Matrix11;
+            //    SharpDX.Matrix view = renderContext.ViewBase.Matrix11;
+            //    SharpDX.Matrix world = renderContext.WorldBase.Matrix11;
 
-                // Test for tile scale in view..
-                topLeftScreen = TopLeft.Vector311;
-                topLeftScreen = SharpDX.Vector3.Project(topLeftScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
+            //    // Test for tile scale in view..
+            //    topLeftScreen = TopLeft.Vector311;
+            //    topLeftScreen = SharpDX.Vector3.Project(topLeftScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
 
-                bottomRightScreen = BottomRight.Vector311;
-                bottomRightScreen = SharpDX.Vector3.Project(bottomRightScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
+            //    bottomRightScreen = BottomRight.Vector311;
+            //    bottomRightScreen = SharpDX.Vector3.Project(bottomRightScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
 
-                topRightScreen = TopRight.Vector311;
-                topRightScreen = SharpDX.Vector3.Project(topRightScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
+            //    topRightScreen = TopRight.Vector311;
+            //    topRightScreen = SharpDX.Vector3.Project(topRightScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
 
-                bottomLeftScreen = BottomLeft.Vector311;
-                bottomLeftScreen = SharpDX.Vector3.Project(bottomLeftScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
+            //    bottomLeftScreen = BottomLeft.Vector311;
+            //    bottomLeftScreen = SharpDX.Vector3.Project(bottomLeftScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
 
-                SharpDX.Vector3 top = topLeftScreen;
-                top = SharpDX.Vector3.Subtract(top, topRightScreen);
-                float topLength = top.Length();
+            //    SharpDX.Vector3 top = topLeftScreen;
+            //    top = SharpDX.Vector3.Subtract(top, topRightScreen);
+            //    float topLength = top.Length();
 
-                SharpDX.Vector3 bottom = bottomLeftScreen;
-                bottom = SharpDX.Vector3.Subtract(bottom, bottomRightScreen);
-                float bottomLength = bottom.Length();
+            //    SharpDX.Vector3 bottom = bottomLeftScreen;
+            //    bottom = SharpDX.Vector3.Subtract(bottom, bottomRightScreen);
+            //    float bottomLength = bottom.Length();
 
-                SharpDX.Vector3 left = bottomLeftScreen;
-                left = SharpDX.Vector3.Subtract(left, topLeftScreen);
-                float leftLength = left.Length();
+            //    SharpDX.Vector3 left = bottomLeftScreen;
+            //    left = SharpDX.Vector3.Subtract(left, topLeftScreen);
+            //    float leftLength = left.Length();
 
-                SharpDX.Vector3 right = bottomRightScreen;
-                right = SharpDX.Vector3.Subtract(right, topRightScreen);
-                float rightLength = right.Length();
+            //    SharpDX.Vector3 right = bottomRightScreen;
+            //    right = SharpDX.Vector3.Subtract(right, topRightScreen);
+            //    float rightLength = right.Length();
 
-                float lengthMax = Math.Max(Math.Max(rightLength, leftLength), Math.Max(bottomLength, topLength));
+            //    float lengthMax = Math.Max(Math.Max(rightLength, leftLength), Math.Max(bottomLength, topLength));
 
-                float testLength = (400 - ((Earth3d.MainWindow.dumpFrameParams.Dome && SpaceTimeController.FrameDumping) ? -200 : Tile.imageQuality));
+            //    float testLength = (400 - ((Earth3d.MainWindow.dumpFrameParams.Dome && SpaceTimeController.FrameDumping) ? -200 : Tile.imageQuality));
 
-                if (lengthMax < testLength) // was 220
-                {
-                    return false;
-                }
-                else
-                {
-                    deepestLevel = level > deepestLevel ? level : deepestLevel;
-                }
-            }
+            //    if (lengthMax < testLength) // was 220
+            //    {
+            //        return false;
+            //    }
+            //    else
+            //    {
+            //        deepestLevel = Level > deepestLevel ? Level : deepestLevel;
+            //    }
+            //}
 
             return true;
         }
@@ -817,7 +823,7 @@
         {
             npface = nside * nside;
             long pix = ipix & (npface - 1);//ÔÚ¾ßÌåÄ³¸öÃæÖÐµÄquadindex
-            return new Xyf(compress_bits(pix), compress_bits(unsignRM(pix, 1)),
+            return Xyf.Create(compress_bits(pix), compress_bits(unsignRM(pix, 1)),
                             (int)(unsignRM(ipix, (2 * nside2order(nside)))));
         }
 
@@ -867,54 +873,53 @@
             return x;
         }
 
-        static protected IndexBuffer11[,] slashIndexBuffer = new IndexBuffer11[4, 16];
-        static protected IndexBuffer11[,] backSlashIndexBuffer = new IndexBuffer11[4, 16];
-        static protected IndexBuffer11[] rootIndexBuffer = new IndexBuffer11[4];
-
-        public override IndexBuffer11 GetIndexBuffer(int index, int accomidation)
+        public override WebGLBuffer GetIndexBuffer(int index, int accomidation)
         {
-            if (level == 0)
+            if (Level == 0)
             {
                 return rootIndexBuffer[index];
             }
 
             if (backslash)
             {
-                return backSlashIndexBuffer[index, accomidation];
+                return backSlashIndexBuffer[index * 16 + accomidation];
             }
             else
             {
-                return slashIndexBuffer[index, accomidation];
+                return slashIndexBuffer[index * 16 + accomidation];
             }
         }
 
         protected void CalcSphere(Vector3d[] list)
         {
-            ConvexHull.FindEnclosingSphere(list, out sphereCenter, out sphereRadius);
+            SphereHull result = ConvexHull.FindEnclosingSphere(list);
+
+            sphereCenter = result.Center;
+            sphereRadius = result.Radius;
         }
 
         public override bool IsPointInTile(double lat, double lng)
         {
-            if (level == 0)
+            if (Level == 0)
             {
                 return true;
             }
 
-            if (level == 1)
+            if (Level == 1)
             {
-                if ((lng >= 0 && lng <= 90) && (X == 0 && Y == 1))
+                if ((lng >= 0 && lng <= 90) && (tileX == 0 && tileY == 1))
                 {
                     return true;
                 }
-                if ((lng > 90 && lng <= 180) && (X == 1 && Y == 1))
+                if ((lng > 90 && lng <= 180) && (tileX == 1 && tileY == 1))
                 {
                     return true;
                 }
-                if ((lng < 0 && lng >= -90) && (X == 0 && Y == 0))
+                if ((lng < 0 && lng >= -90) && (tileX == 0 && tileY == 0))
                 {
                     return true;
                 }
-                if ((lng < -90 && lng >= -180) && (X == 1 && Y == 0))
+                if ((lng < -90 && lng >= -180) && (tileX == 1 && tileY == 0))
                 {
                     return true;
                 }
@@ -947,13 +952,12 @@
         public override double GetSurfacePointAltitude(double lat, double lng, bool meters)
         {
 
-            if (level < lastDeepestLevel)
+            if (Level < lastDeepestLevel)
             {
                 //interate children
 
-                foreach (long childKey in childrenId)
+                foreach (Tile child in children)
                 {
-                    Tile child = TileCache.GetCachedTile(childKey);
                     if (child != null)
                     {
                         if (child.IsPointInTile(lat, lng))
@@ -1009,63 +1013,63 @@
 
         static int countCreatedForNow = 0;
 
-        public override double GetSurfacePointAltitudeNow(double lat, double lng, bool meters, int targetLevel)
-        {
-            if (level < targetLevel)
-            {
-                int yOffset = 0;
-                if (dataset.Mercator || dataset.BottomsUp)
-                {
-                    yOffset = 1;
-                }
-                int xOffset = 0;
+        //public override double GetSurfacePointAltitudeNow(double lat, double lng, bool meters, int targetLevel)
+        //{
+        //    if (Level < targetLevel)
+        //    {
+        //        int yOffset = 0;
+        //        if (dataset.Mercator || dataset.BottomsUp)
+        //        {
+        //            yOffset = 1;
+        //        }
+        //        int xOffset = 0;
 
-                int xMax = 2;
-                int childIndex = 0;
-                for (int y1 = 0; y1 < 2; y1++)
-                {
-                    for (int x1 = 0; x1 < xMax; x1++)
-                    {
-                        if (level < dataset.Levels && level < (targetLevel + 1))
-                        {
-                            Tile child = TileCache.GetCachedTile(childrenId[childIndex]);
-                            if (child == null || !child.ReadyToRender)
-                            {
-                                countCreatedForNow++;
-                                child = TileCache.GetTileNow(level + 1, x * 2 + ((x1 + xOffset) % 2), y * 2 + ((y1 + yOffset) % 2), dataset, this);
-                                childrenId[childIndex] = child.Key;
-                            }
-                            childIndex++;
-                            if (child != null)
-                            {
-                                if (child.IsPointInTile(lat, lng))
-                                {
-                                    double retVal = child.GetSurfacePointAltitudeNow(lat, lng, meters, targetLevel);
-                                    if (retVal != 0)
-                                    {
-                                        return retVal;
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        //        int xMax = 2;
+        //        int childIndex = 0;
+        //        for (int y1 = 0; y1 < 2; y1++)
+        //        {
+        //            for (int x1 = 0; x1 < xMax; x1++)
+        //            {
+        //                if (Level < dataset.Levels && Level < (targetLevel + 1))
+        //                {
+        //                    Tile child = TileCache.GetCachedTile(childrenId[childIndex]);
+        //                    if (child == null || !child.ReadyToRender)
+        //                    {
+        //                        countCreatedForNow++;
+        //                        child = TileCache.GetTile(Level + 1, tileX * 2 + ((x1 + xOffset) % 2), tileY * 2 + ((y1 + yOffset) % 2), dataset, this);
+        //                        childrenId[childIndex] = child.Key;
+        //                    }
+        //                    childIndex++;
+        //                    if (child != null)
+        //                    {
+        //                        if (child.IsPointInTile(lat, lng))
+        //                        {
+        //                            double retVal = child.GetSurfacePointAltitudeNow(lat, lng, meters, targetLevel);
+        //                            if (retVal != 0)
+        //                            {
+        //                                return retVal;
+        //                            }
+        //                            else
+        //                            {
+        //                                break;
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
 
-            return GetAltitudeFromLatLng(lat, lng, meters);
-        }
+        //    return GetAltitudeFromLatLng(lat, lng, meters);
+        //}
 
         private PositionTexture Midpoint(PositionTexture positionNormalTextured, PositionTexture positionNormalTextured_2)
         {
             Vector3d a1 = Vector3d.Lerp(positionNormalTextured.Position, positionNormalTextured_2.Position, .5f);
-            Vector2d a1uv = Vector2d.Lerp(new Vector2d(positionNormalTextured.Tu, positionNormalTextured.Tv), new Vector2d(positionNormalTextured_2.Tu, positionNormalTextured_2.Tv), .5f);
+            Vector2d a1uv = Vector2d.Lerp(Vector2d.Create(positionNormalTextured.Tu, positionNormalTextured.Tv), Vector2d.Create(positionNormalTextured_2.Tu, positionNormalTextured_2.Tv), .5f);
 
             a1.Normalize();
-            return new PositionTexture(a1, a1uv.X, a1uv.Y);
+            return PositionTexture.CreatePos(a1, a1uv.X, a1uv.Y);
         }
 
         private Vector3d MidPoint3d(Vector3d vector1, Vector3d vector2)
@@ -1078,96 +1082,222 @@
 
         bool subDivided = false;
 
-        public static Mutex dumpMutex = new Mutex();
+        //public static Mutex dumpMutex = new Mutex();
 
-        public override void OnCreateVertexBuffer(VertexBuffer11 vb)
+        //public override void OnCreateVertexBuffer(VertexBuffer11 vb)
+        public override void OnCreateVertexBuffer(object sender, EventArgs e)
         {
-            if (!subDivided)
-            {
-                if (vertexList == null)
-                {
-                    createGeometry();
-                }
+            //if (!subDivided)
+            //{
+            //    if (vertexList == null)
+            //    {
+            //        createGeometry();
+            //    }
 
-                try
-                {
-                    // Create a vertex buffer 
-                    PositionNormalTexturedX2[] verts = (PositionNormalTexturedX2[])vb.Lock(0, 0); // Lock the buffer (which will return our structs)
-                    int index = 0;
-                    foreach (PositionTexture vert in vertexList)
-                    {
-                        verts[index++] = vert.PositionNormalTextured(new Vector3d(0, 0, 0), false);
+            //    try
+            //    {
+            //        // Create a vertex buffer 
+            //        PositionNormalTexturedX2[] verts = (PositionNormalTexturedX2[])vb.Lock(0, 0); // Lock the buffer (which will return our structs)
+            //        int index = 0;
+            //        foreach (PositionTexture vert in vertexList)
+            //        {
+            //            verts[index++] = vert.PositionNormalTextured(Vector3d.Create(0, 0, 0), false);
 
-                    }
+            //        }
 
-                    vb.Unlock();
+            //        vb.Unlock();
 
 
-                    if (level == 0)
-                    {
-                        this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 16, RenderContext11.PrepDevice);
-                        index = 0;
-                        indexArray = (short[])this.indexBuffer[0].Lock();
-                        int offset = verts.Length / 16;
-                        for (int i = 0; i < 16; i++)
-                        {
-                            indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
-                            indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
-                            indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
-                            indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
-                            indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
-                            indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
-                        }
-                    }
-                    else
-                    {
-                        this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 4, RenderContext11.PrepDevice);
-                        index = 0;
-                        indexArray = (short[])this.indexBuffer[0].Lock();
-                        int offset = verts.Length / 4;
-                        for (int i = 0; i < 4; i++)
-                        {
-                            indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
-                            indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
-                            indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
-                            indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
-                            indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
-                            indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
-                        }
-                    }
-                    this.indexBuffer[0].Unlock();
-                }
-                catch (Exception e)
-                {
+            //        if (Level == 0)
+            //        {
+            //            this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 16, RenderContext11.PrepDevice);
+            //            index = 0;
+            //            indexArray = (short[])this.indexBuffer[0].Lock();
+            //            int offset = verts.Length / 16;
+            //            for (int i = 0; i < 16; i++)
+            //            {
+            //                indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
+            //                indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
+            //                indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
+            //                indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
+            //                indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
+            //                indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 4, RenderContext11.PrepDevice);
+            //            index = 0;
+            //            indexArray = (short[])this.indexBuffer[0].Lock();
+            //            int offset = verts.Length / 4;
+            //            for (int i = 0; i < 4; i++)
+            //            {
+            //                indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
+            //                indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
+            //                indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
+            //                indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
+            //                indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
+            //                indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
+            //            }
+            //        }
+            //        this.indexBuffer[0].Unlock();
+            //    }
+            //    catch (Exception e)
+            //    {
 
-                }
+            //    }
 
-                ReturnBuffers();
-            }
+            //    ReturnBuffers();
+            //}
         }
 
-        private void ProcessIndexBuffer(short[] indexArray, int part)
+        private void ProcessIndexBuffer(ushort[] indexArray, int part)
         {
-            if (level == 0)
+            if (Level == 0)
             {
-                rootIndexBuffer[part] = new IndexBuffer11(RenderContext11.PrepDevice, indexArray);
+                rootIndexBuffer[part] = PrepDevice.createBuffer();
+                PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, rootIndexBuffer[part]);
+                PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)indexArray, GL.STATIC_DRAW);
+                //rootIndexBuffer[part] = new IndexBuffer11(RenderContext11.PrepDevice, indexArray);
                 return;
             }
 
             for (int a = 0; a < 16; a++)
             {
-                short[] partArray = indexArray.Clone() as short[];
+                ////short[] partArray = indexArray.Clone() as short[];
+                //short[] partArray = indexArray as short[];
+                //if (backslash)
+                //{
+                //    backSlashIndexBuffer[part, a] = new IndexBuffer11(RenderContext11.PrepDevice, partArray);
+                //}
+                //else
+                //{
+                //    slashIndexBuffer[part, a] = new IndexBuffer11(RenderContext11.PrepDevice, partArray);
+                //}
+                UInt16[] partArray = CloneArray(indexArray);
+                ProcessAccomindations(partArray, a);
                 if (backslash)
                 {
-                    backSlashIndexBuffer[part, a] = new IndexBuffer11(RenderContext11.PrepDevice, partArray);
+                    backSlashIndexBuffer[part * 16 + a] = PrepDevice.createBuffer();
+                    PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, backSlashIndexBuffer[part * 16 + a]);
+                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)partArray, GL.STATIC_DRAW);
                 }
                 else
                 {
-                    slashIndexBuffer[part, a] = new IndexBuffer11(RenderContext11.PrepDevice, partArray);
+                    slashIndexBuffer[part * 16 + a] = PrepDevice.createBuffer();
+                    PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, slashIndexBuffer[part * 16 + a]);
+                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)partArray, GL.STATIC_DRAW);
+                }
+            }
+        }
+        private void ProcessAccomindations(UInt16[] indexArray, int a)
+        {
+            Dictionary<UInt16, UInt16> map = new Dictionary<UInt16, UInt16>();
+            Dictionary<int, UInt16> gridMap = new Dictionary<int, UInt16>();
+
+            foreach (UInt16 index in indexArray)
+            {
+                PositionTexture vert = vertexList[index];
+                int arrayX = (int)(vert.Tu * 16 + .5);
+                int arrayY = (int)(vert.Tv * 16 + .5);
+                int ii = (arrayY << 8) + arrayX;
+
+                if (!gridMap.ContainsKey(ii))
+                {
+                    gridMap[ii] = index;
+                }
+
+            }
+
+
+            int sections = 16;
+
+            if ((a & 1) == 1)
+            {
+                for (int x = 1; x < sections; x += 2)
+                {
+                    int y = sections;
+                    int key = (y << 8) + x;
+                    int val = (y << 8) + x + 1;
+                    if (gridMap.ContainsKey(key))
+                    {
+                        map[gridMap[key]] = (gridMap[val]);
+                    }
+                }
+            }
+
+            if ((a & 2) == 2)
+            {
+                for (int y = 1; y < sections; y += 2)
+                {
+                    int x = sections;
+                    int key = (y << 8) + x;
+                    int val = ((y + 1) << 8) + x;
+                    if (gridMap.ContainsKey(key))
+                    {
+                        map[gridMap[key]] = (gridMap[val]);
+                    }
+                }
+            }
+
+            if ((a & 4) == 4)
+            {
+                for (int x = 1; x < sections; x += 2)
+                {
+                    int y = 0;
+                    int key = (y << 8) + x;
+                    int val = (y << 8) + x + 1;
+                    if (gridMap.ContainsKey(key))
+                    {
+                        map[gridMap[key]] = (gridMap[val]);
+                    }
+                }
+            }
+
+            if ((a & 8) == 8)
+            {
+                for (int y = 1; y < sections; y += 2)
+                {
+                    int x = 0;
+                    int key = (y << 8) + x;
+                    int val = ((y + 1) << 8) + x;
+                    if (gridMap.ContainsKey(key))
+                    {
+                        map[gridMap[key]] = (gridMap[val]);
+                    }
+                }
+            }
+
+            if (map.Count == 0)
+            {
+                //nothing to process
+                return;
+            }
+
+            for (int i = 0; i < indexArray.Length; i++)
+            {
+                if (map.ContainsKey(indexArray[i]))
+                {
+                    indexArray[i] = map[indexArray[i]];
                 }
             }
         }
 
+
+
+        private static UInt16[] CloneArray(UInt16[] indexArray)
+        {
+            int count = indexArray.Length;
+            Uint16Array ui16array = new Uint16Array(count);
+
+            UInt16[] indexArrayNew = (UInt16[])(object)ui16array;
+            for (int i = 0; i < count; i++)
+            {
+                indexArrayNew[i] = indexArray[i];
+            }
+
+            return indexArrayNew;
+        }
 
         int quadrant = 0;
 
@@ -1175,14 +1305,14 @@
         {
             int xQuad = 0;
             int yQuad = 0;
-            int tiles = (int)Math.Pow(2, this.level);
+            int tiles = (int)Math.Pow(2, this.Level);
 
-            if (x > (tiles / 2) - 1)
+            if (tileX > (tiles / 2) - 1)
             {
                 xQuad = 1;
             }
 
-            if (y > (tiles / 2) - 1)
+            if (tileY > (tiles / 2) - 1)
             {
                 yQuad = 1;
             }
@@ -1200,7 +1330,7 @@
         {
             if (vertexList != null)
             {
-                BufferPool11.ReturnPositionTextureList(vertexList);
+                //BufferPool11.ReturnPositionTextureList(vertexList);
                 vertexList = null;
             }
         }
@@ -1241,7 +1371,7 @@
                             u = 0.25 / step * ty;
                             v = 0.25;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 1)
@@ -1271,7 +1401,7 @@
                             u = 0.25 / step * ty;
                             v = 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 2)
@@ -1301,7 +1431,7 @@
                             u = 0.25 + 0.25 / step * ty;
                             v = 0.25;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 3)
@@ -1331,7 +1461,7 @@
                             u = 0.25 + 0.25 / step * ty;
                             v = 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 4)
@@ -1361,7 +1491,7 @@
                             u = 0.25 / step * ty;
                             v = 0.25 + 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 5)
@@ -1391,7 +1521,7 @@
                             u = 0.25 / step * ty;
                             v = 0.5 + 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 6)
@@ -1421,7 +1551,7 @@
                             u = 0.25 + 0.25 / step * ty;
                             v = 0.25 + 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 7)
@@ -1451,7 +1581,7 @@
                             u = 0.25 + 0.25 / step * ty;
                             v = 0.5 + 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 8)
@@ -1481,7 +1611,7 @@
                             u = 0.25 / step * ty + 0.5;
                             v = 0.25;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 9)
@@ -1511,7 +1641,7 @@
                             u = 0.25 / step * ty + 0.5;
                             v = 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 10)
@@ -1541,7 +1671,7 @@
                             u = 0.25 + 0.25 / step * ty + 0.5;
                             v = 0.25;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 11)
@@ -1571,7 +1701,7 @@
                             u = 0.25 + 0.25 / step * ty + 0.5;
                             v = 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 if (quadIndex == 12)
@@ -1601,7 +1731,7 @@
                             u = 0.25 / step * ty + 0.5;
                             v = 0.25 + 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 13)
@@ -1631,7 +1761,7 @@
                             u = 0.25 / step * ty + 0.5;
                             v = 0.5 + 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 14)
@@ -1661,7 +1791,7 @@
                             u = 0.25 + 0.25 / step * ty + 0.5;
                             v = 0.25 + 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
                 else if (quadIndex == 15)
@@ -1691,7 +1821,7 @@
                             u = 0.25 + 0.25 / step * ty + 0.5;
                             v = 0.5 + 0.5;
                         }
-                        vertexList.Add(new PositionTexture(points[i], u, v));
+                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                     }
                 }
 
@@ -1712,45 +1842,45 @@
             string path = filename.Replace("\\properties", "\\");
             try
             {
-                if (!File.Exists(filename))
-                {
-                    //Create cache directroy if not yet created
-                    if (!System.IO.Directory.Exists(path))
-                    {
-                        System.IO.Directory.CreateDirectory(path);
-                    }
+                //if (!File.Exists(filename))
+                //{
+                //    //Create cache directroy if not yet created
+                //    if (!System.IO.Directory.Exists(path))
+                //    {
+                //        System.IO.Directory.CreateDirectory(path);
+                //    }
 
-                    WebClient client = new WebClient();
-                    client.DownloadFile(propsUrl, filename);
-                }
+                //    WebClient client = new WebClient();
+                //    client.DownloadFile(propsUrl, filename);
+                //}
 
-                string[] lines = File.ReadAllLines(filename);
+                //string[] lines = File.ReadAllLines(filename);
 
-                foreach (string line in lines)
-                {
-                    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
-                    {
-                        string[] parts = line.Split('=');
-                        string key = parts[0].Trim();
-                        string val = parts[1].Trim();
-                        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
-                        {
-                            props.Properties[key] = val;
-                        }
-                    }
-                }
+                //foreach (string line in lines)
+                //{
+                //    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
+                //    {
+                //        string[] parts = line.Split('=');
+                //        string key = parts[0].Trim();
+                //        string val = parts[1].Trim();
+                //        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
+                //        {
+                //            props.Properties[key] = val;
+                //        }
+                //    }
+                //}
 
-                // now download the catalog
-                if (props.Properties.ContainsKey("dataproduct_type") && props.Properties["dataproduct_type"] == "catalog")
-                {
-                    if (!File.Exists(tableFilename))
-                    {
-                        WebClient client = new WebClient();
-                        client.DownloadFile(tableUrl, tableFilename);
-                    }
+                //// now download the catalog
+                //if (props.Properties.ContainsKey("dataproduct_type") && props.Properties["dataproduct_type"] == "catalog")
+                //{
+                //    if (!File.Exists(tableFilename))
+                //    {
+                //        WebClient client = new WebClient();
+                //        client.DownloadFile(tableUrl, tableFilename);
+                //    }
 
-                    props.VoTable = new VoTable(tableFilename);
-                }
+                //    props.VoTable = new VoTable(tableFilename);
+                //}
             }
             catch
             {
@@ -1762,12 +1892,12 @@
             return props;
         }
 
-        public static HipsProperties GetProperties(string url)
+        public static HipsProperties GetProperties2(string url)
         {
             HipsProperties props = new HipsProperties();
             string propsUrl = "";
 
-            if (url.Contains("/Norder"))
+            if (url.ToLowerCase().IndexOf("/Norder") > -1)
             {
                 url = url.Substring(0, url.IndexOf("/Norder"));
             }
@@ -1780,38 +1910,38 @@
 
             try
             {
-                WebClient client = new WebClient();
-                string data = client.DownloadString(propsUrl);
+                //WebClient client = new WebClient();
+                //string data = client.DownloadString(propsUrl);
 
-                string[] lines = data.Split('\n');
+                //string[] lines = data.Split('\n');
 
-                foreach (string line in lines)
-                {
-                    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
-                    {
-                        string[] parts = line.Split('=');
-                        string key = parts[0].Trim();
-                        string val = parts[1].Trim();
-                        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
-                        {
-                            props.Properties[key] = val;
-                        }
-                    }
-                }
+                //foreach (string line in lines)
+                //{
+                //    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
+                //    {
+                //        string[] parts = line.Split('=');
+                //        string key = parts[0].Trim();
+                //        string val = parts[1].Trim();
+                //        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
+                //        {
+                //            props.Properties[key] = val;
+                //        }
+                //    }
+                //}
 
 
-                // now download the catalog
-                if (props.Properties.ContainsKey("dataproduct_type") && props.Properties["dataproduct_type"] == "catalog")
-                {
-                    string tableUrl = propsUrl.Replace("/properties", "/metadata.xml");
+                //// now download the catalog
+                //if (props.Properties.ContainsKey("dataproduct_type") && props.Properties["dataproduct_type"] == "catalog")
+                //{
+                //    string tableUrl = propsUrl.Replace("/properties", "/metadata.xml");
 
-                    client = new WebClient();
-                    string voTable = client.DownloadString(tableUrl);
+                //    client = new WebClient();
+                //    string voTable = client.DownloadString(tableUrl);
 
-                    System.Xml.XmlDocument xmlDocument = new System.Xml.XmlDocument();
-                    xmlDocument.LoadXml(voTable);
-                    props.VoTable = new VoTable(xmlDocument);
-                }
+                //    System.Xml.XmlDocument xmlDocument = new System.Xml.XmlDocument();
+                //    xmlDocument.LoadXml(voTable);
+                //    props.VoTable = new VoTable(xmlDocument);
+                //}
             }
             catch
             {
@@ -1870,7 +2000,7 @@
             {
                 return false;
             }
-            if (props.Properties.ContainsKey("client_category") && props.Properties["client_category"].ToLower().Contains("solar"))
+            if (props.Properties.ContainsKey("client_category") && props.Properties["client_category"].ToLowerCase().IndexOf("solar") > -1)
             {
                 return false;
             }
@@ -1906,10 +2036,18 @@
 
     public class Xyf
     {
-        public int ix, iy, face;
+        public int ix;
+        public int iy;
+        public int face;
         public Xyf() { }
-        public Xyf(int x, int y, int f)
-        { ix = x; iy = y; face = f; }
+        public static Xyf Create(int x, int y, int f)
+        {
+            Xyf temp = new Xyf();
+            temp.ix = x;
+            temp.iy = y;
+            temp.face = f;
+            return temp;
+        }
     }
 
 }
