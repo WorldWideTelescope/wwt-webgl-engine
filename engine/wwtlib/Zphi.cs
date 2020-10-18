@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
-
-namespace TerraViewer.Healpix
+namespace wwtlib
 {
     public class Zphi
     {
@@ -18,15 +13,30 @@ namespace TerraViewer.Healpix
 
         public Zphi() { }
 
-        public Zphi(double z_, double phi_)
-        { z = z_; phi = phi_; }
+        public static Zphi Create(double z_, double phi_)
+        {
+            Zphi temp = new Zphi();
+            temp.z = z_;
+            temp.phi = phi_;
+            return temp;
+        }
+        
+        //public static Zphi Create(Vector3d v)
+        //{ 
+        //    Zphi temp = new Zphi();
+        //    temp.z = v.Z / v.Length(); 
+        //    temp.phi = FastMath.atan2(v.Y, v.X); 
+        //    return temp;
+        //}
 
-        public Zphi(Vector3d v)
-        { z = v.Z / v.Length(); phi = FastMath.atan2(v.Y, v.X); }
 
-
-        public Zphi(Pointing ptg)
-        { z = FastMath.cos(ptg.theta); phi = ptg.phi; }
+        //public static Zphi Create(Pointing ptg)
+        //{ 
+        //    Zphi temp = new Zphi();
+        //    temp.z = FastMath.cos(ptg.theta); 
+        //    temp.phi = ptg.phi; 
+        //    return temp;
+        //}
 
         public String toString()
         {
