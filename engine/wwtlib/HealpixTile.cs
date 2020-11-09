@@ -15,7 +15,6 @@ namespace wwtlib
         int npface;
         protected double[] demArray;
         public int tileIndex = -1;
-        short[] indexArray;
         int step;
         int face;
 
@@ -31,7 +30,8 @@ namespace wwtlib
 
         static protected WebGLBuffer[] slashIndexBuffer = new WebGLBuffer[64];
         static protected WebGLBuffer[] backSlashIndexBuffer = new WebGLBuffer[64];
-        static protected WebGLBuffer[] rootIndexBuffer = new WebGLBuffer[4];
+        //static protected WebGLBuffer[] rootIndexBuffer = new WebGLBuffer[4];
+        static protected WebGLBuffer[] rootIndexBuffer = new WebGLBuffer[16];
 
         //static protected IndexBuffer11[,] slashIndexBuffer = new IndexBuffer11[4, 16];
         //static protected IndexBuffer11[,] backSlashIndexBuffer = new IndexBuffer11[4, 16];
@@ -56,12 +56,13 @@ namespace wwtlib
 
         public HealpixTile(int level, int x, int y, Imageset dataset, Tile parent)
         {
+            PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
             HealpixTile.LoadProperties(dataset);
             this.Level = level;
             this.tileX = x;
             this.tileY = y;
             this.dataset = dataset;
-
+            DemEnabled = false;
             if (level == 0)
             {
                 this.nside = 4;
@@ -319,9 +320,110 @@ namespace wwtlib
             //        vertexList[i] = vert;
             //    }
             //}
+
+
+
+            Uint16Array ui16array = new Uint16Array(6 * vertexList.Count);
+            UInt16[] indexArray = (UInt16[])(object)ui16array;
+
+
+
+
+            if (!subDivided)
+            {
+                //if (vertexList == null)
+                //{
+                //    createGeometry();
+                //}
+
+                try
+                {
+                    //process vertex list
+                    VertexBuffer = PrepDevice.createBuffer();
+                    PrepDevice.bindBuffer(GL.ARRAY_BUFFER, VertexBuffer);
+                    Float32Array f32array = new Float32Array(vertexList.Count * 5);
+                    float[] buffer = (float[])(object)f32array;
+                    int index = 0;
+
+                    //PositionNormalTexturedX2[] verts = (PositionNormalTexturedX2[])vb.Lock(0, 0); // Lock the buffer (which will return our structs)
+                    foreach (PositionTexture vert in vertexList)
+                    {
+                        index = AddVertex(buffer, index, vert);
+                        //verts[index++] = vert.PositionNormalTextured(Vector3d.Create(0, 0, 0), false);
+
+                    }
+                    PrepDevice.bufferData(GL.ARRAY_BUFFER, f32array, GL.STATIC_DRAW);
+
+
+
+                    //vb.Unlock();
+
+                    if (Level == 0)
+                    {
+
+                        TriangleCount = 32; 
+                        //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 16, RenderContext11.PrepDevice);
+                        index = 0;
+                        //indexArray = (short[])this.indexBuffer[0].Lock();
+                        int offset = vertexList.Count / 16;
+                        for (int i = 0; i < 16; i++)
+                        {
+                            indexArray[i * 6 + 0] = (UInt16)(0 + offset * i);
+                            indexArray[i * 6 + 1] = (UInt16)(1 + offset * i);
+                            indexArray[i * 6 + 2] = (UInt16)(2 + offset * i);
+                            indexArray[i * 6 + 3] = (UInt16)(0 + offset * i);
+                            indexArray[i * 6 + 4] = (UInt16)(2 + offset * i);
+                            indexArray[i * 6 + 5] = (UInt16)(3 + offset * i);
+
+                            //indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
+                            //indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
+                            //indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
+                            //indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
+                            //indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
+                            //indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
+                            ProcessIndexBuffer(indexArray, i);
+                        }
+
+                    }
+                    else
+                    {
+                        //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 4, RenderContext11.PrepDevice);
+                        index = 0;
+
+                        //indexArray = (short[])this.indexBuffer[0].Lock();
+                        int offset = 0;
+                        //int offset = verts.Length / 4;
+                        for (int i = 0; i < 4; i++)
+                        {
+                            indexArray[i * 6 + 0] = (UInt16)(2 * step + offset * i);
+                            indexArray[i * 6 + 1] = (UInt16)(3 * step + offset * i);
+                            indexArray[i * 6 + 2] = (UInt16)(1 * step + offset * i);
+                            indexArray[i * 6 + 3] = (UInt16)(3 * step + offset * i);
+                            indexArray[i * 6 + 4] = (UInt16)(0 * step + offset * i);
+                            indexArray[i * 6 + 5] = (UInt16)(1 * step + offset * i);
+                            ProcessIndexBuffer(indexArray, i);
+                        }
+                    }
+                    //this.indexBuffer[0].Unlock();
+                }
+                catch (Exception exception)
+                {
+
+                }
+
+                //ReturnBuffers();
+            }
+
+
         }
         static bool galMatInit = false;
         static Matrix3d galacticMatrix = Matrix3d.Identity;
+
+        public override bool CreateDemFromParent()
+        {
+            return true;
+        }
+
 
         public string GetDirectory(Imageset dataset, int level, int x, int y)
         {
@@ -473,7 +575,8 @@ namespace wwtlib
 
             returnUrl = string.Format(dataset.Url, level.ToString(), sb.ToString(), tileTextureIndex.ToString() + extention);
 
-            return returnUrl;
+            //return returnUrl;
+            return "http://skies.esac.esa.int/DSSColor/Norder0/Dir0/Npix4.jpg";
         }
 
         private string GetHipsFileExtention()
@@ -520,32 +623,20 @@ namespace wwtlib
 
         public Vector3d[] boundaries(long pix)
         {
+            step = 1;
             Vector3d[] points = new Vector3d[4 * step];
             Xyf xyf = pix2xyf(pix);
             double dc = 0.5 / nside;
-            double xc = (xyf.ix + 0.5) / nside, yc = (xyf.iy + 0.5) / nside;
+            double xc = (xyf.ix + 0.5) / nside;
+            double yc = (xyf.iy + 0.5) / nside;
 
-            double d = 1d / (step * nside);
+            double d = 1d / (step);
             for (int i = 0; i < step; ++i)
             {
-                //if (insideOut)
-                //{
-                    points[i] = Fxyf.Create(xc + dc - i * d, yc + dc, xyf.face).toVec3();
-                    points[i + step] = Fxyf.Create(xc - dc, yc + dc - i * d, xyf.face).toVec3();
-                    points[i + 2 * step] = Fxyf.Create(xc - dc + i * d, yc - dc, xyf.face).toVec3();
-                    points[i + 3 * step] = Fxyf.Create(xc + dc, yc - dc + i * d, xyf.face).toVec3();
-                //}
-                //else
-                //{
-                //    Vector3d tmp = new Fxyf(xc + dc - i * d, yc + dc, xyf.face).toVec3();
-                //    points[i] = Vector3d.Create(-tmp.X, tmp.Y, -tmp.Z);
-                //    tmp = new Fxyf(xc - dc, yc + dc - i * d, xyf.face).toVec3();
-                //    points[i + step] = Vector3d.Create(-tmp.X, tmp.Y, -tmp.Z);
-                //    tmp = new Fxyf(xc - dc + i * d, yc - dc, xyf.face).toVec3();
-                //    points[i + 2 * step] = Vector3d.Create(-tmp.X, tmp.Y, -tmp.Z);
-                //    tmp = new Fxyf(xc + dc, yc - dc + i * d, xyf.face).toVec3();
-                //    points[i + 3 * step] = Vector3d.Create(-tmp.X, tmp.Y, -tmp.Z);
-                //}
+                points[i] = Fxyf.Create(xc + dc - i * d, yc + dc, xyf.face).toVec3();
+                points[i + step] = Fxyf.Create(xc - dc, yc + dc - i * d, xyf.face).toVec3();
+                points[i + 2 * step] = Fxyf.Create(xc - dc + i * d, yc - dc, xyf.face).toVec3();
+                points[i + 3 * step] = Fxyf.Create(xc + dc, yc - dc + i * d, xyf.face).toVec3();
 
                 if (i == 0)
                 {
@@ -559,177 +650,233 @@ namespace wwtlib
             return points;
         }
 
-        //public override bool Draw3D(RenderContext11 renderContext, float transparancy, Tile parent)
-        //{
-        //    int tileTextureIndex = -1;
-        //    if (Level == 0)
-        //    {
-        //        tileTextureIndex = this.face;
-        //    }
-        //    else
-        //    {
-        //        tileTextureIndex = this.face * nside * nside / 4 + this.tileIndex;
-        //    }
+        public override bool Draw3D(RenderContext renderContext, double opacity)
+        {
+            if (Level != 0)
+            {
+                return false;
+            }
 
-        //    RenderedGeneration = CurrentRenderGeneration;
-        //    TilesTouched++;
+            if (true)
+            {
+                RenderedGeneration = CurrentRenderGeneration;
+                TilesTouched++;
 
-        //    InViewFrustum = true;
+                InViewFrustum = true;
 
-        //    if (!ReadyToRender)
-        //    {
-        //        TileCache.AddTileToQueue(this);
+                if (!ReadyToRender)
+                {
+                    TileCache.AddTileToQueue(this);
 
-        //        return false;
-        //    }
+                    return false;
+                }
 
-        //    TilesInView++;
+                TilesInView++;
 
-        //    if (!CreateGeometry(renderContext, true))
-        //    {
-        //        if (Level > 2)
-        //        {
-        //            return false;
-        //        }
-        //    }
 
-        //    int partCount = this.TriangleCount;
-        //    TrianglesRendered += partCount;
+                //if (!CreateGeometry(renderContext))
+                //{
+                //    if (Level > 2)
+                //    {
+                //        return false;
+                //    }
+                //}
 
-        //    Matrix3d savedWorld = renderContext.World;
-        //    Matrix3d savedView = renderContext.View;
-        //    bool usingLocalCenter = false;
-        //    if (localCenter != Vector3d.Empty)
-        //    {
-        //        usingLocalCenter = true;
-        //        Vector3d temp = localCenter;
-        //        renderContext.World = Matrix3d.Translation(temp) * renderContext.WorldBase * Matrix3d.Translation(-renderContext.CameraPosition);
-        //        renderContext.View = Matrix3d.Translation(renderContext.CameraPosition) * renderContext.ViewBase;
-        //    }
+                int partCount = this.TriangleCount;
+                TrianglesRendered += partCount;
 
-        //    try
-        //    {
-        //        bool anythingToRender = false;
-        //        bool childRendered = false;
-        //        int childIndex = 0;
+                Matrix3d savedWorld = renderContext.World;
+                Matrix3d savedView = renderContext.View;
 
-        //        for (int y1 = 0; y1 < 2; y1++)
-        //        {
-        //            for (int x1 = 0; x1 < 2; x1++)
-        //            {
-        //                if (Level < dataset.Levels)
-        //                {
-        //                    HealpixTile child;
-        //                    child = (HealpixTile)TileCache.GetTile(Level + 1, x1, y1, dataset, this);
-        //                    //childrenId[childIndex] = child.Key;
-        //                    children[childIndex] = child;
-        //                    if (child.IsTileInFrustum(renderContext.Frustum))
-        //                    {
-        //                        InViewFrustum = true;
-        //                        if (child.IsTileBigEnough(renderContext))
-        //                        {
-        //                            renderChildPart[childIndex].TargetState = !child.Draw3D(renderContext, transparancy, this);
-        //                            if (Level > 4)
-        //                            {
 
-        //                                int uvx = 0;
-        //                            }
+                //try
+                {
+                    RenderedAtOrBelowGeneration = CurrentRenderGeneration;
+                    if (Parent != null)
+                    {
+                        Parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
+                    }
+                    TilesInView++;
 
-        //                            if (!renderChildPart[childIndex].TargetState)
-        //                            {
-        //                                childRendered = true;
-        //                            }
-        //                        }
-        //                        else
-        //                        {
-        //                            renderChildPart[childIndex].TargetState = true;
-        //                        }
-        //                    }
-        //                    else
-        //                    {
-        //                        renderChildPart[childIndex].TargetState = renderChildPart[childIndex].State = false;
-        //                    }
+                    for (int i = 0; i < 16; i++)
+                    {
+                        //if (renderChildPart[i].TargetState)
+                        //{
+                            RenderPart(renderContext, i, (opacity / 100), false);
+                        //}
+                    }
+                    //Below from windows client - above copied from webGL Tile.cs
+                    //renderContext.MainTexture = texture;
+                    ////}
 
-        //                    if (renderChildPart[childIndex].TargetState == true)
-        //                    {
-        //                        renderChildPart[childIndex].State = renderChildPart[childIndex].TargetState;
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    renderChildPart[childIndex].State = true;
-        //                }
-        //                if (renderChildPart[childIndex].State == true)
-        //                {
-        //                    anythingToRender = true;
-        //                }
-        //                childIndex++;
-        //            }
-        //        }
+                    //if (dataset.DataSetType == ImageSetType.Sky)
+                    //{
+                    //    HDRPixelShader.constants.opacity = transparancy;
+                    //    HDRPixelShader.Use(renderContext.devContext);
+                    //}
 
-        //        if (childRendered || anythingToRender)
-        //        {
-        //            RenderedAtOrBelowGeneration = CurrentRenderGeneration;
-        //            if (parent != null)
-        //            {
-        //                parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
-        //            }
-        //        }
+                    //renderContext.SetVertexBuffer(vertexBuffer);
 
-        //        if (!anythingToRender && !(IsCatalogTile && childRendered))
-        //        {
-        //            return true;
-        //        }
+                    //renderContext.SetIndexBuffer(indexBuffer[0]);
 
-        //        if (!CreateGeometry(renderContext, true))
-        //        {
-        //            return false;
-        //        }
+                    //renderContext.devContext.DrawIndexed(indexBuffer[0].Count, 0, 0);
+                }
+                //catch
+                {
+                }
+                return true;
 
-        //        TilesInView++;
+            }
 
-        //        if (IsCatalogTile)
-        //        {
-        //            //RenderCatalog(renderContext);
-        //        }
-        //        else
-        //        {
-        //            //if (wireFrame)
-        //            //{
-        //            //    renderContext.MainTexture = null;
-        //            //}
-        //            //else
-        //            //{
-        //                renderContext.MainTexture = texture;
-        //            //}
 
-        //            if (dataset.DataSetType == ImageSetType.Sky)
-        //            {
-        //                HDRPixelShader.constants.opacity = transparancy;
-        //                HDRPixelShader.Use(renderContext.devContext);
-        //            }
+            //RenderedGeneration = CurrentRenderGeneration;
+            //TilesTouched++;
 
-        //            renderContext.SetVertexBuffer(vertexBuffer);
+            //InViewFrustum = true;
 
-        //            renderContext.SetIndexBuffer(indexBuffer[0]);
+            //if (!ReadyToRender)
+            //{
+            //    TileCache.AddTileToQueue(this);
 
-        //            renderContext.devContext.DrawIndexed(indexBuffer[0].Count, 0, 0);
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
+            //    return false;
+            //}
 
-        //    }
-        //    finally
-        //    {
-        //        if (usingLocalCenter)
-        //        {
-        //            renderContext.World = savedWorld;
-        //            renderContext.View = savedView;
-        //        }
-        //    }
-        //    return true;
-        //}
+            //TilesInView++;
+
+            //if (!CreateGeometry(renderContext))
+            //{
+            //    if (Level > 2)
+            //    {
+            //        return false;
+            //    }
+            //}
+
+            //int partCount = this.TriangleCount;
+            //TrianglesRendered += partCount;
+
+            //Matrix3d savedWorld = renderContext.World;
+            //Matrix3d savedView = renderContext.View;
+
+
+            ////try
+            //{
+            //    bool anythingToRender = false;
+            //    bool childRendered = false;
+            //    int childIndex = 0;
+
+            //    for (int y1 = 0; y1 < 2; y1++)
+            //    {
+            //        for (int x1 = 0; x1 < 2; x1++)
+            //        {
+            //            if (Level < dataset.Levels)
+            //            {
+            //                HealpixTile child;
+            //                child = (HealpixTile)TileCache.GetTile(Level + 1, x1, y1, dataset, this);
+            //                //childrenId[childIndex] = child.Key;
+            //                children[childIndex] = child;
+            //                if (child.IsTileInFrustum(renderContext.Frustum))
+            //                {
+            //                    InViewFrustum = true;
+            //                    if (child.IsTileBigEnough(renderContext))
+            //                    {
+            //                        renderChildPart[childIndex].TargetState = !child.Draw3D(renderContext, opacity);
+            //                        if (!renderChildPart[childIndex].TargetState)
+            //                        {
+            //                            childRendered = true;
+            //                        }
+            //                    }
+            //                    else
+            //                    {
+            //                        renderChildPart[childIndex].TargetState = true;
+            //                    }
+            //                }
+            //                else
+            //                {
+            //                    renderChildPart[childIndex].TargetState = renderChildPart[childIndex].State = false;
+            //                }
+
+            //                //if (renderChildPart[childIndex].TargetState == true)
+            //                //{
+            //                //    renderChildPart[childIndex].State = renderChildPart[childIndex].TargetState;
+            //                //}
+            //            }
+            //            else
+            //            {
+            //                renderChildPart[childIndex].State = true;
+            //            }
+            //            if (renderChildPart[childIndex].State == true)
+            //            {
+            //                anythingToRender = true;
+            //            }
+            //            childIndex++;
+            //        }
+            //    }
+
+            //    if (childRendered || anythingToRender)
+            //    {
+            //        RenderedAtOrBelowGeneration = CurrentRenderGeneration;
+            //        if (Parent != null)
+            //        {
+            //            Parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
+            //        }
+            //    }
+
+            //    //if (!anythingToRender && !(IsCatalogTile && childRendered))
+            //    //{
+            //    //    return true;
+            //    //}
+
+            //    //if (!CreateGeometry(renderContext))
+            //    //{
+            //    //    return false;
+            //    //}
+
+            //    TilesInView++;
+
+            //    if (IsCatalogTile)
+            //    {
+            //        //RenderCatalog(renderContext);
+            //    }
+            //    else
+            //    {
+            //        //if (wireFrame)
+            //        //{
+            //        //    renderContext.MainTexture = null;
+            //        //}
+            //        //else
+            //        //{
+
+
+            //        accomidation = ComputeAccomidation();
+            //        for (int i = 0; i < 4; i++)
+            //        {
+            //            if (renderChildPart[i].TargetState)
+            //            {
+            //                RenderPart(renderContext, i, (opacity / 100), false);
+            //            }
+            //        }
+            //        //Below from windows client - above copied from webGL Tile.cs
+            //        //renderContext.MainTexture = texture;
+            //        ////}
+
+            //        //if (dataset.DataSetType == ImageSetType.Sky)
+            //        //{
+            //        //    HDRPixelShader.constants.opacity = transparancy;
+            //        //    HDRPixelShader.Use(renderContext.devContext);
+            //        //}
+
+            //        //renderContext.SetVertexBuffer(vertexBuffer);
+
+            //        //renderContext.SetIndexBuffer(indexBuffer[0]);
+
+            //        //renderContext.devContext.DrawIndexed(indexBuffer[0].Count, 0, 0);
+            //    }
+            //}
+            ////catch
+            //{
+            //}
+            //return true;
+        }
         //static Mutex propMutex = new Mutex();
 
         internal static void LoadProperties(Imageset dataset)
@@ -822,18 +969,23 @@ namespace wwtlib
         protected Xyf pix2xyf(long ipix)
         {
             npface = nside * nside;
-            long pix = ipix & (npface - 1);//ÔÚ¾ßÌåÄ³¸öÃæÖÐµÄquadindex
-            return Xyf.Create(compress_bits(pix), compress_bits(unsignRM(pix, 1)),
-                            (int)(unsignRM(ipix, (2 * nside2order(nside)))));
+            //long pix = ipix & (npface - 1);//ÔÚ¾ßÌåÄ³¸öÃæÖÐµÄquadindex
+            //return Xyf.Create(compress_bits(pix), compress_bits(unsignRM(pix, 1)),
+            //                (int)(unsignRM(ipix, (2 * nside2order(nside)))));
+
+            //long pix = Math.Floor(ipix & (4*4 - 1));
+            long pix = Math.Floor(ipix & (npface - 1));
+            return Xyf.Create(compress_bits(pix), compress_bits(pix >> 1),
+                    Math.Floor((pix >> (2 * (Level)))));
         }
 
         protected void setStep()
         {
-            step = 4;
+            step = 1;
             if (nside >= 8)
-                step = 4;
+                step = 1;
             if (nside >= 16)
-                step = 2;
+                step = 1;
             if (nside >= 32)
                 step = 1;
             //if (nside >= 64)
@@ -842,24 +994,35 @@ namespace wwtlib
 
         public static int nside2order(long nside)
         {
-            HealpixUtils.check(nside > 0, "nside must be positive");
-            return ((nside & (nside - 1)) != 0) ? -1 : HealpixUtils.ilog2(nside);
+            return 0;
+            //HealpixUtils.check(nside > 0, "nside must be positive");
+            //return ((nside & (nside - 1)) != 0) ? -1 : HealpixUtils.ilog2(nside);
         }
 
         private static int compress_bits(long v)
         {
-            long raw = v & 0x5555555555555555L;
-            raw |= unsignRM(raw, 15);
-            int raw1 = (int)(raw & 0xffffL), raw2 = (int)((unsignRM(raw, 32)) & 0xffffL);
-            int result = 0;
+            //long raw = v & 0x5555555555555555L;
+            //raw |= unsignRM(raw, 15);
+            //int raw1 = (int)(raw & 0xffffL), raw2 = (int)((unsignRM(raw, 32)) & 0xffffL);
+            //int result = 0;
 
-            short a = HealpixTables.ctab[raw1 & 0xff];
-            short b = (short)(HealpixTables.ctab[unsignRM(raw1, 8)] << 4);
-            short c = (short)(HealpixTables.ctab[raw2 & 0xff] << 16);
-            short d = (short)(HealpixTables.ctab[unsignRM(raw2, 8)] << 20);
-            result = a | b | c | d;
+            //short a = HealpixTables.ctab[raw1 & 0xff];
+            //short b = (short)(HealpixTables.ctab[unsignRM(raw1, 8)] << 4);
+            //short c = (short)(HealpixTables.ctab[raw2 & 0xff] << 16);
+            //short d = (short)(HealpixTables.ctab[unsignRM(raw2, 8)] << 20);
+            //result = a | b | c | d;
 
-            return result;
+            //return result;
+
+
+
+            long raw = Math.Floor((v & 0x5555)) | Math.Floor(((v & 0x55550000) >> 15));
+            short temp = HealpixTables.ctab[raw >> 8];
+            int temp2 = temp << 4;
+            int temp3 = HealpixTables.ctab[raw & 0xff];
+            int compressed = temp3 | temp2;
+            return compressed;
+
         }
 
         public static long unsignRM(long x, int y)
@@ -1087,71 +1250,78 @@ namespace wwtlib
         //public override void OnCreateVertexBuffer(VertexBuffer11 vb)
         public override void OnCreateVertexBuffer(object sender, EventArgs e)
         {
-            //if (!subDivided)
-            //{
-            //    if (vertexList == null)
-            //    {
-            //        createGeometry();
-            //    }
+            if (!subDivided)
+            {
+                if (vertexList == null)
+                {
+                    createGeometry();
+                }
 
-            //    try
-            //    {
-            //        // Create a vertex buffer 
-            //        PositionNormalTexturedX2[] verts = (PositionNormalTexturedX2[])vb.Lock(0, 0); // Lock the buffer (which will return our structs)
-            //        int index = 0;
-            //        foreach (PositionTexture vert in vertexList)
-            //        {
-            //            verts[index++] = vert.PositionNormalTextured(Vector3d.Create(0, 0, 0), false);
+                try
+                {
+                    // Create a vertex buffer 
+                    //PositionNormalTexturedX2[] verts = (PositionNormalTexturedX2[])vb.Lock(0, 0); // Lock the buffer (which will return our structs)
+                    int index = 0;
+                    foreach (PositionTexture vert in vertexList)
+                    {
+                        //verts[index++] = vert.PositionNormalTextured(Vector3d.Create(0, 0, 0), false);
 
-            //        }
+                    }
 
-            //        vb.Unlock();
+                    //vb.Unlock();
 
 
-            //        if (Level == 0)
-            //        {
-            //            this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 16, RenderContext11.PrepDevice);
-            //            index = 0;
-            //            indexArray = (short[])this.indexBuffer[0].Lock();
-            //            int offset = verts.Length / 16;
-            //            for (int i = 0; i < 16; i++)
-            //            {
-            //                indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
-            //                indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
-            //                indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
-            //                indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
-            //                indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
-            //                indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 4, RenderContext11.PrepDevice);
-            //            index = 0;
-            //            indexArray = (short[])this.indexBuffer[0].Lock();
-            //            int offset = verts.Length / 4;
-            //            for (int i = 0; i < 4; i++)
-            //            {
-            //                indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
-            //                indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
-            //                indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
-            //                indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
-            //                indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
-            //                indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
-            //            }
-            //        }
-            //        this.indexBuffer[0].Unlock();
-            //    }
-            //    catch (Exception e)
-            //    {
+                    if (Level == 0)
+                    {
+                        //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 16, RenderContext11.PrepDevice);
+                        index = 0;
 
-            //    }
+                        Uint16Array ui16array = new Uint16Array(6 * 16);
+                        UInt16[] indexArray = (UInt16[])(object)ui16array;
+                        
+                        int offset = vertexList.Count / 16;
+                        for (int i = 0; i < 16; i++)
+                        {
+                            indexArray[i * 6 + 0] = (UInt16)(2 * step + offset * i);
+                            indexArray[i * 6 + 1] = (UInt16)(3 * step + offset * i);
+                            indexArray[i * 6 + 2] = (UInt16)(1 * step + offset * i);
+                            indexArray[i * 6 + 3] = (UInt16)(3 * step + offset * i);
+                            indexArray[i * 6 + 4] = (UInt16)(0 * step + offset * i);
+                            indexArray[i * 6 + 5] = (UInt16)(1 * step + offset * i);
+                        }
 
-            //    ReturnBuffers();
-            //}
+                        WebGLBuffer indexBuffer = PrepDevice.createBuffer();
+                        PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
+                        PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)indexArray, GL.STATIC_DRAW);
+                    }
+                    else
+                    {
+                        //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 4, RenderContext11.PrepDevice);
+                        index = 0;
+                        //indexArray = (short[])this.indexBuffer[0].Lock();
+                        //int offset = verts.Length / 4;
+                        for (int i = 0; i < 4; i++)
+                        {
+                            //indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
+                            //indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
+                            //indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
+                            //indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
+                            //indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
+                            //indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
+                        }
+                    }
+                    //this.indexBuffer[0].Unlock();
+                }
+                catch (Exception exception)
+                {
+
+                }
+
+                ReturnBuffers();
+            }
         }
 
-        private void ProcessIndexBuffer(ushort[] indexArray, int part)
+        private void ProcessIndexBuffer(UInt16[] indexArray, int part)
         {
             if (Level == 0)
             {
@@ -1344,486 +1514,57 @@ namespace wwtlib
                 points = this.boundaries(faceoff + q);
 
                 double u = 0, v = 0;
-                if (quadIndex == 0)
+                for (int i = 0; i < points.Length; i++)
                 {
-                    for (int i = 0; i < points.Length; i++)
+                    int tx = Math.Floor(i / 2);
+                    int ty = 0;
+                    if (i == 1  || i == 2)
                     {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.25;
-                            v = 0.25 - 0.25 / step * ty;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.25 - 0.25 / step * ty;
-                            v = 0;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0;
-                            v = 0.25 / step * ty;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 / step * ty;
-                            v = 0.25;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
+                        ty = 1;
                     }
-                }
-                else if (quadIndex == 1)
-                {
-                    for (int i = 0; i < points.Length; i++)
+
+                    int qx = 0;
+                    if (quadIndex == 0 || quadIndex == 1 || quadIndex == 4 || quadIndex == 5)
                     {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.25;
-                            v = 0.5 - 0.25 / step * ty;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.25 - 0.25 / step * ty;
-                            v = 0.25;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0;
-                            v = 0.25 + 0.25 / step * ty;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 / step * ty;
-                            v = 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
-                else if (quadIndex == 2)
-                {
-                    for (int i = 0; i < points.Length; i++)
+                        qx = 3;
+                    } else if (quadIndex == 2 || quadIndex == 3 || quadIndex == 6 || quadIndex == 7)
                     {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.5;
-                            v = 0.25 - 0.25 / step * ty;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.5 - 0.25 / step * ty;
-                            v = 0;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0.25;
-                            v = 0.25 / step * ty;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 + 0.25 / step * ty;
-                            v = 0.25;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
+                        qx = 2;
                     }
-                }
-                else if (quadIndex == 3)
-                {
-                    for (int i = 0; i < points.Length; i++)
+                    else if (quadIndex == 8 || quadIndex == 9 || quadIndex == 12 || quadIndex == 13)
                     {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.5;
-                            v = 0.5 - 0.25 / step * ty;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.5 - 0.25 / step * ty;
-                            v = 0.25;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0.25;
-                            v = 0.25 + 0.25 / step * ty;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 + 0.25 / step * ty;
-                            v = 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
+                        qx = 1;
                     }
-                }
-                else if (quadIndex == 4)
-                {
-                    for (int i = 0; i < points.Length; i++)
+
+
+                    // 0 2 8 10 = 3 
+                    // 1 3 9 11 = 2 
+                    // 4 6 12 14 = 1 
+                    // 5 7 13 15 = 0 
+                    int qy = 0;
+                    if (quadIndex == 0 || quadIndex == 2 || quadIndex == 8 || quadIndex == 10)
                     {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.25;
-                            v = 0.25 - 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.25 - 0.25 / step * ty;
-                            v = 0.5;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0;
-                            v = 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 / step * ty;
-                            v = 0.25 + 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
+                        qy = 3;
                     }
-                }
-                else if (quadIndex == 5)
-                {
-                    for (int i = 0; i < points.Length; i++)
+                    else if (quadIndex == 1 || quadIndex == 3 || quadIndex == 9 || quadIndex == 11)
                     {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.25;
-                            v = 0.5 - 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.25 - 0.25 / step * ty;
-                            v = 0.25 + 0.5;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0;
-                            v = 0.25 + 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 / step * ty;
-                            v = 0.5 + 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
+                        qy = 2;
                     }
-                }
-                else if (quadIndex == 6)
-                {
-                    for (int i = 0; i < points.Length; i++)
+                    else if (quadIndex == 4 || quadIndex == 6 || quadIndex == 12 || quadIndex == 14)
                     {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.5;
-                            v = 0.25 - 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.5 - 0.25 / step * ty;
-                            v = 0.5;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0.25;
-                            v = 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 + 0.25 / step * ty;
-                            v = 0.25 + 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
+                        qy = 1;
                     }
-                }
-                else if (quadIndex == 7)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
 
-                        if (tx == 0)
-                        {
-                            u = 0.5;
-                            v = 0.5 - 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.5 - 0.25 / step * ty;
-                            v = 0.25 + 0.5;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0.25;
-                            v = 0.25 + 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 + 0.25 / step * ty;
-                            v = 0.5 + 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
-                else if (quadIndex == 8)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
+                    u = 1 / nside * tx + 1 / nside * qx;
+                    v = 1 / nside * ty + 1 / nside * qy;
+ 
 
-                        if (tx == 0)
-                        {
-                            u = 0.25 + 0.5;
-                            v = 0.25 - 0.25 / step * ty;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.25 - 0.25 / step * ty + 0.5;
-                            v = 0;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0 + 0.5;
-                            v = 0.25 / step * ty;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 / step * ty + 0.5;
-                            v = 0.25;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
-                else if (quadIndex == 9)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
 
-                        if (tx == 0)
-                        {
-                            u = 0.25 + 0.5;
-                            v = 0.5 - 0.25 / step * ty;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.25 - 0.25 / step * ty + 0.5;
-                            v = 0.25;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0 + 0.5;
-                            v = 0.25 + 0.25 / step * ty;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 / step * ty + 0.5;
-                            v = 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
-                else if (quadIndex == 10)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
 
-                        if (tx == 0)
-                        {
-                            u = 0.5 + 0.5;
-                            v = 0.25 - 0.25 / step * ty;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.5 - 0.25 / step * ty + 0.5;
-                            v = 0;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0.25 + 0.5;
-                            v = 0.25 / step * ty;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 + 0.25 / step * ty + 0.5;
-                            v = 0.25;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
-                else if (quadIndex == 11)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
+                    vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
 
-                        if (tx == 0)
-                        {
-                            u = 0.5 + 0.5;
-                            v = 0.5 - 0.25 / step * ty;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.5 - 0.25 / step * ty + 0.5;
-                            v = 0.25;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0.25 + 0.5;
-                            v = 0.25 + 0.25 / step * ty;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 + 0.25 / step * ty + 0.5;
-                            v = 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
                 }
-                if (quadIndex == 12)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
 
-                        if (tx == 0)
-                        {
-                            u = 0.25 + 0.5;
-                            v = 0.25 - 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.25 - 0.25 / step * ty + 0.5;
-                            v = 0 + 0.5;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0 + 0.5;
-                            v = 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 / step * ty + 0.5;
-                            v = 0.25 + 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
-                else if (quadIndex == 13)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.25 + 0.5;
-                            v = 0.5 - 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.25 - 0.25 / step * ty + 0.5;
-                            v = 0.25 + 0.5;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0 + 0.5;
-                            v = 0.25 + 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 / step * ty + 0.5;
-                            v = 0.5 + 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
-                else if (quadIndex == 14)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.5 + 0.5;
-                            v = 0.25 - 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.5 - 0.25 / step * ty + 0.5;
-                            v = 0 + 0.5;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0.25 + 0.5;
-                            v = 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 + 0.25 / step * ty + 0.5;
-                            v = 0.25 + 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
-                else if (quadIndex == 15)
-                {
-                    for (int i = 0; i < points.Length; i++)
-                    {
-                        int tx = i / step;
-                        int ty = i % step;
-
-                        if (tx == 0)
-                        {
-                            u = 0.5 + 0.5;
-                            v = 0.5 - 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 1)
-                        {
-                            u = 0.5 - 0.25 / step * ty + 0.5;
-                            v = 0.25 + 0.5;
-                        }
-                        else if (tx == 2)
-                        {
-                            u = 0.25 + 0.5;
-                            v = 0.25 + 0.25 / step * ty + 0.5;
-                        }
-                        else if (tx == 3)
-                        {
-                            u = 0.25 + 0.25 / step * ty + 0.5;
-                            v = 0.5 + 0.5;
-                        }
-                        vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                    }
-                }
 
                 quadIndex++;
             }
@@ -2045,7 +1786,7 @@ namespace wwtlib
             Xyf temp = new Xyf();
             temp.ix = x;
             temp.iy = y;
-            temp.face = f;
+            temp.face = 4;
             return temp;
         }
     }
