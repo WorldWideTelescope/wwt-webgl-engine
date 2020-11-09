@@ -79,7 +79,11 @@ namespace wwtlib
 
             double x = st * FastMath.cos(phi);
             double y = st * FastMath.sin(phi);
-            return Vector3d.Create(-x, z, -y);
+            return Vector3d.Create(x, y, z);
+            //return Vector3d.Create(-x, z, -y);
+
+
+
             //return new Vector3d(x, z, y); //for planet
 
             //switch (Earth3d.DebugValue)
