@@ -136,7 +136,7 @@ namespace wwtlib
         public static double sin(double d)
         {
             double u = d * M_1_PI;
-            long q = (long)(u < 0 ? u - 0.5 : u + 0.5);
+            long q = Math.Floor(u < 0 ? u - 0.5 : u + 0.5);
 
             double x = 4d * q;
             d -= x * PI4_A;
@@ -153,7 +153,7 @@ namespace wwtlib
         public static double cos(double d)
         {
             double u = d * M_1_PI - 0.5;
-            long q = 1 + 2 * (long)(u < 0 ? u - 0.5 : u + 0.5);
+            long q = 1 + 2 * Math.Floor(u < 0 ? u - 0.5 : u + 0.5);
 
             double x = 2d * q;
             d -= x * PI4_A;
