@@ -21,23 +21,7 @@ namespace wwtlib
 
         static public int ilog2(long arg)
         {
-            //	return Math.max(Math.log2(arg));
-            return 63 - HealpixUtils.numberOfLeadingZeros(Math.Max(arg, 1));
-        }
-
-        static public int numberOfLeadingZeros(int i)
-        {
-            if (i == 0)
-                return 64;
-            int n = 1;
-            int x = (i >> 32);
-            if (x == 0) { n += 32; x = i; }
-            if (x >> 16 == 0) { n += 16; x <<= 16; }
-            if (x >> 24 == 0) { n += 8; x <<= 8; }
-            if (x >> 28 == 0) { n += 4; x <<= 4; }
-            if (x >> 30 == 0) { n += 2; x <<= 2; }
-            n -= x >> 31;
-            return n;
+            return Math.Round(Math.Log(arg) * Math.LOG2E);
         }
 
 
