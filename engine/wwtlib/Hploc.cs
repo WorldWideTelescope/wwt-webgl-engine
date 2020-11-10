@@ -79,8 +79,7 @@ namespace wwtlib
 
             double x = st * FastMath.cos(phi);
             double y = st * FastMath.sin(phi);
-            return Vector3d.Create(x, y, z);
-            //return Vector3d.Create(-x, z, -y);
+            return Vector3d.Create(x, z, y); 
 
 
 
