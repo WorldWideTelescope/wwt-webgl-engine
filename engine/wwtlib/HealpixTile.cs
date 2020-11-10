@@ -56,7 +56,6 @@ namespace wwtlib
 
         public HealpixTile(int level, int x, int y, Imageset dataset, Tile parent)
         {
-            PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
             HealpixTile.LoadProperties(dataset);
             this.Level = level;
             this.tileX = x;
@@ -547,7 +546,6 @@ namespace wwtlib
 
         public string GetUrl(Imageset dataset, int level, int x, int y)
         {
-            string returnUrl = "";
             string extention = GetHipsFileExtention();
 
             int tileTextureIndex = -1;
@@ -561,22 +559,10 @@ namespace wwtlib
             }
             StringBuilder sb = new StringBuilder();
 
-            int subDirIndex = tileTextureIndex / 10000;
+            int subDirIndex = Math.Floor(tileTextureIndex / 10000) * 10000;
 
-            if (subDirIndex != 0)
-            {
-                sb.Append(subDirIndex);
-                sb.Append("0000");
-            }
-            else
-            {
-                sb.Append("0");
-            }
 
-            returnUrl = string.Format(dataset.Url, level.ToString(), sb.ToString(), tileTextureIndex.ToString() + extention);
-
-            //return returnUrl;
-            return "http://skies.esac.esa.int/DSSColor/Norder0/Dir0/Npix4.jpg";
+            return String.Format(dataset.Url, level.ToString(), subDirIndex.ToString(), tileTextureIndex.ToString() + extention);
         }
 
         private string GetHipsFileExtention()
@@ -969,14 +955,9 @@ namespace wwtlib
         protected Xyf pix2xyf(long ipix)
         {
             npface = nside * nside;
-            //long pix = ipix & (npface - 1);//ÔÚ¾ßÌåÄ³¸öÃæÖÐµÄquadindex
-            //return Xyf.Create(compress_bits(pix), compress_bits(unsignRM(pix, 1)),
-            //                (int)(unsignRM(ipix, (2 * nside2order(nside)))));
-
-            //long pix = Math.Floor(ipix & (4*4 - 1));
             long pix = Math.Floor(ipix & (npface - 1));
             return Xyf.Create(compress_bits(pix), compress_bits(pix >> 1),
-                    Math.Floor((pix >> (2 * (Level)))));
+                Math.Floor((ipix >> (2 * nside2order(nside)))));
         }
 
         protected void setStep()
@@ -994,9 +975,8 @@ namespace wwtlib
 
         public static int nside2order(long nside)
         {
-            return 0;
-            //HealpixUtils.check(nside > 0, "nside must be positive");
-            //return ((nside & (nside - 1)) != 0) ? -1 : HealpixUtils.ilog2(nside);
+            HealpixUtils.check(nside > 0, "nside must be positive");
+            return ((nside & (nside - 1)) != 0) ? -1 : HealpixUtils.ilog2(nside);
         }
 
         private static int compress_bits(long v)
@@ -1516,53 +1496,49 @@ namespace wwtlib
                 double u = 0, v = 0;
                 for (int i = 0; i < points.Length; i++)
                 {
-                    int tx = Math.Floor(i / 2);
-                    int ty = 0;
+                    int tx = 0;
+                    if(Math.Floor(i / 2) == 0)
+                    {
+                        tx = 1;
+                    }
+                    int ty = 1;
                     if (i == 1  || i == 2)
                     {
-                        ty = 1;
+                        ty = 0;
                     }
 
-                    int qx = 0;
+                    int qx = 3;
                     if (quadIndex == 0 || quadIndex == 1 || quadIndex == 4 || quadIndex == 5)
                     {
-                        qx = 3;
+                        qx = 0;
                     } else if (quadIndex == 2 || quadIndex == 3 || quadIndex == 6 || quadIndex == 7)
-                    {
-                        qx = 2;
-                    }
-                    else if (quadIndex == 8 || quadIndex == 9 || quadIndex == 12 || quadIndex == 13)
                     {
                         qx = 1;
                     }
+                    else if (quadIndex == 8 || quadIndex == 9 || quadIndex == 12 || quadIndex == 13)
+                    {
+                        qx = 2;
+                    }
 
 
-                    // 0 2 8 10 = 3 
-                    // 1 3 9 11 = 2 
-                    // 4 6 12 14 = 1 
-                    // 5 7 13 15 = 0 
-                    int qy = 0;
+                    int qy = 3;
                     if (quadIndex == 0 || quadIndex == 2 || quadIndex == 8 || quadIndex == 10)
                     {
-                        qy = 3;
+                        qy = 0;
                     }
                     else if (quadIndex == 1 || quadIndex == 3 || quadIndex == 9 || quadIndex == 11)
                     {
-                        qy = 2;
+                        qy = 1;
                     }
                     else if (quadIndex == 4 || quadIndex == 6 || quadIndex == 12 || quadIndex == 14)
                     {
-                        qy = 1;
+                        qy = 2;
                     }
 
                     u = 1 / nside * tx + 1 / nside * qx;
                     v = 1 / nside * ty + 1 / nside * qy;
- 
-
-
 
                     vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-
                 }
 
 
@@ -1786,7 +1762,7 @@ namespace wwtlib
             Xyf temp = new Xyf();
             temp.ix = x;
             temp.iy = y;
-            temp.face = 4;
+            temp.face = f;
             return temp;
         }
     }
