@@ -8,10 +8,10 @@ namespace wwtlib
     public class HealpixTile : Tile
     {
         protected PositionTexture[] bounds;
-        protected bool backslash = false;
         List<PositionTexture> vertexList = null;
 
         int nside = 2;
+        int npix;
         int npface;
         protected double[] demArray;
         public int tileIndex = -1;
@@ -28,14 +28,10 @@ namespace wwtlib
         int quadIndexStart;
         int quadIndexEnd;
 
-        static protected WebGLBuffer[] slashIndexBuffer = new WebGLBuffer[64];
-        static protected WebGLBuffer[] backSlashIndexBuffer = new WebGLBuffer[64];
+        static protected WebGLBuffer[] slashIndexBuffer = new WebGLBuffer[16];
+        //static protected WebGLBuffer[] slashIndexBuffer = new WebGLBuffer[4 * step]; //TODO constructor
         //static protected WebGLBuffer[] rootIndexBuffer = new WebGLBuffer[4];
-        static protected WebGLBuffer[] rootIndexBuffer = new WebGLBuffer[16];
-
-        //static protected IndexBuffer11[,] slashIndexBuffer = new IndexBuffer11[4, 16];
-        //static protected IndexBuffer11[,] backSlashIndexBuffer = new IndexBuffer11[4, 16];
-        //static protected IndexBuffer11[] rootIndexBuffer = new IndexBuffer11[4];
+        protected WebGLBuffer[] rootIndexBuffer = new WebGLBuffer[16];
 
         string url;
         public String URL
@@ -76,6 +72,7 @@ namespace wwtlib
                 this.face = x * 4 + y;
                 quadIndexStart = 0;
                 quadIndexEnd = 15;
+                this.npix = this.face;
             }
             else
             {
@@ -92,6 +89,7 @@ namespace wwtlib
                     //if has parent, the index is 4*parenttileindex+2y+x
                     this.tileIndex = parentTile.tileIndex * 4 + y * 2 + x;
                 }
+                this.npix = this.face * nside * nside / 4 + this.tileIndex;
                 quadIndexStart = this.tileIndex * 4;
                 quadIndexEnd = quadIndexStart + 3;
                 this.Parent = parent;
@@ -130,14 +128,13 @@ namespace wwtlib
             }
 
             Vector3d[] pointList = new Vector3d[vertexList.Count];
-            //Vector3d[] pointList = BufferPool11.GetVector3dBuffer(vertexList.Count);
             for (int i = 0; i < vertexList.Count; i++)
             {
                 pointList[i] = vertexList[i].Position;
             }
-
             CalcSphere(pointList);
-            VertexCount = vertexList.Count;
+
+            setCorners(npix);
         }
 
         private void createGeometry()
@@ -147,144 +144,15 @@ namespace wwtlib
 
             int nQuads = (int)Math.Pow(nside, 2);// quads of one face in a specific order 
             int faceoff = nQuads * face;
-            Vector3d[] points;
 
             try
             {
-                int quadIndex = 0;
-
                 if (Level == 0)
                 {
                     vertexListOfLevel0(vertexList, quadIndexStart, quadIndexEnd, faceoff);
-                }
-                else
+                } else
                 {
-                    for (int q = quadIndexStart; q <= quadIndexEnd; q++)
-                    {
-                        points = this.boundaries(faceoff + q);
-                        double u = 0, v = 0;
-                        if (quadIndex == 0)
-                        {
-                            for (int i = 0; i < points.Length; i++)
-                            {
-                                int tx = i / step;
-                                int ty = i % step;
-
-                                if (tx == 0)
-                                {
-                                    u = 0.5;
-                                    v = 0.5 - 0.5 / step * ty;
-                                }
-                                else if (tx == 1)
-                                {
-                                    u = 0.5 - 0.5 / step * ty;
-                                    v = 0;
-                                }
-                                else if (tx == 2)
-                                {
-                                    u = 0;
-                                    v = 0.5 / step * ty;
-                                }
-                                else if (tx == 3)
-                                {
-                                    u = 0.5 / step * ty;
-                                    v = 0.5;
-                                }
-                                vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                            }
-                        }
-                        else if (quadIndex == 1)
-                        {
-                            for (int i = 0; i < points.Length; i++)
-                            {
-                                int tx = i / step;
-                                int ty = i % step;
-
-                                if (tx == 0)
-                                {
-                                    u = 0.5;
-                                    v = 1 - 0.5 / step * ty;
-                                }
-                                else if (tx == 1)
-                                {
-                                    u = 0.5 - 0.5 / step * ty;
-                                    v = 0.5;
-                                }
-                                else if (tx == 2)
-                                {
-                                    u = 0;
-                                    v = 0.5 + 0.5 / step * ty;
-                                }
-                                else if (tx == 3)
-                                {
-                                    u = 0.5 / step * ty;
-                                    v = 1;
-                                }
-                                vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                            }
-                        }
-                        else if (quadIndex == 2)
-                        {
-                            for (int i = 0; i < points.Length; i++)
-                            {
-                                int tx = i / step;
-                                int ty = i % step;
-
-                                if (tx == 0)
-                                {
-                                    u = 1;
-                                    v = 0.5 - 0.5 / step * ty;
-                                }
-                                else if (tx == 1)
-                                {
-                                    u = 1 - 0.5 / step * ty;
-                                    v = 0;
-                                }
-                                else if (tx == 2)
-                                {
-                                    u = 0.5;
-                                    v = 0.5 / step * ty;
-                                }
-                                else if (tx == 3)
-                                {
-                                    u = 0.5 + 0.5 / step * ty;
-                                    v = 0.5;
-                                }
-                                vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                            }
-                        }
-                        else if (quadIndex == 3)
-                        {
-                            for (int i = 0; i < points.Length; i++)
-                            {
-                                int tx = i / step;
-                                int ty = i % step;
-
-                                if (tx == 0)
-                                {
-                                    u = 1;
-                                    v = 1 - 0.5 / step * ty;
-                                }
-                                else if (tx == 1)
-                                {
-                                    u = 1 - 0.5 / step * ty;
-                                    v = 0.5;
-                                }
-                                else if (tx == 2)
-                                {
-                                    u = 0.5;
-                                    v = 0.5 + 0.5 / step * ty;
-                                }
-                                else if (tx == 3)
-                                {
-                                    u = 0.5 + 0.5 / step * ty;
-                                    v = 1;
-                                }
-                                vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
-                            }
-                        }
-                        quadIndex++;
-                    }
+                    vertexListOfLevel1(vertexList, quadIndexStart, quadIndexEnd, faceoff);
                 }
             }
             catch (Exception e)
@@ -322,7 +190,7 @@ namespace wwtlib
 
 
 
-            Uint16Array ui16array = new Uint16Array(6 * vertexList.Count);
+            Uint16Array ui16array = new Uint16Array(6);
             UInt16[] indexArray = (UInt16[])(object)ui16array;
 
 
@@ -357,53 +225,24 @@ namespace wwtlib
 
                     //vb.Unlock();
 
-                    if (Level == 0)
+
+                    TriangleCount = 2;
+                    //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 16, RenderContext11.PrepDevice);
+                    index = 0;
+                    int offset = vertexList.Count / (4 * step);
+
+                    for (int i = 0; i < 4 * step; i++)
                     {
+                        indexArray[0] = (UInt16)(0 + offset * i);
+                        indexArray[1] = (UInt16)(1 + offset * i);
+                        indexArray[2] = (UInt16)(2 + offset * i);
+                        indexArray[3] = (UInt16)(0 + offset * i);
+                        indexArray[4] = (UInt16)(2 + offset * i);
+                        indexArray[5] = (UInt16)(3 + offset * i);
 
-                        TriangleCount = 32; 
-                        //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 16, RenderContext11.PrepDevice);
-                        index = 0;
-                        //indexArray = (short[])this.indexBuffer[0].Lock();
-                        int offset = vertexList.Count / 16;
-                        for (int i = 0; i < 16; i++)
-                        {
-                            indexArray[i * 6 + 0] = (UInt16)(0 + offset * i);
-                            indexArray[i * 6 + 1] = (UInt16)(1 + offset * i);
-                            indexArray[i * 6 + 2] = (UInt16)(2 + offset * i);
-                            indexArray[i * 6 + 3] = (UInt16)(0 + offset * i);
-                            indexArray[i * 6 + 4] = (UInt16)(2 + offset * i);
-                            indexArray[i * 6 + 5] = (UInt16)(3 + offset * i);
-
-                            //indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
-                            //indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
-                            //indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
-                            //indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
-                            //indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
-                            //indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
-                            ProcessIndexBuffer(indexArray, i);
-                        }
-
+                        ProcessIndexBuffer(indexArray, i);
                     }
-                    else
-                    {
-                        //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 4, RenderContext11.PrepDevice);
-                        index = 0;
 
-                        //indexArray = (short[])this.indexBuffer[0].Lock();
-                        int offset = 0;
-                        //int offset = verts.Length / 4;
-                        for (int i = 0; i < 4; i++)
-                        {
-                            indexArray[i * 6 + 0] = (UInt16)(2 * step + offset * i);
-                            indexArray[i * 6 + 1] = (UInt16)(3 * step + offset * i);
-                            indexArray[i * 6 + 2] = (UInt16)(1 * step + offset * i);
-                            indexArray[i * 6 + 3] = (UInt16)(3 * step + offset * i);
-                            indexArray[i * 6 + 4] = (UInt16)(0 * step + offset * i);
-                            indexArray[i * 6 + 5] = (UInt16)(1 * step + offset * i);
-                            ProcessIndexBuffer(indexArray, i);
-                        }
-                    }
-                    //this.indexBuffer[0].Unlock();
                 }
                 catch (Exception exception)
                 {
@@ -561,7 +400,6 @@ namespace wwtlib
 
             int subDirIndex = Math.Floor(tileTextureIndex / 10000) * 10000;
 
-
             return String.Format(dataset.Url, level.ToString(), subDirIndex.ToString(), tileTextureIndex.ToString() + extention);
         }
 
@@ -609,39 +447,36 @@ namespace wwtlib
 
         public Vector3d[] boundaries(long pix)
         {
-            step = 1;
-            Vector3d[] points = new Vector3d[4 * step];
+            Vector3d[] points = new Vector3d[4];
             Xyf xyf = pix2xyf(pix);
             double dc = 0.5 / nside;
             double xc = (xyf.ix + 0.5) / nside;
             double yc = (xyf.iy + 0.5) / nside;
 
-            double d = 1d / (step);
-            for (int i = 0; i < step; ++i)
-            {
-                points[i] = Fxyf.Create(xc + dc - i * d, yc + dc, xyf.face).toVec3();
-                points[i + step] = Fxyf.Create(xc - dc, yc + dc - i * d, xyf.face).toVec3();
-                points[i + 2 * step] = Fxyf.Create(xc - dc + i * d, yc - dc, xyf.face).toVec3();
-                points[i + 3 * step] = Fxyf.Create(xc + dc, yc - dc + i * d, xyf.face).toVec3();
-
-                if (i == 0)
-                {
-                    TopLeft = points[i];
-                    BottomLeft = points[i + step];
-                    BottomRight = points[i + 2 * step];
-                    TopRight = points[i + 3 * step];
-                }
-            }
+            points[0] = Fxyf.Create(xc + dc, yc + dc, xyf.face).toVec3();
+            points[1] = Fxyf.Create(xc - dc, yc + dc, xyf.face).toVec3();
+            points[2] = Fxyf.Create(xc - dc, yc - dc, xyf.face).toVec3();
+            points[3] = Fxyf.Create(xc + dc, yc - dc, xyf.face).toVec3();
 
             return points;
         }
 
+
+        public void setCorners(long pix)
+        {
+            Xyf xyf = pix2xyf2(pix);
+            double dc = 0.5 / nside;
+            double xc = (xyf.ix + 0.5) / nside;
+            double yc = (xyf.iy + 0.5) / nside;
+
+            TopLeft = Fxyf.Create(xc + dc, yc + dc, xyf.face).toVec3();
+            BottomLeft = Fxyf.Create(xc - dc, yc + dc, xyf.face).toVec3();
+            BottomRight = Fxyf.Create(xc - dc, yc - dc, xyf.face).toVec3();
+            TopRight = Fxyf.Create(xc + dc, yc - dc, xyf.face).toVec3();
+        }
+      
         public override bool Draw3D(RenderContext renderContext, double opacity)
         {
-            if (Level != 0)
-            {
-                return false;
-            }
 
             if (true)
             {
@@ -675,41 +510,122 @@ namespace wwtlib
                 Matrix3d savedView = renderContext.View;
 
 
-                //try
+                bool anythingToRender = false;
+                bool childRendered = false;
+                int childIndex = 0;
+                for (int y1 = 0; y1 < 2; y1++)
+                {
+                    for (int x1 = 0; x1 < 2; x1++)
+                    {
+                        if (Level < dataset.Levels)
+                        {
+                            // make children 
+                            if (children[childIndex] == null)
+                            {
+                                //children[childIndex] = TileCache.GetTile(Level + 1, tileX * 2 + ((x1 + xOffset) % 2), tileY * 2 + ((y1 + yOffset) % 2), dataset, this);
+                                //children[childIndex] = TileCache.GetTile(Level + 1, x1, y1, dataset, this);
+                                children[childIndex] = new HealpixTile(Level + 1, x1, y1, dataset, this);
+                            }
+
+                            if (children[childIndex].IsTileInFrustum(renderContext.Frustum))
+                            {
+                                InViewFrustum = true;
+                                if (children[childIndex].IsTileBigEnough(renderContext))
+                                {
+                                    renderChildPart[childIndex].TargetState = !children[childIndex].Draw3D(renderContext, opacity);
+                                    if (renderChildPart[childIndex].TargetState)
+                                    {
+                                        childRendered = true;
+                                    }
+                                }
+                                else
+                                {
+                                    renderChildPart[childIndex].TargetState = true;
+                                }
+                            }
+                            else
+                            {
+                                renderChildPart[childIndex].TargetState = renderChildPart[childIndex].State = false;
+                            }
+
+                            //if (renderChildPart[childIndex].TargetState == true || !blendMode)
+                            //{
+                            //    renderChildPart[childIndex].State = renderChildPart[childIndex].TargetState;
+                            //}
+                            //if (renderChildPart[childIndex].TargetState != renderChildPart[childIndex].State)
+                            //{
+                            //    transitioning = true;
+                            //}
+                        }
+                        else
+                        {
+                            renderChildPart[childIndex].State = true;
+                        }
+
+                        ////if(childIndex != 0)
+                        ////{
+                        ////    renderChildPart[childIndex].TargetState = true;
+                        ////    anythingToRender = true;
+                        ////}
+
+                        if (renderChildPart[childIndex].State == true)
+                        {
+                            anythingToRender = true;
+                        }
+
+                        childIndex++;
+                    }
+                }
+
+                if (childRendered || anythingToRender)
                 {
                     RenderedAtOrBelowGeneration = CurrentRenderGeneration;
                     if (Parent != null)
                     {
                         Parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
                     }
-                    TilesInView++;
-
-                    for (int i = 0; i < 16; i++)
-                    {
-                        //if (renderChildPart[i].TargetState)
-                        //{
-                            RenderPart(renderContext, i, (opacity / 100), false);
-                        //}
-                    }
-                    //Below from windows client - above copied from webGL Tile.cs
-                    //renderContext.MainTexture = texture;
-                    ////}
-
-                    //if (dataset.DataSetType == ImageSetType.Sky)
-                    //{
-                    //    HDRPixelShader.constants.opacity = transparancy;
-                    //    HDRPixelShader.Use(renderContext.devContext);
-                    //}
-
-                    //renderContext.SetVertexBuffer(vertexBuffer);
-
-                    //renderContext.SetIndexBuffer(indexBuffer[0]);
-
-                    //renderContext.devContext.DrawIndexed(indexBuffer[0].Count, 0, 0);
                 }
-                //catch
+
+                if (!anythingToRender)
                 {
+                    return true;
                 }
+
+                if (!CreateGeometry(renderContext))
+                {
+                    return false;
+                }
+
+                TilesInView++;
+
+
+                //accomidation = ComputeAccomidation();
+                for (int i = 0; i < 4 * step; i++)
+                {
+                    if (renderChildPart[Math.Floor(i / step)].TargetState)
+                    {
+                        RenderPart(renderContext, i, opacity / 100, false);
+                    }
+                }
+
+                //Below from windows client - above copied from webGL Tile.cs
+                //renderContext.MainTexture = texture;
+                ////}
+
+                //if (dataset.DataSetType == ImageSetType.Sky)
+                //{
+                //    HDRPixelShader.constants.opacity = transparancy;
+                //    HDRPixelShader.Use(renderContext.devContext);
+                //}
+
+                //renderContext.SetVertexBuffer(vertexBuffer);
+
+                //renderContext.SetIndexBuffer(indexBuffer[0]);
+
+                //renderContext.devContext.DrawIndexed(indexBuffer[0].Count, 0, 0);
+
+                //catch
+
                 return true;
 
             }
@@ -893,65 +809,6 @@ namespace wwtlib
             return tileTextureIndex;
         }
 
-        public override bool IsTileBigEnough(RenderContext renderContext)
-        {
-            //if (Level > 1)
-            //{
-            //    SharpDX.Vector3 topLeftScreen;
-            //    SharpDX.Vector3 bottomRightScreen;
-            //    SharpDX.Vector3 topRightScreen;
-            //    SharpDX.Vector3 bottomLeftScreen;
-
-            //    SharpDX.Matrix proj = renderContext.Projection.Matrix11;
-            //    SharpDX.Matrix view = renderContext.ViewBase.Matrix11;
-            //    SharpDX.Matrix world = renderContext.WorldBase.Matrix11;
-
-            //    // Test for tile scale in view..
-            //    topLeftScreen = TopLeft.Vector311;
-            //    topLeftScreen = SharpDX.Vector3.Project(topLeftScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
-
-            //    bottomRightScreen = BottomRight.Vector311;
-            //    bottomRightScreen = SharpDX.Vector3.Project(bottomRightScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
-
-            //    topRightScreen = TopRight.Vector311;
-            //    topRightScreen = SharpDX.Vector3.Project(topRightScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
-
-            //    bottomLeftScreen = BottomLeft.Vector311;
-            //    bottomLeftScreen = SharpDX.Vector3.Project(bottomLeftScreen, Viewport.X, Viewport.Y, Viewport.Width, Viewport.Height, Viewport.MinDepth, Viewport.MaxDepth, wvp);
-
-            //    SharpDX.Vector3 top = topLeftScreen;
-            //    top = SharpDX.Vector3.Subtract(top, topRightScreen);
-            //    float topLength = top.Length();
-
-            //    SharpDX.Vector3 bottom = bottomLeftScreen;
-            //    bottom = SharpDX.Vector3.Subtract(bottom, bottomRightScreen);
-            //    float bottomLength = bottom.Length();
-
-            //    SharpDX.Vector3 left = bottomLeftScreen;
-            //    left = SharpDX.Vector3.Subtract(left, topLeftScreen);
-            //    float leftLength = left.Length();
-
-            //    SharpDX.Vector3 right = bottomRightScreen;
-            //    right = SharpDX.Vector3.Subtract(right, topRightScreen);
-            //    float rightLength = right.Length();
-
-            //    float lengthMax = Math.Max(Math.Max(rightLength, leftLength), Math.Max(bottomLength, topLength));
-
-            //    float testLength = (400 - ((Earth3d.MainWindow.dumpFrameParams.Dome && SpaceTimeController.FrameDumping) ? -200 : Tile.imageQuality));
-
-            //    if (lengthMax < testLength) // was 220
-            //    {
-            //        return false;
-            //    }
-            //    else
-            //    {
-            //        deepestLevel = Level > deepestLevel ? Level : deepestLevel;
-            //    }
-            //}
-
-            return true;
-        }
-
         protected Xyf pix2xyf(long ipix)
         {
             npface = nside * nside;
@@ -960,17 +817,28 @@ namespace wwtlib
                 Math.Floor((ipix >> (2 * nside2order(nside)))));
         }
 
+        protected Xyf pix2xyf2(long ipix)
+        {
+            return Xyf.Create(tileX, tileY,
+                face);
+        }
+
         protected void setStep()
         {
-            step = 1;
+            step = 4;
             if (nside >= 8)
-                step = 1;
+                step = 4;
             if (nside >= 16)
-                step = 1;
+                step = 2;
             if (nside >= 32)
                 step = 1;
             //if (nside >= 64)
             //    step = 1;
+
+            if (Level > 0)
+            {
+                step = 1;
+            }
         }
 
         public static int nside2order(long nside)
@@ -1023,14 +891,8 @@ namespace wwtlib
                 return rootIndexBuffer[index];
             }
 
-            if (backslash)
-            {
-                return backSlashIndexBuffer[index * 16 + accomidation];
-            }
-            else
-            {
-                return slashIndexBuffer[index * 16 + accomidation];
-            }
+            //return slashIndexBuffer[index * 16 + accomidation];
+            return slashIndexBuffer[index];
         }
 
         protected void CalcSphere(Vector3d[] list)
@@ -1230,75 +1092,7 @@ namespace wwtlib
         //public override void OnCreateVertexBuffer(VertexBuffer11 vb)
         public override void OnCreateVertexBuffer(object sender, EventArgs e)
         {
-            if (!subDivided)
-            {
-                if (vertexList == null)
-                {
-                    createGeometry();
-                }
 
-                try
-                {
-                    // Create a vertex buffer 
-                    //PositionNormalTexturedX2[] verts = (PositionNormalTexturedX2[])vb.Lock(0, 0); // Lock the buffer (which will return our structs)
-                    int index = 0;
-                    foreach (PositionTexture vert in vertexList)
-                    {
-                        //verts[index++] = vert.PositionNormalTextured(Vector3d.Create(0, 0, 0), false);
-
-                    }
-
-                    //vb.Unlock();
-
-
-                    if (Level == 0)
-                    {
-                        //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 16, RenderContext11.PrepDevice);
-                        index = 0;
-
-                        Uint16Array ui16array = new Uint16Array(6 * 16);
-                        UInt16[] indexArray = (UInt16[])(object)ui16array;
-                        
-                        int offset = vertexList.Count / 16;
-                        for (int i = 0; i < 16; i++)
-                        {
-                            indexArray[i * 6 + 0] = (UInt16)(2 * step + offset * i);
-                            indexArray[i * 6 + 1] = (UInt16)(3 * step + offset * i);
-                            indexArray[i * 6 + 2] = (UInt16)(1 * step + offset * i);
-                            indexArray[i * 6 + 3] = (UInt16)(3 * step + offset * i);
-                            indexArray[i * 6 + 4] = (UInt16)(0 * step + offset * i);
-                            indexArray[i * 6 + 5] = (UInt16)(1 * step + offset * i);
-                        }
-
-                        WebGLBuffer indexBuffer = PrepDevice.createBuffer();
-                        PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-                        PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)indexArray, GL.STATIC_DRAW);
-                    }
-                    else
-                    {
-                        //this.indexBuffer[0] = new IndexBuffer11(typeof(short), 6 * 4, RenderContext11.PrepDevice);
-                        index = 0;
-                        //indexArray = (short[])this.indexBuffer[0].Lock();
-                        //int offset = verts.Length / 4;
-                        for (int i = 0; i < 4; i++)
-                        {
-                            //indexArray[i * 6 + 0] = (short)(2 * step + offset * i);
-                            //indexArray[i * 6 + 1] = (short)(3 * step + offset * i);
-                            //indexArray[i * 6 + 2] = (short)(1 * step + offset * i);
-                            //indexArray[i * 6 + 3] = (short)(3 * step + offset * i);
-                            //indexArray[i * 6 + 4] = (short)(0 * step + offset * i);
-                            //indexArray[i * 6 + 5] = (short)(1 * step + offset * i);
-                        }
-                    }
-                    //this.indexBuffer[0].Unlock();
-                }
-                catch (Exception exception)
-                {
-
-                }
-
-                ReturnBuffers();
-            }
         }
 
         private void ProcessIndexBuffer(UInt16[] indexArray, int part)
@@ -1308,36 +1102,23 @@ namespace wwtlib
                 rootIndexBuffer[part] = PrepDevice.createBuffer();
                 PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, rootIndexBuffer[part]);
                 PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)indexArray, GL.STATIC_DRAW);
-                //rootIndexBuffer[part] = new IndexBuffer11(RenderContext11.PrepDevice, indexArray);
+                return;
+            }
+            else
+            {
+                slashIndexBuffer[part] = PrepDevice.createBuffer();
+                PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, slashIndexBuffer[part]);
+                PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)indexArray, GL.STATIC_DRAW);
                 return;
             }
 
             for (int a = 0; a < 16; a++)
             {
-                ////short[] partArray = indexArray.Clone() as short[];
-                //short[] partArray = indexArray as short[];
-                //if (backslash)
-                //{
-                //    backSlashIndexBuffer[part, a] = new IndexBuffer11(RenderContext11.PrepDevice, partArray);
-                //}
-                //else
-                //{
-                //    slashIndexBuffer[part, a] = new IndexBuffer11(RenderContext11.PrepDevice, partArray);
-                //}
                 UInt16[] partArray = CloneArray(indexArray);
                 ProcessAccomindations(partArray, a);
-                if (backslash)
-                {
-                    backSlashIndexBuffer[part * 16 + a] = PrepDevice.createBuffer();
-                    PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, backSlashIndexBuffer[part * 16 + a]);
-                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)partArray, GL.STATIC_DRAW);
-                }
-                else
-                {
-                    slashIndexBuffer[part * 16 + a] = PrepDevice.createBuffer();
-                    PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, slashIndexBuffer[part * 16 + a]);
-                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)partArray, GL.STATIC_DRAW);
-                }
+                slashIndexBuffer[part * 16 + a] = PrepDevice.createBuffer();
+                PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, slashIndexBuffer[part * 16 + a]);
+                PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, (Uint16Array)(object)partArray, GL.STATIC_DRAW);
             }
         }
         private void ProcessAccomindations(UInt16[] indexArray, int a)
@@ -1497,12 +1278,12 @@ namespace wwtlib
                 for (int i = 0; i < points.Length; i++)
                 {
                     int tx = 0;
-                    if(Math.Floor(i / 2) == 0)
+                    if (Math.Floor(i / 2) == 0)
                     {
                         tx = 1;
                     }
                     int ty = 1;
-                    if (i == 1  || i == 2)
+                    if (i == 1 || i == 2)
                     {
                         ty = 0;
                     }
@@ -1511,7 +1292,8 @@ namespace wwtlib
                     if (quadIndex == 0 || quadIndex == 1 || quadIndex == 4 || quadIndex == 5)
                     {
                         qx = 0;
-                    } else if (quadIndex == 2 || quadIndex == 3 || quadIndex == 6 || quadIndex == 7)
+                    }
+                    else if (quadIndex == 2 || quadIndex == 3 || quadIndex == 6 || quadIndex == 7)
                     {
                         qx = 1;
                     }
@@ -1537,6 +1319,61 @@ namespace wwtlib
 
                     u = 1 / nside * tx + 1 / nside * qx;
                     v = 1 / nside * ty + 1 / nside * qy;
+
+                    vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
+                }
+
+
+                quadIndex++;
+            }
+        }
+
+        private void vertexListOfLevel1(List<PositionTexture> vertexList, int quadIndexStart, int quadIndexEnd, int faceoff)
+        {
+            Vector3d[] points;
+            int quadIndex = 0;
+            int modulo = 4;
+            for (int q = quadIndexStart; q <= quadIndexEnd; q++)
+            {
+                points = this.boundaries(faceoff + q);
+
+                double u = 0, v = 0;
+                for (int i = 0; i < points.Length; i++)
+                {
+                    int tx = 0;
+                    if (Math.Floor(i / 2) == 0)
+                    {
+                        tx = 1;
+                    }
+                    int ty = 1;
+                    if (i == 1 || i == 2)
+                    {
+                        ty = 0;
+                    }
+
+                    int qx = 3;
+                    if (quadIndex % modulo == 0 || quadIndex % modulo == 1)
+                    {
+                        qx = 0;
+                    }
+                    else if (quadIndex % modulo == 2 || quadIndex % modulo == 3)
+                    {
+                        qx = 1;
+                    }
+
+
+                    int qy = 3;
+                    if (quadIndex % modulo == 0 || quadIndex % modulo == 2)
+                    {
+                        qy = 0;
+                    }
+                    else if (quadIndex % modulo == 1 || quadIndex % modulo == 3)
+                    {
+                        qy = 1;
+                    }
+
+                    u = 1 / 2 * tx + 1 / 2 * qx;
+                    v = 1 / 2 * ty + 1 / 2 * qy;
 
                     vertexList.Add(PositionTexture.CreatePos(points[i], u, v));
                 }
