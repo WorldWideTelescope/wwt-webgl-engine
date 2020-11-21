@@ -487,7 +487,10 @@ namespace wwtlib
 
                 if (!ReadyToRender)
                 {
-                    TileCache.AddTileToQueue(this);
+                    if (!errored)
+                    {
+                        TileCache.AddTileToQueue(this);
+                    }
 
                     return false;
                 }
