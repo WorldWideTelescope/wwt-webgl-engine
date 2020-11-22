@@ -18,7 +18,7 @@ namespace wwtlib
         {
 
             Tile retTile = null;
-            string tileKey = Imageset.GetTileKey(dataset, level, x, y);
+            string tileKey = Imageset.GetTileKey(dataset, level, x, y, parent);
            // try
             {
                 if (!tiles.ContainsKey(tileKey))
@@ -49,7 +49,7 @@ namespace wwtlib
             }
 
             Tile retTile = null;
-            string tileKey = Imageset.GetTileKey(dataset, level, x, y);
+            string tileKey = Imageset.GetTileKey(dataset, level, x, y, parent);
             try
             {
                 if (!tiles.ContainsKey(tileKey))

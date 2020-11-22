@@ -11,10 +11,18 @@ namespace wwtlib
         List<PositionTexture> vertexList = null;
 
         int nside = 2;
-        int npix;
+        int ipix;
+
+        public int Ipix
+        {
+            get
+            {
+                return ipix;
+            }
+        }
         int npface;
         protected double[] demArray;
-        public int tileIndex = -1;
+        public int tileIndex = 0;
         int step;
         int face;
 
@@ -72,24 +80,15 @@ namespace wwtlib
                 this.face = x * 4 + y;
                 quadIndexStart = 0;
                 quadIndexEnd = 15;
-                this.npix = this.face;
+                this.ipix = this.face;
             }
             else
             {
                 // if not, current tile's face index is its parent's face index
                 HealpixTile parentTile = (HealpixTile)parent;
                 this.face = parentTile.face;
-                // if no parent, the current tile's index is 2y+x
-                if (parentTile.tileIndex == -1)
-                {
-                    this.tileIndex = y * 2 + x;
-                }
-                else
-                {
-                    //if has parent, the index is 4*parenttileindex+2y+x
-                    this.tileIndex = parentTile.tileIndex * 4 + y * 2 + x;
-                }
-                this.npix = this.face * nside * nside / 4 + this.tileIndex;
+                this.tileIndex = parentTile.tileIndex * 4 + y * 2 + x;
+                this.ipix = this.face * nside * nside / 4 + this.tileIndex;
                 quadIndexStart = this.tileIndex * 4;
                 quadIndexEnd = quadIndexStart + 3;
                 this.Parent = parent;
@@ -134,7 +133,7 @@ namespace wwtlib
             }
             CalcSphere(pointList);
 
-            setCorners(npix);
+            setCorners(ipix);
         }
 
         private void createGeometry()
@@ -525,9 +524,7 @@ namespace wwtlib
                             // make children 
                             if (children[childIndex] == null)
                             {
-                                //children[childIndex] = TileCache.GetTile(Level + 1, tileX * 2 + ((x1 + xOffset) % 2), tileY * 2 + ((y1 + yOffset) % 2), dataset, this);
-                                //children[childIndex] = TileCache.GetTile(Level + 1, x1, y1, dataset, this);
-                                children[childIndex] = new HealpixTile(Level + 1, x1, y1, dataset, this);
+                                children[childIndex] = TileCache.GetTile(Level + 1, x1, y1, dataset, this);
                             }
 
                             if (children[childIndex].IsTileInFrustum(renderContext.Frustum))
