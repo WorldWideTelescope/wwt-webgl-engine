@@ -565,7 +565,7 @@ namespace wwtlib
             XmlNode descriptionNode = Util.SelectSingleNode(place, "Description");
             if (descriptionNode != null)
             {
-                newPlace.HtmlDescription = descriptionNode.Value;
+                newPlace.HtmlDescription = Util.GetInnerText(descriptionNode);
             }
 
             XmlNode backgroundImageSet = Util.SelectSingleNode(place, "BackgroundImageSet");

@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
-	<DisableHandlePackageFileConflicts>true</DisableHandlePackageFileConflicts>
+    <DisableHandlePackageFileConflicts>true</DisableHandlePackageFileConflicts>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -45,6 +45,13 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FastMath.cs" />
+    <Compile Include="Fxyf.cs" />
+    <Compile Include="HealpixTables.cs" />
+    <Compile Include="HealpixTile.cs" />
+    <Compile Include="HealpixUtils.cs" />
+    <Compile Include="Hploc.cs" />
+    <Compile Include="Pointing.cs" />
     <Compile Include="URLHelpers.cs" />
     <Compile Include="Annotation.cs" />
     <Compile Include="AstroCalc\AAAberration.cs" />
@@ -135,6 +142,7 @@
     <Compile Include="MercatorTile.cs" />
     <Compile Include="MinorPlanets.cs" />
     <Compile Include="MouseEvent.cs" />
+    <Compile Include="Zphi.cs" />
     <None Include="packages.config" />
     <Compile Include="Place.cs" />
     <Compile Include="Planets.cs" />
@@ -188,7 +196,7 @@
     <Compile Include="WWTControl.cs" />
     <Compile Include="XDomainRequest.cs" />
     <Compile Include="XMLHttpRequest2.cs" />
-	<!-- So this is exciting: if Coordinates.cs appears in this list before Planets.cs,
+    <!-- So this is exciting: if Coordinates.cs appears in this list before Planets.cs,
 		 we get a ScriptSharp compile error. I don't want to know why. -->
     <Compile Include="Coordinates.cs" />
   </ItemGroup>

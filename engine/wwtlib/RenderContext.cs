@@ -380,6 +380,9 @@ namespace wwtlib
                 case ProjectionType.Spherical:
                     maxY = 1;
                     break;
+                case ProjectionType.Healpix:
+                    maxY = 4 * (int)Math.Pow(2, level);
+                    break;
                 default:
                     maxY = (int)Math.Pow(2, level);
                     break;
@@ -425,6 +428,9 @@ namespace wwtlib
                     break;
                 case ProjectionType.Spherical:
                     maxX = 1;
+                    break;
+                case ProjectionType.Healpix:
+                    maxX = (int)Math.Pow(2, level) * 3;
                     break;
                 default:
                     maxX = (int)Math.Pow(2, level) * 2;
