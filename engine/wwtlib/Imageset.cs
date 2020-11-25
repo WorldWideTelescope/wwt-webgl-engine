@@ -52,6 +52,10 @@ namespace wwtlib
                     {
                         return PlotTile.Create(level, x, y, imageset, parent);
                     }
+                case ProjectionType.Healpix:
+                    {
+                        return new HealpixTile(level, x, y, imageset, parent);
+                    }
 
                 case ProjectionType.Tangent:
                     {

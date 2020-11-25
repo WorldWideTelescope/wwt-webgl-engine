@@ -32,6 +32,7 @@ namespace wwtlib
         public int tileY;
         public ImageElement texture = null;
         public WebGLTexture texture2d = null;
+        public bool IsCatalogTile = false;
 
         public bool ReadyToRender = false;
         public bool InViewFrustum = true;
@@ -1210,7 +1211,7 @@ namespace wwtlib
                 vertexCount = value;
             }
         }
-        BlendState[] renderChildPart = null;
+        protected BlendState[] renderChildPart = null;
       
         public Tile()
         {

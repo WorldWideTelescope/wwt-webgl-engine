@@ -1,4 +1,12 @@
-# rc: micro bump
+# rc: minor bump
+
+- engine/wwtlib/Place.cs: use GetInnerText to get Place.Description text (#70, @pkgw)
+- Start working on the HiPS implementation! Not yet fully baked, but the
+  building blocks are there if you know how to turn them on. Future releases
+  will refine the implementation and actually expose it to the world. (#68,
+  @imbasimba)
+
+# @wwtelescope/engine 7.5.1 (2020-10-10)
 
 - Fix pinch-to-zoom on Firefox (on Linux and Android, at least) - it seems that
   its pointerIds sometimes just suddenly change on you.
