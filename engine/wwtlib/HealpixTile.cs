@@ -444,6 +444,12 @@ namespace wwtlib
         }
 
 
+        public override bool IsTileBigEnough(RenderContext renderContext)
+        {
+            double arcPixels = (3600 / (Math.Pow(2, Level) * 4));
+            return (renderContext.FovScale < arcPixels);
+        }
+
         public Vector3d[] boundaries(long pix)
         {
             Vector3d[] points = new Vector3d[4];
