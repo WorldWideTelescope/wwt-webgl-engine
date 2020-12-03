@@ -72,7 +72,7 @@ namespace wwtlib
             }
             else
             {
-                this.nside = (int)Math.Pow(2, level + 1);
+                this.nside = Math.Pow(2, level + 1);
             }
 
             if (parent == null)
@@ -232,12 +232,12 @@ namespace wwtlib
 
                     for (int i = 0; i < 4 * step; i++)
                     {
-                        indexArray[0] = (UInt16)(0 + offset * i);
-                        indexArray[1] = (UInt16)(1 + offset * i);
-                        indexArray[2] = (UInt16)(2 + offset * i);
-                        indexArray[3] = (UInt16)(0 + offset * i);
-                        indexArray[4] = (UInt16)(2 + offset * i);
-                        indexArray[5] = (UInt16)(3 + offset * i);
+                        indexArray[0] = (UInt16)(2 + offset * i);
+                        indexArray[1] = (UInt16)(3 + offset * i);
+                        indexArray[2] = (UInt16)(1 + offset * i);
+                        indexArray[3] = (UInt16)(3 + offset * i);
+                        indexArray[4] = (UInt16)(0 + offset * i);
+                        indexArray[5] = (UInt16)(1 + offset * i);
 
                         ProcessIndexBuffer(indexArray, i);
                     }
@@ -473,7 +473,7 @@ namespace wwtlib
             BottomRight = Fxyf.Create(xc - dc, yc - dc, xyf.face).toVec3();
             TopRight = Fxyf.Create(xc + dc, yc - dc, xyf.face).toVec3();
         }
-      
+
         public override bool Draw3D(RenderContext renderContext, double opacity)
         {
 
