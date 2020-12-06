@@ -20,7 +20,7 @@ namespace wwtlib
         {
             if (imageset.Projection ==ProjectionType.Healpix && parent != null)
             {
-                int ipix = ((HealpixTile)parent).Ipix * 4 + y * 2 + x;
+                int ipix = ((HealpixTile)parent).ipix * 4 + y * 2 + x;
                 return imageset.ImageSetID.ToString() + @"\" + level.ToString() + @"\" + ipix.ToString();
             }
             return imageset.ImageSetID.ToString() + @"\" + level.ToString() + @"\" + y.ToString() + "_" + x.ToString();

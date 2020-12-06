@@ -142,7 +142,6 @@
     <Compile Include="MercatorTile.cs" />
     <Compile Include="MinorPlanets.cs" />
     <Compile Include="MouseEvent.cs" />
-    <Compile Include="Zphi.cs" />
     <None Include="packages.config" />
     <Compile Include="Place.cs" />
     <Compile Include="Planets.cs" />
