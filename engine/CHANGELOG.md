@@ -1,4 +1,9 @@
-# rc: minor bump
+# rc: micro bump
+
+- Improvements to the HiPS implementation. It now looks like it's working
+  reliably for equatorial HiPS imagery! (#71, @imbasimba).
+
+# @wwtelescope/engine 7.6.0 (2020-11-25)
 
 - engine/wwtlib/Place.cs: use GetInnerText to get Place.Description text (#70, @pkgw)
 - Start working on the HiPS implementation! Not yet fully baked, but the
