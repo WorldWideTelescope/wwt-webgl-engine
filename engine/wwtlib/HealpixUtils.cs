@@ -9,22 +9,6 @@ namespace wwtlib
             if (!cond) throw new Exception(errtxt);
         }
 
-        /** Integer base 2 logarithm.
-         */
-        //static public int ilog2(long arg)
-        //{
-        //    int res = (int)Math.Log(arg, 2);
-
-        //    return res;
-        //}
-
-
-        static public int ilog2(long arg)
-        {
-            return Math.Round(Math.Log(arg) * Math.LOG2E);
-        }
-
-
         /** Integer square root.
          */
         static public int isqrt(long arg)

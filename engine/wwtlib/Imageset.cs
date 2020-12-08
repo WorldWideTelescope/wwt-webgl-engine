@@ -16,8 +16,13 @@ namespace wwtlib
             set { wcsImage = value; }
         }
 
-        public static string GetTileKey(Imageset imageset, int level, int x, int y)
+        public static string GetTileKey(Imageset imageset, int level, int x, int y, Tile parent)
         {
+            if (imageset.Projection ==ProjectionType.Healpix && parent != null)
+            {
+                int ipix = ((HealpixTile)parent).ipix * 4 + y * 2 + x;
+                return imageset.ImageSetID.ToString() + @"\" + level.ToString() + @"\" + ipix.ToString();
+            }
             return imageset.ImageSetID.ToString() + @"\" + level.ToString() + @"\" + y.ToString() + "_" + x.ToString();
         }
 
