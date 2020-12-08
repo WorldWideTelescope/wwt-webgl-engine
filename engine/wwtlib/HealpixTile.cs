@@ -102,35 +102,32 @@ namespace wwtlib
             vertexList = new List<PositionTexture>();
 
             PopulateVertexList(vertexList, step);
+
+            //TODO proper check for hips_frame
+            if (dataset.Name.IndexOf("Planck") != -1)
             // Convert to galactic points.
-            //if (dataset.Projection == ProjectionType.Healpix && dataset.Properties.ContainsKey("hips_frame") && dataset.Properties["hips_frame"] == "galactic")
-            //{
-            //    if (!galMatInit)
-            //    {
-            //        Matrix3d galMatrix = Matrix3d.Identity;
-            //        //galMatrix.Multiply(Matrix3d.RotationY(90 +((17.7603329867975 * 15)) / 180.0 * Math.PI));
-            //        //galMatrix.Multiply(Matrix3d.RotationX(((-28.9361739586894)) / 180.0 * Math.PI));
-            //        //galMatrix.Multiply(Matrix3d.RotationZ(((31.422052860102041270114993238783)) / 180.0 * Math.PI));
-            //        //galMatrix.Invert(); 
+            //if (dataset.Properties.ContainsKey("hips_frame") && dataset.Properties["hips_frame"] == "galactic")
+            {
+                if (!galMatInit)
+                {
+                    Matrix3d galMatrix = Matrix3d.Create(
+                        -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
+                        -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
+                        0.4941094279435681, 0.7469822444763707, -0.4448296299195045, 0,
+                        0, 0, 0, 1);
 
-            //        //Matrix3d galMatrix = new Matrix3d(-.0548755604, -.8734370902, -.4838350155, 0, .4941094279, -.4448296300, .7469822445, 0, -.8676661490, -.1980763734, .4559837762, 0, 0, 0, 0, 1);
-            //        //Matrix3d galMatrix = new Matrix3d(-.0548755604, -.8734370902, -.4838350155, 0, .4941094279, -.4448296300, .7469822445, 0, -.8676661490, -.1980763734, .4559837762, 0, 0, 0, 0, 1);
-            //        ////galMatrix.Invert();
-            //        //galMatrix = Matrix3d.Multiply(galMatrix, Matrix3d.RotationZ( Math.PI));
-            //        //galMatrix.Transpose(); 
-            //        galacticMatrix = galMatrix;
-
-            //        galMatInit = true;
-            //    }
-            //    for (int i = 0; i < vertexList.Count; i++)
-            //    {
-            //        var vert = vertexList[i];
-            //        var pos = vert.Position;
-            //        galacticMatrix.MultiplyVector(ref pos);
-            //        vert.Position = pos;
-            //        vertexList[i] = vert;
-            //    }
-            //}
+                    galacticMatrix = galMatrix;
+                    galMatInit = true;
+                }
+                for (int i = 0; i < vertexList.Count; i++)
+                {
+                    PositionTexture vert = vertexList[i];
+                    Vector3d pos = vert.Position;
+                    galacticMatrix.MultiplyVector(pos);
+                    vert.Position = pos;
+                    vertexList[i] = vert;
+                }
+            }
 
 
             TriangleCount = step * step / 2;
