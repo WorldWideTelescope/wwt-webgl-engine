@@ -59,7 +59,17 @@ namespace wwtlib
                     }
                 case ProjectionType.Healpix:
                     {
-                        return new HealpixTile(level, x, y, imageset, parent);
+                        if (imageset.HipsProperties == null)
+                        {
+                            HipsProperties.LoadProperties(imageset);
+                        }
+                        if (imageset.HipsProperties.downloadComplete)
+                        {
+                            return new HealpixTile(level, x, y, imageset, parent);
+                        } else
+                        {
+                            return null;
+                        }
                     }
 
                 case ProjectionType.Tangent:
@@ -312,6 +322,13 @@ namespace wwtlib
             set { singleImage = value; }
         }
 
+        HipsProperties hipsProperties;
+
+        public HipsProperties HipsProperties
+        {
+            get { return hipsProperties; }
+            set { hipsProperties = value; }
+        }
 
         public static Imageset FromXMLNode(XmlNode node)
         {
@@ -805,6 +822,7 @@ namespace wwtlib
                 return false;
             }
         }
+
 
 
         public static Imageset Create(string name, string url, ImageSetType dataSetType, BandPass bandPass, ProjectionType projection, int imageSetID, int baseLevel, int levels, int tileSize, double baseTileDegrees, string extension, bool bottomsUp, string quadTreeMap, double centerX, double centerY, double rotation, bool sparse, string thumbnailUrl, bool defaultSet, bool elevationModel, int wf, double offsetX, double offsetY, string credits, string creditsUrl, string demUrlIn, string alturl, double meanRadius, string referenceFrame)

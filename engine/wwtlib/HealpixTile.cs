@@ -21,8 +21,11 @@ namespace wwtlib
         private int step;
         private string url;
         private bool subDivided = false;
-        private static bool galMatInit = false;
-        private static Matrix3d galacticMatrix = Matrix3d.Identity;
+        private static Matrix3d galacticMatrix = Matrix3d.Create(
+                    -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
+                    -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
+                    0.4941094279435681, 0.7469822444763707, -0.4448296299195045, 0,
+                    0, 0, 0, 1);
 
         public String URL
         {
@@ -42,7 +45,6 @@ namespace wwtlib
 
         public HealpixTile(int level, int x, int y, Imageset dataset, Tile parent)
         {
-            HealpixTile.LoadProperties(dataset);
             this.Level = level;
             this.tileX = x;
             this.tileY = y;
@@ -103,29 +105,13 @@ namespace wwtlib
 
             PopulateVertexList(vertexList, step);
 
-            //TODO proper check for hips_frame
-            if (dataset.Name.IndexOf("Planck") != -1)
-            // Convert to galactic points.
-            //if (dataset.Properties.ContainsKey("hips_frame") && dataset.Properties["hips_frame"] == "galactic")
+            if (dataset.HipsProperties.Properties.ContainsKey("hips_frame") 
+                && dataset.HipsProperties.Properties["hips_frame"] == "galactic")
             {
-                if (!galMatInit)
-                {
-                    Matrix3d galMatrix = Matrix3d.Create(
-                        -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
-                        -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
-                        0.4941094279435681, 0.7469822444763707, -0.4448296299195045, 0,
-                        0, 0, 0, 1);
-
-                    galacticMatrix = galMatrix;
-                    galMatInit = true;
-                }
                 for (int i = 0; i < vertexList.Count; i++)
                 {
                     PositionTexture vert = vertexList[i];
-                    Vector3d pos = vert.Position;
-                    galacticMatrix.MultiplyVector(pos);
-                    vert.Position = pos;
-                    vertexList[i] = vert;
+                    galacticMatrix.MultiplyVector(vert.Position);
                 }
             }
 
@@ -306,140 +292,135 @@ namespace wwtlib
 
         public override bool Draw3D(RenderContext renderContext, double opacity)
         {
+            RenderedGeneration = CurrentRenderGeneration;
+            TilesTouched++;
 
-            if (true)
+            InViewFrustum = true;
+
+            if (!ReadyToRender)
             {
-                RenderedGeneration = CurrentRenderGeneration;
-                TilesTouched++;
-
-                InViewFrustum = true;
-
-                if (!ReadyToRender)
+                if (!errored)
                 {
-                    if (!errored)
-                    {
-                        TileCache.AddTileToQueue(this);
-                    }
-
-                    return false;
+                    TileCache.AddTileToQueue(this);
                 }
 
-                TilesInView++;
+                return false;
+            }
+
+            TilesInView++;
 
 
-                //if (!CreateGeometry(renderContext))
-                //{
-                //    if (Level > 2)
-                //    {
-                //        return false;
-                //    }
-                //}
+            //if (!CreateGeometry(renderContext))
+            //{
+            //    if (Level > 2)
+            //    {
+            //        return false;
+            //    }
+            //}
 
-                int partCount = this.TriangleCount;
-                TrianglesRendered += partCount;
+            int partCount = this.TriangleCount;
+            TrianglesRendered += partCount;
 
-                Matrix3d savedWorld = renderContext.World;
-                Matrix3d savedView = renderContext.View;
+            Matrix3d savedWorld = renderContext.World;
+            Matrix3d savedView = renderContext.View;
 
 
-                bool anythingToRender = false;
-                bool childRendered = false;
-                int childIndex = 0;
-                for (int y1 = 0; y1 < 2; y1++)
+            bool anythingToRender = false;
+            bool childRendered = false;
+            int childIndex = 0;
+            for (int y1 = 0; y1 < 2; y1++)
+            {
+                for (int x1 = 0; x1 < 2; x1++)
                 {
-                    for (int x1 = 0; x1 < 2; x1++)
+                    if (Level < dataset.Levels)
                     {
-                        if (Level < dataset.Levels)
+                        // make children 
+                        if (children[childIndex] == null)
                         {
-                            // make children 
-                            if (children[childIndex] == null)
-                            {
-                                children[childIndex] = TileCache.GetTile(Level + 1, x1, y1, dataset, this);
-                            }
+                            children[childIndex] = TileCache.GetTile(Level + 1, x1, y1, dataset, this);
+                        }
 
-                            if (children[childIndex].IsTileInFrustum(renderContext.Frustum))
+                        if (children[childIndex].IsTileInFrustum(renderContext.Frustum))
+                        {
+                            InViewFrustum = true;
+                            if (children[childIndex].IsTileBigEnough(renderContext))
                             {
-                                InViewFrustum = true;
-                                if (children[childIndex].IsTileBigEnough(renderContext))
+                                renderChildPart[childIndex].TargetState = !children[childIndex].Draw3D(renderContext, opacity);
+                                if (renderChildPart[childIndex].TargetState)
                                 {
-                                    renderChildPart[childIndex].TargetState = !children[childIndex].Draw3D(renderContext, opacity);
-                                    if (renderChildPart[childIndex].TargetState)
-                                    {
-                                        childRendered = true;
-                                    }
-                                }
-                                else
-                                {
-                                    renderChildPart[childIndex].TargetState = true;
+                                    childRendered = true;
                                 }
                             }
                             else
                             {
-                                renderChildPart[childIndex].TargetState = renderChildPart[childIndex].State = false;
+                                renderChildPart[childIndex].TargetState = true;
                             }
-
-                            //if (renderChildPart[childIndex].TargetState == true || !blendMode)
-                            //{
-                            //    renderChildPart[childIndex].State = renderChildPart[childIndex].TargetState;
-                            //}
-                            //if (renderChildPart[childIndex].TargetState != renderChildPart[childIndex].State)
-                            //{
-                            //    transitioning = true;
-                            //}
                         }
                         else
                         {
-                            renderChildPart[childIndex].State = true;
+                            renderChildPart[childIndex].TargetState = renderChildPart[childIndex].State = false;
                         }
 
-                        ////if(childIndex != 0)
-                        ////{
-                        ////    renderChildPart[childIndex].TargetState = true;
-                        ////    anythingToRender = true;
-                        ////}
-
-                        if (renderChildPart[childIndex].State == true)
-                        {
-                            anythingToRender = true;
-                        }
-
-                        childIndex++;
+                        //if (renderChildPart[childIndex].TargetState == true || !blendMode)
+                        //{
+                        //    renderChildPart[childIndex].State = renderChildPart[childIndex].TargetState;
+                        //}
+                        //if (renderChildPart[childIndex].TargetState != renderChildPart[childIndex].State)
+                        //{
+                        //    transitioning = true;
+                        //}
                     }
-                }
-
-                if (childRendered || anythingToRender)
-                {
-                    RenderedAtOrBelowGeneration = CurrentRenderGeneration;
-                    if (Parent != null)
+                    else
                     {
-                        Parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
+                        renderChildPart[childIndex].State = true;
                     }
-                }
 
-                if (!anythingToRender)
-                {
-                    return true;
-                }
+                    ////if(childIndex != 0)
+                    ////{
+                    ////    renderChildPart[childIndex].TargetState = true;
+                    ////    anythingToRender = true;
+                    ////}
 
-                if (!CreateGeometry(renderContext))
-                {
-                    return false;
-                }
-
-                TilesInView++;
-
-
-                for (int i = 0; i < 4; i++)
-                {
-                    if (renderChildPart[i].TargetState)
+                    if (renderChildPart[childIndex].State == true)
                     {
-                        RenderPart(renderContext, i, opacity / 100, false);
+                        anythingToRender = true;
                     }
+
+                    childIndex++;
                 }
-
-                return true;
-
             }
+
+            if (childRendered || anythingToRender)
+            {
+                RenderedAtOrBelowGeneration = CurrentRenderGeneration;
+                if (Parent != null)
+                {
+                    Parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
+                }
+            }
+
+            if (!anythingToRender)
+            {
+                return true;
+            }
+
+            if (!CreateGeometry(renderContext))
+            {
+                return false;
+            }
+
+            TilesInView++;
+
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (renderChildPart[i].TargetState)
+                {
+                    RenderPart(renderContext, i, opacity / 100, false);
+                }
+            }
+
+            return true;
 
 
             //    if (IsCatalogTile)
@@ -447,26 +428,6 @@ namespace wwtlib
             //        //RenderCatalog(renderContext);
             //    }
     
-        }
-
-        private static void LoadProperties(Imageset dataset)
-        {
-            //if (dataset.Properties.Count == 0)
-            //{
-            //    StringBuilder sb = new StringBuilder();
-            //    sb.Append(Properties.Settings.Default.CahceDirectory);
-            //    sb.Append(@"Imagery\HiPS\");
-            //    sb.Append(ReplaceInvalidChars(dataset.Name));
-            //    sb.Append("\\");
-            //    sb.Append(@"properties");
-
-            //    string propFilename = sb.ToString();
-
-            //    HipsProperties props = HipsProperties.GetProperties(dataset.Url, propFilename);
-
-            //    dataset.Properties = props.Properties;
-            //    dataset.TableMetadata = props.VoTable;
-            //}
         }
 
         private void SetStep()
@@ -708,212 +669,7 @@ namespace wwtlib
             }
         }
     }
-
-    public class HipsProperties
-    {
-        public Dictionary<string, string> Properties = new Dictionary<string, string>();
-        public VoTable VoTable = null;
-        public static HipsProperties GetProperties(string url, string filename)
-        {
-            HipsProperties props = new HipsProperties();
-            string propsUrl = url.Substring(0, url.IndexOf("/Norder")) + "/properties";
-            string tableUrl = propsUrl.Replace("/properties", "/metadata.xml");
-            string tableFilename = filename.Replace("\\properties", "\\metadata.xml");
-            string path = filename.Replace("\\properties", "\\");
-            try
-            {
-                //if (!File.Exists(filename))
-                //{
-                //    //Create cache directroy if not yet created
-                //    if (!System.IO.Directory.Exists(path))
-                //    {
-                //        System.IO.Directory.CreateDirectory(path);
-                //    }
-
-                //    WebClient client = new WebClient();
-                //    client.DownloadFile(propsUrl, filename);
-                //}
-
-                //string[] lines = File.ReadAllLines(filename);
-
-                //foreach (string line in lines)
-                //{
-                //    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
-                //    {
-                //        string[] parts = line.Split('=');
-                //        string key = parts[0].Trim();
-                //        string val = parts[1].Trim();
-                //        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
-                //        {
-                //            props.Properties[key] = val;
-                //        }
-                //    }
-                //}
-
-                //// now download the catalog
-                //if (props.Properties.ContainsKey("dataproduct_type") && props.Properties["dataproduct_type"] == "catalog")
-                //{
-                //    if (!File.Exists(tableFilename))
-                //    {
-                //        WebClient client = new WebClient();
-                //        client.DownloadFile(tableUrl, tableFilename);
-                //    }
-
-                //    props.VoTable = new VoTable(tableFilename);
-                //}
-            }
-            catch
-            {
-                props.Properties["dummy"] = "failed";
-            }
-
-            ValidateProperties(props);
-
-            return props;
-        }
-
-        public static HipsProperties GetProperties2(string url)
-        {
-            HipsProperties props = new HipsProperties();
-            string propsUrl = "";
-
-            if (url.ToLowerCase().IndexOf("/Norder") > -1)
-            {
-                url = url.Substring(0, url.IndexOf("/Norder"));
-            }
-            if (!url.EndsWith("/"))
-            {
-                url += "/";
-            }
-
-            propsUrl = url + "properties";
-
-            try
-            {
-                //WebClient client = new WebClient();
-                //string data = client.DownloadString(propsUrl);
-
-                //string[] lines = data.Split('\n');
-
-                //foreach (string line in lines)
-                //{
-                //    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
-                //    {
-                //        string[] parts = line.Split('=');
-                //        string key = parts[0].Trim();
-                //        string val = parts[1].Trim();
-                //        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
-                //        {
-                //            props.Properties[key] = val;
-                //        }
-                //    }
-                //}
-
-
-                //// now download the catalog
-                //if (props.Properties.ContainsKey("dataproduct_type") && props.Properties["dataproduct_type"] == "catalog")
-                //{
-                //    string tableUrl = propsUrl.Replace("/properties", "/metadata.xml");
-
-                //    client = new WebClient();
-                //    string voTable = client.DownloadString(tableUrl);
-
-                //    System.Xml.XmlDocument xmlDocument = new System.Xml.XmlDocument();
-                //    xmlDocument.LoadXml(voTable);
-                //    props.VoTable = new VoTable(xmlDocument);
-                //}
-            }
-            catch
-            {
-                props.Properties["dummy"] = "failed";
-            }
-            ValidateProperties(props);
-            return props;
-        }
-
-        public static void ValidateProperties(HipsProperties props)
-        {
-            if (props.Properties.Count == 1)
-            {
-                return;
-            }
-            if (!props.Properties.ContainsKey("obs_title"))
-            {
-                if (props.Properties.ContainsKey("creator_did"))
-                {
-                    props.Properties["obs_title"] = props.Properties["creator_did"];
-                }
-                else
-                {
-                    props.Properties["obs_title"] = "No Title";
-                }
-            }
-        }
-
-        public static bool IsValid(HipsProperties props)
-        {
-            if (props.Properties.Count == 1)
-            {
-                return false;
-            }
-            if (!props.Properties.ContainsKey("obs_title"))
-            {
-                return false;
-            }
-            if (!props.Properties.ContainsKey("hips_tile_format"))
-            {
-                return false;
-            }
-            if (!props.Properties.ContainsKey("hips_service_url"))
-            {
-                return false;
-            }
-            if (!props.Properties.ContainsKey("hips_order"))
-            {
-                return false;
-            }
-            if (!props.Properties.ContainsKey("dataproduct_type"))
-            {
-                return false;
-            }
-            if (props.Properties["dataproduct_type"] == "cube")
-            {
-                return false;
-            }
-            if (props.Properties.ContainsKey("client_category") && props.Properties["client_category"].ToLowerCase().IndexOf("solar") > -1)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public static HipsProperties ParseProperties(string data)
-        {
-            HipsProperties props = new HipsProperties();
-            string[] lines = data.Split('\n');
-
-            foreach (string line in lines)
-            {
-                if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
-                {
-                    string[] parts = line.Split('=');
-                    if (parts.Length == 2)
-                    {
-                        string key = parts[0].Trim();
-                        string val = parts[1].Trim();
-                        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
-                        {
-                            props.Properties[key] = val;
-                        }
-                    }
-                }
-            }
-
-            ValidateProperties(props);
-            return props;
-        }
-    }
-
+ 
     public class Xyf
     {
         public int ix;

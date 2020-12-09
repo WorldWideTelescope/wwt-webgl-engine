@@ -45,6 +45,7 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="HipsProperties.cs" />
     <Compile Include="FastMath.cs" />
     <Compile Include="Fxyf.cs" />
     <Compile Include="HealpixTables.cs" />
