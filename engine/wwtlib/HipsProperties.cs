@@ -98,7 +98,7 @@ namespace wwtlib
             {
                 props.Properties["dummy"] = "failed";
             }
-            ValidateProperties(props);
+            
             return props;
         }
 
@@ -117,24 +117,9 @@ namespace wwtlib
             }
             else if (webFile.State == StateType.Received)
             {
-                string data = webFile.GetText();
-
-                string[] lines = data.Split('\n');
-                foreach (string line in lines)
-                {
-                    if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
-                    {
-                        string[] parts = line.Split('=');
-                        string key = parts[0].Trim();
-                        string val = parts[1].Trim();
-                        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
-                        {
-                            Properties[key] = val;
-                        }
-                    }
-                }
+                ParseProperties(webFile.GetText());
+                downloadComplete = true;
             }
-            downloadComplete = true;
         }
 
         public static void ValidateProperties(HipsProperties props)
@@ -193,9 +178,8 @@ namespace wwtlib
             return true;
         }
 
-        public static HipsProperties ParseProperties(string data)
+        public void ParseProperties(string data)
         {
-            HipsProperties props = new HipsProperties();
             string[] lines = data.Split('\n');
 
             foreach (string line in lines)
@@ -209,14 +193,13 @@ namespace wwtlib
                         string val = parts[1].Trim();
                         if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(val))
                         {
-                            props.Properties[key] = val;
+                            Properties[key] = val;
                         }
                     }
                 }
             }
 
-            ValidateProperties(props);
-            return props;
+            ValidateProperties(this);
         }
         public static void LoadProperties(Imageset dataset)
         {
