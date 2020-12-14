@@ -61,9 +61,9 @@ namespace wwtlib
                     {
                         if (imageset.HipsProperties == null)
                         {
-                            HipsProperties.LoadProperties(imageset);
+                            imageset.HipsProperties = new HipsProperties(imageset.Url);
                         }
-                        if (imageset.HipsProperties.downloadComplete)
+                        if (imageset.HipsProperties.DownloadComplete)
                         {
                             return new HealpixTile(level, x, y, imageset, parent);
                         } else
