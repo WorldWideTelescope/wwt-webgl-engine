@@ -296,18 +296,24 @@ namespace wwtlib
             TilesTouched++;
 
             InViewFrustum = true;
+            bool onlyDrawChildren = false;
 
             if (!ReadyToRender)
             {
                 if (!errored)
                 {
                     TileCache.AddTileToQueue(this);
+                    return false;
                 }
 
-                return false;
+                if (errored && Level < 3) //Level 0-2 sometimes deleted in favor of allsky.jpg/tsv
+                {
+                    onlyDrawChildren = true;
+                } else
+                {
+                    return false;
+                }
             }
-
-            TilesInView++;
 
 
             //if (!CreateGeometry(renderContext))
@@ -320,10 +326,6 @@ namespace wwtlib
 
             int partCount = this.TriangleCount;
             TrianglesRendered += partCount;
-
-            Matrix3d savedWorld = renderContext.World;
-            Matrix3d savedView = renderContext.View;
-
 
             bool anythingToRender = false;
             bool childRendered = false;
@@ -343,7 +345,7 @@ namespace wwtlib
                         if (children[childIndex].IsTileInFrustum(renderContext.Frustum))
                         {
                             InViewFrustum = true;
-                            if (children[childIndex].IsTileBigEnough(renderContext))
+                            if (children[childIndex].IsTileBigEnough(renderContext) || onlyDrawChildren)
                             {
                                 renderChildPart[childIndex].TargetState = !children[childIndex].Draw3D(renderContext, opacity);
                                 if (renderChildPart[childIndex].TargetState)
@@ -409,6 +411,11 @@ namespace wwtlib
                 return false;
             }
 
+            if (onlyDrawChildren)
+            {
+                return true;
+            }
+
             TilesInView++;
 
 
@@ -421,13 +428,6 @@ namespace wwtlib
             }
 
             return true;
-
-
-            //    if (IsCatalogTile)
-            //    {
-            //        //RenderCatalog(renderContext);
-            //    }
-    
         }
 
         private void SetStep()
