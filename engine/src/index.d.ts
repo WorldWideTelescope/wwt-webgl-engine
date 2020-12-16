@@ -441,8 +441,8 @@ export class ScriptInterface {
   /** Deregister a "ready" callback. */
   remove_ready(callback: ReadyEventCallback): void;
 
-  /** Register a callback to be called when [[WWTControl.playTour]] has finished
-   * loading a tour.
+  /** Register a callback to be called when [[WWTControl.loadTour]] or
+   * [[WWTControl.playTour]] have finished loading a tour.
    */
   add_tourReady(callback: ScriptInterfaceCallback): void;
 
@@ -856,7 +856,7 @@ export class WWTControl {
    * not found, this function silently does nothing.
    *
    * @param imagesetName: The imageset name.
-  */
+   */
   setBackgroundImageByName(imagesetName: string): void;
 
   /** Set the foreground imageset using a name-based lookup.
@@ -869,10 +869,23 @@ export class WWTControl {
    * imageset in question.
    *
    * @param imagesetName: The imageset name.
-  */
+   */
   setForegroundImageByName(imagesetName: string): void;
 
-  /** Start playing the tour stored at the specified URL. */
+  /** Start loading the tour stored at the specified URL.
+   *
+   * When loading is complete, a `tourReady` event will be issued, which you can
+   * listen for using the [[add_tourReady]] method.
+   */
+  loadTour(url: string): void;
+
+  /** Load the tour stored at the specified URL and start playing it.
+   *
+   * When loading is complete, a `tourReady` event will be issued, which you can
+   * listen for using the [[add_tourReady]] method.
+   *
+   * See also [[loadTour]], which provides more flexibility to the caller.
+   */
   playTour(url: string): void;
 
   /** Start playing the currently active tour. */
@@ -880,6 +893,9 @@ export class WWTControl {
 
   /** Pause the currently playing tour. */
   pauseCurrentTour(): void;
+
+  /** Stop the currently playing tour. */
+  stopCurrentTour(): void;
 
   /** Set the maximum allowed user zoom level in 3D ("solar system") mode.
    *
@@ -923,9 +939,6 @@ export class WWTControl {
    * The default value corresponds to a viewport height of 47 arcseconds.
   */
   set_zoomMin(limit: number): number;
-
-  /** Stop the currently playing tour. */
-  stopCurrentTour(): void;
 }
 
 export namespace Wtml {
