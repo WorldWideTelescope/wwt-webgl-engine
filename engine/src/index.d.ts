@@ -25,6 +25,7 @@ import {
   // SolarSystemObjects
   Thumbnail,
   SolarSystemObjects,
+  SettingsInterface,
 } from "@wwtelescope/engine-types";
 
 /** A generic callback type. */
@@ -486,7 +487,7 @@ export interface ScriptInterfaceCallback {
 
 
 /** A variety of settings for the WWT rendering engine. */
-export class Settings {
+export class Settings implements SettingsInterface {
   get_constellationFigureColor(): string;
   set_constellationFigureColor(v: string): string;
   get_constellationBoundryColor(): string;
