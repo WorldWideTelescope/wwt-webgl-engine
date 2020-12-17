@@ -13,8 +13,8 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:^0.1.0",
-    "@wwtelescope/engine": "manual:^7.3.0",
-    "@wwtelescope/engine-types": "manual:^0.1.0"
+    "@wwtelescope/engine": "thiscommit:2020-12-16:Quoh7yie",
+    "@wwtelescope/engine-types": "thiscommit:2020-12-16:Diniu6ah"
   },
   "keywords": [
     "AAS WorldWide Telescope"

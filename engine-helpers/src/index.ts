@@ -469,9 +469,38 @@ export class WWTInstance {
   private tourReadyPromises: SavedPromise<number, void>[] = [];
   private tourReadySeqnum = 0;
 
+  /** Load a tour from a URL.
+   *
+   * Once the tour has loaded, you can use [[getActiveTourPlayer]] to get the
+   * tour player controller and the underlying tour document.
+   *
+   * @param url The URL of the tour to load and play.
+   * @returns A promise that resolves when the tour has loaded.
+   */
+  async loadTour(url: string): Promise<void> {
+    this.ctl.loadTour(url);
+
+    this.tourReadySeqnum += 1;
+    const seq = this.tourReadySeqnum;
+
+    for (const p of this.tourReadyPromises) {
+      p.reject("superseded");
+    }
+
+    this.tourReadyPromises = [];
+
+    return new Promise((resolve, reject) => {
+      if (this.tourReadySeqnum > seq) {
+        reject("superseded");
+      } else {
+        this.tourReadyPromises.push(new SavedPromise(seq, resolve, reject));
+      }
+    });
+  }
+
   /** Load a tour from a URL and start playing it.
    *
-   * @params url The URL of the tour to load and play.
+   * @param url The URL of the tour to load and play.
    * @returns A promise that resolves when the tour has loaded and started
    * playing.
    */
