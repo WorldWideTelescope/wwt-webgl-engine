@@ -2461,6 +2461,11 @@ namespace wwtlib
 
             tour = TourDocument.FromUrl(url, delegate {
                 SetupTour();
+
+                TourPlayer player = new TourPlayer();
+                player.Tour = tour;
+                WWTControl.Singleton.uiController = player;
+
                 WWTControl.scriptInterface.FireTourReady();
             });
         }
