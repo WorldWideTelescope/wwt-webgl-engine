@@ -718,17 +718,130 @@ export namespace SpaceTimeController {
 export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
 
-export class TourPlayer implements UiController {
-  // get_tour(): TourDocument
-  // set_tour
+/** A WWT tour. */
+export class TourDocument {
+  /** Get this tour's "attributes and credits" text.
+   *
+   * TODO: determine and document any markup / formatting semantics.
+   */
+  get_attributesAndCredits(): string;
 
-  nextSlide(): void;
-  play(): void;
-  stop(ignored: boolean): void;
-  close(): void;
-  pauseTour(): void;
+  /** Set this tour's "attributes and credits" text". */
+  set_attributesAndCredits(aandc: string): string;
+
+  /** Get the "author URL" of this tour. */
+  get_authorUrl(): string;
+
+  /** Set the "author URL" of this tour. */
+  set_authorUrl(title: string): string;
+
+  /** Get this tour's description.
+   *
+   * TODO: document any markup semantics, etc.
+   */
+  get_description(): string;
+
+  /** Set this tour's description. */
+  set_description(desc: string): string;
+
+  /** Get the tour's run-time, in milliseconds. An integer. */
+  get_runTime(): number;
+
+  /** Get this tour's title. */
+  get_title(): string;
+
+  /** Set this tour's title. */
+  set_title(title: string): string;
+
+  /** Get the set of stops that comprise this tour. */
+  get_tourStops(): TourStop[];
+
+  //get_author();
+  //get_authorContactText();
+  //get_authorEmailOther();
+  //get_authorEmail();
+  //get_authorImageUrl();
+  //get_authorImage();
+  //get_authorPhone();
+  //get_authorThumbnailFilename();
+  //get_currentTourstopIndex(): number;
+  //get_editMode();
+  //get_fileName();
+  //get_id();
+  //get_keywords(): string;
+  //get_level(): UserLevel;
+  //get_objects(): string;
+  //get_organizationUrl();
+  //get_orgName();
+  //get_orgUrl();
+  //get_tagId();
+  //get_taxonomy(): string;
+  //get_tourDirty();
+  //get_tourThumbnailFilename();
+  //get_type(): Classification;
+  //get_workingDirectory();
+
+  /** Calculate how much time must elapse in the tour playback to reach
+   * the specified tour stop.
+   *
+   * @param index The index number of the tour stop to query
+   * @returns The amount of time, in seconds.
+   */
+  elapsedTimeTillTourstop(index: number): number;
+
+  /** Get the stop index of a tour stop, given its identifier.
+   *
+   * If the ID is the empty string or "Next", the current tour stop index *will
+   * be incremented* and returned.
+   *
+   * @param id The tour stop ID, or an empty string or "Next"
+   * @returns The tour stop index
+   */
+  getTourStopIndexByID(id: string): number;
 }
 
+
+export interface TourEndedCallback {
+  /** Called when a [[TourPlayer]] has finished playing its tour. */
+  (player: TourPlayer): void;
+}
+
+
+/** An object that manages the playback of a tour.
+ *
+ * Each [[TourPlayer]] may be associated with an underlying [[TourDocument]],
+ * which defines the tour in question. It may be accessed using the [[get_tour]]
+ * method.
+ */
+export class TourPlayer implements UiController {
+  /** Get the tour associated with this tour player, if there is one. */
+  get_tour(): TourDocument | null;
+
+  /** Set the tour associated with this tour player. */
+  set_tour(tour: TourDocument | null): TourDocument | null;
+
+  /** Force the currently playing tour to advance to the next slide. */
+  nextSlide(): void;
+
+  /** Start or resume playing the current tour.
+   *
+   * TODO: clarify semantics about where we start from. Beginning of the current
+   * slide, I think?
+   */
+  play(): void;
+
+  /** Stop playing the current tour.
+   *
+   * TODO: clarify how this differs from `pauseTour`.
+   */
+  stop(ignored: boolean): void;
+
+  /** Stop playing the current tour, if needed, and clear the current tour document. */
+  close(): void;
+
+  /** Toggle the playback state of the current tour, to or from paused. */
+  pauseTour(): void;
+}
 
 // Static TourPlayer methods.
 export namespace TourPlayer {
@@ -740,6 +853,108 @@ export namespace TourPlayer {
   export function get_playing(): boolean;
 
   //export function set_playing(v: boolean): boolean;
+
+  /** Register a callback to be called when a tour player finishes playing its
+   * tour. Note that this function is static.
+   */
+  export function add_tourEnded(callback: TourEndedCallback): void;
+
+  /** Deregister a "tourEnded" callback.
+   *
+   * The deregistration is performed by object equality check. Since the
+   * callback in question is a function, if you want to use this function you
+   * probably need to save the callback in some kind of variable for future
+   * retrieval.
+   */
+  export function remove_tourEnded(callback: TourEndedCallback): void;
+}
+
+
+/** A stop in a [[TourDocument]]. */
+export class TourStop implements SettingsInterface {
+  get_description(): string;
+  set_description(desc: string): string;
+  /** Get the stop duration, in integer milliseconds */
+  get_duration(): number;
+  set_duration(value: number): number;
+  /** Get the place that defines the ending camera position of this stop. */
+  get_endTarget(): Place;
+  set_endTarget(p: Place): Place;
+  get_id(): string;
+  set_id(id: string): string;
+  get_name(): string;
+  set_name(name: string): string;
+  /** Get the place that defines the starting camera position of this stop. */
+  get_target(): Place;
+  set_target(p: Place): Place;
+  get_tourStopType(): ImageSetType;
+  get_tweenPosition(): number;
+  set_tweenPosition(value: number): number;
+
+  // get_overlays()
+  // layers: Guid=>LayerInfo dict
+
+  // SettingsInterface:
+  get_actualPlanetScale(): boolean;
+  get_constellationArtFilter(): ConstellationFilterInterface;
+  get_constellationBoundariesFilter(): ConstellationFilterInterface;
+  get_constellationFiguresFilter(): ConstellationFilterInterface;
+  get_constellationNamesFilter(): ConstellationFilterInterface;
+  get_constellationsEnabled(): string;
+  get_earthCutawayView(): boolean;
+  get_fovCamera(): number;
+  get_fovEyepiece(): number;
+  get_fovTelescope(): number;
+  get_galacticMode(): boolean;
+  get_localHorizonMode(): boolean;
+  get_locationAltitude(): number;
+  get_locationLat(): number;
+  get_locationLng(): number;
+  get_milkyWayModel(): boolean;
+  get_minorPlanetsFilter(): number;
+  get_planetOrbitsFilter(): number;
+  get_showAltAzGrid(): boolean;
+  get_showAltAzGridText(): boolean;
+  get_showClouds(): boolean;
+  get_showConstellationBoundries(): boolean;
+  get_showConstellationFigures(): boolean;
+  get_showConstellationLabels(): boolean;
+  get_showConstellationPictures(): boolean;
+  get_showConstellationSelection(): boolean;
+  get_showConstellations(): boolean;
+  get_showEarthSky(): boolean;
+  get_showEcliptic(): boolean;
+  get_showEclipticGrid(): boolean;
+  get_showEclipticGridText(): boolean;
+  get_showEclipticOverviewText(): boolean;
+  get_showElevationModel(): boolean;
+  get_showEquatorialGridText(): boolean;
+  get_showFieldOfView(): boolean;
+  get_showGalacticGrid(): boolean;
+  get_showGalacticGridText(): boolean;
+  get_showGrid(): boolean;
+  get_showHorizon(): boolean;
+  get_showHorizonPanorama(): boolean;
+  get_showISSModel(): boolean;
+  get_showMoonsAsPointSource(): boolean;
+  get_showPrecessionChart(): boolean;
+  get_showSkyGrids(): boolean;
+  get_showSkyNode(): boolean;
+  get_showSkyOverlays(): boolean;
+  get_showSkyOverlaysIn3d(): boolean;
+  get_showSolarSystem(): boolean;
+  get_solarSystemCMB(): boolean;
+  get_solarSystemCosmos(): boolean;
+  get_solarSystemLighting(): boolean;
+  get_solarSystemMilkyWay(): boolean;
+  get_solarSystemMinorOrbits(): boolean;
+  get_solarSystemMinorPlanets(): boolean;
+  get_solarSystemMultiRes(): boolean;
+  get_solarSystemOrbits(): boolean;
+  get_solarSystemOverlays(): boolean;
+  get_solarSystemPlanets(): boolean;
+  get_solarSystemScale(): number;
+  get_solarSystemStars(): boolean;
 }
 
 
