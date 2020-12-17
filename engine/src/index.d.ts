@@ -1091,7 +1091,16 @@ export class WWTControl {
   /** Start loading the tour stored at the specified URL.
    *
    * When loading is complete, a `tourReady` event will be issued, which you can
-   * listen for using the [[add_tourReady]] method.
+   * listen for using the [[add_tourReady]] method. You can then get access to a
+   * [[TourPlayer]] by casting the [[uiController]] property of this
+   * [[WWTControl]]:
+   *
+   * ```
+   * if (ctl.uiController !== null && ctl.uiController instanceof TourPlayer) {
+   *   const player: TourPlayer = ctl.uiController;
+   *   // ...
+   * }
+   * ```
    */
   loadTour(url: string): void;
 
