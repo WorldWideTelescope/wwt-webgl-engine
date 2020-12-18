@@ -37,6 +37,7 @@ export class WWTAwareComponent extends Vue {
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
         wwtTourRunTime: (state, _getters) => (state as WWTEngineVuexState).tourRunTime,
         wwtTourStopStartTimes: (state, _getters) => (state as WWTEngineVuexState).tourStopStartTimes,
+        wwtTourTimecode: (state, _getters) => (state as WWTEngineVuexState).tourTimecode,
       }),
       ...mapGetters([
         "lookupImageset",
@@ -59,6 +60,7 @@ export class WWTAwareComponent extends Vue {
       ]),
       ...mapMutations([
         "applySetting",
+        "seekToTourTimecode",
         "setBackgroundImageByName",
         "setForegroundImageByName",
         "setForegroundOpacity",
@@ -83,12 +85,14 @@ export class WWTAwareComponent extends Vue {
   wwtRenderType!: ImageSetType;
   wwtTourRunTime!: number | null;
   wwtTourStopStartTimes!: number[];
+  wwtTourTimecode!: number;
 
   // Getters
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
   applySetting!: (_s: WWTSetting) => void;
+  seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;

@@ -90,6 +90,18 @@ export interface WWTEngineVuexState {
    * actual playback won't proceed linearly in the way that this API would imply.
    */
   tourStopStartTimes: number[];
+
+  /** How far we have progressed into the current tour, in seconds.
+   *
+   * This number does not necessarily progress monotonically due to the way that
+   * WWT measures tour playback progress. We associate a start time with each
+   * "stop" in the tour, and can measure progress through a stop, but stops do
+   * not necessarily transition from one to another in linear fashion.
+   *
+   * That being said, this number should range between 0 and the runtime of the
+   * current tour. If no tour is loaded, it will be zero.
+   */
+  tourTimecode: number;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -145,6 +157,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   renderType = ImageSetType.sky;
   tourRunTime: number | null = null;
   tourStopStartTimes: number[] = [];
+  tourTimecode = 0.0;
 
   get lookupImageset() {
     // This is how you create a parametrized getter in vuex-module-decorators:
@@ -199,6 +212,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       this.renderType = wwt.ctl.renderType;
 
     const player = wwt.getActiveTourPlayer();
+    this.tourTimecode = wwt.getEffectiveTourTimecode();
 
     if (player !== null) {
       this.isTourPlayerActive = true;
@@ -287,6 +301,14 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('no tour player to control');
 
     player.set_leaveSettingsWhenStopped(value);
+  }
+
+  @Mutation
+  seekToTourTimecode(value: number): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot seekToTourTimecode without linking to WWTInstance');
+
+    Vue.$wwt.inst.seekToTourTimecode(value);
   }
 
   @Action({ rawError: true })
