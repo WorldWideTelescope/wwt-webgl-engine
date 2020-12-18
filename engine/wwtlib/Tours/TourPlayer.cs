@@ -1021,7 +1021,7 @@ namespace wwtlib
             }
         }
 
-        private void PlayFromTourstop(TourStop tourStop)
+        public void PlayFromTourstop(TourStop tourStop)
         {
             Stop(true);
             tour.CurrentTourStop = tourStop;
