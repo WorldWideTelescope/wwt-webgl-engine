@@ -60,6 +60,10 @@
           </option>
         </select>
       </template>
+      <template v-else-if="currentTool == 'playback-controls'">
+        <font-awesome-icon v-bind:icon="wwtIsTourPlaying ? 'pause' : 'play'"
+          size="lg" class="clickable" @click="toggleTourPlayback()"></font-awesome-icon>
+      </template>
       </div>
     </div>
 
@@ -95,7 +99,7 @@ enum ComponentState {
   Started,
 }
 
-type ToolType = "crossfade" | "choose-background" | null;
+type ToolType = "crossfade" | "choose-background" | "playback-controls" | null;
 
 class BackgroundImageset {
   public imagesetName: string;
@@ -206,6 +210,8 @@ export default class Embed extends WWTAwareComponent {
         });
 
         this.componentState = ComponentState.ReadyToStart;
+        this.setTourPlayerLeaveSettingsWhenStopped(true);
+        this.currentTool = "playback-controls";
       });
     } else {
       // Many more possibilities if we're not playing a tour ...
@@ -336,6 +342,11 @@ export default class Embed extends WWTAwareComponent {
     if (this.embedSettings.tourUrl.length) {
       this.startTour();
     }
+  }
+
+  toggleTourPlayback() {
+    if (this.wwtIsTourPlayerActive)
+      this.toggleTourPlayPauseState();
   }
 }
 </script>
@@ -499,6 +510,10 @@ body {
 
   .opacity-range {
     width: 50vw;
+  }
+
+  .clickable {
+    cursor: pointer;
   }
 }
 

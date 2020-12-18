@@ -9,6 +9,7 @@ import {
   faExpand,
   faMountain,
   faPlay,
+  faPause,
   faSearchMinus,
   faSearchPlus,
   faSlidersH,
@@ -37,6 +38,7 @@ library.add(faCompress);
 library.add(faExpand);
 library.add(faMountain);
 library.add(faPlay);
+library.add(faPause);
 library.add(faSearchMinus);
 library.add(faSearchPlus);
 library.add(faSlidersH);
