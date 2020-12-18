@@ -33,6 +33,7 @@ export class WWTAwareComponent extends Vue {
         wwtForegroundImageset: (state, _getters) => (state as WWTEngineVuexState).foregroundImageset,
         wwtForegroundOpacity: (state, _getters) => (state as WWTEngineVuexState).foregroundOpacity,
         wwtIsTourPlayerActive: (state, _getters) => (state as WWTEngineVuexState).isTourPlayerActive,
+        wwtIsTourPlaying: (state, _getters) => (state as WWTEngineVuexState).isTourPlaying,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
       }),
       ...mapGetters([
@@ -60,8 +61,10 @@ export class WWTAwareComponent extends Vue {
         "setBackgroundImageByName",
         "setForegroundImageByName",
         "setForegroundOpacity",
+        "setTourPlayerLeaveSettingsWhenStopped",
         "setupForImageset",
         "startTour",
+        "toggleTourPlayPauseState",
         "zoom",
       ]),
     };
@@ -75,6 +78,7 @@ export class WWTAwareComponent extends Vue {
   wwtForegroundImageset!: Imageset | null;
   wwtForegroundOpacity!: number;
   wwtIsTourPlayerActive!: boolean;
+  wwtIsTourPlaying!: boolean;
   wwtRenderType!: ImageSetType;
 
   // Getters
@@ -85,8 +89,10 @@ export class WWTAwareComponent extends Vue {
   setBackgroundImageByName!: (_n: string) => void;
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
+  setTourPlayerLeaveSettingsWhenStopped!: (v: boolean) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
   startTour!: () => void;
+  toggleTourPlayPauseState!: () => void;
   zoom!: (f: number) => void;
 
   // Actions

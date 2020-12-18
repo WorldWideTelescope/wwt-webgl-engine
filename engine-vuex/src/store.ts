@@ -68,9 +68,15 @@ export interface WWTEngineVuexState {
   /** Whether the tour playback mode is active.
    *
    * Specifically, this is true if the `WWTControl` has a `uiController` item
-   * that is a `TourPlayer` item.
+   * that is a `TourPlayer` item. See also [[isTourPlaying]].
    */
   isTourPlayerActive: boolean;
+
+  /** Whether a tour is actively playing righ now.
+   *
+   * It might be the case that a tour player is active, but the tour is paused.
+   */
+  isTourPlaying: boolean;
 
   /** The current mode of the renderer */
   renderType: ImageSetType;
@@ -123,6 +129,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   foregroundImageset: Imageset | null = null;
   foregroundOpacity = 100;
   isTourPlayerActive = false;
+  isTourPlaying = false;
   renderType = ImageSetType.sky;
 
   get lookupImageset() {
@@ -177,7 +184,15 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (this.renderType != wwt.ctl.renderType)
       this.renderType = wwt.ctl.renderType;
 
-    this.isTourPlayerActive = (wwt.getActiveTourPlayer() !== null);
+    const player = wwt.getActiveTourPlayer();
+
+    if (player !== null) {
+      this.isTourPlayerActive = true;
+      this.isTourPlaying = wwt.getIsTourPlaying(player);
+    } else {
+      this.isTourPlayerActive = false;
+      this.isTourPlaying = false;
+    }
   }
 
   @Mutation
@@ -233,6 +248,31 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('no tour to start');
 
     player.play();
+  }
+
+  @Mutation
+  toggleTourPlayPauseState(): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot play/pause tour without linking to WWTInstance');
+
+    const player = Vue.$wwt.inst.getActiveTourPlayer();
+    if (player === null)
+      throw new Error('no tour to play/pause');
+
+    // Despite the unclear name, this function does toggle play/pause state.
+    player.pauseTour();
+  }
+
+  @Mutation
+  setTourPlayerLeaveSettingsWhenStopped(value: boolean): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setTourPlayerLeaveSettingsWhenStopped without linking to WWTInstance');
+
+    const player = Vue.$wwt.inst.getActiveTourPlayer();
+    if (player === null)
+      throw new Error('no tour player to control');
+
+    player.set_leaveSettingsWhenStopped(value);
   }
 
   @Action({ rawError: true })

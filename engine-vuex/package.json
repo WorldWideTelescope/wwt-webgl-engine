@@ -19,8 +19,8 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine": "26daabb4172752d8f6474693f91fb36a25920b7d",
-    "@wwtelescope/engine-helpers": "453fcee96f94fe456c92dd108b5be869337f580a"
+    "@wwtelescope/engine": "1ae9e9763cf4ba10b734df4ca9fd71d635fdf77b",
+    "@wwtelescope/engine-helpers": "a3eea34d0a005dd1764d6411134d75cfcadc3d26"
   },
   "keywords": [
     "AAS WorldWide Telescope"
