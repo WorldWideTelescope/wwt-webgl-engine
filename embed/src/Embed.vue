@@ -19,9 +19,11 @@
       </div>
     </transition>
 
-    <div id="overlays">
-      <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
-    </div>
+    <transition name="fade">
+      <div id="overlays">
+        <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
+      </div>
+    </transition>
 
     <ul id="controls">
       <li v-show="showToolMenu">
@@ -31,14 +33,15 @@
             <ul class="tooltip-content tool-menu">
               <li v-show="showCrossfader"><a href="#" v-close-popover @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
               <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
+              <li v-show="showPlaybackControls"><a href="#" v-close-popover @click="selectTool('playback-controls')"><font-awesome-icon icon="redo" /> Tour player controls</a></li>
             </ul>
           </template>
         </v-popover>
       </li>
-      <li v-show="!wwtIsTourPlayerActive">
+      <li v-show="!wwtIsTourPlaying">
         <font-awesome-icon icon="search-plus" size="lg" @click="doZoom(true)"></font-awesome-icon>
       </li>
-      <li v-show="!wwtIsTourPlayerActive">
+      <li v-show="!wwtIsTourPlaying">
         <font-awesome-icon icon="search-minus" size="lg" @click="doZoom(false)"></font-awesome-icon>
       </li>
       <li v-show="fullscreenAvailable">
@@ -64,7 +67,16 @@
         <div class="playback-controls">
           <font-awesome-icon v-bind:icon="wwtIsTourPlaying ? 'pause' : 'play'"
             size="lg" class="clickable" @click="toggleTourPlayback()"></font-awesome-icon>
-          <vue-slider class="scrubber" v-model="foregroundOpacity"></vue-slider>
+          <vue-slider
+            class="scrubber"
+            v-model="twoWayTourTimecode"
+            :max="wwtTourRunTime"
+            :marks="wwtTourStopStartTimes"
+            :tooltip-formatter="formatTimecode"
+            :adsorb="true"
+            :duration="0"
+            :hide-label="true"
+          ></vue-slider>
         </div>
       </template>
       </div>
@@ -174,7 +186,7 @@ export default class Embed extends WWTAwareComponent {
   }
 
   get showBackgroundChooser() {
-    if (this.wwtIsTourPlayerActive)
+    if (this.wwtIsTourPlaying)
       return false;
 
     // TODO: we should wire in choices for other modes!
@@ -182,7 +194,7 @@ export default class Embed extends WWTAwareComponent {
   }
 
   get showCrossfader() {
-    if (this.wwtIsTourPlayerActive)
+    if (this.wwtIsTourPlaying)
       return false; // maybe show this if tour player is active but not playing?
 
     if (this.wwtForegroundImageset == null || this.wwtForegroundImageset === undefined)
@@ -191,9 +203,13 @@ export default class Embed extends WWTAwareComponent {
     return this.wwtForegroundImageset != this.wwtBackgroundImageset;
   }
 
+  get showPlaybackControls() {
+    return this.wwtIsTourPlayerActive && !this.wwtIsTourPlaying;
+  }
+
   get showToolMenu() {
     // This should return true if there are any tools to show.
-    return this.showBackgroundChooser || this.showCrossfader;
+    return this.showBackgroundChooser || this.showCrossfader || this.showPlaybackControls;
   }
 
   created() {
@@ -351,6 +367,23 @@ export default class Embed extends WWTAwareComponent {
   toggleTourPlayback() {
     if (this.wwtIsTourPlayerActive)
       this.toggleTourPlayPauseState();
+  }
+
+  formatTimecode(seconds: number): string {
+    if (seconds < 0)
+      return "-:--"
+
+    const minutes = Math.floor(seconds / 60);
+    seconds = Math.round(seconds - 60 * minutes);
+    return minutes.toString() + ":" + seconds.toString().padStart(2, "0");
+  }
+
+  get twoWayTourTimecode() {
+    return this.wwtTourTimecode;
+  }
+
+  set twoWayTourTimecode(code: number) {
+    this.seekToTourTimecode(code);
   }
 }
 </script>
