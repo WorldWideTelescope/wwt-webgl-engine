@@ -843,6 +843,10 @@ export class TourPlayer implements UiController {
    */
   play(): void;
 
+  /** Start playing the current tour from the beginning of the specified stop.
+   */
+  playFromTourstop(stop: TourStop): void;
+
   /** Stop playing the current tour.
    *
    * TODO: clarify how this differs from `pauseTour`.
