@@ -52,6 +52,7 @@ export class WWTAwareComponent extends Vue {
         "gotoTarget",
         "loadAndPlayTour",
         "loadImageCollection",
+        "loadTour",
         "waitForReady",
       ]),
       ...mapMutations([
@@ -60,6 +61,7 @@ export class WWTAwareComponent extends Vue {
         "setForegroundImageByName",
         "setForegroundOpacity",
         "setupForImageset",
+        "startTour",
         "zoom",
       ]),
     };
@@ -84,6 +86,7 @@ export class WWTAwareComponent extends Vue {
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
+  startTour!: () => void;
   zoom!: (f: number) => void;
 
   // Actions
@@ -91,5 +94,6 @@ export class WWTAwareComponent extends Vue {
   gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
   loadAndPlayTour!: (o: LoadAndPlayTourParams) => Promise<void>;
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
+  loadTour!: (o: LoadAndPlayTourParams) => Promise<void>; /* argument type is correct: we're (ab)using the same interface */
   waitForReady!: () => Promise<void>;
 }

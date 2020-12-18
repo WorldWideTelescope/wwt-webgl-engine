@@ -97,7 +97,9 @@ export interface GotoRADecZoomParams {
   instant: boolean;
 }
 
-/** The parameters for the [[WWTEngineVuexModule.loadAndPlayTour]] action. */
+/** The parameters for the [[WWTEngineVuexModule.loadAndPlayTour]] and
+ * [[WWTEngineVuexModule.loadTour]] actions.
+ */
 export interface LoadAndPlayTourParams {
   /** The tour URL to load. */
   url: string;
@@ -221,6 +223,18 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.$wwt.inst.ctl.zoom(factor);
   }
 
+  @Mutation
+  startTour(): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot start tour without linking to WWTInstance');
+
+    const player = Vue.$wwt.inst.getActiveTourPlayer();
+    if (player === null)
+      throw new Error('no tour to start');
+
+    player.play();
+  }
+
   @Action({ rawError: true })
   async waitForReady(): Promise<void> {
     if (Vue.$wwt.inst !== null) {
@@ -263,6 +277,15 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadAndPlayTour without linking to WWTInstance');
     return Vue.$wwt.inst.loadAndPlayTour(url);
+  }
+
+  @Action({ rawError: true })
+  async loadTour(
+    {url}: LoadAndPlayTourParams
+  ): Promise<void> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot loadTour without linking to WWTInstance');
+    return Vue.$wwt.inst.loadTour(url);
   }
 
   @Action({ rawError: true })
