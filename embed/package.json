@@ -25,8 +25,8 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/embed-common": "manual:^0.2.0",
-    "@wwtelescope/engine": "thiscommit:20201009a",
-    "@wwtelescope/engine-vuex": "thiscommit:20201009b"
+    "@wwtelescope/engine": "c6b343a6cc2288c86bd0d02f8eaa00369732e41b",
+    "@wwtelescope/engine-vuex": "fba3e33cf8f4caa0bd547b06e42a8ae4c331281c"
   },
   "keywords": [
     "AAS WorldWide Telescope"

@@ -2,6 +2,23 @@
   <div id="app">
     <WorldWideTelescope wwt-namespace="wwt-embed"></WorldWideTelescope>
 
+    <transition name="fade">
+      <div class="modal" id="modal-loading" v-show="isLoadingState">
+        <div class="container">
+          <div class="spinner"></div>
+          <p>Loading …</p>
+        </div>
+      </div>
+    </transition>
+
+    <transition name="fade">
+      <div class="modal" id="modal-readytostart" v-show="isReadyToStartState" @click="startInteractive()">
+        <div>
+          <font-awesome-icon class="icon" icon="play"></font-awesome-icon>
+        </div>
+      </div>
+    </transition>
+
     <div id="overlays">
       <p v-show="embedSettings.showCoordinateReadout">{{ coordText }}</p>
     </div>
@@ -66,6 +83,18 @@ import { ImageSetType } from "@wwtelescope/engine-types";
 import { SetupForImagesetOptions, WWTAwareComponent } from "@wwtelescope/engine-vuex";
 import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
 
+/** The overall state of the WWT embed component. */
+enum ComponentState {
+  /** Waiting for resources and/or content to load. Not yet ready to start. */
+  LoadingResources,
+
+  /** Resources have loaded. We can start when the user activates us. */
+  ReadyToStart,
+
+  /** The user has activated us. */
+  Started,
+}
+
 type ToolType = "crossfade" | "choose-background" | null;
 
 class BackgroundImageset {
@@ -94,9 +123,18 @@ export default class Embed extends WWTAwareComponent {
 
   @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
 
+  componentState = ComponentState.LoadingResources;
   backgroundImagesets: BackgroundImageset[] = [];
   currentTool: ToolType = null;
   fullscreenModeActive = false;
+
+  get isLoadingState() {
+    return this.componentState == ComponentState.LoadingResources;
+  }
+
+  get isReadyToStartState() {
+    return this.componentState == ComponentState.ReadyToStart;
+  }
 
   get coordText() {
     if (this.wwtRenderType == ImageSetType.sky) {
@@ -163,9 +201,11 @@ export default class Embed extends WWTAwareComponent {
         // TODO: figure out a good thing to do here
         this.backgroundImagesets = [];
 
-        await this.loadAndPlayTour({
+        await this.loadTour({
           url: this.embedSettings.tourUrl
         });
+
+        this.componentState = ComponentState.ReadyToStart;
       });
     } else {
       // Many more possibilities if we're not playing a tour ...
@@ -242,6 +282,8 @@ export default class Embed extends WWTAwareComponent {
         if (!foundBG) {
           this.backgroundImagesets.unshift(new BackgroundImageset(bgName, bgName));
         }
+
+        this.componentState = ComponentState.Started;
       });
     }
   }
@@ -287,6 +329,14 @@ export default class Embed extends WWTAwareComponent {
       this.fullscreenModeActive = screenfull.isFullscreen;
     }
   }
+
+  startInteractive() {
+    this.componentState = ComponentState.Started;
+
+    if (this.embedSettings.tourUrl.length) {
+      this.startTour();
+    }
+  }
 }
 </script>
 
@@ -320,6 +370,85 @@ body {
     border-width: 0;
     margin: 0;
     padding: 0;
+  }
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.modal {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+
+  color: #FFF;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modal-loading {
+  background-color: #000;
+
+  .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    .spinner {
+      background-image: url('assets/lunar_loader.gif');
+      background-repeat: no-repeat;
+      background-size: contain;
+      width: 3rem;
+      height: 3rem;
+    }
+
+    p {
+      margin: 0 0 0 1rem;
+      padding: 0;
+      font-size: 150%;
+    }
+  }
+}
+
+#modal-readytostart {
+  cursor: pointer;
+  color: #999;
+
+  &:hover {
+    color: #2aa5f7;
+  }
+
+  div {
+    margin: 0;
+    padding: 0;
+    background-image: url('assets/wwt_globe_bg.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 20rem;
+    height: 20rem;
+    max-width: 70%;
+    max-height: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .icon {
+      width: 60%;
+      height: 60%;
+      margin-left: 14%;
+      margin-top: 3%;
+    }
   }
 }
 
