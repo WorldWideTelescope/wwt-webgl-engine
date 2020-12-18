@@ -2,7 +2,7 @@
 // Licensed under the MIT License
 
 import Vue from "vue";
-import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
+import { Module, VuexModule, Mutation, MutationAction, Action } from 'vuex-module-decorators';
 
 import { D2R, H2R } from "@wwtelescope/astro";
 import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
@@ -83,6 +83,13 @@ export interface WWTEngineVuexState {
 
   /** The total run-time of the current tour, if there is one, measured in seconds. */
   tourRunTime: number | null;
+
+  /** The start times of the stops in the tour, measured in seconds.
+   *
+   * It is possible for tour stops to be linked in a non-linear order, such that
+   * actual playback won't proceed linearly in the way that this API would imply.
+   */
+  tourStopStartTimes: number[];
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -106,12 +113,14 @@ export interface GotoRADecZoomParams {
   instant: boolean;
 }
 
-/** The parameters for the [[WWTEngineVuexModule.loadAndPlayTour]] and
- * [[WWTEngineVuexModule.loadTour]] actions.
+/** The parameters for the [[WWTEngineVuexModule.loadTour]] action.
  */
-export interface LoadAndPlayTourParams {
+export interface LoadTourParams {
   /** The tour URL to load. */
   url: string;
+
+  /** Whether to start playing it immediately. */
+  play: boolean;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.loadImageCollection]] action. */
@@ -135,6 +144,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   raRad = 0.0;
   renderType = ImageSetType.sky;
   tourRunTime: number | null = null;
+  tourStopStartTimes: number[] = [];
 
   get lookupImageset() {
     // This is how you create a parametrized getter in vuex-module-decorators:
@@ -314,40 +324,35 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return Vue.$wwt.inst.gotoTarget(options);
   }
 
-  async loadTourInternal(
-    {url}: LoadAndPlayTourParams,
-    play: boolean,
-  ): Promise<void> {
+  @MutationAction
+  async loadTour(
+    {url, play}: LoadTourParams
+  ) {
     if (Vue.$wwt.inst === null)
-      throw new Error('cannot load(AndPlay)Tour without linking to WWTInstance');
+      throw new Error('cannot loadTour without linking to WWTInstance');
 
     if (play)
       await Vue.$wwt.inst.loadAndPlayTour(url);
     else
       await Vue.$wwt.inst.loadTour(url);
 
-    this.tourRunTime = null;
+    let tourRunTime: number | null = null;
+    const tourStopStartTimes: number[] = [];
 
     const player = Vue.$wwt.inst.getActiveTourPlayer();
     if (player !== null) {
       const tour = player.get_tour();
-      if (tour !== null)
-        this.tourRunTime = tour.get_runTime() * 0.001; // ms => s
+      if (tour !== null) {
+        tourRunTime = tour.get_runTime() * 0.001; // ms => s
+        const nStops = tour.get_tourStops().length;
+
+        for (let i = 0; i < nStops; i++) {
+          tourStopStartTimes.push(tour.elapsedTimeTillTourstop(i));
+        }
+      }
     }
-  }
 
-  @Action({ rawError: true })
-  async loadAndPlayTour(
-    params: LoadAndPlayTourParams
-  ): Promise<void> {
-    return this.loadTourInternal(params, true);
-  }
-
-  @Action({ rawError: true })
-  async loadTour(
-    params: LoadAndPlayTourParams
-  ): Promise<void> {
-    return this.loadTourInternal(params, false);
+    return { tourRunTime, tourStopStartTimes };
   }
 
   @Action({ rawError: true })

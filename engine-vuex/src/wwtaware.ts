@@ -7,7 +7,7 @@ import { GotoTargetOptions, SetupForImagesetOptions } from "@wwtelescope/engine-
 
 import {
   GotoRADecZoomParams,
-  LoadAndPlayTourParams,
+  LoadTourParams,
   LoadImageCollectionParams,
   WWTEngineVuexState
 } from "./store";
@@ -36,6 +36,7 @@ export class WWTAwareComponent extends Vue {
         wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
         wwtTourRunTime: (state, _getters) => (state as WWTEngineVuexState).tourRunTime,
+        wwtTourStopStartTimes: (state, _getters) => (state as WWTEngineVuexState).tourStopStartTimes,
       }),
       ...mapGetters([
         "lookupImageset",
@@ -52,7 +53,6 @@ export class WWTAwareComponent extends Vue {
       ...mapActions([
         "gotoRADecZoom",
         "gotoTarget",
-        "loadAndPlayTour",
         "loadImageCollection",
         "loadTour",
         "waitForReady",
@@ -82,6 +82,7 @@ export class WWTAwareComponent extends Vue {
   wwtRARad!: number;
   wwtRenderType!: ImageSetType;
   wwtTourRunTime!: number | null;
+  wwtTourStopStartTimes!: number[];
 
   // Getters
   lookupImageset!: (_n: string) => Imageset | null;
@@ -100,8 +101,7 @@ export class WWTAwareComponent extends Vue {
   // Actions
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
   gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
-  loadAndPlayTour!: (o: LoadAndPlayTourParams) => Promise<void>;
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
-  loadTour!: (o: LoadAndPlayTourParams) => Promise<void>; /* argument type is correct: we're (ab)using the same interface */
+  loadTour!: (o: LoadTourParams) => Promise<void>;
   waitForReady!: () => Promise<void>;
 }

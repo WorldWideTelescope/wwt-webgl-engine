@@ -209,7 +209,8 @@ export default class Embed extends WWTAwareComponent {
         this.backgroundImagesets = [];
 
         await this.loadTour({
-          url: this.embedSettings.tourUrl
+          url: this.embedSettings.tourUrl,
+          play: false,
         });
 
         this.componentState = ComponentState.ReadyToStart;
