@@ -16,6 +16,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+import VueSlider from 'vue-slider-component';
+import 'vue-slider-component/theme/default.css';
+
 import { createPlugin } from "@wwtelescope/engine-vuex";
 import { EmbedSettings } from "@wwtelescope/embed-common";
 
@@ -43,6 +46,8 @@ library.add(faSearchMinus);
 library.add(faSearchPlus);
 library.add(faSlidersH);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
+
+Vue.component('vue-slider', VueSlider);
 
 const queryParams = new URLSearchParams(window.location.search);
 const settings = EmbedSettings.fromQueryParams(queryParams.entries());

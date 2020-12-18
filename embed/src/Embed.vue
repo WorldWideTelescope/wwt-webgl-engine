@@ -61,8 +61,11 @@
         </select>
       </template>
       <template v-else-if="currentTool == 'playback-controls'">
-        <font-awesome-icon v-bind:icon="wwtIsTourPlaying ? 'pause' : 'play'"
-          size="lg" class="clickable" @click="toggleTourPlayback()"></font-awesome-icon>
+        <div class="playback-controls">
+          <font-awesome-icon v-bind:icon="wwtIsTourPlaying ? 'pause' : 'play'"
+            size="lg" class="clickable" @click="toggleTourPlayback()"></font-awesome-icon>
+          <vue-slider class="scrubber" v-model="foregroundOpacity"></vue-slider>
+        </div>
       </template>
       </div>
     </div>
@@ -514,6 +517,23 @@ body {
 
   .clickable {
     cursor: pointer;
+  }
+}
+
+
+.playback-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 75vw;
+
+  .clickable {
+    margin: 0 8px;
+  }
+
+  .scrubber {
+    flex: 1;
   }
 }
 
