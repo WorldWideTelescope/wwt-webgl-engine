@@ -11,7 +11,9 @@ namespace wwtlib
         public TourPlayer()
         {
         }
+
         BlendState overlayBlend = BlendState.Create(false, 1000);
+
         public void Render(RenderContext renderContext)
         {
             //window.SetupMatricesOverlays();
@@ -29,7 +31,7 @@ namespace wwtlib
                 slideStartTime = Date.Now;
                 if (renderContext.OnTarget(Tour.CurrentTourStop.Target))
                 {
-                    
+
                     onTarget = true;
                     overlayBlend.State = !Tour.CurrentTourStop.FadeInOverlays;
                     overlayBlend.TargetState = true;
@@ -45,7 +47,7 @@ namespace wwtlib
                     string caption = "";
                     foreach (Overlay overlay in tour.CurrentTourStop.Overlays)
                     {
-                        
+
                         if (overlay.Name.ToLowerCase() == "caption")
                         {
                             TextOverlay text = overlay as TextOverlay;
@@ -82,10 +84,10 @@ namespace wwtlib
             if (renderContext.gl != null)
             {
                 renderContext.SetupMatricesOverlays();
-          
+
                 //todo Factor opacity in somehow ??
                 //view.overlays.Opacity = overlayBlend.Opacity;
-                
+
                 if (currentMasterSlide != null)
                 {
                     foreach (Overlay overlay in currentMasterSlide.Overlays)
@@ -154,10 +156,10 @@ namespace wwtlib
                 renderContext.Restore();
 
                 DrawPlayerControls(renderContext);
-                
+
             }
 
-          
+
         }
 
         BlendState PlayerState = BlendState.Create(false, 2000);
@@ -168,18 +170,18 @@ namespace wwtlib
 
         bool middleDown = false;
         bool leftDown = false;
-        bool rightDown = false;  
-        
+        bool rightDown = false;
+
         double top = 1;
         double center =1;
-        
+
         void DrawPlayerControls(RenderContext renderContext)
         {
             LoadImages();
 
             if (!imagesLoaded)
             {
-                
+
                 return;
             }
 
@@ -212,12 +214,11 @@ namespace wwtlib
                 ctx.Restore();
             }
         }
+
         Date lastHit = Date.Now;
 
         bool HitTextPlayerControls(Vector2d point, bool click, bool act)
         {
-
-
             if (click)
             {
                 leftDown = false;
@@ -285,7 +286,7 @@ namespace wwtlib
                 else
                 {
                     middleHover = true;
-                } 
+                }
                 if (act)
                 {
                     PauseTour();
@@ -379,9 +380,11 @@ namespace wwtlib
             get { return playing; }
             set { playing = value; }
         }
+
         bool onTarget = false;
         Date slideStartTime;
         TourStop currentMasterSlide = null;
+
         public void NextSlide()
         {
             if (tour.CurrentTourStop != null)
@@ -550,6 +553,13 @@ namespace wwtlib
         static bool switchedToFullScreen = false;
         Stack<int> callStack = new Stack<int>();
 
+        bool leaveSettingsWhenStopped = false;
+
+        public bool LeaveSettingsWhenStopped {
+            get { return leaveSettingsWhenStopped; }
+            set { leaveSettingsWhenStopped = value; }
+        }
+
         public void Play()
         {
             if (tour == null)
@@ -636,14 +646,20 @@ namespace wwtlib
 
         public void Stop(bool noSwitchBackFullScreen)
         {
-
-
             if (switchedToFullScreen && !noSwitchBackFullScreen)
             {
                // Viewer.MasterView.ShowFullScreen(false);
             }
 
-            Settings.TourSettings = null;
+            // By default, when you stop (or pause) a tour, the main WWT
+            // settings become active again. However, this can cause a jarring
+            // jump if, say, the tour has localHorizonMode active and the main
+            // settings don't. If you activate this option, we'll leave the tour
+            // settings lingering, preventing any dramatic changes.
+            if (!leaveSettingsWhenStopped) {
+                Settings.TourSettings = null;
+            }
+
             playing = false;
             if (tour.CurrentTourStop != null)
             {
@@ -865,7 +881,7 @@ namespace wwtlib
                 PlayerState.TargetState = true;
                 lastHit = Date.Now;
             }
-           
+
 
             return false;
         }
@@ -880,7 +896,7 @@ namespace wwtlib
                 return true;
             }
 
-          
+
             return false;
         }
 
@@ -907,7 +923,7 @@ namespace wwtlib
             {
                 if (tour.CurrentTourStop.Overlays[i].HitTest(location) && (!string.IsNullOrEmpty(tour.CurrentTourStop.Overlays[i].Url) || !string.IsNullOrEmpty(tour.CurrentTourStop.Overlays[i].LinkID)))
                 {
-                    //todo change cursor to hand 
+                    //todo change cursor to hand
                     return true;
                 }
             }
@@ -931,7 +947,7 @@ namespace wwtlib
             //}
             //else
             //{
-               
+
             //    PlayerState.TargetState = true;
             //}
 
