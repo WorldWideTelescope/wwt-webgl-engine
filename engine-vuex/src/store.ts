@@ -45,12 +45,6 @@ export interface WWTEngineVuexState {
   /** The current WWT clock time of the view, as a UTC Date. */
   currentTime: Date;
 
-  /** The current right ascension of the view, in radians.
-   *
-   * TODO: define this properly for planetary lat/lng views!
-   */
-  raRad: number;
-
   /** The current declination of the view, in radians.
    *
    * TODO: define this properly for planetary lat/lng views!
@@ -78,8 +72,17 @@ export interface WWTEngineVuexState {
    */
   isTourPlaying: boolean;
 
+  /** The current right ascension of the view, in radians.
+   *
+   * TODO: define this properly for planetary lat/lng views!
+   */
+  raRad: number;
+
   /** The current mode of the renderer */
   renderType: ImageSetType;
+
+  /** The total run-time of the current tour, if there is one, measured in seconds. */
+  tourRunTime: number | null;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -122,15 +125,16 @@ export interface LoadImageCollectionParams {
   stateFactory: true,
 })
 export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexState {
-  raRad = 0.0;
-  decRad = 0.0;
   backgroundImageset: Imageset | null = null;
   currentTime = new Date();
+  decRad = 0.0;
   foregroundImageset: Imageset | null = null;
   foregroundOpacity = 100;
   isTourPlayerActive = false;
   isTourPlaying = false;
+  raRad = 0.0;
   renderType = ImageSetType.sky;
+  tourRunTime: number | null = null;
 
   get lookupImageset() {
     // This is how you create a parametrized getter in vuex-module-decorators:
@@ -310,22 +314,40 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return Vue.$wwt.inst.gotoTarget(options);
   }
 
-  @Action({ rawError: true })
-  async loadAndPlayTour(
-    {url}: LoadAndPlayTourParams
+  async loadTourInternal(
+    {url}: LoadAndPlayTourParams,
+    play: boolean,
   ): Promise<void> {
     if (Vue.$wwt.inst === null)
-      throw new Error('cannot loadAndPlayTour without linking to WWTInstance');
-    return Vue.$wwt.inst.loadAndPlayTour(url);
+      throw new Error('cannot load(AndPlay)Tour without linking to WWTInstance');
+
+    if (play)
+      await Vue.$wwt.inst.loadAndPlayTour(url);
+    else
+      await Vue.$wwt.inst.loadTour(url);
+
+    this.tourRunTime = null;
+
+    const player = Vue.$wwt.inst.getActiveTourPlayer();
+    if (player !== null) {
+      const tour = player.get_tour();
+      if (tour !== null)
+        this.tourRunTime = tour.get_runTime() * 0.001; // ms => s
+    }
+  }
+
+  @Action({ rawError: true })
+  async loadAndPlayTour(
+    params: LoadAndPlayTourParams
+  ): Promise<void> {
+    return this.loadTourInternal(params, true);
   }
 
   @Action({ rawError: true })
   async loadTour(
-    {url}: LoadAndPlayTourParams
+    params: LoadAndPlayTourParams
   ): Promise<void> {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot loadTour without linking to WWTInstance');
-    return Vue.$wwt.inst.loadTour(url);
+    return this.loadTourInternal(params, false);
   }
 
   @Action({ rawError: true })

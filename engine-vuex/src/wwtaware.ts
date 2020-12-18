@@ -26,15 +26,16 @@ export class WWTAwareComponent extends Vue {
 
     this.$options.computed = {
       ...mapState({
-        wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
-        wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         wwtBackgroundImageset: (state, _getters) => (state as WWTEngineVuexState).backgroundImageset,
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
+        wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         wwtForegroundImageset: (state, _getters) => (state as WWTEngineVuexState).foregroundImageset,
         wwtForegroundOpacity: (state, _getters) => (state as WWTEngineVuexState).foregroundOpacity,
         wwtIsTourPlayerActive: (state, _getters) => (state as WWTEngineVuexState).isTourPlayerActive,
         wwtIsTourPlaying: (state, _getters) => (state as WWTEngineVuexState).isTourPlaying,
+        wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
+        wwtTourRunTime: (state, _getters) => (state as WWTEngineVuexState).tourRunTime,
       }),
       ...mapGetters([
         "lookupImageset",
@@ -71,15 +72,16 @@ export class WWTAwareComponent extends Vue {
   }
 
   // Teach TypeScript about everything we wired up. State:
-  wwtRARad!: number;
-  wwtDecRad!: number;
   wwtBackgroundImageset!: Imageset | null;
   wwtCurrentTime!: Date;
+  wwtDecRad!: number;
   wwtForegroundImageset!: Imageset | null;
   wwtForegroundOpacity!: number;
   wwtIsTourPlayerActive!: boolean;
   wwtIsTourPlaying!: boolean;
+  wwtRARad!: number;
   wwtRenderType!: ImageSetType;
+  wwtTourRunTime!: number | null;
 
   // Getters
   lookupImageset!: (_n: string) => Imageset | null;
