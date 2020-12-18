@@ -533,4 +533,33 @@ export class WWTInstance {
       }
     });
   }
+
+  /** Find out how far we have progressed into the tour, in seconds.
+   *
+   * This number does not necessarily progress monotonically due to the way that
+   * WWT measures tour playback progress. We associate a start time with each
+   * "stop" in the tour, and can measure progress through a stop, but stops do
+   * not necessarily transition from one to another in linear fashion.
+   *
+   * That being said, this number should range between 0 and the runtime of the
+   * current tour. If no tour is loaded, it will be zero.
+   */
+  getEffectiveTourTimecode(): number {
+    const player = this.getActiveTourPlayer();
+    if (player === null)
+      return 0.0;
+
+    const tour = player.get_tour();
+    if (tour === null)
+      return 0.0;
+
+    const idx = tour.get_currentTourstopIndex();
+    if (idx < 0)
+      return 0.0;
+
+    const base = tour.elapsedTimeTillTourstop(idx);
+    const stop = tour.get_tourStops()[idx];
+    const delta = stop.get_tweenPosition() * stop.get_duration() * 0.001; // ms => s
+    return base + delta;
+  }
 }

@@ -13,7 +13,7 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:^0.1.0",
-    "@wwtelescope/engine": "thiscommit:2020-12-16:Quoh7yie",
+    "@wwtelescope/engine": "b2e688f50feb78ccf5fe00e108b631a386f81572",
     "@wwtelescope/engine-types": "thiscommit:2020-12-16:Diniu6ah"
   },
   "keywords": [
