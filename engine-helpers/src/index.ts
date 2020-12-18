@@ -562,4 +562,46 @@ export class WWTInstance {
     const delta = stop.get_tweenPosition() * stop.get_duration() * 0.001; // ms => s
     return base + delta;
   }
+
+  /** "Seek" tour playback to approximately the specified timecode (in seconds).
+   *
+   * The tour will start playing back.
+   *
+   * This operation is approximate because WWT can only resume playback from the
+   * beginning of a "tour stop". So, if the desired timecode is in the middle of
+   * such a stop, playback will start there, not at the exact value that was
+   * commanded. This can be a little annoying when a slide is long.
+   *
+   * If no tour or tour player is active, nothing happens.
+   */
+  seekToTourTimecode(value: number): void {
+    const player = this.getActiveTourPlayer();
+    if (player === null)
+      return;
+
+    const tour = player.get_tour();
+    if (tour === null)
+      return;
+
+    // Figure out the stop index that best matches the specified timecode.
+    const stops = tour.get_tourStops()
+    let index = stops.length - 1;
+
+    for (let i = 0; i < stops.length; i++) {
+      const tStart = tour.elapsedTimeTillTourstop(i);
+
+      if (tStart >= value) {
+        index = i - 1;
+        break;
+      }
+    }
+
+    if (index < 0) {
+      index = 0;
+    }
+
+    // Apply the change.
+    player.playFromTourstop(stops[index]);
+  }
+
 }
