@@ -466,6 +466,15 @@ export class WWTInstance {
     return null;
   }
 
+  /** Find out whether a tour is playing.
+   *
+   * For obscure reasons, this is a static method in WWT that is not attached to
+   * a TourPlayer instance. We take one as an argument for future-proofiness.
+   */
+  getIsTourPlaying(_player: TourPlayer): boolean {
+    return TourPlayer.get_playing();
+  }
+
   private tourReadyPromises: SavedPromise<number, void>[] = [];
   private tourReadySeqnum = 0;
 
