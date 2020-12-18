@@ -820,6 +820,12 @@ export class TourPlayer implements UiController {
   /** Set the tour associated with this tour player. */
   set_tour(tour: TourDocument | null): TourDocument | null;
 
+  /** Get whether this player will leave slide [[Settings]] applied when it stops. */
+  get_leaveSettingsWhenStopped(): boolean;
+
+  /** Set whether this player will leave slide [[Settings]] applied when it stops. */
+  set_leaveSettingsWhenStopped(v: boolean): boolean;
+
   /** Force the currently playing tour to advance to the next slide. */
   nextSlide(): void;
 
