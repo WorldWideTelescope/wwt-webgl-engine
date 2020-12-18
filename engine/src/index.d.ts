@@ -735,6 +735,14 @@ export class TourDocument {
   /** Set the "author URL" of this tour. */
   set_authorUrl(title: string): string;
 
+  /** Get the index number of the currently active tour stop.
+   *
+   * In principle, this should maybe be a property of a tour player, not a tour
+   * document, but here we are. This will be negative if the tour isn't
+   * currently playing.
+   */
+  get_currentTourstopIndex(): number;
+
   /** Get this tour's description.
    *
    * TODO: document any markup semantics, etc.
@@ -764,7 +772,6 @@ export class TourDocument {
   //get_authorImage();
   //get_authorPhone();
   //get_authorThumbnailFilename();
-  //get_currentTourstopIndex(): number;
   //get_editMode();
   //get_fileName();
   //get_id();
