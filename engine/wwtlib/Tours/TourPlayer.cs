@@ -80,7 +80,6 @@ namespace wwtlib
                 }
             }
 
-            //todo implement gl based tour rendering
             if (renderContext.gl != null)
             {
                 renderContext.SetupMatricesOverlays();
@@ -109,14 +108,14 @@ namespace wwtlib
                     }
                 }
 
-
                 renderContext.Restore();
 
+                // There used to be code to draw on-screen tour player controls here.
+                // In the web engine, that kind of work is now taken care of at higher levels.
                 //DrawPlayerControls(renderContext);
             }
             else
             {
-
                 renderContext.Device.Scale(renderContext.Height / 1116, renderContext.Height / 1116);
 
                 double aspectOrig = 1920 / 1116;
@@ -154,216 +153,12 @@ namespace wwtlib
                     int i = 0;
                 }
                 renderContext.Restore();
-
-                DrawPlayerControls(renderContext);
-
             }
-
-
         }
 
         BlendState PlayerState = BlendState.Create(false, 2000);
 
-        bool middleHover = false;
-        bool leftHover = false;
-        bool rightHover = false;
-
-        bool middleDown = false;
-        bool leftDown = false;
-        bool rightDown = false;
-
-        double top = 1;
-        double center =1;
-
-        void DrawPlayerControls(RenderContext renderContext)
-        {
-            LoadImages();
-
-            if (!imagesLoaded)
-            {
-
-                return;
-            }
-
-            if (PlayerState.State)
-            {
-                int span = Date.Now - lastHit;
-
-                if (span > 7000)
-                {
-                    PlayerState.TargetState = false;
-                }
-
-
-                CanvasContext2D ctx = renderContext.Device;
-
-                ctx.Save();
-                ctx.Alpha = PlayerState.Opacity;
-                top = renderContext.Height - 60;
-                center = renderContext.Width / 2;
-
-                ImageElement left = leftDown ? buttonPreviousPressed : (leftHover ? buttonPreviousHover : buttonPreviousNormal);
-                ImageElement middle = Playing ? (middleDown ? buttonPausePressed : (middleHover ? buttonPauseHover : buttonPauseNormal)) :
-                                                 (middleDown ? buttonPlayPressed : (middleHover ? buttonPlayHover : buttonPlayNormal));
-                ImageElement right = rightDown ? buttonNextPressed : (rightHover ? buttonNextHover : buttonNextNormal);
-
-                ctx.DrawImage(left, center - 110, top);
-                ctx.DrawImage(right, center, top);
-                ctx.DrawImage(middle, center - 32, top - 4);
-
-                ctx.Restore();
-            }
-        }
-
         Date lastHit = Date.Now;
-
-        bool HitTextPlayerControls(Vector2d point, bool click, bool act)
-        {
-            if (click)
-            {
-                leftDown = false;
-                rightDown = false;
-                middleDown = false;
-            }
-            else
-            {
-                leftHover = false;
-                rightHover = false;
-                middleHover = false;
-
-            }
-
-            if (point.Y < (top - 2))
-            {
-                return false;
-            }
-
-            if (point.X < (center - 32) && point.X > (center - 105))
-            {
-                if (click)
-                {
-
-                    leftDown = true;
-                }
-                else
-                {
-                    leftHover = true;
-                }
-                if (act)
-                {
-                    PlayPreviousSlide();
-                    lastHit = Date.Now;
-                }
-                return true;
-            }
-
-            if (point.X < (center + 105) && point.X > (center + 32))
-            {
-                if (click)
-                {
-
-                    rightDown = true;
-                }
-                else
-                {
-                    rightHover = true;
-                }
-                if (act)
-                {
-                    PlayNextSlide();
-                    lastHit = Date.Now;
-                }
-                return true;
-            }
-
-            if (point.X < (center + 32) && point.X > (center - 32))
-            {
-                if (click)
-                {
-
-                    middleDown = true;
-                }
-                else
-                {
-                    middleHover = true;
-                }
-                if (act)
-                {
-                    PauseTour();
-                    lastHit = Date.Now;
-                }
-                return true;
-            }
-
-            return false;
-        }
-
-
-        ImageElement buttonNextDisabled;
-        ImageElement buttonNextHover;
-        ImageElement buttonNextNormal;
-        ImageElement buttonNextPressed;
-        ImageElement buttonPauseDisabled;
-        ImageElement buttonPauseHover;
-        ImageElement buttonPauseNormal;
-        ImageElement buttonPausePressed;
-        ImageElement buttonPlayDisabled;
-        ImageElement buttonPlayHover;
-        ImageElement buttonPlayNormal;
-        ImageElement buttonPlayPressed;
-        ImageElement buttonPreviousDisabled;
-        ImageElement buttonPreviousHover;
-        ImageElement buttonPreviousNormal;
-        ImageElement buttonPreviousPressed;
-
-        void LoadImages()
-        {
-            if (!imagesLoaded && !downloading)
-            {
-                buttonNextDisabled = LoadImageElement("images/button_next_disabled.png");
-                buttonNextHover = LoadImageElement("images/button_next_hover.png");
-                buttonNextNormal = LoadImageElement("images/button_next_normal.png");
-                buttonNextPressed = LoadImageElement("images/button_next_pressed.png");
-                buttonPauseDisabled = LoadImageElement("images/button_pause_disabled.png");
-                buttonPauseHover = LoadImageElement("images/button_pause_hover.png");
-                buttonPauseNormal = LoadImageElement("images/button_pause_normal.png");
-                buttonPausePressed = LoadImageElement("images/button_pause_pressed.png");
-                buttonPlayDisabled = LoadImageElement("images/button_play_disabled.png");
-                buttonPlayHover = LoadImageElement("images/button_play_hover.png");
-                buttonPlayNormal = LoadImageElement("images/button_play_normal.png");
-                buttonPlayPressed = LoadImageElement("images/button_play_pressed.png");
-                buttonPreviousDisabled = LoadImageElement("images/button_previous_disabled.png");
-                buttonPreviousHover = LoadImageElement("images/button_previous_hover.png");
-                buttonPreviousNormal = LoadImageElement("images/button_previous_normal.png");
-                buttonPreviousPressed = LoadImageElement("images/button_previous_pressed.png");
-            }
-        }
-
-
-        int imageCount = 0;
-        int imageLoadCount = 0;
-        bool imagesLoaded = false;
-        bool downloading = false;
-        ImageElement LoadImageElement(string url)
-        {
-            imageCount++;
-            imagesLoaded = false;
-            downloading = true;
-            ImageElement temp = (ImageElement)Document.CreateElement("img");
-            temp.Src = url;
-            temp.AddEventListener("load", delegate(ElementEvent e)
-            {
-                imageLoadCount++;
-                if (imageLoadCount == imageCount)
-                {
-                    downloading = false;
-                    imagesLoaded = true;
-                    // Refresh();
-                }
-            }, false);
-
-            return temp;
-        }
 
         TourDocument tour = null;
 
@@ -490,8 +285,6 @@ namespace wwtlib
                 Settings.TourSettings = tour.CurrentTourStop;
                 SpaceTimeController.Now = tour.CurrentTourStop.StartTime;
                 SpaceTimeController.SyncToClock = false;
-
-
             }
             else
             {
@@ -510,7 +303,7 @@ namespace wwtlib
                         TourEnded.Invoke(this, new EventArgs());
                     }
 
-                    ShowEndTourPopup();
+                    //ShowEndTourPopup();
                     WWTControl.Singleton.HideUI(false);
                     WWTControl.scriptInterface.FireTourEnded();
                 }
@@ -538,15 +331,6 @@ namespace wwtlib
                 }
                 currentMasterSlide = null;
             }
-        }
-
-        public void ShowEndTourPopup()
-        {
-            //FolderBrowser.Explorer.TourPopupContainer.IsOpen = true;
-            //FolderBrowser.Explorer.TourPopupContents.ShowEndTourPopup(tour);
-
-            //FolderBrowser.Explorer.TourPopupContainer.HorizontalOffset = Viewer.MasterView.ActualWidth / 2 - 300;
-            //FolderBrowser.Explorer.TourPopupContainer.VerticalOffset = Viewer.MasterView.ActualHeight/2-200;
         }
 
         static public event EventHandler TourEnded;
@@ -583,7 +367,6 @@ namespace wwtlib
             }
             WWTControl.Singleton.HideUI(true);
 
-
             playing = true;
 
             if (tour.TourStops.Count > 0)
@@ -600,14 +383,11 @@ namespace wwtlib
 
                 }
 
-
                 WWTControl.Singleton.GotoTarget(tour.CurrentTourStop.Target, false, true, false);
-
             }
 
             slideStartTime = Date.Now;
             playing = true;
-
         }
 
         private void PlayMasterForCurrent()
@@ -845,7 +625,6 @@ namespace wwtlib
             // todo enable links
             Vector2d location;
 
-
             location = PointToView(Vector2d.Create(e.OffsetX, e.OffsetY));
 
             if (tour == null || tour.CurrentTourStop == null)
@@ -863,40 +642,28 @@ namespace wwtlib
                         Util.OpenUrl(linkItem.Url);
                         return true;
                     }
+
                     if (!string.IsNullOrEmpty(tour.CurrentTourStop.Overlays[i].LinkID))
                     {
                         callStack.Push(tour.CurrentTourstopIndex);
                         PlayFromTourstop(tour.TourStops[tour.GetTourStopIndexByID(tour.CurrentTourStop.Overlays[i].LinkID)]);
                         return true;
                     }
-
                 }
             }
-            if (PlayerState.State)
-            {
-                return HitTextPlayerControls(Vector2d.Create(e.OffsetX, e.OffsetY), true, true);
-            }
-            else
+
+            // This toggle relates to the built-in tour navigation UI, which
+            // is now taken care of at a higher level.
+            if (!PlayerState.State)
             {
                 PlayerState.TargetState = true;
-                lastHit = Date.Now;
             }
-
 
             return false;
         }
 
         public bool MouseUp(object sender, ElementEvent e)
         {
-            if (leftDown || rightDown || middleDown)
-            {
-                leftDown = false;
-                rightDown = false;
-                middleDown = false;
-                return true;
-            }
-
-
             return false;
         }
 
@@ -927,30 +694,14 @@ namespace wwtlib
                     return true;
                 }
             }
+
             //todo set cursor to default
             //Viewer.MasterView.Cursor = null;
-
-            if (PlayerState.State)
-            {
-                return HitTextPlayerControls(Vector2d.Create(e.OffsetX, e.OffsetY), false, false);
-            }
-
-
             return false;
         }
 
         public bool MouseClick(object sender, ElementEvent e)
         {
-            //if (PlayerState.State)
-            //{
-            //    return HitTextPlayerControls(Vector2d.Create(e.OffsetX, e.OffsetY), true, true);
-            //}
-            //else
-            //{
-
-            //    PlayerState.TargetState = true;
-            //}
-
             return false;
         }
 
@@ -961,43 +712,41 @@ namespace wwtlib
 
         public bool MouseDoubleClick(object sender, ElementEvent e)
         {
-
             return false;
         }
 
         public bool KeyDown(object sender, ElementEvent e)
         {
-
             switch (e.KeyCode)
             {
-                case 27:
+                case 27: // escape
                     Stop(switchedToFullScreen);
                     WWTControl.Singleton.CloseTour();
                     return true;
 
-                case 32:
-
+                case 32: // spacebar
                     PauseTour();
                     return true;
-                case 39:
+
+                case 39: // right arrow
                     PlayNextSlide();
                     return true;
-                case 37:
-                    PlayPreviousSlide();
 
+                case 37: // left arrow
+                    PlayPreviousSlide();
                     return true;
-                case 35:
+
+                case 35: // end key
                     if (tour.TourStops.Count > 0)
                     {
                         PlayFromTourstop(tour.TourStops[tour.TourStops.Count - 1]);
                     }
-
                     return true;
-                case 36:
+
+                case 36: // home key
                     if (tour.TourStops.Count > 0)
                     {
                         PlayFromTourstop(tour.TourStops[0]);
-
                     }
                     return true;
             }
@@ -1006,7 +755,7 @@ namespace wwtlib
         }
 
         private void PlayNextSlide()
-       {
+        {
             if ((tour.CurrentTourstopIndex < tour.TourStops.Count - 1) && tour.TourStops.Count > 0)
             {
                 PlayFromTourstop(tour.TourStops[tour.CurrentTourstopIndex + 1]);
@@ -1051,7 +800,6 @@ namespace wwtlib
             return false;
         }
 
-
         public bool Hover(Vector2d pnt)
         {
             if (playing)
@@ -1068,7 +816,6 @@ namespace wwtlib
             double viewWidth = (clientWidth / clientHeight) * 1116f;
             double x = (((double)pnt.X) / ((double)clientWidth) * viewWidth) - ((viewWidth - 1920) / 2);
             double y = ((double)pnt.Y) / clientHeight * 1116;
-
             return Vector2d.Create(x, y);
         }
     }
