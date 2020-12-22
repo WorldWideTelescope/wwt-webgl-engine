@@ -560,6 +560,7 @@ body {
 
 #overlays {
   position: absolute;
+  z-index: 10;
   top: 0.5rem;
   left: 0.5rem;
   color: #FFF;
@@ -573,6 +574,7 @@ body {
 
 #controls {
   position: absolute;
+  z-index: 10;
   top: 0.5rem;
   right: 0.5rem;
   color: #FFF;
@@ -594,6 +596,7 @@ body {
 
 #tools {
   position: absolute;
+  z-index: 10;
   bottom: 3rem;
   left: 50%;
   color: #FFF;
@@ -631,6 +634,7 @@ body {
 
 #credits {
   position: absolute;
+  z-index: 10;
   bottom: 0.5rem;
   right: 1rem;
   color: #ddd;
