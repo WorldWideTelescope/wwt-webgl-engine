@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <WorldWideTelescope wwt-namespace="wwt-embed"></WorldWideTelescope>
+    <WorldWideTelescope
+      wwt-namespace="wwt-embed"
+      v-bind:style="{height: wwtComponentHeight, top: wwtComponentTop}"
+    ></WorldWideTelescope>
 
     <transition name="fade">
       <div class="modal" id="modal-loading" v-show="isLoadingState">
@@ -136,6 +139,8 @@ const skyBackgroundImagesets: BackgroundImageset[] = [
   new BackgroundImageset("Gamma Rays (FERMI LAT 8-year)", "Fermi LAT 8-year (gamma)"),
 ];
 
+const defaultWindowAspectRatio = 1.333;
+
 @Component
 export default class Embed extends WWTAwareComponent {
   CreditMode = CreditMode
@@ -146,6 +151,7 @@ export default class Embed extends WWTAwareComponent {
   backgroundImagesets: BackgroundImageset[] = [];
   currentTool: ToolType = null;
   fullscreenModeActive = false;
+  windowAspectRatio = defaultWindowAspectRatio;
 
   get isLoadingState() {
     return this.componentState == ComponentState.LoadingResources;
@@ -318,12 +324,17 @@ export default class Embed extends WWTAwareComponent {
     if (screenfull.isEnabled) {
       screenfull.on('change', this.onFullscreenEvent);
     }
+
+    window.addEventListener('resize', this.onResizeEvent);
+    this.onResizeEvent();
   }
 
   destroyed() {
     if (screenfull.isEnabled) {
       screenfull.off('change', this.onFullscreenEvent);
     }
+
+    window.removeEventListener('resize', this.onResizeEvent);
   }
 
   selectTool(name: ToolType) {
@@ -356,6 +367,14 @@ export default class Embed extends WWTAwareComponent {
     }
   }
 
+  onResizeEvent() {
+    if (window.innerHeight > 0 && window.innerWidth > 0) {
+      this.windowAspectRatio = (1.0 * window.innerWidth) / window.innerHeight;
+    } else {
+      this.windowAspectRatio = defaultWindowAspectRatio;
+    }
+  }
+
   startInteractive() {
     this.componentState = ComponentState.Started;
 
@@ -385,6 +404,31 @@ export default class Embed extends WWTAwareComponent {
   set twoWayTourTimecode(code: number) {
     this.seekToTourTimecode(code);
   }
+
+  // These propertes are used to achieve a widescreen effect when playing tour
+  // back on a portrait-mode screen, such as on a mobile device. Tours have to
+  // be designed with a target screen aspect ratio in mind, so without the
+  // widescreen effect the content will get cut off.
+  get wwtComponentTop()  {
+    if (!this.wwtIsTourPlaying)
+      return '0';
+
+    if (this.windowAspectRatio > 1)
+      return '0';
+
+    const targetWWTHeight = window.innerWidth * 0.75;
+    return 0.5 * (window.innerHeight - targetWWTHeight) + 'px';
+  }
+
+  get wwtComponentHeight() {
+    if (!this.wwtIsTourPlaying)
+      return '100%';
+
+    if (this.windowAspectRatio > 1)
+      return '100%';
+
+    return window.innerWidth * 0.75 + 'px';
+  }
 }
 </script>
 
@@ -412,6 +456,8 @@ body {
   margin: 0;
 
   .wwtelescope-component {
+    position: relative;
+    top: 0;
     width: 100%;
     height: 100%;
     border-style: none;
