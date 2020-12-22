@@ -2,7 +2,7 @@
   <div id="app">
     <WorldWideTelescope
       wwt-namespace="wwt-embed"
-      v-bind:style="{height: wwtComponentHeight, top: wwtComponentTop}"
+      v-bind:style="{height: wwtComponentLayout.height, top: wwtComponentLayout.top}"
     ></WorldWideTelescope>
 
     <transition name="fade">
@@ -139,7 +139,10 @@ const skyBackgroundImagesets: BackgroundImageset[] = [
   new BackgroundImageset("Gamma Rays (FERMI LAT 8-year)", "Fermi LAT 8-year (gamma)"),
 ];
 
-const defaultWindowAspectRatio = 1.333;
+type Shape = { width: number; height: number };
+const defaultWindowShape: Shape = {width: 1200, height: 900};
+
+type WwtComponentLayout = { top: string; height: string };
 
 @Component
 export default class Embed extends WWTAwareComponent {
@@ -151,7 +154,7 @@ export default class Embed extends WWTAwareComponent {
   backgroundImagesets: BackgroundImageset[] = [];
   currentTool: ToolType = null;
   fullscreenModeActive = false;
-  windowAspectRatio = defaultWindowAspectRatio;
+  windowShape = defaultWindowShape;
 
   get isLoadingState() {
     return this.componentState == ComponentState.LoadingResources;
@@ -368,10 +371,27 @@ export default class Embed extends WWTAwareComponent {
   }
 
   onResizeEvent() {
-    if (window.innerHeight > 0 && window.innerWidth > 0) {
-      this.windowAspectRatio = (1.0 * window.innerWidth) / window.innerHeight;
+    // In most cases, window.inner{Width,Height} is the shape info that we want.
+    // But on mobile, that can refer to the "visual viewport", which can vary
+    // with pinch-zooming and is not what we want. (Observed on Chrome/Android.)
+    // In those cases, window.screen.{width,height} is what we want. But on
+    // desktop, that can refer to the whole screen containing the browser! The
+    // following logic seems to work. Cf: https://stackoverflow.com/a/63964440/3760486
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    if (window.screen !== null) {
+      if (window.screen.width < width)
+        width = window.screen.width;
+      if (window.screen.height < height)
+        height = window.screen.height;
+    }
+
+    if (width > 0 && height > 0) {
+      this.windowShape = {width, height};
     } else {
-      this.windowAspectRatio = defaultWindowAspectRatio;
+      this.windowShape = defaultWindowShape;
     }
   }
 
@@ -405,29 +425,21 @@ export default class Embed extends WWTAwareComponent {
     this.seekToTourTimecode(code);
   }
 
-  // These propertes are used to achieve a widescreen effect when playing tour
+  // This property is used to achieve a widescreen effect when playing tours
   // back on a portrait-mode screen, such as on a mobile device. Tours have to
   // be designed with a target screen aspect ratio in mind, so without the
   // widescreen effect the content will get cut off.
-  get wwtComponentTop()  {
-    if (!this.wwtIsTourPlaying)
-      return '0';
+  get wwtComponentLayout(): WwtComponentLayout  {
+    if (this.wwtIsTourPlaying) {
+      if (this.windowShape.height > this.windowShape.width) {
+        const wwtHeight = this.windowShape.width * 0.75; // => 4:3 aspect ratio
+        const height = wwtHeight + 'px';
+        const top = 0.5 * (this.windowShape.height - wwtHeight) + 'px';
+        return { top, height };
+      }
+    }
 
-    if (this.windowAspectRatio > 1)
-      return '0';
-
-    const targetWWTHeight = window.innerWidth * 0.75;
-    return 0.5 * (window.innerHeight - targetWWTHeight) + 'px';
-  }
-
-  get wwtComponentHeight() {
-    if (!this.wwtIsTourPlaying)
-      return '100%';
-
-    if (this.windowAspectRatio > 1)
-      return '100%';
-
-    return window.innerWidth * 0.75 + 'px';
+    return { top: '0', height: '100%' };
   }
 }
 </script>
