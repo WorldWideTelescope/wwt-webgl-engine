@@ -329,6 +329,10 @@ export default class Embed extends WWTAwareComponent {
     }
 
     window.addEventListener('resize', this.onResizeEvent);
+    // ResizeObserver not yet in TypeScript but we should start using it when
+    // available. If we're in an iframe, our shape might change spontaneously.
+    // const ro = new ResizeObserver(entries => this.onResizeEvent());
+    // ro.observer(this.$el);
     this.onResizeEvent();
   }
 
@@ -371,14 +375,8 @@ export default class Embed extends WWTAwareComponent {
   }
 
   onResizeEvent() {
-    let width = -1;
-    let height = -1;
-
-    const appEl = document.getElementById("app");
-    if (appEl != null) {
-      width = appEl.clientWidth;
-      height = appEl.clientHeight;
-    }
+    const width = this.$el.clientWidth;
+    const height = this.$el.clientHeight;
 
     if (width > 0 && height > 0) {
       this.windowShape = {width, height};
