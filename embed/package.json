@@ -27,7 +27,7 @@
   "internalDepVersions": {
     "@wwtelescope/embed-common": "manual:^0.2.0",
     "@wwtelescope/engine": "1ae9e9763cf4ba10b734df4ca9fd71d635fdf77b",
-    "@wwtelescope/engine-vuex": "thiscommit:2020-12-18:dooXah7s"
+    "@wwtelescope/engine-vuex": "060128405effb7a38cd8fc2953c54b857225b070"
   },
   "keywords": [
     "AAS WorldWide Telescope"
