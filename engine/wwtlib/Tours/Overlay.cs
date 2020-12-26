@@ -138,7 +138,7 @@ namespace wwtlib
             }
             else
             {
-             
+
             }
         }
 
@@ -597,12 +597,12 @@ namespace wwtlib
 
         public virtual void AddFilesToCabinet(FileCabinet fc)
         {
-            
+
         }
 
         public virtual void WriteOverlayProperties(XmlTextWriter xmlWriter)
         {
-            
+
         }
 
 
@@ -682,7 +682,7 @@ namespace wwtlib
                     if (node.Attributes.GetNamedItem("InterpolationType") != null)
                     {
                         InterpolationType = (InterpolationType)Enums.Parse("InterpolationType", node.Attributes.GetNamedItem("InterpolationType").Value);
-                    } 
+                    }
                 }
             }
 
@@ -768,7 +768,7 @@ namespace wwtlib
                 if (RenderContext.UseGl)
                 {
                     texture2d = Owner.Owner.GetCachedTexture2d(filename);
-                    textureReady = true;                 
+                    textureReady = true;
                 }
                 else
                 {
@@ -997,7 +997,7 @@ namespace wwtlib
 
         private void CalculateTextSize()
         {
-             
+
             if (ctx == null || ce == null)
             {
                 ce = (CanvasElement)Document.CreateElement("canvas");
@@ -1651,7 +1651,7 @@ namespace wwtlib
             ctx.Save();
             ctx.Translate(X, Y);
             ctx.Rotate(RotationAngle*RC);
- 
+
             ctx.BeginPath();
             ctx.MoveTo(-Width / 2, -Height / 2);
             ctx.LineTo(Width / 2, -Height / 2);
@@ -1736,7 +1736,7 @@ namespace wwtlib
             ctx.Save();
             ctx.Translate(X, Y);
             ctx.Rotate(RotationAngle * RC);
- 
+
             ctx.BeginPath();
             ctx.MoveTo((-(Width / 2)), (-(Height / 4)));
             ctx.LineTo(((Width / 4)), (-(Height / 4)));
@@ -1792,7 +1792,7 @@ namespace wwtlib
             ctx.Restore();
         }
 
-  
+
         public override void CleanUpGeometry()
         {
             base.CleanUpGeometry();
@@ -1817,21 +1817,22 @@ namespace wwtlib
             ShapeOverlay overlay = new ShapeOverlay();
             overlay.shapeType = shapeType;
             overlay.Owner = currentTourStop;
-            
+
 
             return overlay;
         }
     }
+
     public class AudioOverlay : Overlay
     {
         public override string GetTypeName()
         {
             return "TerraViewer.AudioOverlay";
         }
+
         string filename;
         AudioElement audio = null;
         int volume = 100;
-
         bool mute = false;
 
         public bool Mute
@@ -1873,13 +1874,13 @@ namespace wwtlib
             fc.AddFile(Owner.Owner.WorkingDirectory + filename, Owner.Owner.GetFileBlob(this.filename));
         }
 
-
         public override void Play()
         {
             if (audio == null)
             {
                 InitializeTexture();
             }
+
             if (audio != null && audioReady)
             {
                 audio.Play();
@@ -1895,6 +1896,7 @@ namespace wwtlib
             {
                 InitializeTexture();
             }
+
             if (audio != null && audioReady)
             {
                 audio.Pause();
@@ -1908,6 +1910,7 @@ namespace wwtlib
             {
                 InitializeTexture();
             }
+
             if (audio != null && audioReady)
             {
                 audio.Pause();
@@ -1915,6 +1918,7 @@ namespace wwtlib
         }
 
         double position = 0;
+
         public override void Seek(double time)
         {
             position = time;
@@ -1936,7 +1940,9 @@ namespace wwtlib
                 }
             }
         }
+
         bool audioReady = false;
+
         //public AudioOverlay(RenderContext renderContext, TourStop owner, string filename)
         //{
         //    isDesignTimeOnly = true;
@@ -1953,11 +1959,6 @@ namespace wwtlib
             if (audio == null)
             {
                 audio = (AudioElement)Document.CreateElement("audio");
-                //audio.AutoPlay = true;
-                //audio.MediaFailed += new EventHandler<ExceptionRoutedEventArgs>(audio_MediaFailed);
-                //audio.MediaOpened += new RoutedEventHandler(audio_MediaOpened);
-                //Viewer.MasterView.audio.Children.Add(audio);
-                audio.Src = Owner.Owner.GetFileStream(this.filename);
                 audio.AddEventListener("canplaythrough", delegate
                 {
                     if (!audioReady)
@@ -1968,9 +1969,21 @@ namespace wwtlib
                     }
                 }, false);
 
-
+                // As of December 2020, on Safari, we need to use a <source>
+                // sub-element for the audio to play. If we set src/type on the
+                // parent element the playback breaks. This in turn breaks some
+                // older browsers -- in a world of infinite developer time we'd
+                // choose the behavior based on the browser version.
+                //
+                // The mis-cast here is intentional since ScriptSharp doesn't
+                // have a <source> element definition. It also doesn't have the
+                // "type" property. Sigh.
+                AudioElement source = (AudioElement) Document.CreateElement("source");
+                audio.AppendChild(source);
+                source.Src = Owner.Owner.GetFileStream(this.filename);
+                Script.Literal("source.type = {0}", "audio/mp3"); // TODO! non-MP3 audio formats!
+                audio.Load();
             }
-
         }
 
         public override void CleanUp()
@@ -1989,9 +2002,7 @@ namespace wwtlib
         void audio_MediaOpened()
         {
             audio.CurrentTime = position;
-
             audio.Volume = this.mute ? 0 : (float)(volume / 100.0);
-
         }
 
         AudioType trackType = AudioType.Music;
@@ -2021,6 +2032,7 @@ namespace wwtlib
         {
             XmlNode audio = Util.SelectSingleNode(node, "Audio");
             filename = audio.Attributes.GetNamedItem("Filename").Value;
+
             if (audio.Attributes.GetNamedItem("Volume") != null)
             {
                 volume = int.Parse(audio.Attributes.GetNamedItem("Volume").Value);
@@ -2263,7 +2275,7 @@ namespace wwtlib
             frames = int.Parse(flipbook.Attributes.GetNamedItem("Frames").Value);
 
             loopType = (LoopTypes)Enums.Parse("LoopTypes", flipbook.Attributes.GetNamedItem("Loop").Value);
-            
+
             if (flipbook.Attributes.GetNamedItem("FramesX") != null)
             {
                 FramesX = int.Parse(flipbook.Attributes.GetNamedItem("FramesX").Value);
