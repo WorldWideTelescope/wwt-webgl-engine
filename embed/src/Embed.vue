@@ -371,21 +371,13 @@ export default class Embed extends WWTAwareComponent {
   }
 
   onResizeEvent() {
-    // In most cases, window.inner{Width,Height} is the shape info that we want.
-    // But on mobile, that can refer to the "visual viewport", which can vary
-    // with pinch-zooming and is not what we want. (Observed on Chrome/Android.)
-    // In those cases, window.screen.{width,height} is what we want. But on
-    // desktop, that can refer to the whole screen containing the browser! The
-    // following logic seems to work. Cf: https://stackoverflow.com/a/63964440/3760486
+    let width = -1;
+    let height = -1;
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-
-    if (window.screen !== null) {
-      if (window.screen.width < width)
-        width = window.screen.width;
-      if (window.screen.height < height)
-        height = window.screen.height;
+    const appEl = document.getElementById("app");
+    if (appEl != null) {
+      width = appEl.clientWidth;
+      height = appEl.clientHeight;
     }
 
     if (width > 0 && height > 0) {
