@@ -161,6 +161,8 @@ namespace wwtlib
         // can control their playback more precisely. So, this function should
         // do any multimedia playback initialization needed. It will be called
         // when the user initiates tour playback.
+        //
+        // Repeated calls should be idempotent.
         virtual public void PrepMultimedia()
         {
         }

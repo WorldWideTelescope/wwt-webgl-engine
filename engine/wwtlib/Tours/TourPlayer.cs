@@ -372,15 +372,37 @@ namespace wwtlib
             if (tour.TourStops.Count > 0)
             {
                 onTarget = false;
+
                 if (tour.CurrentTourstopIndex == -1)
                 {
                     tour.CurrentTourStop = tour.TourStops[0];
                 }
 
+                // Ensure that all multimedia elements are prepared. When
+                // playing back a tour in a browser, restrictions on autoplay
+                // mean that we have to ensure that all of our multimedia
+                // elements are prepared for playback inside code that is
+                // triggered by a user-initiated event. The PrepMultimedia
+                // callback should do whatever's needed to make sure that media
+                // files are all ready to go.
+
+                foreach (TourStop stop in tour.TourStops)
+                {
+                    if (stop.MusicTrack != null)
+                        stop.MusicTrack.PrepMultimedia();
+
+                    if (stop.VoiceTrack != null)
+                        stop.VoiceTrack.PrepMultimedia();
+
+                    foreach (Overlay overlay in stop.Overlays)
+                    {
+                        overlay.PrepMultimedia();
+                    }
+                }
+
                 if (tour.CurrentTourstopIndex > 0)
                 {
                     PlayMasterForCurrent();
-
                 }
 
                 WWTControl.Singleton.GotoTarget(tour.CurrentTourStop.Target, false, true, false);
