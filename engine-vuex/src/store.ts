@@ -102,6 +102,14 @@ export interface WWTEngineVuexState {
    * current tour. If no tour is loaded, it will be zero.
    */
   tourTimecode: number;
+
+  /** The current zoom level of the view, in degrees.
+   *
+   * The zoom level is the angular height of the viewport, times size.
+   *
+   * TODO: define this properly for 3D modes!
+   */
+  zoomDeg: number;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -158,6 +166,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   tourRunTime: number | null = null;
   tourStopStartTimes: number[] = [];
   tourTimecode = 0.0;
+  zoomDeg = 0.0;
 
   get lookupImageset() {
     // This is how you create a parametrized getter in vuex-module-decorators:
@@ -192,6 +201,10 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const decRad = wwt.si.getDec() * D2R;
     if (this.decRad != decRad)
       this.decRad = decRad;
+
+    const zoomDeg = wwt.ctl.renderContext.viewCamera.zoom;
+    if (this.zoomDeg != zoomDeg)
+      this.zoomDeg = zoomDeg;
 
     const bg = wwt.ctl.renderContext.get_backgroundImageset() || null; // TEMP
     if (this.backgroundImageset != bg)
