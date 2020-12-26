@@ -396,8 +396,37 @@ export default class Embed extends WWTAwareComponent {
   }
 
   toggleTourPlayback() {
-    if (this.wwtIsTourPlayerActive)
+    if (this.wwtIsTourPlayerActive) {
+      // If we're playing and our window is tall, we have styling active that
+      // keeps the WWT widget in a widescreen-ish format to preserve tour
+      // layout. If we're stopping playback, this styling will go away. Since
+      // the WWT widget tracks its view height as an angular size, we need to
+      // tweak it in order to preserve continuity when the tour is paused. This
+      // isn't 100% necessary but is cool when it works. It doesn't work if the
+      // pause occurs in a very zoomed-out state, where we can't zoom out any
+      // farther because we hit the zoom clamps.
+      //
+      // Keep this in sync with wwtComponentLayout.
+      //
+      // TODO: make sure this works in 3D mode.
+      let newView = null;
+
+      if (this.wwtIsTourPlaying && this.wwtComponentLayout.top != '0') {
+        const curHeight = this.windowShape.width * 0.75;
+        newView = {
+          raRad: 1.0 * this.wwtRARad,
+          decRad: 1.0 * this.wwtDecRad,
+          zoomDeg: this.wwtZoomDeg * this.windowShape.height / curHeight,
+          instant: true,
+        };
+      }
+
       this.toggleTourPlayPauseState();
+
+      if (newView !== null) {
+        this.gotoRADecZoom(newView);
+      }
+    }
   }
 
   formatTimecode(seconds: number): string {
@@ -421,6 +450,8 @@ export default class Embed extends WWTAwareComponent {
   // back on a portrait-mode screen, such as on a mobile device. Tours have to
   // be designed with a target screen aspect ratio in mind, so without the
   // widescreen effect the content will get cut off.
+  //
+  // Keep this in sync with toggleTourPlayback.
   get wwtComponentLayout(): WwtComponentLayout  {
     if (this.wwtIsTourPlaying) {
       if (this.windowShape.height > this.windowShape.width) {
