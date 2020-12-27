@@ -78,6 +78,7 @@
             :tooltip-formatter="formatTimecode"
             :adsorb="true"
             :duration="0"
+            :interval="0.001"
             :hide-label="true"
           ></vue-slider>
         </div>
