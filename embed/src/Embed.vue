@@ -79,6 +79,7 @@
             :adsorb="true"
             :duration="0"
             :interval="0.001"
+            :contained="true"
             :hide-label="true"
             :use-keyboard="false"
           ></vue-slider>
