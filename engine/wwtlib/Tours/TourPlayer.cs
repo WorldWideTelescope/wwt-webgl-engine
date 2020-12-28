@@ -16,25 +16,24 @@ namespace wwtlib
 
         public void Render(RenderContext renderContext)
         {
-            //window.SetupMatricesOverlays();
             if (tour == null || tour.CurrentTourStop == null || !playing)
             {
                 return;
             }
 
             renderContext.Save();
-
             UpdateSlideStates();
 
             if (!onTarget)
             {
                 slideStartTime = Date.Now;
+
                 if (renderContext.OnTarget(Tour.CurrentTourStop.Target))
                 {
-
                     onTarget = true;
                     overlayBlend.State = !Tour.CurrentTourStop.FadeInOverlays;
                     overlayBlend.TargetState = true;
+
                     if (tour.CurrentTourStop.MusicTrack != null)
                     {
                         tour.CurrentTourStop.MusicTrack.Play();
@@ -44,10 +43,11 @@ namespace wwtlib
                     {
                         tour.CurrentTourStop.VoiceTrack.Play();
                     }
+
                     string caption = "";
+
                     foreach (Overlay overlay in tour.CurrentTourStop.Overlays)
                     {
-
                         if (overlay.Name.ToLowerCase() == "caption")
                         {
                             TextOverlay text = overlay as TextOverlay;
@@ -69,13 +69,13 @@ namespace wwtlib
                             //tour.CurrentTourStop.Target.UpdatePlanetLocation(SpaceTimeController.UtcToJulian(tour.CurrentTourStop.StartTime));
                             //tour.CurrentTourStop.EndTarget.UpdatePlanetLocation(SpaceTimeController.UtcToJulian(tour.CurrentTourStop.EndTime));
                         }
-                        renderContext.ViewMover = new ViewMoverKenBurnsStyle(tour.CurrentTourStop.Target.CamParams, tour.CurrentTourStop.EndTarget.CamParams, tour.CurrentTourStop.Duration / 1000.0, tour.CurrentTourStop.StartTime, tour.CurrentTourStop.EndTime, tour.CurrentTourStop.InterpolationType);
 
+                        renderContext.ViewMover = new ViewMoverKenBurnsStyle(tour.CurrentTourStop.Target.CamParams, tour.CurrentTourStop.EndTarget.CamParams, tour.CurrentTourStop.Duration / 1000.0, tour.CurrentTourStop.StartTime, tour.CurrentTourStop.EndTime, tour.CurrentTourStop.InterpolationType);
                     }
+
                     Settings.TourSettings = tour.CurrentTourStop;
                     SpaceTimeController.Now = tour.CurrentTourStop.StartTime;
                     SpaceTimeController.SyncToClock = false;
-
                     WWTControl.scriptInterface.FireSlideChanged(caption);
                 }
             }
@@ -102,7 +102,10 @@ namespace wwtlib
                     {
                         if (overlay.Name.ToLowerCase() != "caption" || WWTControl.scriptInterface.ShowCaptions)
                         {
-                            overlay.TweenFactor = (float)CameraParameters.EaseCurve(tour.CurrentTourStop.TweenPosition, overlay.InterpolationType == InterpolationType.DefaultV ? tour.CurrentTourStop.InterpolationType : overlay.InterpolationType);
+                            overlay.TweenFactor = (float)CameraParameters.EaseCurve(
+                                tour.CurrentTourStop.TweenPosition,
+                                overlay.InterpolationType == InterpolationType.DefaultV ? tour.CurrentTourStop.InterpolationType : overlay.InterpolationType
+                            );
                             overlay.Draw3D(renderContext, false);
                         }
                     }
@@ -117,16 +120,12 @@ namespace wwtlib
             else
             {
                 renderContext.Device.Scale(renderContext.Height / 1116, renderContext.Height / 1116);
-
                 double aspectOrig = 1920 / 1116;
-
                 double aspectNow = renderContext.Width / renderContext.Height;
-
                 renderContext.Device.Translate(-((1920 - (aspectNow * 1116)) / 2), 0);
 
                 //todo Factor opacity in somehow ??
                 //view.overlays.Opacity = overlayBlend.Opacity;
-
 
                 if (currentMasterSlide != null)
                 {
@@ -155,10 +154,6 @@ namespace wwtlib
                 renderContext.Restore();
             }
         }
-
-        BlendState PlayerState = BlendState.Create(false, 2000);
-
-        Date lastHit = Date.Now;
 
         TourDocument tour = null;
 
@@ -214,7 +209,9 @@ namespace wwtlib
                     WWTControl.Singleton.GotoTargetFull(false, true, tour.CurrentTourStop.EndTarget.CamParams, tour.CurrentTourStop.Target.StudyImageset, tour.CurrentTourStop.Target.BackgroundImageset);
                     WWTControl.Singleton.Mover = null;
                 }
+
                 onTarget = false;
+
                 if (tour.CurrentTourStop.IsLinked)
                 {
                     try
@@ -238,7 +235,7 @@ namespace wwtlib
                     }
                     catch
                     {
-                        if ((tour.CurrentTourstopIndex < (tour.TourStops.Count - 1)))
+                        if (tour.CurrentTourstopIndex < (tour.TourStops.Count - 1))
                         {
                             tour.CurrentTourstopIndex++;
                         }
@@ -255,6 +252,7 @@ namespace wwtlib
                 }
 
                 bool instant = false;
+
                 switch (tour.CurrentTourStop.Transition)
                 {
                     case TransitionType.Slew:
@@ -290,6 +288,7 @@ namespace wwtlib
             {
                 StopCurrentMaster();
                 playing = false;
+
                 if (Settings.Current.AutoRepeatTour)
                 {
                     tour.CurrentTourstopIndex = -1;
@@ -362,11 +361,10 @@ namespace wwtlib
                 //if (switchedToFullScreen)
                 //{
                 //    Viewer.MasterView.ShowFullScreen(true);
-
                 //}
             }
-            WWTControl.Singleton.HideUI(true);
 
+            WWTControl.Singleton.HideUI(true);
             playing = true;
 
             if (tour.TourStops.Count > 0)
@@ -463,6 +461,7 @@ namespace wwtlib
             }
 
             playing = false;
+
             if (tour.CurrentTourStop != null)
             {
                 if (tour.CurrentTourStop.MusicTrack != null)
@@ -480,6 +479,7 @@ namespace wwtlib
                     overlay.Stop();
                 }
             }
+
             if (currentMasterSlide != null)
             {
                 if (currentMasterSlide.MusicTrack != null)
@@ -519,15 +519,10 @@ namespace wwtlib
             if (tour.CurrentTourStop != null)
             {
                 tour.CurrentTourStop.TweenPosition = Math.Min(1, (float)(slideElapsedTime / tour.CurrentTourStop.Duration));
-            }
-
-            if (tour.CurrentTourStop != null)
-            {
                 tour.CurrentTourStop.FaderOpacity = 0;
                 //Tile.fastLoad = false;
                 double elapsedSeconds = tour.CurrentTourStop.TweenPosition * tour.CurrentTourStop.Duration / 1000;
 
-                //Document.Title = elapsedSeconds.ToString();
                 if (slideChanging)
                 {
                     WWTControl.Singleton.CrossFadeFrame = false;
@@ -539,6 +534,7 @@ namespace wwtlib
                         tour.CurrentTourStop.FaderOpacity = 0;
                         WWTControl.Singleton.CrossFadeFrame = false;
                         break;
+
                     case TransitionType.CrossCut:
                         {
                             if (slideChanging)
@@ -559,6 +555,7 @@ namespace wwtlib
                             }
                         }
                         break;
+
                     case TransitionType.CrossFade:
                         {
                             WWTControl.Singleton.CrossFadeFrame = true;
@@ -571,6 +568,7 @@ namespace wwtlib
                             }
                         }
                         break;
+
                     case TransitionType.FadeOutIn:
                     case TransitionType.FadeIn:
                         {
@@ -579,6 +577,7 @@ namespace wwtlib
                             tour.CurrentTourStop.FaderOpacity = (float)opacity;
                         }
                         break;
+
                     case TransitionType.FadeOut:
                         WWTControl.Singleton.CrossFadeFrame = false;
                         break;
@@ -592,10 +591,8 @@ namespace wwtlib
                     TransitionType nextTrans = tour.TourStops[tour.CurrentTourstopIndex + 1].Transition;
                     double nextTransTime = tour.TourStops[tour.CurrentTourstopIndex + 1].TransitionOutTime;
 
-
                     switch (nextTrans)
                     {
-
                         case TransitionType.FadeOut:
                         case TransitionType.FadeOutIn:
                             {
@@ -672,13 +669,6 @@ namespace wwtlib
                         return true;
                     }
                 }
-            }
-
-            // This toggle relates to the built-in tour navigation UI, which
-            // is now taken care of at a higher level.
-            if (!PlayerState.State)
-            {
-                PlayerState.TargetState = true;
             }
 
             return false;
