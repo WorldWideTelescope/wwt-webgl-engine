@@ -416,11 +416,11 @@ namespace wwtlib
         {
             if (!tour.CurrentTourStop.MasterSlide)
             {
-                MasterTime currentMaster =  tour.ElapsedTimeSinceLastMaster(tour.CurrentTourstopIndex);
+                MasterTime currentMaster = tour.ElapsedTimeSinceLastMaster(tour.CurrentTourstopIndex);
 
                 if (currentMaster != null && currentMasterSlide != null)
                 {
-                    double elapsed = currentMaster.Durration;
+                    double elapsed = currentMaster.Duration;
                     currentMasterSlide = currentMaster.Master;
 
                     if (currentMasterSlide.MusicTrack != null)
@@ -845,12 +845,12 @@ namespace wwtlib
     public class MasterTime
     {
         public TourStop Master;
-        public double Durration;
+        public double Duration;
 
-        public MasterTime( TourStop master, double durration)
+        public MasterTime(TourStop master, double duration)
         {
             Master = master;
-            Durration = durration;
+            Duration = duration;
         }
     }
 }
