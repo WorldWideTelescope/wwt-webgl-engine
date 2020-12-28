@@ -80,6 +80,7 @@
             :duration="0"
             :interval="0.001"
             :hide-label="true"
+            :use-keyboard="false"
           ></vue-slider>
         </div>
       </template>
