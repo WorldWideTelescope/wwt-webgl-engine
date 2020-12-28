@@ -37,11 +37,13 @@ namespace wwtlib
                     if (tour.CurrentTourStop.MusicTrack != null)
                     {
                         tour.CurrentTourStop.MusicTrack.Play();
+                        tour.CurrentTourStop.MusicTrack.Seek(0);
                     }
 
                     if (tour.CurrentTourStop.VoiceTrack != null)
                     {
                         tour.CurrentTourStop.VoiceTrack.Play();
+                        tour.CurrentTourStop.VoiceTrack.Seek(0);
                     }
 
                     string caption = "";
