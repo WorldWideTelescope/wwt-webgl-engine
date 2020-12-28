@@ -126,7 +126,7 @@ namespace wwtlib
 
                 if (!isDesignTimeOnly || designTime)
                 {
-                    InitiaizeGeometry();
+                    InitializeGeometry();
 
                     UpdateRotation();
 
@@ -175,7 +175,7 @@ namespace wwtlib
             points = null;
         }
 
-        virtual public void InitiaizeGeometry()
+        virtual public void InitializeGeometry()
         {
             if (points == null)
             {
@@ -814,7 +814,7 @@ namespace wwtlib
                 }
 
 
-                InitiaizeGeometry();
+                InitializeGeometry();
 
                 UpdateRotation();
 
@@ -925,7 +925,7 @@ namespace wwtlib
             if (RenderContext.UseGl)
             {
                 InitializeTexture();
-                InitiaizeGeometry();
+                InitializeGeometry();
 
                 UpdateRotation();
 
@@ -1172,11 +1172,11 @@ namespace wwtlib
         }
 
 
-        override public void InitiaizeGeometry()
+        override public void InitializeGeometry()
         {
             if (RenderContext.UseGl)
             {
-                base.InitiaizeGeometry();
+                base.InitializeGeometry();
             }
         }
     }
@@ -1221,7 +1221,7 @@ namespace wwtlib
         {
             if (RenderContext.UseGl)
             {
-                InitiaizeGeometry();
+                InitializeGeometry();
                 sprite.Draw(renderContext, points, points.Length, null, TriangleStrip, Opacity);
             }
             else
@@ -1257,7 +1257,7 @@ namespace wwtlib
             }
         }
 
-        public override void InitiaizeGeometry()
+        public override void InitializeGeometry()
         {
             if (points == null)
             {
@@ -1270,7 +1270,7 @@ namespace wwtlib
                         }
                         break;
                     case ShapeType.Rectagle:
-                        base.InitiaizeGeometry();
+                        base.InitializeGeometry();
                         break;
                     case ShapeType.OpenRectagle:
                         CreateOpenRectGeometry();
@@ -2327,7 +2327,7 @@ namespace wwtlib
             currentFrame = 0;
         }
 
-        override public void InitiaizeGeometry()
+        override public void InitializeGeometry()
         {
             int frameCount = frames;
             if (!String.IsNullOrEmpty(frameSequence))
