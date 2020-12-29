@@ -68,8 +68,8 @@
       </template>
       <template v-else-if="currentTool == 'playback-controls'">
         <div class="playback-controls">
-          <font-awesome-icon v-bind:icon="wwtIsTourPlaying ? 'pause' : 'play'"
-            size="lg" class="clickable" @click="toggleTourPlayback()"></font-awesome-icon>
+          <font-awesome-icon v-bind:icon="tourPlaybackIcon"
+            size="lg" class="clickable" @click="tourPlaybackButtonClicked()"></font-awesome-icon>
           <vue-slider
             class="scrubber"
             v-model="twoWayTourTimecode"
@@ -99,7 +99,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from "vue-property-decorator";
+import { Component, Prop, Watch } from "vue-property-decorator";
 
 import * as screenfull from "screenfull";
 
@@ -157,6 +157,7 @@ export default class Embed extends WWTAwareComponent {
   backgroundImagesets: BackgroundImageset[] = [];
   currentTool: ToolType = null;
   fullscreenModeActive = false;
+  tourPlaybackJustEnded = false;
   windowShape = defaultWindowShape;
 
   get isLoadingState() {
@@ -396,7 +397,19 @@ export default class Embed extends WWTAwareComponent {
     }
   }
 
-  toggleTourPlayback() {
+  get tourPlaybackIcon() {
+    if (this.tourPlaybackJustEnded) {
+      return "undo-alt";
+    }
+
+    if (this.wwtIsTourPlaying) {
+      return "pause";
+    }
+
+    return "play";
+  }
+
+  tourPlaybackButtonClicked() {
     if (this.wwtIsTourPlayerActive) {
       // If we're playing and our window is tall, we have styling active that
       // keeps the WWT widget in a widescreen-ish format to preserve tour
@@ -422,7 +435,13 @@ export default class Embed extends WWTAwareComponent {
         };
       }
 
-      this.toggleTourPlayPauseState();
+      if (this.tourPlaybackJustEnded) {
+        // Restart from beginning. (seekToTourTimecode() starts playback.)
+        this.seekToTourTimecode(0);
+        this.tourPlaybackJustEnded = false;
+      } else {
+        this.toggleTourPlayPauseState();
+      }
 
       if (newView !== null) {
         this.gotoRADecZoom(newView);
@@ -445,6 +464,12 @@ export default class Embed extends WWTAwareComponent {
 
   set twoWayTourTimecode(code: number) {
     this.seekToTourTimecode(code);
+    this.tourPlaybackJustEnded = false;
+  }
+
+  @Watch('wwtTourCompletions')
+  onTourCompletionsChanged(count: number) {
+    this.tourPlaybackJustEnded = true;
   }
 
   // This property is used to achieve a widescreen effect when playing tours

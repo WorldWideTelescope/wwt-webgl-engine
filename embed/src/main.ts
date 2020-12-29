@@ -14,6 +14,7 @@ import {
   faSearchMinus,
   faSearchPlus,
   faSlidersH,
+  faUndoAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -47,6 +48,7 @@ library.add(faRedo);
 library.add(faSearchMinus);
 library.add(faSearchPlus);
 library.add(faSlidersH);
+library.add(faUndoAlt);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 Vue.component('vue-slider', VueSlider);
