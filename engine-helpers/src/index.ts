@@ -184,6 +184,15 @@ export class WWTInstance {
 
       this.tourReadyPromises = [];
     });
+
+    // TourEnded event init:
+    TourPlayer.add_tourEnded((_tpclass) => {
+      const tp = this.getActiveTourPlayer();
+
+      if (tp !== null && this.tourEndedCallback !== null) {
+        this.tourEndedCallback(tp);
+      }
+    });
   }
 
   // Ready promises
@@ -478,6 +487,9 @@ export class WWTInstance {
   private tourReadyPromises: SavedPromise<number, void>[] = [];
   private tourReadySeqnum = 0;
 
+  /** A callback to be invoked when a tour completes playing. */
+  public tourEndedCallback: ((tp: TourPlayer) => void) | null = null;
+
   /** Load a tour from a URL.
    *
    * Once the tour has loaded, you can use [[getActiveTourPlayer]] to get the
@@ -603,5 +615,4 @@ export class WWTInstance {
     // Apply the change.
     player.playFromTourstop(stops[index]);
   }
-
 }
