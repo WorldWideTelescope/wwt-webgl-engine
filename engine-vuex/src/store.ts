@@ -81,6 +81,13 @@ export interface WWTEngineVuexState {
   /** The current mode of the renderer */
   renderType: ImageSetType;
 
+  /** The number of times that a tour has played through to the end.
+   *
+   * The point of this property is that one can watch() it and get alerted to
+   * tour completion.
+   */
+  tourCompletions: number;
+
   /** The total run-time of the current tour, if there is one, measured in seconds. */
   tourRunTime: number | null;
 
@@ -163,6 +170,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   isTourPlaying = false;
   raRad = 0.0;
   renderType = ImageSetType.sky;
+  tourCompletions = 0;
   tourRunTime: number | null = null;
   tourStopStartTimes: number[] = [];
   tourTimecode = 0.0;
@@ -234,6 +242,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       this.isTourPlayerActive = false;
       this.isTourPlaying = false;
     }
+  }
+
+  @Mutation
+  internalIncrementTourCompletions(): void {
+    this.tourCompletions += 1;
   }
 
   @Mutation

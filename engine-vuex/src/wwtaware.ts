@@ -35,6 +35,7 @@ export class WWTAwareComponent extends Vue {
         wwtIsTourPlaying: (state, _getters) => (state as WWTEngineVuexState).isTourPlaying,
         wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
+        wwtTourCompletions: (state, _getters) => (state as WWTEngineVuexState).tourCompletions,
         wwtTourRunTime: (state, _getters) => (state as WWTEngineVuexState).tourRunTime,
         wwtTourStopStartTimes: (state, _getters) => (state as WWTEngineVuexState).tourStopStartTimes,
         wwtTourTimecode: (state, _getters) => (state as WWTEngineVuexState).tourTimecode,
@@ -84,6 +85,7 @@ export class WWTAwareComponent extends Vue {
   wwtIsTourPlaying!: boolean;
   wwtRARad!: number;
   wwtRenderType!: ImageSetType;
+  wwtTourCompletions!: number;
   wwtTourRunTime!: number | null;
   wwtTourStopStartTimes!: number[];
   wwtTourTimecode!: number;
