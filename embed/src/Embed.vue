@@ -674,10 +674,12 @@ body {
 
   .clickable {
     margin: 0 8px;
+    cursor: pointer;
   }
 
   .scrubber {
     flex: 1;
+    cursor: pointer;
   }
 }
 
