@@ -1,5 +1,11 @@
 # rc: micro bump
 
+- Use https:// for some sample URLs. Fixes the tour sample when visiting the site
+  using HTTPS.
+
+
+# @wwtelescope/embed-creator 0.3.1 (2020-12-30)
+
 - No code changes, just making Cranko happy.
 
 

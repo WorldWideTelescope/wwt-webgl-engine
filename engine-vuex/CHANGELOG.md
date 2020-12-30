@@ -1,24 +1,8 @@
-# rc: minor bump
+# See elsewhere for changelog
 
-This release contains a **breaking change.**
+This project’s release notes are curated from the Git history of its main
+branch. You can find them by looking at [the version of this file on the
+`release` branch][branch] or the [GitHub release history][gh-releases].
 
-- Add a variety of APIs to support tour playback (#73, @pkgw)
-- I cannot figure out how to provide both the new `loadTour` and the old
-  `loadAndPlayTour` as separate Actions that share a common implementation. So
-  I've removed `loadAndPlayTour` and replaced it with `loadTour` that takes a
-  `play` boolean argument. To get the old functionality, use the new action and
-  set `play` to true. (In detail, these now need to be mutation-actions and I
-  think that basic issue is that the Vuex module decorator does a lot of funky
-  transformations on the underlying code that make it so that you can't just
-  delegate to a shared async function.)
-- Expose the current zoom level.
-
-
-# @wwtelescope/engine-vuex 0.4.0 (2020-10-09)
-
-- Add an API to adjust the zoom level.
-
-
-# @wwtelescope/engine-vuex 0.3.1 (2020-09-23)
-
-- No code changes; issuing a new release for the Cranko switchover.
+[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/engine-vuex/CHANGELOG.md
+[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases
