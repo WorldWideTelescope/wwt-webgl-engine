@@ -81,7 +81,7 @@
                 v-model="qsb.s.wtmlUrl"
                 name="wtml-input"
                 type="url"
-                placeholder="http://example.com/data.wtml"
+                placeholder="https://example.com/data.wtml"
                 ></b-form-input>
             </b-form-group>
           </b-tab>
@@ -210,7 +210,7 @@
                     v-model="qsb.s.wtmlUrl"
                     name="img-wtml-input"
                     type="url"
-                    placeholder="http://example.com/data.wtml"
+                    placeholder="https://example.com/data.wtml"
                   ></b-form-input>
                 </b-form-group>
 
@@ -250,7 +250,7 @@
             </p>
 
             <p>Looking for a sample? Copy and paste <a
-            href="http://data1.wwtassets.org/packages/2020/06_ngc6441/NGC6441.WTT">this link URL</a>.</p>
+            href="https://data1.wwtassets.org/packages/2020/06_ngc6441/NGC6441.WTT">this link URL</a>.</p>
 
             <b-form-group
               label="Tour URL:"
@@ -259,7 +259,7 @@
                 name="img-tour-url-input"
                 type="url"
                 v-model="qsb.s.tourUrl"
-                placeholder="http://example.com/tour.wtt"
+                placeholder="https://example.com/tour.wtt"
               ></b-form-input>
             </b-form-group>
           </b-tab>
