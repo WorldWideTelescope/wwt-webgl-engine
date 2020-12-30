@@ -24,7 +24,10 @@ namespace wwtlib
                 if (!tiles.ContainsKey(tileKey))
                 {
                     retTile = Imageset.GetNewTile(dataset, level, x, y, parent);
-                    tiles[tileKey] = retTile;
+                    if(retTile != null)
+                    {
+                        tiles[tileKey] = retTile;
+                    }
 
                 }
                 else

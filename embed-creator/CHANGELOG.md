@@ -1,8 +1,15 @@
-# See elsewhere for changelog
+# rc: micro bump
 
-This project’s release notes are curated from the Git history of its main
-branch. You can find them by looking at [the version of this file on the
-`release` branch][branch] or the [GitHub release history][gh-releases].
+- No code changes, just making Cranko happy.
 
-[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/embed-creator/CHANGELOG.md
-[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases
+
+# @wwtelescope/embed-creator 0.3.0 (2020-10-09)
+
+- Add permissions in the recommended embed `<iframe>` HTML. This will allow
+  embeds to fullscreen. We also request some additional permissions that aren't
+  used now, but that we might wish to use in the future.
+
+
+#  @wwtelescope/embed-creator 0.2.1 (2020-09-24)
+
+- No code changes; just issuing a new release for the Cranko switchover.

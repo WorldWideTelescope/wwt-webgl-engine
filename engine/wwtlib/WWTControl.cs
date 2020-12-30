@@ -2421,16 +2421,8 @@ namespace wwtlib
             //todo implement this
         }
 
-        internal void CloseTour()
-        {
-            //todo implement tour close
-        }
         public TourDocument tour = null;
-
-        //public TourEditor TourEditor = null;
         public TourEditTab TourEdit = null;
-
-
 
         public TourDocument CreateTour(string name)
         {
@@ -2459,30 +2451,38 @@ namespace wwtlib
            uiController = TourEdit.TourEditorUI;
         }
 
+        public void LoadTour(string url)
+        {
+            if (uiController is TourPlayer)
+            {
+                TourPlayer player = (TourPlayer) uiController;
+                player.Stop(false);
+            }
+
+            tour = TourDocument.FromUrl(url, delegate {
+                SetupTour();
+
+                TourPlayer player = new TourPlayer();
+                player.Tour = tour;
+                WWTControl.Singleton.uiController = player;
+
+                WWTControl.scriptInterface.FireTourReady();
+            });
+        }
+
         public void PlayTour(string url)
         {
             if (uiController is TourPlayer)
             {
-                TourPlayer player = (TourPlayer)uiController;
+                TourPlayer player = (TourPlayer) uiController;
                 player.Stop(false);
             }
 
-            //LayerManager.TourLayers = true;
-
-            tour = TourDocument.FromUrl(url, delegate
-                    {
-                        //TourPlayer player = new TourPlayer();
-                        //player.Tour = tour;
-                        //tour.CurrentTourstopIndex = -1;
-                        //uiController = player;
-                        //WWTControl.scriptInterface.FireTourReady();
-                        //player.Play();
-
-                        SetupTour();
-                        TourEdit.PlayNow(true);
-                        WWTControl.scriptInterface.FireTourReady();
-                    });
-
+            tour = TourDocument.FromUrl(url, delegate {
+                SetupTour();
+                TourEdit.PlayNow(true /* fromStart */);
+                WWTControl.scriptInterface.FireTourReady();
+            });
         }
 
         public void PlayCurrentTour()
@@ -2492,7 +2492,6 @@ namespace wwtlib
                 TourPlayer player = (TourPlayer)uiController;
                 player.Play();
             }
-
         }
 
         public void PauseCurrentTour()
@@ -2502,7 +2501,6 @@ namespace wwtlib
                 TourPlayer player = (TourPlayer)uiController;
                 player.PauseTour();
             }
-
         }
 
         public void StopCurrentTour()
@@ -2512,6 +2510,11 @@ namespace wwtlib
                 TourPlayer player = (TourPlayer)uiController;
                 player.Stop(false);
             }
+        }
+
+        internal void CloseTour()
+        {
+            //todo implement tour close
         }
 
         public Imageset GetImagesetByName(string name)

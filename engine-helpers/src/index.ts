@@ -184,6 +184,15 @@ export class WWTInstance {
 
       this.tourReadyPromises = [];
     });
+
+    // TourEnded event init:
+    TourPlayer.add_tourEnded((_tpclass) => {
+      const tp = this.getActiveTourPlayer();
+
+      if (tp !== null && this.tourEndedCallback !== null) {
+        this.tourEndedCallback(tp);
+      }
+    });
   }
 
   // Ready promises
@@ -466,12 +475,53 @@ export class WWTInstance {
     return null;
   }
 
+  /** Find out whether a tour is playing.
+   *
+   * For obscure reasons, this is a static method in WWT that is not attached to
+   * a TourPlayer instance. We take one as an argument for future-proofiness.
+   */
+  getIsTourPlaying(_player: TourPlayer): boolean {
+    return TourPlayer.get_playing();
+  }
+
   private tourReadyPromises: SavedPromise<number, void>[] = [];
   private tourReadySeqnum = 0;
 
+  /** A callback to be invoked when a tour completes playing. */
+  public tourEndedCallback: ((tp: TourPlayer) => void) | null = null;
+
+  /** Load a tour from a URL.
+   *
+   * Once the tour has loaded, you can use [[getActiveTourPlayer]] to get the
+   * tour player controller and the underlying tour document.
+   *
+   * @param url The URL of the tour to load and play.
+   * @returns A promise that resolves when the tour has loaded.
+   */
+  async loadTour(url: string): Promise<void> {
+    this.ctl.loadTour(url);
+
+    this.tourReadySeqnum += 1;
+    const seq = this.tourReadySeqnum;
+
+    for (const p of this.tourReadyPromises) {
+      p.reject("superseded");
+    }
+
+    this.tourReadyPromises = [];
+
+    return new Promise((resolve, reject) => {
+      if (this.tourReadySeqnum > seq) {
+        reject("superseded");
+      } else {
+        this.tourReadyPromises.push(new SavedPromise(seq, resolve, reject));
+      }
+    });
+  }
+
   /** Load a tour from a URL and start playing it.
    *
-   * @params url The URL of the tour to load and play.
+   * @param url The URL of the tour to load and play.
    * @returns A promise that resolves when the tour has loaded and started
    * playing.
    */
@@ -494,5 +544,89 @@ export class WWTInstance {
         this.tourReadyPromises.push(new SavedPromise(seq, resolve, reject));
       }
     });
+  }
+
+  /** Find out how far we have progressed into the tour, in seconds.
+   *
+   * This number does not necessarily progress monotonically due to the way that
+   * WWT measures tour playback progress. We associate a start time with each
+   * "stop" in the tour, and can measure progress through a stop, but stops do
+   * not necessarily transition from one to another in linear fashion.
+   *
+   * That being said, this number should range between 0 and the runtime of the
+   * current tour. If no tour is loaded, it will be zero.
+   */
+  getEffectiveTourTimecode(): number {
+    const player = this.getActiveTourPlayer();
+    if (player === null)
+      return 0.0;
+
+    const tour = player.get_tour();
+    if (tour === null)
+      return 0.0;
+
+    const idx = tour.get_currentTourstopIndex();
+    if (idx < 0)
+      return 0.0;
+
+    const base = tour.elapsedTimeTillTourstop(idx);
+    const stop = tour.get_tourStops()[idx];
+    const delta = stop.get_tweenPosition() * stop.get_duration() * 0.001; // ms => s
+    const value = base + delta;
+
+    // It's possible for our math to yield a value slightly larger than the
+    // nominal tour runtime, which can upset code that expects the value to stay
+    // rigorously within that bound. So, clamp it to be sure.
+
+    if (value < 0)
+      return 0.0;
+
+    const runTime = tour.get_runTime() * 0.001; // ms => s
+
+    if (value > runTime)
+      return runTime;
+
+    return value;
+  }
+
+  /** "Seek" tour playback to approximately the specified timecode (in seconds).
+   *
+   * The tour will start playing back.
+   *
+   * This operation is approximate because WWT can only resume playback from the
+   * beginning of a "tour stop". So, if the desired timecode is in the middle of
+   * such a stop, playback will start there, not at the exact value that was
+   * commanded. This can be a little annoying when a slide is long.
+   *
+   * If no tour or tour player is active, nothing happens.
+   */
+  seekToTourTimecode(value: number): void {
+    const player = this.getActiveTourPlayer();
+    if (player === null)
+      return;
+
+    const tour = player.get_tour();
+    if (tour === null)
+      return;
+
+    // Figure out the stop index that best matches the specified timecode.
+    const stops = tour.get_tourStops()
+    let index = stops.length - 1;
+
+    for (let i = 0; i < stops.length; i++) {
+      const tStart = tour.elapsedTimeTillTourstop(i);
+
+      if (tStart >= value) {
+        index = i - 1;
+        break;
+      }
+    }
+
+    if (index < 0) {
+      index = 0;
+    }
+
+    // Apply the change.
+    player.playFromTourstop(stops[index]);
   }
 }
