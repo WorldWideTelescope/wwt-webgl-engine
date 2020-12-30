@@ -36,14 +36,14 @@ namespace wwtlib
 
                     if (tour.CurrentTourStop.MusicTrack != null)
                     {
-                        tour.CurrentTourStop.MusicTrack.Play();
                         tour.CurrentTourStop.MusicTrack.Seek(0);
+                        tour.CurrentTourStop.MusicTrack.Play();
                     }
 
                     if (tour.CurrentTourStop.VoiceTrack != null)
                     {
-                        tour.CurrentTourStop.VoiceTrack.Play();
                         tour.CurrentTourStop.VoiceTrack.Seek(0);
+                        tour.CurrentTourStop.VoiceTrack.Play();
                     }
 
                     string caption = "";
@@ -425,20 +425,20 @@ namespace wwtlib
 
                     if (currentMasterSlide.MusicTrack != null)
                     {
-                        currentMasterSlide.MusicTrack.Play();
                         currentMasterSlide.MusicTrack.Seek(elapsed);
+                        currentMasterSlide.MusicTrack.Play();
                     }
 
                     if (currentMasterSlide.VoiceTrack != null)
                     {
-                        currentMasterSlide.VoiceTrack.Play();
                         currentMasterSlide.VoiceTrack.Seek(elapsed);
+                        currentMasterSlide.VoiceTrack.Play();
                     }
 
                     foreach (Overlay overlay in currentMasterSlide.Overlays)
                     {
-                        overlay.Play();
                         overlay.Seek(elapsed);
+                        overlay.Play();
                     }
                 }
             }
