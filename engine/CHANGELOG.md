@@ -1,3 +1,19 @@
+# @wwtelescope/engine 7.7.0 (2020-12-30)
+
+- Expose a variety of new features to TypeScript to enable the construction of
+  sophisticated tour playback UIs (#73, @pkgw)
+- Fix a variety of bugs in tour playback  (#73, @pkgw):
+  - Fix audio in Safari
+  - Fix a variety of issues related to seeking around
+  - Remove deprecated built-in UI hooks that cause weird interaction behavior
+  - Add ability to preserve tour settings on pause to prevent jumps when things
+    like localHorizonMode have been customized.
+- Improvements to HiPS rendering (#72, @imbasimba)
+  - In case of view order 0-2 tile 404, continue to burrow until order 3 or a
+    tile found. HiPS order 0-2 may be deleted on some servers
+  - Properly wait for HiPS properties to load before showing any HiPS tiles
+  - Fixed point conversion of galactic HiPS
+
 # @wwtelescope/engine 7.6.1 (2020-12-08)
 
 - Improvements to the HiPS implementation. It now looks like it's working

@@ -11,41 +11,45 @@ namespace wwtlib
         public TourPlayer()
         {
         }
+
         BlendState overlayBlend = BlendState.Create(false, 1000);
+
         public void Render(RenderContext renderContext)
         {
-            //window.SetupMatricesOverlays();
             if (tour == null || tour.CurrentTourStop == null || !playing)
             {
                 return;
             }
 
             renderContext.Save();
-
             UpdateSlideStates();
 
             if (!onTarget)
             {
                 slideStartTime = Date.Now;
+
                 if (renderContext.OnTarget(Tour.CurrentTourStop.Target))
                 {
-                    
                     onTarget = true;
                     overlayBlend.State = !Tour.CurrentTourStop.FadeInOverlays;
                     overlayBlend.TargetState = true;
+
                     if (tour.CurrentTourStop.MusicTrack != null)
                     {
+                        tour.CurrentTourStop.MusicTrack.Seek(0);
                         tour.CurrentTourStop.MusicTrack.Play();
                     }
 
                     if (tour.CurrentTourStop.VoiceTrack != null)
                     {
+                        tour.CurrentTourStop.VoiceTrack.Seek(0);
                         tour.CurrentTourStop.VoiceTrack.Play();
                     }
+
                     string caption = "";
+
                     foreach (Overlay overlay in tour.CurrentTourStop.Overlays)
                     {
-                        
                         if (overlay.Name.ToLowerCase() == "caption")
                         {
                             TextOverlay text = overlay as TextOverlay;
@@ -67,25 +71,24 @@ namespace wwtlib
                             //tour.CurrentTourStop.Target.UpdatePlanetLocation(SpaceTimeController.UtcToJulian(tour.CurrentTourStop.StartTime));
                             //tour.CurrentTourStop.EndTarget.UpdatePlanetLocation(SpaceTimeController.UtcToJulian(tour.CurrentTourStop.EndTime));
                         }
-                        renderContext.ViewMover = new ViewMoverKenBurnsStyle(tour.CurrentTourStop.Target.CamParams, tour.CurrentTourStop.EndTarget.CamParams, tour.CurrentTourStop.Duration / 1000.0, tour.CurrentTourStop.StartTime, tour.CurrentTourStop.EndTime, tour.CurrentTourStop.InterpolationType);
 
+                        renderContext.ViewMover = new ViewMoverKenBurnsStyle(tour.CurrentTourStop.Target.CamParams, tour.CurrentTourStop.EndTarget.CamParams, tour.CurrentTourStop.Duration / 1000.0, tour.CurrentTourStop.StartTime, tour.CurrentTourStop.EndTime, tour.CurrentTourStop.InterpolationType);
                     }
+
                     Settings.TourSettings = tour.CurrentTourStop;
                     SpaceTimeController.Now = tour.CurrentTourStop.StartTime;
                     SpaceTimeController.SyncToClock = false;
-
                     WWTControl.scriptInterface.FireSlideChanged(caption);
                 }
             }
 
-            //todo implement gl based tour rendering
             if (renderContext.gl != null)
             {
                 renderContext.SetupMatricesOverlays();
-          
+
                 //todo Factor opacity in somehow ??
                 //view.overlays.Opacity = overlayBlend.Opacity;
-                
+
                 if (currentMasterSlide != null)
                 {
                     foreach (Overlay overlay in currentMasterSlide.Overlays)
@@ -101,31 +104,30 @@ namespace wwtlib
                     {
                         if (overlay.Name.ToLowerCase() != "caption" || WWTControl.scriptInterface.ShowCaptions)
                         {
-                            overlay.TweenFactor = (float)CameraParameters.EaseCurve(tour.CurrentTourStop.TweenPosition, overlay.InterpolationType == InterpolationType.DefaultV ? tour.CurrentTourStop.InterpolationType : overlay.InterpolationType);
+                            overlay.TweenFactor = (float)CameraParameters.EaseCurve(
+                                tour.CurrentTourStop.TweenPosition,
+                                overlay.InterpolationType == InterpolationType.DefaultV ? tour.CurrentTourStop.InterpolationType : overlay.InterpolationType
+                            );
                             overlay.Draw3D(renderContext, false);
                         }
                     }
                 }
 
-
                 renderContext.Restore();
 
+                // There used to be code to draw on-screen tour player controls here.
+                // In the web engine, that kind of work is now taken care of at higher levels.
                 //DrawPlayerControls(renderContext);
             }
             else
             {
-
                 renderContext.Device.Scale(renderContext.Height / 1116, renderContext.Height / 1116);
-
                 double aspectOrig = 1920 / 1116;
-
                 double aspectNow = renderContext.Width / renderContext.Height;
-
                 renderContext.Device.Translate(-((1920 - (aspectNow * 1116)) / 2), 0);
 
                 //todo Factor opacity in somehow ??
                 //view.overlays.Opacity = overlayBlend.Opacity;
-
 
                 if (currentMasterSlide != null)
                 {
@@ -152,216 +154,7 @@ namespace wwtlib
                     int i = 0;
                 }
                 renderContext.Restore();
-
-                DrawPlayerControls(renderContext);
-                
             }
-
-          
-        }
-
-        BlendState PlayerState = BlendState.Create(false, 2000);
-
-        bool middleHover = false;
-        bool leftHover = false;
-        bool rightHover = false;
-
-        bool middleDown = false;
-        bool leftDown = false;
-        bool rightDown = false;  
-        
-        double top = 1;
-        double center =1;
-        
-        void DrawPlayerControls(RenderContext renderContext)
-        {
-            LoadImages();
-
-            if (!imagesLoaded)
-            {
-                
-                return;
-            }
-
-            if (PlayerState.State)
-            {
-                int span = Date.Now - lastHit;
-
-                if (span > 7000)
-                {
-                    PlayerState.TargetState = false;
-                }
-
-
-                CanvasContext2D ctx = renderContext.Device;
-
-                ctx.Save();
-                ctx.Alpha = PlayerState.Opacity;
-                top = renderContext.Height - 60;
-                center = renderContext.Width / 2;
-
-                ImageElement left = leftDown ? buttonPreviousPressed : (leftHover ? buttonPreviousHover : buttonPreviousNormal);
-                ImageElement middle = Playing ? (middleDown ? buttonPausePressed : (middleHover ? buttonPauseHover : buttonPauseNormal)) :
-                                                 (middleDown ? buttonPlayPressed : (middleHover ? buttonPlayHover : buttonPlayNormal));
-                ImageElement right = rightDown ? buttonNextPressed : (rightHover ? buttonNextHover : buttonNextNormal);
-
-                ctx.DrawImage(left, center - 110, top);
-                ctx.DrawImage(right, center, top);
-                ctx.DrawImage(middle, center - 32, top - 4);
-
-                ctx.Restore();
-            }
-        }
-        Date lastHit = Date.Now;
-
-        bool HitTextPlayerControls(Vector2d point, bool click, bool act)
-        {
-
-
-            if (click)
-            {
-                leftDown = false;
-                rightDown = false;
-                middleDown = false;
-            }
-            else
-            {
-                leftHover = false;
-                rightHover = false;
-                middleHover = false;
-
-            }
-
-            if (point.Y < (top - 2))
-            {
-                return false;
-            }
-
-            if (point.X < (center - 32) && point.X > (center - 105))
-            {
-                if (click)
-                {
-
-                    leftDown = true;
-                }
-                else
-                {
-                    leftHover = true;
-                }
-                if (act)
-                {
-                    PlayPreviousSlide();
-                    lastHit = Date.Now;
-                }
-                return true;
-            }
-
-            if (point.X < (center + 105) && point.X > (center + 32))
-            {
-                if (click)
-                {
-
-                    rightDown = true;
-                }
-                else
-                {
-                    rightHover = true;
-                }
-                if (act)
-                {
-                    PlayNextSlide();
-                    lastHit = Date.Now;
-                }
-                return true;
-            }
-
-            if (point.X < (center + 32) && point.X > (center - 32))
-            {
-                if (click)
-                {
-
-                    middleDown = true;
-                }
-                else
-                {
-                    middleHover = true;
-                } 
-                if (act)
-                {
-                    PauseTour();
-                    lastHit = Date.Now;
-                }
-                return true;
-            }
-
-            return false;
-        }
-
-
-        ImageElement buttonNextDisabled;
-        ImageElement buttonNextHover;
-        ImageElement buttonNextNormal;
-        ImageElement buttonNextPressed;
-        ImageElement buttonPauseDisabled;
-        ImageElement buttonPauseHover;
-        ImageElement buttonPauseNormal;
-        ImageElement buttonPausePressed;
-        ImageElement buttonPlayDisabled;
-        ImageElement buttonPlayHover;
-        ImageElement buttonPlayNormal;
-        ImageElement buttonPlayPressed;
-        ImageElement buttonPreviousDisabled;
-        ImageElement buttonPreviousHover;
-        ImageElement buttonPreviousNormal;
-        ImageElement buttonPreviousPressed;
-
-        void LoadImages()
-        {
-            if (!imagesLoaded && !downloading)
-            {
-                buttonNextDisabled = LoadImageElement("images/button_next_disabled.png");
-                buttonNextHover = LoadImageElement("images/button_next_hover.png");
-                buttonNextNormal = LoadImageElement("images/button_next_normal.png");
-                buttonNextPressed = LoadImageElement("images/button_next_pressed.png");
-                buttonPauseDisabled = LoadImageElement("images/button_pause_disabled.png");
-                buttonPauseHover = LoadImageElement("images/button_pause_hover.png");
-                buttonPauseNormal = LoadImageElement("images/button_pause_normal.png");
-                buttonPausePressed = LoadImageElement("images/button_pause_pressed.png");
-                buttonPlayDisabled = LoadImageElement("images/button_play_disabled.png");
-                buttonPlayHover = LoadImageElement("images/button_play_hover.png");
-                buttonPlayNormal = LoadImageElement("images/button_play_normal.png");
-                buttonPlayPressed = LoadImageElement("images/button_play_pressed.png");
-                buttonPreviousDisabled = LoadImageElement("images/button_previous_disabled.png");
-                buttonPreviousHover = LoadImageElement("images/button_previous_hover.png");
-                buttonPreviousNormal = LoadImageElement("images/button_previous_normal.png");
-                buttonPreviousPressed = LoadImageElement("images/button_previous_pressed.png");
-            }
-        }
-
-
-        int imageCount = 0;
-        int imageLoadCount = 0;
-        bool imagesLoaded = false;
-        bool downloading = false;
-        ImageElement LoadImageElement(string url)
-        {
-            imageCount++;
-            imagesLoaded = false;
-            downloading = true;
-            ImageElement temp = (ImageElement)Document.CreateElement("img");
-            temp.Src = url;
-            temp.AddEventListener("load", delegate(ElementEvent e)
-            {
-                imageLoadCount++;
-                if (imageLoadCount == imageCount)
-                {
-                    downloading = false;
-                    imagesLoaded = true;
-                    // Refresh();
-                }
-            }, false);
-
-            return temp;
         }
 
         TourDocument tour = null;
@@ -379,9 +172,11 @@ namespace wwtlib
             get { return playing; }
             set { playing = value; }
         }
+
         bool onTarget = false;
         Date slideStartTime;
         TourStop currentMasterSlide = null;
+
         public void NextSlide()
         {
             if (tour.CurrentTourStop != null)
@@ -416,7 +211,9 @@ namespace wwtlib
                     WWTControl.Singleton.GotoTargetFull(false, true, tour.CurrentTourStop.EndTarget.CamParams, tour.CurrentTourStop.Target.StudyImageset, tour.CurrentTourStop.Target.BackgroundImageset);
                     WWTControl.Singleton.Mover = null;
                 }
+
                 onTarget = false;
+
                 if (tour.CurrentTourStop.IsLinked)
                 {
                     try
@@ -440,7 +237,7 @@ namespace wwtlib
                     }
                     catch
                     {
-                        if ((tour.CurrentTourstopIndex < (tour.TourStops.Count - 1)))
+                        if (tour.CurrentTourstopIndex < (tour.TourStops.Count - 1))
                         {
                             tour.CurrentTourstopIndex++;
                         }
@@ -457,6 +254,7 @@ namespace wwtlib
                 }
 
                 bool instant = false;
+
                 switch (tour.CurrentTourStop.Transition)
                 {
                     case TransitionType.Slew:
@@ -487,13 +285,12 @@ namespace wwtlib
                 Settings.TourSettings = tour.CurrentTourStop;
                 SpaceTimeController.Now = tour.CurrentTourStop.StartTime;
                 SpaceTimeController.SyncToClock = false;
-
-
             }
             else
             {
                 StopCurrentMaster();
                 playing = false;
+
                 if (Settings.Current.AutoRepeatTour)
                 {
                     tour.CurrentTourstopIndex = -1;
@@ -507,7 +304,7 @@ namespace wwtlib
                         TourEnded.Invoke(this, new EventArgs());
                     }
 
-                    ShowEndTourPopup();
+                    //ShowEndTourPopup();
                     WWTControl.Singleton.HideUI(false);
                     WWTControl.scriptInterface.FireTourEnded();
                 }
@@ -537,18 +334,16 @@ namespace wwtlib
             }
         }
 
-        public void ShowEndTourPopup()
-        {
-            //FolderBrowser.Explorer.TourPopupContainer.IsOpen = true;
-            //FolderBrowser.Explorer.TourPopupContents.ShowEndTourPopup(tour);
-
-            //FolderBrowser.Explorer.TourPopupContainer.HorizontalOffset = Viewer.MasterView.ActualWidth / 2 - 300;
-            //FolderBrowser.Explorer.TourPopupContainer.VerticalOffset = Viewer.MasterView.ActualHeight/2-200;
-        }
-
         static public event EventHandler TourEnded;
         static bool switchedToFullScreen = false;
         Stack<int> callStack = new Stack<int>();
+
+        bool leaveSettingsWhenStopped = false;
+
+        public bool LeaveSettingsWhenStopped {
+            get { return leaveSettingsWhenStopped; }
+            set { leaveSettingsWhenStopped = value; }
+        }
 
         public void Play()
         {
@@ -568,65 +363,82 @@ namespace wwtlib
                 //if (switchedToFullScreen)
                 //{
                 //    Viewer.MasterView.ShowFullScreen(true);
-
                 //}
             }
+
             WWTControl.Singleton.HideUI(true);
-
-
             playing = true;
 
             if (tour.TourStops.Count > 0)
             {
                 onTarget = false;
+
                 if (tour.CurrentTourstopIndex == -1)
                 {
                     tour.CurrentTourStop = tour.TourStops[0];
                 }
 
+                // Ensure that all multimedia elements are prepared. When
+                // playing back a tour in a browser, restrictions on autoplay
+                // mean that we have to ensure that all of our multimedia
+                // elements are prepared for playback inside code that is
+                // triggered by a user-initiated event. The PrepMultimedia
+                // callback should do whatever's needed to make sure that media
+                // files are all ready to go.
+
+                foreach (TourStop stop in tour.TourStops)
+                {
+                    if (stop.MusicTrack != null)
+                        stop.MusicTrack.PrepMultimedia();
+
+                    if (stop.VoiceTrack != null)
+                        stop.VoiceTrack.PrepMultimedia();
+
+                    foreach (Overlay overlay in stop.Overlays)
+                    {
+                        overlay.PrepMultimedia();
+                    }
+                }
+
                 if (tour.CurrentTourstopIndex > 0)
                 {
                     PlayMasterForCurrent();
-
                 }
 
-
                 WWTControl.Singleton.GotoTarget(tour.CurrentTourStop.Target, false, true, false);
-
             }
 
             slideStartTime = Date.Now;
             playing = true;
-
         }
 
         private void PlayMasterForCurrent()
         {
             if (!tour.CurrentTourStop.MasterSlide)
             {
-                MasterTime currentMaster =  tour.ElapsedTimeSinceLastMaster(tour.CurrentTourstopIndex);
+                MasterTime currentMaster = tour.ElapsedTimeSinceLastMaster(tour.CurrentTourstopIndex);
 
-                if (currentMaster != null && currentMasterSlide != null)
+                if (currentMaster != null)
                 {
-                    double elapsed = currentMaster.Durration;
+                    double elapsed = currentMaster.Duration;
                     currentMasterSlide = currentMaster.Master;
 
                     if (currentMasterSlide.MusicTrack != null)
                     {
-                        currentMasterSlide.MusicTrack.Play();
                         currentMasterSlide.MusicTrack.Seek(elapsed);
+                        currentMasterSlide.MusicTrack.Play();
                     }
 
                     if (currentMasterSlide.VoiceTrack != null)
                     {
-                        currentMasterSlide.VoiceTrack.Play();
                         currentMasterSlide.VoiceTrack.Seek(elapsed);
+                        currentMasterSlide.VoiceTrack.Play();
                     }
 
                     foreach (Overlay overlay in currentMasterSlide.Overlays)
                     {
-                        overlay.Play();
                         overlay.Seek(elapsed);
+                        overlay.Play();
                     }
                 }
             }
@@ -636,15 +448,22 @@ namespace wwtlib
 
         public void Stop(bool noSwitchBackFullScreen)
         {
-
-
             if (switchedToFullScreen && !noSwitchBackFullScreen)
             {
                // Viewer.MasterView.ShowFullScreen(false);
             }
 
-            Settings.TourSettings = null;
+            // By default, when you stop (or pause) a tour, the main WWT
+            // settings become active again. However, this can cause a jarring
+            // jump if, say, the tour has localHorizonMode active and the main
+            // settings don't. If you activate this option, we'll leave the tour
+            // settings lingering, preventing any dramatic changes.
+            if (!leaveSettingsWhenStopped) {
+                Settings.TourSettings = null;
+            }
+
             playing = false;
+
             if (tour.CurrentTourStop != null)
             {
                 if (tour.CurrentTourStop.MusicTrack != null)
@@ -662,6 +481,7 @@ namespace wwtlib
                     overlay.Stop();
                 }
             }
+
             if (currentMasterSlide != null)
             {
                 if (currentMasterSlide.MusicTrack != null)
@@ -701,15 +521,10 @@ namespace wwtlib
             if (tour.CurrentTourStop != null)
             {
                 tour.CurrentTourStop.TweenPosition = Math.Min(1, (float)(slideElapsedTime / tour.CurrentTourStop.Duration));
-            }
-
-            if (tour.CurrentTourStop != null)
-            {
                 tour.CurrentTourStop.FaderOpacity = 0;
                 //Tile.fastLoad = false;
                 double elapsedSeconds = tour.CurrentTourStop.TweenPosition * tour.CurrentTourStop.Duration / 1000;
 
-                //Document.Title = elapsedSeconds.ToString();
                 if (slideChanging)
                 {
                     WWTControl.Singleton.CrossFadeFrame = false;
@@ -721,6 +536,7 @@ namespace wwtlib
                         tour.CurrentTourStop.FaderOpacity = 0;
                         WWTControl.Singleton.CrossFadeFrame = false;
                         break;
+
                     case TransitionType.CrossCut:
                         {
                             if (slideChanging)
@@ -741,6 +557,7 @@ namespace wwtlib
                             }
                         }
                         break;
+
                     case TransitionType.CrossFade:
                         {
                             WWTControl.Singleton.CrossFadeFrame = true;
@@ -753,6 +570,7 @@ namespace wwtlib
                             }
                         }
                         break;
+
                     case TransitionType.FadeOutIn:
                     case TransitionType.FadeIn:
                         {
@@ -761,6 +579,7 @@ namespace wwtlib
                             tour.CurrentTourStop.FaderOpacity = (float)opacity;
                         }
                         break;
+
                     case TransitionType.FadeOut:
                         WWTControl.Singleton.CrossFadeFrame = false;
                         break;
@@ -774,10 +593,8 @@ namespace wwtlib
                     TransitionType nextTrans = tour.TourStops[tour.CurrentTourstopIndex + 1].Transition;
                     double nextTransTime = tour.TourStops[tour.CurrentTourstopIndex + 1].TransitionOutTime;
 
-
                     switch (nextTrans)
                     {
-
                         case TransitionType.FadeOut:
                         case TransitionType.FadeOutIn:
                             {
@@ -829,7 +646,6 @@ namespace wwtlib
             // todo enable links
             Vector2d location;
 
-
             location = PointToView(Vector2d.Create(e.OffsetX, e.OffsetY));
 
             if (tour == null || tour.CurrentTourStop == null)
@@ -847,40 +663,21 @@ namespace wwtlib
                         Util.OpenUrl(linkItem.Url);
                         return true;
                     }
+
                     if (!string.IsNullOrEmpty(tour.CurrentTourStop.Overlays[i].LinkID))
                     {
                         callStack.Push(tour.CurrentTourstopIndex);
                         PlayFromTourstop(tour.TourStops[tour.GetTourStopIndexByID(tour.CurrentTourStop.Overlays[i].LinkID)]);
                         return true;
                     }
-
                 }
             }
-            if (PlayerState.State)
-            {
-                return HitTextPlayerControls(Vector2d.Create(e.OffsetX, e.OffsetY), true, true);
-            }
-            else
-            {
-                PlayerState.TargetState = true;
-                lastHit = Date.Now;
-            }
-           
 
             return false;
         }
 
         public bool MouseUp(object sender, ElementEvent e)
         {
-            if (leftDown || rightDown || middleDown)
-            {
-                leftDown = false;
-                rightDown = false;
-                middleDown = false;
-                return true;
-            }
-
-          
             return false;
         }
 
@@ -907,34 +704,18 @@ namespace wwtlib
             {
                 if (tour.CurrentTourStop.Overlays[i].HitTest(location) && (!string.IsNullOrEmpty(tour.CurrentTourStop.Overlays[i].Url) || !string.IsNullOrEmpty(tour.CurrentTourStop.Overlays[i].LinkID)))
                 {
-                    //todo change cursor to hand 
+                    //todo change cursor to hand
                     return true;
                 }
             }
+
             //todo set cursor to default
             //Viewer.MasterView.Cursor = null;
-
-            if (PlayerState.State)
-            {
-                return HitTextPlayerControls(Vector2d.Create(e.OffsetX, e.OffsetY), false, false);
-            }
-
-
             return false;
         }
 
         public bool MouseClick(object sender, ElementEvent e)
         {
-            //if (PlayerState.State)
-            //{
-            //    return HitTextPlayerControls(Vector2d.Create(e.OffsetX, e.OffsetY), true, true);
-            //}
-            //else
-            //{
-               
-            //    PlayerState.TargetState = true;
-            //}
-
             return false;
         }
 
@@ -945,43 +726,41 @@ namespace wwtlib
 
         public bool MouseDoubleClick(object sender, ElementEvent e)
         {
-
             return false;
         }
 
         public bool KeyDown(object sender, ElementEvent e)
         {
-
             switch (e.KeyCode)
             {
-                case 27:
+                case 27: // escape
                     Stop(switchedToFullScreen);
                     WWTControl.Singleton.CloseTour();
                     return true;
 
-                case 32:
-
+                case 32: // spacebar
                     PauseTour();
                     return true;
-                case 39:
+
+                case 39: // right arrow
                     PlayNextSlide();
                     return true;
-                case 37:
-                    PlayPreviousSlide();
 
+                case 37: // left arrow
+                    PlayPreviousSlide();
                     return true;
-                case 35:
+
+                case 35: // end key
                     if (tour.TourStops.Count > 0)
                     {
                         PlayFromTourstop(tour.TourStops[tour.TourStops.Count - 1]);
                     }
-
                     return true;
-                case 36:
+
+                case 36: // home key
                     if (tour.TourStops.Count > 0)
                     {
                         PlayFromTourstop(tour.TourStops[0]);
-
                     }
                     return true;
             }
@@ -990,7 +769,7 @@ namespace wwtlib
         }
 
         private void PlayNextSlide()
-       {
+        {
             if ((tour.CurrentTourstopIndex < tour.TourStops.Count - 1) && tour.TourStops.Count > 0)
             {
                 PlayFromTourstop(tour.TourStops[tour.CurrentTourstopIndex + 1]);
@@ -1005,7 +784,7 @@ namespace wwtlib
             }
         }
 
-        private void PlayFromTourstop(TourStop tourStop)
+        public void PlayFromTourstop(TourStop tourStop)
         {
             Stop(true);
             tour.CurrentTourStop = tourStop;
@@ -1035,7 +814,6 @@ namespace wwtlib
             return false;
         }
 
-
         public bool Hover(Vector2d pnt)
         {
             if (playing)
@@ -1052,7 +830,6 @@ namespace wwtlib
             double viewWidth = (clientWidth / clientHeight) * 1116f;
             double x = (((double)pnt.X) / ((double)clientWidth) * viewWidth) - ((viewWidth - 1920) / 2);
             double y = ((double)pnt.Y) / clientHeight * 1116;
-
             return Vector2d.Create(x, y);
         }
     }
@@ -1060,12 +837,12 @@ namespace wwtlib
     public class MasterTime
     {
         public TourStop Master;
-        public double Durration;
+        public double Duration;
 
-        public MasterTime( TourStop master, double durration)
+        public MasterTime(TourStop master, double duration)
         {
             Master = master;
-            Durration = durration;
+            Duration = duration;
         }
     }
 }

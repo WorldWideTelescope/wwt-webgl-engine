@@ -6,15 +6,15 @@
   },
   "dependencies": {
     "@wwtelescope/astro": "^0.1.0",
-    "@wwtelescope/engine": "^7.3.0",
-    "@wwtelescope/engine-types": "^0.1.0"
+    "@wwtelescope/engine": "^7.7.0",
+    "@wwtelescope/engine-types": "^0.2.0"
   },
   "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:^0.1.0",
-    "@wwtelescope/engine": "manual:^7.3.0",
-    "@wwtelescope/engine-types": "manual:^0.1.0"
+    "@wwtelescope/engine": "c318af4a2adb9c9f8785ac6bd9aa7c6817da1b38",
+    "@wwtelescope/engine-types": "thiscommit:2020-12-16:Diniu6ah"
   },
   "keywords": [
     "AAS WorldWide Telescope"
@@ -31,5 +31,5 @@
     "doc": "typedoc",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "version": "0.3.1"
+  "version": "0.4.0"
 }

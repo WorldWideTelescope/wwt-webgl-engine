@@ -22,5 +22,5 @@
     "doc": "typedoc",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "version": "0.1.1"
+  "version": "0.2.0"
 }
