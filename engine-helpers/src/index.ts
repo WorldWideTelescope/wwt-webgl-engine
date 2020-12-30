@@ -572,7 +572,21 @@ export class WWTInstance {
     const base = tour.elapsedTimeTillTourstop(idx);
     const stop = tour.get_tourStops()[idx];
     const delta = stop.get_tweenPosition() * stop.get_duration() * 0.001; // ms => s
-    return base + delta;
+    const value = base + delta;
+
+    // It's possible for our math to yield a value slightly larger than the
+    // nominal tour runtime, which can upset code that expects the value to stay
+    // rigorously within that bound. So, clamp it to be sure.
+
+    if (value < 0)
+      return 0.0;
+
+    const runTime = tour.get_runTime() * 0.001; // ms => s
+
+    if (value > runTime)
+      return runTime;
+
+    return value;
   }
 
   /** "Seek" tour playback to approximately the specified timecode (in seconds).
