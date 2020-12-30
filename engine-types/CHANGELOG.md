@@ -1,9 +1,8 @@
-# @wwtelescope/engine-types 0.2.0 (2020-12-30)
+# See elsewhere for changelog
 
-- Add the SettingsInterface
+This project’s release notes are curated from the Git history of its main
+branch. You can find them by looking at [the version of this file on the
+`release` branch][branch] or the [GitHub release history][gh-releases].
 
-
-# @wwtelescope/engine-types 0.1.1 (2020-09-23)
-
-- No code changes; issuing a new release as part of the Cranko switchover.
-
+[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/engine-types/CHANGELOG.md
+[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases
