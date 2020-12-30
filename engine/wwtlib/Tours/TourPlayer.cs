@@ -418,7 +418,7 @@ namespace wwtlib
             {
                 MasterTime currentMaster = tour.ElapsedTimeSinceLastMaster(tour.CurrentTourstopIndex);
 
-                if (currentMaster != null && currentMasterSlide != null)
+                if (currentMaster != null)
                 {
                     double elapsed = currentMaster.Duration;
                     currentMasterSlide = currentMaster.Master;
