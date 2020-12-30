@@ -7,7 +7,7 @@ import { GotoTargetOptions, SetupForImagesetOptions } from "@wwtelescope/engine-
 
 import {
   GotoRADecZoomParams,
-  LoadAndPlayTourParams,
+  LoadTourParams,
   LoadImageCollectionParams,
   WWTEngineVuexState
 } from "./store";
@@ -26,14 +26,20 @@ export class WWTAwareComponent extends Vue {
 
     this.$options.computed = {
       ...mapState({
-        wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
-        wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         wwtBackgroundImageset: (state, _getters) => (state as WWTEngineVuexState).backgroundImageset,
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
+        wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         wwtForegroundImageset: (state, _getters) => (state as WWTEngineVuexState).foregroundImageset,
         wwtForegroundOpacity: (state, _getters) => (state as WWTEngineVuexState).foregroundOpacity,
         wwtIsTourPlayerActive: (state, _getters) => (state as WWTEngineVuexState).isTourPlayerActive,
+        wwtIsTourPlaying: (state, _getters) => (state as WWTEngineVuexState).isTourPlaying,
+        wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
+        wwtTourCompletions: (state, _getters) => (state as WWTEngineVuexState).tourCompletions,
+        wwtTourRunTime: (state, _getters) => (state as WWTEngineVuexState).tourRunTime,
+        wwtTourStopStartTimes: (state, _getters) => (state as WWTEngineVuexState).tourStopStartTimes,
+        wwtTourTimecode: (state, _getters) => (state as WWTEngineVuexState).tourTimecode,
+        wwtZoomDeg: (state, _getters) => (state as WWTEngineVuexState).zoomDeg,
       }),
       ...mapGetters([
         "lookupImageset",
@@ -50,46 +56,60 @@ export class WWTAwareComponent extends Vue {
       ...mapActions([
         "gotoRADecZoom",
         "gotoTarget",
-        "loadAndPlayTour",
         "loadImageCollection",
+        "loadTour",
         "waitForReady",
       ]),
       ...mapMutations([
         "applySetting",
+        "seekToTourTimecode",
         "setBackgroundImageByName",
         "setForegroundImageByName",
         "setForegroundOpacity",
+        "setTourPlayerLeaveSettingsWhenStopped",
         "setupForImageset",
+        "startTour",
+        "toggleTourPlayPauseState",
         "zoom",
       ]),
     };
   }
 
   // Teach TypeScript about everything we wired up. State:
-  wwtRARad!: number;
-  wwtDecRad!: number;
   wwtBackgroundImageset!: Imageset | null;
   wwtCurrentTime!: Date;
+  wwtDecRad!: number;
   wwtForegroundImageset!: Imageset | null;
   wwtForegroundOpacity!: number;
   wwtIsTourPlayerActive!: boolean;
+  wwtIsTourPlaying!: boolean;
+  wwtRARad!: number;
   wwtRenderType!: ImageSetType;
+  wwtTourCompletions!: number;
+  wwtTourRunTime!: number | null;
+  wwtTourStopStartTimes!: number[];
+  wwtTourTimecode!: number;
+  wwtZoomDeg!: number;
 
   // Getters
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
   applySetting!: (_s: WWTSetting) => void;
+  seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
+  setTourPlayerLeaveSettingsWhenStopped!: (v: boolean) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
+  startTour!: () => void;
+  toggleTourPlayPauseState!: () => void;
   zoom!: (f: number) => void;
 
   // Actions
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
   gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
-  loadAndPlayTour!: (o: LoadAndPlayTourParams) => Promise<void>;
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
+  loadTour!: (o: LoadTourParams) => Promise<void>;
   waitForReady!: () => Promise<void>;
 }

@@ -6,10 +6,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
-import { ImageSetType } from "@wwtelescope/engine-types";
 import { WWTInstance } from "@wwtelescope/engine-helpers";
-
-import { WWTEngineVuexState } from "./store";
 
 let idCounter = 0;
 
@@ -26,19 +23,11 @@ export default class WWTComponent extends Vue {
   beforeCreate() {
     // Wire up this component to its backing Vuex state module.
     const namespace = this.$options.propsData ? (this.$options.propsData as any).wwtNamespace : "wwt";  // eslint-disable-line @typescript-eslint/no-explicit-any
-    const { mapActions, mapMutations, mapState } = createNamespacedHelpers(namespace);
-
-    this.$options.computed = {
-      ...mapState({
-        raRad: (state, _getters) => (state as WWTEngineVuexState).raRad,
-        decRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
-        currentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
-        renderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
-      }),
-    };
+    const { mapActions, mapMutations } = createNamespacedHelpers(namespace);
 
     this.$options.methods = {
       ...mapMutations([
+        "internalIncrementTourCompletions",
         "internalLinkToInstance",
         "internalUnlinkFromInstance",
         "internalUpdate",
@@ -85,6 +74,10 @@ export default class WWTComponent extends Vue {
         this.renderLoopId = window.requestAnimationFrame(render);
       });
     });
+
+    this.wwt.tourEndedCallback = ((_tp) => {
+      this.internalIncrementTourCompletions();
+    });
   }
 
   destroyed() {
@@ -93,14 +86,15 @@ export default class WWTComponent extends Vue {
       this.renderLoopId = undefined;
     }
 
+    if (this.wwt !== undefined) {
+      this.wwt.tourEndedCallback = null;
+    }
+
     this.internalUnlinkFromInstance();
   }
 
   // Hacks to make TypeScript happy with our programmatically-created properties
-  raRad!: number;
-  decRad!: number;
-  currentTime!: Date;
-  renderType!: ImageSetType;
+  internalIncrementTourCompletions!: () => void;
   internalLinkToInstance!: (_wwt: WWTInstance) => void;
   internalUnlinkFromInstance!: () => void;
   internalUpdate!: () => void;

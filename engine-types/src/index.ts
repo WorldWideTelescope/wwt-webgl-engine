@@ -303,3 +303,73 @@ export type WWTSetting =
   [WWTConstellationFilterSetting, ConstellationFilterInterface] |
   [WWTNumberSetting, number] |
   [WWTStringSetting, string];
+
+/** Core settings for the WWT rendering engine.
+ *
+ * This corresponds to the `ISettings` interface, which is implemented by the
+ * `Settings` and `TourStop` classes.
+*/
+export interface SettingsInterface {
+  get_actualPlanetScale(): boolean;
+  get_constellationArtFilter(): ConstellationFilterInterface;
+  get_constellationBoundariesFilter(): ConstellationFilterInterface;
+  get_constellationFiguresFilter(): ConstellationFilterInterface;
+  get_constellationNamesFilter(): ConstellationFilterInterface;
+  get_constellationsEnabled(): string;
+  get_earthCutawayView(): boolean;
+  get_fovCamera(): number;
+  get_fovEyepiece(): number;
+  get_fovTelescope(): number;
+  get_galacticMode(): boolean;
+  get_localHorizonMode(): boolean;
+  get_locationAltitude(): number;
+  get_locationLat(): number;
+  get_locationLng(): number;
+  get_milkyWayModel(): boolean;
+  get_minorPlanetsFilter(): number;
+  get_planetOrbitsFilter(): number;
+  get_showAltAzGrid(): boolean;
+  get_showAltAzGridText(): boolean;
+  get_showClouds(): boolean;
+  get_showConstellationBoundries(): boolean;
+  get_showConstellationFigures(): boolean;
+  get_showConstellationLabels(): boolean;
+  get_showConstellationPictures(): boolean;
+  get_showConstellationSelection(): boolean;
+  get_showConstellations(): boolean;
+  get_showEarthSky(): boolean;
+  get_showEcliptic(): boolean;
+  get_showEclipticGrid(): boolean;
+  get_showEclipticGridText(): boolean;
+  get_showEclipticOverviewText(): boolean;
+  get_showElevationModel(): boolean;
+  get_showEquatorialGridText(): boolean;
+  get_showFieldOfView(): boolean;
+  get_showGalacticGrid(): boolean;
+  get_showGalacticGridText(): boolean;
+  get_showGrid(): boolean;
+  get_showHorizon(): boolean;
+  get_showHorizonPanorama(): boolean;
+  get_showISSModel(): boolean;
+  get_showMoonsAsPointSource(): boolean;
+  get_showPrecessionChart(): boolean;
+  get_showSkyGrids(): boolean;
+  get_showSkyNode(): boolean;
+  get_showSkyOverlays(): boolean;
+  get_showSkyOverlaysIn3d(): boolean;
+  get_showSolarSystem(): boolean;
+  get_solarSystemCMB(): boolean;
+  get_solarSystemCosmos(): boolean;
+  get_solarSystemLighting(): boolean;
+  get_solarSystemMilkyWay(): boolean;
+  get_solarSystemMinorOrbits(): boolean;
+  get_solarSystemMinorPlanets(): boolean;
+  get_solarSystemMultiRes(): boolean;
+  get_solarSystemOrbits(): boolean;
+  get_solarSystemOverlays(): boolean;
+  get_solarSystemPlanets(): boolean;
+  get_solarSystemScale(): number;
+  get_solarSystemStars(): boolean;
+
+  // getSetting()
+}

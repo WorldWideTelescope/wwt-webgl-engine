@@ -20,6 +20,7 @@ namespace wwtlib
         protected bool isDesignTimeOnly = false;
         string name = "";
         public static int NextId = 11231;
+
         public string Name
         {
             get { return name; }
@@ -75,16 +76,13 @@ namespace wwtlib
         {
         }
 
-
         virtual public void Pause()
         {
         }
 
-
         virtual public void Stop()
         {
         }
-
 
         virtual public void Seek(double time)
         {
@@ -128,7 +126,7 @@ namespace wwtlib
 
                 if (!isDesignTimeOnly || designTime)
                 {
-                    InitiaizeGeometry();
+                    InitializeGeometry();
 
                     UpdateRotation();
 
@@ -138,7 +136,7 @@ namespace wwtlib
             }
             else
             {
-             
+
             }
         }
 
@@ -155,6 +153,20 @@ namespace wwtlib
         {
         }
 
+        // This hook exists to deal with web browser autoplay restrictions. In
+        // the strictest case, we can't just start playing media files at will
+        // -- we need to start playing them in response to a user-initiated
+        // event. But there is a generally a scheme in which files are
+        // "unlocked" once they've started to be played, and after that point we
+        // can control their playback more precisely. So, this function should
+        // do any multimedia playback initialization needed. It will be called
+        // when the user initiates tour playback.
+        //
+        // Repeated calls should be idempotent.
+        virtual public void PrepMultimedia()
+        {
+        }
+
         protected PositionColoredTextured[] points = null;
 
         virtual public void CleanUpGeometry()
@@ -163,7 +175,7 @@ namespace wwtlib
             points = null;
         }
 
-        virtual public void InitiaizeGeometry()
+        virtual public void InitializeGeometry()
         {
             if (points == null)
             {
@@ -597,12 +609,12 @@ namespace wwtlib
 
         public virtual void AddFilesToCabinet(FileCabinet fc)
         {
-            
+
         }
 
         public virtual void WriteOverlayProperties(XmlTextWriter xmlWriter)
         {
-            
+
         }
 
 
@@ -682,7 +694,7 @@ namespace wwtlib
                     if (node.Attributes.GetNamedItem("InterpolationType") != null)
                     {
                         InterpolationType = (InterpolationType)Enums.Parse("InterpolationType", node.Attributes.GetNamedItem("InterpolationType").Value);
-                    } 
+                    }
                 }
             }
 
@@ -761,6 +773,7 @@ namespace wwtlib
         }
 
         bool textureReady = false;
+
         public override void InitializeTexture()
         {
             try
@@ -768,7 +781,7 @@ namespace wwtlib
                 if (RenderContext.UseGl)
                 {
                     texture2d = Owner.Owner.GetCachedTexture2d(filename);
-                    textureReady = true;                 
+                    textureReady = true;
                 }
                 else
                 {
@@ -801,7 +814,7 @@ namespace wwtlib
                 }
 
 
-                InitiaizeGeometry();
+                InitializeGeometry();
 
                 UpdateRotation();
 
@@ -912,7 +925,7 @@ namespace wwtlib
             if (RenderContext.UseGl)
             {
                 InitializeTexture();
-                InitiaizeGeometry();
+                InitializeGeometry();
 
                 UpdateRotation();
 
@@ -997,7 +1010,7 @@ namespace wwtlib
 
         private void CalculateTextSize()
         {
-             
+
             if (ctx == null || ce == null)
             {
                 ce = (CanvasElement)Document.CreateElement("canvas");
@@ -1051,9 +1064,6 @@ namespace wwtlib
             ce = null;
             ctx = null;
         }
-
-
-
 
         CanvasContext2D ctx = null;
         CanvasElement ce = null;
@@ -1162,16 +1172,17 @@ namespace wwtlib
         }
 
 
-        override public void InitiaizeGeometry()
+        override public void InitializeGeometry()
         {
             if (RenderContext.UseGl)
             {
-                base.InitiaizeGeometry();
+                base.InitializeGeometry();
             }
         }
     }
 
     public enum ShapeType { Circle = 0, Rectagle = 1, Star = 2, Donut = 3, Arrow = 4, Line = 5, OpenRectagle = 6 };
+
     public class ShapeOverlay : Overlay
     {
 
@@ -1210,7 +1221,7 @@ namespace wwtlib
         {
             if (RenderContext.UseGl)
             {
-                InitiaizeGeometry();
+                InitializeGeometry();
                 sprite.Draw(renderContext, points, points.Length, null, TriangleStrip, Opacity);
             }
             else
@@ -1245,7 +1256,8 @@ namespace wwtlib
 
             }
         }
-        public override void InitiaizeGeometry()
+
+        public override void InitializeGeometry()
         {
             if (points == null)
             {
@@ -1258,7 +1270,7 @@ namespace wwtlib
                         }
                         break;
                     case ShapeType.Rectagle:
-                        base.InitiaizeGeometry();
+                        base.InitializeGeometry();
                         break;
                     case ShapeType.OpenRectagle:
                         CreateOpenRectGeometry();
@@ -1280,6 +1292,7 @@ namespace wwtlib
                 }
             }
         }
+
         private void CreateLineGeometry()
         {
             double centerX = X;
@@ -1312,6 +1325,7 @@ namespace wwtlib
 
             }
         }
+
         private void CreateOpenRectGeometry()
         {
             double centerX = X;
@@ -1366,7 +1380,9 @@ namespace wwtlib
                 points[k + 1].Color = Color;
 
             }
+
             int offset = ((segments + 1) * 2);
+
             for (int j = 0; j <= segmentsHigh; j++)
             {
                 int top = ((segmentsHigh + 1) * 2) + offset - 2;
@@ -1406,7 +1422,9 @@ namespace wwtlib
 
             }
         }
+
         PositionColoredTextured[] pnts;
+
         private void CreateStarGeometry()
         {
             double centerX = X;
@@ -1459,6 +1477,7 @@ namespace wwtlib
             points[11] = pnts[8];
             TriangleStrip = false;
         }
+
         private void CreateArrowGeometry()
         {
             if (points == null)
@@ -1527,6 +1546,7 @@ namespace wwtlib
 
             TriangleStrip = false;
         }
+
         private void CreateDonutGeometry()
         {
             double centerX = X;
@@ -1592,6 +1612,7 @@ namespace wwtlib
 
             }
         }
+
         public override void InitializeTexture()
         {
             switch (ShapeType)
@@ -1651,7 +1672,7 @@ namespace wwtlib
             ctx.Save();
             ctx.Translate(X, Y);
             ctx.Rotate(RotationAngle*RC);
- 
+
             ctx.BeginPath();
             ctx.MoveTo(-Width / 2, -Height / 2);
             ctx.LineTo(Width / 2, -Height / 2);
@@ -1736,7 +1757,7 @@ namespace wwtlib
             ctx.Save();
             ctx.Translate(X, Y);
             ctx.Rotate(RotationAngle * RC);
- 
+
             ctx.BeginPath();
             ctx.MoveTo((-(Width / 2)), (-(Height / 4)));
             ctx.LineTo(((Width / 4)), (-(Height / 4)));
@@ -1792,7 +1813,7 @@ namespace wwtlib
             ctx.Restore();
         }
 
-  
+
         public override void CleanUpGeometry()
         {
             base.CleanUpGeometry();
@@ -1817,22 +1838,26 @@ namespace wwtlib
             ShapeOverlay overlay = new ShapeOverlay();
             overlay.shapeType = shapeType;
             overlay.Owner = currentTourStop;
-            
+
 
             return overlay;
         }
     }
+
     public class AudioOverlay : Overlay
     {
         public override string GetTypeName()
         {
             return "TerraViewer.AudioOverlay";
         }
+
         string filename;
         AudioElement audio = null;
+        bool audioReady = false;
+        bool wantPlaying = false;
         int volume = 100;
-
         bool mute = false;
+        double position = 0;
 
         public bool Mute
         {
@@ -1860,26 +1885,22 @@ namespace wwtlib
         public AudioOverlay()
         {
             isDesignTimeOnly = true;
-
         }
-
-        //void audio_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        //{
-        //    audio.Stop();
-        //}
 
         public override void AddFilesToCabinet(FileCabinet fc)
         {
             fc.AddFile(Owner.Owner.WorkingDirectory + filename, Owner.Owner.GetFileBlob(this.filename));
         }
 
-
         public override void Play()
         {
             if (audio == null)
             {
-                InitializeTexture();
+                PrepMultimedia();
             }
+
+            wantPlaying = true;
+
             if (audio != null && audioReady)
             {
                 audio.Play();
@@ -1888,39 +1909,32 @@ namespace wwtlib
             }
         }
 
-
         public override void Pause()
         {
             if (audio == null)
             {
-                InitializeTexture();
+                PrepMultimedia();
             }
+
+            wantPlaying = false;
+
             if (audio != null && audioReady)
             {
                 audio.Pause();
             }
         }
-
 
         public override void Stop()
         {
-            if (audio == null)
-            {
-                InitializeTexture();
-            }
-            if (audio != null && audioReady)
-            {
-                audio.Pause();
-            }
+            Pause(); // these operations are identical for audio
         }
 
-        double position = 0;
         public override void Seek(double time)
         {
             position = time;
             if (audio == null)
             {
-                InitializeTexture();
+                PrepMultimedia();
             }
             //todo double check time
 
@@ -1936,7 +1950,7 @@ namespace wwtlib
                 }
             }
         }
-        bool audioReady = false;
+
         //public AudioOverlay(RenderContext renderContext, TourStop owner, string filename)
         //{
         //    isDesignTimeOnly = true;
@@ -1948,34 +1962,51 @@ namespace wwtlib
         //    // File.Copy(filename, Owner.Owner.WorkingDirectory + this.filename);
         //}
 
+        public override void PrepMultimedia()
+        {
+            if (audio != null)
+                return;
+
+            audio = (AudioElement)Document.CreateElement("audio");
+            audio.AddEventListener("canplaythrough", delegate {
+                if (!audioReady) {
+                    audioReady = true;
+                    if (wantPlaying) {
+                        Play();
+                    }
+                }
+            }, false);
+
+            // As of December 2020, on Safari, we need to use a <source>
+            // sub-element for the audio to play. If we set src/type on the
+            // parent element the playback breaks. This in turn breaks some
+            // older browsers -- in a world of infinite developer time we'd
+            // choose the behavior based on the browser version.
+            //
+            // The mis-cast here is intentional since ScriptSharp doesn't
+            // have a <source> element definition. It also doesn't have the
+            // "type" property. Sigh.
+            AudioElement source = (AudioElement) Document.CreateElement("source");
+            audio.AppendChild(source);
+            source.Src = Owner.Owner.GetFileStream(this.filename);
+            Script.Literal("source.type = {0}", "audio/mp3"); // TODO! non-MP3 audio formats!
+            audio.Load();
+        }
+
+        // TODO: understand better when/how this function is called. It ought to
+        // be called for every frame by the generic Draw3D implementation since
+        // we never set `texture`, I think. But note that the main music and
+        // voice tracks aren't "rendered" in this way, so this function doesn't
+        // get called for them, it looks.
         public override void InitializeTexture()
         {
-            if (audio == null)
-            {
-                audio = (AudioElement)Document.CreateElement("audio");
-                //audio.AutoPlay = true;
-                //audio.MediaFailed += new EventHandler<ExceptionRoutedEventArgs>(audio_MediaFailed);
-                //audio.MediaOpened += new RoutedEventHandler(audio_MediaOpened);
-                //Viewer.MasterView.audio.Children.Add(audio);
-                audio.Src = Owner.Owner.GetFileStream(this.filename);
-                audio.AddEventListener("canplaythrough", delegate
-                {
-                    if (!audioReady)
-                    {
-                        audioReady = true;
-                        audio_MediaOpened();
-                        audio.Play();
-                    }
-                }, false);
-
-
-            }
-
+            PrepMultimedia();
         }
 
         public override void CleanUp()
         {
             base.CleanUp();
+            wantPlaying = false;
 
             if (audio != null)
             {
@@ -1983,15 +2014,6 @@ namespace wwtlib
                 audio.Src = null;
                 audio = null;
             }
-
-        }
-
-        void audio_MediaOpened()
-        {
-            audio.CurrentTime = position;
-
-            audio.Volume = this.mute ? 0 : (float)(volume / 100.0);
-
         }
 
         AudioType trackType = AudioType.Music;
@@ -2021,6 +2043,7 @@ namespace wwtlib
         {
             XmlNode audio = Util.SelectSingleNode(node, "Audio");
             filename = audio.Attributes.GetNamedItem("Filename").Value;
+
             if (audio.Attributes.GetNamedItem("Volume") != null)
             {
                 volume = int.Parse(audio.Attributes.GetNamedItem("Volume").Value);
@@ -2263,7 +2286,7 @@ namespace wwtlib
             frames = int.Parse(flipbook.Attributes.GetNamedItem("Frames").Value);
 
             loopType = (LoopTypes)Enums.Parse("LoopTypes", flipbook.Attributes.GetNamedItem("Loop").Value);
-            
+
             if (flipbook.Attributes.GetNamedItem("FramesX") != null)
             {
                 FramesX = int.Parse(flipbook.Attributes.GetNamedItem("FramesX").Value);
@@ -2304,7 +2327,7 @@ namespace wwtlib
             currentFrame = 0;
         }
 
-        override public void InitiaizeGeometry()
+        override public void InitializeGeometry()
         {
             int frameCount = frames;
             if (!String.IsNullOrEmpty(frameSequence))
