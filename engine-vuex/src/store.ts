@@ -42,6 +42,17 @@ export interface WWTEngineVuexState {
   /** The current imageset acting as the background imagery, if defined. */
   backgroundImageset: Imageset | null;
 
+  /** The number of times that the WWT engine clock has been changed in a
+   * discontinuous manner.
+   *
+   * The point of this property is that one can watch() it and get alerted to
+   * when this happens.
+   */
+  clockDiscontinuities: number;
+
+  /** The rate at which the WWT engine clock progresses, compared to real time. */
+  clockRate: number;
+
   /** The current WWT clock time of the view, as a UTC Date. */
   currentTime: Date;
 
@@ -162,6 +173,8 @@ export interface LoadImageCollectionParams {
 })
 export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexState {
   backgroundImageset: Imageset | null = null;
+  clockDiscontinuities = 0;
+  clockRate = 1.0;
   currentTime = new Date();
   decRad = 0.0;
   foregroundImageset: Imageset | null = null;
@@ -290,6 +303,23 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot zoom without linking to WWTInstance');
     Vue.$wwt.inst.ctl.zoom(factor);
+  }
+
+  @Mutation
+  setTime(time: Date): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setTime without linking to WWTInstance');
+    Vue.$wwt.inst.stc.set_now(time);
+    this.clockDiscontinuities += 1;
+  }
+
+  @Mutation
+  setClockRate(rate: number): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setClockRate without linking to WWTInstance');
+    Vue.$wwt.inst.stc.set_timeRate(rate);
+    this.clockRate = rate;
+    this.clockDiscontinuities += 1;
   }
 
   @Mutation
