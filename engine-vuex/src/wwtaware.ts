@@ -28,6 +28,7 @@ export class WWTAwareComponent extends Vue {
       ...mapState({
         wwtBackgroundImageset: (state, _getters) => (state as WWTEngineVuexState).backgroundImageset,
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
+        wwtClockRate: (state, _getters) => (state as WWTEngineVuexState).clockRate,
         wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         wwtForegroundImageset: (state, _getters) => (state as WWTEngineVuexState).foregroundImageset,
         wwtForegroundOpacity: (state, _getters) => (state as WWTEngineVuexState).foregroundOpacity,
@@ -64,6 +65,7 @@ export class WWTAwareComponent extends Vue {
         "applySetting",
         "seekToTourTimecode",
         "setBackgroundImageByName",
+        "setClockRate",
         "setForegroundImageByName",
         "setForegroundOpacity",
         "setTourPlayerLeaveSettingsWhenStopped",
@@ -77,6 +79,7 @@ export class WWTAwareComponent extends Vue {
 
   // Teach TypeScript about everything we wired up. State:
   wwtBackgroundImageset!: Imageset | null;
+  wwtClockRate!: number;
   wwtCurrentTime!: Date;
   wwtDecRad!: number;
   wwtForegroundImageset!: Imageset | null;
@@ -98,6 +101,7 @@ export class WWTAwareComponent extends Vue {
   applySetting!: (_s: WWTSetting) => void;
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
+  setClockRate!: (_r: number) => void;
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
   setTourPlayerLeaveSettingsWhenStopped!: (v: boolean) => void;
