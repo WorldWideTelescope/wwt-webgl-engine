@@ -20,20 +20,14 @@ jobs:
       echo "##vso[task.prependpath]$d"
     displayName: Install latest Cranko (Windows)
 
-  - task: NodeTool@0
-    displayName: Set up node.js
-    inputs:
-      versionSpec: '>=12'
-
   - bash: |
       set -xeuo pipefail
       git status # seems to help with mysterious Windows dirtiness issue
       cranko release-workflow apply-versions
-      npm install # update package-lock.json
       git add .
       cranko release-workflow commit
       git show
-    displayName: Generate release commit
+    displayName: Apply versions and generate release commit
 
   # Publish release commit as an artifact -- the next stages will need it.
 
