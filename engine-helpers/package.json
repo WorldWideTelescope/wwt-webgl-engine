@@ -2,7 +2,7 @@
   "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
   "bugs": {
     "email": "wwt@aas.org",
-    "url": "https://github.com/pkgw/wwt-webgl-engine/issues"
+    "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
   },
   "dependencies": {
     "@wwtelescope/astro": "^0.1.0",
@@ -25,7 +25,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "github:pkgw/wwt-webgl-engine",
+  "repository": "github:WorldWideTelesope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
     "doc": "typedoc",
