@@ -70,14 +70,14 @@ steps:
     inputs:
       versionSpec: '>=12'
 
-  ## - bash: npm cache clean -f
-  ##   displayName: npm cache clean
-
   - bash: |
       set -xeuo pipefail
       mkdir -p engine/wwtlib/bin
       cp $PIPELINE_WORKSPACE/scriptsharp/wwtlib.js engine/wwtlib/bin/
     displayName: Restore ScriptSharp wwtlib.js
+
+  - bash: cranko npm lerna-workaround
+    displayName: Fake internal version requirements for Lerna
 
   - bash: npx lerna bootstrap --concurrency=1
     displayName: Lerna NPM setup

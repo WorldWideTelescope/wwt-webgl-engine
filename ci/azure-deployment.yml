@@ -270,11 +270,23 @@ jobs:
       parameters:
         setupBuild: true
         setupNpm: true
+
     - bash: npm run build
       displayName: NPM build
+
+    # Very important! Revert the `cranko npm lerna-workaround` (in
+    # azure-job-setup.yml) that's needed for the build to work reliably.
+    # Nothing about the build process should be embedding the hacked
+    # internal version requirements anywhere that will linger in our
+    # published artifacts.
+
+    - bash: git reset --hard release
+      displayName: Undo Lerna-driven internal requirement mods
+
     - bash: |
         set -xeou pipefail
         cranko npm foreach-released npm publish
       displayName: Publish to NPM
+
     - bash: shred ~/.npmrc
       displayName: Clean up credentials
