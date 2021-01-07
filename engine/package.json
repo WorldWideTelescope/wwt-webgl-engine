@@ -3,7 +3,7 @@
   "browser": "./src/index.js",
   "bugs": {
     "email": "wwt@aas.org",
-    "url": "https://github.com/pkgw/wwt-webgl-engine/issues"
+    "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
   },
   "dependencies": {
     "@wwtelescope/engine-types": "0.0.0-dev.0"
@@ -35,7 +35,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "github:pkgw/wwt-webgl-engine",
+  "repository": "github:WorldWideTelesope/wwt-webgl-engine",
   "scripts": {
     "build": "npm run concat-index && npm run uglify",
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
