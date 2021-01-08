@@ -1,9 +1,22 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
-import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
-import { Folder, Imageset } from "@wwtelescope/engine";
-import { GotoTargetOptions, SetupForImagesetOptions } from "@wwtelescope/engine-helpers";
+import {
+  ImageSetType,
+  WWTSetting,
+} from "@wwtelescope/engine-types";
+
+import {
+  Folder,
+  Imageset,
+  ImageSetLayer,
+} from "@wwtelescope/engine";
+
+import {
+  GotoTargetOptions,
+  LoadFitsLayerOptions,
+  SetupForImagesetOptions,
+} from "@wwtelescope/engine-helpers";
 
 import {
   GotoRADecZoomParams,
@@ -59,6 +72,7 @@ export class WWTAwareComponent extends Vue {
         "gotoRADecZoom",
         "gotoTarget",
         "loadImageCollection",
+        "loadFitsLayer",
         "loadTour",
         "waitForReady",
       ]),
@@ -118,6 +132,7 @@ export class WWTAwareComponent extends Vue {
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
   gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
+  loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
   loadTour!: (o: LoadTourParams) => Promise<void>;
   waitForReady!: () => Promise<void>;
 }
