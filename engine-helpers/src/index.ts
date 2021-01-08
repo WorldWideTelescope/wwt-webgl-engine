@@ -18,6 +18,8 @@ import {
   ConstellationFilter,
   Folder,
   Imageset,
+  LayerManager,
+  LayerManagerObject,
   Place,
   ScriptInterface,
   SpaceTimeControllerObject,
@@ -116,6 +118,7 @@ class SavedPromise<P, T> {
 
 export class WWTInstance {
   readonly ctl: WWTControl;
+  readonly lm: LayerManagerObject;
   readonly si: ScriptInterface;
   readonly stc: SpaceTimeControllerObject;
 
@@ -141,6 +144,7 @@ export class WWTInstance {
       o.startMode as InitControlViewType,
     );
     this.ctl = WWTControl.singleton;
+    this.lm = LayerManager;
     this.stc = SpaceTimeController;
 
     // Override some defaults
