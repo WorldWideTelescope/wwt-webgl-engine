@@ -678,3 +678,25 @@ export type PywwtMessage =
   StretchFitsLayerMessage |
   TrackObjectMessage |
   UpdateTableLayerMessage;
+
+
+/** If the input object is a classic pywwt message, rewrite any relative URLs
+ * that it contains.
+ *
+ * The motivation for this function is to allow data exchange from a
+ * Jupyter(Lab) server to the WWT research app. It is possible to publish data
+ * by hooking into the Jupyter server, but that layer of code doesn't always
+ * know the URL at which it is exposed to the world. So, such layers need to
+ * supply relative URLs in their messages, and then the JavaScript layer needs
+ * to modify those messages to turn them into absolute URLs. That's what this
+ * function enables. The input is modified in-place.
+*/
+export function applyBaseUrlIfApplicable(o: any, baseurl: string) {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (isCreateFitsLayerMessage(o)) {
+    o.url = new URL(o.url, baseurl).toString();
+  } else if (isLoadImageCollectionMessage(o)) {
+    o.url = new URL(o.url, baseurl).toString();
+  } else if (isLoadTourMessage(o)) {
+    o.url = new URL(o.url, baseurl).toString();
+  }
+}
