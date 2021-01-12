@@ -26,9 +26,7 @@
   "typedocOptions": {
     "readme": "../docs/engine-helpers-index.md",
     "out": "../docs/static/apiref/engine-helpers",
-    "mode": "library",
     "gaID": "UA-107473046-3",
-    "excludeNotExported": true,
     "excludePrivate": true,
     "listInvalidSymbolLinks": true
   }

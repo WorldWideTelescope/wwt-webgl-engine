@@ -34,12 +34,9 @@
   "typedocOptions": {
     "readme": "../docs/engine-index.md",
     "out": "../docs/static/apiref/engine",
-    "mode": "file",
     "gaID": "UA-107473046-3",
     "listInvalidSymbolLinks": true,
-    "includeDeclarations": true,
     "excludeExternals": true,
-    "excludeNotExported": true,
     "excludePrivate": true
   }
 }

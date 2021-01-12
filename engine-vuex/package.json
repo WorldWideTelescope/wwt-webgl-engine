@@ -35,7 +35,7 @@
   "repository": "github:WorldWideTelesope/wwt-webgl-engine",
   "scripts": {
     "build": "vue-cli-service build --target lib --name index src/index.ts",
-    "doc": "typedoc",
+    "doc": "typedoc src/index.ts",
     "lint": "vue-cli-service lint src"
   },
   "types": "dist/engine-vuex/src/index.d.ts",
