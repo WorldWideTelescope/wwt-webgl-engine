@@ -1,4 +1,4 @@
-# rc: minor bump
+# rc: force 0.3.0
 
 - Add `classicPywwt.applyBaseUrlIfApplicable`.
 
