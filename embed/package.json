@@ -12,7 +12,7 @@
     "@wwtelescope/engine": "0.0.0-dev.0",
     "@wwtelescope/engine-vuex": "0.0.0-dev.0",
     "screenfull": "^5",
-    "v-tooltip": "=2.0.2",
+    "v-tooltip": "^2.1",
     "vue": "^2.6.11",
     "vue-slider-component": "^3.2.11",
     "vuex": "^3.1.3"
