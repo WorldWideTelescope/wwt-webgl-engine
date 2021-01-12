@@ -123,14 +123,14 @@ export default class App extends WWTAwareComponent {
         instant: msg.instant,
       });
     } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
-      this.pywwtClassicCreateFitsLayer(msg);
+      this.loadFitsLayer({
+        url: msg.url,
+        name: msg.id,
+        gotoTarget: true,
+      });
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
-  }
-
-  pywwtClassicCreateFitsLayer(_m: classicPywwt.CreateFitsLayerMessage) {
-    console.log("TODO");
   }
 
   // Outgoing messages
