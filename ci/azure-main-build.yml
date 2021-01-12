@@ -84,6 +84,18 @@ jobs:
       artifactName: embed-creator
       targetPath: $(Build.ArtifactStagingDirectory)/embed-creator
 
+  - task: CopyFiles@2
+    displayName: Stage research-app artifacts
+    inputs:
+      sourceFolder: research-app/dist
+      targetFolder: $(Build.ArtifactStagingDirectory)/research-app
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish research-app artifacts
+    inputs:
+      artifactName: research-app
+      targetPath: $(Build.ArtifactStagingDirectory)/research-app
+
   # Test
   #
   # In principle we could/should reapply the Lerna workaround here, but correct

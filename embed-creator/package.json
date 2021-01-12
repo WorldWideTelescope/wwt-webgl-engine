@@ -35,7 +35,6 @@
   "repository": "github:WorldWideTelesope/wwt-webgl-engine",
   "scripts": {
     "build": "vue-cli-service build",
-    "doc": "echo OK - no API docs",
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },

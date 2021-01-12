@@ -7,7 +7,9 @@
     "engine-vuex",
     "embed-common",
     "embed",
-    "embed-creator"
+    "embed-creator",
+    "research-app-messages",
+    "research-app"
   ],
   "version": "independent",
   "npmClient": "npm",

@@ -1,0 +1,31 @@
+{
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "bugs": {
+    "email": "wwt@aas.org",
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
+  },
+  "description": "Data structures for messages sent to the AAS WorldWide Telescope research app.",
+  "files": [
+    "dist/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,tsbuildinfo,ttf}"
+  ],
+  "homepage": "https://worldwidetelescope.org/home/",
+  "keywords": [
+    "AAS WorldWide Telescope",
+    "worldwide-telescope"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "name": "@wwtelescope/research-app-messages",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "doc": "typedoc src/index.ts",
+    "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
+  },
+  "types": "dist/index.d.ts",
+  "version": "0.0.0-dev.0"
+}
