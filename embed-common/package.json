@@ -24,7 +24,7 @@
   "repository": "github:WorldWideTelesope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
-    "doc": "typedoc",
+    "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
   "version": "0.2.1"

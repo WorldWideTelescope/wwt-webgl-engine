@@ -15,6 +15,8 @@ import {
   BandPass,
   Classification,
   ConstellationFilterInterface,
+  DataTypes,
+  FadeType,
   FolderGroup,
   FolderRefreshType,
   FolderType,
@@ -24,6 +26,7 @@ import {
   // ReferenceFrameTypes,
   // SolarSystemObjects
   Thumbnail,
+  ScaleTypes,
   SolarSystemObjects,
   SettingsInterface,
 } from "@wwtelescope/engine-types";
@@ -82,8 +85,81 @@ export interface CollectionLoadedEventCallback {
   (si: ScriptInterface, args: CollectionLoadedEventArgs): void;
 }
 
+export class Color {
+  /** The alpha channel value, in the range 0 to 255 (inclusive). */
+  a: number;
+
+  /** The red channel value, in the range 0 to 255 (inclusive). */
+  r: number;
+
+  /** The green channel value, in the range 0 to 255 (inclusive). */
+  g: number;
+
+  /** The blue channel value, in the range 0 to 255 (inclusive). */
+  b: number;
+
+  /** The color name, if defined; otherwise an empty string. */
+  name: string;
+
+  /** If the color's *name* is non-empty, return that. Otherwise return its
+   * textualization in the form `rgb(R,G,B)`. The alpha channel is ignored.
+   */
+  toFormat(): string;
+
+  /** If the color's *name* is non-empty, return that. Otherwise return its
+   * textualization in the form `#RRGGBB`, with hexadecimal values. The alpha
+   * channel is ignored.
+   */
+  toString(): string;
+
+  /** If the color's *name* is non-empty, return that. Otherwise return its
+   * textualization in the form `AARRGGBB`, with hexadecimal values.
+   */
+  toSimpleHex(): string;
+}
+
+export namespace Color {
+  /** Create a new color from individual ARGB components, each in the range 0-255. */
+  export function fromArgb(a: number, r: number, g: number, b: number): Color;
+
+  /** Create a color from its name, as defined by the following schemes:
+   *
+   * - A string of the form `x:A:R:G:B`, where `x` is any text not containing a colon,
+   *   and ARGB are integers between 0 and 255.
+   * - A string of the form `x:name`, where `x` is as above and `name` is lowercased
+   *   and re-evaluated by this function.
+   * - A hex code of the form `#RRGGBB`. Alpha is 255.
+   * - A hex code of the form `AARRGGBB`, with no hash mark.
+   * - The name of one of the HTML Known Colors in lowercase (https://www.w3schools.com/colors/colors_names.asp)
+   * - Otherwise, white.
+   */
+  export function fromName(name: string): Color;
+
+  /** Create a color from a hex string `RRGGBB` with alpha=255. */
+  export function fromHex(hex: string): Color;
+
+  /** Create a color from a hex string `AARRGGBB`. */
+  export function fromSimpleHex(hex: string): Color;}
+
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
+}
+
+export class FitsImage extends WcsImage {
+  histogramMaxCount: number;
+  width: number;
+  height: number;
+  numAxis: number;
+  bZero: number;
+  bScale: number;
+  dataType: DataTypes;
+  containsBlanks: boolean;
+  blankValue: number;
+  maxVal: number;
+  minVal: number;
+  transparentBlack: boolean;
+
+  computeHistogram(count: number): number[];
 }
 
 export class Folder implements Thumbnail {
@@ -146,41 +222,23 @@ export class Folder implements Thumbnail {
   childLoadCallback(callback: Action): void;
 }
 
-export namespace Imageset {
-  export function create(
-    name: string,
-    url: string,
-    dataSetType: ImageSetType,
-    bandPass: BandPass,
-    projection: ProjectionType,
-    imageSetID: number,
-    baseLevel: number,
-    levels: number,
-    unused_tileSize: null,
-    baseTileDegrees: number,
-    extension: string,
-    bottomsUp: boolean,
-    quadTreeMap: string,
-    centerX: number,
-    centerY: number,
-    rotation: number,
-    sparse: boolean,
-    thumbnailUrl: string,
-    defaultSet: boolean,
-    elevationModel: boolean,
-    widthFactor: number,
-    offsetX: number,
-    offsetY: number,
-    creditsText: string,
-    creditsUrl: string,
-    demUrl: string,
-    altUrl: string,
-    meanRadius: number,
-    referenceFrame: string
-  ): Imageset;
+/** An simple Version 4 GUID */
+export class Guid {
+  toString(): string;
 }
 
-/** An imagery layer that can be displayed in WWT. */
+export namespace Guid {
+  /** Create a new, random GUID string (not an instance of the GUID class) */
+  export function create(): string;
+
+  /** Create a new GUID with a random value. */
+  export function newGuid(): Guid;
+
+  /** Create an instance of the GUID class from its string representation. */
+  export function fromString(id: string): Guid;
+}
+
+/** Imagery that can be displayed in WWT. */
 export class Imageset implements Thumbnail {
   get_altUrl(): string;
   set_altUrl(url: string): string;
@@ -286,6 +344,129 @@ export class Imageset implements Thumbnail {
 
   getHashCode(): number;
 }
+
+export namespace Imageset {
+  export function create(
+    name: string,
+    url: string,
+    dataSetType: ImageSetType,
+    bandPass: BandPass,
+    projection: ProjectionType,
+    imageSetID: number,
+    baseLevel: number,
+    levels: number,
+    unused_tileSize: null,
+    baseTileDegrees: number,
+    extension: string,
+    bottomsUp: boolean,
+    quadTreeMap: string,
+    centerX: number,
+    centerY: number,
+    rotation: number,
+    sparse: boolean,
+    thumbnailUrl: string,
+    defaultSet: boolean,
+    elevationModel: boolean,
+    widthFactor: number,
+    offsetX: number,
+    offsetY: number,
+    creditsText: string,
+    creditsUrl: string,
+    demUrl: string,
+    altUrl: string,
+    meanRadius: number,
+    referenceFrame: string
+  ): Imageset;
+}
+
+/** An imageset renderable as its own independent layer. */
+export class ImageSetLayer extends Layer {
+  colorMapperName: string;
+
+  // get_colorMapper(): ColorMapContainer
+  get_colorMapperName(): string;
+  set_colorMapperName(v: string): string;
+  get_imageSet(): Imageset;
+  set_imageSet(v: Imageset): Imageset;
+  get_overrideDefaultLayer(): boolean;
+  set_overrideDefaultLayer(v: boolean): boolean;
+
+  getFitsImage(): FitsImage | null;;
+  setImageScalePhysical(st: ScaleTypes, min: number, max: number): void;
+  setImageScaleRaw(st: ScaleTypes, min: number, max: number): void;
+  setImageZ(z: number): void;
+}
+
+export namespace ImageSetLayer {
+  /** Create a new ImageSetLayer for the specified imageset. */
+  export function create(set: Imageset): ImageSetLayer;
+}
+
+
+export interface ImagesetLoadedCallback {
+  (layer: ImageSetLayer): void;
+}
+
+/** An abstract class for graphical layers that are incorporated into the WWT
+ * rendering engine. */
+export class Layer {
+  id: Guid;
+  loadedFromTour: boolean;
+  tourDocument: TourDocument | null;
+  /** The layer opacity, between 0 and 1. */
+  opacity: number;
+  opened: boolean;
+  version: number;
+  color: Color;
+  enabled: boolean;
+  astronomical: boolean;
+
+  getFileStreamUrl(filename: string): string | null;
+
+  get_astronomical(): boolean;
+  set_astronomical(v: boolean): boolean;
+  get_color(): Color;
+  set_color(v: Color): Color;
+  get_endTime(): Date;
+  set_endTime(v: Date): Date;
+  get_fadeSpan(): number;
+  set_fadeSpan(v: number): number;
+  get_fadeType(): FadeType;
+  set_fadeType(v: FadeType): FadeType;
+  get_name(): string;
+  set_name(v: string): string;
+  get_opacity(): number;
+  set_opaciy(v: number): number;
+  get_opened(): boolean;
+  set_opened(v: boolean): boolean;
+  get_referenceFrame(): string;
+  set_referenceFrame(v: string): string;
+  get_startTime(): Date;
+  set_startTime(v: Date): Date;
+  get_version(): number;
+  set_version(v: number): number;
+}
+
+export namespace LayerManager {
+  export function get_tourLayers(): boolean;
+  export function set_tourLayers(v: boolean): boolean;
+  //export function get_layerMaps(): {[name: string]: LayerMap}
+  export function get_layerList(): {[guidtext: string]: Layer};
+
+  export function add(layer: Layer, updateTree: boolean): void;
+  export function addFitsImageSetLayer(imageset: ImageSetLayer, title: string): ImageSetLayer;
+  export function addImageSetLayer(imageset: Imageset, title: string): ImageSetLayer;
+  export function createSpreadsheetLayer(frame: string, name: string, data: string): /*SpreadSheet*/Layer;
+  export function deleteLayerByID(id: Guid, removeFromParent: boolean, updateTree: boolean): void;
+  // addVoTableLayer
+  export function getMoonFile(url: string): void;
+  export function initLayers(): void;
+  export function mergeToursLayers(): void;
+}
+
+/** An alias for the type implicitly defined by the static
+ * [[LayerManager]] namespace. */
+export type LayerManagerObject = typeof LayerManager;
 
 export class Place implements Thumbnail {
   annotation: string;
@@ -477,8 +658,24 @@ export class ScriptInterface {
    * @param opacity The opacity, between 0 (invisible) and 100 (fully opaque).
    */
   setForegroundOpacity(opacity: number): void;
-}
 
+  /** Initiate the loading of a single-file FITS layer
+   *
+   * Although this function will return an ImageSetLayer object immediately, the
+   * FITS information won't be ready until the FITS file is downloaded and
+   * parsed. The callback will be called after this completes.
+   *
+   * The specified URL will be downloaded and parsed as a FITS file. This API is
+   * therefore insufficient for large datasets, since they become impractical to
+   * download as whole files.
+   */
+  loadFitsLayer(
+    url: string,
+    name: string,
+    gotoTarget: boolean,
+    callback: ImagesetLoadedCallback
+  ): ImageSetLayer;
+}
 
 /** A generic [[ScriptInterface]] callback. */
 export interface ScriptInterfaceCallback {
@@ -983,6 +1180,77 @@ export class TourStop implements SettingsInterface {
  * */
 export interface UiController { }
 
+
+export class WcsImage {
+  cd1_1: number;
+  cd1_2: number;
+  cd2_1: number;
+  cd2_2: number;
+  centerX: number;
+  centerY: number;
+  copyright: string;
+  creditsUrl: string;
+  description: string;
+  filename: string;
+  hasLocation: boolean;
+  hasPixel: boolean;
+  hasRotation: boolean;
+  hasScale: boolean;
+  hasSize: boolean;
+  keywords: string[];
+  referenceX: number;
+  referenceY: number;
+  rotation: number;
+  scaleX: number;
+  scaleY: number;
+  sizeX: number;
+  sizeY: number;
+
+  get_cd1_1(): number;
+  set_cd1_1(v: number): number;
+  get_cd1_2(): number;
+  set_cd1_2(v: number): number;
+  get_cd2_1(): number;
+  set_cd2_1(v: number): number;
+  get_cd2_2(): number;
+  set_cd2_2(v: number): number;
+  get_centerX(): number;
+  set_centerX(v: number): number;
+  get_centerY(): number;
+  set_centerY(v: number): number;
+  get_colorCombine(): boolean;
+  set_colorCombine(v: boolean): boolean;
+  get_copyright(): string;
+  set_copyright(v: string): string;
+  get_creditsUrl(): string;
+  set_creditsUrl(v: string): string;
+  get_description(): string;
+  set_description(v: string): string;
+  get_filename(): string;
+  set_filename(v: string): string;
+  get_keywords(): string[];
+  set_keywords(v: string[]): string[];
+  get_referenceX(): number;
+  set_referenceX(v: number): number;
+  get_referenceY(): number;
+  set_referenceY(v: number): number;
+  get_rotation(): number;
+  set_rotation(v: number): number;
+  get_scaleX(): number;
+  set_scaleX(v: number): number;
+  get_scaleY(): number;
+  set_scaleY(v: number): number;
+  get_sizeX(): number;
+  set_sizeX(v: number): number;
+  get_sizeY(): number;
+  set_sizeY(v: number): number;
+  get_validWcs(): boolean;
+  set_validWcs(v: boolean): boolean;
+
+  adjustScale(width: number, height: number): void;
+  calculateRotationFromCD(): void;
+  calculateScaleFromCD(): void;
+}
 
 export class WWTControl {
   /** Special UI state that may be active such as a [[TourPlayer]]. */

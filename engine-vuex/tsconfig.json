@@ -26,13 +26,9 @@
     "src/**/*.vue"
   ],
   "typedocOptions": {
-    "inputFiles": "dist/engine-vuex/src/index.d.ts",
     "readme": "../docs/engine-vuex-index.md",
     "out": "../docs/static/apiref/engine-vuex",
-    "mode": "library",
     "gaID": "UA-107473046-3",
-    "includeDeclarations": true,
-    "excludeNotExported": true,
     "excludePrivate": true,
     "listInvalidSymbolLinks": true
   }

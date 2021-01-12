@@ -468,7 +468,7 @@ export default class Embed extends WWTAwareComponent {
   }
 
   @Watch('wwtTourCompletions')
-  onTourCompletionsChanged(count: number) {
+  onTourCompletionsChanged(_count: number) {
     this.tourPlaybackJustEnded = true;
   }
 

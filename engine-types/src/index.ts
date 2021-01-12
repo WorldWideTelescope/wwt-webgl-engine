@@ -79,6 +79,22 @@ export enum Classification {
   other = 436207616
 }
 
+export enum DataTypes {
+  byteT = 0,
+  int16T = 1,
+  int32T = 2,
+  floatT = 3,
+  doubleT = 4,
+  none = 5,
+}
+
+export enum FadeType {
+  fadeIn = 1,
+  fadeOut = 2,
+  both = 3,
+  none = 4,
+}
+
 export enum FolderGroup {
   explorer = 0,
   tour = 1,
@@ -154,6 +170,14 @@ export enum ReferenceFrameTypes {
   orbital = 1,
   trajectory = 2,
   synodic = 3
+}
+
+export enum ScaleTypes {
+  linear = 0,
+  log = 1,
+  power = 2,
+  squareRoot = 3,
+  histogramEqualization = 4,
 }
 
 export enum SolarSystemObjects {

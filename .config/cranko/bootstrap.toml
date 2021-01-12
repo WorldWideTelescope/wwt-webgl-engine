@@ -53,3 +53,10 @@ qnames = [
     'npm',
 ]
 version = '1.2.0'
+
+[[project]]
+qnames = [
+    '@wwtelescope/research-app-messages',
+    'npm',
+]
+version = '0.2.0'

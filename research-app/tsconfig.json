@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "..",
     "target": "es5",
     "module": "esnext",
     "composite": true,
@@ -13,30 +14,20 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "outDir": "dist",
     "paths": {
       "@/*": [
         "src/*"
       ]
     },
     "lib": [
-      "esnext",
       "dom",
       "dom.iterable",
-      "scripthost"
+      "es6"
     ]
   },
   "include": [
-    "src/index.d.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "typedocOptions": {
-    "readme": "../docs/engine-index.md",
-    "out": "../docs/static/apiref/engine",
-    "gaID": "UA-107473046-3",
-    "listInvalidSymbolLinks": true,
-    "excludeExternals": true,
-    "excludePrivate": true
-  }
+    "src/**/*.ts",
+    "src/**/*.vue"
+  ]
 }
