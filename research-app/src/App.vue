@@ -123,13 +123,45 @@ export default class App extends WWTAwareComponent {
         instant: msg.instant,
       });
     } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
-      this.loadFitsLayer({
-        url: msg.url,
-        name: msg.id,
-        gotoTarget: true,
-      });
+      this.applyCreateFitsLayerMessage(msg);
+    } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
+      this.applyStretchFitsLayerMessage(msg);
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
+    }
+  }
+
+  // Maps external layer IDs to internal ones
+  private layerIdMap: Map<string, string> = new Map();
+
+  private applyCreateFitsLayerMessage(msg: classicPywwt.CreateFitsLayerMessage): void {
+    this.loadFitsLayer({
+      url: msg.url,
+      name: msg.id,
+      gotoTarget: true,
+    }).then((layer) => {
+      this.layerIdMap.set(msg.id, layer.id.toString());
+    });
+  }
+
+  // Keyed by external, not internal, ID.
+  private layerStretchVersions: Map<string, number> = new Map();
+
+  private applyStretchFitsLayerMessage(msg: classicPywwt.StretchFitsLayerMessage): void {
+    const prev = this.layerStretchVersions.get(msg.id);
+    if (prev !== undefined && msg.version <= prev) {
+      return;
+    }
+
+    // TODO: have a real solution in case the layer isn't yet loaded, etc.
+    const intId = this.layerIdMap.get(msg.id);
+    if (intId !== undefined) {
+      this.stretchFitsLayer({
+        id: intId,
+        stretch: msg.stretch,
+        vmin: msg.vmin,
+        vmax: msg.vmax,
+      });
     }
   }
 

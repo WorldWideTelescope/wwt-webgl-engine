@@ -16,6 +16,7 @@ import {
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetupForImagesetOptions,
+  StretchFitsLayerOptions,
 } from "@wwtelescope/engine-helpers";
 
 import {
@@ -87,6 +88,7 @@ export class WWTAwareComponent extends Vue {
         "setTime",
         "setupForImageset",
         "startTour",
+        "stretchFitsLayer",
         "toggleTourPlayPauseState",
         "zoom",
       ]),
@@ -125,6 +127,7 @@ export class WWTAwareComponent extends Vue {
   setTourPlayerLeaveSettingsWhenStopped!: (v: boolean) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
   startTour!: () => void;
+  stretchFitsLayer!: (o: StretchFitsLayerOptions) => void;
   toggleTourPlayPauseState!: () => void;
   zoom!: (f: number) => void;
 

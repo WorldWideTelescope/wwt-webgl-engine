@@ -17,6 +17,7 @@ import {
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetupForImagesetOptions,
+  StretchFitsLayerOptions,
   WWTInstance
 } from "@wwtelescope/engine-helpers";
 
@@ -460,5 +461,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadFitsLayer without linking to WWTInstance');
     return Vue.$wwt.inst.loadFitsLayer(options);
+  }
+
+  @Mutation
+  stretchFitsLayer(options: StretchFitsLayerOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot stretchFitsLayer without linking to WWTInstance');
+    Vue.$wwt.inst.stretchFitsLayer(options);
   }
 }

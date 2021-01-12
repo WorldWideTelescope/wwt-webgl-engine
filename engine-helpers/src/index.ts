@@ -101,6 +101,21 @@ export interface LoadFitsLayerOptions {
   gotoTarget: boolean;
 }
 
+/** Options for [[WWTInstance.stretchFitsLayer]]. */
+export interface StretchFitsLayerOptions {
+  /** The ID of the FITS layer. */
+  id: string;
+
+  /** The kind of stretch type to use. TODO: enum-ify! 0..4 = lin/log/pow/sqrt/histeq */
+  stretch: number;
+
+  /** The data value to use for the minimum stretch bound. */
+  vmin: number;
+
+  /** The data value to use for the maximum stretch bound. */
+  vmax: number;
+}
+
 /** Options for [[WWTInstance.setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
@@ -373,6 +388,20 @@ export class WWTInstance {
         resolve(layer);
       })
     });
+  }
+
+  /** Change the "stretch" settings on a FITS image layer. */
+  stretchFitsLayer(options: StretchFitsLayerOptions) {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof ImageSetLayer) {
+      layer.setImageScalePhysical(options.stretch, options.vmin, options.vmax);
+
+      // This is kind of random, but follows the pywwt API implementation.
+      const fits = layer.getFitsImage();
+      if (fits !== null) {
+        fits.transparentBlack = false;
+      }
+    }
   }
 
   // "Mutator" type operations -- not async.
