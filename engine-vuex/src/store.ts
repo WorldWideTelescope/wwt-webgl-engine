@@ -6,8 +6,19 @@ import { Module, VuexModule, Mutation, MutationAction, Action } from 'vuex-modul
 
 import { D2R, H2R } from "@wwtelescope/astro";
 import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
-import { Folder, Imageset } from "@wwtelescope/engine";
-import { GotoTargetOptions, SetupForImagesetOptions, WWTInstance } from "@wwtelescope/engine-helpers";
+
+import {
+  Folder,
+  Imageset,
+  ImageSetLayer
+} from "@wwtelescope/engine";
+
+import {
+  GotoTargetOptions,
+  LoadFitsLayerOptions,
+  SetupForImagesetOptions,
+  WWTInstance
+} from "@wwtelescope/engine-helpers";
 
 interface WWTLinkedCallback {
   (): void;
@@ -440,5 +451,14 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
     return Vue.$wwt.inst.loadImageCollection(url);
+  }
+
+  @Action({ rawError: true })
+  async loadFitsLayer(
+    options: LoadFitsLayerOptions
+  ): Promise<ImageSetLayer> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot loadFitsLayer without linking to WWTInstance');
+    return Vue.$wwt.inst.loadFitsLayer(options);
   }
 }

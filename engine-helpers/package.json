@@ -13,8 +13,8 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:^0.1.0",
-    "@wwtelescope/engine": "c318af4a2adb9c9f8785ac6bd9aa7c6817da1b38",
-    "@wwtelescope/engine-types": "thiscommit:2020-12-16:Diniu6ah"
+    "@wwtelescope/engine": "e125514a925458e467fd1369fb76347b94f9113f",
+    "@wwtelescope/engine-types": "f67f54d777d5ce805fdeff45ec012e8ce352d777"
   },
   "keywords": [
     "AAS WorldWide Telescope"
@@ -28,7 +28,7 @@
   "repository": "github:WorldWideTelesope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
-    "doc": "typedoc",
+    "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
   "version": "0.0.0-dev.0"

@@ -18,6 +18,9 @@ import {
   ConstellationFilter,
   Folder,
   Imageset,
+  ImageSetLayer,
+  LayerManager,
+  LayerManagerObject,
   Place,
   ScriptInterface,
   SpaceTimeControllerObject,
@@ -84,6 +87,20 @@ export interface GotoTargetOptions {
   trackObject: boolean;
 }
 
+/** Options for [[WWTInstance.loadFitsLayer]]. */
+export interface LoadFitsLayerOptions {
+  /** The URL of the FITS file. */
+  url: string;
+
+  /** A name to use for the new layer. */
+  name: string;
+
+  /** Whether to seek the view to the positon of the FITS file on the sky,
+   * if/when it successfully loads.
+   */
+  gotoTarget: boolean;
+}
+
 /** Options for [[WWTInstance.setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
@@ -116,6 +133,7 @@ class SavedPromise<P, T> {
 
 export class WWTInstance {
   readonly ctl: WWTControl;
+  readonly lm: LayerManagerObject;
   readonly si: ScriptInterface;
   readonly stc: SpaceTimeControllerObject;
 
@@ -141,6 +159,7 @@ export class WWTInstance {
       o.startMode as InitControlViewType,
     );
     this.ctl = WWTControl.singleton;
+    this.lm = LayerManager;
     this.stc = SpaceTimeController;
 
     // Override some defaults
@@ -338,6 +357,21 @@ export class WWTInstance {
         // through.
         this.collectionLoadedPromises.push(new SavedPromise(url, resolve, reject));
       }
+    });
+  }
+
+  // Layers
+
+  /** Load a remote FITS file into a data layer and display it.
+   *
+   * The FITS file must be downloaded and processed, so this API is
+   * asynchronous, and is not appropriate for files that might be large.
+   */
+  async loadFitsLayer(options: LoadFitsLayerOptions): Promise<ImageSetLayer> {
+    return new Promise((resolve, _reject) => {
+      this.si.loadFitsLayer(options.url, options.name, options.gotoTarget, (layer) => {
+        resolve(layer);
+      })
     });
   }
 

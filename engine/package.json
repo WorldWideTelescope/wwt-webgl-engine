@@ -24,7 +24,7 @@
   ],
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine-types": "thiscommit:2020-12-16:laiv2iuP"
+    "@wwtelescope/engine-types": "f67f54d777d5ce805fdeff45ec012e8ce352d777"
   },
   "keywords": [
     "AAS WorldWide Telescope"
@@ -39,7 +39,7 @@
   "scripts": {
     "build": "npm run concat-index && npm run uglify",
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
-    "doc": "typedoc",
+    "doc": "typedoc src/index.d.ts",
     "lint": "tsc",
     "test": "mocha-headless-chrome -f tests/tests.html -r xunit >tests/results.xml",
     "tscheck": "tsc",
