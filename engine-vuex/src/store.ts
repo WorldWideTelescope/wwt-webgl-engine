@@ -16,6 +16,7 @@ import {
 import {
   GotoTargetOptions,
   LoadFitsLayerOptions,
+  SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
   WWTInstance
@@ -468,5 +469,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot stretchFitsLayer without linking to WWTInstance');
     Vue.$wwt.inst.stretchFitsLayer(options);
+  }
+
+  @Mutation
+  setFitsLayerColormap(options: SetFitsLayerColormapOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setFitsLayerColormap without linking to WWTInstance');
+    Vue.$wwt.inst.setFitsLayerColormap(options);
   }
 }

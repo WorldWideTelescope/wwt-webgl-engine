@@ -15,6 +15,7 @@ import {
 import {
   GotoTargetOptions,
   LoadFitsLayerOptions,
+  SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
 } from "@wwtelescope/engine-helpers";
@@ -82,6 +83,7 @@ export class WWTAwareComponent extends Vue {
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setClockRate",
+        "setFitsLayerColormap",
         "setForegroundImageByName",
         "setForegroundOpacity",
         "setTourPlayerLeaveSettingsWhenStopped",
@@ -121,6 +123,7 @@ export class WWTAwareComponent extends Vue {
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setClockRate!: (_r: number) => void;
+  setFitsLayerColormap!: (_o: SetFitsLayerColormapOptions) => void;
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
   setTime!: (d: Date) => void;

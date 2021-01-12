@@ -116,6 +116,15 @@ export interface StretchFitsLayerOptions {
   vmax: number;
 }
 
+/** Options for [[WWTInstance.setFitsLayerColormap]]. */
+export interface SetFitsLayerColormapOptions {
+  /** The ID of the FITS layer. */
+  id: string;
+
+  /** The name of the colormap. TODO: document! */
+  name: string;
+}
+
 /** Options for [[WWTInstance.setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
@@ -390,7 +399,7 @@ export class WWTInstance {
     });
   }
 
-  /** Change the "stretch" settings on a FITS image layer. */
+  /** Change the "stretch" settings of a FITS image layer. */
   stretchFitsLayer(options: StretchFitsLayerOptions) {
     const layer = this.lm.get_layerList()[options.id];
     if (layer && layer instanceof ImageSetLayer) {
@@ -401,6 +410,14 @@ export class WWTInstance {
       if (fits !== null) {
         fits.transparentBlack = false;
       }
+    }
+  }
+
+  /** Change the colormap settings of a FITS image layer. */
+  setFitsLayerColormap(options: SetFitsLayerColormapOptions) {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof ImageSetLayer) {
+      layer.set_colorMapperName(options.name);
     }
   }
 

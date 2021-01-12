@@ -126,6 +126,8 @@ export default class App extends WWTAwareComponent {
       this.applyCreateFitsLayerMessage(msg);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
       this.applyStretchFitsLayerMessage(msg);
+    } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {
+      this.applySetFitsLayerColormapMessage(msg);
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
@@ -161,6 +163,25 @@ export default class App extends WWTAwareComponent {
         stretch: msg.stretch,
         vmin: msg.vmin,
         vmax: msg.vmax,
+      });
+    }
+  }
+
+  // Keyed by external, not internal, ID.
+  private layerColormapVersions: Map<string, number> = new Map();
+
+  private applySetFitsLayerColormapMessage(msg: classicPywwt.SetFitsLayerColormapMessage): void {
+    const prev = this.layerColormapVersions.get(msg.id);
+    if (prev !== undefined && msg.version <= prev) {
+      return;
+    }
+
+    // TODO: have a real solution in case the layer isn't yet loaded, etc.
+    const intId = this.layerIdMap.get(msg.id);
+    if (intId !== undefined) {
+      this.setFitsLayerColormap({
+        id: intId,
+        name: msg.cmap,
       });
     }
   }
