@@ -8,7 +8,8 @@
     "test": "lerna run test",
     "pack": "lerna exec npm pack",
     "serve-creator": "concurrently \"cd embed && npm run serve -- --port=23000\" \"cd embed-creator && npm run serve -- --port=8080\"",
-    "serve-embed": "cd embed && npm run serve"
+    "serve-embed": "cd embed && npm run serve",
+    "serve-research": "cd research-app && npm run serve"
   },
   "dependencies": {
     "@wwtelescope/astro": "file:astro",
@@ -18,7 +19,9 @@
     "@wwtelescope/engine": "file:engine",
     "@wwtelescope/engine-helpers": "file:engine-helpers",
     "@wwtelescope/engine-types": "file:engine-types",
-    "@wwtelescope/engine-vuex": "file:engine-vuex"
+    "@wwtelescope/engine-vuex": "file:engine-vuex",
+    "@wwtelescope/research-app": "file:research-app",
+    "@wwtelescope/research-app-messages": "file:research-app-messages"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.7.0",

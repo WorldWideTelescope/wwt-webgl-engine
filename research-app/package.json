@@ -1,0 +1,50 @@
+{
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "bugs": {
+    "email": "wwt@aas.org",
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-solid-svg-icons": "^5.13.0",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
+    "@wwtelescope/astro": "0.0.0-dev.0",
+    "@wwtelescope/engine": "0.0.0-dev.0",
+    "@wwtelescope/engine-types": "0.0.0-dev.0",
+    "@wwtelescope/engine-vuex": "0.0.0-dev.0",
+    "@wwtelescope/research-app-messages": "0.0.0-dev.0",
+    "screenfull": "^5",
+    "v-tooltip": "^2.1",
+    "vue": "^2.6.11",
+    "vuex": "^3.1.3"
+  },
+  "description": "The AAS WorldWide Telescope research app.",
+  "devDependencies": {
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-plugin-typescript": "~4.3.0",
+    "@vue/cli-plugin-vuex": "~4.3.0"
+  },
+  "homepage": "https://worldwidetelescope.org/home/",
+  "internalDepVersions": {
+    "@wwtelescope/astro": "manual:^0.1.0",
+    "@wwtelescope/engine": "1ae9e9763cf4ba10b734df4ca9fd71d635fdf77b",
+    "@wwtelescope/engine-types": "f67f54d777d5ce805fdeff45ec012e8ce352d777",
+    "@wwtelescope/engine-vuex": "ce4a6fa0646e9513be8baab368805febe1f6ffaa",
+    "@wwtelescope/research-app-messages": "thiscommit:2021-01-05:pohbaSh3"
+  },
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "license": "MIT",
+  "name": "@wwtelescope/research-app",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
+  "scripts": {
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint src",
+    "serve": "vue-cli-service serve"
+  },
+  "version": "0.0.0-dev.0"
+}
