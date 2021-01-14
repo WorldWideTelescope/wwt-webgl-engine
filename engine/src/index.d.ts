@@ -139,7 +139,8 @@ export namespace Color {
   export function fromHex(hex: string): Color;
 
   /** Create a color from a hex string `AARRGGBB`. */
-  export function fromSimpleHex(hex: string): Color;}
+  export function fromSimpleHex(hex: string): Color;
+}
 
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
