@@ -691,7 +691,7 @@ export type PywwtMessage =
  * to modify those messages to turn them into absolute URLs. That's what this
  * function enables. The input is modified in-place.
 */
-export function applyBaseUrlIfApplicable(o: any, baseurl: string) {  // eslint-disable-line @typescript-eslint/no-explicit-any
+export function applyBaseUrlIfApplicable(o: any, baseurl: string): void {  // eslint-disable-line @typescript-eslint/no-explicit-any
   if (isCreateFitsLayerMessage(o)) {
     o.url = new URL(o.url, baseurl).toString();
   } else if (isLoadImageCollectionMessage(o)) {
