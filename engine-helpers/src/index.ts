@@ -5,15 +5,23 @@ import { D2H, R2D, R2H } from "@wwtelescope/astro";
 
 import {
   ImageSetType,
+  isBaseEngineSetting,
+  isBaseLayerSetting,
+  isBaseImageSetLayerSetting,
 } from "@wwtelescope/engine-types";
 
 import {
+  Color,
+  ConstellationFilter,
   EngineSetting,
   Folder,
   Imageset,
   ImageSetLayer,
+  ImageSetLayerSetting,
+  Layer,
   LayerManager,
   LayerManagerObject,
+  LayerSetting,
   Place,
   ScriptInterface,
   SpaceTimeControllerObject,
@@ -23,6 +31,68 @@ import {
   SpaceTimeController
 } from "@wwtelescope/engine";
 
+// Type guards for the augmented setting types
+
+const engineSettingTypeInfo = {
+  "constellationArtFilter/ConstellationFilter": true,
+  "constellationBoundariesFilter/ConstellationFilter": true,
+  "constellationBoundryColor/Color": true,
+  "constellationFigureColor/Color": true,
+  "constellationFiguresFilter/ConstellationFilter": true,
+  "constellationNamesFilter/ConstellationFilter": true,
+  "constellationSelectionColor/Color": true,
+  "crosshairsColor/Color": true,
+};
+
+/** Type guard function for EngineSetting. */
+export function isEngineSetting(obj: [string, any]): obj is EngineSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  let typekey: string = typeof obj[1];
+
+  if (obj instanceof Color) {
+    typekey = "Color";
+  } else if (obj instanceof ConstellationFilter) {
+    typekey = "ConstellationFilter";
+  }
+
+  const key = obj[0] + "/" + typekey;
+  return (key in engineSettingTypeInfo) || isBaseEngineSetting(obj);
+}
+
+const layerSettingTypeInfo = {
+  "color/Color": true,
+};
+
+/** Type guard function for LayerSetting. */
+export function isLayerSetting(obj: [string, any]): obj is LayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  let typekey: string = typeof obj[1];
+
+  if (obj instanceof Color) {
+    typekey = "Color";
+  }
+
+  const key = obj[0] + "/" + typekey;
+  return (key in layerSettingTypeInfo) || isBaseLayerSetting(obj);
+}
+
+/** Apply a setting to a generic Layer. */
+export function applyLayerSetting(layer: Layer, setting: LayerSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+/** Type guard function for ImageSetLayerSetting. */
+export function isImageSetLayerSetting(obj: [string, any]): obj is ImageSetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  // No special settings specific to non-base ImageSetLayerSetting.
+  return isLayerSetting(obj) || isBaseImageSetLayerSetting(obj);
+}
+
+/** Apply a setting to an ImageSetLayer. */
+export function applyImageSetLayerSetting(layer: ImageSetLayer, setting: ImageSetLayerSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
 
 export const enum InitControlViewType {
   Sky = "Sky",

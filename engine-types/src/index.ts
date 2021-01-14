@@ -286,6 +286,75 @@ export type BaseEngineSetting =
   ["plantOrbitsFilter", number] |
   ["solarSystemScale", number];
 
+// I'm not aware of any smart TypeScripty way to automate the construction of this table :-(
+const baseEngineSettingTypeInfo = {
+  "actualPlanetScale/boolean": true,
+  "constellations/boolean": true,
+  "constellationsEnabled/string": true,
+  "earthCutawayView/boolean": true,
+  "fovCamera/number": true,
+  "fovEyepiece/number": true,
+  "fovTelescope/number": true,
+  "localHorizonMode/boolean": true,
+  "galacticMode/boolean": true,
+  "locationAltitude/number": true,
+  "locationLat/number": true,
+  "locationLng/number": true,
+  "milkyWayModel/boolean": true,
+  "showAltAzGrid/boolean": true,
+  "showAltAzGridText/boolean": true,
+  "showClouds/boolean": true,
+  "showConstellations/boolean": true,
+  "showConstellationBoundries/boolean": true,
+  "showConstellationFigures/boolean": true,
+  "showConstellationLabels/boolean": true,
+  "showConstellationPictures/boolean": true,
+  "showConstellationSelection/boolean": true,
+  "showCrosshairs/boolean": true,
+  "showEarthSky/boolean": true,
+  "showEcliptic/boolean": true,
+  "showEclipticGrid/boolean": true,
+  "showEclipticGridText/boolean": true,
+  "showEclipticOverviewText/boolean": true,
+  "showElevationModel/boolean": true,
+  "showEquatorialGridText/boolean": true,
+  "showFieldOfView/boolean": true,
+  "showGalacticGrid/boolean": true,
+  "showGalacticGridText/boolean": true,
+  "showGrid/boolean": true,
+  "showHorizon/boolean": true,
+  "showHorizonPanorama/boolean": true,
+  "showISSModel/boolean": true,
+  "showMoonsAsPointSource/boolean": true,
+  "showPrecessionChart/boolean": true,
+  "showSkyGrids/boolean": true,
+  "showSkyNode/boolean": true,
+  "showSkyOverlays/boolean": true,
+  "showSkyOverlaysIn3d/boolean": true,
+  "showSolarSystem/boolean": true,
+  "smoothPan/boolean": true,
+  "solarSystemCMB/boolean": true,
+  "solarSystemCosmos/boolean": true,
+  "solarSystemMilkyWay/boolean": true,
+  "solarSystemOrbits/boolean": true,
+  "solarSystemOverlays/boolean": true,
+  "solarSystemLighting/boolean": true,
+  "solarSystemMultiRes/boolean": true,
+  "solarSystemMinorPlanets/boolean": true,
+  "solarSystemMinorOrbits/boolean": true,
+  "solarSystemPlanets/boolean": true,
+  "solarSystemStars/boolean": true,
+  "minorPlanetsFilter/number": true,
+  "plantOrbitsFilter/number": true,
+  "solarSystemScale/number": true,
+}
+
+/** Type guard function for BaseEngineSetting. */
+export function isBaseEngineSetting(obj: [string, any]): obj is BaseEngineSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in baseEngineSettingTypeInfo);
+}
+
 /** Placeholder for the engine ConstellationFilter type. */
 export interface ConstellationFilterInterface {
   clone(): ConstellationFilterInterface;
@@ -359,4 +428,47 @@ export interface SettingsInterface {
   get_solarSystemStars(): boolean;
 
   // getSetting()
+}
+
+/** Settings for instances of the Layer type.  */
+export type BaseLayerSetting =
+  ["astronomical", boolean] |
+  ["fadeSpan", number] |
+  ["name", string] |
+  ["opacity", number] |
+  ["opened", boolean] |
+  ["referenceFrame", string] |
+  ["version", number];
+
+const baseLayerSettingTypeInfo = {
+  "astronomical/boolean": true,
+  "fadeSpan/number": true,
+  "name/string": true,
+  "opacity/number": true,
+  "opened/boolean": true,
+  "referenceFrame/string": true,
+  "version/number": true,
+}
+
+/** Type guard function for BaseLayerSetting. */
+export function isBaseLayerSetting(obj: [string, any]): obj is BaseLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return key in baseLayerSettingTypeInfo;
+}
+
+/** Settings specifically for instances of the ImageSetLayer type.  */
+export type BaseImageSetLayerSetting =
+  BaseLayerSetting |
+  ["colorMapperName", string] |
+  ["overrideDefaultLayer", boolean];
+
+const baseImageSetLayerSettingTypeInfo = {
+  "colorMapperName/string": true,
+  "overrideDefaultLayer/boolean": true,
+};
+
+/** Type guard function for BaseLayerSetting. */
+export function isBaseImageSetLayerSetting(obj: [string, any]): obj is BaseImageSetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in baseImageSetLayerSettingTypeInfo) || isBaseLayerSetting(obj);
 }

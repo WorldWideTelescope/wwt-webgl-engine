@@ -14,6 +14,8 @@ import {
   // AltUnits,
   BandPass,
   BaseEngineSetting,
+  BaseImageSetLayerSetting,
+  BaseLayerSetting,
   Classification,
   ConstellationFilterInterface,
   DataTypes,
@@ -147,10 +149,11 @@ export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
 }
 
-/** The full EngineSetting type, which adds on types that are only provided within
- * the engine itself.
+/** The full EngineSetting type, which augments engine-types' BaseEngineSetting
+ * with types that are only provided within the engine itself.
  */
 export type EngineSetting = BaseEngineSetting |
+  // NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
   ["constellationArtFilter", ConstellationFilter] |
   ["constellationBoundariesFilter", ConstellationFilter] |
   ["constellationBoundryColor", Color] |
@@ -417,6 +420,10 @@ export namespace ImageSetLayer {
   export function create(set: Imageset): ImageSetLayer;
 }
 
+/** The full LayerSetting type, which augments engine-types' BaseImageSetLayerSetting
+ * with types that are only provided within the engine itself.
+ */
+export type ImageSetLayerSetting = LayerSetting | BaseImageSetLayerSetting;
 
 export interface ImagesetLoadedCallback {
   (layer: ImageSetLayer): void;
@@ -482,6 +489,13 @@ export namespace LayerManager {
 /** An alias for the type implicitly defined by the static
  * [[LayerManager]] namespace. */
 export type LayerManagerObject = typeof LayerManager;
+
+/** The full LayerSetting type, which augments engine-types' BaseLayerSetting
+ * with types that are only provided within the engine itself.
+ */
+export type LayerSetting = BaseLayerSetting |
+  // NOTE: isLayerSetting in engine-helpers needs to be kept in sync.
+  ["color", Color];
 
 export class Place implements Thumbnail {
   annotation: string;

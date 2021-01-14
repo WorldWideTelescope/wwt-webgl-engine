@@ -24,7 +24,7 @@
   ],
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine-types": "thiscommit:2021-01-14:he3gei1I"
+    "@wwtelescope/engine-types": "thiscommit:2021-01-14:ShieTee1"
   },
   "keywords": [
     "AAS WorldWide Telescope"
