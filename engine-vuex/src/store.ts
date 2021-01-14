@@ -5,9 +5,10 @@ import Vue from "vue";
 import { Module, VuexModule, Mutation, MutationAction, Action } from 'vuex-module-decorators';
 
 import { D2R, H2R } from "@wwtelescope/astro";
-import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
+import { ImageSetType } from "@wwtelescope/engine-types";
 
 import {
+  EngineSetting,
   Folder,
   Imageset,
   ImageSetLayer
@@ -276,7 +277,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
-  applySetting(setting: WWTSetting): void {
+  applySetting(setting: EngineSetting): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot applySetting without linking to WWTInstance');
     Vue.$wwt.inst.applySetting(setting);

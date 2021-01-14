@@ -3,10 +3,10 @@ import { createNamespacedHelpers } from "vuex";
 
 import {
   ImageSetType,
-  WWTSetting,
 } from "@wwtelescope/engine-types";
 
 import {
+  EngineSetting,
   Folder,
   Imageset,
   ImageSetLayer,
@@ -119,7 +119,7 @@ export class WWTAwareComponent extends Vue {
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
-  applySetting!: (_s: WWTSetting) => void;
+  applySetting!: (_s: EngineSetting) => void;
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setClockRate!: (_r: number) => void;

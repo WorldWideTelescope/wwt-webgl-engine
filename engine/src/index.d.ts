@@ -13,6 +13,7 @@ import {
   // AltTypes,
   // AltUnits,
   BandPass,
+  BaseEngineSetting,
   Classification,
   ConstellationFilterInterface,
   DataTypes,
@@ -145,6 +146,19 @@ export namespace Color {
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
 }
+
+/** The full EngineSetting type, which adds on types that are only provided within
+ * the engine itself.
+ */
+export type EngineSetting = BaseEngineSetting |
+  ["constellationArtFilter", ConstellationFilter] |
+  ["constellationBoundariesFilter", ConstellationFilter] |
+  ["constellationBoundryColor", Color] |
+  ["constellationFigureColor", Color] |
+  ["constellationFiguresFilter", ConstellationFilter] |
+  ["constellationNamesFilter", ConstellationFilter] |
+  ["constellationSelectionColor", Color] |
+  ["crosshairsColor", Color];
 
 export class FitsImage extends WcsImage {
   histogramMaxCount: number;

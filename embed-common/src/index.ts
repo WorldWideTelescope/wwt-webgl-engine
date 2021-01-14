@@ -1,7 +1,7 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-import { WWTSetting, WWTBooleanSetting } from "@wwtelescope/engine-types";
+import { BaseEngineSetting } from "@wwtelescope/engine-types";
 
 // TypeScript magic to allow fallible reverse mapping of string-valued enums.
 // https://stackoverflow.com/q/57922745/3760486
@@ -124,9 +124,9 @@ export class EmbedSettings {
     return s;
   }
 
-  asSettings(): WWTSetting[] {
-    const s: WWTSetting[] = [];
-    s.push([WWTBooleanSetting.showCrosshairs, this.showCrosshairs]);
+  asSettings(): BaseEngineSetting[] {
+    const s: BaseEngineSetting[] = [];
+    s.push(["showCrosshairs", this.showCrosshairs]);
     return s;
   }
 }

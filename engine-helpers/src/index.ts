@@ -4,18 +4,11 @@
 import { D2H, R2D, R2H } from "@wwtelescope/astro";
 
 import {
-  WWTBooleanSetting,
-  WWTColor,
-  WWTColorSetting,
-  WWTConstellationFilterSetting,
-  WWTNumberSetting,
-  WWTSetting,
-  WWTStringSetting,
   ImageSetType,
 } from "@wwtelescope/engine-types";
 
 import {
-  ConstellationFilter,
+  EngineSetting,
   Folder,
   Imageset,
   ImageSetLayer,
@@ -187,10 +180,10 @@ export class WWTInstance {
     this.stc = SpaceTimeController;
 
     // Override some defaults
-    this.applySetting([WWTBooleanSetting.showConstellationBoundries, false]);
-    this.applySetting([WWTBooleanSetting.showConstellationFigures, false]);
-    this.applySetting([WWTBooleanSetting.showConstellationSelection, false]);
-    this.applySetting([WWTBooleanSetting.showCrosshairs, false]);
+    this.applySetting(["showConstellationBoundries", false]);
+    this.applySetting(["showConstellationFigures", false]);
+    this.applySetting(["showConstellationSelection", false]);
+    this.applySetting(["showCrosshairs", false]);
 
     // Ready promise initialization:
     this.si.add_ready((_si) => {
@@ -423,25 +416,10 @@ export class WWTInstance {
 
   // "Mutator" type operations -- not async.
 
-  applySetting(setting: WWTSetting): void {
+  applySetting(setting: EngineSetting): void {
+    const funcName = "set_" + setting[0];
     const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-    let sname: string;
-
-    if (typeof value === "boolean") {
-      sname = WWTBooleanSetting[setting[0]];
-    } else if (typeof value === "number") {
-      sname = WWTNumberSetting[setting[0]];
-    } else if (typeof value === "string") {
-      sname = WWTStringSetting[setting[0]];
-    } else if (value instanceof WWTColor) {
-      sname = WWTColorSetting[setting[0]];
-    } else if (value instanceof ConstellationFilter) {
-      sname = WWTConstellationFilterSetting[setting[0]];
-    } else {
-      throw new Error("can't happen");
-    }
-
-    (this.si.settings as any)["set_" + sname](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+    (this.si.settings as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 
   setBackgroundImageByName(imagesetName: string): void {

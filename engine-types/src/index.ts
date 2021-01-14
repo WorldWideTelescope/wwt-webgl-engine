@@ -223,110 +223,73 @@ export interface Thumbnail {
 
 // TypeScript-ification of the engine settings
 
-export enum WWTBooleanSetting {
-  actualPlanetScale,
-  constellations,
-  earthCutawayView,
-  localHorizonMode,
-  galacticMode,
-  milkyWayModel,
-  showAltAzGrid,
-  showAltAzGridText,
-  showClouds,
-  showConstellations,
-  showConstellationBoundries,
-  showConstellationFigures,
-  showConstellationLabels,
-  showConstellationPictures,
-  showConstellationSelection,
-  showCrosshairs,
-  showEarthSky,
-  showEcliptic,
-  showEclipticGrid,
-  showEclipticGridText,
-  showEclipticOverviewText,
-  showElevationModel,
-  showEquatorialGridText,
-  showFieldOfView,
-  showGalacticGrid,
-  showGalacticGridText,
-  showGrid,
-  showHorizon,
-  showHorizonPanorama,
-  showISSModel,
-  showMoonsAsPointSource,
-  showPrecessionChart,
-  showSkyGrids,
-  showSkyNode,
-  showSkyOverlays,
-  showSkyOverlaysIn3d,
-  showSolarSystem,
-  smoothPan,
-  solarSystemCMB,
-  solarSystemCosmos,
-  solarSystemMilkyWay,
-  solarSystemOrbits,
-  solarSystemOverlays,
-  solarSystemLighting,
-  solarSystemMultiRes,
-  solarSystemMinorPlanets,
-  solarSystemMinorOrbits,
-  solarSystemPlanets,
-  solarSystemStars,
-}
-
-export enum WWTColorSetting {
-  constellationBoundryColor,
-  constellationFigureColor,
-  constellationSelectionColor,
-  crosshairsColor
-}
-
-export enum WWTConstellationFilterSetting {
-  constellationArtFilter,
-  constellationBoundariesFilter,
-  constellationFiguresFilter,
-  constellationNamesFilter
-}
-
-export enum WWTNumberSetting {
-  fovCamera,
-  fovEyepiece,
-  fovTelescope,
-  locationAltitude,
-  locationLat,
-  locationLng,
-  minorPlanetsFilter,
-  plantOrbitsFilter,
-  solarSystemScale
-}
-
-export enum WWTStringSetting {
-  constellationsEnabled
-}
-
-/** TODO: does wwtlib expose a better color type that we should be using? In the
- * Settings class, colors are just straight strings.
- */
-export class WWTColor {
-  c: string;
-
-  constructor(c: string) {
-    this.c = c;
-  }
-}
+/** Settings for the WWT engine that don't depend on types defined in
+ * the engine itself. */
+export type BaseEngineSetting =
+  ["actualPlanetScale", boolean] |
+  ["constellations", boolean] |
+  ["constellationsEnabled", string] |
+  ["earthCutawayView", boolean] |
+  ["fovCamera", number] |
+  ["fovEyepiece", number] |
+  ["fovTelescope", number] |
+  ["localHorizonMode", boolean] |
+  ["galacticMode", boolean] |
+  ["locationAltitude", number] |
+  ["locationLat", number] |
+  ["locationLng", number] |
+  ["milkyWayModel", boolean] |
+  ["showAltAzGrid", boolean] |
+  ["showAltAzGridText", boolean] |
+  ["showClouds", boolean] |
+  ["showConstellations", boolean] |
+  ["showConstellationBoundries", boolean] |
+  ["showConstellationFigures", boolean] |
+  ["showConstellationLabels", boolean] |
+  ["showConstellationPictures", boolean] |
+  ["showConstellationSelection", boolean] |
+  ["showCrosshairs", boolean] |
+  ["showEarthSky", boolean] |
+  ["showEcliptic", boolean] |
+  ["showEclipticGrid", boolean] |
+  ["showEclipticGridText", boolean] |
+  ["showEclipticOverviewText", boolean] |
+  ["showElevationModel", boolean] |
+  ["showEquatorialGridText", boolean] |
+  ["showFieldOfView", boolean] |
+  ["showGalacticGrid", boolean] |
+  ["showGalacticGridText", boolean] |
+  ["showGrid", boolean] |
+  ["showHorizon", boolean] |
+  ["showHorizonPanorama", boolean] |
+  ["showISSModel", boolean] |
+  ["showMoonsAsPointSource", boolean] |
+  ["showPrecessionChart", boolean] |
+  ["showSkyGrids", boolean] |
+  ["showSkyNode", boolean] |
+  ["showSkyOverlays", boolean] |
+  ["showSkyOverlaysIn3d", boolean] |
+  ["showSolarSystem", boolean] |
+  ["smoothPan", boolean] |
+  ["solarSystemCMB", boolean] |
+  ["solarSystemCosmos", boolean] |
+  ["solarSystemMilkyWay", boolean] |
+  ["solarSystemOrbits", boolean] |
+  ["solarSystemOverlays", boolean] |
+  ["solarSystemLighting", boolean] |
+  ["solarSystemMultiRes", boolean] |
+  ["solarSystemMinorPlanets", boolean] |
+  ["solarSystemMinorOrbits", boolean] |
+  ["solarSystemPlanets", boolean] |
+  ["solarSystemStars", boolean] |
+  ["minorPlanetsFilter", number] |
+  ["plantOrbitsFilter", number] |
+  ["solarSystemScale", number];
 
 /** Placeholder for the engine ConstellationFilter type. */
 export interface ConstellationFilterInterface {
   clone(): ConstellationFilterInterface;
 }
-
-export type WWTSetting =
-  [WWTBooleanSetting, boolean] |
-  [WWTColorSetting, WWTColor] |
-  [WWTConstellationFilterSetting, ConstellationFilterInterface] |
-  [WWTNumberSetting, number] |
-  [WWTStringSetting, string];
 
 /** Core settings for the WWT rendering engine.
  *
