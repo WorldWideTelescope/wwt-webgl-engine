@@ -131,6 +131,31 @@ export default class App extends WWTAwareComponent {
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
+
+    // { event: "image_layer_set", id: "730025ba-e13d-4e81-a89f-d0b18579ecdc", setting: "opacity", value: 1 }
+
+    // TODO:
+    // AddLinePointMessage
+    // AddPolygonPointMessage
+    // ClearAnnotationsMessage
+    // CreateAnnotationMessage
+    // CreateTableLayerMessage
+    // LoadTourMessage
+    // ModifyAnnotationMessage
+    // ModifyFitsLayerMessage
+    // ModifyTableLayerMessage
+    // ModifySettingMessage
+    // PauseTimeMessage
+    // PauseTourMessage
+    // RemoveAnnotationMessage
+    // RemoveFitsLayerMessage
+    // RemoveTableLayerMessage
+    // ResumeTourMessage
+    // ResumeTimeMessage
+    // SetCircleCenterMessage
+    // SetDatetimeMessage
+    // TrackObjectMessage
+    // UpdateTableLayerMessage
   }
 
   // Maps external layer IDs to internal ones
