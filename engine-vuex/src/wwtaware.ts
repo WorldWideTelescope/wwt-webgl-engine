@@ -3,19 +3,22 @@ import { createNamespacedHelpers } from "vuex";
 
 import {
   ImageSetType,
-  WWTSetting,
 } from "@wwtelescope/engine-types";
 
 import {
+  EngineSetting,
   Folder,
   Imageset,
   ImageSetLayer,
 } from "@wwtelescope/engine";
 
 import {
+  ApplyFitsLayerSettingsOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
+  SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
+  StretchFitsLayerOptions,
 } from "@wwtelescope/engine-helpers";
 
 import {
@@ -77,16 +80,19 @@ export class WWTAwareComponent extends Vue {
         "waitForReady",
       ]),
       ...mapMutations([
+        "applyFitsLayerSettings",
         "applySetting",
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setClockRate",
+        "setFitsLayerColormap",
         "setForegroundImageByName",
         "setForegroundOpacity",
         "setTourPlayerLeaveSettingsWhenStopped",
         "setTime",
         "setupForImageset",
         "startTour",
+        "stretchFitsLayer",
         "toggleTourPlayPauseState",
         "zoom",
       ]),
@@ -115,16 +121,19 @@ export class WWTAwareComponent extends Vue {
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
-  applySetting!: (_s: WWTSetting) => void;
+  applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
+  applySetting!: (_s: EngineSetting) => void;
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setClockRate!: (_r: number) => void;
+  setFitsLayerColormap!: (_o: SetFitsLayerColormapOptions) => void;
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
   setTime!: (d: Date) => void;
   setTourPlayerLeaveSettingsWhenStopped!: (v: boolean) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
   startTour!: () => void;
+  stretchFitsLayer!: (o: StretchFitsLayerOptions) => void;
   toggleTourPlayPauseState!: () => void;
   zoom!: (f: number) => void;
 

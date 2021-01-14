@@ -47,6 +47,7 @@
 import * as screenfull from "screenfull";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { isImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { ImageSetType } from "@wwtelescope/engine-types";
 import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
 
@@ -123,14 +124,110 @@ export default class App extends WWTAwareComponent {
         instant: msg.instant,
       });
     } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
-      this.pywwtClassicCreateFitsLayer(msg);
+      this.applyCreateFitsLayerMessage(msg);
+    } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
+      this.applyStretchFitsLayerMessage(msg);
+    } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {
+      this.applySetFitsLayerColormapMessage(msg);
+    } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
+      this.applyModifyFitsLayerMessage(msg);
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
+
+    // { event: "image_layer_set", id: "730025ba-e13d-4e81-a89f-d0b18579ecdc", setting: "opacity", value: 1 }
+
+    // TODO:
+    // AddLinePointMessage
+    // AddPolygonPointMessage
+    // ClearAnnotationsMessage
+    // CreateAnnotationMessage
+    // CreateTableLayerMessage
+    // LoadTourMessage
+    // ModifyAnnotationMessage
+    // ModifyTableLayerMessage
+    // ModifySettingMessage
+    // PauseTimeMessage
+    // PauseTourMessage
+    // RemoveAnnotationMessage
+    // RemoveFitsLayerMessage
+    // RemoveTableLayerMessage
+    // ResumeTourMessage
+    // ResumeTimeMessage
+    // SetCircleCenterMessage
+    // SetDatetimeMessage
+    // TrackObjectMessage
+    // UpdateTableLayerMessage
   }
 
-  pywwtClassicCreateFitsLayer(_m: classicPywwt.CreateFitsLayerMessage) {
-    console.log("TODO");
+  // Maps external layer IDs to internal ones
+  private layerIdMap: Map<string, string> = new Map();
+
+  private applyCreateFitsLayerMessage(msg: classicPywwt.CreateFitsLayerMessage): void {
+    this.loadFitsLayer({
+      url: msg.url,
+      name: msg.id,
+      gotoTarget: true,
+    }).then((layer) => {
+      this.layerIdMap.set(msg.id, layer.id.toString());
+    });
+  }
+
+  // Keyed by external, not internal, ID.
+  private layerStretchVersions: Map<string, number> = new Map();
+
+  private applyStretchFitsLayerMessage(msg: classicPywwt.StretchFitsLayerMessage): void {
+    const prev = this.layerStretchVersions.get(msg.id);
+    if (prev !== undefined && msg.version <= prev) {
+      return;
+    }
+
+    // TODO: have a real solution in case the layer isn't yet loaded, etc.
+    const intId = this.layerIdMap.get(msg.id);
+    if (intId !== undefined) {
+      this.stretchFitsLayer({
+        id: intId,
+        stretch: msg.stretch,
+        vmin: msg.vmin,
+        vmax: msg.vmax,
+      });
+    }
+  }
+
+  // Keyed by external, not internal, ID.
+  private layerColormapVersions: Map<string, number> = new Map();
+
+  private applySetFitsLayerColormapMessage(msg: classicPywwt.SetFitsLayerColormapMessage): void {
+    const prev = this.layerColormapVersions.get(msg.id);
+    if (prev !== undefined && msg.version <= prev) {
+      return;
+    }
+
+    // TODO: have a real solution in case the layer isn't yet loaded, etc.
+    const intId = this.layerIdMap.get(msg.id);
+    if (intId !== undefined) {
+      this.setFitsLayerColormap({
+        id: intId,
+        name: msg.cmap,
+      });
+    }
+  }
+
+  private applyModifyFitsLayerMessage(msg: classicPywwt.ModifyFitsLayerMessage): void {
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (!isImageSetLayerSetting(setting)) {
+      return;
+    }
+
+    // TODO: have a real solution in case the layer isn't yet loaded, etc.
+    const intId = this.layerIdMap.get(msg.id);
+    if (intId !== undefined) {
+      this.applyFitsLayerSettings({
+        id: intId,
+        settings: [setting],
+      });
+    }
   }
 
   // Outgoing messages

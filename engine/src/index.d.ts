@@ -13,6 +13,9 @@ import {
   // AltTypes,
   // AltUnits,
   BandPass,
+  BaseEngineSetting,
+  BaseImageSetLayerSetting,
+  BaseLayerSetting,
   Classification,
   ConstellationFilterInterface,
   DataTypes,
@@ -139,11 +142,26 @@ export namespace Color {
   export function fromHex(hex: string): Color;
 
   /** Create a color from a hex string `AARRGGBB`. */
-  export function fromSimpleHex(hex: string): Color;}
+  export function fromSimpleHex(hex: string): Color;
+}
 
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
 }
+
+/** The full EngineSetting type, which augments engine-types' BaseEngineSetting
+ * with types that are only provided within the engine itself.
+ */
+export type EngineSetting = BaseEngineSetting |
+  // NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
+  ["constellationArtFilter", ConstellationFilter] |
+  ["constellationBoundariesFilter", ConstellationFilter] |
+  ["constellationBoundryColor", Color] |
+  ["constellationFigureColor", Color] |
+  ["constellationFiguresFilter", ConstellationFilter] |
+  ["constellationNamesFilter", ConstellationFilter] |
+  ["constellationSelectionColor", Color] |
+  ["crosshairsColor", Color];
 
 export class FitsImage extends WcsImage {
   histogramMaxCount: number;
@@ -402,6 +420,10 @@ export namespace ImageSetLayer {
   export function create(set: Imageset): ImageSetLayer;
 }
 
+/** The full LayerSetting type, which augments engine-types' BaseImageSetLayerSetting
+ * with types that are only provided within the engine itself.
+ */
+export type ImageSetLayerSetting = LayerSetting | BaseImageSetLayerSetting;
 
 export interface ImagesetLoadedCallback {
   (layer: ImageSetLayer): void;
@@ -467,6 +489,13 @@ export namespace LayerManager {
 /** An alias for the type implicitly defined by the static
  * [[LayerManager]] namespace. */
 export type LayerManagerObject = typeof LayerManager;
+
+/** The full LayerSetting type, which augments engine-types' BaseLayerSetting
+ * with types that are only provided within the engine itself.
+ */
+export type LayerSetting = BaseLayerSetting |
+  // NOTE: isLayerSetting in engine-helpers needs to be kept in sync.
+  ["color", Color];
 
 export class Place implements Thumbnail {
   annotation: string;
