@@ -400,7 +400,7 @@ export class WWTInstance {
   }
 
   /** Change the "stretch" settings of a FITS image layer. */
-  stretchFitsLayer(options: StretchFitsLayerOptions) {
+  stretchFitsLayer(options: StretchFitsLayerOptions): void {
     const layer = this.lm.get_layerList()[options.id];
     if (layer && layer instanceof ImageSetLayer) {
       layer.setImageScalePhysical(options.stretch, options.vmin, options.vmax);
@@ -414,7 +414,7 @@ export class WWTInstance {
   }
 
   /** Change the colormap settings of a FITS image layer. */
-  setFitsLayerColormap(options: SetFitsLayerColormapOptions) {
+  setFitsLayerColormap(options: SetFitsLayerColormapOptions): void {
     const layer = this.lm.get_layerList()[options.id];
     if (layer && layer instanceof ImageSetLayer) {
       layer.set_colorMapperName(options.name);
