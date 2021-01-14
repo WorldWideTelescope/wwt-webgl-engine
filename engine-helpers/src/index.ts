@@ -199,7 +199,7 @@ export interface SetupForImagesetOptions {
 }
 
 interface ResolveFunction<T> {
-  (value?: T): void;
+  (value: T): void;
 }
 
 interface RejectFunction {
