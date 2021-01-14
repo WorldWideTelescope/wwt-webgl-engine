@@ -47,6 +47,7 @@
 import * as screenfull from "screenfull";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { isImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { ImageSetType } from "@wwtelescope/engine-types";
 import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
 
@@ -128,6 +129,8 @@ export default class App extends WWTAwareComponent {
       this.applyStretchFitsLayerMessage(msg);
     } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {
       this.applySetFitsLayerColormapMessage(msg);
+    } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
+      this.applyModifyFitsLayerMessage(msg);
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
@@ -142,7 +145,6 @@ export default class App extends WWTAwareComponent {
     // CreateTableLayerMessage
     // LoadTourMessage
     // ModifyAnnotationMessage
-    // ModifyFitsLayerMessage
     // ModifyTableLayerMessage
     // ModifySettingMessage
     // PauseTimeMessage
@@ -207,6 +209,23 @@ export default class App extends WWTAwareComponent {
       this.setFitsLayerColormap({
         id: intId,
         name: msg.cmap,
+      });
+    }
+  }
+
+  private applyModifyFitsLayerMessage(msg: classicPywwt.ModifyFitsLayerMessage): void {
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (!isImageSetLayerSetting(setting)) {
+      return;
+    }
+
+    // TODO: have a real solution in case the layer isn't yet loaded, etc.
+    const intId = this.layerIdMap.get(msg.id);
+    if (intId !== undefined) {
+      this.applyFitsLayerSettings({
+        id: intId,
+        settings: [setting],
       });
     }
   }

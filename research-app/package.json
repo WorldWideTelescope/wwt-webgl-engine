@@ -10,6 +10,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/astro": "0.0.0-dev.0",
     "@wwtelescope/engine": "0.0.0-dev.0",
+    "@wwtelescope/engine-helpers": "0.0.0-dev.0",
     "@wwtelescope/engine-types": "0.0.0-dev.0",
     "@wwtelescope/engine-vuex": "0.0.0-dev.0",
     "@wwtelescope/research-app-messages": "0.0.0-dev.0",
@@ -27,9 +28,10 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:^0.1.0",
-    "@wwtelescope/engine": "1ae9e9763cf4ba10b734df4ca9fd71d635fdf77b",
-    "@wwtelescope/engine-types": "f67f54d777d5ce805fdeff45ec012e8ce352d777",
-    "@wwtelescope/engine-vuex": "ce4a6fa0646e9513be8baab368805febe1f6ffaa",
+    "@wwtelescope/engine": "thiscommit:2021-01-14:DeiKae4s",
+    "@wwtelescope/engine-helpers": "thiscommit:2021-01-14:phaiJei1",
+    "@wwtelescope/engine-types": "thiscommit:2021-01-14:keiGu2AS",
+    "@wwtelescope/engine-vuex": "thiscommit:2021-01-14:aeJoo4Sh",
     "@wwtelescope/research-app-messages": "thiscommit:2021-01-05:pohbaSh3"
   },
   "keywords": [

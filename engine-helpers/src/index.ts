@@ -188,6 +188,14 @@ export interface SetFitsLayerColormapOptions {
   name: string;
 }
 
+export interface ApplyFitsLayerSettingsOptions {
+  /** The ID of the FITS layer. */
+  id: string;
+
+  /** The settings to apply. */
+  settings: ImageSetLayerSetting[];
+}
+
 /** Options for [[WWTInstance.setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
@@ -481,6 +489,16 @@ export class WWTInstance {
     const layer = this.lm.get_layerList()[options.id];
     if (layer && layer instanceof ImageSetLayer) {
       layer.set_colorMapperName(options.name);
+    }
+  }
+
+  /** Apply settings to a FITS image layer. */
+  applyFitsLayerSettings(options: ApplyFitsLayerSettingsOptions): void {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof ImageSetLayer) {
+      for (const setting of options.settings) {
+        applyImageSetLayerSetting(layer, setting);
+      }
     }
   }
 

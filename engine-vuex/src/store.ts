@@ -15,6 +15,7 @@ import {
 } from "@wwtelescope/engine";
 
 import {
+  ApplyFitsLayerSettingsOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
@@ -477,5 +478,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setFitsLayerColormap without linking to WWTInstance');
     Vue.$wwt.inst.setFitsLayerColormap(options);
+  }
+
+  @Mutation
+  applyFitsLayerSettings(options: ApplyFitsLayerSettingsOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot applyFitsLayerSettings without linking to WWTInstance');
+    Vue.$wwt.inst.applyFitsLayerSettings(options);
   }
 }

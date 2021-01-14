@@ -13,6 +13,7 @@ import {
 } from "@wwtelescope/engine";
 
 import {
+  ApplyFitsLayerSettingsOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
@@ -79,6 +80,7 @@ export class WWTAwareComponent extends Vue {
         "waitForReady",
       ]),
       ...mapMutations([
+        "applyFitsLayerSettings",
         "applySetting",
         "seekToTourTimecode",
         "setBackgroundImageByName",
@@ -119,6 +121,7 @@ export class WWTAwareComponent extends Vue {
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
+  applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
   applySetting!: (_s: EngineSetting) => void;
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
