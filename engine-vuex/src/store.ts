@@ -5,7 +5,11 @@ import Vue from "vue";
 import { Module, VuexModule, Mutation, MutationAction, Action } from 'vuex-module-decorators';
 
 import { D2R, H2R } from "@wwtelescope/astro";
-import { ImageSetType } from "@wwtelescope/engine-types";
+
+import {
+  ImageSetType,
+  SolarSystemObjects,
+} from "@wwtelescope/engine-types";
 
 import {
   EngineSetting,
@@ -436,6 +440,13 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot gotoTarget without linking to WWTInstance');
     return Vue.$wwt.inst.gotoTarget(options);
+  }
+
+  @Mutation
+  setTrackedObject(obj: SolarSystemObjects): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setTrackedObject without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.renderContext.set_solarSystemTrack(obj);
   }
 
   @MutationAction

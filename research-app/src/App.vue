@@ -49,7 +49,7 @@ import * as screenfull from "screenfull";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { isEngineSetting, isImageSetLayerSetting } from "@wwtelescope/engine-helpers";
-import { ImageSetType } from "@wwtelescope/engine-types";
+import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
 
 import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
@@ -154,6 +154,9 @@ export default class App extends WWTAwareComponent {
     } else if (classicPywwt.isResumeTimeMessage(msg)) {
       this.setClockSync(true);
       this.setClockRate(msg.rate);
+    } else if (classicPywwt.isTrackObjectMessage(msg)) {
+      // No input validation here, but I think that's OK ...
+      this.setTrackedObject(msg.code as SolarSystemObjects);
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
@@ -170,7 +173,6 @@ export default class App extends WWTAwareComponent {
     // RemoveFitsLayerMessage
     // RemoveTableLayerMessage
     // SetCircleCenterMessage
-    // TrackObjectMessage
     // UpdateTableLayerMessage
   }
 

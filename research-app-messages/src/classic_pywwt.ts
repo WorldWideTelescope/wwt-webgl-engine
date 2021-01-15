@@ -614,15 +614,15 @@ export interface TrackObjectMessage {
   /** The tag identifying this message type. */
   event: "track_object";
 
-  /** The name of the object to track. TODO: more details here. */
-  code: string;
+  /** The SolarSystemObjects code of the object to track. */
+  code: number;
 }
 
 /** Type guard function for TrackObjectMessage. */
 export function isTrackObjectMessage(o: any): o is TrackObjectMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "track_object" &&
-    typeof o.code === "string";
+    typeof o.code === "number";
 }
 
 

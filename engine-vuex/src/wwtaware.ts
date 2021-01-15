@@ -3,6 +3,7 @@ import { createNamespacedHelpers } from "vuex";
 
 import {
   ImageSetType,
+  SolarSystemObjects,
 } from "@wwtelescope/engine-types";
 
 import {
@@ -91,6 +92,7 @@ export class WWTAwareComponent extends Vue {
         "setForegroundOpacity",
         "setTourPlayerLeaveSettingsWhenStopped",
         "setTime",
+        "setTrackedObject",
         "setupForImageset",
         "startTour",
         "stretchFitsLayer",
@@ -133,6 +135,7 @@ export class WWTAwareComponent extends Vue {
   setForegroundOpacity!: (o: number) => void;
   setTime!: (d: Date) => void;
   setTourPlayerLeaveSettingsWhenStopped!: (v: boolean) => void;
+  setTrackedObject!: (o: SolarSystemObjects) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
   startTour!: () => void;
   stretchFitsLayer!: (o: StretchFitsLayerOptions) => void;

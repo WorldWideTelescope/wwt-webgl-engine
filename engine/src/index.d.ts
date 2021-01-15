@@ -27,7 +27,6 @@ import {
   ProjectionType,
   // ReferenceFrames,
   // ReferenceFrameTypes,
-  // SolarSystemObjects
   Thumbnail,
   ScaleTypes,
   SolarSystemObjects,
