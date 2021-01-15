@@ -155,8 +155,9 @@ export default class App extends WWTAwareComponent {
       this.setClockSync(true);
       this.setClockRate(msg.rate);
     } else if (classicPywwt.isTrackObjectMessage(msg)) {
-      // No input validation here, but I think that's OK ...
-      this.setTrackedObject(msg.code as SolarSystemObjects);
+      if (msg.code in SolarSystemObjects) {
+        this.setTrackedObject(msg.code as SolarSystemObjects);
+      }
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
