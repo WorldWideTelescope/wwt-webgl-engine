@@ -131,11 +131,18 @@ export default class App extends WWTAwareComponent {
       this.applySetFitsLayerColormapMessage(msg);
     } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
       this.applyModifyFitsLayerMessage(msg);
+    } else if (classicPywwt.isLoadTourMessage(msg)) {
+      this.loadTour({
+        url: msg.url,
+        play: true,
+      });
+    } else if (classicPywwt.isPauseTourMessage(msg)) {
+      this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    } else if (classicPywwt.isResumeTourMessage(msg)) {
+      this.toggleTourPlayPauseState();  // note half-assed semantics here!
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
-
-    // { event: "image_layer_set", id: "730025ba-e13d-4e81-a89f-d0b18579ecdc", setting: "opacity", value: 1 }
 
     // TODO:
     // AddLinePointMessage
@@ -143,16 +150,13 @@ export default class App extends WWTAwareComponent {
     // ClearAnnotationsMessage
     // CreateAnnotationMessage
     // CreateTableLayerMessage
-    // LoadTourMessage
     // ModifyAnnotationMessage
     // ModifyTableLayerMessage
     // ModifySettingMessage
     // PauseTimeMessage
-    // PauseTourMessage
     // RemoveAnnotationMessage
     // RemoveFitsLayerMessage
     // RemoveTableLayerMessage
-    // ResumeTourMessage
     // ResumeTimeMessage
     // SetCircleCenterMessage
     // SetDatetimeMessage
