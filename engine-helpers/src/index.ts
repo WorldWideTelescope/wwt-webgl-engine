@@ -8,6 +8,7 @@ import {
   isBaseEngineSetting,
   isBaseLayerSetting,
   isBaseImageSetLayerSetting,
+  isBaseSpreadSheetLayerSetting,
 } from "@wwtelescope/engine-types";
 
 import {
@@ -28,7 +29,9 @@ import {
   TourPlayer,
   Wtml,
   WWTControl,
-  SpaceTimeController
+  SpaceTimeController,
+  SpreadSheetLayer,
+  SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
 
 // Type guards for the augmented setting types
@@ -93,6 +96,20 @@ export function applyImageSetLayerSetting(layer: ImageSetLayer, setting: ImageSe
   const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
   (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
+
+/** Type guard function for SpreadSheetLayerSetting. */
+export function isSpreadSheetLayerSetting(obj: [string, any]): obj is SpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  // No special settings specific to non-base SpreadSheetLayerSetting.
+  return isLayerSetting(obj) || isBaseSpreadSheetLayerSetting(obj);
+}
+
+/** Apply a setting to an SpreadSheetLayer. */
+export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: SpreadSheetLayerSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
 
 export const enum InitControlViewType {
   Sky = "Sky",

@@ -79,6 +79,12 @@ export enum Classification {
   other = 436207616
 }
 
+export enum CoordinatesType {
+  spherical = 0,
+  rectangular = 1,
+  orbital = 2,
+}
+
 export enum DataTypes {
   byteT = 0,
   int16T = 1,
@@ -130,6 +136,23 @@ export enum ImageSetType {
   sandbox = 5
 }
 
+export enum PlotTypes {
+  gaussian = 0,
+  point = 1,
+  circle = 2,
+  square = 3,
+  pushPin = 4,
+  custom = 5,
+}
+
+export enum PointScaleTypes {
+  linear = 0,
+  power = 1,
+  log = 2,
+  constant = 3,
+  stellarMagnitude = 4,
+}
+
 export enum ProjectionType {
   mercator = 0,
   equirectangular = 1,
@@ -139,6 +162,11 @@ export enum ProjectionType {
   spherical = 4,
   skyImage = 5,
   plotted = 6
+}
+
+export enum RAUnits {
+  hours = 0,
+  degrees = 1,
 }
 
 export enum ReferenceFrames {
@@ -467,12 +495,139 @@ const baseImageSetLayerSettingTypeInfo = {
   "overrideDefaultLayer/boolean": true,
 };
 
-/** Type guard function for BaseLayerSetting. */
+/** Type guard function for BaseImageSetLayerSetting. */
 export function isBaseImageSetLayerSetting(obj: [string, any]): obj is BaseImageSetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
   const key = obj[0] + "/" + typeof obj[1];
   return (key in baseImageSetLayerSettingTypeInfo) || isBaseLayerSetting(obj);
 }
 
+/** Settings specifically for instances of the SpreadSheetLayer type. */
+export type BaseSpreadSheetLayerSetting =
+  ["altColumn", number] |
+  ["altType", AltTypes] |
+  ["altUnit", AltUnits] |
+  ["barChartBitmask", number] |
+  ["beginRange", Date] |
+  ["cartesianCustomScale", number] |
+  ["cartesianScale", AltUnits] |
+  ["colorMapColumn", number] |
+  ["colorMapperName", string] |
+  ["coordinatesType", CoordinatesType] |
+  ["decay", number] |
+  ["dynamicColor", boolean] |
+  ["dynamicData", boolean] |
+  ["endDateColumn", number] |
+  ["endRange", Date] |
+  ["geometryColumn", number] |
+  ["hyperlinkColumn", number] |
+  ["hyperlinkFormat", string] |
+  ["latColumn", number] |
+  ["lngColumn", number] |
+  ["markerColumn", number] |
+  ["markerIndex", number] |
+  ["markerScale", number] |
+  ["nameColumn", number] |
+  ["normalizeColorMap", boolean] |
+  ["normalizeColorMapMax", number] |
+  ["normalizeColorMapMin", number] |
+  ["normalizeSize", boolean] |
+  ["normalizeSizeClip", boolean] |
+  ["normalizeSizeMax", number] |
+  ["normalizeSizeMin", number] |
+  ["plotType", PlotTypes] |
+  ["pointScaleType", PointScaleTypes] |
+  ["raUnits", RAUnits] |
+  ["scaleFactor", number] |
+  ["showFarSide", boolean] |
+  ["sizeColumn", number] |
+  ["startDateColumn", number] |
+  ["timeSeries", boolean] |
+  ["xAxisColumn", number] |
+  ["xAxisReverse", boolean] |
+  ["yAxisColumn", number] |
+  ["yAxisReverse", boolean] |
+  ["zAxisColumn", number] |
+  ["zAxisReverse", boolean] |
+  BaseLayerSetting;
+
+// See implementation below -- we need to handle enums specially
+// to make sure that inputs are in-range.
+const baseSpreadSheetLayerSettingTypeInfo: {[k: string]: string} = {
+  "altColumn/number": "",
+  "altType/number": "AltTypes",
+  "altUnit/number": "AltUnits",
+  "barChartBitmask/number": "",
+  "beginRange/Date": "",
+  "cartesianCustomScale/number": "",
+  "cartesianScale/number": "AltUnits",
+  "colorMapColumn/number": "",
+  "colorMapperName/string": "",
+  "coordinatesType/number": "CoordinatesType",
+  "decay/number": "",
+  "dynamicColor/boolean": "",
+  "dynamicData/boolean": "",
+  "endDateColumn/number": "",
+  "endRange/Date": "",
+  "geometryColumn/number": "",
+  "hyperlinkColumn/number": "",
+  "hyperlinkFormat/string": "",
+  "latColumn/number": "",
+  "lngColumn/number": "",
+  "markerColumn/number": "",
+  "markerIndex/number": "",
+  "markerScale/number": "",
+  "nameColumn/number": "",
+  "normalizeColorMap/boolean": "",
+  "normalizeColorMapMax/number": "",
+  "normalizeColorMapMin/number": "",
+  "normalizeSize/boolean": "",
+  "normalizeSizeClip/boolean": "",
+  "normalizeSizeMax/number": "",
+  "normalizeSizeMin/number": "",
+  "plotType/number": "PlotTypes",
+  "pointScaleType/number": "PointScaleTypes",
+  "raUnits/number": "RAUnits",
+  "scaleFactor/number": "",
+  "showFarSide/boolean": "",
+  "sizeColumn/number": "",
+  "startDateColumn/number": "",
+  "timeSeries/boolean": "",
+  "xAxisColumn/number": "",
+  "xAxisReverse/boolean": "",
+  "yAxisColumn/number": "",
+  "yAxisReverse/boolean": "",
+  "zAxisColumn/number": "",
+  "zAxisReverse/boolean": "",
+};
+
+/** Type guard function for BaseSpreadSheetLayerSetting. */
+export function isBaseSpreadSheetLayerSetting(obj: [string, any]): obj is BaseSpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (isBaseLayerSetting(obj))
+    return true;
+
+  const key = obj[0] + "/" + typeof obj[1];
+  const enumType = baseSpreadSheetLayerSettingTypeInfo[key];
+
+  if (enumType === undefined) {
+    return false;
+  } else if (enumType == "") {
+    return true;
+  } else if (enumType == "AltTypes") {
+    return obj[1] in AltTypes;
+  } else if (enumType == "AltUnits") {
+    return obj[1] in AltUnits;
+  } else if (enumType == "CoordinatesType") {
+    return obj[1] in CoordinatesType;
+  } else if (enumType == "PlotTypes") {
+    return obj[1] in PlotTypes;
+  } else if (enumType == "PointScaleTypes") {
+    return obj[1] in PointScaleTypes;
+  } else if (enumType == "RAUnits") {
+    return obj[1] in RAUnits;
+  } else {
+    throw new Error('internal bug isBaseSpreadSheetLayerSetting');
+  }
+}
 
 // TypeScript magic to allow fallible reverse mapping of string-valued enums.
 // https://stackoverflow.com/q/57922745/3760486

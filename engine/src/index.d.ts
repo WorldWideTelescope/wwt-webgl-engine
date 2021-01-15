@@ -10,21 +10,26 @@
 export as namespace wwtlib;
 
 import {
-  // AltTypes,
-  // AltUnits,
+  AltTypes,
+  AltUnits,
   BandPass,
   BaseEngineSetting,
   BaseImageSetLayerSetting,
   BaseLayerSetting,
+  BaseSpreadSheetLayerSetting,
   Classification,
   ConstellationFilterInterface,
+  CoordinatesType,
   DataTypes,
   FadeType,
   FolderGroup,
   FolderRefreshType,
   FolderType,
   ImageSetType,
+  PointScaleTypes,
+  PlotTypes,
   ProjectionType,
+  RAUnits,
   // ReferenceFrames,
   // ReferenceFrameTypes,
   Thumbnail,
@@ -477,7 +482,7 @@ export namespace LayerManager {
   export function add(layer: Layer, updateTree: boolean): void;
   export function addFitsImageSetLayer(imageset: ImageSetLayer, title: string): ImageSetLayer;
   export function addImageSetLayer(imageset: Imageset, title: string): ImageSetLayer;
-  export function createSpreadsheetLayer(frame: string, name: string, data: string): /*SpreadSheet*/Layer;
+  export function createSpreadsheetLayer(frame: string, name: string, data: string): SpreadSheetLayer;
   export function deleteLayerByID(id: Guid, removeFromParent: boolean, updateTree: boolean): void;
   // addVoTableLayer
   export function getMoonFile(url: string): void;
@@ -942,6 +947,111 @@ export namespace SpaceTimeController {
  * [[SpaceTimeController]] namespace. */
 export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
+
+/** A tabular data layer. */
+export class SpreadSheetLayer extends Layer {
+  colorMapperName: string;
+
+  get_altColumn(): number;
+  set_altColumn(v: number): number;
+  get_altType(): AltTypes;
+  set_altType(v: AltTypes): AltTypes;
+  get_altUnit(): AltUnits;
+  set_altUnit(v: AltUnits): AltUnits;
+  get_barChartBitmask(): number;
+  set_barChartBitmask(v: number): number;
+  get_beginRange(): Date;
+  set_beginRange(v: Date): Date;
+  get_cartesianCustomScale(): number;
+  set_cartesianCustomScale(v: number): number;
+  get_cartesianScale(): AltUnits;
+  set_cartesianScale(v: AltUnits): AltUnits;
+  // get_colorMap
+  get_colorMapColumn(): number;
+  set_colorMapColumn(v: number): number;
+  // get_colorMapper
+  get_colorMapperName(): string;
+  set_colorMapperName(v: string): string;
+  get_coordinatesType(): CoordinatesType;
+  set_coordinatesType(v: CoordinatesType): CoordinatesType;
+  get_decay(): number;
+  set_decay(v: number): number;
+  get_dynamicColor(): boolean;
+  set_dynamicColor(v: boolean): boolean;
+  get_dynamicData(): boolean;
+  set_dynamicData(v: boolean): boolean;
+  get_endDateColumn(): number;
+  set_endDateColumn(v: number): number;
+  get_endRange(): Date;
+  set_endRange(v: Date): Date;
+  get_geometryColumn(): number;
+  set_geometryColumn(v: number): number;
+  get_header(): string[];
+  get_hyperlinkColumn(): number;
+  set_hyperlinkColumn(v: number): number;
+  get_hyperlinkFormat(): string;
+  set_hyperlinkFormat(v: string): string;
+  get_latColumn(): number;
+  set_latColumn(v: number): number;
+  get_lngColumn(): number;
+  set_lngColumn(v: number): number;
+  get_markerColumn(): number;
+  set_markerColumn(v: number): number;
+  get_markerIndex(): number;
+  set_markerIndex(v: number): number;
+  // get_markerMix
+  get_markerScale(): number;
+  set_markerScale(v: number): number;
+  get_nameColumn(): number;
+  set_nameColumn(v: number): number;
+  get_normalizeColorMap(): boolean;
+  set_normalizeColorMap(v: boolean): boolean;
+  get_normalizeColorMapMax(): number;
+  set_normalizeColorMapMax(v: number): number;
+  get_normalizeColorMapMin(): number;
+  set_normalizeColorMapMin(v: number): number;
+  get_normalizeSize(): boolean;
+  set_normalizeSize(v: boolean): boolean;
+  get_normalizeSizeClip(): boolean;
+  set_normalizeSizeClip(v: boolean): boolean;
+  get_normalizeSizeMax(): number;
+  set_normalizeSizeMax(v: number): number;
+  get_normalizeSizeMin(): number;
+  set_normalizeSizeMin(v: number): number;
+  get_plotType(): PlotTypes;
+  set_plotType(v: PlotTypes): PlotTypes;
+  get_pointScaleType(): PointScaleTypes;
+  set_pointScaleType(v: PointScaleTypes): PointScaleTypes;
+  get_raUnits(): RAUnits;
+  set_raUnits(v: RAUnits): RAUnits;
+  get_scaleFactor(): number;
+  set_scaleFactor(v: number): number;
+  get_showFarSide(): boolean;
+  set_showFarSide(v: boolean): boolean;
+  get_sizeColumn(): number;
+  set_sizeColumn(v: number): number;
+  get_startDateColumn(): number;
+  set_startDateColumn(v: number): number;
+  get_timeSeries(): boolean;
+  set_timeSeries(v: boolean): boolean;
+  get_xAxisColumn(): number;
+  set_xAxisColumn(v: number): number;
+  get_xAxisReverse(): boolean;
+  set_xAxisReverse(v: boolean): boolean;
+  get_yAxisColumn(): number;
+  set_yAxisColumn(v: number): number;
+  get_yAxisReverse(): boolean;
+  set_yAxisReverse(v: boolean): boolean;
+  get_zAxisColumn(): number;
+  set_zAxisColumn(v: number): number;
+  get_zAxisReverse(): boolean;
+  set_zAxisReverse(v: boolean): boolean;
+
+  updateData(data: string, purgeOld: boolean, purgeAll: boolean, hasHeader: boolean): boolean;
+}
+
+// No settings with types not implemented in engine-types.
+export type SpreadSheetLayerSetting = BaseSpreadSheetLayerSetting;
 
 /** A WWT tour. */
 export class TourDocument {
