@@ -50,6 +50,7 @@ import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { isEngineSetting, isImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
+import { ImageSetLayer, ImageSetLayerSetting } from "@wwtelescope/engine";
 import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
 
 import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
@@ -57,6 +58,142 @@ import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messag
 const D2R = Math.PI / 180.0;
 
 type ToolType = "crossfade" | null;
+
+type AnyFitsLayerMessage =
+  classicPywwt.CreateFitsLayerMessage |
+  classicPywwt.SetFitsLayerColormapMessage |
+  classicPywwt.StretchFitsLayerMessage |
+  classicPywwt.ModifyFitsLayerMessage |
+  classicPywwt.RemoveFitsLayerMessage;
+
+/** Helper for handling messages that mutate FITS / ImageSet layers. Because
+ * FITS loading is asynchronous, and messages might arrive out of order, we need
+ * some logic to smooth everything out.
+ */
+class FitsLayerMessageHandler {
+  private owner: App;
+  private created = false;
+  private internalId: string | null = null;
+  private colormapVersion = -1;
+  private stretchVersion = -1;
+  private queuedStretch: classicPywwt.StretchFitsLayerMessage | null = null;
+  private queuedColormap: classicPywwt.SetFitsLayerColormapMessage | null = null;
+  private queuedSettings: ImageSetLayerSetting[] = [];
+  private queuedRemoval: classicPywwt.RemoveFitsLayerMessage | null = null;
+
+  constructor(owner: App) {
+    this.owner = owner;
+  }
+
+  handleCreateMessage(msg: classicPywwt.CreateFitsLayerMessage) {
+    if (this.created)
+      return;
+
+    this.owner.loadFitsLayer({
+      url: msg.url,
+      name: msg.id,
+      gotoTarget: true, // pywwt expected behavior
+    }).then((layer) => this.layerInitialized(layer));
+
+    this.created = true;
+  }
+
+  private layerInitialized(layer: ImageSetLayer) {
+    this.internalId = layer.id.toString();
+
+    if (this.queuedStretch !== null) {
+      this.handleStretchMessage(this.queuedStretch);
+      this.queuedStretch = null;
+    }
+
+    if (this.queuedColormap !== null) {
+      this.handleSetColormapMessage(this.queuedColormap);
+      this.queuedColormap = null;
+    }
+
+    this.owner.applyFitsLayerSettings({
+      id: this.internalId,
+      settings: this.queuedSettings,
+    });
+    this.queuedSettings = [];
+
+    if (this.queuedRemoval !== null) {
+      this.handleRemoveMessage(this.queuedRemoval);
+      this.queuedRemoval = null;
+    }
+  }
+
+  handleStretchMessage(msg: classicPywwt.StretchFitsLayerMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedStretch === null || msg.version > this.queuedStretch.version) {
+        this.queuedStretch = msg;
+      }
+    } else {
+      if (msg.version > this.stretchVersion) {
+        this.owner.stretchFitsLayer({
+          id: this.internalId,
+          stretch: msg.stretch,
+          vmin: msg.vmin,
+          vmax: msg.vmax,
+        });
+        this.stretchVersion = msg.version;
+      }
+    }
+  }
+
+  handleSetColormapMessage(msg: classicPywwt.SetFitsLayerColormapMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedColormap === null || msg.version > this.queuedColormap.version) {
+        this.queuedColormap = msg;
+      }
+    } else {
+      if (msg.version > this.colormapVersion) {
+        this.owner.setFitsLayerColormap({
+          id: this.internalId,
+          name: msg.cmap,
+        });
+        this.colormapVersion = msg.version;
+      }
+    }
+  }
+
+  handleModifyMessage(msg: classicPywwt.ModifyFitsLayerMessage) {
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (!isImageSetLayerSetting(setting)) {
+      return;
+    }
+
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      this.queuedSettings.push(setting);
+    } else {
+      this.owner.applyFitsLayerSettings({
+        id: this.internalId,
+        settings: [setting],
+      });
+    }
+  }
+
+  handleRemoveMessage(msg: classicPywwt.RemoveFitsLayerMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedRemoval === null) {
+        this.queuedRemoval = msg;
+      }
+    } else {
+      this.owner.deleteLayer(this.internalId);
+      this.internalId = null;
+      this.created = false;
+    }
+  }
+}
 
 @Component
 export default class App extends WWTAwareComponent {
@@ -131,15 +268,15 @@ export default class App extends WWTAwareComponent {
         this.applySetting(setting);
       }
     } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
-      this.applyCreateFitsLayerMessage(msg);
+      this.getFitsLayerHandler(msg).handleCreateMessage(msg);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
-      this.applyStretchFitsLayerMessage(msg);
+      this.getFitsLayerHandler(msg).handleStretchMessage(msg);
     } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {
-      this.applySetFitsLayerColormapMessage(msg);
+      this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
     } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
-      this.applyModifyFitsLayerMessage(msg);
+      this.getFitsLayerHandler(msg).handleModifyMessage(msg);
     } else if (classicPywwt.isRemoveFitsLayerMessage(msg)) {
-      this.applyRemoveFitsLayerMessage(msg);
+      this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
     } else if (classicPywwt.isLoadTourMessage(msg)) {
       this.loadTour({
         url: msg.url,
@@ -178,82 +315,18 @@ export default class App extends WWTAwareComponent {
     // UpdateTableLayerMessage
   }
 
-  // Maps external layer IDs to internal ones
-  private layerIdMap: Map<string, string> = new Map();
+  // Keyed by "external" layer IDs
+  private fitsLayers: Map<string, FitsLayerMessageHandler> = new Map();
 
-  private applyCreateFitsLayerMessage(msg: classicPywwt.CreateFitsLayerMessage): void {
-    this.loadFitsLayer({
-      url: msg.url,
-      name: msg.id,
-      gotoTarget: true,
-    }).then((layer) => {
-      this.layerIdMap.set(msg.id, layer.id.toString());
-    });
-  }
+  private getFitsLayerHandler(msg: AnyFitsLayerMessage): FitsLayerMessageHandler {
+    let handler = this.fitsLayers.get(msg.id);
 
-  // Keyed by external, not internal, ID.
-  private layerStretchVersions: Map<string, number> = new Map();
-
-  private applyStretchFitsLayerMessage(msg: classicPywwt.StretchFitsLayerMessage): void {
-    const prev = this.layerStretchVersions.get(msg.id);
-    if (prev !== undefined && msg.version <= prev) {
-      return;
+    if (handler === undefined) {
+      handler = new FitsLayerMessageHandler(this);
+      this.fitsLayers.set(msg.id, handler);
     }
 
-    // TODO: have a real solution in case the layer isn't yet loaded, etc.
-    const intId = this.layerIdMap.get(msg.id);
-    if (intId !== undefined) {
-      this.stretchFitsLayer({
-        id: intId,
-        stretch: msg.stretch,
-        vmin: msg.vmin,
-        vmax: msg.vmax,
-      });
-    }
-  }
-
-  // Keyed by external, not internal, ID.
-  private layerColormapVersions: Map<string, number> = new Map();
-
-  private applySetFitsLayerColormapMessage(msg: classicPywwt.SetFitsLayerColormapMessage): void {
-    const prev = this.layerColormapVersions.get(msg.id);
-    if (prev !== undefined && msg.version <= prev) {
-      return;
-    }
-
-    // TODO: have a real solution in case the layer isn't yet loaded, etc.
-    const intId = this.layerIdMap.get(msg.id);
-    if (intId !== undefined) {
-      this.setFitsLayerColormap({
-        id: intId,
-        name: msg.cmap,
-      });
-    }
-  }
-
-  private applyModifyFitsLayerMessage(msg: classicPywwt.ModifyFitsLayerMessage): void {
-    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    if (!isImageSetLayerSetting(setting)) {
-      return;
-    }
-
-    // TODO: have a real solution in case the layer isn't yet loaded, etc.
-    const intId = this.layerIdMap.get(msg.id);
-    if (intId !== undefined) {
-      this.applyFitsLayerSettings({
-        id: intId,
-        settings: [setting],
-      });
-    }
-  }
-
-  private applyRemoveFitsLayerMessage(msg: classicPywwt.RemoveFitsLayerMessage): void {
-    // TODO: have a real solution in case the layer isn't yet loaded, etc.
-    const intId = this.layerIdMap.get(msg.id);
-    if (intId !== undefined) {
-      this.deleteLayer(intId);
-    }
+    return handler;
   }
 
   // Outgoing messages
