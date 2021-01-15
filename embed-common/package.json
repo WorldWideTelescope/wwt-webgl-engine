@@ -10,7 +10,7 @@
   "description": "Basic types and classes for the WWT embed framework.",
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine-types": "thiscommit:2021-01-14:aeco6ahD"
+    "@wwtelescope/engine-types": "thiscommit:2021-01-15:pai0eoTh"
   },
   "keywords": [
     "AAS WorldWide Telescope"

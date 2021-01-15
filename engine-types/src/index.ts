@@ -472,3 +472,23 @@ export function isBaseImageSetLayerSetting(obj: [string, any]): obj is BaseImage
   const key = obj[0] + "/" + typeof obj[1];
   return (key in baseImageSetLayerSettingTypeInfo) || isBaseLayerSetting(obj);
 }
+
+
+// TypeScript magic to allow fallible reverse mapping of string-valued enums.
+// https://stackoverflow.com/q/57922745/3760486
+type StringEnum = {[key: string]: string};
+
+function keysOf<K extends {}>(o: K): (keyof K)[];
+function keysOf(o: any) { return Object.keys(o); }  // eslint-disable-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any
+
+export function enumLookup<E extends StringEnum>(
+  stringEnum: E,
+  s: string
+): E[keyof E] | undefined {
+  for (const enumKey of keysOf(stringEnum)) {
+    if (stringEnum[enumKey] === s) {
+      return stringEnum[enumKey] as E[keyof E];
+    }
+  }
+  return undefined;
+}
