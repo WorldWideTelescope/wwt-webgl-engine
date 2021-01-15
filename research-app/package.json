@@ -14,6 +14,7 @@
     "@wwtelescope/engine-types": "0.0.0-dev.0",
     "@wwtelescope/engine-vuex": "0.0.0-dev.0",
     "@wwtelescope/research-app-messages": "0.0.0-dev.0",
+    "moment": "^2.29.1",
     "screenfull": "^5",
     "v-tooltip": "^2.1",
     "vue": "^2.6.11",
@@ -31,7 +32,7 @@
     "@wwtelescope/engine": "thiscommit:2021-01-14:DeiKae4s",
     "@wwtelescope/engine-helpers": "thiscommit:2021-01-14:phaiJei1",
     "@wwtelescope/engine-types": "thiscommit:2021-01-14:keiGu2AS",
-    "@wwtelescope/engine-vuex": "thiscommit:2021-01-14:aeJoo4Sh",
+    "@wwtelescope/engine-vuex": "thiscommit:2021-01-15:XaiNer2m",
     "@wwtelescope/research-app-messages": "thiscommit:2021-01-05:pohbaSh3"
   },
   "keywords": [

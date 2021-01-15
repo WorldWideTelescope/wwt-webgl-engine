@@ -332,9 +332,30 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   setClockRate(rate: number): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setClockRate without linking to WWTInstance');
-    Vue.$wwt.inst.stc.set_timeRate(rate);
-    this.clockRate = rate;
-    this.clockDiscontinuities += 1;
+
+    if (Vue.$wwt.inst.stc.get_timeRate() != rate) {
+      Vue.$wwt.inst.stc.set_timeRate(rate);
+      this.clockRate = rate;
+      this.clockDiscontinuities += 1;
+    }
+  }
+
+  @Mutation
+  setClockSync(isSynced: boolean): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setClockSync without linking to WWTInstance');
+
+    if (Vue.$wwt.inst.stc.get_syncToClock() != isSynced) {
+      Vue.$wwt.inst.stc.set_syncToClock(isSynced);
+
+      if (isSynced) {
+        this.clockRate = Vue.$wwt.inst.stc.get_timeRate();
+      } else {
+        this.clockRate = 0;
+      }
+
+      this.clockDiscontinuities += 1;
+    }
   }
 
   @Mutation

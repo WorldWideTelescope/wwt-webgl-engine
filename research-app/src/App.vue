@@ -44,6 +44,7 @@
 </template>
 
 <script lang="ts">
+import * as moment from "moment";
 import * as screenfull from "screenfull";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
@@ -146,6 +147,13 @@ export default class App extends WWTAwareComponent {
       this.toggleTourPlayPauseState();  // note half-assed semantics here!
     } else if (classicPywwt.isResumeTourMessage(msg)) {
       this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    } else if (classicPywwt.isSetDatetimeMessage(msg)) {
+      this.setTime(moment.utc(msg.isot).toDate());
+    } else if (classicPywwt.isPauseTimeMessage(msg)) {
+      this.setClockSync(false);
+    } else if (classicPywwt.isResumeTimeMessage(msg)) {
+      this.setClockSync(true);
+      this.setClockRate(msg.rate);
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
@@ -158,13 +166,10 @@ export default class App extends WWTAwareComponent {
     // CreateTableLayerMessage
     // ModifyAnnotationMessage
     // ModifyTableLayerMessage
-    // PauseTimeMessage
     // RemoveAnnotationMessage
     // RemoveFitsLayerMessage
     // RemoveTableLayerMessage
-    // ResumeTimeMessage
     // SetCircleCenterMessage
-    // SetDatetimeMessage
     // TrackObjectMessage
     // UpdateTableLayerMessage
   }

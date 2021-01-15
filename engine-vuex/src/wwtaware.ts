@@ -85,6 +85,7 @@ export class WWTAwareComponent extends Vue {
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setClockRate",
+        "setClockSync",
         "setFitsLayerColormap",
         "setForegroundImageByName",
         "setForegroundOpacity",
@@ -126,6 +127,7 @@ export class WWTAwareComponent extends Vue {
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setClockRate!: (_r: number) => void;
+  setClockSync!: (_s: boolean) => void;
   setFitsLayerColormap!: (_o: SetFitsLayerColormapOptions) => void;
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
