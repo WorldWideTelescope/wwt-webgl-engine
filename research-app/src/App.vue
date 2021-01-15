@@ -47,7 +47,7 @@
 import * as screenfull from "screenfull";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { isImageSetLayerSetting } from "@wwtelescope/engine-helpers";
+import { isEngineSetting, isImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { ImageSetType } from "@wwtelescope/engine-types";
 import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
 
@@ -123,6 +123,12 @@ export default class App extends WWTAwareComponent {
         zoomDeg: msg.fov, // TODO: make sure we're not off by a factor of 6 here
         instant: msg.instant,
       });
+    } else if (classicPywwt.isModifySettingMessage(msg)) {
+      const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      if (isEngineSetting(setting)) {
+        this.applySetting(setting);
+      }
     } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
       this.applyCreateFitsLayerMessage(msg);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
@@ -152,7 +158,6 @@ export default class App extends WWTAwareComponent {
     // CreateTableLayerMessage
     // ModifyAnnotationMessage
     // ModifyTableLayerMessage
-    // ModifySettingMessage
     // PauseTimeMessage
     // RemoveAnnotationMessage
     // RemoveFitsLayerMessage
