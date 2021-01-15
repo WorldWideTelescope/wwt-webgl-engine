@@ -138,6 +138,8 @@ export default class App extends WWTAwareComponent {
       this.applySetFitsLayerColormapMessage(msg);
     } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
       this.applyModifyFitsLayerMessage(msg);
+    } else if (classicPywwt.isRemoveFitsLayerMessage(msg)) {
+      this.applyRemoveFitsLayerMessage(msg);
     } else if (classicPywwt.isLoadTourMessage(msg)) {
       this.loadTour({
         url: msg.url,
@@ -171,7 +173,6 @@ export default class App extends WWTAwareComponent {
     // ModifyAnnotationMessage
     // ModifyTableLayerMessage
     // RemoveAnnotationMessage
-    // RemoveFitsLayerMessage
     // RemoveTableLayerMessage
     // SetCircleCenterMessage
     // UpdateTableLayerMessage
@@ -244,6 +245,14 @@ export default class App extends WWTAwareComponent {
         id: intId,
         settings: [setting],
       });
+    }
+  }
+
+  private applyRemoveFitsLayerMessage(msg: classicPywwt.RemoveFitsLayerMessage): void {
+    // TODO: have a real solution in case the layer isn't yet loaded, etc.
+    const intId = this.layerIdMap.get(msg.id);
+    if (intId !== undefined) {
+      this.deleteLayer(intId);
     }
   }
 

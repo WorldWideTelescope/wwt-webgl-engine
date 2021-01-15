@@ -9,6 +9,7 @@ import {
 import {
   EngineSetting,
   Folder,
+  Guid,
   Imageset,
   ImageSetLayer,
 } from "@wwtelescope/engine";
@@ -83,6 +84,7 @@ export class WWTAwareComponent extends Vue {
       ...mapMutations([
         "applyFitsLayerSettings",
         "applySetting",
+        "deleteLayer",
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setClockRate",
@@ -126,6 +128,7 @@ export class WWTAwareComponent extends Vue {
   // Mutations
   applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
   applySetting!: (_s: EngineSetting) => void;
+  deleteLayer!: (id: string | Guid) => void;
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setClockRate!: (_r: number) => void;

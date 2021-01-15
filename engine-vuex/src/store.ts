@@ -14,6 +14,7 @@ import {
 import {
   EngineSetting,
   Folder,
+  Guid,
   Imageset,
   ImageSetLayer
 } from "@wwtelescope/engine";
@@ -518,4 +519,16 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('cannot applyFitsLayerSettings without linking to WWTInstance');
     Vue.$wwt.inst.applyFitsLayerSettings(options);
   }
-}
+
+  @Mutation
+  deleteLayer(id: string | Guid): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot deleteLayer without linking to WWTInstance');
+
+    if (typeof id === "string") {
+      const guid = Guid.fromString(id);
+      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
+    } else {
+      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
+    }
+  }}
