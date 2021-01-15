@@ -48,9 +48,9 @@ const engineSettingTypeInfo = {
 export function isEngineSetting(obj: [string, any]): obj is EngineSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
   let typekey: string = typeof obj[1];
 
-  if (obj instanceof Color) {
+  if (obj[1] instanceof Color) {
     typekey = "Color";
-  } else if (obj instanceof ConstellationFilter) {
+  } else if (obj[1] instanceof ConstellationFilter) {
     typekey = "ConstellationFilter";
   }
 
@@ -66,7 +66,7 @@ const layerSettingTypeInfo = {
 export function isLayerSetting(obj: [string, any]): obj is LayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
   let typekey: string = typeof obj[1];
 
-  if (obj instanceof Color) {
+  if (obj[1] instanceof Color) {
     typekey = "Color";
   }
 
