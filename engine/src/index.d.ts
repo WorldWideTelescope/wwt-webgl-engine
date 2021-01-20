@@ -26,6 +26,7 @@ import {
   FolderRefreshType,
   FolderType,
   ImageSetType,
+  MarkerScales,
   PointScaleTypes,
   PlotTypes,
   ProjectionType,
@@ -148,6 +149,47 @@ export namespace Color {
   /** Create a color from a hex string `AARRGGBB`. */
   export function fromSimpleHex(hex: string): Color;
 }
+
+/** A mapping from scalar values to colors. */
+export class ColorMapContainer {
+  /** Find the color in this map closest to the input scalar.
+   *
+   * The input value should be between 0 and 1. Zero maps to the first color in
+   * the list; one to the last. Intermediate values map linearly. Out-of-bounds
+   * values are clamped.
+   */
+  findClosestColor(value: number): Color;
+}
+
+export namespace ColorMapContainer {
+  /** Create a new ColorMapContainer from the specified list of ARGB colors. */
+  export function fromArgbList(colors: [number, number, number, number][]): ColorMapContainer;
+
+  /** Create a new ColorMapContainer from the specified list of color hex codes,
+   * each having the form `#rrggbb`. */
+  export function fromStringList(colors: string[]): ColorMapContainer;
+
+  /** Create a new ColorMapContainer from the named preset value.
+   *
+   * The presets are extracted from Matplotlib. Accepted values include:
+   *
+   * - viridis
+   * - plasma
+   * - inferno
+   * - magma
+   * - cividis
+   * - greys
+   * - gray
+   * - purples
+   * - blues
+   * - greens
+   * - oranges
+   * - reds
+   * - rdylbu
+   */
+  export function fromNamedColormap(name: string): ColorMapContainer;
+}
+
 
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
@@ -424,7 +466,7 @@ export namespace ImageSetLayer {
   export function create(set: Imageset): ImageSetLayer;
 }
 
-/** The full LayerSetting type, which augments engine-types' BaseImageSetLayerSetting
+/** The full ImageSetLayerSetting type, which augments engine-types' BaseImageSetLayerSetting
  * with types that are only provided within the engine itself.
  */
 export type ImageSetLayerSetting = LayerSetting | BaseImageSetLayerSetting;
@@ -969,7 +1011,7 @@ export class SpreadSheetLayer extends Layer {
   // get_colorMap
   get_colorMapColumn(): number;
   set_colorMapColumn(v: number): number;
-  // get_colorMapper
+  get_colorMapper(): ColorMapContainer;
   get_colorMapperName(): string;
   set_colorMapperName(v: string): string;
   get_coordinatesType(): CoordinatesType;
@@ -1000,8 +1042,8 @@ export class SpreadSheetLayer extends Layer {
   get_markerIndex(): number;
   set_markerIndex(v: number): number;
   // get_markerMix
-  get_markerScale(): number;
-  set_markerScale(v: number): number;
+  get_markerScale(): MarkerScales;
+  set_markerScale(v: MarkerScales): MarkerScales;
   get_nameColumn(): number;
   set_nameColumn(v: number): number;
   get_normalizeColorMap(): boolean;
@@ -1050,8 +1092,11 @@ export class SpreadSheetLayer extends Layer {
   updateData(data: string, purgeOld: boolean, purgeAll: boolean, hasHeader: boolean): boolean;
 }
 
-// No settings with types not implemented in engine-types.
-export type SpreadSheetLayerSetting = BaseSpreadSheetLayerSetting;
+/** The full SpreadSheetLayerSetting type, which augments engine-types'
+ * BaseSpreadSheetLayerSetting with types that are only provided within the
+ * engine itself.
+ */
+export type SpreadSheetLayerSetting = LayerSetting | BaseSpreadSheetLayerSetting;
 
 /** A WWT tour. */
 export class TourDocument {
