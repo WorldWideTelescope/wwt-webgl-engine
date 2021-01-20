@@ -213,6 +213,22 @@ export interface ApplyFitsLayerSettingsOptions {
   settings: ImageSetLayerSetting[];
 }
 
+export interface UpdateTableLayerOptions {
+  /** The ID of the table ("spreadsheet") layer. */
+  id: string;
+
+  /** The new data, as CSV text. */
+  dataCsv: string;
+}
+
+export interface ApplyTableLayerSettingsOptions {
+  /** The ID of the table ("spreadsheet") layer. */
+  id: string;
+
+  /** The settings to apply. */
+  settings: SpreadSheetLayerSetting[];
+}
+
 /** Options for [[WWTInstance.setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
@@ -515,6 +531,24 @@ export class WWTInstance {
     if (layer && layer instanceof ImageSetLayer) {
       for (const setting of options.settings) {
         applyImageSetLayerSetting(layer, setting);
+      }
+    }
+  }
+
+  /** Update the data within a tabular data layer. */
+  updateTableLayer(options: UpdateTableLayerOptions): void {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof SpreadSheetLayer) {
+      layer.updateData(options.dataCsv, true, true, true);
+    }
+  }
+
+  /** Apply settings to a tabular data layer. */
+  applyTableLayerSettings(options: ApplyTableLayerSettingsOptions): void {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof SpreadSheetLayer) {
+      for (const setting of options.settings) {
+        applySpreadSheetLayerSetting(layer, setting);
       }
     }
   }
