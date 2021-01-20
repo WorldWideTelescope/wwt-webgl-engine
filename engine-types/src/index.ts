@@ -136,6 +136,11 @@ export enum ImageSetType {
   sandbox = 5
 }
 
+export enum MarkerScales {
+  screen = 0,
+  world = 1,
+}
+
 export enum PlotTypes {
   gaussian = 0,
   point = 1,
@@ -525,7 +530,7 @@ export type BaseSpreadSheetLayerSetting =
   ["lngColumn", number] |
   ["markerColumn", number] |
   ["markerIndex", number] |
-  ["markerScale", number] |
+  ["markerScale", MarkerScales] |
   ["nameColumn", number] |
   ["normalizeColorMap", boolean] |
   ["normalizeColorMapMax", number] |
