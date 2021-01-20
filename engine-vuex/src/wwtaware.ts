@@ -12,18 +12,22 @@ import {
   Guid,
   Imageset,
   ImageSetLayer,
+  SpreadSheetLayer,
 } from "@wwtelescope/engine";
 
 import {
   ApplyFitsLayerSettingsOptions,
+  ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
+  UpdateTableLayerOptions,
 } from "@wwtelescope/engine-helpers";
 
 import {
+  CreateTableLayerParams,
   GotoRADecZoomParams,
   LoadTourParams,
   LoadImageCollectionParams,
@@ -74,6 +78,7 @@ export class WWTAwareComponent extends Vue {
     this.$options.methods = {
       ...this.$options.methods,
       ...mapActions([
+        "createTableLayer",
         "gotoRADecZoom",
         "gotoTarget",
         "loadImageCollection",
@@ -83,6 +88,7 @@ export class WWTAwareComponent extends Vue {
       ]),
       ...mapMutations([
         "applyFitsLayerSettings",
+        "applyTableLayerSettings",
         "applySetting",
         "deleteLayer",
         "seekToTourTimecode",
@@ -99,6 +105,7 @@ export class WWTAwareComponent extends Vue {
         "startTour",
         "stretchFitsLayer",
         "toggleTourPlayPauseState",
+        "updateTableLayer",
         "zoom",
       ]),
     };
@@ -127,6 +134,7 @@ export class WWTAwareComponent extends Vue {
 
   // Mutations
   applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
+  applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
   applySetting!: (_s: EngineSetting) => void;
   deleteLayer!: (id: string | Guid) => void;
   seekToTourTimecode!: (value: number) => void;
@@ -143,9 +151,11 @@ export class WWTAwareComponent extends Vue {
   startTour!: () => void;
   stretchFitsLayer!: (o: StretchFitsLayerOptions) => void;
   toggleTourPlayPauseState!: () => void;
+  updateTableLayer!: (o: UpdateTableLayerOptions) => void;
   zoom!: (f: number) => void;
 
   // Actions
+  createTableLayer!: (_o: CreateTableLayerParams) => Promise<SpreadSheetLayer>;
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
   gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
