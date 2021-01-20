@@ -48,12 +48,28 @@ import * as moment from "moment";
 import * as screenfull from "screenfull";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { isEngineSetting, isImageSetLayerSetting } from "@wwtelescope/engine-helpers";
-import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { ImageSetLayer, ImageSetLayerSetting } from "@wwtelescope/engine";
+
+import {
+  ImageSetType,
+  SolarSystemObjects,
+} from "@wwtelescope/engine-types";
+
+import {
+  ImageSetLayer,
+  ImageSetLayerSetting,
+  SpreadSheetLayer,
+} from "@wwtelescope/engine";
+
+import {
+  isEngineSetting,
+  isImageSetLayerSetting,
+} from "@wwtelescope/engine-helpers";
+
 import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
 
 import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
+
+import { convertPywwtSpreadSheetLayerSetting } from "./settings";
 
 const D2R = Math.PI / 180.0;
 
@@ -195,6 +211,130 @@ class FitsLayerMessageHandler {
   }
 }
 
+type AnyTableLayerMessage =
+  classicPywwt.CreateTableLayerMessage |
+  classicPywwt.UpdateTableLayerMessage |
+  classicPywwt.ModifyTableLayerMessage |
+  classicPywwt.RemoveTableLayerMessage;
+
+/** Helper for handling messages that mutate tabular / "spreadsheet" layers. */
+class TableLayerMessageHandler {
+  private owner: App;
+  private created = false;
+  private internalId: string | null = null;
+  private layer: SpreadSheetLayer | null = null; // hack for settings
+  private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
+  private queuedSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
+  private queuedRemoval: classicPywwt.RemoveTableLayerMessage | null = null;
+
+  constructor(owner: App) {
+    this.owner = owner;
+  }
+
+  handleCreateMessage(msg: classicPywwt.CreateTableLayerMessage) {
+    if (this.created)
+      return;
+
+    const data = atob(msg.table);
+
+    this.owner.createTableLayer({
+      name: msg.id,
+      referenceFrame: msg.frame,
+      dataCsv: data,
+    }).then((layer) => this.layerInitialized(layer));
+
+    this.created = true;
+  }
+
+  private layerInitialized(layer: SpreadSheetLayer) {
+    this.internalId = layer.id.toString();
+    this.layer = layer;
+
+    if (this.queuedUpdate !== null) {
+      this.handleUpdateMessage(this.queuedUpdate);
+      this.queuedUpdate = null;
+    }
+
+    // Settings need transformation from the pywwt JSON "wire protocol" to
+    // what's used internally by the engine and our surrounding TypeScript
+    // infrastructure. They're close, but some mapping is needed.
+
+    const settings = [];
+
+    for (const ps of this.queuedSettings) {
+      const es = convertPywwtSpreadSheetLayerSetting(ps, layer);
+      if (es !== null) {
+        settings.push(es);
+      }
+    }
+
+    this.owner.applyTableLayerSettings({
+      id: this.internalId,
+      settings,
+    });
+    this.queuedSettings = [];
+
+    if (this.queuedRemoval !== null) {
+      this.handleRemoveMessage(this.queuedRemoval);
+      this.queuedRemoval = null;
+    }
+  }
+
+  handleUpdateMessage(msg: classicPywwt.UpdateTableLayerMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      this.queuedUpdate = msg;
+    } else {
+      this.owner.updateTableLayer({
+        id: this.internalId,
+        dataCsv: atob(msg.table),
+      });
+    }
+  }
+
+  handleModifyMessage(msg: classicPywwt.ModifyTableLayerMessage) {
+    // The messages sent by pywwt here do not map directly into internal WWT
+    // settings - they are more transport-friendly versions, as expressed in the
+    // PywwtSpreadSheetLayerSetting type.
+
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (!classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
+      return;
+    }
+
+    // This `if` statement is over-conservative to make TypeScript happy:
+    if (this.layer === null || this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      this.queuedSettings.push(setting);
+    } else {
+      const es = convertPywwtSpreadSheetLayerSetting(setting, this.layer);
+      if (es !== null) {
+        this.owner.applyTableLayerSettings({
+          id: this.internalId,
+          settings: [es],
+        });
+      }
+    }
+  }
+
+  handleRemoveMessage(msg: classicPywwt.RemoveTableLayerMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedRemoval === null) {
+        this.queuedRemoval = msg;
+      }
+    } else {
+      this.owner.deleteLayer(this.internalId);
+      this.internalId = null;
+      this.created = false;
+    }
+  }
+}
+
 @Component
 export default class App extends WWTAwareComponent {
   @Prop({default: null}) readonly allowedOrigin!: string | null;
@@ -258,7 +398,7 @@ export default class App extends WWTAwareComponent {
       this.gotoRADecZoom({
         raRad: msg.ra * D2R,
         decRad: msg.dec * D2R,
-        zoomDeg: msg.fov, // TODO: make sure we're not off by a factor of 6 here
+        zoomDeg: msg.fov * 6,
         instant: msg.instant,
       });
     } else if (classicPywwt.isModifySettingMessage(msg)) {
@@ -277,6 +417,14 @@ export default class App extends WWTAwareComponent {
       this.getFitsLayerHandler(msg).handleModifyMessage(msg);
     } else if (classicPywwt.isRemoveFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
+    } else if (classicPywwt.isCreateTableLayerMessage(msg)) {
+      this.getTableLayerHandler(msg).handleCreateMessage(msg);
+    } else if (classicPywwt.isUpdateTableLayerMessage(msg)) {
+      this.getTableLayerHandler(msg).handleUpdateMessage(msg);
+    } else if (classicPywwt.isModifyTableLayerMessage(msg)) {
+      this.getTableLayerHandler(msg).handleModifyMessage(msg);
+    } else if (classicPywwt.isRemoveTableLayerMessage(msg)) {
+      this.getTableLayerHandler(msg).handleRemoveMessage(msg);
     } else if (classicPywwt.isLoadTourMessage(msg)) {
       this.loadTour({
         url: msg.url,
@@ -306,13 +454,9 @@ export default class App extends WWTAwareComponent {
     // AddPolygonPointMessage
     // ClearAnnotationsMessage
     // CreateAnnotationMessage
-    // CreateTableLayerMessage
     // ModifyAnnotationMessage
-    // ModifyTableLayerMessage
     // RemoveAnnotationMessage
-    // RemoveTableLayerMessage
     // SetCircleCenterMessage
-    // UpdateTableLayerMessage
   }
 
   // Keyed by "external" layer IDs
@@ -324,6 +468,19 @@ export default class App extends WWTAwareComponent {
     if (handler === undefined) {
       handler = new FitsLayerMessageHandler(this);
       this.fitsLayers.set(msg.id, handler);
+    }
+
+    return handler;
+  }
+
+  private tableLayers: Map<string, TableLayerMessageHandler> = new Map();
+
+  private getTableLayerHandler(msg: AnyTableLayerMessage): TableLayerMessageHandler {
+    let handler = this.tableLayers.get(msg.id);
+
+    if (handler === undefined) {
+      handler = new TableLayerMessageHandler(this);
+      this.tableLayers.set(msg.id, handler);
     }
 
     return handler;
