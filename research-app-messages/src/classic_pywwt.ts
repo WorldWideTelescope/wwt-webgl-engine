@@ -629,7 +629,7 @@ export function isTrackObjectMessage(o: any): o is TrackObjectMessage {  // esli
 /** A command to update a table layer. */
 export interface UpdateTableLayerMessage {
   /** The tag identifying this message type. */
-  event: "table_layer_create";
+  event: "table_layer_update";
 
   /** An identifier for referring to this layer later. */
   id: string;
@@ -641,7 +641,7 @@ export interface UpdateTableLayerMessage {
 /** Type guard function for UpdateTableLayerMessage. */
 export function isUpdateTableLayerMessage(o: any): o is UpdateTableLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
-    o.event == "table_layer_create" &&
+    o.event == "table_layer_update" &&
     typeof o.id === "string" &&
     typeof o.table === "string";
 }
