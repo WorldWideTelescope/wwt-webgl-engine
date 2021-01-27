@@ -4,32 +4,213 @@
 import { D2H, R2D, R2H } from "@wwtelescope/astro";
 
 import {
-  WWTBooleanSetting,
-  WWTColor,
-  WWTColorSetting,
-  WWTConstellationFilterSetting,
-  WWTNumberSetting,
-  WWTSetting,
-  WWTStringSetting,
   ImageSetType,
+  isBaseEngineSetting,
+  isBaseLayerSetting,
+  isBaseImageSetLayerSetting,
+  isBaseSpreadSheetLayerSetting,
 } from "@wwtelescope/engine-types";
 
 import {
+  Annotation,
+  AnnotationSetting,
+  Circle,
+  CircleAnnotationSetting,
+  Color,
   ConstellationFilter,
+  EngineSetting,
   Folder,
   Imageset,
   ImageSetLayer,
+  ImageSetLayerSetting,
+  Layer,
   LayerManager,
   LayerManagerObject,
+  LayerSetting,
   Place,
+  Poly,
+  PolyAnnotationSetting,
+  PolyLine,
+  PolyLineAnnotationSetting,
   ScriptInterface,
   SpaceTimeControllerObject,
   TourPlayer,
   Wtml,
   WWTControl,
-  SpaceTimeController
+  SpaceTimeController,
+  SpreadSheetLayer,
+  SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
 
+
+// Type guards for the augmented setting types
+
+const annotationSettingTypeInfo: {[ix: string]: boolean} = {
+  "id/string": true,
+  "label/string": true,
+  "opacity/number": true,
+  "showHoverLabel/boolean": true,
+  "tag/string": true,
+}
+
+/** Type guard function for AnnotationSetting. */
+export function isAnnotationSetting(obj: [string, any]): obj is AnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return key in annotationSettingTypeInfo;
+}
+
+/** Apply a setting to a generic Annotation. */
+export function applyAnnotationSetting(ann: Annotation, setting: AnnotationSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (ann as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+const circleAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+  "fill/boolean": true,
+  "fillColor/string": true,
+  "lineColor/string": true,
+  "lineWidth/number": true,
+  "radius/number": true,
+  "skyRelative/boolean": true,
+}
+
+/** Type guard function for CircleAnnotationSetting. */
+export function isCircleAnnotationSetting(obj: [string, any]): obj is CircleAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in circleAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
+}
+
+/** Apply a setting to a generic CircleAnnotation. */
+export function applyCircleAnnotationSetting(circle: Circle, setting: CircleAnnotationSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (circle as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+const polyAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+  "fill/boolean": true,
+  "fillColor/string": true,
+  "lineColor/string": true,
+  "lineWidth/number": true,
+}
+
+/** Type guard function for PolyAnnotationSetting. */
+export function isPolyAnnotationSetting(obj: [string, any]): obj is PolyAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in polyAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
+}
+
+/** Apply a setting to a generic PolyAnnotation. */
+export function applyPolyAnnotationSetting(poly: Poly, setting: PolyAnnotationSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (poly as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+const polyLineAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+  "fill/boolean": true,
+  "fillColor/string": true,
+  "lineColor/string": true,
+  "lineWidth/number": true,
+}
+
+/** Type guard function for PolyLineAnnotationSetting. */
+export function isPolyLineAnnotationSetting(obj: [string, any]): obj is PolyLineAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in polyLineAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
+}
+
+/** Apply a setting to a generic PolyLineAnnotation. */
+export function applyPolyLineAnnotationSetting(polyLine: PolyLine, setting: PolyLineAnnotationSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (polyLine as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+const engineSettingTypeInfo = {
+  "constellationArtFilter/ConstellationFilter": true,
+  "constellationBoundariesFilter/ConstellationFilter": true,
+  "constellationBoundryColor/Color": true,
+  "constellationFigureColor/Color": true,
+  "constellationFiguresFilter/ConstellationFilter": true,
+  "constellationNamesFilter/ConstellationFilter": true,
+  "constellationSelectionColor/Color": true,
+  "crosshairsColor/Color": true,
+};
+
+/** Type guard function for EngineSetting. */
+export function isEngineSetting(obj: [string, any]): obj is EngineSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  let typekey: string = typeof obj[1];
+
+  if (obj[1] instanceof Color) {
+    typekey = "Color";
+  } else if (obj[1] instanceof ConstellationFilter) {
+    typekey = "ConstellationFilter";
+  }
+
+  const key = obj[0] + "/" + typekey;
+  return (key in engineSettingTypeInfo) || isBaseEngineSetting(obj);
+}
+
+
+const layerSettingTypeInfo = {
+  "color/Color": true,
+};
+
+/** Type guard function for LayerSetting. */
+export function isLayerSetting(obj: [string, any]): obj is LayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  let typekey: string = typeof obj[1];
+
+  if (obj[1] instanceof Color) {
+    typekey = "Color";
+  }
+
+  const key = obj[0] + "/" + typekey;
+  return (key in layerSettingTypeInfo) || isBaseLayerSetting(obj);
+}
+
+/** Apply a setting to a generic Layer. */
+export function applyLayerSetting(layer: Layer, setting: LayerSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+/** Type guard function for ImageSetLayerSetting. */
+export function isImageSetLayerSetting(obj: [string, any]): obj is ImageSetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  // No special settings specific to non-base ImageSetLayerSetting.
+  return isLayerSetting(obj) || isBaseImageSetLayerSetting(obj);
+}
+
+/** Apply a setting to an ImageSetLayer. */
+export function applyImageSetLayerSetting(layer: ImageSetLayer, setting: ImageSetLayerSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+/** Type guard function for SpreadSheetLayerSetting. */
+export function isSpreadSheetLayerSetting(obj: [string, any]): obj is SpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  // No special settings specific to non-base SpreadSheetLayerSetting.
+  return isLayerSetting(obj) || isBaseSpreadSheetLayerSetting(obj);
+}
+
+/** Apply a setting to an SpreadSheetLayer. */
+export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: SpreadSheetLayerSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+// The WWTInstance wrapper class and friends.
 
 export const enum InitControlViewType {
   Sky = "Sky",
@@ -101,6 +282,54 @@ export interface LoadFitsLayerOptions {
   gotoTarget: boolean;
 }
 
+/** Options for [[WWTInstance.stretchFitsLayer]]. */
+export interface StretchFitsLayerOptions {
+  /** The ID of the FITS layer. */
+  id: string;
+
+  /** The kind of stretch type to use. TODO: enum-ify! 0..4 = lin/log/pow/sqrt/histeq */
+  stretch: number;
+
+  /** The data value to use for the minimum stretch bound. */
+  vmin: number;
+
+  /** The data value to use for the maximum stretch bound. */
+  vmax: number;
+}
+
+/** Options for [[WWTInstance.setFitsLayerColormap]]. */
+export interface SetFitsLayerColormapOptions {
+  /** The ID of the FITS layer. */
+  id: string;
+
+  /** The name of the colormap. TODO: document! */
+  name: string;
+}
+
+export interface ApplyFitsLayerSettingsOptions {
+  /** The ID of the FITS layer. */
+  id: string;
+
+  /** The settings to apply. */
+  settings: ImageSetLayerSetting[];
+}
+
+export interface UpdateTableLayerOptions {
+  /** The ID of the table ("spreadsheet") layer. */
+  id: string;
+
+  /** The new data, as CSV text. */
+  dataCsv: string;
+}
+
+export interface ApplyTableLayerSettingsOptions {
+  /** The ID of the table ("spreadsheet") layer. */
+  id: string;
+
+  /** The settings to apply. */
+  settings: SpreadSheetLayerSetting[];
+}
+
 /** Options for [[WWTInstance.setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
@@ -112,7 +341,7 @@ export interface SetupForImagesetOptions {
 }
 
 interface ResolveFunction<T> {
-  (value?: T): void;
+  (value: T): void;
 }
 
 interface RejectFunction {
@@ -163,10 +392,10 @@ export class WWTInstance {
     this.stc = SpaceTimeController;
 
     // Override some defaults
-    this.applySetting([WWTBooleanSetting.showConstellationBoundries, false]);
-    this.applySetting([WWTBooleanSetting.showConstellationFigures, false]);
-    this.applySetting([WWTBooleanSetting.showConstellationSelection, false]);
-    this.applySetting([WWTBooleanSetting.showCrosshairs, false]);
+    this.applySetting(["showConstellationBoundries", false]);
+    this.applySetting(["showConstellationFigures", false]);
+    this.applySetting(["showConstellationSelection", false]);
+    this.applySetting(["showCrosshairs", false]);
 
     // Ready promise initialization:
     this.si.add_ready((_si) => {
@@ -375,27 +604,62 @@ export class WWTInstance {
     });
   }
 
+  /** Change the "stretch" settings of a FITS image layer. */
+  stretchFitsLayer(options: StretchFitsLayerOptions): void {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof ImageSetLayer) {
+      layer.setImageScalePhysical(options.stretch, options.vmin, options.vmax);
+
+      // This is kind of random, but follows the pywwt API implementation.
+      const fits = layer.getFitsImage();
+      if (fits !== null) {
+        fits.transparentBlack = false;
+      }
+    }
+  }
+
+  /** Change the colormap settings of a FITS image layer. */
+  setFitsLayerColormap(options: SetFitsLayerColormapOptions): void {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof ImageSetLayer) {
+      layer.set_colorMapperName(options.name);
+    }
+  }
+
+  /** Apply settings to a FITS image layer. */
+  applyFitsLayerSettings(options: ApplyFitsLayerSettingsOptions): void {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof ImageSetLayer) {
+      for (const setting of options.settings) {
+        applyImageSetLayerSetting(layer, setting);
+      }
+    }
+  }
+
+  /** Update the data within a tabular data layer. */
+  updateTableLayer(options: UpdateTableLayerOptions): void {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof SpreadSheetLayer) {
+      layer.updateData(options.dataCsv, true, true, true);
+    }
+  }
+
+  /** Apply settings to a tabular data layer. */
+  applyTableLayerSettings(options: ApplyTableLayerSettingsOptions): void {
+    const layer = this.lm.get_layerList()[options.id];
+    if (layer && layer instanceof SpreadSheetLayer) {
+      for (const setting of options.settings) {
+        applySpreadSheetLayerSetting(layer, setting);
+      }
+    }
+  }
+
   // "Mutator" type operations -- not async.
 
-  applySetting(setting: WWTSetting): void {
+  applySetting(setting: EngineSetting): void {
+    const funcName = "set_" + setting[0];
     const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-    let sname: string;
-
-    if (typeof value === "boolean") {
-      sname = WWTBooleanSetting[setting[0]];
-    } else if (typeof value === "number") {
-      sname = WWTNumberSetting[setting[0]];
-    } else if (typeof value === "string") {
-      sname = WWTStringSetting[setting[0]];
-    } else if (value instanceof WWTColor) {
-      sname = WWTColorSetting[setting[0]];
-    } else if (value instanceof ConstellationFilter) {
-      sname = WWTConstellationFilterSetting[setting[0]];
-    } else {
-      throw new Error("can't happen");
-    }
-
-    (this.si.settings as any)["set_" + sname](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+    (this.si.settings as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 
   setBackgroundImageByName(imagesetName: string): void {

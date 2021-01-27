@@ -5,18 +5,32 @@ import Vue from "vue";
 import { Module, VuexModule, Mutation, MutationAction, Action } from 'vuex-module-decorators';
 
 import { D2R, H2R } from "@wwtelescope/astro";
-import { ImageSetType, WWTSetting } from "@wwtelescope/engine-types";
 
 import {
+  AltUnits,
+  ImageSetType,
+  SolarSystemObjects,
+} from "@wwtelescope/engine-types";
+
+import {
+  Annotation,
+  EngineSetting,
   Folder,
+  Guid,
   Imageset,
-  ImageSetLayer
+  ImageSetLayer,
+  SpreadSheetLayer,
 } from "@wwtelescope/engine";
 
 import {
+  ApplyFitsLayerSettingsOptions,
+  ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
+  SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
+  StretchFitsLayerOptions,
+  UpdateTableLayerOptions,
   WWTInstance
 } from "@wwtelescope/engine-helpers";
 
@@ -139,6 +153,18 @@ export interface WWTEngineVuexState {
    * TODO: define this properly for 3D modes!
    */
   zoomDeg: number;
+}
+
+/** The parameters for the [[WWTEngineVuexModule.createTableLayer]] action. */
+export interface CreateTableLayerParams {
+  /** The name to assign the layer. TODO: understand where (if anywhere) this name is exposed. */
+  name: string;
+
+  /** The name of the reference frame to which this layer is attached. */
+  referenceFrame: string;
+
+  /** The table data, as big CSV string. */
+  dataCsv: string;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
@@ -274,7 +300,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
-  applySetting(setting: WWTSetting): void {
+  applySetting(setting: EngineSetting): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot applySetting without linking to WWTInstance');
     Vue.$wwt.inst.applySetting(setting);
@@ -328,9 +354,30 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   setClockRate(rate: number): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setClockRate without linking to WWTInstance');
-    Vue.$wwt.inst.stc.set_timeRate(rate);
-    this.clockRate = rate;
-    this.clockDiscontinuities += 1;
+
+    if (Vue.$wwt.inst.stc.get_timeRate() != rate) {
+      Vue.$wwt.inst.stc.set_timeRate(rate);
+      this.clockRate = rate;
+      this.clockDiscontinuities += 1;
+    }
+  }
+
+  @Mutation
+  setClockSync(isSynced: boolean): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setClockSync without linking to WWTInstance');
+
+    if (Vue.$wwt.inst.stc.get_syncToClock() != isSynced) {
+      Vue.$wwt.inst.stc.set_syncToClock(isSynced);
+
+      if (isSynced) {
+        this.clockRate = Vue.$wwt.inst.stc.get_timeRate();
+      } else {
+        this.clockRate = 0;
+      }
+
+      this.clockDiscontinuities += 1;
+    }
   }
 
   @Mutation
@@ -413,6 +460,13 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return Vue.$wwt.inst.gotoTarget(options);
   }
 
+  @Mutation
+  setTrackedObject(obj: SolarSystemObjects): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setTrackedObject without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.renderContext.set_solarSystemTrack(obj);
+  }
+
   @MutationAction
   async loadTour(
     {url, play}: LoadTourParams
@@ -460,5 +514,114 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadFitsLayer without linking to WWTInstance');
     return Vue.$wwt.inst.loadFitsLayer(options);
+  }
+
+  @Mutation
+  stretchFitsLayer(options: StretchFitsLayerOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot stretchFitsLayer without linking to WWTInstance');
+    Vue.$wwt.inst.stretchFitsLayer(options);
+  }
+
+  @Mutation
+  setFitsLayerColormap(options: SetFitsLayerColormapOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setFitsLayerColormap without linking to WWTInstance');
+    Vue.$wwt.inst.setFitsLayerColormap(options);
+  }
+
+  @Mutation
+  applyFitsLayerSettings(options: ApplyFitsLayerSettingsOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot applyFitsLayerSettings without linking to WWTInstance');
+    Vue.$wwt.inst.applyFitsLayerSettings(options);
+  }
+
+  @Action({ rawError: true })
+  async createTableLayer(
+    options: CreateTableLayerParams
+  ): Promise<SpreadSheetLayer> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot createTableLayer without linking to WWTInstance');
+
+    const layer = Vue.$wwt.inst.lm.createSpreadsheetLayer(
+      options.referenceFrame,
+      options.name,
+      options.dataCsv
+    );
+
+    // Value-add init copied from the pywwt JS component.
+    // Override any column guesses:
+    layer.set_lngColumn(-1);
+    layer.set_latColumn(-1);
+    layer.set_altColumn(-1);
+    layer.set_sizeColumn(-1);
+    layer.set_colorMapColumn(-1);
+    layer.set_startDateColumn(-1);
+    layer.set_endDateColumn(-1);
+    layer.set_xAxisColumn(-1);
+    layer.set_yAxisColumn(-1);
+    layer.set_zAxisColumn(-1);
+
+    layer.set_altUnit(AltUnits.meters);
+    layer.set_referenceFrame(options.referenceFrame);
+
+    if (options.referenceFrame == 'Sky') {
+      layer.set_astronomical(true);
+    }
+
+    // Currently, table creation is synchronous, but treat it as async
+    // in case our API needs to get more sophisticated later.
+    return new Promise((resolve, _reject) => resolve(layer));
+  }
+
+  @Mutation
+  applyTableLayerSettings(options: ApplyTableLayerSettingsOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot applyTableLayerSettings without linking to WWTInstance');
+    Vue.$wwt.inst.applyTableLayerSettings(options);
+  }
+
+  @Mutation
+  updateTableLayer(options: UpdateTableLayerOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot updateTableLayer without linking to WWTInstance');
+    Vue.$wwt.inst.updateTableLayer(options);
+  }
+
+  @Mutation
+  deleteLayer(id: string | Guid): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot deleteLayer without linking to WWTInstance');
+
+    if (typeof id === "string") {
+      const guid = Guid.fromString(id);
+      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
+    } else {
+      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
+    }
+  }
+
+  // Annotations
+
+  @Mutation
+  addAnnotation(ann: Annotation): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot addAnnotation without linking to WWTInstance');
+    Vue.$wwt.inst.si.addAnnotation(ann);
+  }
+
+  @Mutation
+  removeAnnotation(ann: Annotation): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot removeAnnotation without linking to WWTInstance');
+    Vue.$wwt.inst.si.removeAnnotation(ann);
+  }
+
+  @Mutation
+  clearAnnotations(): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot clearAnnotations without linking to WWTInstance');
+    Vue.$wwt.inst.si.clearAnnotations();
   }
 }

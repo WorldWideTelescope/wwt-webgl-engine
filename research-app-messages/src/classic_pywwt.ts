@@ -614,22 +614,22 @@ export interface TrackObjectMessage {
   /** The tag identifying this message type. */
   event: "track_object";
 
-  /** The name of the object to track. TODO: more details here. */
-  code: string;
+  /** The SolarSystemObjects code of the object to track. */
+  code: number;
 }
 
 /** Type guard function for TrackObjectMessage. */
 export function isTrackObjectMessage(o: any): o is TrackObjectMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "track_object" &&
-    typeof o.code === "string";
+    typeof o.code === "number";
 }
 
 
 /** A command to update a table layer. */
 export interface UpdateTableLayerMessage {
   /** The tag identifying this message type. */
-  event: "table_layer_create";
+  event: "table_layer_update";
 
   /** An identifier for referring to this layer later. */
   id: string;
@@ -641,7 +641,7 @@ export interface UpdateTableLayerMessage {
 /** Type guard function for UpdateTableLayerMessage. */
 export function isUpdateTableLayerMessage(o: any): o is UpdateTableLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
-    o.event == "table_layer_create" &&
+    o.event == "table_layer_update" &&
     typeof o.id === "string" &&
     typeof o.table === "string";
 }
@@ -691,7 +691,7 @@ export type PywwtMessage =
  * to modify those messages to turn them into absolute URLs. That's what this
  * function enables. The input is modified in-place.
 */
-export function applyBaseUrlIfApplicable(o: any, baseurl: string) {  // eslint-disable-line @typescript-eslint/no-explicit-any
+export function applyBaseUrlIfApplicable(o: any, baseurl: string): void {  // eslint-disable-line @typescript-eslint/no-explicit-any
   if (isCreateFitsLayerMessage(o)) {
     o.url = new URL(o.url, baseurl).toString();
   } else if (isLoadImageCollectionMessage(o)) {
@@ -699,4 +699,138 @@ export function applyBaseUrlIfApplicable(o: any, baseurl: string) {  // eslint-d
   } else if (isLoadTourMessage(o)) {
     o.url = new URL(o.url, baseurl).toString();
   }
+}
+
+/** Spreadsheet/table layer setting values as serialized in pywwt. Enumerations
+ * are given stringy values, columns are mapped from indices to names, etc.
+ */
+export type PywwtSpreadSheetLayerSetting =
+  ["altColumn", string | number] | // pywwt customization
+  ["altType", string] | // pywwt customization
+  ["altUnit", string] | // pywwt customization
+  ["astronomical", boolean] |
+  ["barChartBitmask", number] |
+  ["beginRange", Date] |
+  ["cartesianCustomScale", number] |
+  ["cartesianScale", string] | // pywwt customization
+  ["color", string] | // pywwt customization
+  ["colorMapColumn", string | number] | // pywwt customization
+  ["colorMapperName", string] |
+  ["coordinatesType", string] | // pywwt customization
+  ["decay", number] |
+  ["dynamicColor", boolean] |
+  ["dynamicData", boolean] |
+  ["endDateColumn", string | number] | // pywwt customization
+  ["endRange", Date] |
+  ["fadeSpan", number] |
+  ["geometryColumn", string | number] | // pywwt customization
+  ["hyperlinkColumn", string | number] | // pywwt customization
+  ["hyperlinkFormat", string] |
+  ["latColumn", string | number] | // pywwt customization
+  ["lngColumn", string | number] | // pywwt customization
+  ["markerColumn", string | number] | // pywwt customization
+  ["markerIndex", number] |
+  ["markerScale", string] | // pywwt customization
+  ["name", string] |
+  ["nameColumn", string | number] | // pywwt customization
+  ["normalizeColorMap", boolean] |
+  ["normalizeColorMapMax", number] |
+  ["normalizeColorMapMin", number] |
+  ["normalizeSize", boolean] |
+  ["normalizeSizeClip", boolean] |
+  ["normalizeSizeMax", number] |
+  ["normalizeSizeMin", number] |
+  ["opacity", number] |
+  ["opened", boolean] |
+  ["plotType", string] | // pywwt customization
+  ["pointScaleType", number] | // pywwt customization -- but unlike other enums, a number not a string
+  ["raUnits", string] | // pywwt customization
+  ["referenceFrame", string] |
+  ["scaleFactor", number] |
+  ["showFarSide", boolean] |
+  ["sizeColumn", string | number] | // pywwt customization
+  ["startDateColumn", string | number] | // pywwt customization
+  ["timeSeries", boolean] |
+  ["version", number] |
+  ["xAxisColumn", string | number] | // pywwt customization
+  ["xAxisReverse", boolean] |
+  ["yAxisColumn", string | number] | // pywwt customization
+  ["yAxisReverse", boolean] |
+  ["zAxisColumn", string | number] | // pywwt customization
+  ["zAxisReverse", boolean];
+
+const pywwtSpreadSheetLayerSettingTypeInfo: {[i: string]: boolean} = {
+  "altColumn/string": true,
+  "altColumn/number": true,
+  "altType/string": true,
+  "altUnit/string": true,
+  "astronomical/boolean": true,
+  "barChartBitmask/number": true,
+  "beginRange/Date": true,
+  "cartesianCustomScale/number": true,
+  "cartesianScale/string": true,
+  "color/string": true,
+  "colorMapColumn/string": true,
+  "colorMapColumn/number": true,
+  "colorMapperName/string": true,
+  "coordinatesType/string": true,
+  "decay/number": true,
+  "dynamicColor/boolean": true,
+  "dynamicData/boolean": true,
+  "endDateColumn/string": true,
+  "endDateColumn/number": true,
+  "endRange/Date": true,
+  "fadeSpan/number": true,
+  "geometryColumn/string": true,
+  "geometryColumn/number": true,
+  "hyperlinkColumn/string": true,
+  "hyperlinkColumn/number": true,
+  "hyperlinkFormat/string": true,
+  "latColumn/string": true,
+  "latColumn/number": true,
+  "lngColumn/string": true,
+  "lngColumn/number": true,
+  "markerColumn/string": true,
+  "markerColumn/number": true,
+  "markerIndex/number": true,
+  "markerScale/string": true,
+  "name/string": true,
+  "nameColumn/string": true,
+  "nameColumn/number": true,
+  "normalizeColorMap/boolean": true,
+  "normalizeColorMapMax/number": true,
+  "normalizeColorMapMin/number": true,
+  "normalizeSize/boolean": true,
+  "normalizeSizeClip/boolean": true,
+  "normalizeSizeMax/number": true,
+  "normalizeSizeMin/number": true,
+  "opacity/number": true,
+  "opened/boolean": true,
+  "plotType/string": true,
+  "pointScaleType/number": true,
+  "raUnits/string": true,
+  "referenceFrame/string": true,
+  "scaleFactor/number": true,
+  "showFarSide/boolean": true,
+  "sizeColumn/string": true,
+  "sizeColumn/number": true,
+  "startDateColumn/string": true,
+  "startDateColumn/number": true,
+  "timeSeries/boolean": true,
+  "version/number": true,
+  "xAxisColumn/string": true,
+  "xAxisColumn/number": true,
+  "xAxisReverse/boolean": true,
+  "yAxisColumn/string": true,
+  "yAxisColumn/number": true,
+  "yAxisReverse/boolean": true,
+  "zAxisColumn/string": true,
+  "zAxisColumn/number": true,
+  "zAxisReverse/boolean": true,
+};
+
+/** Type guard function for PywwtSpreadSheetSetting. */
+export function isPywwtSpreadSheetLayerSetting(obj: [string, any]): obj is PywwtSpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in pywwtSpreadSheetLayerSettingTypeInfo);
 }

@@ -79,6 +79,12 @@ export enum Classification {
   other = 436207616
 }
 
+export enum CoordinatesType {
+  spherical = 0,
+  rectangular = 1,
+  orbital = 2,
+}
+
 export enum DataTypes {
   byteT = 0,
   int16T = 1,
@@ -130,6 +136,28 @@ export enum ImageSetType {
   sandbox = 5
 }
 
+export enum MarkerScales {
+  screen = 0,
+  world = 1,
+}
+
+export enum PlotTypes {
+  gaussian = 0,
+  point = 1,
+  circle = 2,
+  square = 3,
+  pushPin = 4,
+  custom = 5,
+}
+
+export enum PointScaleTypes {
+  linear = 0,
+  power = 1,
+  log = 2,
+  constant = 3,
+  stellarMagnitude = 4,
+}
+
 export enum ProjectionType {
   mercator = 0,
   equirectangular = 1,
@@ -139,6 +167,11 @@ export enum ProjectionType {
   spherical = 4,
   skyImage = 5,
   plotted = 6
+}
+
+export enum RAUnits {
+  hours = 0,
+  degrees = 1,
 }
 
 export enum ReferenceFrames {
@@ -223,110 +256,142 @@ export interface Thumbnail {
 
 // TypeScript-ification of the engine settings
 
-export enum WWTBooleanSetting {
-  actualPlanetScale,
-  constellations,
-  earthCutawayView,
-  localHorizonMode,
-  galacticMode,
-  milkyWayModel,
-  showAltAzGrid,
-  showAltAzGridText,
-  showClouds,
-  showConstellations,
-  showConstellationBoundries,
-  showConstellationFigures,
-  showConstellationLabels,
-  showConstellationPictures,
-  showConstellationSelection,
-  showCrosshairs,
-  showEarthSky,
-  showEcliptic,
-  showEclipticGrid,
-  showEclipticGridText,
-  showEclipticOverviewText,
-  showElevationModel,
-  showEquatorialGridText,
-  showFieldOfView,
-  showGalacticGrid,
-  showGalacticGridText,
-  showGrid,
-  showHorizon,
-  showHorizonPanorama,
-  showISSModel,
-  showMoonsAsPointSource,
-  showPrecessionChart,
-  showSkyGrids,
-  showSkyNode,
-  showSkyOverlays,
-  showSkyOverlaysIn3d,
-  showSolarSystem,
-  smoothPan,
-  solarSystemCMB,
-  solarSystemCosmos,
-  solarSystemMilkyWay,
-  solarSystemOrbits,
-  solarSystemOverlays,
-  solarSystemLighting,
-  solarSystemMultiRes,
-  solarSystemMinorPlanets,
-  solarSystemMinorOrbits,
-  solarSystemPlanets,
-  solarSystemStars,
+/** Settings for the WWT engine that don't depend on types defined in
+ * the engine itself. */
+export type BaseEngineSetting =
+  ["actualPlanetScale", boolean] |
+  ["constellations", boolean] |
+  ["constellationsEnabled", string] |
+  ["earthCutawayView", boolean] |
+  ["fovCamera", number] |
+  ["fovEyepiece", number] |
+  ["fovTelescope", number] |
+  ["localHorizonMode", boolean] |
+  ["galacticMode", boolean] |
+  ["locationAltitude", number] |
+  ["locationLat", number] |
+  ["locationLng", number] |
+  ["milkyWayModel", boolean] |
+  ["showAltAzGrid", boolean] |
+  ["showAltAzGridText", boolean] |
+  ["showClouds", boolean] |
+  ["showConstellations", boolean] |
+  ["showConstellationBoundries", boolean] |
+  ["showConstellationFigures", boolean] |
+  ["showConstellationLabels", boolean] |
+  ["showConstellationPictures", boolean] |
+  ["showConstellationSelection", boolean] |
+  ["showCrosshairs", boolean] |
+  ["showEarthSky", boolean] |
+  ["showEcliptic", boolean] |
+  ["showEclipticGrid", boolean] |
+  ["showEclipticGridText", boolean] |
+  ["showEclipticOverviewText", boolean] |
+  ["showElevationModel", boolean] |
+  ["showEquatorialGridText", boolean] |
+  ["showFieldOfView", boolean] |
+  ["showGalacticGrid", boolean] |
+  ["showGalacticGridText", boolean] |
+  ["showGrid", boolean] |
+  ["showHorizon", boolean] |
+  ["showHorizonPanorama", boolean] |
+  ["showISSModel", boolean] |
+  ["showMoonsAsPointSource", boolean] |
+  ["showPrecessionChart", boolean] |
+  ["showSkyGrids", boolean] |
+  ["showSkyNode", boolean] |
+  ["showSkyOverlays", boolean] |
+  ["showSkyOverlaysIn3d", boolean] |
+  ["showSolarSystem", boolean] |
+  ["smoothPan", boolean] |
+  ["solarSystemCMB", boolean] |
+  ["solarSystemCosmos", boolean] |
+  ["solarSystemMilkyWay", boolean] |
+  ["solarSystemOrbits", boolean] |
+  ["solarSystemOverlays", boolean] |
+  ["solarSystemLighting", boolean] |
+  ["solarSystemMultiRes", boolean] |
+  ["solarSystemMinorPlanets", boolean] |
+  ["solarSystemMinorOrbits", boolean] |
+  ["solarSystemPlanets", boolean] |
+  ["solarSystemStars", boolean] |
+  ["minorPlanetsFilter", number] |
+  ["plantOrbitsFilter", number] |
+  ["solarSystemScale", number];
+
+// I'm not aware of any smart TypeScripty way to automate the construction of this table :-(
+const baseEngineSettingTypeInfo = {
+  "actualPlanetScale/boolean": true,
+  "constellations/boolean": true,
+  "constellationsEnabled/string": true,
+  "earthCutawayView/boolean": true,
+  "fovCamera/number": true,
+  "fovEyepiece/number": true,
+  "fovTelescope/number": true,
+  "localHorizonMode/boolean": true,
+  "galacticMode/boolean": true,
+  "locationAltitude/number": true,
+  "locationLat/number": true,
+  "locationLng/number": true,
+  "milkyWayModel/boolean": true,
+  "showAltAzGrid/boolean": true,
+  "showAltAzGridText/boolean": true,
+  "showClouds/boolean": true,
+  "showConstellations/boolean": true,
+  "showConstellationBoundries/boolean": true,
+  "showConstellationFigures/boolean": true,
+  "showConstellationLabels/boolean": true,
+  "showConstellationPictures/boolean": true,
+  "showConstellationSelection/boolean": true,
+  "showCrosshairs/boolean": true,
+  "showEarthSky/boolean": true,
+  "showEcliptic/boolean": true,
+  "showEclipticGrid/boolean": true,
+  "showEclipticGridText/boolean": true,
+  "showEclipticOverviewText/boolean": true,
+  "showElevationModel/boolean": true,
+  "showEquatorialGridText/boolean": true,
+  "showFieldOfView/boolean": true,
+  "showGalacticGrid/boolean": true,
+  "showGalacticGridText/boolean": true,
+  "showGrid/boolean": true,
+  "showHorizon/boolean": true,
+  "showHorizonPanorama/boolean": true,
+  "showISSModel/boolean": true,
+  "showMoonsAsPointSource/boolean": true,
+  "showPrecessionChart/boolean": true,
+  "showSkyGrids/boolean": true,
+  "showSkyNode/boolean": true,
+  "showSkyOverlays/boolean": true,
+  "showSkyOverlaysIn3d/boolean": true,
+  "showSolarSystem/boolean": true,
+  "smoothPan/boolean": true,
+  "solarSystemCMB/boolean": true,
+  "solarSystemCosmos/boolean": true,
+  "solarSystemMilkyWay/boolean": true,
+  "solarSystemOrbits/boolean": true,
+  "solarSystemOverlays/boolean": true,
+  "solarSystemLighting/boolean": true,
+  "solarSystemMultiRes/boolean": true,
+  "solarSystemMinorPlanets/boolean": true,
+  "solarSystemMinorOrbits/boolean": true,
+  "solarSystemPlanets/boolean": true,
+  "solarSystemStars/boolean": true,
+  "minorPlanetsFilter/number": true,
+  "plantOrbitsFilter/number": true,
+  "solarSystemScale/number": true,
 }
 
-export enum WWTColorSetting {
-  constellationBoundryColor,
-  constellationFigureColor,
-  constellationSelectionColor,
-  crosshairsColor
-}
-
-export enum WWTConstellationFilterSetting {
-  constellationArtFilter,
-  constellationBoundariesFilter,
-  constellationFiguresFilter,
-  constellationNamesFilter
-}
-
-export enum WWTNumberSetting {
-  fovCamera,
-  fovEyepiece,
-  fovTelescope,
-  locationAltitude,
-  locationLat,
-  locationLng,
-  minorPlanetsFilter,
-  plantOrbitsFilter,
-  solarSystemScale
-}
-
-export enum WWTStringSetting {
-  constellationsEnabled
-}
-
-/** TODO: does wwtlib expose a better color type that we should be using? In the
- * Settings class, colors are just straight strings.
- */
-export class WWTColor {
-  c: string;
-
-  constructor(c: string) {
-    this.c = c;
-  }
+/** Type guard function for BaseEngineSetting. */
+export function isBaseEngineSetting(obj: [string, any]): obj is BaseEngineSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in baseEngineSettingTypeInfo);
 }
 
 /** Placeholder for the engine ConstellationFilter type. */
 export interface ConstellationFilterInterface {
   clone(): ConstellationFilterInterface;
 }
-
-export type WWTSetting =
-  [WWTBooleanSetting, boolean] |
-  [WWTColorSetting, WWTColor] |
-  [WWTConstellationFilterSetting, ConstellationFilterInterface] |
-  [WWTNumberSetting, number] |
-  [WWTStringSetting, string];
 
 /** Core settings for the WWT rendering engine.
  *
@@ -396,4 +461,194 @@ export interface SettingsInterface {
   get_solarSystemStars(): boolean;
 
   // getSetting()
+}
+
+/** Settings for instances of the Layer type.  */
+export type BaseLayerSetting =
+  ["astronomical", boolean] |
+  ["fadeSpan", number] |
+  ["name", string] |
+  ["opacity", number] |
+  ["opened", boolean] |
+  ["referenceFrame", string] |
+  ["version", number];
+
+const baseLayerSettingTypeInfo = {
+  "astronomical/boolean": true,
+  "fadeSpan/number": true,
+  "name/string": true,
+  "opacity/number": true,
+  "opened/boolean": true,
+  "referenceFrame/string": true,
+  "version/number": true,
+}
+
+/** Type guard function for BaseLayerSetting. */
+export function isBaseLayerSetting(obj: [string, any]): obj is BaseLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return key in baseLayerSettingTypeInfo;
+}
+
+/** Settings specifically for instances of the ImageSetLayer type.  */
+export type BaseImageSetLayerSetting =
+  BaseLayerSetting |
+  ["colorMapperName", string] |
+  ["overrideDefaultLayer", boolean];
+
+const baseImageSetLayerSettingTypeInfo = {
+  "colorMapperName/string": true,
+  "overrideDefaultLayer/boolean": true,
+};
+
+/** Type guard function for BaseImageSetLayerSetting. */
+export function isBaseImageSetLayerSetting(obj: [string, any]): obj is BaseImageSetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in baseImageSetLayerSettingTypeInfo) || isBaseLayerSetting(obj);
+}
+
+/** Settings specifically for instances of the SpreadSheetLayer type. */
+export type BaseSpreadSheetLayerSetting =
+  ["altColumn", number] |
+  ["altType", AltTypes] |
+  ["altUnit", AltUnits] |
+  ["barChartBitmask", number] |
+  ["beginRange", Date] |
+  ["cartesianCustomScale", number] |
+  ["cartesianScale", AltUnits] |
+  ["colorMapColumn", number] |
+  ["colorMapperName", string] |
+  ["coordinatesType", CoordinatesType] |
+  ["decay", number] |
+  ["dynamicColor", boolean] |
+  ["dynamicData", boolean] |
+  ["endDateColumn", number] |
+  ["endRange", Date] |
+  ["geometryColumn", number] |
+  ["hyperlinkColumn", number] |
+  ["hyperlinkFormat", string] |
+  ["latColumn", number] |
+  ["lngColumn", number] |
+  ["markerColumn", number] |
+  ["markerIndex", number] |
+  ["markerScale", MarkerScales] |
+  ["nameColumn", number] |
+  ["normalizeColorMap", boolean] |
+  ["normalizeColorMapMax", number] |
+  ["normalizeColorMapMin", number] |
+  ["normalizeSize", boolean] |
+  ["normalizeSizeClip", boolean] |
+  ["normalizeSizeMax", number] |
+  ["normalizeSizeMin", number] |
+  ["plotType", PlotTypes] |
+  ["pointScaleType", PointScaleTypes] |
+  ["raUnits", RAUnits] |
+  ["scaleFactor", number] |
+  ["showFarSide", boolean] |
+  ["sizeColumn", number] |
+  ["startDateColumn", number] |
+  ["timeSeries", boolean] |
+  ["xAxisColumn", number] |
+  ["xAxisReverse", boolean] |
+  ["yAxisColumn", number] |
+  ["yAxisReverse", boolean] |
+  ["zAxisColumn", number] |
+  ["zAxisReverse", boolean] |
+  BaseLayerSetting;
+
+// See implementation below -- we need to handle enums specially
+// to make sure that inputs are in-range.
+const baseSpreadSheetLayerSettingTypeInfo: {[k: string]: string} = {
+  "altColumn/number": "",
+  "altType/number": "AltTypes",
+  "altUnit/number": "AltUnits",
+  "barChartBitmask/number": "",
+  "beginRange/Date": "",
+  "cartesianCustomScale/number": "",
+  "cartesianScale/number": "AltUnits",
+  "colorMapColumn/number": "",
+  "colorMapperName/string": "",
+  "coordinatesType/number": "CoordinatesType",
+  "decay/number": "",
+  "dynamicColor/boolean": "",
+  "dynamicData/boolean": "",
+  "endDateColumn/number": "",
+  "endRange/Date": "",
+  "geometryColumn/number": "",
+  "hyperlinkColumn/number": "",
+  "hyperlinkFormat/string": "",
+  "latColumn/number": "",
+  "lngColumn/number": "",
+  "markerColumn/number": "",
+  "markerIndex/number": "",
+  "markerScale/number": "",
+  "nameColumn/number": "",
+  "normalizeColorMap/boolean": "",
+  "normalizeColorMapMax/number": "",
+  "normalizeColorMapMin/number": "",
+  "normalizeSize/boolean": "",
+  "normalizeSizeClip/boolean": "",
+  "normalizeSizeMax/number": "",
+  "normalizeSizeMin/number": "",
+  "plotType/number": "PlotTypes",
+  "pointScaleType/number": "PointScaleTypes",
+  "raUnits/number": "RAUnits",
+  "scaleFactor/number": "",
+  "showFarSide/boolean": "",
+  "sizeColumn/number": "",
+  "startDateColumn/number": "",
+  "timeSeries/boolean": "",
+  "xAxisColumn/number": "",
+  "xAxisReverse/boolean": "",
+  "yAxisColumn/number": "",
+  "yAxisReverse/boolean": "",
+  "zAxisColumn/number": "",
+  "zAxisReverse/boolean": "",
+};
+
+/** Type guard function for BaseSpreadSheetLayerSetting. */
+export function isBaseSpreadSheetLayerSetting(obj: [string, any]): obj is BaseSpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (isBaseLayerSetting(obj))
+    return true;
+
+  const key = obj[0] + "/" + typeof obj[1];
+  const enumType = baseSpreadSheetLayerSettingTypeInfo[key];
+
+  if (enumType === undefined) {
+    return false;
+  } else if (enumType == "") {
+    return true;
+  } else if (enumType == "AltTypes") {
+    return obj[1] in AltTypes;
+  } else if (enumType == "AltUnits") {
+    return obj[1] in AltUnits;
+  } else if (enumType == "CoordinatesType") {
+    return obj[1] in CoordinatesType;
+  } else if (enumType == "PlotTypes") {
+    return obj[1] in PlotTypes;
+  } else if (enumType == "PointScaleTypes") {
+    return obj[1] in PointScaleTypes;
+  } else if (enumType == "RAUnits") {
+    return obj[1] in RAUnits;
+  } else {
+    throw new Error('internal bug isBaseSpreadSheetLayerSetting');
+  }
+}
+
+// TypeScript magic to allow fallible reverse mapping of string-valued enums.
+// https://stackoverflow.com/q/57922745/3760486
+type StringEnum = {[key: string]: string};
+
+function keysOf<K extends {}>(o: K): (keyof K)[];
+function keysOf(o: any) { return Object.keys(o); }  // eslint-disable-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any
+
+export function enumLookup<E extends StringEnum>(
+  stringEnum: E,
+  s: string
+): E[keyof E] | undefined {
+  for (const enumKey of keysOf(stringEnum)) {
+    if (stringEnum[enumKey] === s) {
+      return stringEnum[enumKey] as E[keyof E];
+    }
+  }
+  return undefined;
 }

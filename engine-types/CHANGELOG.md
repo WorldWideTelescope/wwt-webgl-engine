@@ -1,8 +1,25 @@
-# See elsewhere for changelog
+# rc: minor bump
 
-This project’s release notes are curated from the Git history of its main
-branch. You can find them by looking at [the version of this file on the
-`release` branch][branch] or the [GitHub release history][gh-releases].
+This release contains a **breaking change** relating to a rework of how
+"settings" are expressed in TypeScript. The previous system was pretty limited
+and limiting; the new system is much more functional.
 
-[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/engine-types/CHANGELOG.md
-[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases
+- New enumerations in support of SpreadSheetLayer and ImageSetLayer
+- Rework how settings are expressed
+- Upgrade TypeDoc and TypeScript
+- Correct temporary GitHub URLs in the package.json files
+
+
+# @wwtelescope/engine-types 0.2.0 (2020-12-30)
+
+- Add the SettingsInterface
+
+
+# @wwtelescope/engine-types 0.1.1 (2020-09-23)
+
+- No code changes; issuing a new release as part of the Cranko switchover.
+
+
+# [0.1.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine-types@0.1.0-beta.0...@wwtelescope/engine-types@0.1.0) (2020-05-23)
+
+**Note:** Version bump only for package @wwtelescope/engine-types

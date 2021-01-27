@@ -1,26 +1,10 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-import { WWTSetting, WWTBooleanSetting } from "@wwtelescope/engine-types";
-
-// TypeScript magic to allow fallible reverse mapping of string-valued enums.
-// https://stackoverflow.com/q/57922745/3760486
-type StringEnum = {[key: string]: string};
-
-function keysOf<K extends {}>(o: K): (keyof K)[];
-function keysOf(o: any) { return Object.keys(o); }  // eslint-disable-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any
-
-function enumLookup<E extends StringEnum>(
-  stringEnum: E,
-  s: string
-): E[keyof E] | undefined {
-  for (const enumKey of keysOf(stringEnum)) {
-    if (stringEnum[enumKey] === s) {
-      return stringEnum[enumKey] as E[keyof E];
-    }
-  }
-  return undefined;
-}
+import {
+  BaseEngineSetting,
+  enumLookup
+} from "@wwtelescope/engine-types";
 
 export enum PlanetaryBodies {
   Sun = "sun",
@@ -124,9 +108,9 @@ export class EmbedSettings {
     return s;
   }
 
-  asSettings(): WWTSetting[] {
-    const s: WWTSetting[] = [];
-    s.push([WWTBooleanSetting.showCrosshairs, this.showCrosshairs]);
+  asSettings(): BaseEngineSetting[] {
+    const s: BaseEngineSetting[] = [];
+    s.push(["showCrosshairs", this.showCrosshairs]);
     return s;
   }
 }

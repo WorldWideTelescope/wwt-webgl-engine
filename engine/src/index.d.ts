@@ -10,21 +10,29 @@
 export as namespace wwtlib;
 
 import {
-  // AltTypes,
-  // AltUnits,
+  AltTypes,
+  AltUnits,
   BandPass,
+  BaseEngineSetting,
+  BaseImageSetLayerSetting,
+  BaseLayerSetting,
+  BaseSpreadSheetLayerSetting,
   Classification,
   ConstellationFilterInterface,
+  CoordinatesType,
   DataTypes,
   FadeType,
   FolderGroup,
   FolderRefreshType,
   FolderType,
   ImageSetType,
+  MarkerScales,
+  PointScaleTypes,
+  PlotTypes,
   ProjectionType,
+  RAUnits,
   // ReferenceFrames,
   // ReferenceFrameTypes,
-  // SolarSystemObjects
   Thumbnail,
   ScaleTypes,
   SolarSystemObjects,
@@ -35,6 +43,36 @@ import {
 export interface Action {
   (): void;
 }
+
+/** A visual annotation in the WWT view. */
+export class Annotation {
+  //get_center
+  get_id(): string;
+  set_id(v: string): string;
+  get_label(): string;
+  set_label(v: string): string;
+  /** Ranges between 0 and 1. */
+  get_opacity(): number;
+  set_opacity(v: number): number;
+  get_showHoverLabel(): boolean;
+  set_showHoverLabel(v: boolean): boolean;
+  get_tag(): string;
+  set_tag(v: string): string;
+
+  hitTest(renderContext: RenderContext, ra: number, dec: number, x: number, y: number): boolean;
+}
+
+/** Possible settings that can be applied to generic annotations.
+ *
+ * Specific annotation instances (e.g. Circles) can have additional settings.
+ */
+export type AnnotationSetting =
+  // NOTE: isAnnotationSetting in engine-helpers needs to be kept in sync.
+  ["id", string] |
+  ["label", string] |
+  ["opacity", number] |
+  ["showHoverLabel", boolean] |
+  ["tag", string];
 
 export class ArrivedEventArgs {
   /** Get the current right ascension of the view, in hours. */
@@ -70,6 +108,40 @@ export class CameraParameters {
   get_dec(): number;
   set_dec(v: number): number;
 }
+
+/** A simple circular annotation. */
+export class Circle extends Annotation {
+  get_fill(): boolean;
+  set_fill(v: boolean): boolean;
+  get_fillColor(): string;
+  /** The color is parsed using [[Color.fromName]]. */
+  set_fillColor(v: string): string;
+  get_lineColor(): string;
+  /** The color is parsed using [[Color.load]]. */
+  set_lineColor(v: string): string;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  get_lineWidth(): number;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  set_lineWidth(v: number): number;
+  get_radius(): number;
+  set_radius(v: number): number;
+  get_skyRelative(): boolean;
+  set_skyRelative(v: boolean): boolean;
+
+  /** Set the position of this circle's center. */
+  setCenter(raDeg: number, decDeg: number): void;
+}
+
+/** Possible settings that can be applied to Circle annotations. */
+export type CircleAnnotationSetting =
+  // NOTE: isCircleAnnotationSetting in engine-helpers needs to be kept in sync.
+  AnnotationSetting |
+  ["fill", boolean] |
+  ["fillColor", string] |
+  ["lineColor", string] |
+  ["lineWidth", number] |
+  ["radius", number] |
+  ["skyRelative", boolean];
 
 export class CollectionLoadedEventArgs {
   /** Get the URL of the collection that was just loaded. */
@@ -139,11 +211,70 @@ export namespace Color {
   export function fromHex(hex: string): Color;
 
   /** Create a color from a hex string `AARRGGBB`. */
-  export function fromSimpleHex(hex: string): Color;}
+  export function fromSimpleHex(hex: string): Color;
+
+  /** This function is the same as [[Color.fromName]]. */
+  export function load(name: string): Color;
+}
+
+/** A mapping from scalar values to colors. */
+export class ColorMapContainer {
+  /** Find the color in this map closest to the input scalar.
+   *
+   * The input value should be between 0 and 1. Zero maps to the first color in
+   * the list; one to the last. Intermediate values map linearly. Out-of-bounds
+   * values are clamped.
+   */
+  findClosestColor(value: number): Color;
+}
+
+export namespace ColorMapContainer {
+  /** Create a new ColorMapContainer from the specified list of ARGB colors. */
+  export function fromArgbList(colors: [number, number, number, number][]): ColorMapContainer;
+
+  /** Create a new ColorMapContainer from the specified list of color hex codes,
+   * each having the form `#rrggbb`. */
+  export function fromStringList(colors: string[]): ColorMapContainer;
+
+  /** Create a new ColorMapContainer from the named preset value.
+   *
+   * The presets are extracted from Matplotlib. Accepted values include:
+   *
+   * - viridis
+   * - plasma
+   * - inferno
+   * - magma
+   * - cividis
+   * - greys
+   * - gray
+   * - purples
+   * - blues
+   * - greens
+   * - oranges
+   * - reds
+   * - rdylbu
+   */
+  export function fromNamedColormap(name: string): ColorMapContainer;
+}
+
 
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
 }
+
+/** The full EngineSetting type, which augments engine-types' BaseEngineSetting
+ * with types that are only provided within the engine itself.
+ */
+export type EngineSetting = BaseEngineSetting |
+  // NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
+  ["constellationArtFilter", ConstellationFilter] |
+  ["constellationBoundariesFilter", ConstellationFilter] |
+  ["constellationBoundryColor", Color] |
+  ["constellationFigureColor", Color] |
+  ["constellationFiguresFilter", ConstellationFilter] |
+  ["constellationNamesFilter", ConstellationFilter] |
+  ["constellationSelectionColor", Color] |
+  ["crosshairsColor", Color];
 
 export class FitsImage extends WcsImage {
   histogramMaxCount: number;
@@ -402,6 +533,10 @@ export namespace ImageSetLayer {
   export function create(set: Imageset): ImageSetLayer;
 }
 
+/** The full ImageSetLayerSetting type, which augments engine-types' BaseImageSetLayerSetting
+ * with types that are only provided within the engine itself.
+ */
+export type ImageSetLayerSetting = LayerSetting | BaseImageSetLayerSetting;
 
 export interface ImagesetLoadedCallback {
   (layer: ImageSetLayer): void;
@@ -456,7 +591,7 @@ export namespace LayerManager {
   export function add(layer: Layer, updateTree: boolean): void;
   export function addFitsImageSetLayer(imageset: ImageSetLayer, title: string): ImageSetLayer;
   export function addImageSetLayer(imageset: Imageset, title: string): ImageSetLayer;
-  export function createSpreadsheetLayer(frame: string, name: string, data: string): /*SpreadSheet*/Layer;
+  export function createSpreadsheetLayer(frame: string, name: string, data: string): SpreadSheetLayer;
   export function deleteLayerByID(id: Guid, removeFromParent: boolean, updateTree: boolean): void;
   // addVoTableLayer
   export function getMoonFile(url: string): void;
@@ -467,6 +602,13 @@ export namespace LayerManager {
 /** An alias for the type implicitly defined by the static
  * [[LayerManager]] namespace. */
 export type LayerManagerObject = typeof LayerManager;
+
+/** The full LayerSetting type, which augments engine-types' BaseLayerSetting
+ * with types that are only provided within the engine itself.
+ */
+export type LayerSetting = BaseLayerSetting |
+  // NOTE: isLayerSetting in engine-helpers needs to be kept in sync.
+  ["color", Color];
 
 export class Place implements Thumbnail {
   annotation: string;
@@ -525,6 +667,56 @@ export class Place implements Thumbnail {
 
   updatePlanetLocation(jNow: number): void;
 }
+
+
+/** A polygonal annotation. */
+export class Poly extends Annotation {
+  get_fill(): boolean;
+  set_fill(v: boolean): boolean;
+  get_fillColor(): string;
+  /** The color is parsed using [[Color.fromName]]. */
+  set_fillColor(v: string): string;
+  get_lineColor(): string;
+  /** The color is parsed using [[Color.load]]. */
+  set_lineColor(v: string): string;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  get_lineWidth(): number;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  set_lineWidth(v: number): number;
+
+  /** Add a point to this annotation's definition. */
+  addPoint(raDeg: number, decDeg: number): void;
+}
+
+/** Possible settings that can be applied to Poly annotations. */
+export type PolyAnnotationSetting =
+  // NOTE: isPolyAnnotationSetting in engine-helpers needs to be kept in sync.
+  AnnotationSetting |
+  ["fill", boolean] |
+  ["fillColor", string] |
+  ["lineColor", string] |
+  ["lineWidth", number];
+
+/** An annotation composed of a sequence of lines. */
+export class PolyLine extends Annotation {
+  get_lineColor(): string;
+  /** The color is parsed using [[Color.load]]. */
+  set_lineColor(v: string): string;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  get_lineWidth(): number;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  set_lineWidth(v: number): number;
+
+  /** Add a point to this annotation's definition. */
+  addPoint(raDeg: number, decDeg: number): void;
+}
+
+/** Possible settings that can be applied to PolyLine annotations. */
+export type PolyLineAnnotationSetting =
+  // NOTE: isPolyLineAnnotationSetting in engine-helpers needs to be kept in sync.
+  AnnotationSetting |
+  ["lineColor", string] |
+  ["lineWidth", number];
 
 export interface ReadyEventCallback {
   /** Called when the WWT engine has finished its initialization. */
@@ -675,6 +867,33 @@ export class ScriptInterface {
     gotoTarget: boolean,
     callback: ImagesetLoadedCallback
   ): ImageSetLayer;
+
+  /** Create a circle annotation.
+   *
+   * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
+   */
+  createCircle(fill: boolean): Circle;
+
+  /** Create a polygonal annotation.
+   *
+   * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
+   */
+  createPolygon(fill: boolean): Poly;
+
+  /** Create a multi-line annotation.
+   *
+   * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
+   */
+  createPolyLine(unused: boolean): PolyLine;
+
+  /** Add an annotation to the renderer. */
+  addAnnotation(ann: Annotation): void;
+
+  /** Remove an annotation from the renderer. */
+  removeAnnotation(ann: Annotation): void;
+
+  /** Remove all annotations from the renderer. */
+  clearAnnotations(): void;
 }
 
 /** A generic [[ScriptInterface]] callback. */
@@ -914,6 +1133,114 @@ export namespace SpaceTimeController {
  * [[SpaceTimeController]] namespace. */
 export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
+
+/** A tabular data layer. */
+export class SpreadSheetLayer extends Layer {
+  colorMapperName: string;
+
+  get_altColumn(): number;
+  set_altColumn(v: number): number;
+  get_altType(): AltTypes;
+  set_altType(v: AltTypes): AltTypes;
+  get_altUnit(): AltUnits;
+  set_altUnit(v: AltUnits): AltUnits;
+  get_barChartBitmask(): number;
+  set_barChartBitmask(v: number): number;
+  get_beginRange(): Date;
+  set_beginRange(v: Date): Date;
+  get_cartesianCustomScale(): number;
+  set_cartesianCustomScale(v: number): number;
+  get_cartesianScale(): AltUnits;
+  set_cartesianScale(v: AltUnits): AltUnits;
+  // get_colorMap
+  get_colorMapColumn(): number;
+  set_colorMapColumn(v: number): number;
+  get_colorMapper(): ColorMapContainer;
+  get_colorMapperName(): string;
+  set_colorMapperName(v: string): string;
+  get_coordinatesType(): CoordinatesType;
+  set_coordinatesType(v: CoordinatesType): CoordinatesType;
+  get_decay(): number;
+  set_decay(v: number): number;
+  get_dynamicColor(): boolean;
+  set_dynamicColor(v: boolean): boolean;
+  get_dynamicData(): boolean;
+  set_dynamicData(v: boolean): boolean;
+  get_endDateColumn(): number;
+  set_endDateColumn(v: number): number;
+  get_endRange(): Date;
+  set_endRange(v: Date): Date;
+  get_geometryColumn(): number;
+  set_geometryColumn(v: number): number;
+  get_header(): string[];
+  get_hyperlinkColumn(): number;
+  set_hyperlinkColumn(v: number): number;
+  get_hyperlinkFormat(): string;
+  set_hyperlinkFormat(v: string): string;
+  get_latColumn(): number;
+  set_latColumn(v: number): number;
+  get_lngColumn(): number;
+  set_lngColumn(v: number): number;
+  get_markerColumn(): number;
+  set_markerColumn(v: number): number;
+  get_markerIndex(): number;
+  set_markerIndex(v: number): number;
+  // get_markerMix
+  get_markerScale(): MarkerScales;
+  set_markerScale(v: MarkerScales): MarkerScales;
+  get_nameColumn(): number;
+  set_nameColumn(v: number): number;
+  get_normalizeColorMap(): boolean;
+  set_normalizeColorMap(v: boolean): boolean;
+  get_normalizeColorMapMax(): number;
+  set_normalizeColorMapMax(v: number): number;
+  get_normalizeColorMapMin(): number;
+  set_normalizeColorMapMin(v: number): number;
+  get_normalizeSize(): boolean;
+  set_normalizeSize(v: boolean): boolean;
+  get_normalizeSizeClip(): boolean;
+  set_normalizeSizeClip(v: boolean): boolean;
+  get_normalizeSizeMax(): number;
+  set_normalizeSizeMax(v: number): number;
+  get_normalizeSizeMin(): number;
+  set_normalizeSizeMin(v: number): number;
+  get_plotType(): PlotTypes;
+  set_plotType(v: PlotTypes): PlotTypes;
+  get_pointScaleType(): PointScaleTypes;
+  set_pointScaleType(v: PointScaleTypes): PointScaleTypes;
+  get_raUnits(): RAUnits;
+  set_raUnits(v: RAUnits): RAUnits;
+  get_scaleFactor(): number;
+  set_scaleFactor(v: number): number;
+  get_showFarSide(): boolean;
+  set_showFarSide(v: boolean): boolean;
+  get_sizeColumn(): number;
+  set_sizeColumn(v: number): number;
+  get_startDateColumn(): number;
+  set_startDateColumn(v: number): number;
+  get_timeSeries(): boolean;
+  set_timeSeries(v: boolean): boolean;
+  get_xAxisColumn(): number;
+  set_xAxisColumn(v: number): number;
+  get_xAxisReverse(): boolean;
+  set_xAxisReverse(v: boolean): boolean;
+  get_yAxisColumn(): number;
+  set_yAxisColumn(v: number): number;
+  get_yAxisReverse(): boolean;
+  set_yAxisReverse(v: boolean): boolean;
+  get_zAxisColumn(): number;
+  set_zAxisColumn(v: number): number;
+  get_zAxisReverse(): boolean;
+  set_zAxisReverse(v: boolean): boolean;
+
+  updateData(data: string, purgeOld: boolean, purgeAll: boolean, hasHeader: boolean): boolean;
+}
+
+/** The full SpreadSheetLayerSetting type, which augments engine-types'
+ * BaseSpreadSheetLayerSetting with types that are only provided within the
+ * engine itself.
+ */
+export type SpreadSheetLayerSetting = LayerSetting | BaseSpreadSheetLayerSetting;
 
 /** A WWT tour. */
 export class TourDocument {
