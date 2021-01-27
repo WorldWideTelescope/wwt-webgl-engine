@@ -3,25 +3,32 @@ import { createNamespacedHelpers } from "vuex";
 
 import {
   ImageSetType,
+  SolarSystemObjects,
 } from "@wwtelescope/engine-types";
 
 import {
+  Annotation,
   EngineSetting,
   Folder,
+  Guid,
   Imageset,
   ImageSetLayer,
+  SpreadSheetLayer,
 } from "@wwtelescope/engine";
 
 import {
   ApplyFitsLayerSettingsOptions,
+  ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
+  UpdateTableLayerOptions,
 } from "@wwtelescope/engine-helpers";
 
 import {
+  CreateTableLayerParams,
   GotoRADecZoomParams,
   LoadTourParams,
   LoadImageCollectionParams,
@@ -72,6 +79,7 @@ export class WWTAwareComponent extends Vue {
     this.$options.methods = {
       ...this.$options.methods,
       ...mapActions([
+        "createTableLayer",
         "gotoRADecZoom",
         "gotoTarget",
         "loadImageCollection",
@@ -80,20 +88,28 @@ export class WWTAwareComponent extends Vue {
         "waitForReady",
       ]),
       ...mapMutations([
+        "addAnnotation",
         "applyFitsLayerSettings",
+        "applyTableLayerSettings",
         "applySetting",
+        "clearAnnotations",
+        "deleteLayer",
+        "removeAnnotation",
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setClockRate",
+        "setClockSync",
         "setFitsLayerColormap",
         "setForegroundImageByName",
         "setForegroundOpacity",
         "setTourPlayerLeaveSettingsWhenStopped",
         "setTime",
+        "setTrackedObject",
         "setupForImageset",
         "startTour",
         "stretchFitsLayer",
         "toggleTourPlayPauseState",
+        "updateTableLayer",
         "zoom",
       ]),
     };
@@ -121,23 +137,32 @@ export class WWTAwareComponent extends Vue {
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
+  addAnnotation!: (_a: Annotation) => void;
   applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
+  applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
   applySetting!: (_s: EngineSetting) => void;
+  clearAnnotations!: () => void;
+  deleteLayer!: (id: string | Guid) => void;
+  removeAnnotation!: (_a: Annotation) => void;
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setClockRate!: (_r: number) => void;
+  setClockSync!: (_s: boolean) => void;
   setFitsLayerColormap!: (_o: SetFitsLayerColormapOptions) => void;
   setForegroundImageByName!: (_n: string) => void;
   setForegroundOpacity!: (o: number) => void;
   setTime!: (d: Date) => void;
   setTourPlayerLeaveSettingsWhenStopped!: (v: boolean) => void;
+  setTrackedObject!: (o: SolarSystemObjects) => void;
   setupForImageset!: (o: SetupForImagesetOptions) => void;
   startTour!: () => void;
   stretchFitsLayer!: (o: StretchFitsLayerOptions) => void;
   toggleTourPlayPauseState!: () => void;
+  updateTableLayer!: (o: UpdateTableLayerOptions) => void;
   zoom!: (f: number) => void;
 
   // Actions
+  createTableLayer!: (_o: CreateTableLayerParams) => Promise<SpreadSheetLayer>;
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
   gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;

@@ -44,19 +44,388 @@
 </template>
 
 <script lang="ts">
+import * as moment from "moment";
 import * as screenfull from "screenfull";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { isImageSetLayerSetting } from "@wwtelescope/engine-helpers";
-import { ImageSetType } from "@wwtelescope/engine-types";
+
+import {
+  ImageSetType,
+  SolarSystemObjects,
+} from "@wwtelescope/engine-types";
+
+import {
+  Annotation,
+  Circle,
+  ImageSetLayer,
+  ImageSetLayerSetting,
+  Poly,
+  PolyLine,
+  SpreadSheetLayer,
+} from "@wwtelescope/engine";
+
+import {
+  applyCircleAnnotationSetting,
+  applyPolyAnnotationSetting,
+  applyPolyLineAnnotationSetting,
+  isCircleAnnotationSetting,
+  isEngineSetting,
+  isImageSetLayerSetting,
+  isPolyAnnotationSetting,
+  isPolyLineAnnotationSetting,
+} from "@wwtelescope/engine-helpers";
+
 import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
 
 import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
 
+import { convertPywwtSpreadSheetLayerSetting } from "./settings";
+
 const D2R = Math.PI / 180.0;
+const R2D = 180.0 / Math.PI;
 
 type ToolType = "crossfade" | null;
 
+type AnyFitsLayerMessage =
+  classicPywwt.CreateFitsLayerMessage |
+  classicPywwt.SetFitsLayerColormapMessage |
+  classicPywwt.StretchFitsLayerMessage |
+  classicPywwt.ModifyFitsLayerMessage |
+  classicPywwt.RemoveFitsLayerMessage;
+
+/** Helper for handling messages that mutate FITS / ImageSet layers. Because
+ * FITS loading is asynchronous, and messages might arrive out of order, we need
+ * some logic to smooth everything out.
+ */
+class FitsLayerMessageHandler {
+  private owner: App;
+  private created = false;
+  private internalId: string | null = null;
+  private colormapVersion = -1;
+  private stretchVersion = -1;
+  private queuedStretch: classicPywwt.StretchFitsLayerMessage | null = null;
+  private queuedColormap: classicPywwt.SetFitsLayerColormapMessage | null = null;
+  private queuedSettings: ImageSetLayerSetting[] = [];
+  private queuedRemoval: classicPywwt.RemoveFitsLayerMessage | null = null;
+
+  constructor(owner: App) {
+    this.owner = owner;
+  }
+
+  handleCreateMessage(msg: classicPywwt.CreateFitsLayerMessage) {
+    if (this.created)
+      return;
+
+    this.owner.loadFitsLayer({
+      url: msg.url,
+      name: msg.id,
+      gotoTarget: true, // pywwt expected behavior
+    }).then((layer) => this.layerInitialized(layer));
+
+    this.created = true;
+  }
+
+  private layerInitialized(layer: ImageSetLayer) {
+    this.internalId = layer.id.toString();
+
+    if (this.queuedStretch !== null) {
+      this.handleStretchMessage(this.queuedStretch);
+      this.queuedStretch = null;
+    }
+
+    if (this.queuedColormap !== null) {
+      this.handleSetColormapMessage(this.queuedColormap);
+      this.queuedColormap = null;
+    }
+
+    this.owner.applyFitsLayerSettings({
+      id: this.internalId,
+      settings: this.queuedSettings,
+    });
+    this.queuedSettings = [];
+
+    if (this.queuedRemoval !== null) {
+      this.handleRemoveMessage(this.queuedRemoval);
+      this.queuedRemoval = null;
+    }
+  }
+
+  handleStretchMessage(msg: classicPywwt.StretchFitsLayerMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedStretch === null || msg.version > this.queuedStretch.version) {
+        this.queuedStretch = msg;
+      }
+    } else {
+      if (msg.version > this.stretchVersion) {
+        this.owner.stretchFitsLayer({
+          id: this.internalId,
+          stretch: msg.stretch,
+          vmin: msg.vmin,
+          vmax: msg.vmax,
+        });
+        this.stretchVersion = msg.version;
+      }
+    }
+  }
+
+  handleSetColormapMessage(msg: classicPywwt.SetFitsLayerColormapMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedColormap === null || msg.version > this.queuedColormap.version) {
+        this.queuedColormap = msg;
+      }
+    } else {
+      if (msg.version > this.colormapVersion) {
+        this.owner.setFitsLayerColormap({
+          id: this.internalId,
+          name: msg.cmap,
+        });
+        this.colormapVersion = msg.version;
+      }
+    }
+  }
+
+  handleModifyMessage(msg: classicPywwt.ModifyFitsLayerMessage) {
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (!isImageSetLayerSetting(setting)) {
+      return;
+    }
+
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      this.queuedSettings.push(setting);
+    } else {
+      this.owner.applyFitsLayerSettings({
+        id: this.internalId,
+        settings: [setting],
+      });
+    }
+  }
+
+  handleRemoveMessage(msg: classicPywwt.RemoveFitsLayerMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedRemoval === null) {
+        this.queuedRemoval = msg;
+      }
+    } else {
+      this.owner.deleteLayer(this.internalId);
+      this.internalId = null;
+      this.created = false;
+    }
+  }
+}
+
+type AnyTableLayerMessage =
+  classicPywwt.CreateTableLayerMessage |
+  classicPywwt.UpdateTableLayerMessage |
+  classicPywwt.ModifyTableLayerMessage |
+  classicPywwt.RemoveTableLayerMessage;
+
+/** Helper for handling messages that mutate tabular / "spreadsheet" layers. */
+class TableLayerMessageHandler {
+  private owner: App;
+  private created = false;
+  private internalId: string | null = null;
+  private layer: SpreadSheetLayer | null = null; // hack for settings
+  private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
+  private queuedSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
+  private queuedRemoval: classicPywwt.RemoveTableLayerMessage | null = null;
+
+  constructor(owner: App) {
+    this.owner = owner;
+  }
+
+  handleCreateMessage(msg: classicPywwt.CreateTableLayerMessage) {
+    if (this.created)
+      return;
+
+    const data = atob(msg.table);
+
+    this.owner.createTableLayer({
+      name: msg.id,
+      referenceFrame: msg.frame,
+      dataCsv: data,
+    }).then((layer) => this.layerInitialized(layer));
+
+    this.created = true;
+  }
+
+  private layerInitialized(layer: SpreadSheetLayer) {
+    this.internalId = layer.id.toString();
+    this.layer = layer;
+
+    if (this.queuedUpdate !== null) {
+      this.handleUpdateMessage(this.queuedUpdate);
+      this.queuedUpdate = null;
+    }
+
+    // Settings need transformation from the pywwt JSON "wire protocol" to
+    // what's used internally by the engine and our surrounding TypeScript
+    // infrastructure. They're close, but some mapping is needed.
+
+    const settings = [];
+
+    for (const ps of this.queuedSettings) {
+      const es = convertPywwtSpreadSheetLayerSetting(ps, layer);
+      if (es !== null) {
+        settings.push(es);
+      }
+    }
+
+    this.owner.applyTableLayerSettings({
+      id: this.internalId,
+      settings,
+    });
+    this.queuedSettings = [];
+
+    if (this.queuedRemoval !== null) {
+      this.handleRemoveMessage(this.queuedRemoval);
+      this.queuedRemoval = null;
+    }
+  }
+
+  handleUpdateMessage(msg: classicPywwt.UpdateTableLayerMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      this.queuedUpdate = msg;
+    } else {
+      this.owner.updateTableLayer({
+        id: this.internalId,
+        dataCsv: atob(msg.table),
+      });
+    }
+  }
+
+  handleModifyMessage(msg: classicPywwt.ModifyTableLayerMessage) {
+    // The messages sent by pywwt here do not map directly into internal WWT
+    // settings - they are more transport-friendly versions, as expressed in the
+    // PywwtSpreadSheetLayerSetting type.
+
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (!classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
+      return;
+    }
+
+    // This `if` statement is over-conservative to make TypeScript happy:
+    if (this.layer === null || this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      this.queuedSettings.push(setting);
+    } else {
+      const es = convertPywwtSpreadSheetLayerSetting(setting, this.layer);
+      if (es !== null) {
+        this.owner.applyTableLayerSettings({
+          id: this.internalId,
+          settings: [es],
+        });
+      }
+    }
+  }
+
+  handleRemoveMessage(msg: classicPywwt.RemoveTableLayerMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedRemoval === null) {
+        this.queuedRemoval = msg;
+      }
+    } else {
+      this.owner.deleteLayer(this.internalId);
+      this.internalId = null;
+      this.created = false;
+    }
+  }
+}
+
+
+type AnyAnnotationMessage =
+  classicPywwt.AddLinePointMessage |
+  classicPywwt.AddPolygonPointMessage |
+  classicPywwt.CreateAnnotationMessage |
+  classicPywwt.ModifyAnnotationMessage |
+  classicPywwt.RemoveAnnotationMessage |
+  classicPywwt.SetCircleCenterMessage;
+
+/** Helper for handling messages that mutate annotations. These are actually
+ * much simpler to deal with than image or data layers, but it doesn't hurt
+ * to use the same sort of design.
+ */
+class AnnotationMessageHandler {
+  private owner: App;
+  private ann: Annotation;
+
+  public static tryCreate(owner: App, msg: classicPywwt.CreateAnnotationMessage): AnnotationMessageHandler | null {
+    // defaults here track pywwt's
+    if (msg.shape == 'circle') {
+      const circ = new Circle();
+      circ.set_fill(false);
+      circ.set_skyRelative(true);
+      circ.setCenter(owner.wwtRARad * R2D, owner.wwtDecRad * R2D);
+      return new AnnotationMessageHandler(owner, circ, msg.id);
+    } else if (msg.shape == 'polygon') {
+      const poly = new Poly();
+      poly.set_fill(false);
+      return new AnnotationMessageHandler(owner, poly, msg.id);
+    } else if (msg.shape == 'line') {
+      return new AnnotationMessageHandler(owner, new PolyLine(), msg.id);
+    }
+
+    return null;
+  }
+
+  private constructor(owner: App, ann: Annotation, id: string) {
+    this.owner = owner;
+    this.ann = ann;
+    ann.set_id(id);
+    owner.addAnnotation(ann);
+  }
+
+  handleModifyAnnotationMessage(msg: classicPywwt.ModifyAnnotationMessage) {
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (this.ann instanceof Circle && isCircleAnnotationSetting(setting)) {
+      applyCircleAnnotationSetting(this.ann, setting);
+    } else if (this.ann instanceof Poly && isPolyAnnotationSetting(setting)) {
+      applyPolyAnnotationSetting(this.ann, setting);
+    } else if (this.ann instanceof PolyLine && isPolyLineAnnotationSetting(setting)) {
+      applyPolyLineAnnotationSetting(this.ann, setting);
+    }
+  }
+
+  handleRemoveAnnotationMessage(_msg: classicPywwt.RemoveAnnotationMessage) {
+    this.owner.removeAnnotation(this.ann);
+  }
+
+  handleSetCircleCenterMessage(msg: classicPywwt.SetCircleCenterMessage) {
+    if (this.ann instanceof Circle) {
+      this.ann.setCenter(msg.ra, msg.dec);
+    }
+  }
+
+  handleAddLinePointMessage(msg: classicPywwt.AddLinePointMessage) {
+    if (this.ann instanceof PolyLine) {
+      this.ann.addPoint(msg.ra, msg.dec);
+    }
+  }
+
+  handleAddPolygonPointMessage(msg: classicPywwt.AddPolygonPointMessage) {
+    if (this.ann instanceof Poly) {
+      this.ann.addPoint(msg.ra, msg.dec);
+    }
+  }
+}
+
+
+/** The main "research app" Vue component. */
 @Component
 export default class App extends WWTAwareComponent {
   @Prop({default: null}) readonly allowedOrigin!: string | null;
@@ -120,114 +489,129 @@ export default class App extends WWTAwareComponent {
       this.gotoRADecZoom({
         raRad: msg.ra * D2R,
         decRad: msg.dec * D2R,
-        zoomDeg: msg.fov, // TODO: make sure we're not off by a factor of 6 here
+        zoomDeg: msg.fov * 6,
         instant: msg.instant,
       });
+    } else if (classicPywwt.isModifySettingMessage(msg)) {
+      const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      if (isEngineSetting(setting)) {
+        this.applySetting(setting);
+      }
     } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
-      this.applyCreateFitsLayerMessage(msg);
+      this.getFitsLayerHandler(msg).handleCreateMessage(msg);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
-      this.applyStretchFitsLayerMessage(msg);
+      this.getFitsLayerHandler(msg).handleStretchMessage(msg);
     } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {
-      this.applySetFitsLayerColormapMessage(msg);
+      this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
     } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
-      this.applyModifyFitsLayerMessage(msg);
+      this.getFitsLayerHandler(msg).handleModifyMessage(msg);
+    } else if (classicPywwt.isRemoveFitsLayerMessage(msg)) {
+      // NB we never remove the handler! It's tricky due to async issues.
+      this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
+    } else if (classicPywwt.isCreateTableLayerMessage(msg)) {
+      this.getTableLayerHandler(msg).handleCreateMessage(msg);
+    } else if (classicPywwt.isUpdateTableLayerMessage(msg)) {
+      this.getTableLayerHandler(msg).handleUpdateMessage(msg);
+    } else if (classicPywwt.isModifyTableLayerMessage(msg)) {
+      this.getTableLayerHandler(msg).handleModifyMessage(msg);
+    } else if (classicPywwt.isRemoveTableLayerMessage(msg)) {
+      // NB we never remove the handler! It's tricky due to async issues.
+      this.getTableLayerHandler(msg).handleRemoveMessage(msg);
+    } else if (classicPywwt.isCreateAnnotationMessage(msg)) {
+      this.createAnnotationHandler(msg);
+    } else if (classicPywwt.isModifyAnnotationMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleModifyAnnotationMessage(msg);
+      }
+    } else if (classicPywwt.isSetCircleCenterMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleSetCircleCenterMessage(msg);
+      }
+    } else if (classicPywwt.isAddLinePointMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleAddLinePointMessage(msg);
+      }
+    } else if (classicPywwt.isAddPolygonPointMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleAddPolygonPointMessage(msg);
+      }
+    } else if (classicPywwt.isRemoveAnnotationMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleRemoveAnnotationMessage(msg);
+      }
+      this.annotations.delete(msg.id);
+    } else if (classicPywwt.isClearAnnotationsMessage(msg)) {
+      this.clearAnnotations();
+    } else if (classicPywwt.isLoadTourMessage(msg)) {
+      this.loadTour({
+        url: msg.url,
+        play: true,
+      });
+    } else if (classicPywwt.isPauseTourMessage(msg)) {
+      this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    } else if (classicPywwt.isResumeTourMessage(msg)) {
+      this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    } else if (classicPywwt.isSetDatetimeMessage(msg)) {
+      this.setTime(moment.utc(msg.isot).toDate());
+    } else if (classicPywwt.isPauseTimeMessage(msg)) {
+      this.setClockSync(false);
+    } else if (classicPywwt.isResumeTimeMessage(msg)) {
+      this.setClockSync(true);
+      this.setClockRate(msg.rate);
+    } else if (classicPywwt.isTrackObjectMessage(msg)) {
+      if (msg.code in SolarSystemObjects) {
+        this.setTrackedObject(msg.code as SolarSystemObjects);
+      }
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
-
-    // { event: "image_layer_set", id: "730025ba-e13d-4e81-a89f-d0b18579ecdc", setting: "opacity", value: 1 }
-
-    // TODO:
-    // AddLinePointMessage
-    // AddPolygonPointMessage
-    // ClearAnnotationsMessage
-    // CreateAnnotationMessage
-    // CreateTableLayerMessage
-    // LoadTourMessage
-    // ModifyAnnotationMessage
-    // ModifyTableLayerMessage
-    // ModifySettingMessage
-    // PauseTimeMessage
-    // PauseTourMessage
-    // RemoveAnnotationMessage
-    // RemoveFitsLayerMessage
-    // RemoveTableLayerMessage
-    // ResumeTourMessage
-    // ResumeTimeMessage
-    // SetCircleCenterMessage
-    // SetDatetimeMessage
-    // TrackObjectMessage
-    // UpdateTableLayerMessage
   }
 
-  // Maps external layer IDs to internal ones
-  private layerIdMap: Map<string, string> = new Map();
+  // Keyed by "external" layer IDs
+  private fitsLayers: Map<string, FitsLayerMessageHandler> = new Map();
 
-  private applyCreateFitsLayerMessage(msg: classicPywwt.CreateFitsLayerMessage): void {
-    this.loadFitsLayer({
-      url: msg.url,
-      name: msg.id,
-      gotoTarget: true,
-    }).then((layer) => {
-      this.layerIdMap.set(msg.id, layer.id.toString());
-    });
-  }
+  private getFitsLayerHandler(msg: AnyFitsLayerMessage): FitsLayerMessageHandler {
+    let handler = this.fitsLayers.get(msg.id);
 
-  // Keyed by external, not internal, ID.
-  private layerStretchVersions: Map<string, number> = new Map();
-
-  private applyStretchFitsLayerMessage(msg: classicPywwt.StretchFitsLayerMessage): void {
-    const prev = this.layerStretchVersions.get(msg.id);
-    if (prev !== undefined && msg.version <= prev) {
-      return;
+    if (handler === undefined) {
+      handler = new FitsLayerMessageHandler(this);
+      this.fitsLayers.set(msg.id, handler);
     }
 
-    // TODO: have a real solution in case the layer isn't yet loaded, etc.
-    const intId = this.layerIdMap.get(msg.id);
-    if (intId !== undefined) {
-      this.stretchFitsLayer({
-        id: intId,
-        stretch: msg.stretch,
-        vmin: msg.vmin,
-        vmax: msg.vmax,
-      });
+    return handler;
+  }
+
+  private tableLayers: Map<string, TableLayerMessageHandler> = new Map();
+
+  private getTableLayerHandler(msg: AnyTableLayerMessage): TableLayerMessageHandler {
+    let handler = this.tableLayers.get(msg.id);
+
+    if (handler === undefined) {
+      handler = new TableLayerMessageHandler(this);
+      this.tableLayers.set(msg.id, handler);
+    }
+
+    return handler;
+  }
+
+  private annotations: Map<string, AnnotationMessageHandler> = new Map();
+
+  private createAnnotationHandler(msg: classicPywwt.CreateAnnotationMessage): void {
+    const handler = AnnotationMessageHandler.tryCreate(this, msg);
+
+    if (handler !== null) {
+      this.annotations.set(msg.id, handler);
     }
   }
 
-  // Keyed by external, not internal, ID.
-  private layerColormapVersions: Map<string, number> = new Map();
-
-  private applySetFitsLayerColormapMessage(msg: classicPywwt.SetFitsLayerColormapMessage): void {
-    const prev = this.layerColormapVersions.get(msg.id);
-    if (prev !== undefined && msg.version <= prev) {
-      return;
-    }
-
-    // TODO: have a real solution in case the layer isn't yet loaded, etc.
-    const intId = this.layerIdMap.get(msg.id);
-    if (intId !== undefined) {
-      this.setFitsLayerColormap({
-        id: intId,
-        name: msg.cmap,
-      });
-    }
-  }
-
-  private applyModifyFitsLayerMessage(msg: classicPywwt.ModifyFitsLayerMessage): void {
-    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    if (!isImageSetLayerSetting(setting)) {
-      return;
-    }
-
-    // TODO: have a real solution in case the layer isn't yet loaded, etc.
-    const intId = this.layerIdMap.get(msg.id);
-    if (intId !== undefined) {
-      this.applyFitsLayerSettings({
-        id: intId,
-        settings: [setting],
-      });
-    }
+  private lookupAnnotationHandler(msg: AnyAnnotationMessage): AnnotationMessageHandler | undefined {
+    return this.annotations.get(msg.id);
   }
 
   // Outgoing messages

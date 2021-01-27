@@ -14,6 +14,7 @@
     "@wwtelescope/engine-types": "0.0.0-dev.0",
     "@wwtelescope/engine-vuex": "0.0.0-dev.0",
     "@wwtelescope/research-app-messages": "0.0.0-dev.0",
+    "moment": "^2.29.1",
     "screenfull": "^5",
     "v-tooltip": "^2.1",
     "vue": "^2.6.11",
@@ -28,11 +29,11 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:^0.1.0",
-    "@wwtelescope/engine": "thiscommit:2021-01-14:DeiKae4s",
-    "@wwtelescope/engine-helpers": "thiscommit:2021-01-14:phaiJei1",
-    "@wwtelescope/engine-types": "thiscommit:2021-01-14:keiGu2AS",
-    "@wwtelescope/engine-vuex": "thiscommit:2021-01-14:aeJoo4Sh",
-    "@wwtelescope/research-app-messages": "thiscommit:2021-01-05:pohbaSh3"
+    "@wwtelescope/engine": "c82477033d2bedfdfdde185b56ccaf9dfa552225",
+    "@wwtelescope/engine-helpers": "d251682276bb8c8a86c9150c8a53484be9225a5a",
+    "@wwtelescope/engine-types": "b56a5e9844beaa427aae4496cc865a1d60f376b7",
+    "@wwtelescope/engine-vuex": "715adcce721e6e9a2c3f9418599879c11c057e56",
+    "@wwtelescope/research-app-messages": "91c29e60440e47deaea3395bcf97cbee3884e33e"
   },
   "keywords": [
     "AAS WorldWide Telescope"
