@@ -55,14 +55,24 @@ import {
 } from "@wwtelescope/engine-types";
 
 import {
+  Annotation,
+  Circle,
   ImageSetLayer,
   ImageSetLayerSetting,
+  Poly,
+  PolyLine,
   SpreadSheetLayer,
 } from "@wwtelescope/engine";
 
 import {
+  applyCircleAnnotationSetting,
+  applyPolyAnnotationSetting,
+  applyPolyLineAnnotationSetting,
+  isCircleAnnotationSetting,
   isEngineSetting,
   isImageSetLayerSetting,
+  isPolyAnnotationSetting,
+  isPolyLineAnnotationSetting,
 } from "@wwtelescope/engine-helpers";
 
 import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
@@ -72,6 +82,7 @@ import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messag
 import { convertPywwtSpreadSheetLayerSetting } from "./settings";
 
 const D2R = Math.PI / 180.0;
+const R2D = 180.0 / Math.PI;
 
 type ToolType = "crossfade" | null;
 
@@ -335,6 +346,86 @@ class TableLayerMessageHandler {
   }
 }
 
+
+type AnyAnnotationMessage =
+  classicPywwt.AddLinePointMessage |
+  classicPywwt.AddPolygonPointMessage |
+  classicPywwt.CreateAnnotationMessage |
+  classicPywwt.ModifyAnnotationMessage |
+  classicPywwt.RemoveAnnotationMessage |
+  classicPywwt.SetCircleCenterMessage;
+
+/** Helper for handling messages that mutate annotations. These are actually
+ * much simpler to deal with than image or data layers, but it doesn't hurt
+ * to use the same sort of design.
+ */
+class AnnotationMessageHandler {
+  private owner: App;
+  private ann: Annotation;
+
+  public static tryCreate(owner: App, msg: classicPywwt.CreateAnnotationMessage): AnnotationMessageHandler | null {
+    // defaults here track pywwt's
+    if (msg.shape == 'circle') {
+      const circ = new Circle();
+      circ.set_fill(false);
+      circ.set_skyRelative(true);
+      circ.setCenter(owner.wwtRARad * R2D, owner.wwtDecRad * R2D);
+      return new AnnotationMessageHandler(owner, circ, msg.id);
+    } else if (msg.shape == 'polygon') {
+      const poly = new Poly();
+      poly.set_fill(false);
+      return new AnnotationMessageHandler(owner, poly, msg.id);
+    } else if (msg.shape == 'line') {
+      return new AnnotationMessageHandler(owner, new PolyLine(), msg.id);
+    }
+
+    return null;
+  }
+
+  private constructor(owner: App, ann: Annotation, id: string) {
+    this.owner = owner;
+    this.ann = ann;
+    ann.set_id(id);
+    owner.addAnnotation(ann);
+  }
+
+  handleModifyAnnotationMessage(msg: classicPywwt.ModifyAnnotationMessage) {
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (this.ann instanceof Circle && isCircleAnnotationSetting(setting)) {
+      applyCircleAnnotationSetting(this.ann, setting);
+    } else if (this.ann instanceof Poly && isPolyAnnotationSetting(setting)) {
+      applyPolyAnnotationSetting(this.ann, setting);
+    } else if (this.ann instanceof PolyLine && isPolyLineAnnotationSetting(setting)) {
+      applyPolyLineAnnotationSetting(this.ann, setting);
+    }
+  }
+
+  handleRemoveAnnotationMessage(_msg: classicPywwt.RemoveAnnotationMessage) {
+    this.owner.removeAnnotation(this.ann);
+  }
+
+  handleSetCircleCenterMessage(msg: classicPywwt.SetCircleCenterMessage) {
+    if (this.ann instanceof Circle) {
+      this.ann.setCenter(msg.ra, msg.dec);
+    }
+  }
+
+  handleAddLinePointMessage(msg: classicPywwt.AddLinePointMessage) {
+    if (this.ann instanceof PolyLine) {
+      this.ann.addPoint(msg.ra, msg.dec);
+    }
+  }
+
+  handleAddPolygonPointMessage(msg: classicPywwt.AddPolygonPointMessage) {
+    if (this.ann instanceof Poly) {
+      this.ann.addPoint(msg.ra, msg.dec);
+    }
+  }
+}
+
+
+/** The main "research app" Vue component. */
 @Component
 export default class App extends WWTAwareComponent {
   @Prop({default: null}) readonly allowedOrigin!: string | null;
@@ -416,6 +507,7 @@ export default class App extends WWTAwareComponent {
     } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleModifyMessage(msg);
     } else if (classicPywwt.isRemoveFitsLayerMessage(msg)) {
+      // NB we never remove the handler! It's tricky due to async issues.
       this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
     } else if (classicPywwt.isCreateTableLayerMessage(msg)) {
       this.getTableLayerHandler(msg).handleCreateMessage(msg);
@@ -424,7 +516,38 @@ export default class App extends WWTAwareComponent {
     } else if (classicPywwt.isModifyTableLayerMessage(msg)) {
       this.getTableLayerHandler(msg).handleModifyMessage(msg);
     } else if (classicPywwt.isRemoveTableLayerMessage(msg)) {
+      // NB we never remove the handler! It's tricky due to async issues.
       this.getTableLayerHandler(msg).handleRemoveMessage(msg);
+    } else if (classicPywwt.isCreateAnnotationMessage(msg)) {
+      this.createAnnotationHandler(msg);
+    } else if (classicPywwt.isModifyAnnotationMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleModifyAnnotationMessage(msg);
+      }
+    } else if (classicPywwt.isSetCircleCenterMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleSetCircleCenterMessage(msg);
+      }
+    } else if (classicPywwt.isAddLinePointMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleAddLinePointMessage(msg);
+      }
+    } else if (classicPywwt.isAddPolygonPointMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleAddPolygonPointMessage(msg);
+      }
+    } else if (classicPywwt.isRemoveAnnotationMessage(msg)) {
+      const handler = this.lookupAnnotationHandler(msg);
+      if (handler !== undefined) {
+        handler.handleRemoveAnnotationMessage(msg);
+      }
+      this.annotations.delete(msg.id);
+    } else if (classicPywwt.isClearAnnotationsMessage(msg)) {
+      this.clearAnnotations();
     } else if (classicPywwt.isLoadTourMessage(msg)) {
       this.loadTour({
         url: msg.url,
@@ -448,15 +571,6 @@ export default class App extends WWTAwareComponent {
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
-
-    // TODO:
-    // AddLinePointMessage
-    // AddPolygonPointMessage
-    // ClearAnnotationsMessage
-    // CreateAnnotationMessage
-    // ModifyAnnotationMessage
-    // RemoveAnnotationMessage
-    // SetCircleCenterMessage
   }
 
   // Keyed by "external" layer IDs
@@ -484,6 +598,20 @@ export default class App extends WWTAwareComponent {
     }
 
     return handler;
+  }
+
+  private annotations: Map<string, AnnotationMessageHandler> = new Map();
+
+  private createAnnotationHandler(msg: classicPywwt.CreateAnnotationMessage): void {
+    const handler = AnnotationMessageHandler.tryCreate(this, msg);
+
+    if (handler !== null) {
+      this.annotations.set(msg.id, handler);
+    }
+  }
+
+  private lookupAnnotationHandler(msg: AnyAnnotationMessage): AnnotationMessageHandler | undefined {
+    return this.annotations.get(msg.id);
   }
 
   // Outgoing messages
