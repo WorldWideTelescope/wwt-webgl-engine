@@ -44,6 +44,36 @@ export interface Action {
   (): void;
 }
 
+/** A visual annotation in the WWT view. */
+export class Annotation {
+  //get_center
+  get_id(): string;
+  set_id(v: string): string;
+  get_label(): string;
+  set_label(v: string): string;
+  /** Ranges between 0 and 1. */
+  get_opacity(): number;
+  set_opacity(v: number): number;
+  get_showHoverLabel(): boolean;
+  set_showHoverLabel(v: boolean): boolean;
+  get_tag(): string;
+  set_tag(v: string): string;
+
+  hitTest(renderContext: RenderContext, ra: number, dec: number, x: number, y: number): boolean;
+}
+
+/** Possible settings that can be applied to generic annotations.
+ *
+ * Specific annotation instances (e.g. Circles) can have additional settings.
+ */
+export type AnnotationSetting =
+  // NOTE: isAnnotationSetting in engine-helpers needs to be kept in sync.
+  ["id", string] |
+  ["label", string] |
+  ["opacity", number] |
+  ["showHoverLabel", boolean] |
+  ["tag", string];
+
 export class ArrivedEventArgs {
   /** Get the current right ascension of the view, in hours. */
   get_RA(): number;
@@ -78,6 +108,40 @@ export class CameraParameters {
   get_dec(): number;
   set_dec(v: number): number;
 }
+
+/** A simple circular annotation. */
+export class Circle extends Annotation {
+  get_fill(): boolean;
+  set_fill(v: boolean): boolean;
+  get_fillColor(): string;
+  /** The color is parsed using [[Color.fromName]]. */
+  set_fillColor(v: string): string;
+  get_lineColor(): string;
+  /** The color is parsed using [[Color.load]]. */
+  set_lineColor(v: string): string;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  get_lineWidth(): number;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  set_lineWidth(v: number): number;
+  get_radius(): number;
+  set_radius(v: number): number;
+  get_skyRelative(): boolean;
+  set_skyRelative(v: boolean): boolean;
+
+  /** Set the position of this circle's center. */
+  setCenter(raDeg: number, decDeg: number): void;
+}
+
+/** Possible settings that can be applied to Circle annotations. */
+export type CircleAnnotationSetting =
+  // NOTE: isCircleAnnotationSetting in engine-helpers needs to be kept in sync.
+  AnnotationSetting |
+  ["fill", boolean] |
+  ["fillColor", string] |
+  ["lineColor", string] |
+  ["lineWidth", number] |
+  ["radius", number] |
+  ["skyRelative", boolean];
 
 export class CollectionLoadedEventArgs {
   /** Get the URL of the collection that was just loaded. */
@@ -148,6 +212,9 @@ export namespace Color {
 
   /** Create a color from a hex string `AARRGGBB`. */
   export function fromSimpleHex(hex: string): Color;
+
+  /** This function is the same as [[Color.fromName]]. */
+  export function load(name: string): Color;
 }
 
 /** A mapping from scalar values to colors. */
@@ -601,6 +668,56 @@ export class Place implements Thumbnail {
   updatePlanetLocation(jNow: number): void;
 }
 
+
+/** A polygonal annotation. */
+export class Poly extends Annotation {
+  get_fill(): boolean;
+  set_fill(v: boolean): boolean;
+  get_fillColor(): string;
+  /** The color is parsed using [[Color.fromName]]. */
+  set_fillColor(v: string): string;
+  get_lineColor(): string;
+  /** The color is parsed using [[Color.load]]. */
+  set_lineColor(v: string): string;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  get_lineWidth(): number;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  set_lineWidth(v: number): number;
+
+  /** Add a point to this annotation's definition. */
+  addPoint(raDeg: number, decDeg: number): void;
+}
+
+/** Possible settings that can be applied to Poly annotations. */
+export type PolyAnnotationSetting =
+  // NOTE: isPolyAnnotationSetting in engine-helpers needs to be kept in sync.
+  AnnotationSetting |
+  ["fill", boolean] |
+  ["fillColor", string] |
+  ["lineColor", string] |
+  ["lineWidth", number];
+
+/** An annotation composed of a sequence of lines. */
+export class PolyLine extends Annotation {
+  get_lineColor(): string;
+  /** The color is parsed using [[Color.load]]. */
+  set_lineColor(v: string): string;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  get_lineWidth(): number;
+  /** This parameter currently DOES NOTHING because the WebGL renderer doesn't yet support parametrizable line widths. */
+  set_lineWidth(v: number): number;
+
+  /** Add a point to this annotation's definition. */
+  addPoint(raDeg: number, decDeg: number): void;
+}
+
+/** Possible settings that can be applied to PolyLine annotations. */
+export type PolyLineAnnotationSetting =
+  // NOTE: isPolyLineAnnotationSetting in engine-helpers needs to be kept in sync.
+  AnnotationSetting |
+  ["lineColor", string] |
+  ["lineWidth", number];
+
 export interface ReadyEventCallback {
   /** Called when the WWT engine has finished its initialization. */
   (si: ScriptInterface): void;
@@ -750,6 +867,33 @@ export class ScriptInterface {
     gotoTarget: boolean,
     callback: ImagesetLoadedCallback
   ): ImageSetLayer;
+
+  /** Create a circle annotation.
+   *
+   * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
+   */
+  createCircle(fill: boolean): Circle;
+
+  /** Create a polygonal annotation.
+   *
+   * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
+   */
+  createPolygon(fill: boolean): Poly;
+
+  /** Create a multi-line annotation.
+   *
+   * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
+   */
+  createPolyLine(unused: boolean): PolyLine;
+
+  /** Add an annotation to the renderer. */
+  addAnnotation(ann: Annotation): void;
+
+  /** Remove an annotation from the renderer. */
+  removeAnnotation(ann: Annotation): void;
+
+  /** Remove all annotations from the renderer. */
+  clearAnnotations(): void;
 }
 
 /** A generic [[ScriptInterface]] callback. */
