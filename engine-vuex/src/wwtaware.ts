@@ -7,6 +7,7 @@ import {
 } from "@wwtelescope/engine-types";
 
 import {
+  Annotation,
   EngineSetting,
   Folder,
   Guid,
@@ -87,10 +88,13 @@ export class WWTAwareComponent extends Vue {
         "waitForReady",
       ]),
       ...mapMutations([
+        "addAnnotation",
         "applyFitsLayerSettings",
         "applyTableLayerSettings",
         "applySetting",
+        "clearAnnotations",
         "deleteLayer",
+        "removeAnnotation",
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setClockRate",
@@ -133,10 +137,13 @@ export class WWTAwareComponent extends Vue {
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
+  addAnnotation!: (_a: Annotation) => void;
   applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
   applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
   applySetting!: (_s: EngineSetting) => void;
+  clearAnnotations!: () => void;
   deleteLayer!: (id: string | Guid) => void;
+  removeAnnotation!: (_a: Annotation) => void;
   seekToTourTimecode!: (value: number) => void;
   setBackgroundImageByName!: (_n: string) => void;
   setClockRate!: (_r: number) => void;

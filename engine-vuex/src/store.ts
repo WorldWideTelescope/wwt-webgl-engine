@@ -13,6 +13,7 @@ import {
 } from "@wwtelescope/engine-types";
 
 import {
+  Annotation,
   EngineSetting,
   Folder,
   Guid,
@@ -599,4 +600,28 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     } else {
       Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
     }
-  }}
+  }
+
+  // Annotations
+
+  @Mutation
+  addAnnotation(ann: Annotation): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot addAnnotation without linking to WWTInstance');
+    Vue.$wwt.inst.si.addAnnotation(ann);
+  }
+
+  @Mutation
+  removeAnnotation(ann: Annotation): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot removeAnnotation without linking to WWTInstance');
+    Vue.$wwt.inst.si.removeAnnotation(ann);
+  }
+
+  @Mutation
+  clearAnnotations(): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot clearAnnotations without linking to WWTInstance');
+    Vue.$wwt.inst.si.clearAnnotations();
+  }
+}
