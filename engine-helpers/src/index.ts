@@ -12,6 +12,10 @@ import {
 } from "@wwtelescope/engine-types";
 
 import {
+  Annotation,
+  AnnotationSetting,
+  Circle,
+  CircleAnnotationSetting,
   Color,
   ConstellationFilter,
   EngineSetting,
@@ -24,6 +28,10 @@ import {
   LayerManagerObject,
   LayerSetting,
   Place,
+  Poly,
+  PolyAnnotationSetting,
+  PolyLine,
+  PolyLineAnnotationSetting,
   ScriptInterface,
   SpaceTimeControllerObject,
   TourPlayer,
@@ -34,7 +42,95 @@ import {
   SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
 
+
 // Type guards for the augmented setting types
+
+const annotationSettingTypeInfo: {[ix: string]: boolean} = {
+  "id/string": true,
+  "label/string": true,
+  "opacity/number": true,
+  "showHoverLabel/boolean": true,
+  "tag/string": true,
+}
+
+/** Type guard function for AnnotationSetting. */
+export function isAnnotationSetting(obj: [string, any]): obj is AnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return key in annotationSettingTypeInfo;
+}
+
+/** Apply a setting to a generic Annotation. */
+export function applyAnnotationSetting(ann: Annotation, setting: AnnotationSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (ann as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+const circleAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+  "fill/boolean": true,
+  "fillColor/string": true,
+  "lineColor/string": true,
+  "lineWidth/number": true,
+  "radius/number": true,
+  "skyRelative/boolean": true,
+}
+
+/** Type guard function for CircleAnnotationSetting. */
+export function isCircleAnnotationSetting(obj: [string, any]): obj is CircleAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in circleAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
+}
+
+/** Apply a setting to a generic CircleAnnotation. */
+export function applyCircleAnnotationSetting(circle: Circle, setting: CircleAnnotationSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (circle as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+const polyAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+  "fill/boolean": true,
+  "fillColor/string": true,
+  "lineColor/string": true,
+  "lineWidth/number": true,
+}
+
+/** Type guard function for PolyAnnotationSetting. */
+export function isPolyAnnotationSetting(obj: [string, any]): obj is PolyAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in polyAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
+}
+
+/** Apply a setting to a generic PolyAnnotation. */
+export function applyPolyAnnotationSetting(poly: Poly, setting: PolyAnnotationSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (poly as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+const polyLineAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+  "fill/boolean": true,
+  "fillColor/string": true,
+  "lineColor/string": true,
+  "lineWidth/number": true,
+}
+
+/** Type guard function for PolyLineAnnotationSetting. */
+export function isPolyLineAnnotationSetting(obj: [string, any]): obj is PolyLineAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in polyLineAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
+}
+
+/** Apply a setting to a generic PolyLineAnnotation. */
+export function applyPolyLineAnnotationSetting(polyLine: PolyLine, setting: PolyLineAnnotationSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (polyLine as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
 
 const engineSettingTypeInfo = {
   "constellationArtFilter/ConstellationFilter": true,
@@ -61,6 +157,7 @@ export function isEngineSetting(obj: [string, any]): obj is EngineSetting {  // 
   return (key in engineSettingTypeInfo) || isBaseEngineSetting(obj);
 }
 
+
 const layerSettingTypeInfo = {
   "color/Color": true,
 };
@@ -84,6 +181,7 @@ export function applyLayerSetting(layer: Layer, setting: LayerSetting): void {
   (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
+
 /** Type guard function for ImageSetLayerSetting. */
 export function isImageSetLayerSetting(obj: [string, any]): obj is ImageSetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
   // No special settings specific to non-base ImageSetLayerSetting.
@@ -96,6 +194,7 @@ export function applyImageSetLayerSetting(layer: ImageSetLayer, setting: ImageSe
   const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
   (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
+
 
 /** Type guard function for SpreadSheetLayerSetting. */
 export function isSpreadSheetLayerSetting(obj: [string, any]): obj is SpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -110,6 +209,8 @@ export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: S
   (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
+
+// The WWTInstance wrapper class and friends.
 
 export const enum InitControlViewType {
   Sky = "Sky",
