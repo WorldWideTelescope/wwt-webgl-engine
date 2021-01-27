@@ -1,3 +1,9 @@
+# @wwtelescope/embed-creator 0.3.3 (2021-01-27)
+
+- Remove superfluous no-op "doc" script in the `package.json`
+- Correct temporary GitHub URLs in the package.json files
+
+
 # @wwtelescope/embed-creator 0.3.2 (2020-12-30)
 
 - Use https:// for some sample URLs. Fixes the tour sample when visiting the site
@@ -19,3 +25,19 @@
 #  @wwtelescope/embed-creator 0.2.1 (2020-09-24)
 
 - No code changes; just issuing a new release for the Cranko switchover.
+
+
+# [0.2.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/embed-creator@0.2.0-beta.1...@wwtelescope/embed-creator@0.2.0) (2020-06-12)
+
+- Wire up a minimal UI for creating tour-playback embeds
+
+
+## [0.1.1](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/embed-creator@0.1.1-beta.0...@wwtelescope/embed-creator@0.1.1) (2020-06-09)
+
+- If activating a "show image" mode, clear out mutually inconsistent state from
+  the planetary mode.
+
+
+# [0.1.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/embed-creator@0.1.0-beta.3...@wwtelescope/embed-creator@0.1.0) (2020-05-24)
+
+**Note:** Version bump only for package @wwtelescope/embed-creator

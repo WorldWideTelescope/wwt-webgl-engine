@@ -1,3 +1,18 @@
+# @wwtelescope/engine-vuex 0.7.0 (2021-01-27)
+
+This release contains a **breaking change** relating to a rework of how
+"settings" are expressed in TypeScript. The previous system was pretty limited
+and limiting; the new system is much more functional.
+
+- Expose lots of new engine facets:
+  - Annotations
+  - Table (spreadsheet) layers
+  - Image layers
+  - The "track object" comand
+- Track the rework of how settings are expressed
+- Upgrade TypeDoc and TypeScript
+
+
 # @wwtelescope/engine-vuex 0.6.0 (2021-01-07)
 
 - Add new interfaces for monitoring and controlling the WWT internal clock.
@@ -27,3 +42,20 @@ This release contains a **breaking change.**
 # @wwtelescope/engine-vuex 0.3.1 (2020-09-23)
 
 - No code changes; issuing a new release for the Cranko switchover.
+
+
+# [0.3.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine-vuex@0.3.0-beta.1...@wwtelescope/engine-vuex@0.3.0) (2020-06-12)
+
+- Export interfaces relating to basic tour playback
+
+
+# [0.2.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine-vuex@0.2.0-beta.0...@wwtelescope/engine-vuex@0.2.0) (2020-06-09)
+
+- Expose current foreground and background imagesets, and the foreground
+  opacity, as state
+- Clean up internal mechanism for updating Vuex state from the WWT component
+
+
+# [0.1.0](https://github.com/pkgw/wwt-webgl-engine/compare/@wwtelescope/engine-vuex@0.1.0-beta.2...@wwtelescope/engine-vuex@0.1.0) (2020-05-23)
+
+**Note:** Version bump only for package @wwtelescope/engine-vuex
