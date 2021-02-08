@@ -687,8 +687,6 @@ namespace wwtlib
             Matrix3d viewSave = RenderContext.View;
             Matrix3d projSave = RenderContext.Projection;
 
-            Vector2d raDecDownDown = GetCoordinatesForScreenPoint(RenderContext.Width / 2, RenderContext.Height / 2);
-
             if (Settings.Current.ShowCrosshairs)
             {
                 DrawCrosshairs(RenderContext);
