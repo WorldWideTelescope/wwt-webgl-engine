@@ -132,14 +132,22 @@ namespace wwtlib
                         }
                         else
                         {
-                            if (ResponseType == "")
+                            if(xhr.Status >= 400)
                             {
-                                LoadData(xhr.ResponseText);
-                            }
-                            else
+                                _message = xhr.StatusText;
+                                State = StateType.Error;
+                            } else
                             {
-                                LoadBlob(xhr.Response);
+                                if (ResponseType == "")
+                                {
+                                    LoadData(xhr.ResponseText);
+                                }
+                                else
+                                {
+                                    LoadBlob(xhr.Response);
+                                }
                             }
+
                         }
 
                     }
