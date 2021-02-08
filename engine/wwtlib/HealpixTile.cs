@@ -21,7 +21,9 @@ namespace wwtlib
         private int step;
         private string url;
         private bool subDivided = false;
-        private static Matrix3d galacticMatrix = Matrix3d.Create(
+        private bool catalogRowsAdded = false;
+        private readonly List<VoRow> CatalogRows = new List<VoRow>();
+        private static readonly Matrix3d galacticMatrix = Matrix3d.Create(
                     -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
                     -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
                     0.4941094279435681, 0.7469822444763707, -0.4448296299195045, 0,
@@ -75,7 +77,7 @@ namespace wwtlib
                 this.faceY = parentTile.faceY * 2 + y;
             }
 
-
+            IsCatalogTile = dataset.Extension.ToLowerCase().IndexOf("tsv") > -1;
             // All healpix is inside out
             //insideOut = true;
             ComputeBoundingSphere();
@@ -224,29 +226,24 @@ namespace wwtlib
             //prioritize transparent Png over other image formats
             if (dataset.Extension.ToLowerCase().IndexOf("png") > -1)
             {
-                IsCatalogTile = false;
                 return ".png";
             }
 
             // Check for either type
             if (dataset.Extension.ToLowerCase().IndexOf("jpeg") > -1 || dataset.Extension.ToLowerCase().IndexOf("jpg") > -1)
             {
-                IsCatalogTile = false;
                 return ".jpg";
             }
 
             if (dataset.Extension.ToLowerCase().IndexOf("tsv") > -1)
             {
-                IsCatalogTile = true;
                 return ".tsv";
             }
 
             if (dataset.Extension.ToLowerCase().IndexOf("fits") > -1)
             {
-                IsCatalogTile = false;
                 return ".fits";
             }
-            IsCatalogTile = false;
 
             //default to most common
             return ".jpg";
@@ -292,6 +289,11 @@ namespace wwtlib
 
         public override bool Draw3D(RenderContext renderContext, double opacity)
         {
+            if (IsCatalogTile)
+            {
+                DrawCatalogTile(renderContext, opacity);
+                return true;
+            }
             RenderedGeneration = CurrentRenderGeneration;
             TilesTouched++;
 
@@ -362,15 +364,6 @@ namespace wwtlib
                         {
                             renderChildPart[childIndex].TargetState = renderChildPart[childIndex].State = false;
                         }
-
-                        //if (renderChildPart[childIndex].TargetState == true || !blendMode)
-                        //{
-                        //    renderChildPart[childIndex].State = renderChildPart[childIndex].TargetState;
-                        //}
-                        //if (renderChildPart[childIndex].TargetState != renderChildPart[childIndex].State)
-                        //{
-                        //    transitioning = true;
-                        //}
                     }
                     else
                     {
@@ -400,7 +393,6 @@ namespace wwtlib
                     Parent.RenderedAtOrBelowGeneration = RenderedAtOrBelowGeneration;
                 }
             }
-
             if (!anythingToRender)
             {
                 return true;
@@ -418,7 +410,6 @@ namespace wwtlib
 
             TilesInView++;
 
-
             for (int i = 0; i < 4; i++)
             {
                 if (renderChildPart[i].TargetState)
@@ -430,33 +421,233 @@ namespace wwtlib
             return true;
         }
 
+        public void DrawCatalogTile(RenderContext renderContext, double opacity)
+        {
+            RenderedGeneration = CurrentRenderGeneration;
+            TilesTouched++;
+
+            InViewFrustum = true;
+            bool onlyDrawChildren = false;
+
+            if (!ReadyToRender)
+            {
+                if (!errored)
+                {
+                    TileCache.AddTileToQueue(this);
+                    return;
+                }
+
+                if (errored && Level < 3) //Level 0-2 sometimes deleted in favor of allsky.jpg/tsv
+                {
+                    onlyDrawChildren = true;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            bool anyChildInFrustum = false;
+            int childIndex = 0;
+            for (int y1 = 0; y1 < 2; y1++)
+            {
+                for (int x1 = 0; x1 < 2; x1++)
+                {
+                    if (Level < dataset.Levels)
+                    {
+                        if (children[childIndex] == null)
+                        {
+                            children[childIndex] = TileCache.GetTile(Level + 1, x1, y1, dataset, this);
+                        }
+
+                        if (children[childIndex].IsTileInFrustum(renderContext.Frustum))
+                        {
+                            InViewFrustum = true;
+                            anyChildInFrustum = true;
+                            if (children[childIndex].IsTileBigEnough(renderContext) || onlyDrawChildren)
+                            {
+                                ((HealpixTile)children[childIndex]).DrawCatalogTile(renderContext, opacity);
+                            }
+                            else
+                            {
+                                ((HealpixTile)children[childIndex]).RemoveCatalogTile();
+                            }
+                        }
+                        else
+                        {
+                            ((HealpixTile)children[childIndex]).RemoveCatalogTile();
+                        }
+                    }
+
+                    childIndex++;
+                }
+            }
+            if (Level == 0 && !anyChildInFrustum && !onlyDrawChildren)
+            {
+                RemoveCatalogTile();
+            } else if (anyChildInFrustum)
+            {
+                TilesInView++;
+                AddCatalogTile(renderContext, (float)opacity);
+            }
+        }
+
+        public void RemoveCatalogTile()
+        {
+            if (catalogRowsAdded)
+            {
+                foreach (Tile child in children)
+                {
+                    if(child != null)
+                    {
+                        ((HealpixTile)child).RemoveCatalogTile();
+                    }
+                }
+                VoTable table = dataset.HipsProperties.CatalogVoTable;
+
+                foreach (VoRow row in CatalogRows)
+                {
+                    table.Rows.Remove(row);
+                }
+                catalogRowsAdded = false;
+
+                dataset.HipsProperties.CatalogVoTableLayer.CleanUp();
+            }
+        }
+
+        public bool AddCatalogTile(RenderContext renderContext, float opacity)
+        {
+            if (!catalogRowsAdded)
+            {
+                catalogRowsAdded = true;
+                VoTable table = dataset.HipsProperties.CatalogVoTable;
+
+                foreach (VoRow row in CatalogRows)
+                {
+                    row.Owner = table;
+                    table.Rows.Add(row);
+                }
+                if (dataset.HipsProperties.CatalogVoTableLayer == null)
+                {
+                    dataset.HipsProperties.CatalogVoTableLayer = LayerManager.AddVoTableLayerWithPlotType(table, dataset.Name, PlotTypes.Circle);
+                } else
+                {
+                    dataset.HipsProperties.CatalogVoTableLayer.CleanUp();
+                }
+            }
+
+            return true;
+        }
+
+        private WebFile catalogData;
+
         private void SetStep()
         {
-            switch (Level)
+            if (IsCatalogTile)
             {
-                case 0:
-                case 1:
-                case 2:
-                    step = 64;
-                    break;
-                case 3:
-                    step = 32;
-                    break;
-                case 4:
-                    step = 16;
-                    break;
-                case 5:
-                    step = 8;
-                    break;
-                case 6:
-                    step = 4;
-                    break;
-                case 7:
-                    step = 2;
-                    break;
-                default:
-                    step = 2;
-                    break;
+                step = 2;
+            } else
+            {
+                switch (Level)
+                {
+                    case 0:
+                    case 1:
+                    case 2:
+                        step = 64;
+                        break;
+                    case 3:
+                        step = 32;
+                        break;
+                    case 4:
+                        step = 16;
+                        break;
+                    case 5:
+                        step = 8;
+                        break;
+                    case 6:
+                        step = 4;
+                        break;
+                    default:
+                        step = 2;
+                        break;
+                }
+            }
+        }
+
+
+        public override void RequestImage()
+        {
+            if (IsCatalogTile)
+            {
+                if (!Downloading && !ReadyToRender)
+                {
+                    Downloading = true;
+                    catalogData = new WebFile(this.URL);
+                    catalogData.OnStateChange = LoadCatalogData;
+                    catalogData.Send();
+                }
+            }
+            else
+            {
+                base.RequestImage();
+            }
+
+        }
+
+        private void LoadCatalogData()
+        {
+            if (catalogData.State == StateType.Error)
+            {
+                RequestPending = false;
+                Downloading = false;
+                errored = true;
+                TileCache.RemoveFromQueue(this.Key, true);
+            }
+            else if (catalogData.State == StateType.Received)
+            {
+                string tableData = "";
+                bool header = true;
+                foreach (string line in catalogData.GetText().Split("\n"))
+                {
+                    if (!line.StartsWith("#") && header)
+                    {
+                        tableData += line.Replace("RAJ2000", "RA").Replace("DEJ2000", "Dec") + "\r\n";
+                        header = false;
+                        continue;
+                    }
+
+                    if (!line.StartsWith("#"))
+                    {
+                        tableData += line + "\r\n";
+                    }
+                }
+                Table table = new Table();
+                table.LoadFromString(tableData, false, false, true);
+                header = true;
+                foreach (List<string> row in table.Rows)
+                {
+                    if (header)
+                    {
+                        header = false;
+                    } else
+                    {
+                        VoRow voRow = new VoRow(dataset.HipsProperties.CatalogVoTable);
+                        voRow.ColumnData = new object[dataset.HipsProperties.CatalogVoTable.Columns.Count];
+
+                        for (int i = 0; i < row.Count; i++)
+                        {
+                            voRow.ColumnData[i] = row[i];
+                        }
+                        CatalogRows.Add(voRow);
+                    }
+                }
+
+                texReady = true;
+                Downloading = false;
+                errored = false;
+                ReadyToRender = true;
+                RequestPending = false;
+                TileCache.RemoveFromQueue(this.Key, true);
             }
         }
 
@@ -529,8 +720,6 @@ namespace wwtlib
 
             if (Level < lastDeepestLevel)
             {
-                //interate children
-
                 foreach (Tile child in children)
                 {
                     if (child != null)

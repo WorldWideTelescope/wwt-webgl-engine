@@ -6,11 +6,16 @@ namespace wwtlib
     public class HipsProperties
     {
         public Dictionary<string, string> Properties { get { return properties; } }
+        public VoTableLayer CatalogVoTableLayer {
+            get { return catalogVoTableLayer; } 
+            set { catalogVoTableLayer = value; }
+        }
         public VoTable CatalogVoTable { get { return catalogVoTable; } }
         public bool DownloadComplete { get { return downloadComplete; } }
 
         private Dictionary<string, string> properties = new Dictionary<string, string>();
         private VoTable catalogVoTable = null;
+        private VoTableLayer catalogVoTableLayer = null;
         private bool downloadComplete = false;
         private WebFile webFile;
         private readonly string url;

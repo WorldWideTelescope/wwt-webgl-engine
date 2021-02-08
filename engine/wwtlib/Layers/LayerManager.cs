@@ -379,8 +379,11 @@ namespace wwtlib
 
         public static VoTableLayer AddVoTableLayer(VoTable table, string title)
         {
-
-            VoTableLayer layer = VoTableLayer.Create(table);
+            return LayerManager.AddVoTableLayerWithPlotType(table, title, PlotTypes.Circle);
+        }
+        public static VoTableLayer AddVoTableLayerWithPlotType(VoTable table, string title, PlotTypes plotType)
+        {
+            VoTableLayer layer = VoTableLayer.Create(table, plotType);
             layer.Name = title;
             layer.Astronomical = true;
             layer.ReferenceFrame = "Sky";
