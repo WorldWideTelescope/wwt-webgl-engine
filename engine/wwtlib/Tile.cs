@@ -945,7 +945,7 @@ namespace wwtlib
         {
             get
             {
-                return dataset.ImageSetID.ToString() + @"\" + Level.ToString() + @"\" + tileY.ToString() + "_" + tileX.ToString();
+                return Imageset.GetTileKey(dataset, Level, tileX, tileY, Parent);
             }
 
         }
