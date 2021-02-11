@@ -4,9 +4,10 @@ sort_by = "weight"
 insert_anchor_links = "right"
 +++
 
-The [WebGL] engine of the [AAS](https://aas.org/) [WorldWide Telescope] puts
-essentially the entire power of the [WWT web client] in a [TypeScript] package
-that can be embedded in webpages or your own applications. Like this!
+The “[WebGL] engine” is the core renderer that powers the web-based forms of the
+[AAS](https://aas.org/) [WorldWide Telescope] software system. While it
+underpins the [WWT web client] application, it is a reusable [TypeScript]
+framework that can be embedded in webpages or your own applications. Like this!
 
 [WebGL]: https://www.khronos.org/webgl/
 [WorldWide Telescope]: http://www.worldwidetelescope.org/
@@ -21,11 +22,10 @@ This manual is the detailed reference on its usage and behavior.
 
 ## Historical Note
 
-The Web manifestation of WWT has gone through several stages of evolution.
-These stages include a [Silverlight] version and the `<canvas>`-based “HTML5”
-version. This documentation describes the “WebGL” version, which is the latest
-and, we hope, final version of the WWT web engine. We won’t intentionally
-break the older versions, but there are no guarantees that they will continue
-functioning going forward.
+The Web manifestation of WWT has gone through several stages of evolution. These
+stages include a [Silverlight] web client, a `<canvas>`-based “HTML5” version, a
+“WebGL” iteration, and gradual improvements in its modularization. We won’t
+intentionally break the pre-WebGL versions, but there are no guarantees that
+they will continue functioning going forward.
 
 [Silverlight]: https://www.microsoft.com/silverlight/
