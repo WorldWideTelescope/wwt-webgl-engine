@@ -26,7 +26,7 @@ environment.
 [ts-gulp-example]: https://www.typescriptlang.org/docs/handbook/gulp.html
 [Vue]: https://vuejs.org/
 
-Once your skeleton is ready, we recommend adding the
+Once your skeleton is ready, we recommend adding
 the {{engineapi(p="index.html",t="@wwtelescope/engine")}}
 and {{helpersapi(p="index.html",t="@wwtelescope/engine-helpers")}}
 packages as dependencies, using a command something like:
