@@ -24,8 +24,8 @@
     "src/**/*.ts"
   ],
   "typedocOptions": {
-    "readme": "../docs/astro-index.md",
-    "out": "../docs/static/apiref/astro",
+    "readme": "../docs/engine/astro-index.md",
+    "out": "../docs/engine/static/apiref/astro",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
     "listInvalidSymbolLinks": true

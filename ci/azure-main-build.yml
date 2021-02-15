@@ -174,18 +174,18 @@ jobs:
 
   - bash: |
       set -xeuo pipefail
-      cd docs
-      ../zola check
-    displayName: Check Zola docs site
+      cd docs/engine
+      ../../zola check
+    displayName: Check Zola engine docs site
 
   - bash: |
       set -xeuo pipefail
-      cd docs
-      ../zola build -o $ARTIFACT_STAGING/docs
-    displayName: Zola docs build
+      cd docs/engine
+      ../../zola build -o $ARTIFACT_STAGING/docs-engine
+    displayName: Zola engine docs build
 
   - task: PublishPipelineArtifact@0
-    displayName: Publish docs artifacts
+    displayName: Publish engine docs artifacts
     inputs:
-      artifactName: docs
-      targetPath: $(Build.ArtifactStagingDirectory)/docs
+      artifactName: docs-engine
+      targetPath: $(Build.ArtifactStagingDirectory)/docs-engine

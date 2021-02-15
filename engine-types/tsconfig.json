@@ -24,8 +24,8 @@
     "src/**/*.ts"
   ],
   "typedocOptions": {
-    "readme": "../docs/engine-types-index.md",
-    "out": "../docs/static/apiref/engine-types",
+    "readme": "../docs/engine/engine-types-index.md",
+    "out": "../docs/engine/static/apiref/engine-types",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
     "listInvalidSymbolLinks": true

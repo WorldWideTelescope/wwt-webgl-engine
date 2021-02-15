@@ -1,7 +1,7 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-// Toplevel documentation found at @/docs/research-app-messages-index.md
+// Toplevel documentation found at @/docs/engine/research-app-messages-index.md
 
 import * as classicPywwt from './classic_pywwt';
 

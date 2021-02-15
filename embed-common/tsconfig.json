@@ -24,8 +24,8 @@
     "src/**/*.ts"
   ],
   "typedocOptions": {
-    "readme": "../docs/embed-common-index.md",
-    "out": "../docs/static/apiref/embed-common",
+    "readme": "../docs/engine/embed-common-index.md",
+    "out": "../docs/engine/static/apiref/embed-common",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
     "listInvalidSymbolLinks": true
