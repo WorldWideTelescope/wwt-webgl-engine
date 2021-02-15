@@ -38,7 +38,7 @@ object structures without needing to actually use or import the package.
 
 [@wwtelescope/research-app-messages]: https://www.npmjs.com/package/@wwtelescope/research-app-messages
 [msg-docs]: https://docs.worldwidetelescope.org/webgl-reference/latest/apiref/research-app-messages/
-[TypeScript]: https://typescriptlang.org/
+[TypeScript]: https://www.typescriptlang.org/
 
 To see an index of the messages that are supported, visit the
 [@wwtelescope/research-app-messages documentation][msg-docs].
