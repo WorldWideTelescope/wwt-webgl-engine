@@ -21,8 +21,9 @@ namespace wwtlib
         private int step;
         private string url;
         private bool subDivided = false;
+        private readonly List<List<string>> catalogRows = new List<List<string>>();
         private bool catalogRowsAdded = false;
-        private readonly List<VoRow> CatalogRows = new List<VoRow>();
+        private WebFile catalogData;
         private static readonly Matrix3d galacticMatrix = Matrix3d.Create(
                     -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
                     -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
@@ -488,7 +489,7 @@ namespace wwtlib
             } else if (anyChildInFrustum)
             {
                 TilesInView++;
-                AddCatalogTile(renderContext, (float)opacity);
+                AddCatalogTile();
             }
         }
 
@@ -496,50 +497,48 @@ namespace wwtlib
         {
             if (catalogRowsAdded)
             {
-                foreach (Tile child in children)
-                {
-                    if(child != null)
-                    {
-                        ((HealpixTile)child).RemoveCatalogTile();
-                    }
-                }
-                VoTable table = dataset.HipsProperties.CatalogVoTable;
-
-                foreach (VoRow row in CatalogRows)
-                {
-                    table.Rows.Remove(row);
-                }
                 catalogRowsAdded = false;
-
-                dataset.HipsProperties.CatalogVoTableLayer.CleanUp();
+                foreach (List<string> row in catalogRows)
+                {
+                    dataset.HipsProperties.CatalogSpreadSheetLayer.Table.Rows.Remove(row);
+                }
+                dataset.HipsProperties.CatalogSpreadSheetLayer.dirty = true;
             }
         }
 
-        public bool AddCatalogTile(RenderContext renderContext, float opacity)
+        private void AddCatalogTile()
         {
             if (!catalogRowsAdded)
             {
                 catalogRowsAdded = true;
-                VoTable table = dataset.HipsProperties.CatalogVoTable;
 
-                foreach (VoRow row in CatalogRows)
+                foreach(List<string> row in catalogRows)
                 {
-                    row.Owner = table;
-                    table.Rows.Add(row);
+                    dataset.HipsProperties.CatalogSpreadSheetLayer.Table.Rows.Add(row);
                 }
-                if (dataset.HipsProperties.CatalogVoTableLayer == null)
-                {
-                    dataset.HipsProperties.CatalogVoTableLayer = LayerManager.AddVoTableLayerWithPlotType(table, dataset.Name, PlotTypes.Circle);
-                } else
-                {
-                    dataset.HipsProperties.CatalogVoTableLayer.CleanUp();
-                }
+                dataset.HipsProperties.CatalogSpreadSheetLayer.dirty = true;
             }
 
-            return true;
         }
 
-        private WebFile catalogData;
+        private void ExtractCatalogTileRows()
+        {
+            bool headerRemoved = false;
+            foreach (string line in catalogData.GetText().Split("\n"))
+            {
+                if (!line.StartsWith("#") && !headerRemoved)
+                {
+                    headerRemoved = true;
+                    continue;
+                }
+
+                if (!line.StartsWith("#"))
+                {
+                    List<string> rowData = UiTools.SplitString(line, dataset.HipsProperties.CatalogSpreadSheetLayer.Table.Delimiter);
+                    catalogRows.Add(rowData);
+                }
+            }
+        }
 
         private void SetStep()
         {
@@ -605,43 +604,7 @@ namespace wwtlib
             }
             else if (catalogData.State == StateType.Received)
             {
-                string tableData = "";
-                bool header = true;
-                foreach (string line in catalogData.GetText().Split("\n"))
-                {
-                    if (!line.StartsWith("#") && header)
-                    {
-                        tableData += line.Replace("RAJ2000", "RA").Replace("DEJ2000", "Dec") + "\r\n";
-                        header = false;
-                        continue;
-                    }
-
-                    if (!line.StartsWith("#"))
-                    {
-                        tableData += line + "\r\n";
-                    }
-                }
-                Table table = new Table();
-                table.LoadFromString(tableData, false, false, true);
-                header = true;
-                foreach (List<string> row in table.Rows)
-                {
-                    if (header)
-                    {
-                        header = false;
-                    } else
-                    {
-                        VoRow voRow = new VoRow(dataset.HipsProperties.CatalogVoTable);
-                        voRow.ColumnData = new object[dataset.HipsProperties.CatalogVoTable.Columns.Count];
-
-                        for (int i = 0; i < row.Count; i++)
-                        {
-                            voRow.ColumnData[i] = row[i];
-                        }
-                        CatalogRows.Add(voRow);
-                    }
-                }
-
+                ExtractCatalogTileRows();
                 texReady = true;
                 Downloading = false;
                 errored = false;

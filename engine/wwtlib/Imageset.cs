@@ -61,7 +61,7 @@ namespace wwtlib
                     {
                         if (imageset.HipsProperties == null)
                         {
-                            imageset.HipsProperties = new HipsProperties(imageset.Url);
+                            imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
                         }
                         if (imageset.HipsProperties.DownloadComplete)
                         {

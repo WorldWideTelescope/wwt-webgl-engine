@@ -2130,16 +2130,20 @@ namespace wwtlib
         {
             SpreadSheetLayer layer = new SpreadSheetLayer();
             layer.LoadFromString(data, false, false, false, true);
-            layer.Enabled = true;
             layer.Name = name;
+            LayerManager.AddSpreadsheetLayer(layer, frame);
+            return layer;
+        }
 
-            LayerList[layer.ID] =  layer;
+        public static void AddSpreadsheetLayer(SpreadSheetLayer layer, string frame)
+        {
+            layer.Enabled = true;
+            LayerList[layer.ID] = layer;
             layer.ReferenceFrame = CurrentMap;
             AllMaps[frame].Layers.Add(layer);
             AllMaps[frame].Open = true;
             version++;
             LoadTree();
-            return layer;
         }
 
         static void showOrbitPlanet_Click(object sender, EventArgs e)

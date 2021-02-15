@@ -6,22 +6,26 @@ namespace wwtlib
     public class HipsProperties
     {
         public Dictionary<string, string> Properties { get { return properties; } }
-        public VoTableLayer CatalogVoTableLayer {
-            get { return catalogVoTableLayer; } 
-            set { catalogVoTableLayer = value; }
+        public SpreadSheetLayer CatalogSpreadSheetLayer
+        {
+            get { return catalogSpreadSheetLayer; }
+            set { catalogSpreadSheetLayer = value; }
         }
-        public VoTable CatalogVoTable { get { return catalogVoTable; } }
+
         public bool DownloadComplete { get { return downloadComplete; } }
 
         private Dictionary<string, string> properties = new Dictionary<string, string>();
         private VoTable catalogVoTable = null;
-        private VoTableLayer catalogVoTableLayer = null;
+        private SpreadSheetLayer catalogSpreadSheetLayer = new SpreadSheetLayer();
+
         private bool downloadComplete = false;
         private WebFile webFile;
         private readonly string url;
+        private string datasetName;
 
-        public HipsProperties (string datasetUrl)
+        public HipsProperties (string datasetUrl, string datasetName)
         {
+            this.datasetName = datasetName;
             if (datasetUrl.ToLowerCase().IndexOf("norder") > -1)
             {
                 datasetUrl = datasetUrl.Substring(0, datasetUrl.ToLowerCase().IndexOf("norder"));
@@ -56,6 +60,9 @@ namespace wwtlib
 
         private void OnCatalogMetadataDownloadComplete ()
         {
+            catalogSpreadSheetLayer.UseHeadersFromVoTable(catalogVoTable);
+            catalogSpreadSheetLayer.Name = datasetName;
+            LayerManager.AddSpreadsheetLayer(CatalogSpreadSheetLayer, "Sky");
             downloadComplete = true;
         }
 

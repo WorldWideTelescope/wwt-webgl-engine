@@ -10,7 +10,7 @@ using System.Html.Data.Files;
 
 namespace wwtlib
 {
-     // public enum PointScaleTypes { Linear=0, Power=1, Log=2, Constant=3, StellarMagnitude=4 };
+    // public enum PointScaleTypes { Linear=0, Power=1, Log=2, Constant=3, StellarMagnitude=4 };
 
 
     public class SpreadSheetLayer : Layer
@@ -48,7 +48,7 @@ namespace wwtlib
             //todo copy binary format
 
 
-       //     Clipboard.SetText(table.ToString());
+            //     Clipboard.SetText(table.ToString());
 
         }
 
@@ -221,9 +221,9 @@ namespace wwtlib
             // See PrepareBackCompatTable for an explanation of the
             // circumstances under which table_backcompat is used.
             if (table_backcompat == null) {
-              data = table.Save();
+                data = table.Save();
             } else {
-              data = table_backcompat.Save();
+                data = table_backcompat.Save();
             }
 
             Blob blob = new Blob(new object[] { data });
@@ -241,44 +241,44 @@ namespace wwtlib
         private void PrepareBackCompatTable()
         {
 
-          // In this this layer class we implement dynamic normalization of the
-          // points based on one of the existing numerical columns. However, we
-          // need to produce XML files that are backward-compatible with older
-          // versions of WWT, so the approach we take is to add a column with
-          // the computed sizes for versions of WWT that can't do the dynamic
-          // scaling - while in newer versions we ignore this additional column
-          // and use the dynamic scaling.
+            // In this this layer class we implement dynamic normalization of the
+            // points based on one of the existing numerical columns. However, we
+            // need to produce XML files that are backward-compatible with older
+            // versions of WWT, so the approach we take is to add a column with
+            // the computed sizes for versions of WWT that can't do the dynamic
+            // scaling - while in newer versions we ignore this additional column
+            // and use the dynamic scaling.
 
-          // Take a shortcut to avoid copying the table if possible
-          if ((sizeColumn == -1 || !NormalizeSize) && (colorMapColumn == -1 || !DynamicColor)) {
-            lastNormalizeSizeColumnIndex = -1;
-            lastDynamicColorColumnIndex = -1;
-            return;
-          }
-
-          table_backcompat = table.Clone();
-
-          if (sizeColumn > -1 && NormalizeSize) {
-            List<string> normalizedPointSize = new List<string>();
-            foreach (string[] row in table_backcompat.Rows) {
-                normalizedPointSize.Add(NormalizePointSize(Single.Parse(row[sizeColumn])).ToString());
+            // Take a shortcut to avoid copying the table if possible
+            if ((sizeColumn == -1 || !NormalizeSize) && (colorMapColumn == -1 || !DynamicColor)) {
+                lastNormalizeSizeColumnIndex = -1;
+                lastDynamicColorColumnIndex = -1;
+                return;
             }
-            table_backcompat.AddColumn(NormalizeSizeColumnName, normalizedPointSize);
-            lastNormalizeSizeColumnIndex = table_backcompat.Header.Count - 1;
-          } else {
-            lastNormalizeSizeColumnIndex = -1;
-          }
 
-          if (colorMapColumn > -1 && DynamicColor) {
-            List<string> pointColors = new List<string>();
-            foreach (string[] row in table_backcompat.Rows) {
-              pointColors.Add(ColorMapper.FindClosestColor(NormalizeColorMapValue(Single.Parse(row[ColorMapColumn]))).ToSimpleHex());
+            table_backcompat = table.Clone();
+
+            if (sizeColumn > -1 && NormalizeSize) {
+                List<string> normalizedPointSize = new List<string>();
+                foreach (string[] row in table_backcompat.Rows) {
+                    normalizedPointSize.Add(NormalizePointSize(Single.Parse(row[sizeColumn])).ToString());
+                }
+                table_backcompat.AddColumn(NormalizeSizeColumnName, normalizedPointSize);
+                lastNormalizeSizeColumnIndex = table_backcompat.Header.Count - 1;
+            } else {
+                lastNormalizeSizeColumnIndex = -1;
             }
-            table_backcompat.AddColumn(DynamicColorColumnName, pointColors);
-            lastDynamicColorColumnIndex = table_backcompat.Header.Count - 1;
-          } else {
-            lastDynamicColorColumnIndex = -1;
-          }
+
+            if (colorMapColumn > -1 && DynamicColor) {
+                List<string> pointColors = new List<string>();
+                foreach (string[] row in table_backcompat.Rows) {
+                    pointColors.Add(ColorMapper.FindClosestColor(NormalizeColorMapValue(Single.Parse(row[ColorMapColumn]))).ToSimpleHex());
+                }
+                table_backcompat.AddColumn(DynamicColorColumnName, pointColors);
+                lastDynamicColorColumnIndex = table_backcompat.Header.Count - 1;
+            } else {
+                lastDynamicColorColumnIndex = -1;
+            }
 
         }
 
@@ -287,88 +287,7 @@ namespace wwtlib
             int index = 0;
             foreach (string headerName in table.Header)
             {
-                string name = headerName.ToLowerCase();
-
-                if (name.IndexOf("lat") > -1 && latColumn == -1)
-                {
-                    latColumn = index;
-                }
-
-                if ((name.IndexOf("lon") > -1 || name.IndexOf("lng") > -1) && lngColumn == -1)
-                {
-                    lngColumn = index;
-                }
-
-                if (name.IndexOf("dec") > -1 && latColumn == -1)
-                {
-                    latColumn = index;
-                    astronomical = true;
-                }
-
-                if ((name.IndexOf("ra") > -1 || name.IndexOf("ascen") > -1) && lngColumn == -1)
-                {
-                    lngColumn = index;
-                    astronomical = true;
-                    pointScaleType = PointScaleTypes.StellarMagnitude;
-                }
-
-                if ((name.IndexOf("mag") > -1 || name.IndexOf("size") > -1) && sizeColumn == -1)
-                {
-                    sizeColumn = index;
-                }
-
-                if ((name.IndexOf("date") > -1  || name.IndexOf("time") > -1  || name.IndexOf("dt") > -1  || name.IndexOf("tm") > -1))
-                {
-                    if (name.IndexOf("end") > -1  && endDateColumn == -1)
-                    {
-                        endDateColumn = index;
-                    }
-                    else if (startDateColumn == -1)
-                    {
-                        startDateColumn = index;
-                    }
-                }
-
-
-                if ((name.IndexOf("altitude") > -1  || name.IndexOf("alt") > -1 ) && altColumn == -1)
-                {
-                    altColumn = index;
-                    AltType = AltTypes.Altitude;
-                    AltUnit = AltUnits.Meters;
-                }
-
-                if (name.IndexOf("depth") > -1  && altColumn == -1)
-                {
-                    altColumn = index;
-                    AltType = AltTypes.Depth;
-                    AltUnit = AltUnits.Kilometers;
-                }
-
-                if (name.StartsWith("x") && XAxisColumn == -1)
-                {
-                    XAxisColumn = index;
-                }
-
-                if (name.StartsWith("y") && YAxisColumn == -1)
-                {
-                    YAxisColumn = index;
-                }
-
-                if (name.StartsWith("z") && ZAxisColumn == -1)
-                {
-                    ZAxisColumn = index;
-                }
-
-                if (name.IndexOf("color") > -1 && ColorMapColumn == -1)
-                {
-                    ColorMapColumn = index;
-                }
-
-                if ((name.IndexOf("geometry") > -1 || name.IndexOf("geography") > -1) && geometryColumn == -1)
-                {
-                    geometryColumn = index;
-                }
-                index++;
+                GuessHeaderAssignment(headerName, index++);
             }
 
             if (table.Header.Count > 0)
@@ -377,6 +296,123 @@ namespace wwtlib
             }
         }
 
+        public void GuessHeaderAssignmentsFromVoTable(VoTable votable)
+        {
+            VoColumn decColumn = votable.GetDecColumn();
+            if (decColumn != null)
+            {
+                latColumn = decColumn.Index;
+                astronomical = true;
+
+            }
+            VoColumn raColumn = votable.GetRAColumn();
+            if (raColumn != null)
+            {
+                lngColumn = raColumn.Index;
+                astronomical = true;
+                pointScaleType = PointScaleTypes.StellarMagnitude;
+            }
+            VoColumn magColumn = votable.GetMagColumn();
+            if (magColumn != null)
+            {
+                sizeColumn = magColumn.Index;
+            }
+
+            int index = 0;
+            foreach (VoColumn column in votable.Column)
+            {
+                GuessHeaderAssignment(column.Name, index++);
+            }
+
+            if (table.Header.Count > 0)
+            {
+                nameColumn = 0;
+            }
+        }
+
+        private void GuessHeaderAssignment(string name, int index)
+        {
+            name = name.ToLowerCase();
+            if (name.IndexOf("lat") > -1 && latColumn == -1)
+            {
+                latColumn = index;
+            }
+
+            if ((name.IndexOf("lon") > -1 || name.IndexOf("lng") > -1) && lngColumn == -1)
+            {
+                lngColumn = index;
+            }
+
+            if (name.IndexOf("dec") > -1 && latColumn == -1)
+            {
+                latColumn = index;
+                astronomical = true;
+            }
+
+            if ((name.IndexOf("ra") > -1 || name.IndexOf("ascen") > -1) && lngColumn == -1)
+            {
+                lngColumn = index;
+                astronomical = true;
+                pointScaleType = PointScaleTypes.StellarMagnitude;
+            }
+
+            if ((name.IndexOf("mag") > -1 || name.IndexOf("size") > -1) && sizeColumn == -1)
+            {
+                sizeColumn = index;
+            }
+
+            if ((name.IndexOf("date") > -1 || name.IndexOf("time") > -1 || name.IndexOf("dt") > -1 || name.IndexOf("tm") > -1))
+            {
+                if (name.IndexOf("end") > -1 && endDateColumn == -1)
+                {
+                    endDateColumn = index;
+                }
+                else if (startDateColumn == -1)
+                {
+                    startDateColumn = index;
+                }
+            }
+
+
+            if ((name.IndexOf("altitude") > -1 || name.IndexOf("alt") > -1) && altColumn == -1)
+            {
+                altColumn = index;
+                AltType = AltTypes.Altitude;
+                AltUnit = AltUnits.Meters;
+            }
+
+            if (name.IndexOf("depth") > -1 && altColumn == -1)
+            {
+                altColumn = index;
+                AltType = AltTypes.Depth;
+                AltUnit = AltUnits.Kilometers;
+            }
+
+            if (name.StartsWith("x") && XAxisColumn == -1)
+            {
+                XAxisColumn = index;
+            }
+
+            if (name.StartsWith("y") && YAxisColumn == -1)
+            {
+                YAxisColumn = index;
+            }
+
+            if (name.StartsWith("z") && ZAxisColumn == -1)
+            {
+                ZAxisColumn = index;
+            }
+
+            if (name.IndexOf("color") > -1 && ColorMapColumn == -1)
+            {
+                ColorMapColumn = index;
+            }
+
+            if ((name.IndexOf("geometry") > -1 || name.IndexOf("geography") > -1) && geometryColumn == -1)
+            {
+                geometryColumn = index;
+            }
+        }
 
         public void ComputeDateDomainRange(int columnStart, int columnEnd)
         {
@@ -613,10 +649,10 @@ namespace wwtlib
 
             positions.Clear();
             UInt32 currentIndex = 0;
-         //   device.RenderState.FillMode = FillMode.WireFrame;
+            //   device.RenderState.FillMode = FillMode.WireFrame;
             Color colorLocal = Color;
 
-           // colorLocal.A = (byte)(Color.A * Opacity);
+            // colorLocal.A = (byte)(Color.A * Opacity);
 
             // for space 3d
             double ecliptic = Coordinates.MeanObliquityOfEcliptic(SpaceTimeController.JNow) / 180.0 * Math.PI;
@@ -634,7 +670,7 @@ namespace wwtlib
 
             Vector3d position = new Vector3d();
             float pointSize = .0002f;
-            Color pointColor = Colors.White ;
+            Color pointColor = Colors.White;
             float pointStartTime = 0;
             float pointEndTime = 0;
             foreach (string[] row in table.Rows)
@@ -1086,7 +1122,7 @@ namespace wwtlib
             int current = 0;
             while (current < shapes.Length)
             {
-                if (shapes.Substr(current,1) == "(")
+                if (shapes.Substr(current, 1) == "(")
                 {
                     nesting++;
                 }
@@ -1287,74 +1323,74 @@ namespace wwtlib
             return factor;
         }
 
-    //    public override Place FindClosest(Coordinates target, float distance, IPlace defaultPlace, bool astronomical)
-     //   {
-            //Vector3 searchPoint = Coordinates.GeoTo3d(target.Lat, target.Lng);
+        //    public override Place FindClosest(Coordinates target, float distance, IPlace defaultPlace, bool astronomical)
+        //   {
+        //Vector3 searchPoint = Coordinates.GeoTo3d(target.Lat, target.Lng);
 
-            ////searchPoint = -searchPoint;
-            //Vector3 dist;
-            //if (defaultPlace != null)
-            //{
-            //    Vector3 testPoint = Coordinates.RADecTo3d(defaultPlace.RA, -defaultPlace.Dec, -1.0).Vector3;
-            //    dist = searchPoint - testPoint;
-            //    distance = dist.Length();
-            //}
+        ////searchPoint = -searchPoint;
+        //Vector3 dist;
+        //if (defaultPlace != null)
+        //{
+        //    Vector3 testPoint = Coordinates.RADecTo3d(defaultPlace.RA, -defaultPlace.Dec, -1.0).Vector3;
+        //    dist = searchPoint - testPoint;
+        //    distance = dist.Length();
+        //}
 
-            //int closestItem = -1;
-            //int index = 0;
-            //foreach (Vector3 point in positions)
-            //{
-            //    dist = searchPoint - point;
-            //    if (dist.Length() < distance)
-            //    {
-            //        distance = dist.Length();
-            //        closestItem = index;
-            //    }
-            //    index++;
-            //}
+        //int closestItem = -1;
+        //int index = 0;
+        //foreach (Vector3 point in positions)
+        //{
+        //    dist = searchPoint - point;
+        //    if (dist.Length() < distance)
+        //    {
+        //        distance = dist.Length();
+        //        closestItem = index;
+        //    }
+        //    index++;
+        //}
 
 
-            //if (closestItem == -1)
-            //{
-            //    return defaultPlace;
-            //}
+        //if (closestItem == -1)
+        //{
+        //    return defaultPlace;
+        //}
 
-            //Coordinates pnt = Coordinates.CartesianToSpherical2(positions[closestItem]);
+        //Coordinates pnt = Coordinates.CartesianToSpherical2(positions[closestItem]);
 
-            //string name = table.Rows[closestItem][this.nameColumn];
-            //if (nameColumn == startDateColumn || nameColumn == endDateColumn)
-            //{
-            //    name = ParseDate(name).ToString("u");
-            //}
+        //string name = table.Rows[closestItem][this.nameColumn];
+        //if (nameColumn == startDateColumn || nameColumn == endDateColumn)
+        //{
+        //    name = ParseDate(name).ToString("u");
+        //}
 
-            //if (String.IsNullOrEmpty(name))
-            //{
-            //    name = string.Format("RA={0}, Dec={1}", Coordinates.FormatHMS(pnt.RA), Coordinates.FormatDMS(pnt.Dec));
-            //}
-            //TourPlace place = new TourPlace(name, pnt.Lat, pnt.Lng, Classification.Unidentified, "", ImageSetType.Earth, -1);
+        //if (String.IsNullOrEmpty(name))
+        //{
+        //    name = string.Format("RA={0}, Dec={1}", Coordinates.FormatHMS(pnt.RA), Coordinates.FormatDMS(pnt.Dec));
+        //}
+        //TourPlace place = new TourPlace(name, pnt.Lat, pnt.Lng, Classification.Unidentified, "", ImageSetType.Earth, -1);
 
-            //Dictionary<String, String> rowData = new Dictionary<string, string>();
-            //for (int i = 0; i < table.Header.GetLength(0); i++)
-            //{
-            //    string colValue = table.Rows[closestItem][i];
-            //    if (i == startDateColumn || i == endDateColumn)
-            //    {
-            //        colValue = ParseDate(colValue).ToString("u");
-            //    }
+        //Dictionary<String, String> rowData = new Dictionary<string, string>();
+        //for (int i = 0; i < table.Header.GetLength(0); i++)
+        //{
+        //    string colValue = table.Rows[closestItem][i];
+        //    if (i == startDateColumn || i == endDateColumn)
+        //    {
+        //        colValue = ParseDate(colValue).ToString("u");
+        //    }
 
-            //    if (!rowData.ContainsKey(table.Header[i]) && !string.IsNullOrEmpty(table.Header[i]))
-            //    {
-            //        rowData.Add(table.Header[i], colValue);
-            //    }
-            //    else
-            //    {
-            //        rowData.Add("Column" + i.ToString(), colValue);
-            //    }
-            //}
-            //place.Tag = rowData;
+        //    if (!rowData.ContainsKey(table.Header[i]) && !string.IsNullOrEmpty(table.Header[i]))
+        //    {
+        //        rowData.Add(table.Header[i], colValue);
+        //    }
+        //    else
+        //    {
+        //        rowData.Add("Column" + i.ToString(), colValue);
+        //    }
+        //}
+        //place.Tag = rowData;
 
-            //return place;
-     //   }
+        //return place;
+        //   }
 
 
 
@@ -1367,9 +1403,21 @@ namespace wwtlib
             set { table = value; }
         }
 
+        public void UseHeadersFromVoTable(VoTable voTable)
+        {
+            foreach(VoColumn column in voTable.Column)
+            {
+                Header.Add(column.Name);
+            }
+            GuessHeaderAssignmentsFromVoTable(voTable);
+            if(voTable.GetRAColumn() != null && voTable.GetRAColumn().Unit.ToLowerCase() == "deg")
+            {
+                RaUnits = RAUnits.Degrees;
+            }
+        }
+
         public void LoadFromString(string data, bool isUpdate, bool purgeOld, bool purgeAll, bool hasHeader)
         {
-
             if (!isUpdate)
             {
                 table = new Table();
