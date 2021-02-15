@@ -7,7 +7,7 @@
 
 parameters:
 - name: 'zolaVersion'
-  default: '0.10.1'
+  default: '0.13.0'
   type: string
 
 jobs:
@@ -149,7 +149,7 @@ jobs:
     displayName: NPM lint
 
 
-- job: docs
+- job: docs_engine
   pool:
     vmImage: ubuntu-20.04
   steps:
@@ -189,3 +189,45 @@ jobs:
     inputs:
       artifactName: docs-engine
       targetPath: $(Build.ArtifactStagingDirectory)/docs-engine
+
+
+- job: docs_research
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - template: azure-job-setup.yml
+    parameters:
+      setupBuild: true
+
+  - bash: npm run build
+    displayName: NPM build
+
+  - script: npm run doc
+    displayName: NPM doc
+
+  - bash: |
+      set -xeuo pipefail
+      fn="zola-v${{ parameters.zolaVersion }}-x86_64-unknown-linux-gnu.tar.gz"
+      u="https://github.com/getzola/zola/releases/download/v${{ parameters.zolaVersion }}/$fn"
+      wget "$u"
+      tar xzf "$fn"
+      rm -rf "$fn"
+    displayName: Install Zola
+
+  - bash: |
+      set -xeuo pipefail
+      cd docs/research-app
+      ../../zola check
+    displayName: Check Zola research app docs site
+
+  - bash: |
+      set -xeuo pipefail
+      cd docs/research-app
+      ../../zola build -o $ARTIFACT_STAGING/docs-research-app
+    displayName: Zola research app docs build
+
+  - task: PublishPipelineArtifact@0
+    displayName: Publish research app docs artifacts
+    inputs:
+      artifactName: docs-research-app
+      targetPath: $(Build.ArtifactStagingDirectory)/docs-research-app
