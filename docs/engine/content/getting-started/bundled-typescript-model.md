@@ -1,6 +1,6 @@
 +++
 title = "The Bundled TypeScript Model"
-weight = 200
+weight = 300
 +++
 
 If you’re using [npm] or another JavaScript package manager, we recommend

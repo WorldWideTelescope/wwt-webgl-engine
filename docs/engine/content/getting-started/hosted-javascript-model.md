@@ -1,6 +1,6 @@
 +++
 title = "The Hosted JavaScript Model"
-weight = 100
+weight = 200
 +++
 
 You can get a simple WWT web application up and running with hand-coded HTML and

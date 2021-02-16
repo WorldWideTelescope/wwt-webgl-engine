@@ -1,6 +1,6 @@
 +++
 title = "The Vue/Vuex Component Model"
-weight = 300
+weight = 400
 +++
 
 The main WWT applications are built using the [Vue] UI framework using the
