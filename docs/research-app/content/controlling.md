@@ -1,10 +1,12 @@
 +++
 title = "Controlling an Embedded Research App"
-weight = 100
+weight = 200
 +++
 
-If you embed the WWT research app inside one of your own web apps, you can
-control its behavior by sending it JSON messages.
+If you [embed][embedding] the WWT research app inside one of your own web apps,
+you can control its behavior by sending it JSON messages using JavaScript.
+
+[embedding]: @/embedding.md
 
 
 # First Things First: Security
