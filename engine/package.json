@@ -11,9 +11,6 @@
   "description": "The AAS WorldWide Telescope WebGL engine",
   "files": [
     ".eslintrc.json",
-    "docs/**/*.html",
-    "docs/**/*.md",
-    "docs/**/*.toml",
     "scriptsharp-0.8.0/ss.js",
     "src/*.js",
     "src/*.ts",

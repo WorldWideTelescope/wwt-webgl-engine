@@ -32,8 +32,8 @@
     "node_modules"
   ],
   "typedocOptions": {
-    "readme": "../docs/engine-index.md",
-    "out": "../docs/static/apiref/engine",
+    "readme": "../docs/engine/engine-index.md",
+    "out": "../docs/engine/static/apiref/engine",
     "gaID": "UA-107473046-3",
     "listInvalidSymbolLinks": true,
     "excludeExternals": true,
