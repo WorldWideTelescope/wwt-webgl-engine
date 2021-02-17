@@ -11,9 +11,9 @@ programmatically from the outside.
 [embed-intro]: https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies
 [controlling]: @/controlling.md
 
-**NOTE:** This functionality is in beta-test and the details here are subject to
+**NOTE:** *This functionality is in beta-test and the details here are subject to
 change. We will do our best to ensure that the documentation stays accurate but
-it is possible that information here might be out of date.
+it is possible that information here might be out of date.*
 
 Here’s an example of an app embed:
 
