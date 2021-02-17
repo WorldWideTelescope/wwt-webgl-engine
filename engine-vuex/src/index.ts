@@ -7,7 +7,10 @@ import { Store } from "vuex/types";
 export { SetupForImagesetOptions } from "@wwtelescope/engine-helpers";
 
 export {
+  CreateTableLayerParams,
   GotoRADecZoomParams,
+  LoadImageCollectionParams,
+  LoadTourParams,
   WWTEngineVuexModule,
   WWTEngineVuexState,
 } from "./store";
