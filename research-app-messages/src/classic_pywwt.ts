@@ -1,7 +1,61 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
-/** Data structures used by older versions of the pywwt Python package.
+/** Messages created for older versions of the
+ * [pywwt](https://pywwt.readthedocs.io/) Python package.
+ *
+ * These can be grouped into the following categories:
+ *
+ * ### View Control
+ *
+ * - [[CenterOnCoordinatesMessage]]
+ * - [[PauseTimeMessage]]
+ * - [[ResumeTimeMessage]]
+ * - [[SetDatetimeMessage]]
+ * - [[SetViewerModeMessage]]
+ * - [[TrackObjectMessage]]
+ *
+ * ### FITS Image Layers
+ *
+ * - [[CreateFitsLayerMessage]]
+ * - [[ModifyFitsLayerMessage]]
+ * - [[RemoveFitsLayerMessage]]
+ * - [[SetFitsLayerColormapMessage]]
+ * - [[StretchFitsLayerMessage]]
+ *
+ * ### Data Table Layers
+ *
+ * - [[CreateTableLayerMessage]]
+ * - [[ModifyTableLayerMessage]]
+ * - [[RemoveTableLayerMessage]]
+ * - [[UpdateTableLayerMessage]]
+ *
+ * ### Image Sets
+ *
+ * - [[LoadImageCollectionMessage]]
+ * - [[SetBackgroundByNameMessage]]
+ * - [[SetForegroundByNameMessage]]
+ * - [[SetForegroundOpacityMessage]]
+ *
+ * ### Annotations
+ *
+ * - [[AddLinePointMessage]]
+ * - [[AddPolygonPointMessage]]
+ * - [[ClearAnnotationsMessage]]
+ * - [[CreateAnnotationMessage]]
+ * - [[ModifyAnnotationMessage]]
+ * - [[RemoveAnnotationMessage]]
+ * - [[SetCircleCenterMessage]]
+ *
+ * ## Tours
+ *
+ * - [[LoadTourMessage]]
+ * - [[PauseTourMessage]]
+ * - [[ResumeTourMessage]]
+ *
+ * ## Miscellaneous
+ *
+ * - [[ModifySettingMessage]]
  */
 
 // As far as I can tell, I have to implement all of these type guard functions manually :-(
