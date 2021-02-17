@@ -330,7 +330,7 @@ export interface ApplyTableLayerSettingsOptions {
   settings: SpreadSheetLayerSetting[];
 }
 
-/** Options for [[WWTInstance.setupForImageset]]. */
+/** Options for [[setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
   foreground: Imageset;
