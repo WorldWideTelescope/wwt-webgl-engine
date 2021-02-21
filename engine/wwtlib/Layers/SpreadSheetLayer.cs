@@ -581,6 +581,71 @@ namespace wwtlib
 
         private double meanRadius = 6371000;
 
+        private bool IsPointInFrustum(Vector3d position, PlaneD[] frustum)
+        {
+            Vector4d centerV4 = new Vector4d(position.X, position.Y, position.Z, 1f);
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (frustum[i].Dot(centerV4) < 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public string GetTableDataInView()
+        {
+
+            string data = "";
+
+            bool first = true;
+
+            foreach (string col in Header)
+            {
+                if (!first)
+                {
+                    data += "\t";
+                }
+                else
+                {
+                    first = false;
+                }
+
+                data += col;
+            }
+            data += "\r\n";
+            foreach (string[] row in Table.Rows)
+            {
+                double ra = Double.Parse(row[LngColumn]);
+                double dec = Double.Parse(row[LatColumn]);
+                Vector3d position = Coordinates.GeoTo3dDouble(dec, ra);
+
+                if(!IsPointInFrustum(position, WWTControl.Singleton.RenderContext.Frustum))
+                { 
+                    continue;
+                }
+                first = true;
+                foreach (string col in row)
+                {
+                    if (!first)
+                    {
+                        data += "\t";
+                    }
+                    else
+                    {
+                        first = false;
+                    }
+
+                    data += col;
+                }
+                data += "\r\n";
+            }
+
+            return data;
+        }
+
         protected bool PrepVertexBuffer(RenderContext renderContext, float opacity)
         {
             table.Lock();
@@ -2941,7 +3006,43 @@ namespace wwtlib
     }
 
 
+    public class CatalogSpreadSheetLayer : SpreadSheetLayer
+    {
+        // HashSet not compilable with scriptSharp
+        private Dictionary<string, bool> addedTiles = new Dictionary<string, bool>();
+        public void AddTileRows(string tileKey, List<List<string>> catalogRows)
+        {
+            if (!addedTiles.ContainsKey(tileKey))
+            {
+                foreach (List<string> row in catalogRows)
+                {
+                    Table.Rows.Add(row);
+                }
+                dirty = true;
+                addedTiles[tileKey] =  true;
+            }
+        }
 
+        public void RemoveTileRows(string tileKey, List<List<string>> catalogRows)
+        {
+            if (addedTiles.ContainsKey(tileKey))
+            {
+                foreach (List<string> row in catalogRows)
+                {
+                    Table.Rows.Remove(row);
+                }
+                dirty = true;
+                addedTiles.Remove(tileKey);
+            }
+        }
+
+        public override void CleanUp()
+        {
+            base.CleanUp();
+            addedTiles.Clear();
+            Table.Rows.Clear();
+        }
+    }
 
 
     //public struct PointVertex
