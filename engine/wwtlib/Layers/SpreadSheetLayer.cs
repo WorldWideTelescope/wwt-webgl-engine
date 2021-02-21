@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Html;
 using System.Xml;
-using System.Html.Services;
 using System.Html.Media.Graphics;
-using System.Net;
 using System.Html.Data.Files;
 
 namespace wwtlib
@@ -1388,74 +1385,74 @@ namespace wwtlib
             return factor;
         }
 
-        //    public override Place FindClosest(Coordinates target, float distance, IPlace defaultPlace, bool astronomical)
-        //   {
-        //Vector3 searchPoint = Coordinates.GeoTo3d(target.Lat, target.Lng);
+    //    public override Place FindClosest(Coordinates target, float distance, IPlace defaultPlace, bool astronomical)
+     //   {
+            //Vector3 searchPoint = Coordinates.GeoTo3d(target.Lat, target.Lng);
 
-        ////searchPoint = -searchPoint;
-        //Vector3 dist;
-        //if (defaultPlace != null)
-        //{
-        //    Vector3 testPoint = Coordinates.RADecTo3d(defaultPlace.RA, -defaultPlace.Dec, -1.0).Vector3;
-        //    dist = searchPoint - testPoint;
-        //    distance = dist.Length();
-        //}
+            ////searchPoint = -searchPoint;
+            //Vector3 dist;
+            //if (defaultPlace != null)
+            //{
+            //    Vector3 testPoint = Coordinates.RADecTo3d(defaultPlace.RA, -defaultPlace.Dec, -1.0).Vector3;
+            //    dist = searchPoint - testPoint;
+            //    distance = dist.Length();
+            //}
 
-        //int closestItem = -1;
-        //int index = 0;
-        //foreach (Vector3 point in positions)
-        //{
-        //    dist = searchPoint - point;
-        //    if (dist.Length() < distance)
-        //    {
-        //        distance = dist.Length();
-        //        closestItem = index;
-        //    }
-        //    index++;
-        //}
+            //int closestItem = -1;
+            //int index = 0;
+            //foreach (Vector3 point in positions)
+            //{
+            //    dist = searchPoint - point;
+            //    if (dist.Length() < distance)
+            //    {
+            //        distance = dist.Length();
+            //        closestItem = index;
+            //    }
+            //    index++;
+            //}
 
 
-        //if (closestItem == -1)
-        //{
-        //    return defaultPlace;
-        //}
+            //if (closestItem == -1)
+            //{
+            //    return defaultPlace;
+            //}
 
-        //Coordinates pnt = Coordinates.CartesianToSpherical2(positions[closestItem]);
+            //Coordinates pnt = Coordinates.CartesianToSpherical2(positions[closestItem]);
 
-        //string name = table.Rows[closestItem][this.nameColumn];
-        //if (nameColumn == startDateColumn || nameColumn == endDateColumn)
-        //{
-        //    name = ParseDate(name).ToString("u");
-        //}
+            //string name = table.Rows[closestItem][this.nameColumn];
+            //if (nameColumn == startDateColumn || nameColumn == endDateColumn)
+            //{
+            //    name = ParseDate(name).ToString("u");
+            //}
 
-        //if (String.IsNullOrEmpty(name))
-        //{
-        //    name = string.Format("RA={0}, Dec={1}", Coordinates.FormatHMS(pnt.RA), Coordinates.FormatDMS(pnt.Dec));
-        //}
-        //TourPlace place = new TourPlace(name, pnt.Lat, pnt.Lng, Classification.Unidentified, "", ImageSetType.Earth, -1);
+            //if (String.IsNullOrEmpty(name))
+            //{
+            //    name = string.Format("RA={0}, Dec={1}", Coordinates.FormatHMS(pnt.RA), Coordinates.FormatDMS(pnt.Dec));
+            //}
+            //TourPlace place = new TourPlace(name, pnt.Lat, pnt.Lng, Classification.Unidentified, "", ImageSetType.Earth, -1);
 
-        //Dictionary<String, String> rowData = new Dictionary<string, string>();
-        //for (int i = 0; i < table.Header.GetLength(0); i++)
-        //{
-        //    string colValue = table.Rows[closestItem][i];
-        //    if (i == startDateColumn || i == endDateColumn)
-        //    {
-        //        colValue = ParseDate(colValue).ToString("u");
-        //    }
+            //Dictionary<String, String> rowData = new Dictionary<string, string>();
+            //for (int i = 0; i < table.Header.GetLength(0); i++)
+            //{
+            //    string colValue = table.Rows[closestItem][i];
+            //    if (i == startDateColumn || i == endDateColumn)
+            //    {
+            //        colValue = ParseDate(colValue).ToString("u");
+            //    }
 
-        //    if (!rowData.ContainsKey(table.Header[i]) && !string.IsNullOrEmpty(table.Header[i]))
-        //    {
-        //        rowData.Add(table.Header[i], colValue);
-        //    }
-        //    else
-        //    {
-        //        rowData.Add("Column" + i.ToString(), colValue);
-        //    }
-        //}
-        //place.Tag = rowData;
+            //    if (!rowData.ContainsKey(table.Header[i]) && !string.IsNullOrEmpty(table.Header[i]))
+            //    {
+            //        rowData.Add(table.Header[i], colValue);
+            //    }
+            //    else
+            //    {
+            //        rowData.Add("Column" + i.ToString(), colValue);
+            //    }
+            //}
+            //place.Tag = rowData;
 
-        //return place;
-        //   }
+            //return place;
+     //   }
 
 
 

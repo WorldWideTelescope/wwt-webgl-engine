@@ -1901,7 +1901,7 @@ namespace wwtlib
 
             webFolder = new Folder();
             webFolder.LoadFromUrl(
-                 URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
+                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
                 SetupComplete
             );
         }

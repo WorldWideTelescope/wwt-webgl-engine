@@ -1454,20 +1454,6 @@ namespace wwtlib
             return place;
         }
 
-        private bool IsPointInFrustum(Vector3d position, PlaneD[] frustum)
-        {
-            Vector4d centerV4 = new Vector4d(position.X, position.Y, position.Z, 1f);
-
-            for (int i = 0; i < 6; i++)
-            {
-                if (frustum[i].Dot(centerV4) < 0)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
         protected bool PrepVertexBuffer(RenderContext renderContext, float opacity)
         {
             VoColumn col = table.GetColumnByUcd("meta.id");
@@ -1524,11 +1510,6 @@ namespace wwtlib
                             double ra = Double.Parse(row[this.LngColumn].ToString());
                             double dec = Double.Parse(row[this.LatColumn].ToString());
                             Vector3d position = Coordinates.GeoTo3dDouble(dec, ra);
-
-                            //if (!IsPointInFrustum(position, renderContext.Frustum))
-                            //{
-                            //    //continue;
-                            //}
 
                             lastItem.Position = position;
                             positions.Add(lastItem.Position);
