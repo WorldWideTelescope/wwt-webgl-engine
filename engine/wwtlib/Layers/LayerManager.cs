@@ -2004,6 +2004,8 @@ namespace wwtlib
 
                 LayerList.Remove(node.ID);
                 AllMaps[CurrentMap].Layers.Remove(node);
+                node.CleanUp();
+                node.Version++;
                 LoadTree();
                 version++;
             }
