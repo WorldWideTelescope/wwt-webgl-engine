@@ -2141,7 +2141,7 @@ namespace wwtlib
         {
             layer.Enabled = true;
             LayerList[layer.ID] = layer;
-            layer.ReferenceFrame = CurrentMap;
+            layer.ReferenceFrame = frame;
             AllMaps[frame].Layers.Add(layer);
             AllMaps[frame].Open = true;
             version++;
