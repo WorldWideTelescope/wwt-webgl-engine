@@ -940,12 +940,16 @@ namespace wwtlib
             }
         }
 
-   
+        private String key = null;
         public String Key
         {
             get
             {
-                return Imageset.GetTileKey(dataset, Level, tileX, tileY, Parent);
+                if (key == null)
+                {
+                    key = Imageset.GetTileKey(dataset, Level, tileX, tileY, Parent);
+                }
+                return key;
             }
 
         }
