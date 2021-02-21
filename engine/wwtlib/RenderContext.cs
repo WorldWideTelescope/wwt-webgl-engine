@@ -298,6 +298,43 @@ namespace wwtlib
             set { foregroundImageset = value; }
         }
 
+
+        private List<Imageset> catalogHipsImagesets = new List<Imageset>();
+
+        public List<Imageset> CatalogHipsImagesets
+        {
+            get { return catalogHipsImagesets; }
+        }
+
+        public void AddCatalogHips(Imageset imageset, Action onLoad)
+        {
+            if (!catalogHipsImagesets.Contains(imageset))
+            {
+                catalogHipsImagesets.Add(imageset);
+            }
+            if (imageset.HipsProperties == null)
+            {
+                imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
+                imageset.HipsProperties.SetDownloadCompleteListener(onLoad);
+            } else if(imageset.HipsProperties != null && imageset.HipsProperties.DownloadComplete)
+            {
+                LayerManager.AddSpreadsheetLayer(imageset.HipsProperties.CatalogSpreadSheetLayer, "Sky");
+                if(onLoad != null)
+                {
+                    onLoad.Invoke();
+                }
+            }
+        }
+
+        public void RemoveCatalogHips(Imageset imageset)
+        {
+            catalogHipsImagesets.Remove(imageset);
+            if(imageset.HipsProperties != null)
+            {
+                LayerManager.DeleteLayerByID(imageset.HipsProperties.CatalogSpreadSheetLayer.ID, true, true);
+            }
+        }
+
         public double GetAltitudeForLatLongForPlanet(int planetID, double viewLat, double viewLong)
         {
 

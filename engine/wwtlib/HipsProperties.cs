@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace wwtlib
 {
@@ -6,7 +7,7 @@ namespace wwtlib
     public class HipsProperties
     {
         public Dictionary<string, string> Properties { get { return properties; } }
-        public SpreadSheetLayer CatalogSpreadSheetLayer
+        public CatalogSpreadSheetLayer CatalogSpreadSheetLayer
         {
             get { return catalogSpreadSheetLayer; }
             set { catalogSpreadSheetLayer = value; }
@@ -16,12 +17,13 @@ namespace wwtlib
 
         private Dictionary<string, string> properties = new Dictionary<string, string>();
         private VoTable catalogVoTable = null;
-        private SpreadSheetLayer catalogSpreadSheetLayer = new SpreadSheetLayer();
+        private CatalogSpreadSheetLayer catalogSpreadSheetLayer = new CatalogSpreadSheetLayer();
 
         private bool downloadComplete = false;
         private WebFile webFile;
         private readonly string url;
         private string datasetName;
+        private Action onDownloadComplete;
 
         public HipsProperties (string datasetUrl, string datasetName)
         {
@@ -54,6 +56,10 @@ namespace wwtlib
                 } else
                 {
                     downloadComplete = true;
+                    if(onDownloadComplete != null)
+                    {
+                        onDownloadComplete.Invoke();
+                    }
                 }
             }
         }
@@ -62,8 +68,18 @@ namespace wwtlib
         {
             catalogSpreadSheetLayer.UseHeadersFromVoTable(catalogVoTable);
             catalogSpreadSheetLayer.Name = datasetName;
+            catalogSpreadSheetLayer.ID = Guid.FromString(this.datasetName);
             LayerManager.AddSpreadsheetLayer(CatalogSpreadSheetLayer, "Sky");
             downloadComplete = true;
+            if (onDownloadComplete != null)
+            {
+                onDownloadComplete.Invoke();
+            }
+        }
+
+        public void SetDownloadCompleteListener(Action listener)
+        {
+            this.onDownloadComplete = listener;
         }
 
         private void ParseProperties(string data)
