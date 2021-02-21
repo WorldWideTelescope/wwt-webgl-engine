@@ -22,7 +22,6 @@ namespace wwtlib
         private string url;
         private bool subDivided = false;
         private readonly List<List<string>> catalogRows = new List<List<string>>();
-        private bool catalogRowsAdded = false;
         private WebFile catalogData;
         private static readonly Matrix3d galacticMatrix = Matrix3d.Create(
                     -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
@@ -78,7 +77,7 @@ namespace wwtlib
                 this.faceY = parentTile.faceY * 2 + y;
             }
 
-            IsCatalogTile = dataset.Extension.ToLowerCase().IndexOf("tsv") > -1;
+            IsCatalogTile = dataset.DataSetType == ImageSetType.CatalogHips;
             // All healpix is inside out
             //insideOut = true;
             ComputeBoundingSphere();
@@ -495,30 +494,12 @@ namespace wwtlib
 
         public void RemoveCatalogTile()
         {
-            if (catalogRowsAdded)
-            {
-                catalogRowsAdded = false;
-                foreach (List<string> row in catalogRows)
-                {
-                    dataset.HipsProperties.CatalogSpreadSheetLayer.Table.Rows.Remove(row);
-                }
-                dataset.HipsProperties.CatalogSpreadSheetLayer.dirty = true;
-            }
+            dataset.HipsProperties.CatalogSpreadSheetLayer.RemoveTileRows(Key, catalogRows);
         }
 
         private void AddCatalogTile()
         {
-            if (!catalogRowsAdded)
-            {
-                catalogRowsAdded = true;
-
-                foreach(List<string> row in catalogRows)
-                {
-                    dataset.HipsProperties.CatalogSpreadSheetLayer.Table.Rows.Add(row);
-                }
-                dataset.HipsProperties.CatalogSpreadSheetLayer.dirty = true;
-            }
-
+            dataset.HipsProperties.CatalogSpreadSheetLayer.AddTileRows(Key, catalogRows);
         }
 
         private void ExtractCatalogTileRows()
