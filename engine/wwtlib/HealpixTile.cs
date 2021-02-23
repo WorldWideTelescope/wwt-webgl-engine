@@ -521,6 +521,55 @@ namespace wwtlib
             }
         }
 
+
+        public bool GetDataInView(RenderContext renderContext, bool limit, CatalogSpreadSheetLayer catalogSpreadSheetLayer)
+        {
+            if (!ReadyToRender)
+            {
+                if (!errored)
+                {
+                    RequestImage();
+                    if (limit)
+                    {
+                        return false;
+                    }
+                } else if(Level >= 3) //Level 0-2 sometimes deleted in favor of allsky.jpg/tsv
+                {
+                    return true;
+                }
+            }
+
+            bool allChildrenReady = true;
+            bool anyChildInFrustum = false;
+            int childIndex = 0;
+            for (int y1 = 0; y1 < 2; y1++)
+            {
+                for (int x1 = 0; x1 < 2; x1++)
+                {
+                    if (Level < dataset.Levels)
+                    {
+                        if (children[childIndex] == null)
+                        {
+                            children[childIndex] = TileCache.GetTile(Level + 1, x1, y1, dataset, this);
+                        }
+
+                        if (children[childIndex].IsTileInFrustum(renderContext.Frustum))
+                        {
+                            anyChildInFrustum = true;
+                            allChildrenReady = allChildrenReady && ((HealpixTile)children[childIndex]).GetDataInView(renderContext, limit, catalogSpreadSheetLayer);
+                        }
+                    }
+
+                    childIndex++;
+                }
+            }
+            if (anyChildInFrustum)
+            {
+                catalogSpreadSheetLayer.AddTileRows(Key, catalogRows);
+            }
+            return allChildrenReady && !Downloading;
+        }
+
         private void SetStep()
         {
             if (IsCatalogTile)

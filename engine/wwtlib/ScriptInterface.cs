@@ -262,6 +262,14 @@ namespace wwtlib
             }
         }
 
+        public void GetCatalogHipsDataInView(string name, bool limit, Action<InViewReturnMessage> onComplete)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.GetCatalogHipsDataInView(name, limit, onComplete);
+            }
+        }
+
         public void HideUI(bool hide)
         {
             //todo enable

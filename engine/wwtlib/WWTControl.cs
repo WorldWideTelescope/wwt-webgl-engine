@@ -2582,6 +2582,15 @@ namespace wwtlib
             }
         }
 
+        public void GetCatalogHipsDataInView(string name, bool limit, Action<InViewReturnMessage> onComplete)
+        {
+            Imageset catalogHips = GetImagesetByName(name);
+            if (catalogHips != null)
+            {
+                RenderContext.GetCatalogHipsDataInView(catalogHips, limit, onComplete);
+            }
+        }
+
         private SimpleLineList crossHairs = null;
 
         private void DrawCrosshairs(RenderContext context)

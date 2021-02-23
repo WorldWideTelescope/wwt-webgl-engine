@@ -13,10 +13,16 @@ namespace wwtlib
             set { catalogSpreadSheetLayer = value; }
         }
 
+        public VoTable CatalogColumnInfo
+        {
+            get { return catalogColumnInfo; }
+            set { catalogColumnInfo = value; }
+        }
+
         public bool DownloadComplete { get { return downloadComplete; } }
 
         private Dictionary<string, string> properties = new Dictionary<string, string>();
-        private VoTable catalogVoTable = null;
+        private VoTable catalogColumnInfo = null;
         private CatalogSpreadSheetLayer catalogSpreadSheetLayer = new CatalogSpreadSheetLayer();
 
         private bool downloadComplete = false;
@@ -52,7 +58,7 @@ namespace wwtlib
                 ParseProperties(webFile.GetText());
                 if (Properties.ContainsKey("dataproduct_type") && Properties["dataproduct_type"].ToLowerCase() == "catalog")
                 {
-                    catalogVoTable = VoTable.LoadFromUrl(url.Replace("/properties", "/metadata.xml"), OnCatalogMetadataDownloadComplete);
+                    catalogColumnInfo = VoTable.LoadFromUrl(url.Replace("/properties", "/metadata.xml"), OnCatalogMetadataDownloadComplete);
                 } else
                 {
                     downloadComplete = true;
@@ -66,7 +72,7 @@ namespace wwtlib
 
         private void OnCatalogMetadataDownloadComplete ()
         {
-            catalogSpreadSheetLayer.UseHeadersFromVoTable(catalogVoTable);
+            catalogSpreadSheetLayer.UseHeadersFromVoTable(catalogColumnInfo);
             catalogSpreadSheetLayer.Name = datasetName;
             catalogSpreadSheetLayer.ID = Guid.FromString(this.datasetName);
             LayerManager.AddSpreadsheetLayer(CatalogSpreadSheetLayer, "Sky");
