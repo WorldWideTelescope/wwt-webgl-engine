@@ -77,7 +77,8 @@ namespace wwtlib
                 this.faceY = parentTile.faceY * 2 + y;
             }
 
-            IsCatalogTile = dataset.DataSetType == ImageSetType.CatalogHips;
+            IsCatalogTile = dataset.HipsProperties.Properties.ContainsKey("dataproduct_type")
+                && dataset.HipsProperties.Properties["dataproduct_type"].ToLowerCase() == "catalog";
             // All healpix is inside out
             //insideOut = true;
             ComputeBoundingSphere();
