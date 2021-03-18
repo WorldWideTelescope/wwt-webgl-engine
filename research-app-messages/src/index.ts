@@ -1,7 +1,7 @@
 // Copyright 2020 the .NET Foundation
 // Licensed under the MIT License
 
-// Toplevel documentation found at @/docs/research-app-messages-index.md
+// Toplevel documentation found at @/docs/engine/research-app-messages-index.md
 
 import * as classicPywwt from './classic_pywwt';
 
@@ -11,10 +11,37 @@ export { classicPywwt };
 
 /** Information about the current position of the WWT view.
  *
- * Frontends periodically send this information to backends so that they can be
- * aware of what's going on with the view. The WWT clock time isn't sent
- * directly so that constant updates aren't needed in the common case that the
- * clock is running.
+ * Frontends (e.g., [embedded WWT apps][embed]) periodically send this
+ * information to backends (e.g., [pywwt]) so that they can be aware of what's
+ * going on with the view.
+ *
+ * [embed]: https://docs.worldwidetelescope.org/research-app/latest/embedding/
+ * [pywwt]: https://pywwt.readthedocs.io/
+ *
+ * The WWT clock time isn't sent directly, so that constant updates aren't
+ * needed in the common case that the clock is running. If you care about the
+ * current time of the WWT clock, you should maintain state that tracks the most
+ * recently provided values of the [[engineClockISOT]], [[systemClockISOT]], and
+ * [[engineClockRateFactor]] fields. If you need to estimate the current time of
+ * the WWT clock, you should calculate:
+ *
+ * ```
+ * const engineDelta = (getCurrentTime() - systemClock) * engineClockRateFactor;
+ * const currentEngineTime = engineClock + engineDelta;
+ * ```
+ *
+ * This calculation assumes that the frontend and backend system clocks are in
+ * OK agreement. You could try to do better by tracking the difference between
+ * the frontend and backend system clocks, but your accuracy is always going to
+ * be limited because messages from the frontend are propagating over *some*
+ * channel with unknown latency, and this simple protocol doesn't have any
+ * mechanism for determining this latency. File an issue if you think that you
+ * have an application that calls for higher accuracy than is made possible
+ * here.
+ *
+ * Updates are sent no more frequently than every ten-or-so of milliseconds, and
+ * no less frequently than every minute or so. If the clock rate parameters
+ * change discontinuously, an update is sent immediately.
  */
 export interface ViewStateMessage {
   /** A message type identifier. */
@@ -29,15 +56,20 @@ export interface ViewStateMessage {
   /** The current height of the viewport (zoom level), in degrees. */
   fovDeg: number;
 
-  /** The current value of WWT's internal clock, as an ISO-T datetime string. */
+  /** The current value of WWT's internal clock, as an
+   * [ISO-T](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)
+   * datetime string.
+   * */
   engineClockISOT: string;
 
-  /** The current datetime of the computer running the WWT frontend, as an ISO-T
-   * datetime string. */
+  /** The current datetime of the computer running the WWT frontend, as an
+   * [ISO-T](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)
+   * datetime string.
+   * */
   systemClockISOT: string;
 
   /** The current rate at which the WWT clock is running compared to the
-   * frontend system clock. 0 indicates that the WWT clock is paused. */
+   * frontend system clock. Zero indicates that the WWT clock is paused. */
   engineClockRateFactor: number;
 }
 

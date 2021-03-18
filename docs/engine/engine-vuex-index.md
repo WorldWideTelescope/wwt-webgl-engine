@@ -1,4 +1,4 @@
-This package turns the base [AAS WorldWide Telescope][wwt] library,
+This package turns the [AAS WorldWide Telescope][wwt] rendering engine,
 [@wwtelescope/engine], into a well-behaved web app component using [Vue],
 [Vuex], and [TypeScript].
 
@@ -10,8 +10,9 @@ This package turns the base [AAS WorldWide Telescope][wwt] library,
 
 The important top-level interfaces are:
 
-- [createPlugin] function
-- [WWTAwareComponent] class
+- The [createPlugin] function for initializing the engine
+- The [WWTAwareComponent] class defining Vue/Vuex hooks for interfacing with the
+  engine
 
 [createPlugin]: ./globals.html#createplugin
 [WWTAwareComponent]: ./classes/wwtawarecomponent.html
@@ -24,7 +25,7 @@ this:
 
 [sfc]: https://vuejs.org/v2/guide/single-file-components.html
 
-```
+```vue
 <template>
   <div id="app">
     <!-- Include a WWT Component: -->
@@ -35,13 +36,14 @@ this:
 
 <script lang="ts">
 import { Component } from "vue-property-decorator";
-import { fmtDegLat, fmtHours, WWTAwareComponent } from "@wwtelescope/engine-vuex";
+import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
+import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
 
 // Extend WWTAwareComponent to auto-inherit WWT view properties:
 @Component
 export default class App extends WWTAwareComponent {
   get coordText() {
-    return `${astutils.fmtHours(this.wwtRARad)} ${astutils.fmtDegLat(this.wwtDecRad)}`;
+    return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
   }
 }
 </script>
@@ -65,6 +67,10 @@ export default class App extends WWTAwareComponent {
 </style>
 ```
 
+By having your app inherit the [[WWTAwareComponent]] class, you get [TypeScript]
+definitions of all of the properties, getters, actions, and mutations that allow
+you to observe the WWT component and control it programmatically.
+
 Above we use the [vue-property-decorator] package to simplify the creation of custom
 Vue properties in a TypeScript context, but this isn't required.
 
@@ -72,7 +78,7 @@ Vue properties in a TypeScript context, but this isn't required.
 
 The associated main application file might look like this:
 
-```
+```ts
 import Vue from "vue";
 import Vuex from "vuex";
 import { createPlugin } from "@wwtelescope/engine-vuex";
@@ -97,7 +103,9 @@ new Vue({
 });
 ```
 
-Note that **you can only include one WWT component in each app**, because the WWT engine library maintains global state. To work around this, use iframes.
+Note that for now, **you can only include one WWT component in each app**,
+because the WWT engine library maintains global state. To work around this, use
+iframes.
 
 Finally, if you’re using [Webpack], you may run into a pitfall because this
 library must explicitly depend on the Vue package to obtain its TypeScript
@@ -108,7 +116,7 @@ for your app, the following code in `vue.config.js` fixes the problem:
 [Webpack]: https://webpack.js.org/
 [Vue CLI]: https://cli.vuejs.org/
 
-```
+```js
 const path = require('path');
 
 module.exports = {
@@ -141,8 +149,8 @@ ecosystem.
 
 This package exposes the power of the WWT engine to [Vue]. It requires the use
 of the [Vuex] state management library because the WWT engine maintains a great
-deal of complex internal state. Realistic web applications will want to reflex
-that state in other app components separate from the WWT component, which calls
+deal of complex internal state. Realistic web applications will want to reflect
+that state in other app components separate from the main WWT view, which calls
 for the kind of careful state sychronization that [Vuex] provides.
 
 Finally, because we are big believers in the reliability benefits of using type-
@@ -171,7 +179,7 @@ Vuex state needs to be exposed as a [Vuex dynamic module][vuex-dynamic-module].
 This adds a little hassle because the module needs to be registered during app
 startup.
 
-[vuex-dyamic-module]: https://vuex.vuejs.org/guide/modules.html#dynamic-module-registration
+[vuex-dynamic-module]: https://vuex.vuejs.org/guide/modules.html#dynamic-module-registration
 
 Next, in order to make this library composable with a wide range of app
 architectures, it is important that the WWT Vuex state module be

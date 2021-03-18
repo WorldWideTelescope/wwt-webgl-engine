@@ -1,6 +1,0 @@
-{%- if i -%}
-{%- set text = i -%}
-{%- set i = i | lower -%}
-{%- set url = "../apiref/engine/interfaces/" ~ i ~ ".html" -%}
-{%- endif -%}
-<a class="apiref-link" href="{{url | safe}}">{{text}}</a>

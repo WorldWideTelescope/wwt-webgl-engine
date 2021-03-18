@@ -214,7 +214,11 @@ namespace wwtlib
         {
             return LayerManager.AddVoTableLayer(table, "Vo Table");
         }
-        
+
+        public Dictionary<Guid, Layer> GetLayers()
+        {
+            return LayerManager.LayerList;
+        }
 
         public void SetForegroundImageByName(string name)
         {
@@ -231,6 +235,38 @@ namespace wwtlib
             if (WWTControl.Singleton != null)
             {
                 WWTControl.Singleton.RenderContext.ViewCamera.Opacity = opacity;
+            }
+        }
+
+        public void AddCatalogHipsByName(string name)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.AddCatalogHipsByName(name);
+            }
+        }
+
+        public void AddCatalogHipsByNameWithCallback(string name, Action onLoad)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.AddCatalogHipsByNameWithCallback(name, onLoad);
+            }
+        }
+
+        public void RemoveCatalogHipsByName(string name)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.RemoveCatalogHipsByName(name);
+            }
+        }
+
+        public void GetCatalogHipsDataInView(string name, bool limit, Action<InViewReturnMessage> onComplete)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.GetCatalogHipsDataInView(name, limit, onComplete);
             }
         }
 

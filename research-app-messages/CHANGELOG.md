@@ -1,23 +1,8 @@
-# rc: minor bump
+# See elsewhere for changelog
 
-- Add a typing layer for pywwt spreadsheet settings
-- Fix detection of the SpreadSheetLayer modify message
-- Wire up the TrackObjectMessage
-- Fix another linter complaint
+This project’s release notes are curated from the Git history of its main
+branch. You can find them by looking at [the version of this file on the
+`release` branch][branch] or the [GitHub release history][gh-releases].
 
-
-# @wwtelescope/research-app-messages 0.3.0 (2021-01-12)
-
-- Add `classicPywwt.applyBaseUrlIfApplicable`.
-
-
-# @wwtelescope/research-app-messages 0.2.0 (2021-01-07)
-
-- Update NPM/TypeScript meta-foo to try to play nice with Jupyter.
-
-
-# @wwtelescope/research-app-messages 0.1.0 (2021-01-07)
-
-- Initial release of message types module for the prototype research application
-  and Jupyer extension. It looks like we might need to make this publicly
-  available for the extension to work.
+[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/research-app-messages/CHANGELOG.md
+[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases

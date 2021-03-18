@@ -18,6 +18,12 @@ namespace wwtlib
         public bool IsDefault;
     }
 
+    public class InViewReturnMessage
+    {
+        public string table;
+        public bool aborted;
+    }
+
     public class RenderContext
     {
         public static bool UseGl = false;
@@ -296,6 +302,126 @@ namespace wwtlib
         {
             get { return foregroundImageset; }
             set { foregroundImageset = value; }
+        }
+
+
+        private List<Imageset> activeCatalogHipsImagesets = new List<Imageset>();
+
+        public List<Imageset> CatalogHipsImagesets
+        {
+            get { return activeCatalogHipsImagesets; }
+        }
+
+
+        public void GetCatalogHipsDataInView(Imageset imageset, bool limit, Action<InViewReturnMessage> onComplete)
+        {
+            CatalogSpreadSheetLayer layer = new CatalogSpreadSheetLayer();
+            Action onHeaderInfoLoad = delegate ()
+            {
+                layer.UseHeadersFromVoTable(imageset.HipsProperties.CatalogColumnInfo);
+                TryGetAllDataInView(imageset, limit, layer, onComplete, 0);
+            };
+
+            if (imageset.HipsProperties == null)
+            {
+                imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
+                imageset.HipsProperties.SetDownloadCompleteListener(onHeaderInfoLoad);
+            }
+            else if (imageset.HipsProperties != null && imageset.HipsProperties.DownloadComplete)
+            {
+                onHeaderInfoLoad.Invoke();
+            } else
+            {
+                imageset.HipsProperties.SetDownloadCompleteListener(onHeaderInfoLoad);
+            }
+        }
+
+        private void TryGetAllDataInView(Imageset imageset, bool limit, CatalogSpreadSheetLayer catalogSpreadSheetLayer, Action<InViewReturnMessage> onComplete, int i)
+        {
+            int maxX = GetTilesXForLevel(imageset, imageset.BaseLevel);
+            int maxY = GetTilesYForLevel(imageset, imageset.BaseLevel);
+            bool anyTileStillDownloading = false;
+            for (int x = 0; x < maxX; x++)
+            {
+                for (int y = 0; y < maxY; y++)
+                {
+                    Tile tile = TileCache.GetTile(imageset.BaseLevel, x, y, imageset, null);
+                    if (tile != null)
+                    {
+                        bool tileAndChildrenReady = ((HealpixTile)tile).GetDataInView(this, limit, catalogSpreadSheetLayer);
+                        anyTileStillDownloading = anyTileStillDownloading || !tileAndChildrenReady;
+                    }
+                    else
+                    {
+                        anyTileStillDownloading = true;
+                    }
+                }
+            }
+            if (anyTileStillDownloading)
+            {
+                int count = catalogSpreadSheetLayer.Table.Rows.Count;
+                if((count > 10000 || i > 100 * 60 * 5) && limit) // ~5 minutes
+                {
+                    Script.Literal("console.log('Too Many results - Aborting')");
+                    Script.Literal("console.log(count)");
+                    InViewReturnMessage returnMessage = new InViewReturnMessage();
+                    returnMessage.aborted = true;
+                    returnMessage.table = catalogSpreadSheetLayer.GetTableDataInView();
+                    onComplete.Invoke(returnMessage);
+                    catalogSpreadSheetLayer.CleanUp();
+                }
+                else
+                {
+                    Script.SetTimeout(delegate () { TryGetAllDataInView(imageset, limit, catalogSpreadSheetLayer, onComplete, i); }, 10);
+                    if(i % 200 == 0)
+                    {
+                        Script.Literal("console.log('Waiting for more tiles to load')");
+                        Script.Literal("console.log(count)");
+                    }
+                    i++;
+                }
+            }
+            else
+            {
+                int count = catalogSpreadSheetLayer.Table.Rows.Count;
+                Script.Literal("console.log('Done!')");
+                Script.Literal("console.log(count)");
+                InViewReturnMessage returnMessage = new InViewReturnMessage();
+                returnMessage.aborted = false;
+                returnMessage.table = catalogSpreadSheetLayer.GetTableDataInView();
+                onComplete.Invoke(returnMessage);
+                catalogSpreadSheetLayer.CleanUp();
+            }
+
+        }
+
+        public void AddCatalogHips(Imageset imageset, Action onLoad)
+        {
+            if (!activeCatalogHipsImagesets.Contains(imageset))
+            {
+                activeCatalogHipsImagesets.Add(imageset);
+            }
+            if (imageset.HipsProperties == null)
+            {
+                imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
+                imageset.HipsProperties.SetDownloadCompleteListener(onLoad);
+            } else if(imageset.HipsProperties != null && imageset.HipsProperties.DownloadComplete)
+            {
+                LayerManager.AddSpreadsheetLayer(imageset.HipsProperties.CatalogSpreadSheetLayer, "Sky");
+                if(onLoad != null)
+                {
+                    onLoad.Invoke();
+                }
+            }
+        }
+
+        public void RemoveCatalogHips(Imageset imageset)
+        {
+            activeCatalogHipsImagesets.Remove(imageset);
+            if(imageset.HipsProperties != null)
+            {
+                LayerManager.DeleteLayerByID(imageset.HipsProperties.CatalogSpreadSheetLayer.ID, true, true);
+            }
         }
 
         public double GetAltitudeForLatLongForPlanet(int planetID, double viewLat, double viewLong)

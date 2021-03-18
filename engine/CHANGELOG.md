@@ -1,5 +1,15 @@
 # rc: minor bump
 
+- Initial support for catalog HiPS data from @imbasimba (#84)! Documentation and
+  TypeScript bindings currently lacking but this should get us on the patch of
+  demoing the functionality in the web client and wiring it up in the classic
+  pywwt framework.
+- Start reworking docs structure to have a place to document the research app
+  (#82, @pkgw).
+
+
+# @wwtelescope/engine 7.8.0 (2021-01-27)
+
 - Expose many new APIs and types needed for pywwt functionality, including:
   - Better settings
   - SpreadSheetLayer

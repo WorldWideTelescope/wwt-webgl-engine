@@ -18,7 +18,7 @@ namespace wwtlib
 
         public static string GetTileKey(Imageset imageset, int level, int x, int y, Tile parent)
         {
-            if (imageset.Projection ==ProjectionType.Healpix && parent != null)
+            if (imageset.Projection == ProjectionType.Healpix && parent != null)
             {
                 int ipix = ((HealpixTile)parent).ipix * 4 + y * 2 + x;
                 return imageset.ImageSetID.ToString() + @"\" + level.ToString() + @"\" + ipix.ToString();
@@ -61,7 +61,7 @@ namespace wwtlib
                     {
                         if (imageset.HipsProperties == null)
                         {
-                            imageset.HipsProperties = new HipsProperties(imageset.Url);
+                            imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
                         }
                         if (imageset.HipsProperties.DownloadComplete)
                         {

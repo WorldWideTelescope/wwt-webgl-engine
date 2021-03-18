@@ -35,8 +35,189 @@ import {
   WWTEngineVuexState
 } from "./store";
 
+/** A class for Vue components that wish to interact with a [[WWTComponent]]
+ * through the Vuex state management system.
+ *
+ * Vue applications are composed of multiple [components]. In a WWT-powered app,
+ * one of those components will be a `<WorldWideTelescope>` component containing
+ * the actual WWT rendering window. The other components of the app will wish to
+ * monitor or alter the state of the WWT rendering window. The
+ * [[WWTAwareComponent]] class provides a convenient framework for doing so.
+ *
+ * [components]: https://vuejs.org/v2/guide/components.html
+ *
+ * In particular, if your component’s TypeScript class [extends] this class, it
+ * will automatically be set up with fields and methods allowing you to interact
+ * with the WWT engine’s state. A minimal example:
+ *
+ * [extends]: https://www.typescriptlang.org/docs/handbook/classes.html#inheritance
+ *
+ * ```vue
+ * <template>
+ *   <div id="app">
+ *     <WorldWideTelescope wwt-namespace="mywwt"></WorldWideTelescope>
+ *     <p class="coord-overlay">{{ coordText }}</p>
+ *   </div>
+ * </template>
+ *
+ * <script lang="ts">
+ *   import { Component } from "vue-property-decorator";
+ *   import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
+ *   import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
+ *
+ *   @Component
+ *   export default class App extends WWTAwareComponent {get coordText() {return
+ *     `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+ *     }
+ *   }
+ * </script>
+ * ```
+ *
+ * This simple `App` component will display the coordinates of the current center
+ * of the WWT view, and the coordinate readout will update automagically as the
+ * user interacts with the view.
+ *
+ * ### Props
+ *
+ * Classes inheriting from [[WWTAwareComponent]] automatically define a prop
+ * named [[wwtNamespace]]. This should be set to the namespace of the [Vuex
+ * module] used to track the `<WorldWideTelescope>` component’s state — that is,
+ * it should have the same value as that component’s own `wwtNamespace` prop.
+ * The default value is `"wwt"`.
+ *
+ * [Vuex module]: https://vuex.vuejs.org/guide/modules.html
+ *
+ * ### WWT State Interfaces
+ *
+ * Your [[WWTAwareComponent]] can monitor or manipulate the state of the WWT
+ * renderer using the following interfaces, grouped by category. As a reminder,
+ * in the Vuex paradigm, state is expressed in [state variables] and [getters],
+ * and modified through instantaneous [mutations] and asynchronous [actions].
+ *
+ * [state variables]: https://vuex.vuejs.org/guide/state.html
+ * [getters]: https://vuex.vuejs.org/guide/getters.html
+ * [mutations]: https://vuex.vuejs.org/guide/mutations.html
+ * [actions]: https://vuex.vuejs.org/guide/actions.html
+ *
+ * #### Initialization
+ *
+ * Actions:
+ *
+ * - [[waitForReady]]
+ *
+ * #### Basic View Information
+ *
+ * State:
+ *
+ * - [[wwtCurrentTime]]
+ * - [[wwtClockDiscontinuities]]
+ * - [[wwtClockRate]]
+ * - [[wwtDecRad]]
+ * - [[wwtRARad]]
+ * - [[wwtZoomDeg]]
+ *
+ * Mutations:
+ *
+ * - [[setClockRate]]
+ * - [[setClockSync]]
+ * - [[setTime]]
+ * - [[setTrackedObject]]
+ * - [[zoom]]
+ *
+ * Actions:
+ *
+ * - [[gotoRADecZoom]]
+ * - [[gotoTarget]]
+ *
+ * #### Image Sets
+ *
+ * State:
+ *
+ * - [[wwtBackgroundImageset]]
+ * - [[wwtForegroundImageset]]
+ * - [[wwtForegroundOpacity]]
+ * - [[wwtRenderType]]
+ *
+ * Getters:
+ *
+ * - [[lookupImageset]]
+ *
+ * Mutations:
+ *
+ * - [[setBackgroundImageByName]]
+ * - [[setForegroundImageByName]]
+ * - [[setForegroundOpacity]]
+ * - [[setupForImageset]]
+ *
+ * Actions:
+ *
+ * - [[loadImageCollection]]
+ *
+ * #### FITS Image Layers
+ *
+ * Mutations:
+ *
+ * - [[applyFitsLayerSettings]]
+ * - [[setFitsLayerColormap]]
+ * - [[stretchFitsLayer]]
+ * - [[deleteLayer]]
+ *
+ * Actions:
+ *
+ * - [[loadFitsLayer]]
+ *
+ * #### Tabular Data Layers
+ *
+ * Mutations:
+ *
+ * - [[applyTableLayerSettings]]
+ * - [[updateTableLayer]]
+ * - [[deleteLayer]]
+ *
+ * Actions:
+ *
+ * - [[createTableLayer]]
+ *
+ * #### Annotations
+ *
+ * Mutations:
+ *
+ * - [[addAnnotation]]
+ * - [[clearAnnotations]]
+ * - [[removeAnnotation]]
+ *
+ * #### Tours
+ *
+ * State:
+ *
+ * - [[wwtIsTourPlayerActive]]
+ * - [[wwtIsTourPlaying]]
+ * - [[wwtTourCompletions]]
+ * - [[wwtTourRunTime]]
+ * - [[wwtTourStopStartTimes]]
+ * - [[wwtTourTimecode]]
+ *
+ * Mutations:
+ *
+ * - [[seekToTourTimecode]]
+ * - [[setTourPlayerLeaveSettingsWhenStopped]]
+ * - [[startTour]]
+ * - [[toggleTourPlayPauseState]]
+ *
+ * Actions:
+ *
+ * - [[loadTour]]
+ *
+ * #### Miscellaneous
+ *
+ * - [[applySetting]]
+ **/
 @Component
 export class WWTAwareComponent extends Vue {
+  /** The namespace of the Vuex module used to track the WWT component’s state.
+   * This prop should have the same value in all components in the app that
+   * reference WWT.
+   */
   @Prop({default: "wwt"}) readonly wwtNamespace!: string;
 
   beforeCreate(): void {
@@ -116,57 +297,345 @@ export class WWTAwareComponent extends Vue {
   }
 
   // Teach TypeScript about everything we wired up. State:
+
+  /** The current background [Imageset](../../engine/classes/imageset.html), or
+   * null if it is undefined.
+   *
+   * You can cause this state variable to change using the
+   * [[setBackgroundImageByName]] mutation.
+   * **/
   wwtBackgroundImageset!: Imageset | null;
+
+  /** The number of times that the progression of the WWT internal clock has
+   * been changed discontinuously.
+   *
+   * The main use of this state variable is that you can
+   * [watch](https://vuex.vuejs.org/api/#watch) for changes to it and be alerted
+   * when the clock has been altered. */
   wwtClockDiscontinuities!: number;
+
+  /** The rate at which the WWT internal clock progresses compared to real time.
+   * If the WWT clock is paused, this will be zero. Negative and fractional
+   * values are both possible. */
   wwtClockRate!: number;
+
+  /** The current time of WWT internal clock. In normal operation this variable
+   * will change with every rendered WWT frame, or every 30 ms or so.
+   */
   wwtCurrentTime!: Date;
+
+  /** The current declination of the center of the WWT view, in radians.
+   *
+   * TODO: define the meaning here for view modes other than "sky."
+   */
   wwtDecRad!: number;
+
+  /** The current foreground [Imageset](../../engine/classes/imageset.html), or
+   * null if it is undefined.
+   *
+   * You can cause this state variable to change using the
+   * [[setForegroundImageByName]] mutation.
+   * **/
   wwtForegroundImageset!: Imageset | null;
+
+  /** The opacity of the foreground imageset. Values range between 0 (invisible)
+   * and 100 (fully opaque). */
   wwtForegroundOpacity!: number;
+
+  /** Whether a tour has been loaded up and is available for playback. */
   wwtIsTourPlayerActive!: boolean;
+
+  /** Whether a tour is actively playing back right now. This can spontaneously become
+   * false if the tour completes playing. */
   wwtIsTourPlaying!: boolean;
+
+  /** The current right ascension of the center of the WWT view, in radians.
+   *
+   * TODO: define the meaning here for view modes other than "sky."
+   */
   wwtRARad!: number;
+
+  /** The current mode of the WWT renderer.
+   *
+   * This is derived from the "type" of the active background imageset. To
+   * change the mode, change the background imageset with
+   * [[setBackgroundImageByName]].
+   */
   wwtRenderType!: ImageSetType;
+
+  /** The number of times that a WWT tour has completed playing.
+   *
+   * The main use of this state variable is that you can
+   * [watch](https://vuex.vuejs.org/api/#watch) for changes to it and be alerted
+   * when a tour finishes. Watching [[wwtIsTourPlaying]] doesn't suffice because
+   * that will trigger when a tour is paused. */
   wwtTourCompletions!: number;
+
+  /** The total runtime of the current tour, in seconds, if there is one. */
   wwtTourRunTime!: number | null;
+
+  /** The timecodes at which the current tour’s "stops" begin, in seconds.
+   *
+   * Each WWT tour is composed of one or more "stops", each of which has a fixed
+   * wall-clock duration. This variable gives the start times of the stops under
+   * the assumption that they all follow one another in sequence. It is possible
+   * to have nonlinear flow from one stop to the next.
+   *
+   * If no tour is loaded, this is an empty array.
+   */
   wwtTourStopStartTimes!: number[];
+
+  /** The "timecode" of the current tour playback progression.
+   *
+   * The "timecode" is approximately the number of seconds elapsed since tour
+   * playback began. More precisely, however, it is the start time of the
+   * current tour stop, plus however much wall-clock time has elapsed while at
+   * that stop. Because it is possible for stops to link to each other
+   * non-linearly, it is also possible for the timecode to progress non-linearly
+   * even when the tour plays back without user interaction.
+   *
+   * In combination with [[wwtTourStopStartTimes]], you can use this value to
+   * determine the index number of the currently active tour stop.
+   *
+   * If no tour is loaded, this is zero.
+   */
   wwtTourTimecode!: number;
+
+  /** The WWT zoom level, in degrees.
+   *
+   * TODO: define the semantics here in 3D and other modes.
+   *
+   * In 2D sky mode, the zoom level is the angular height of the viewport,
+   * *times six*.
+   */
   wwtZoomDeg!: number;
 
   // Getters
+
+  /** Look up an [Imageset](../../engine/classes/imageset.html) in the engine’s
+   * table of ones with registered names.
+   *
+   * This delegates to
+   * [WWTControl.getImagesetByName()](../../engine/wwtcontrol.html#getimagesetbyname),
+   * which has very eager name-matching rules. But if nothing matches, null is
+   * returned.
+   *
+   * Imagesets are not added to the engine’s list of names automatically. In
+   * order for an imageset to be findable by this function, its containing
+   * folder must have been loaded using the [[loadImageCollection]] action.
+   */
   lookupImageset!: (_n: string) => Imageset | null;
 
   // Mutations
+
+  /** Add an [Annotation](../../engine/classes/annotation.html) to the view. */
   addAnnotation!: (_a: Annotation) => void;
+
+  /** Alter one or more settings of the specified FITS image layer as specified
+   * in [the options](../../engine-helpers/interfaces/applyfitslayersettingsoptions.html).
+   */
   applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
+
+  /** Alter one or more settings of the specified tabular data layers as specified
+   * in [the options](../../engine-helpers/interfaces/applytablelayersettingsoptions.html).
+   */
   applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
+
+  /** Alter one [WWT engine setting](../../engine/modules.html#enginesetting). */
   applySetting!: (_s: EngineSetting) => void;
+
+  /** Clear all [Annotations](../../engine/classes/annotation.html) from the view. */
   clearAnnotations!: () => void;
+
+  /** Delete the specified layer from the layer manager.
+   *
+   * A layer may be identified by either its name or its [id](../../engine/classes/layer.html#id).
+   */
   deleteLayer!: (id: string | Guid) => void;
+
+  /** Remove the specified [Annotation](../../engine/classes/annotation.html) from the view. */
   removeAnnotation!: (_a: Annotation) => void;
+
+  /** Seek tour playback to the specified timecode.
+   *
+   * See [[wwtTourTimecode]] for a definition of the tour timecode.
+   *
+   * An important limitation is that the engine can only seek to the very
+   * beginning of a tour stop. If you request a timecode in the middle of a
+   * slide, the seek will actually occur to the start time of that slide.
+   */
   seekToTourTimecode!: (value: number) => void;
+
+  /** Set the current background [Imageset](../../engine/classes/imageset.html)
+   * based on its name.
+   *
+   * The name lookup here is effectively done using [[lookupImageset]]. If
+   * the name is not found, the current background imageset remains unchanged.
+   *
+   * Changing the background imageset may change the value of [[wwtRenderType]],
+   * and the overall "mode" of the WWT renderer.
+   */
   setBackgroundImageByName!: (_n: string) => void;
+
+  /** Set the rate at which the WWT clock progresses compared to wall-clock time.
+   *
+   * A value of 10 means that the WWT clock progresses ten times faster than
+   * real time. A value of -0.1 means that the WWT clock moves backwards, ten
+   * times slower than real time.
+   *
+   * Altering this causes an increment in [[wwtClockDiscontinuities]].
+   */
   setClockRate!: (_r: number) => void;
+
+  /** Set whether the WWT clock should progress with real time.
+   *
+   * See
+   * [SpaceTimeController.set_syncToClock()](../../engine/modules/spacetimecontroller.html#set_synctoclock).
+   * This interface effectively allows you to pause the WWT clock.
+   *
+   * Altering this causes an increment in [[wwtClockDiscontinuities]].
+   */
   setClockSync!: (_s: boolean) => void;
+
+  /** Set the colormap used for a FITS image layer according to
+   * [the options](../../engine-helpers/interfaces/setfitslayercolormapoptions.html).
+   */
   setFitsLayerColormap!: (_o: SetFitsLayerColormapOptions) => void;
+
+  /** Set the current foreground [Imageset](../../engine/classes/imageset.html)
+   * based on its name.
+   *
+   * The name lookup here is effectively done using [[lookupImageset]]. If
+   * the name is not found, the current foreground imageset remains unchanged.
+   */
   setForegroundImageByName!: (_n: string) => void;
+
+  /** Set the opacity of the foreground imageset.
+   *
+   * Valid values are between 0 (invisible) and 100 (fully opaque).
+   */
   setForegroundOpacity!: (o: number) => void;
+
+  /** Set the current time of WWT's internal clock.
+   *
+   * Altering this causes an increment in [[wwtClockDiscontinuities]].
+   */
   setTime!: (d: Date) => void;
+
+  /** Set whether the renderer settings of tours should remain applied after
+   * those tours finish playing back.
+   *
+   * This specialized option helps avoid jarring visual effects when tours
+   * finish playing. If a tour activates a renderer option like "local horizon
+   * mode", by default that option will turn off when the tour finishes, causing
+   * the view to suddenly change. If this option is set to True, that setting
+   * will remain active, preventing the sudden change.
+   */
   setTourPlayerLeaveSettingsWhenStopped!: (v: boolean) => void;
+
+  /** Set the "tracked object" in the 3D solar system view.
+   *
+   * Allowed values are
+   * [defined in @wwtelescope/engine-types](../../engine-types/enums/solarsystemobjects.html).
+   */
   setTrackedObject!: (o: SolarSystemObjects) => void;
+
+  /** Set up the background and foreground imagesets according to
+   * [the options](../../engine-helpers/interfaces/setupforimagesetoptions.html)
+   *
+   * The main use of this interface is that it provides a mechanism to guess
+   * the appropriate background imageset given a foreground imageset that you
+   * want to show.
+   */
   setupForImageset!: (o: SetupForImagesetOptions) => void;
+
+  /** Start playback of the currently loaded tour.
+   *
+   * Nothing hppanes if no tour is loaded.
+   */
   startTour!: () => void;
+
+  /** Alter the "stretch" of a FITS image layer according to
+   * [the options](../../engine-helpers/interfaces/stretchfitslayeroptions.html).
+   */
   stretchFitsLayer!: (o: StretchFitsLayerOptions) => void;
+
+  /** Toggle the play/pause state of the current tour.
+   *
+   * Nothing happens if no tour is loaded.
+   */
   toggleTourPlayPauseState!: () => void;
+
+  /** Update the contents of a tabular data layer according to
+   * [the options](../../engine-helpers/interfaces/updatetablelayeroptions.html).
+   */
   updateTableLayer!: (o: UpdateTableLayerOptions) => void;
+
+  /** Set the zoom level of the view.
+   *
+   * This mutation may result in an action that takes a perceptible amount of
+   * time to resolve, if the "smooth pan" renderer option is enabled. To have
+   * proper asynchronous feedback about when the zoom operation completes, use
+   * [[gotoRADecZoom]].
+   */
   zoom!: (f: number) => void;
 
   // Actions
+
+  /** Request the creation of a tabular data layer.
+   *
+   * The action resolves to a new [SpreadSheetLayer](../../engine/classes/spreadsheetlayer.html) instance.
+   */
   createTableLayer!: (_o: CreateTableLayerParams) => Promise<SpreadSheetLayer>;
+
+  /** Command the view to steer to a specific configuration.
+   *
+   * The async action completes when the view arrives, or when
+   * a subsequent view command overrides this one.
+   *
+   * TODO: document semantics when not in 2D sky mode!
+   */
   gotoRADecZoom!: (_o: GotoRADecZoomParams) => Promise<void>;
+
+  /** Command the view to steer as specified in
+   * [the options](../../engine-helpers/interfaces/gototargetoptions.html).
+   *
+   * The async action completes when the view arrives, or when
+   * a subsequent view command overrides this one.
+   */
   gotoTarget!: (o: GotoTargetOptions) => Promise<void>;
+
+  /** Request the engine to load the specified image collection.
+   *
+   * The image collection is a [WTML file](https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/)
+   * Images in collections loaded this way become usable for name-based lookup
+   * by interfaces such as [[setForegroundImageByName]].
+   *
+   * The action resolves to a [Folder](../../engine/classes/folder.html) instance.
+   * It’s asynchronous because the specified WTML file has to be downloaded.
+   */
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
+
+  /** Request the creation of a FITS image layer.
+   *
+   * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
+   * It’s asynchronous because the requested FITS file has to be downloaded.
+   */
   loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
+
+  /** Request the engine to load a tour file.
+   *
+   * The action resolves when the load is complete. It’s asynchronous because
+   * the full WTT tour file has to be downloaded.
+  */
   loadTour!: (o: LoadTourParams) => Promise<void>;
+
+  /** Wait for the WWT engine to become ready for usage.
+   *
+   * You should invoke this action and wait for is completion before trying to
+   * do anything else with a WWT-aware component. The action resolves when the
+   * WWT engine has completed its initialization, which involes the download of
+   * some supporting data files.
+   */
   waitForReady!: () => Promise<void>;
 }

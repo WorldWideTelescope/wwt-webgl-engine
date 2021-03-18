@@ -414,8 +414,6 @@ namespace wwtlib
                 {
                     color = value;
                     version++;
-                    CleanUp();
-                    //todo should this invalidate and cleanup
                 }
 
             }
@@ -423,7 +421,6 @@ namespace wwtlib
 
         public virtual void ColorChanged()
         {
-            CleanUp();
         }
 
         public virtual string ColorValue

@@ -883,16 +883,17 @@ namespace wwtlib
 
         protected Date baseDate = new Date(2010, 0, 1, 12, 00, 00);
 
-        static ImageElement circleTexture = null;
+        static Texture circleTexture = null;
 
-        static ImageElement CircleTexture
+        static Texture CircleTexture
         {
             get
             {
-                //if (circleTexture == null)
-                //{
-                //    circleTexture = UiTools.LoadTextureFromBmp(Tile.prepDevice, Properties.Resources.circle, 0);
-                //}
+                if (circleTexture == null)
+                {
+                    string url = URLHelpers.singleton.engineAssetUrl("circle.png");
+                    circleTexture = Planets.LoadPlanetTexture(url);
+                }
 
                 return circleTexture;
             }
@@ -956,12 +957,30 @@ namespace wwtlib
             if (pointList != null)
             {
                 pointList.DepthBuffered = false;
-                pointList.Decay = decay;
+                pointList.ShowFarSide = ShowFarSide;
+                pointList.Decay = timeSeries ? decay : 0;
                 pointList.Sky = this.Astronomical;
                 pointList.TimeSeries = timeSeries;
                 pointList.JNow = jNow;
                 pointList.scale = (markerScale == MarkerScales.World) ? (float)adjustedScale : -(float)adjustedScale;
-                pointList.Draw(renderContext, opacity * Opacity, false);
+                switch (plotType)
+                {
+                    case PlotTypes.Gaussian:
+                        pointList.Draw(renderContext, opacity * Opacity, false);
+                        break;
+                    case PlotTypes.Circle:
+                    case PlotTypes.Point:
+                    case PlotTypes.Square:
+                        pointList.DrawTextured(renderContext, CircleTexture.Texture2d, opacity * Opacity);
+                        break;
+                    case PlotTypes.Custom:
+                    case PlotTypes.PushPin:
+                        pointList.DrawTextured(renderContext, PushPin.GetPushPinTexture(markerIndex), opacity * Opacity);
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
             if (lineList != null)
@@ -1292,7 +1311,7 @@ namespace wwtlib
 
             PlotType = PlotTypes.Circle;
         }
-        public static VoTableLayer Create(VoTable table)
+        public static VoTableLayer Create(VoTable table, PlotTypes plotType)
         {
             VoTableLayer layer = new VoTableLayer();
 
@@ -1300,7 +1319,8 @@ namespace wwtlib
             layer.filename = table.LoadFilename;
             layer.LngColumn = table.GetRAColumn().Index;
             layer.LatColumn = table.GetDecColumn().Index;
-            layer.PlotType = PlotTypes.Circle;
+            layer.sizeColumn = table.GetColumnByUcd("phot.mag").Index;
+            layer.PlotType = plotType;
 
             return layer;
         }
@@ -1481,16 +1501,17 @@ namespace wwtlib
                 Color color = Color.FromArgb((int)(opacity * (float)Color.A), Color.R, Color.G, Color.B);
 
                 pointScaleType = PointScaleTypes.StellarMagnitude;
-
                 foreach (VoRow row in table.Rows)
                 {
                     try
                     {
                         if (lngColumn > -1 && latColumn > -1)
                         {
-                            double Xcoord = Coordinates.ParseRA(row[this.LngColumn].ToString(), true) * 15;
-                            double Ycoord = Coordinates.ParseDec(row[this.LatColumn].ToString());
-                            lastItem.Position = Coordinates.GeoTo3dDouble(Ycoord, Xcoord);
+                            double ra = Double.Parse(row[this.LngColumn].ToString());
+                            double dec = Double.Parse(row[this.LatColumn].ToString());
+                            Vector3d position = Coordinates.GeoTo3dDouble(dec, ra);
+
+                            lastItem.Position = position;
                             positions.Add(lastItem.Position);
                             lastItem.Color = color;
                             if (sizeColumn > -1)

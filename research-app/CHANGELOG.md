@@ -1,9 +1,8 @@
-# rc: minor bump
+# See elsewhere for changelog
 
-First release of the new "research application". This will be the embeddable UI
-for use in Jupyter, reseacher-oriented interfaces, etc.
+This project’s release notes are curated from the Git history of its main
+branch. You can find them by looking at [the version of this file on the
+`release` branch][branch] or the [GitHub release history][gh-releases].
 
-This version can handle all of the messages from the pywwt "JSON API", which
-means that it can be dropped in as a replacement for the pywwt widget with the
-proper JupyterLab glue, as implemented in what is currently called the
-`wwt-research-kit` repo.
+[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/research-app/CHANGELOG.md
+[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases

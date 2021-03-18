@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace wwtlib
 {
@@ -6,17 +7,33 @@ namespace wwtlib
     public class HipsProperties
     {
         public Dictionary<string, string> Properties { get { return properties; } }
-        public VoTable CatalogVoTable { get { return catalogVoTable; } }
+        public CatalogSpreadSheetLayer CatalogSpreadSheetLayer
+        {
+            get { return catalogSpreadSheetLayer; }
+            set { catalogSpreadSheetLayer = value; }
+        }
+
+        public VoTable CatalogColumnInfo
+        {
+            get { return catalogColumnInfo; }
+            set { catalogColumnInfo = value; }
+        }
+
         public bool DownloadComplete { get { return downloadComplete; } }
 
         private Dictionary<string, string> properties = new Dictionary<string, string>();
-        private VoTable catalogVoTable = null;
+        private VoTable catalogColumnInfo = null;
+        private CatalogSpreadSheetLayer catalogSpreadSheetLayer = new CatalogSpreadSheetLayer();
+
         private bool downloadComplete = false;
         private WebFile webFile;
         private readonly string url;
+        private string datasetName;
+        private Action onDownloadComplete;
 
-        public HipsProperties (string datasetUrl)
+        public HipsProperties (string datasetUrl, string datasetName)
         {
+            this.datasetName = datasetName;
             if (datasetUrl.ToLowerCase().IndexOf("norder") > -1)
             {
                 datasetUrl = datasetUrl.Substring(0, datasetUrl.ToLowerCase().IndexOf("norder"));
@@ -41,17 +58,34 @@ namespace wwtlib
                 ParseProperties(webFile.GetText());
                 if (Properties.ContainsKey("dataproduct_type") && Properties["dataproduct_type"].ToLowerCase() == "catalog")
                 {
-                    catalogVoTable = VoTable.LoadFromUrl(url.Replace("/properties", "/metadata.xml"), OnCatalogMetadataDownloadComplete);
+                    catalogColumnInfo = VoTable.LoadFromUrl(url.Replace("/properties", "/metadata.xml"), OnCatalogMetadataDownloadComplete);
                 } else
                 {
                     downloadComplete = true;
+                    if(onDownloadComplete != null)
+                    {
+                        onDownloadComplete.Invoke();
+                    }
                 }
             }
         }
 
         private void OnCatalogMetadataDownloadComplete ()
         {
+            catalogSpreadSheetLayer.UseHeadersFromVoTable(catalogColumnInfo);
+            catalogSpreadSheetLayer.Name = datasetName;
+            catalogSpreadSheetLayer.ID = Guid.FromString(this.datasetName);
+            LayerManager.AddSpreadsheetLayer(CatalogSpreadSheetLayer, "Sky");
             downloadComplete = true;
+            if (onDownloadComplete != null)
+            {
+                onDownloadComplete.Invoke();
+            }
+        }
+
+        public void SetDownloadCompleteListener(Action listener)
+        {
+            this.onDownloadComplete = listener;
         }
 
         private void ParseProperties(string data)
