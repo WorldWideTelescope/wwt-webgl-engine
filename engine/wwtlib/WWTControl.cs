@@ -638,6 +638,18 @@ namespace wwtlib
                     }
                 }
 
+                if(RenderType == ImageSetType.Sky)
+                {
+                    foreach (Imageset imageset in RenderContext.CatalogHipsImagesets)
+                    {
+                        if (imageset.HipsProperties.CatalogSpreadSheetLayer.Enabled 
+                            && imageset.HipsProperties.CatalogSpreadSheetLayer.lastVersion == imageset.HipsProperties.CatalogSpreadSheetLayer.Version)
+                        {
+                            RenderContext.DrawImageSet(imageset, 100);
+                        }
+                    }
+                }
+
                 if (RenderType == ImageSetType.Sky && Settings.Active.ShowSolarSystem)
                 {
                     Planets.DrawPlanets(RenderContext, 1);
@@ -686,8 +698,6 @@ namespace wwtlib
             Matrix3d worldSave = RenderContext.World;
             Matrix3d viewSave = RenderContext.View;
             Matrix3d projSave = RenderContext.Projection;
-
-            Vector2d raDecDownDown = GetCoordinatesForScreenPoint(RenderContext.Width / 2, RenderContext.Height / 2);
 
             if (Settings.Current.ShowCrosshairs)
             {
@@ -2546,6 +2556,38 @@ namespace wwtlib
             if (newForeground != null)
             {
                 RenderContext.ForegroundImageset = newForeground;
+            }
+        }
+
+        public void AddCatalogHipsByName(string name)
+        {
+            AddCatalogHipsByNameWithCallback(name, null);
+        }
+
+        public void AddCatalogHipsByNameWithCallback(string name, Action onLoad)
+        {
+            Imageset catalogHips = GetImagesetByName(name);
+            if (catalogHips != null)
+            {
+                RenderContext.AddCatalogHips(catalogHips, onLoad);
+            }
+        }
+
+        public void RemoveCatalogHipsByName(string name)
+        {
+            Imageset catalogHips = GetImagesetByName(name);
+            if (catalogHips != null)
+            {
+                RenderContext.RemoveCatalogHips(catalogHips);
+            }
+        }
+
+        public void GetCatalogHipsDataInView(string name, bool limit, Action<InViewReturnMessage> onComplete)
+        {
+            Imageset catalogHips = GetImagesetByName(name);
+            if (catalogHips != null)
+            {
+                RenderContext.GetCatalogHipsDataInView(catalogHips, limit, onComplete);
             }
         }
 

@@ -379,8 +379,11 @@ namespace wwtlib
 
         public static VoTableLayer AddVoTableLayer(VoTable table, string title)
         {
-
-            VoTableLayer layer = VoTableLayer.Create(table);
+            return LayerManager.AddVoTableLayerWithPlotType(table, title, PlotTypes.Circle);
+        }
+        public static VoTableLayer AddVoTableLayerWithPlotType(VoTable table, string title, PlotTypes plotType)
+        {
+            VoTableLayer layer = VoTableLayer.Create(table, plotType);
             layer.Name = title;
             layer.Astronomical = true;
             layer.ReferenceFrame = "Sky";
@@ -2001,6 +2004,8 @@ namespace wwtlib
 
                 LayerList.Remove(node.ID);
                 AllMaps[CurrentMap].Layers.Remove(node);
+                node.CleanUp();
+                node.Version++;
                 LoadTree();
                 version++;
             }
@@ -2127,16 +2132,20 @@ namespace wwtlib
         {
             SpreadSheetLayer layer = new SpreadSheetLayer();
             layer.LoadFromString(data, false, false, false, true);
-            layer.Enabled = true;
             layer.Name = name;
+            LayerManager.AddSpreadsheetLayer(layer, frame);
+            return layer;
+        }
 
-            LayerList[layer.ID] =  layer;
-            layer.ReferenceFrame = CurrentMap;
+        public static void AddSpreadsheetLayer(SpreadSheetLayer layer, string frame)
+        {
+            layer.Enabled = true;
+            LayerList[layer.ID] = layer;
+            layer.ReferenceFrame = frame;
             AllMaps[frame].Layers.Add(layer);
             AllMaps[frame].Open = true;
             version++;
             LoadTree();
-            return layer;
         }
 
         static void showOrbitPlanet_Click(object sender, EventArgs e)

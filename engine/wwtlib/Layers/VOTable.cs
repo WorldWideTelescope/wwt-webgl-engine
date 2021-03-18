@@ -235,6 +235,19 @@ namespace wwtlib
             return null;
         }
 
+        public VoColumn GetMagColumn()
+        {
+            foreach (string key in Columns.Keys)
+            {
+                VoColumn col = Columns[key];
+                if (col.Ucd.ToLowerCase().IndexOf("phot.mag") > -1 || col.Ucd.ToLowerCase().IndexOf("phot_mag") > -1)
+                {
+                    return col;
+                }
+            }
+            return null;
+        }
+
         public VoColumn GetDistanceColumn()
         {
             foreach (string key in Columns.Keys)

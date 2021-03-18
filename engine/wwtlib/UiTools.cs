@@ -151,7 +151,16 @@ namespace wwtlib
                 }
                 if (current == (data.Length - 1))
                 {
-                    count++;
+                    if (data.Substr(current, 1) == delimiter)
+                    {
+                        output.Add(data.Substr(start, count));
+                        output.Add("");
+                        return output;
+                    }
+                    else
+                    {
+                        count++;
+                    }
                 }
 
                 if (current == (data.Length - 1) || (data.Substr(current, 1) == delimiter && delimiter == "\t") || (nestingLevel == 0 && data.Substr(current, 1) == delimiter))

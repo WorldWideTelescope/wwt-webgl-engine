@@ -1,0 +1,12 @@
+{%- if page -%}
+{%- set path = page.path -%}
+{%- else -%}
+{%- set path = section.path -%}
+{%- endif -%}
+{%- set rel_top_work = [] -%}
+{%- for _ignored in path | trim_end_matches(pat="/") | split(pat="/") | slice(start=1) -%}
+  {%- set_global rel_top_work = rel_top_work | concat(with="..") -%}
+{%- endfor -%}
+{%- set rel_top = rel_top_work | join(sep="/") -%}
+{%- set url = rel_top ~ "/apiref/engine/" ~ p -%}
+<a class="apiref-link" href="{{url | safe}}">{{t}}</a>
