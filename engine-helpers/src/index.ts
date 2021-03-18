@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
 import { D2H, R2D, R2H } from "@wwtelescope/astro";
@@ -9,6 +9,7 @@ import {
   isBaseLayerSetting,
   isBaseImageSetLayerSetting,
   isBaseSpreadSheetLayerSetting,
+  isBaseVoTableLayerSetting,
 } from "@wwtelescope/engine-types";
 
 import {
@@ -40,6 +41,8 @@ import {
   SpaceTimeController,
   SpreadSheetLayer,
   SpreadSheetLayerSetting,
+  VoTableLayer,
+  VoTableLayerSetting,
 } from "@wwtelescope/engine";
 
 
@@ -204,6 +207,20 @@ export function isSpreadSheetLayerSetting(obj: [string, any]): obj is SpreadShee
 
 /** Apply a setting to an SpreadSheetLayer. */
 export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: SpreadSheetLayerSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
+/** Type guard function for VoTableLayerSetting. */
+export function isVoTableLayerSetting(obj: [string, any]): obj is VoTableLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  // No special settings specific to non-base VoTableLayerSetting.
+  return isLayerSetting(obj) || isBaseVoTableLayerSetting(obj);
+}
+
+/** Apply a setting to a VoTableLayer. */
+export function applyVoTableLayerSetting(layer: VoTableLayer, setting: VoTableLayerSetting): void {
   const funcName = "set_" + setting[0];
   const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
   (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
