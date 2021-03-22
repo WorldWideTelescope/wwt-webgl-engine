@@ -21,6 +21,15 @@ namespace wwtlib
         public static FitsImage Last = null;
 
         private WcsLoaded callBack;
+
+        public bool isHipsTile = false;
+        public static FitsImage CreateHipsTile(string file, WcsLoaded callMeBack)
+        {
+            FitsImage fits = new FitsImage(file, null, callMeBack);
+            fits.isHipsTile = true;
+            return fits;
+        }
+
         public FitsImage(string file, Blob blob, WcsLoaded callMeBack)
         {
             Last = this;
@@ -50,7 +59,7 @@ namespace wwtlib
         {
             if (webFile.State == StateType.Error)
             {
-                Script.Literal("alert({0})", webFile.Message);
+                Script.Literal("console.log({0})", webFile.Message);
             }
             else if (webFile.State == StateType.Received)
             {
@@ -262,7 +271,10 @@ namespace wwtlib
                 }
                 sizeX = Width = AxisSize[0];
                 sizeY = Height = AxisSize[1];
-                ComputeWcs();
+                if (!isHipsTile)
+                {
+                    ComputeWcs();
+                }
                 Histogram = ComputeHistogram(256);
                 HistogramMaxCount = Histogram[256];
             }
