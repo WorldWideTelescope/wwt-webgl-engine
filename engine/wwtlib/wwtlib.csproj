@@ -52,6 +52,7 @@
     <Compile Include="HealpixTile.cs" />
     <Compile Include="HealpixUtils.cs" />
     <Compile Include="Hploc.cs" />
+    <Compile Include="Layers\FitsImageWebGL.cs" />
     <Compile Include="Pointing.cs" />
     <Compile Include="URLHelpers.cs" />
     <Compile Include="Annotation.cs" />

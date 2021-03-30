@@ -330,7 +330,8 @@ namespace wwtlib
             else if (imageset.HipsProperties != null && imageset.HipsProperties.DownloadComplete)
             {
                 onHeaderInfoLoad.Invoke();
-            } else
+            }
+            else
             {
                 imageset.HipsProperties.SetDownloadCompleteListener(onHeaderInfoLoad);
             }
@@ -360,7 +361,7 @@ namespace wwtlib
             if (anyTileStillDownloading)
             {
                 int count = catalogSpreadSheetLayer.Table.Rows.Count;
-                if((count > 10000 || i > 100 * 60 * 5) && limit) // ~5 minutes
+                if ((count > 10000 || i > 100 * 60 * 5) && limit) // ~5 minutes
                 {
                     Script.Literal("console.log('Too Many results - Aborting')");
                     Script.Literal("console.log(count)");
@@ -373,7 +374,7 @@ namespace wwtlib
                 else
                 {
                     Script.SetTimeout(delegate () { TryGetAllDataInView(imageset, limit, catalogSpreadSheetLayer, onComplete, i); }, 10);
-                    if(i % 200 == 0)
+                    if (i % 200 == 0)
                     {
                         Script.Literal("console.log('Waiting for more tiles to load')");
                         Script.Literal("console.log(count)");
@@ -405,10 +406,11 @@ namespace wwtlib
             {
                 imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
                 imageset.HipsProperties.SetDownloadCompleteListener(onLoad);
-            } else if(imageset.HipsProperties != null && imageset.HipsProperties.DownloadComplete)
+            }
+            else if (imageset.HipsProperties != null && imageset.HipsProperties.DownloadComplete)
             {
                 LayerManager.AddSpreadsheetLayer(imageset.HipsProperties.CatalogSpreadSheetLayer, "Sky");
-                if(onLoad != null)
+                if (onLoad != null)
                 {
                     onLoad.Invoke();
                 }
@@ -418,7 +420,7 @@ namespace wwtlib
         public void RemoveCatalogHips(Imageset imageset)
         {
             activeCatalogHipsImagesets.Remove(imageset);
-            if(imageset.HipsProperties != null)
+            if (imageset.HipsProperties != null)
             {
                 LayerManager.DeleteLayerByID(imageset.HipsProperties.CatalogSpreadSheetLayer.ID, true, true);
             }
@@ -1423,6 +1425,7 @@ namespace wwtlib
             Tile.uvMultiple = 1;
             Tile.DemEnabled = true;
 
+            FitsShader.Init(this);
             TileShader.Init(this);
         }
 
@@ -1433,7 +1436,7 @@ namespace wwtlib
 
             TargetCamera = ViewCamera.Copy();
         }
-    
+
         internal void SetVertexBuffer(VertexBufferBase vertexBuffer)
         {
         }

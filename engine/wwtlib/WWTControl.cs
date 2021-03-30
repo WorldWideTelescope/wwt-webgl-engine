@@ -1750,7 +1750,7 @@ namespace wwtlib
 
                 CanvasElement canvas = CreateCanvasElement(DivId);
 
-                String webgltext = "webgl";
+                String webgltext = "webgl2";
                 GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
 
                 if (gl == null) {

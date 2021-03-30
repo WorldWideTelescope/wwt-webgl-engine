@@ -98,7 +98,7 @@ namespace wwtlib
 
                 gl.uniformMatrix4fv(mvMatLoc, false, mvMat.FloatArray());
                 gl.uniformMatrix4fv(projMatLoc, false, renderContext.Projection.FloatArray());
-                gl.uniform4f(lineColorLoc, lineColor.R/255, lineColor.G/255, lineColor.B/255, 1);
+                gl.uniform4f(lineColorLoc, lineColor.R / 255, lineColor.G / 255, lineColor.B / 255, 1);
                 if (renderContext.Space || !useDepth)
                 {
                     gl.disable(GL.DEPTH_TEST);
@@ -114,7 +114,7 @@ namespace wwtlib
 
 
                 gl.enableVertexAttribArray(vertLoc);
-                
+
                 gl.bindBuffer(GL.ARRAY_BUFFER, vertex);
                 gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
                 gl.vertexAttribPointer(vertLoc, 3, GL.FLOAT, false, 0, 0);
@@ -185,7 +185,7 @@ namespace wwtlib
 
             vertLoc = gl.getAttribLocation(prog, "aVertexPosition");
             lineColorLoc = gl.getUniformLocation(prog, "lineColor");
-      
+
             gl.enable(GL.BLEND);
             gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
             initialized = true;
@@ -656,7 +656,7 @@ namespace wwtlib
             minSizeLoc = gl.getUniformLocation(prog, "minSize");
 
             gl.enable(GL.BLEND);
-           
+
             initialized = true;
         }
 
@@ -691,7 +691,7 @@ namespace wwtlib
                 gl.uniform1f(scaleLoc, scale);
                 gl.uniform1f(minSizeLoc, minSize);
                 gl.uniform1f(showFarSideLoc, showFarSide ? 1 : 0);
-                gl.uniform1f(skyLoc, sky? -1 : 1);
+                gl.uniform1f(skyLoc, sky ? -1 : 1);
                 if (zBuffer)
                 {
                     gl.enable(GL.DEPTH_TEST);
@@ -846,7 +846,7 @@ namespace wwtlib
                     "     pnt.w = 1.0;                                                                       \n" +
                     "                                                                                        \n" +
                     "     float dist = distance(pnt.xyz, cameraPosition.xyz);                                \n" +
-                    "     gl_Position = uPMatrix * uMVMatrix * pnt;                                          \n" + 
+                    "     gl_Position = uPMatrix * uMVMatrix * pnt;                                          \n" +
                     "     vColor.a = opacity * (1.0-(orbit.x));                                              \n" +
                     "     vColor.r = Color.r;                                                                \n" +
                     "     vColor.g = Color.g;                                                                \n" +
@@ -1022,7 +1022,7 @@ namespace wwtlib
                     "    uniform float eccentricity;                                                              \n" +
                     "    uniform vec4 color;                                                             \n" +
                     "    uniform float eccentricAnomaly;                                                              \n" +
-         //           "    uniform float opacity;                                                              \n" +
+                    //           "    uniform float opacity;                                                              \n" +
                     "    varying lowp vec4 vColor;                                                           \n" +
                     "                                                                                        \n" +
                     "    void main(void)                                                                     \n" +
@@ -1069,11 +1069,11 @@ namespace wwtlib
             matPositionLoc = gl.getUniformLocation(prog, "matPosition");
             positionNowLoc = gl.getUniformLocation(prog, "positionNow");
             colorLoc = gl.getUniformLocation(prog, "color");
-           // opacityLoc = gl.getUniformLocation(prog, "opacity");
+            // opacityLoc = gl.getUniformLocation(prog, "opacity");
             semiMajorAxisLoc = gl.getUniformLocation(prog, "semiMajorAxis");
             eccentricityLoc = gl.getUniformLocation(prog, "eccentricity");
             eccentricAnomalyLoc = gl.getUniformLocation(prog, "eccentricAnomaly");
-            
+
             gl.enable(GL.BLEND);
 
             initialized = true;
@@ -1082,8 +1082,8 @@ namespace wwtlib
         private static WebGLProgram prog = null;
 
         public static void Use(
-            RenderContext renderContext,float semiMajorAxis,float eccentricity, float eccentricAnomaly, 
-            Color lineColor, float opacity, Matrix3d world, Vector3d positionNow )
+            RenderContext renderContext, float semiMajorAxis, float eccentricity, float eccentricAnomaly,
+            Color lineColor, float opacity, Matrix3d world, Vector3d positionNow)
         {
             GL gl = renderContext.gl;
             if (gl != null)
@@ -1095,20 +1095,20 @@ namespace wwtlib
 
                 gl.useProgram(prog);
 
-                Matrix3d WVPPos = Matrix3d.MultiplyMatrix(Matrix3d.MultiplyMatrix(world,renderContext.View ),  renderContext.Projection);
-                Matrix3d WVP = Matrix3d.MultiplyMatrix(Matrix3d.MultiplyMatrix(renderContext.World,renderContext.View ),  renderContext.Projection);
+                Matrix3d WVPPos = Matrix3d.MultiplyMatrix(Matrix3d.MultiplyMatrix(world, renderContext.View), renderContext.Projection);
+                Matrix3d WVP = Matrix3d.MultiplyMatrix(Matrix3d.MultiplyMatrix(renderContext.World, renderContext.View), renderContext.Projection);
 
                 gl.uniformMatrix4fv(matWVPLoc, false, WVP.FloatArray());
                 gl.uniformMatrix4fv(matPositionLoc, false, WVPPos.FloatArray());
                 gl.uniform3f(positionNowLoc, (float)positionNow.X, (float)positionNow.Y, (float)positionNow.Z);
                 gl.uniform4f(colorLoc, lineColor.R / 255f, lineColor.G / 255f, lineColor.B / 255f, lineColor.A / 255f);
-               // gl.uniform1f(opacityLoc, opacity);
+                // gl.uniform1f(opacityLoc, opacity);
                 gl.uniform1f(semiMajorAxisLoc, semiMajorAxis);
                 gl.uniform1f(eccentricityLoc, eccentricity);
                 gl.uniform1f(eccentricAnomalyLoc, eccentricAnomaly);
 
 
-              //  gl.enable(GL.DEPTH_TEST);
+                //  gl.enable(GL.DEPTH_TEST);
                 gl.disable(GL.DEPTH_TEST);
 
                 gl.disableVertexAttribArray(0);
@@ -1120,7 +1120,7 @@ namespace wwtlib
                 //gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
 
                 gl.enableVertexAttribArray(AngleLoc);
-               
+
                 gl.vertexAttribPointer(AngleLoc, 3, GL.FLOAT, false, 0, 0);
                 gl.lineWidth(1.0f);
                 gl.enable(GL.BLEND);
@@ -1259,7 +1259,7 @@ namespace wwtlib
         public static float MinLightingBrightness = 1.0f;
 
         public static Color AtmosphereColor = Color.FromArgb(0, 0, 0, 0);
-        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index,  WebGLTexture texture, float opacity, bool noDepth, int stride)
+        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth, int stride)
         {
             if (texture == null)
             {
@@ -1325,7 +1325,7 @@ namespace wwtlib
                 gl.enableVertexAttribArray(textureLoc);
                 gl.vertexAttribPointer(vertLoc, 3, GL.FLOAT, false, stride, 0);
                 gl.vertexAttribPointer(normalLoc, 3, GL.FLOAT, false, stride, 12);
-                gl.vertexAttribPointer(textureLoc, 2, GL.FLOAT, false, stride, stride-8);
+                gl.vertexAttribPointer(textureLoc, 2, GL.FLOAT, false, stride, stride - 8);
                 gl.activeTexture(GL.TEXTURE0);
                 gl.bindTexture(GL.TEXTURE_2D, texture);
                 gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, index);
@@ -1342,7 +1342,7 @@ namespace wwtlib
             }
         }
     }
-  public class ModelShaderTan
+    public class ModelShaderTan
     {
         public ModelShaderTan()
         {
@@ -1472,7 +1472,7 @@ namespace wwtlib
         public static float MinLightingBrightness = 1.0f;
 
         public static Color AtmosphereColor = Color.FromArgb(0, 0, 0, 0);
-        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index,  WebGLTexture texture, float opacity, bool noDepth, int stride)
+        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth, int stride)
         {
             if (texture == null)
             {
@@ -1538,7 +1538,7 @@ namespace wwtlib
                 gl.enableVertexAttribArray(textureLoc);
                 gl.vertexAttribPointer(vertLoc, 3, GL.FLOAT, false, stride, 0);
                 gl.vertexAttribPointer(normalLoc, 3, GL.FLOAT, false, stride, 12);
-                gl.vertexAttribPointer(textureLoc, 2, GL.FLOAT, false, stride, stride-8);
+                gl.vertexAttribPointer(textureLoc, 2, GL.FLOAT, false, stride, stride - 8);
                 gl.activeTexture(GL.TEXTURE0);
                 gl.bindTexture(GL.TEXTURE_2D, texture);
                 gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, index);
@@ -1730,6 +1730,240 @@ namespace wwtlib
                 gl.uniform3f(sunLoc, -(float)sp.X, -(float)sp.Y, -(float)sp.Z);
 
                 gl.uniform1i(sampLoc, 0);
+                if (renderContext.Space || noDepth)
+                {
+                    gl.disable(GL.DEPTH_TEST);
+                }
+                else
+                {
+                    gl.enable(GL.DEPTH_TEST);
+                }
+                gl.disableVertexAttribArray(0);
+                gl.disableVertexAttribArray(1);
+                gl.disableVertexAttribArray(2);
+                gl.disableVertexAttribArray(3);
+
+                gl.bindBuffer(GL.ARRAY_BUFFER, vertex);
+
+                gl.enableVertexAttribArray(vertLoc);
+                gl.enableVertexAttribArray(textureLoc);
+                gl.vertexAttribPointer(vertLoc, 3, GL.FLOAT, false, 20, 0);
+                gl.vertexAttribPointer(textureLoc, 2, GL.FLOAT, false, 20, 12);
+                gl.activeTexture(GL.TEXTURE0);
+                gl.bindTexture(GL.TEXTURE_2D, texture);
+                gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, index);
+                gl.enable(GL.BLEND);
+
+                if (noDepth)
+                {
+                    gl.blendFunc(GL.SRC_ALPHA, GL.ONE);
+                }
+                else
+                {
+                    gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+                }
+            }
+        }
+    }
+
+    public class FitsShader
+    {
+        public FitsShader()
+        {
+
+        }
+        internal static WebGLShader frag;
+        internal static WebGLShader vert;
+
+
+        public static int vertLoc;
+        public static int textureLoc;
+        public static WebGLUniformLocation projMatLoc;
+        public static WebGLUniformLocation mvMatLoc;
+        public static WebGLUniformLocation sampLoc;
+        public static WebGLUniformLocation blank;
+        public static WebGLUniformLocation bzero;
+        public static WebGLUniformLocation bscale;
+        public static WebGLUniformLocation scalingLocation;
+
+        public static WebGLUniformLocation sunLoc;
+        public static WebGLUniformLocation opacityLoc;
+        public static WebGLUniformLocation minBrightnessLoc;
+        public static WebGLUniformLocation atmosphereColorLoc;
+
+        public static bool initialized = false;
+        public static void Init(RenderContext renderContext)
+        {
+            GL gl = renderContext.gl;
+
+            String fragShaderText = @"#version 300 es
+                precision mediump float;
+                in vec2 vTextureCoord;
+                in vec3 vNormal;
+                in vec3 vCamVector;
+                out vec4 fragmentColor;
+
+                uniform sampler2D uSampler;
+                uniform float blank;
+                uniform float bzero;
+                uniform float bscale;
+                uniform int scalingFunction;
+                uniform float opacity;
+                uniform vec3 uSunPosition;
+                uniform float uMinBrightness;
+                uniform vec3 uAtmosphereColor;
+                void main(void) {
+                    float min = -0.043;
+                    float max = 1.517;
+                    vec4 color = texture(uSampler, vTextureCoord);
+                    vec4 newColor = vec4(color.r, color.r, color.r, 1.0);
+                    if(abs(blank - color.r) < 0.00000001){
+                        newColor = vec4(0.0, 0.0, 0.0, 0.0);
+                    } else {
+                        float physicalValue = bzero + bscale * color.r;
+                        physicalValue = clamp((physicalValue - min) / (max - min), 0.0, 1.0);
+                        newColor = vec4(physicalValue, physicalValue, physicalValue, 1.0);
+                    }
+                    fragmentColor = newColor;
+                }";
+
+            String vertexShaderText =
+                      "#version 300 es  \n" +
+                    "     in vec3 aVertexPosition;                                              \n" +
+                    "     in vec2 aTextureCoord;                                                \n" +
+                    "                                                                                  \n" +
+                    "     uniform mat4 uMVMatrix;                                                      \n" +
+                    "     uniform mat4 uPMatrix;                                                       \n" +
+                    "                                                                                  \n" +
+                    "     out vec2 vTextureCoord;                                                  \n" +
+                    "     out vec3 vNormal;                                                        \n" +
+                    "     out vec3 vCamVector;                                                     \n" +
+                    "                                                                                  \n" +
+                    "                                                                                  \n" +
+                    "     void main(void) {                                                            \n" +
+                    "         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);         \n" +
+                    "         vCamVector = normalize((mat3(uMVMatrix) * aVertexPosition).xyz);              \n" +
+                    "         vec3 normal = normalize(aVertexPosition);                                \n" +
+                    "         vec3 normalT = normalize(mat3(uMVMatrix) * normal);                      \n" +
+                    "         vTextureCoord = aTextureCoord;                                           \n" +
+                    "         vNormal = normalT;                                                       \n" +
+                    "     }                                                                            \n" +
+                    "                                                                                  \n";
+
+            frag = gl.createShader(GL.FRAGMENT_SHADER);
+            gl.shaderSource(frag, fragShaderText);
+            gl.compileShader(frag);
+
+            object stat = gl.getShaderParameter(frag, GL.COMPILE_STATUS);
+            if ((int)stat == 0)
+            {
+                object errorF = gl.getShaderInfoLog(frag);
+                Script.Literal("console.log({0})", errorF);
+            }
+
+            vert = gl.createShader(GL.VERTEX_SHADER);
+            gl.shaderSource(vert, vertexShaderText);
+            gl.compileShader(vert);
+            object stat1 = gl.getShaderParameter(vert, GL.COMPILE_STATUS);
+            if ((int)stat1 == 0)
+            {
+                object errorV = gl.getShaderInfoLog(vert);
+                Script.Literal("console.log({0})", errorV);
+            }
+
+            prog = gl.createProgram();
+
+            gl.attachShader(prog, vert);
+            gl.attachShader(prog, frag);
+            gl.linkProgram(prog);
+            object errcode = gl.getProgramParameter(prog, GL.LINK_STATUS);
+
+
+            gl.useProgram(prog);
+
+            vertLoc = gl.getAttribLocation(prog, "aVertexPosition");
+            textureLoc = gl.getAttribLocation(prog, "aTextureCoord");
+            projMatLoc = gl.getUniformLocation(prog, "uPMatrix");
+            mvMatLoc = gl.getUniformLocation(prog, "uMVMatrix");
+            sampLoc = gl.getUniformLocation(prog, "uSampler");
+            blank = gl.getUniformLocation(prog, "blank");
+            bzero = gl.getUniformLocation(prog, "bzero");
+            bscale = gl.getUniformLocation(prog, "bscale");
+            scalingLocation = gl.getUniformLocation(prog, "scalingFunction");
+            sunLoc = gl.getUniformLocation(prog, "uSunPosition");
+            minBrightnessLoc = gl.getUniformLocation(prog, "uMinBrightness");
+            opacityLoc = gl.getUniformLocation(prog, "opacity");
+            atmosphereColorLoc = gl.getUniformLocation(prog, "uAtmosphereColor");
+
+            Tile.uvMultiple = 1;
+            Tile.DemEnabled = true;
+
+            gl.enable(GL.BLEND);
+            gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+            initialized = true;
+        }
+
+        private static WebGLProgram prog = null;
+        public static Vector3d SunPosition = Vector3d.Create(-1, -1, -1);
+        public static float MinLightingBrightness = 1.0f;
+
+        public static Color AtmosphereColor = Color.FromArgb(0, 0, 0, 0);
+        public static float BlankValue = 0f;
+        public static float BScale = 0f;
+        public static float BZero = 0f;
+        public static int ScalingFunction = 0;
+        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth)
+        {
+            if (texture == null)
+            {
+                texture = Texture.GetEmpty();
+            }
+
+            GL gl = renderContext.gl;
+            if (gl != null)
+            {
+                if (!initialized)
+                {
+                    Init(renderContext);
+                }
+
+                gl.useProgram(prog);
+
+                Matrix3d mvMat = Matrix3d.MultiplyMatrix(renderContext.World, renderContext.View);
+                gl.uniform1f(opacityLoc, opacity);
+                gl.uniform1f(minBrightnessLoc, renderContext.Lighting ? MinLightingBrightness : 1.0f);
+
+                if (renderContext.Lighting)
+                {
+                    gl.uniform3f(atmosphereColorLoc, AtmosphereColor.R / 255.0f, AtmosphereColor.G / 255.0f, AtmosphereColor.B / 255.0f);
+                }
+                else
+                {
+                    gl.uniform3f(atmosphereColorLoc, 0f, 0f, 0f);
+                }
+
+                gl.uniformMatrix4fv(mvMatLoc, false, mvMat.FloatArray());
+                gl.uniformMatrix4fv(projMatLoc, false, renderContext.Projection.FloatArray());
+                SunPosition.Normalize();
+
+                Matrix3d mvInv = renderContext.View.Clone();
+                mvInv.M41 = 0;
+                mvInv.M42 = 0;
+                mvInv.M43 = 0;
+                mvInv.M44 = 1;
+                Vector3d sp = Vector3d.TransformCoordinate(SunPosition, mvInv);
+                sp.Normalize();
+
+
+                gl.uniform3f(sunLoc, -(float)sp.X, -(float)sp.Y, -(float)sp.Z);
+
+                gl.uniform1i(sampLoc, 0);
+
+                gl.uniform1f(blank, BlankValue);
+                gl.uniform1f(bzero, BZero);
+                gl.uniform1f(bscale, BScale);
+                gl.uniform1i(scalingLocation, ScalingFunction);
+
                 if (renderContext.Space || noDepth)
                 {
                     gl.disable(GL.DEPTH_TEST);
@@ -2344,7 +2578,7 @@ namespace wwtlib
                 gl.disableVertexAttribArray(2);
                 gl.disableVertexAttribArray(3);
                 gl.bindBuffer(GL.ARRAY_BUFFER, vertex);
-             
+
                 gl.enableVertexAttribArray(vertLoc);
                 gl.enableVertexAttribArray(textureLoc);
                 gl.enableVertexAttribArray(colorLoc);

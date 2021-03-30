@@ -195,6 +195,12 @@ namespace System.Html
         public const int RGB5_A1 = 32855;
         public const int RGB565 = 36194;
         public const int RGBA = 6408;
+        public const int RGBA8 = 32856;
+        public const int RGBA16I = 36232;
+        public const int RED_INTEGER = 36244;
+        public const int RED = 6403;
+        public const int R32F = 33326;
+        public const int R16I = 33331;
         public const int RGBA4 = 32854;
         public const int SAMPLE_ALPHA_TO_COVERAGE = 32926;
         public const int SAMPLE_BUFFERS = 32936;
@@ -408,12 +414,12 @@ namespace System.Html
         public void hint(int target, int mode) { return; }
         public bool isBuffer(WebGLBuffer buffer) { return false; }
         public bool isContextLost() { return false; }
-        public bool isEnabled(int cap) { return false; ;}
-        public bool isFramebuffer(WebGLFramebuffer framebuffer) { return false; ;}
-        public bool isProgram(WebGLProgram program) { return false; ;}
-        public bool isRenderbuffer(WebGLRenderbuffer renderbuffer) { return false; ;}
-        public bool isShader(WebGLShader shader) { return false; ;}
-        public bool isTexture(WebGLTexture texture) { return false; ;}
+        public bool isEnabled(int cap) { return false; ; }
+        public bool isFramebuffer(WebGLFramebuffer framebuffer) { return false; ; }
+        public bool isProgram(WebGLProgram program) { return false; ; }
+        public bool isRenderbuffer(WebGLRenderbuffer renderbuffer) { return false; ; }
+        public bool isShader(WebGLShader shader) { return false; ; }
+        public bool isTexture(WebGLTexture texture) { return false; ; }
         public void lineWidth(float width) { return; }
         public void linkProgram(WebGLProgram program) { return; }
         public void pixelStorei(int pname, int param) { return; }
@@ -444,6 +450,10 @@ namespace System.Html
         public void texImage2D(int target, int level, VideoElement video, bool flipY, bool asPremultipliedAlpha) { return; }
         public void texImage2D(int target, int level, ImageData pixels, bool flipY, bool asPremultipliedAlpha) { return; }
         public void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, WebGLArray pixels) { return; }
+        public void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Float32Array pixels) { return; }
+        public void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Uint8Array pixels) { return; }
+        public void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Int16Array pixels) { return; }
+        public void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, byte[] pixels) { return; }
         public void texParameterf(int target, int pname, float param) { return; }
         public void texParameteri(int target, int pname, int param) { return; }
         public void texSubImage2D(int target, int level, int xoffset, int yoffset, CanvasElement canvas) { return; }
@@ -581,7 +591,7 @@ namespace System.Html
         public WebGLArray() { }
 
         [ScriptField]
-        public WebGLArrayBuffer buffer { get { return null; } }
+        public WebGLArrayBuffer buffer { get { return null; } set { buffer = value; } }
         [ScriptField]
         public int byteLength { get { return 0; } }
         [ScriptField]
@@ -813,6 +823,7 @@ namespace System.Html
         public float this[int key]
         {
             get { return 0; }
+            set { }
         }
     }
 
@@ -859,6 +870,30 @@ namespace System.Html
         public Uint16Array(object data) { }
         [ScriptField]
         public int length { get { return 0; } }
+
+        [ScriptField]
+        public UInt16 this[int key]
+        {
+            get { return 0; }
+            set { }
+        }
+    }
+
+
+    [ScriptIgnoreNamespace]
+    [ScriptImport]
+    public class Int16Array
+    {
+        public Int16Array(object data) { }
+        [ScriptField]
+        public int length { get { return 0; } }
+
+        [ScriptField]
+        public Int16 this[int key]
+        {
+            get { return 0; }
+            set { }
+        }
     }
 
     [ScriptIgnoreNamespace]
