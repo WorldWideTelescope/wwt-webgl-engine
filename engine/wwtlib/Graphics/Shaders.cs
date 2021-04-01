@@ -1784,6 +1784,8 @@ namespace wwtlib
         public static WebGLUniformLocation blank;
         public static WebGLUniformLocation bzero;
         public static WebGLUniformLocation bscale;
+        public static WebGLUniformLocation minLoc;
+        public static WebGLUniformLocation maxLoc;
         public static WebGLUniformLocation scalingLocation;
 
         public static WebGLUniformLocation sunLoc;
@@ -1807,14 +1809,14 @@ namespace wwtlib
                 uniform float blank;
                 uniform float bzero;
                 uniform float bscale;
+                uniform float min;
+                uniform float max;
                 uniform int scalingFunction;
                 uniform float opacity;
                 uniform vec3 uSunPosition;
                 uniform float uMinBrightness;
                 uniform vec3 uAtmosphereColor;
                 void main(void) {
-                    float min = -0.043;
-                    float max = 1.517;
                     vec4 color = texture(uSampler, vTextureCoord);
                     vec4 newColor = vec4(color.r, color.r, color.r, 1.0);
                     if(abs(blank - color.r) < 0.00000001){
@@ -1889,6 +1891,8 @@ namespace wwtlib
             blank = gl.getUniformLocation(prog, "blank");
             bzero = gl.getUniformLocation(prog, "bzero");
             bscale = gl.getUniformLocation(prog, "bscale");
+            minLoc = gl.getUniformLocation(prog, "min");
+            maxLoc = gl.getUniformLocation(prog, "max");
             scalingLocation = gl.getUniformLocation(prog, "scalingFunction");
             sunLoc = gl.getUniformLocation(prog, "uSunPosition");
             minBrightnessLoc = gl.getUniformLocation(prog, "uMinBrightness");
@@ -1909,8 +1913,10 @@ namespace wwtlib
 
         public static Color AtmosphereColor = Color.FromArgb(0, 0, 0, 0);
         public static float BlankValue = 0f;
-        public static float BScale = 0f;
+        public static float BScale = 1f;
         public static float BZero = 0f;
+        public static float Min = 0f;
+        public static float Max = 0f;
         public static int ScalingFunction = 0;
         public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth)
         {
@@ -1962,6 +1968,8 @@ namespace wwtlib
                 gl.uniform1f(blank, BlankValue);
                 gl.uniform1f(bzero, BZero);
                 gl.uniform1f(bscale, BScale);
+                gl.uniform1f(minLoc, Min);
+                gl.uniform1f(maxLoc, Max);
                 gl.uniform1i(scalingLocation, ScalingFunction);
 
                 if (renderContext.Space || noDepth)
