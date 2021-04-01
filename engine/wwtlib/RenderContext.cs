@@ -27,6 +27,7 @@ namespace wwtlib
     public class RenderContext
     {
         public static bool UseGl = false;
+        public static bool UseGlVersion2 = false;
         public CanvasContext2D Device;
         public GL gl;
 

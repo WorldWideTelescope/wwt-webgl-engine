@@ -635,7 +635,7 @@ namespace wwtlib
                     PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
                     PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
-                    if (GetHipsFileExtention() == ".fits")
+                    if (GetHipsFileExtention() == ".fits" && RenderContext.UseGlVersion2)
                     {
                         PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
                         PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, fitsImage.AxisSize[0], fitsImage.AxisSize[1], 0, GL.RED, GL.FLOAT, fitsImage.buffer);
@@ -679,19 +679,34 @@ namespace wwtlib
                 if (!Downloading && !ReadyToRender)
                 {
                     Downloading = true;
-                    fitsImage = FitsImageWebGL.CreateHipsTile(URL, delegate (WcsImage wcsImage)
+                    if (RenderContext.UseGlVersion2)
                     {
-                        Downloading = false;
-                        errored = fitsImage.errored;
-                        TileCache.RemoveFromQueue(this.Key, true);
-                        if (!fitsImage.errored)
+                        fitsImage = FitsImageWebGL.CreateHipsTile(URL, delegate (WcsImage wcsImage)
+                        {
+                            Downloading = false;
+                            errored = fitsImage.errored;
+                            TileCache.RemoveFromQueue(this.Key, true);
+                            if (!fitsImage.errored)
+                            {
+                                texReady = true;
+                                ReadyToRender = texReady && (DemReady || !demTile);
+                                RequestPending = false;
+                                MakeTexture();
+                            }
+                        });
+                    } else
+                    {
+                        FitsImage image = FitsImage.CreateHipsTile(URL, delegate (WcsImage wcsImage)
                         {
                             texReady = true;
+                            Downloading = false;
+                            errored = false;
                             ReadyToRender = texReady && (DemReady || !demTile);
                             RequestPending = false;
-                            MakeTexture();
-                        }
-                    });
+                            TileCache.RemoveFromQueue(this.Key, true);
+                            texture2d = wcsImage.GetBitmap().GetTexture();
+                        });
+                    }
                 }
             }
             else

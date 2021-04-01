@@ -1750,12 +1750,19 @@ namespace wwtlib
 
                 CanvasElement canvas = CreateCanvasElement(DivId);
 
-                String webgltext = "webgl2";
-                GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
-
+                GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)"webgl2");
+                if(gl != null)
+                {
+                    RenderContext.UseGlVersion2 = true;
+                }
+                else 
+                {
+                    //TODO if safari -> recommend enabling webgl2 flag 
+                    //Else Recommend using a modern browser (Chrome, Firefox, Edge) to get the full AAS WWT experience
+                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)"webgl");
+                }
                 if (gl == null) {
-                    webgltext = "experimental-webgl";
-                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
+                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)"experimental-webgl");
                 }
 
                 if (gl == null) {
