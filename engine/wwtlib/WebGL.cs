@@ -904,6 +904,24 @@ namespace System.Html
         [ScriptField]
         public int length { get { return 0; } }
     }
+
+    [ScriptIgnoreNamespace]
+    [ScriptImport]
+    public class DataView
+    {
+        public DataView(object data) { }
+        [ScriptField]
+        public int byteLength { get { return 0; } }
+
+        public int getUint8 (int position) { return 0; }
+        public int getFloat64 (int position, bool littleEndian) { return 0; }
+        public int getFloat32 (int position, bool littleEndian) { return 0; }
+        public int getInt8 (int position, bool littleEndian) { return 0; }
+        public int getInt16(int position, bool littleEndian) { return 0; }
+        public int getInt32(int position, bool littleEndian) { return 0; }
+        //public int getInt64(int position, bool littleEndian) { return 0; }
+
+    }
 }
 
 

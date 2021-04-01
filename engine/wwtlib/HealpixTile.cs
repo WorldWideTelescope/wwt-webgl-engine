@@ -352,6 +352,7 @@ namespace wwtlib
                             InViewFrustum = true;
                             if (children[childIndex].IsTileBigEnough(renderContext) || onlyDrawChildren)
                             {
+                                //renderChildPart[childIndex].TargetState = true;
                                 renderChildPart[childIndex].TargetState = !children[childIndex].Draw3D(renderContext, opacity);
                                 if (renderChildPart[childIndex].TargetState)
                                 {
@@ -637,7 +638,7 @@ namespace wwtlib
                     if (GetHipsFileExtention() == ".fits")
                     {
                         PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
-                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, 512, 512, 0, GL.RED, GL.FLOAT, fitsImage.buffer);
+                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, fitsImage.AxisSize[0], fitsImage.AxisSize[1], 0, GL.RED, GL.FLOAT, fitsImage.buffer);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
                     }

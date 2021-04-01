@@ -78,7 +78,7 @@ namespace wwtlib
             FileReader chunck = new FileReader();
             chunck.OnLoadEnd = delegate (System.Html.Data.Files.FileProgressEvent e)
             {
-                ReadFromBin(new BinaryReader(new Uint8Array(chunck.Result)));
+                ReadFromBin(new DataView(chunck.Result));
                 errored = !parseSuccessful;
                 if (callBack != null)
                 {
@@ -88,9 +88,9 @@ namespace wwtlib
             chunck.ReadAsArrayBuffer(blob);
         }
 
-        private void ReadFromBin(BinaryReader br)
+        private void ReadFromBin(DataView dataView)
         {
-            ParseHeader(br);
+            ParseHeader(dataView);
         }
 
 
@@ -104,14 +104,15 @@ namespace wwtlib
         public DataTypes DataType = DataTypes.None;
         public bool ContainsBlanks = false;
         public double BlankValue = double.MinValue;
-        public double MaxVal = int.MinValue;
-        public double MinVal = int.MaxValue;
+        public static double MaxVal = double.MinValue;
+        public static double MinVal = double.MaxValue;
         public bool TransparentBlack = true;
 
         public int lastMin = 0;
         public int lastMax = 255;
         bool color = false;
         private bool parseSuccessful = false;
+        private int position = 0;
 
         public static bool IsGzip(BinaryReader br)
         {
@@ -128,19 +129,28 @@ namespace wwtlib
             }
         }
 
-        private bool ValidateFitsSimple (BinaryReader br)
+        private string ReadByteString(DataView dataView, int count)
         {
-            int pos = br.Position;
-            br.Seek(0);
-            string data = br.ReadByteString(8);
+            string data = "";
+            for (int i = 0; i < count; i++)
+            {
+                data += string.FromCharCode(dataView.getUint8(this.position));
+                this.position++;
+            }
+            return data;
+        }
+
+        private bool ValidateFitsSimple (DataView dataView)
+        {
+            string data = this.ReadByteString(dataView, 8);
             string keyword = data.TrimEnd();
-            br.Seek(pos);
+            this.position -= 8;
             return keyword.ToUpperCase() == "SIMPLE";
         }
 
-        public void ParseHeader(BinaryReader br)
+        public void ParseHeader(DataView dataView)
         {
-            if (!ValidateFitsSimple(br))
+            if (!ValidateFitsSimple(dataView))
             {
                 Script.Literal("console.log('The requested file is not a valid FITS file.')");
                 return;
@@ -149,11 +159,11 @@ namespace wwtlib
             bool foundEnd = false;
 
 
-            while (!foundEnd && !br.EndOfStream)
+            while (!foundEnd)
             {
                 for (int i = 0; i < 36; i++)
                 {
-                    string data = br.ReadByteString(80);
+                    string data = this.ReadByteString(dataView, 80);
 
                     if (!foundEnd)
                     {
@@ -164,11 +174,11 @@ namespace wwtlib
                             foundEnd = true;
                             // Check for XTENSION
                             i++;
-                            data = br.ReadByteString(80);
+                            data = this.ReadByteString(dataView, 80);
                             while (String.IsNullOrWhiteSpace(data))
                             {
                                 i++;
-                                data = br.ReadByteString(80);
+                                data = this.ReadByteString(dataView, 80);
                             }
                             keyword = data.Substring(0, 8).TrimEnd();
                             values = data.Substring(10).Split("/");
@@ -180,7 +190,7 @@ namespace wwtlib
                             else
                             {
                                 // Rewind these 80 bytes which could be data
-                                br.SeekRelative(-80);
+                                this.position -= 80;
                             }
                         }
                         else
@@ -228,16 +238,16 @@ namespace wwtlib
                 BufferSize *= AxisSize[axis];
             }
 
-            int bitsPix = Int32.Parse(header["BITPIX"]);
+            int bitpix = Int32.Parse(header["BITPIX"]);
 
-            this.DataType = DataTypes.ByteT;
-            InitDataBytes(br);
+            this.ReadRemainingData(dataView, bitpix);
+            //this.DataType = DataTypes.ByteT;
 
             //switch (bitsPix)
             //{
             //    case 8:
             //        this.DataType = DataTypes.ByteT;
-            //        InitDataBytes(br);
+            //        InitDataBytes(dataView, "getInt8");
             //        break;
             //    case 16:
             //        this.DataType = DataTypes.Int16T;
@@ -423,131 +433,75 @@ namespace wwtlib
         //    }
         //}
         public Float32Array buffer;
-        private void InitDataBytes(BinaryReader br)
-        {
-            //webGlArray.buffer = new WebGLArrayBuffer();
-            //DataBuffer = buffer;
-            buffer = br.ReadRemainingI16(BufferSize);
-            //for (int i = 0; i < BufferSize; i++)
-            //{
-            //    this.position += 1;
-                //if (MinVal > (double)buffer[i])
-                //{
-                //    MinVal = (double)buffer[i];
-                //}
-                //if (MaxVal < (double)buffer[i])
-                //{
-                //    MaxVal = (double)buffer[i];
-                //}
-            //}
-        }
+        //private void InitDataBytes(DataView dataView)
+        //{
+        //    //webGlArray.buffer = new WebGLArrayBuffer();
+        //    //DataBuffer = buffer;
+        //    buffer = br.ReadRemainingI16(BufferSize);
+        //    //for (int i = 0; i < BufferSize; i++)
+        //    //{
+        //    //    this.position += 1;
+        //        //if (MinVal > (double)buffer[i])
+        //        //{
+        //        //    MinVal = (double)buffer[i];
+        //        //}
+        //        //if (MaxVal < (double)buffer[i])
+        //        //{
+        //        //    MaxVal = (double)buffer[i];
+        //        //}
+        //    //}
+        //}
 
-        private void InitDataShort(BinaryReader br)
+        private Float32Array ReadRemainingData(DataView dataView, int bitpix)
         {
-            short[] buffer = new Int16[BufferSize];
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
+            int i = 0;
+            buffer = new Float32Array(this.BufferSize);
+            int dataUnitSize = Math.Abs(bitpix) / 8;
+            while (this.position < dataView.byteLength)
             {
-                buffer[i] = (short)((br.ReadSByte() * 256) + (short)br.ReadByte());
-                if (MinVal > (double)buffer[i])
+                switch (bitpix)
                 {
-                    MinVal = (double)buffer[i];
+                    case -64:
+                        buffer[i] = dataView.getFloat64(this.position, false);
+                        break;
+                    case -32:
+                        buffer[i] = dataView.getFloat32(this.position, false);
+                        break;
+                    case 8:
+                        buffer[i] = dataView.getInt8(this.position, false);
+                        break;
+                    case 16:
+                        buffer[i] = dataView.getInt16(this.position, false);
+                        break;
+                    case 32:
+                        buffer[i] = dataView.getInt32(this.position, false);
+                        break;
+                    case 64:
+                        //buffer[i] = dataView.getInt64(this.position, false);
+                        break;
                 }
-                if (MaxVal < (double)buffer[i])
+                if (buffer[i] != this.BlankValue)
                 {
-                    MaxVal = (double)buffer[i];
+                    if (buffer[i] < MinVal)
+                    {
+                        MinVal = buffer[i];
+                    }
+                    if (buffer[i] > MaxVal)
+                    {
+                        MaxVal = buffer[i];
+                    }
                 }
+                i++;
+                this.position += dataUnitSize;
             }
+
+            
+            FitsShader.Min = (float)(this.BZero + MinVal * this.BScale);
+            FitsShader.Max = (float)(this.BZero + MaxVal * this.BScale);
+
+            return buffer;
         }
 
-        private void InitDataUnsignedShort(BinaryReader br)
-        {
-            int[] buffer = new int[BufferSize];
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                buffer[i] = (int)((((short)br.ReadSByte() * 256) + (short)br.ReadByte()) + 32768);
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-
-        private void InitDataInt(BinaryReader br)
-        {
-            int[] buffer = new int[BufferSize];
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                buffer[i] = (br.ReadSByte() << 24) + (br.ReadSByte() << 16) + (br.ReadSByte() << 8) + br.ReadByte();
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-
-        private void InitDataFloat(BinaryReader br)
-        {
-            float[] buffer = new float[BufferSize];
-            DataBuffer = buffer;
-            Uint8Array part = new Uint8Array(4);
-            for (int i = 0; i < BufferSize; i++)
-            {
-                part[3] = br.ReadByte();
-                part[2] = br.ReadByte();
-                part[1] = br.ReadByte();
-                part[0] = br.ReadByte();
-
-                buffer[i] = (new Float32Array(part.buffer, 0, 1))[0];
-
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-
-        private void InitDataDouble(BinaryReader br)
-        {
-            double[] buffer = new double[BufferSize];
-            Uint8Array part = new Uint8Array(8);
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                part[7] = br.ReadByte();
-                part[6] = br.ReadByte();
-                part[5] = br.ReadByte();
-                part[4] = br.ReadByte();
-                part[3] = br.ReadByte();
-                part[2] = br.ReadByte();
-                part[1] = br.ReadByte();
-                part[0] = br.ReadByte();
-                buffer[i] = (new Float64Array(part.buffer, 0, 1))[0];
-
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
         public ScaleTypes lastScale = ScaleTypes.Linear;
         public double lastBitmapMin = 0;
         public double lastBitmapMax = 0;
