@@ -196,7 +196,7 @@ All participation in WWT communities is conditioned on your adherence to the
 
 The AAS WorldWide Telescope system is a [.NET Foundation] project. Work on WWT
 has been supported by the [American Astronomical Society] (AAS), the US
-[National Science Foundation] (grants [1550701] and [1642446]), the [Gordon
+[National Science Foundation] (grants [1550701], [1642446], and [2004840]), the [Gordon
 and Betty Moore Foundation], and [Microsoft].
 
 [American Astronomical Society]: https://aas.org/
@@ -204,6 +204,7 @@ and Betty Moore Foundation], and [Microsoft].
 [National Science Foundation]: https://www.nsf.gov/
 [1550701]: https://www.nsf.gov/awardsearch/showAward?AWD_ID=1550701
 [1642446]: https://www.nsf.gov/awardsearch/showAward?AWD_ID=1642446
+[2004840]: https://www.nsf.gov/awardsearch/showAward?AWD_ID=2004840
 [Gordon and Betty Moore Foundation]: https://www.moore.org/
 [Microsoft]: https://www.microsoft.com/
 
