@@ -104,8 +104,6 @@ namespace wwtlib
         public DataTypes DataType = DataTypes.None;
         public bool ContainsBlanks = false;
         public double BlankValue = double.MinValue;
-        public static double MaxVal = double.MinValue;
-        public static double MinVal = double.MaxValue;
         public bool TransparentBlack = true;
 
         public int lastMin = 0;
@@ -215,19 +213,16 @@ namespace wwtlib
             if (ContainsBlanks)
             {
                 BlankValue = Double.Parse(header["BLANK"]);
-                FitsShader.BlankValue = (float)BlankValue;
             }
 
             if (header.ContainsKey("BZERO"))
             {
                 BZero = Double.Parse(header["BZERO"]);
-                FitsShader.BZero = (float)BZero;
             }
 
             if (header.ContainsKey("BSCALE"))
             {
                 BScale = Double.Parse(header["BSCALE"]);
-                FitsShader.BScale = (float)BScale;
             }
 
             AxisSize = new int[NumAxis];
@@ -480,25 +475,11 @@ namespace wwtlib
                         //buffer[i] = dataView.getInt64(this.position, false);
                         break;
                 }
-                if (buffer[i] != this.BlankValue)
-                {
-                    if (buffer[i] < MinVal)
-                    {
-                        MinVal = buffer[i];
-                    }
-                    if (buffer[i] > MaxVal)
-                    {
-                        MaxVal = buffer[i];
-                    }
-                }
                 i++;
                 this.position += dataUnitSize;
             }
 
             
-            FitsShader.Min = (float)(this.BZero + MinVal * this.BScale);
-            FitsShader.Max = (float)(this.BZero + MaxVal * this.BScale);
-
             return buffer;
         }
 
@@ -510,12 +491,6 @@ namespace wwtlib
 
         override public Bitmap GetBitmap()
         {
-            if (lastBitmapMax == 0 && lastBitmapMin == 0)
-            {
-                lastBitmapMin = MinVal;
-                lastBitmapMax = MaxVal;
-            }
-
             return GetScaledBitmap(lastBitmapMin, lastBitmapMax, lastScale, lastBitmapZ, lastBitmapColorMapperName);
         }
 

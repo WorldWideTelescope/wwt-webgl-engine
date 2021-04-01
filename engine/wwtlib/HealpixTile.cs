@@ -433,6 +433,11 @@ namespace wwtlib
             }
             else
             {
+                FitsShader.Min = (float)dataset.HipsProperties.MinVal;
+                FitsShader.Max = (float)dataset.HipsProperties.MaxVal;
+                FitsShader.BlankValue = (float)dataset.HipsProperties.BlankValue;
+                FitsShader.BZero = (float)dataset.HipsProperties.BZero;
+                FitsShader.BScale = (float)dataset.HipsProperties.BScale;
                 FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
             }
             renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
@@ -692,6 +697,10 @@ namespace wwtlib
                                 ReadyToRender = texReady && (DemReady || !demTile);
                                 RequestPending = false;
                                 MakeTexture();
+                                dataset.HipsProperties.BlankValue = fitsImage.BlankValue;
+                                dataset.HipsProperties.BZero= fitsImage.BZero;
+                                dataset.HipsProperties.BScale = fitsImage.BScale;
+                                dataset.HipsProperties.ContainsBlanks = fitsImage.ContainsBlanks;
                             }
                         });
                     } else

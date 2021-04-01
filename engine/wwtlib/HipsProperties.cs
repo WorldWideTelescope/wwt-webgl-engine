@@ -31,6 +31,13 @@ namespace wwtlib
         private string datasetName;
         private Action onDownloadComplete;
 
+        public double BZero = 0;
+        public double BScale = 1;
+        public bool ContainsBlanks = false;
+        public double BlankValue = double.MinValue;
+        public double MaxVal = double.MinValue;
+        public double MinVal = double.MaxValue;
+
         public HipsProperties (string datasetUrl, string datasetName)
         {
             this.datasetName = datasetName;
@@ -61,6 +68,12 @@ namespace wwtlib
                     catalogColumnInfo = VoTable.LoadFromUrl(url.Replace("/properties", "/metadata.xml"), OnCatalogMetadataDownloadComplete);
                 } else
                 {
+                    if (Properties.ContainsKey("hips_pixel_cut"))
+                    {
+                        string hips_pixel_cut = Properties["hips_pixel_cut"];
+                        this.MinVal = Double.Parse(Properties["hips_pixel_cut"].Split(" ")[0]);
+                        this.MaxVal = Double.Parse(Properties["hips_pixel_cut"].Split(" ")[1]);
+                    }
                     downloadComplete = true;
                     if(onDownloadComplete != null)
                     {
