@@ -270,6 +270,14 @@ namespace wwtlib
             }
         }
 
+        public void ChangeCutsForFitsHips(string hipsName, double min, double max)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.ChangeCutsForFitsHips(hipsName, min , max);
+            }
+        }
+
         public void HideUI(bool hide)
         {
             //todo enable

@@ -2598,7 +2598,21 @@ namespace wwtlib
             }
         }
 
-        private SimpleLineList crossHairs = null;
+        public void ChangeCutsForFitsHips(string hipsName, double min, double max)
+        {
+            Imageset hips = GetImagesetByName(hipsName);
+            if (hips != null && hips.HipsProperties != null)
+            {
+                hips.HipsProperties.MinVal = min;
+                hips.HipsProperties.MaxVal = max;
+            } else
+            {
+                Script.Literal("console.log({0} + ' not found')", hipsName);
+            }
+        }
+
+
+private SimpleLineList crossHairs = null;
 
         private void DrawCrosshairs(RenderContext context)
         {
