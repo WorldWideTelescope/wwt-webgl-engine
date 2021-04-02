@@ -1426,7 +1426,6 @@ namespace wwtlib
             Tile.uvMultiple = 1;
             Tile.DemEnabled = true;
 
-            FitsShader.Init(this);
             TileShader.Init(this);
         }
 
