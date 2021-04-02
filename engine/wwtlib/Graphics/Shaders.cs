@@ -1787,11 +1787,7 @@ namespace wwtlib
         public static WebGLUniformLocation minLoc;
         public static WebGLUniformLocation maxLoc;
         public static WebGLUniformLocation scalingLocation;
-
-        public static WebGLUniformLocation sunLoc;
         public static WebGLUniformLocation opacityLoc;
-        public static WebGLUniformLocation minBrightnessLoc;
-        public static WebGLUniformLocation atmosphereColorLoc;
 
         public static bool initialized = false;
         public static void Init(RenderContext renderContext)
@@ -1813,9 +1809,6 @@ namespace wwtlib
                 uniform float max;
                 uniform int scalingFunction;
                 uniform float opacity;
-                uniform vec3 uSunPosition;
-                uniform float uMinBrightness;
-                uniform vec3 uAtmosphereColor;
                 void main(void) {
                     vec4 color = texture(uSampler, vTextureCoord);
                     vec4 newColor = vec4(color.r, color.r, color.r, 1.0);
@@ -1894,10 +1887,7 @@ namespace wwtlib
             minLoc = gl.getUniformLocation(prog, "min");
             maxLoc = gl.getUniformLocation(prog, "max");
             scalingLocation = gl.getUniformLocation(prog, "scalingFunction");
-            sunLoc = gl.getUniformLocation(prog, "uSunPosition");
-            minBrightnessLoc = gl.getUniformLocation(prog, "uMinBrightness");
             opacityLoc = gl.getUniformLocation(prog, "opacity");
-            atmosphereColorLoc = gl.getUniformLocation(prog, "uAtmosphereColor");
 
             Tile.uvMultiple = 1;
             Tile.DemEnabled = true;
@@ -1908,10 +1898,6 @@ namespace wwtlib
         }
 
         private static WebGLProgram prog = null;
-        public static Vector3d SunPosition = Vector3d.Create(-1, -1, -1);
-        public static float MinLightingBrightness = 1.0f;
-
-        public static Color AtmosphereColor = Color.FromArgb(0, 0, 0, 0);
         public static float BlankValue = 0f;
         public static float BScale = 1f;
         public static float BZero = 0f;
@@ -1937,31 +1923,10 @@ namespace wwtlib
 
                 Matrix3d mvMat = Matrix3d.MultiplyMatrix(renderContext.World, renderContext.View);
                 gl.uniform1f(opacityLoc, opacity);
-                gl.uniform1f(minBrightnessLoc, renderContext.Lighting ? MinLightingBrightness : 1.0f);
-
-                if (renderContext.Lighting)
-                {
-                    gl.uniform3f(atmosphereColorLoc, AtmosphereColor.R / 255.0f, AtmosphereColor.G / 255.0f, AtmosphereColor.B / 255.0f);
-                }
-                else
-                {
-                    gl.uniform3f(atmosphereColorLoc, 0f, 0f, 0f);
-                }
 
                 gl.uniformMatrix4fv(mvMatLoc, false, mvMat.FloatArray());
                 gl.uniformMatrix4fv(projMatLoc, false, renderContext.Projection.FloatArray());
-                SunPosition.Normalize();
 
-                Matrix3d mvInv = renderContext.View.Clone();
-                mvInv.M41 = 0;
-                mvInv.M42 = 0;
-                mvInv.M43 = 0;
-                mvInv.M44 = 1;
-                Vector3d sp = Vector3d.TransformCoordinate(SunPosition, mvInv);
-                sp.Normalize();
-
-
-                gl.uniform3f(sunLoc, -(float)sp.X, -(float)sp.Y, -(float)sp.Z);
 
                 gl.uniform1i(sampLoc, 0);
 

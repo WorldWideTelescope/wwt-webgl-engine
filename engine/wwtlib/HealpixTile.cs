@@ -643,7 +643,7 @@ namespace wwtlib
                     if (GetHipsFileExtention() == ".fits" && RenderContext.UseGlVersion2)
                     {
                         PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
-                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, fitsImage.AxisSize[0], fitsImage.AxisSize[1], 0, GL.RED, GL.FLOAT, fitsImage.buffer);
+                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
                     }
@@ -686,7 +686,7 @@ namespace wwtlib
                     Downloading = true;
                     if (RenderContext.UseGlVersion2)
                     {
-                        fitsImage = FitsImageWebGL.CreateHipsTile(URL, delegate (WcsImage wcsImage)
+                        fitsImage = new FitsImageWebGL(URL, delegate (WcsImage wcsImage)
                         {
                             Downloading = false;
                             errored = fitsImage.errored;

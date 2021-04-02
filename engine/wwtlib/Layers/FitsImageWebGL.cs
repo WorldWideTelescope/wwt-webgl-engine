@@ -1,47 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Html;
-using System.Xml;
-using System.Net;
 using System.Html.Data.Files;
-using System.Html.Media.Graphics;
 
 namespace wwtlib
 {
     public class FitsImageWebGL : WcsImage
     {
-        Dictionary<String, String> header = new Dictionary<string, string>();
-        public static FitsImageWebGL Last = null;
-
-        private WcsLoaded callBack;
-
-        public bool isHipsTile = false;
-
         public bool errored = false;
-        public static FitsImageWebGL CreateHipsTile(string file, WcsLoaded callMeBack)
-        {
-            FitsImageWebGL fits = new FitsImageWebGL(file, null, callMeBack);
-            fits.isHipsTile = true;
-            return fits;
-        }
+        public int NumAxis = 0;
+        public double BZero = 0;
+        public double BScale = 1;
+        public int[] AxisSize;
+        public bool ContainsBlanks = false;
+        public double BlankValue = double.MinValue;
+        public Float32Array dataUnit;
 
-        public FitsImageWebGL(string file, Blob blob, WcsLoaded callMeBack)
+        private readonly Dictionary<String, String> header = new Dictionary<string, string>();
+        private readonly WcsLoaded callBack;
+        private WebFile webFile;
+        private bool parseSuccessful = false;
+        private int position = 0;
+        private int BufferSize = 1;
+
+        public FitsImageWebGL(string file, WcsLoaded callMeBack)
         {
-            Last = this;
             callBack = callMeBack;
             filename = file;
-            if (blob != null)
-            {
-                ReadFromBlob(blob);
-            }
-            else
-            {
-                GetFile(file);
-            }
+            GetFile(file);
         }
-
-        WebFile webFile;
 
         public void GetFile(string url)
         {
@@ -64,16 +51,13 @@ namespace wwtlib
             }
             else if (webFile.State == StateType.Received)
             {
-                System.Html.Data.Files.Blob mainBlob = (System.Html.Data.Files.Blob)webFile.GetBlob();
+                Blob mainBlob = webFile.GetBlob();
                 ReadFromBlob(mainBlob);
             }
         }
 
-        public Blob sourceBlob = null;
-
         private void ReadFromBlob(Blob blob)
         {
-            sourceBlob = blob;
             FileReader chunck = new FileReader();
             chunck.OnLoadEnd = delegate (System.Html.Data.Files.FileProgressEvent e)
             {
@@ -85,45 +69,6 @@ namespace wwtlib
                 }
             };
             chunck.ReadAsArrayBuffer(blob);
-        }
-
-        private void ReadFromBin(DataView dataView)
-        {
-            ParseHeader(dataView);
-        }
-
-
-        public int Width = 0;
-        public int Height = 0;
-        public int NumAxis = 0;
-        public double BZero = 0;
-        public double BScale = 1;
-        public int[] AxisSize;
-        public object DataBuffer;
-        public DataTypes DataType = DataTypes.None;
-        public bool ContainsBlanks = false;
-        public double BlankValue = double.MinValue;
-        public bool TransparentBlack = true;
-
-        public int lastMin = 0;
-        public int lastMax = 255;
-        bool color = false;
-        private bool parseSuccessful = false;
-        private int position = 0;
-
-        public static bool IsGzip(BinaryReader br)
-        {
-
-            byte[] line = br.ReadBytes(2);
-            br.Seek(0);
-            if (line[0] == 31 && line[1] == 139)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         private string ReadByteString(DataView dataView, int count)
@@ -145,7 +90,7 @@ namespace wwtlib
             return keyword.ToUpperCase() == "SIMPLE";
         }
 
-        public void ParseHeader(DataView dataView)
+        public void ReadFromBin(DataView dataView)
         {
             if (!ValidateFitsSimple(dataView))
             {
@@ -154,7 +99,6 @@ namespace wwtlib
             }
 
             bool foundEnd = false;
-
 
             while (!foundEnd)
             {
@@ -178,7 +122,6 @@ namespace wwtlib
                                 data = this.ReadByteString(dataView, 80);
                             }
                             keyword = data.Substring(0, 8).TrimEnd();
-                            values = data.Substring(10).Split("/");
                             if (keyword.ToUpperCase() == "XTENSION")
                             {
                                 // We have additional headers
@@ -234,20 +177,12 @@ namespace wwtlib
 
             int bitpix = Int32.Parse(header["BITPIX"]);
 
-            this.ReadRemainingData(dataView, bitpix);
+            this.ReadDataUnit(dataView, bitpix);
 
             if (NumAxis > 1)
             {
-                if (NumAxis == 3)
-                {
-                    if (AxisSize[2] == 3)
-                    {
-                        color = true;
-                    }
-                }
-
-                sizeX = Width = AxisSize[0];
-                sizeY = Height = AxisSize[1];
+                sizeX = AxisSize[0];
+                sizeY = AxisSize[1];
             }
             parseSuccessful = true;
         }
@@ -267,7 +202,6 @@ namespace wwtlib
                     {
                         header[keyword.ToUpperCase()] = values[0].Trim();
                     }
-
                 }
                 catch
                 {
@@ -275,14 +209,10 @@ namespace wwtlib
             }
         }
 
-        int BufferSize = 1;
-
-        public Float32Array buffer;
-
-        private Float32Array ReadRemainingData(DataView dataView, int bitpix)
+        private Float32Array ReadDataUnit(DataView dataView, int bitpix)
         {
             int i = 0;
-            buffer = new Float32Array(this.BufferSize);
+            dataUnit = new Float32Array(this.BufferSize);
             int dataUnitSize = Math.Abs(bitpix) / 8;
             while (this.position < dataView.byteLength)
             {
@@ -290,19 +220,19 @@ namespace wwtlib
                 switch (bitpix)
                 {
                     case -64:
-                        buffer[i] = dataView.getFloat64(this.position, false);
+                        dataUnit[i] = dataView.getFloat64(this.position, false);
                         break;
                     case -32:
-                        buffer[i] = dataView.getFloat32(this.position, false);
+                        dataUnit[i] = dataView.getFloat32(this.position, false);
                         break;
                     case 8:
-                        buffer[i] = dataView.getInt8(this.position, false);
+                        dataUnit[i] = dataView.getInt8(this.position, false);
                         break;
                     case 16:
-                        buffer[i] = dataView.getInt16(this.position, false);
+                        dataUnit[i] = dataView.getInt16(this.position, false);
                         break;
                     case 32:
-                        buffer[i] = dataView.getInt32(this.position, false);
+                        dataUnit[i] = dataView.getInt32(this.position, false);
                         break;
                     case 64:
                         //buffer[i] = dataView.getInt64(this.position, false);
@@ -312,12 +242,7 @@ namespace wwtlib
                 this.position += dataUnitSize;
             }
 
-
-            return buffer;
+            return dataUnit;
         }
-
-        public ScaleTypes lastScale = ScaleTypes.Linear;
     }
-
-
 }
