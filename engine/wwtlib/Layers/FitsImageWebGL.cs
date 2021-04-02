@@ -55,7 +55,6 @@ namespace wwtlib
         {
             if (webFile.State == StateType.Error)
             {
-                Script.Literal("console.log({0})", webFile.Message);
                 errored = true;
                 if (callBack != null)
                 {
@@ -287,6 +286,7 @@ namespace wwtlib
             int dataUnitSize = Math.Abs(bitpix) / 8;
             while (this.position < dataView.byteLength)
             {
+                //TODO move switch outside loop
                 switch (bitpix)
                 {
                     case -64:
