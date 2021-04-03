@@ -226,7 +226,7 @@ namespace wwtlib
                         dataUnit[i] = dataView.getFloat32(this.position, false);
                         break;
                     case 8:
-                        dataUnit[i] = dataView.getInt8(this.position, false);
+                        dataUnit[i] = dataView.getUint8(this.position);
                         break;
                     case 16:
                         dataUnit[i] = dataView.getInt16(this.position, false);

@@ -917,7 +917,6 @@ namespace System.Html
         public int getUint8 (int position) { return 0; }
         public int getFloat64 (int position, bool littleEndian) { return 0; }
         public int getFloat32 (int position, bool littleEndian) { return 0; }
-        public int getInt8 (int position, bool littleEndian) { return 0; }
         public int getInt16(int position, bool littleEndian) { return 0; }
         public int getInt32(int position, bool littleEndian) { return 0; }
         //public int getInt64(int position, bool littleEndian) { return 0; }
