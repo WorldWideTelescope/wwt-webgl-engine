@@ -1809,14 +1809,28 @@ namespace wwtlib
                 uniform float bscale;
                 uniform float min;
                 uniform float max;
-                uniform int scalingFunction;
+                uniform int scaleType;
                 uniform float opacity;
+                float e = 2.71828182845904523536028747135266249775724709369995;
                 void main(void) {
                     vec4 color = texture(uSampler, vTextureCoord);
                     if(abs(blank - color.r) < 0.00000001){
                         fragmentColor = vec4(0.0, 0.0, 0.0, 0.0);
                     } else {
                         float physicalValue = clamp((bzero + bscale * color.r - min) / (max - min), 0.0, 1.0);
+
+                        switch(scaleType){
+                            case 1:
+                                physicalValue = log(physicalValue * (e - 1.0) + 1.0);
+                                break;
+                            case 2:
+                                physicalValue = physicalValue * physicalValue;
+                                break;
+                            case 3:
+                                physicalValue = sqrt(physicalValue);
+                                break;
+                        }
+
 		                vec4 colorFromColorMapper = texture(colorSampler, vec2(physicalValue, 0.5));
 		                fragmentColor = vec4(colorFromColorMapper.rgb, 1.0);
                     }
@@ -1888,7 +1902,7 @@ namespace wwtlib
             bscale = gl.getUniformLocation(prog, "bscale");
             minLoc = gl.getUniformLocation(prog, "min");
             maxLoc = gl.getUniformLocation(prog, "max");
-            scalingLocation = gl.getUniformLocation(prog, "scalingFunction");
+            scalingLocation = gl.getUniformLocation(prog, "scaleType");
             opacityLoc = gl.getUniformLocation(prog, "opacity");
 
             Tile.uvMultiple = 1;
@@ -1905,7 +1919,7 @@ namespace wwtlib
         public static float BZero = 0f;
         public static float Min = 0f;
         public static float Max = 0f;
-        public static int ScalingFunction = 0;
+        public static int ScaleType = 0;
         public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth)
         {
             if (texture == null)
@@ -1938,7 +1952,7 @@ namespace wwtlib
                 gl.uniform1f(bscale, BScale);
                 gl.uniform1f(minLoc, Min);
                 gl.uniform1f(maxLoc, Max);
-                gl.uniform1i(scalingLocation, ScalingFunction);
+                gl.uniform1i(scalingLocation, ScaleType);
 
                 if (renderContext.Space || noDepth)
                 {

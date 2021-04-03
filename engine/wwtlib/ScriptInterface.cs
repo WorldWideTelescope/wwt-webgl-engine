@@ -286,6 +286,15 @@ namespace wwtlib
             }
         }
 
+        public void SetScaleTypeForFitsHips(string hipsName, ScaleTypes scaleType)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.SetScaleTypeForFitsHips(hipsName, scaleType);
+            }
+        }
+
+
         public void HideUI(bool hide)
         {
             //todo enable

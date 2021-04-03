@@ -2624,6 +2624,19 @@ namespace wwtlib
             }
         }
 
+        public void SetScaleTypeForFitsHips(string hipsName, ScaleTypes scaleType)
+        {
+            Imageset hips = GetImagesetByName(hipsName);
+            if (hips != null && hips.HipsProperties != null)
+            {
+                hips.HipsProperties.ScaleType = scaleType;
+            }
+            else
+            {
+                Script.Literal("console.log({0} + ' not found')", hipsName);
+            }
+        }
+        
 
         private SimpleLineList crossHairs = null;
 

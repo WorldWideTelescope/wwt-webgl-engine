@@ -38,6 +38,8 @@ namespace wwtlib
         public double MaxVal = double.MinValue;
         public double MinVal = double.MaxValue;
         public string ColorMapName = "gray";
+        public ScaleTypes ScaleType = ScaleTypes.Linear;
+
 
         public HipsProperties (string datasetUrl, string datasetName)
         {

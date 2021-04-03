@@ -433,6 +433,7 @@ namespace wwtlib
                 FitsShader.BlankValue = (float)dataset.HipsProperties.BlankValue;
                 FitsShader.BZero = (float)dataset.HipsProperties.BZero;
                 FitsShader.BScale = (float)dataset.HipsProperties.BScale;
+                FitsShader.ScaleType = (int)dataset.HipsProperties.ScaleType;
                 FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
             }
             renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
