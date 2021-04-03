@@ -194,12 +194,6 @@ namespace wwtlib
             ProcessIndexBuffer(indexArray, x * 2 + y);
         }
 
-        private static string ReplaceInvalidChars(string filename)
-        {
-            return filename;
-            //return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
-        }
-
         private string GetUrl(Imageset dataset, int level, int x, int y)
         {
             string extention = GetHipsFileExtention();
@@ -433,6 +427,7 @@ namespace wwtlib
             }
             else
             {
+                ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.HipsProperties.ColorMapName);
                 FitsShader.Min = (float)dataset.HipsProperties.MinVal;
                 FitsShader.Max = (float)dataset.HipsProperties.MaxVal;
                 FitsShader.BlankValue = (float)dataset.HipsProperties.BlankValue;

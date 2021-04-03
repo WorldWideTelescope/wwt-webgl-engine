@@ -1,5 +1,6 @@
+using System;
 using System.Collections.Generic;
-
+using System.Html;
 
 namespace wwtlib
 {
@@ -13,6 +14,7 @@ namespace wwtlib
         // be created by providing a sufficient number of colors (ideally 256 or more).
 
         public List<Color> colors = new List<Color>();
+        public static Dictionary<string, WebGLTexture> ColorTextures = new Dictionary<string, WebGLTexture>();
 
         public static ColorMapContainer FromArgbList(List<List<float>> color_list)
         {
@@ -96,6 +98,64 @@ namespace wwtlib
                     return RdYlBu;
             }
             return null;
+        }
+
+
+        private static WebGLTexture GetTextureFromName(GL gl, string name)
+        {
+            WebGLTexture texture = ColorTextures[name];
+            if (texture == null)
+            {
+                ColorMapContainer colorMapContainer = FromNamedColormap(name);
+                if (colorMapContainer != null)
+                {
+                    texture = InitColorTexture(gl, colorMapContainer);
+                    ColorTextures[name.ToLowerCase()] = texture;
+                }
+            }
+
+            return texture;
+        }
+
+        public static void BindColorMapTexture(GL gl, string colorMapName)
+        {
+            WebGLTexture texture = GetTextureFromName(gl, colorMapName);
+            if (texture == null)
+            {
+                texture = GetTextureFromName(gl, "gray");
+            }
+            gl.activeTexture(GL.TEXTURE1);
+            gl.bindTexture(GL.TEXTURE_2D, texture);
+        }
+
+        private static WebGLTexture InitColorTexture(GL gl, ColorMapContainer colorMapContainer)
+        {
+            WebGLTexture colorTexture = gl.createTexture();
+            gl.activeTexture(GL.TEXTURE1);
+
+            gl.bindTexture(GL.TEXTURE_2D, colorTexture);
+            gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+            gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+
+            Uint8Array colorBuffer = ExtractColorArray(colorMapContainer.colors);
+
+            gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB8, colorBuffer.length / 3, 1, 0, GL.RGB, GL.UNSIGNED_BYTE, colorBuffer);
+            gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+            gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
+            return colorTexture;
+        }
+
+        private static Uint8Array ExtractColorArray(List<Color> colors)
+        {
+            int index = 0;
+            Uint8Array colorBuffer = new Uint8Array(colors.Count * 3);
+            foreach (Color color in colors)
+            {
+                colorBuffer[index++] = (byte)color.R;
+                colorBuffer[index++] = (byte)color.G;
+                colorBuffer[index++] = (byte)color.B;
+            }
+            return colorBuffer;
         }
 
         // The colormaps below were produced using the following Python code:

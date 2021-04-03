@@ -37,6 +37,7 @@ namespace wwtlib
         public double BlankValue = double.MinValue;
         public double MaxVal = double.MinValue;
         public double MinVal = double.MaxValue;
+        public string ColorMapName = "gray";
 
         public HipsProperties (string datasetUrl, string datasetName)
         {

@@ -1781,6 +1781,7 @@ namespace wwtlib
         public static WebGLUniformLocation projMatLoc;
         public static WebGLUniformLocation mvMatLoc;
         public static WebGLUniformLocation sampLoc;
+        public static WebGLUniformLocation colorLoc;
         public static WebGLUniformLocation blank;
         public static WebGLUniformLocation bzero;
         public static WebGLUniformLocation bscale;
@@ -1802,6 +1803,7 @@ namespace wwtlib
                 out vec4 fragmentColor;
 
                 uniform sampler2D uSampler;
+                uniform sampler2D colorSampler;
                 uniform float blank;
                 uniform float bzero;
                 uniform float bscale;
@@ -1811,15 +1813,14 @@ namespace wwtlib
                 uniform float opacity;
                 void main(void) {
                     vec4 color = texture(uSampler, vTextureCoord);
-                    vec4 newColor = vec4(color.r, color.r, color.r, 1.0);
                     if(abs(blank - color.r) < 0.00000001){
-                        newColor = vec4(0.0, 0.0, 0.0, 0.0);
+                        fragmentColor = vec4(0.0, 0.0, 0.0, 0.0);
                     } else {
-                        float physicalValue = bzero + bscale * color.r;
-                        physicalValue = clamp((physicalValue - min) / (max - min), 0.0, 1.0);
-                        newColor = vec4(physicalValue, physicalValue, physicalValue, 1.0);
+                        float physicalValue = clamp((bzero + bscale * color.r - min) / (max - min), 0.0, 1.0);
+		                vec4 colorFromColorMapper = texture(colorSampler, vec2(physicalValue, 0.5));
+		                fragmentColor = vec4(colorFromColorMapper.rgb, 1.0);
                     }
-                    fragmentColor = newColor;
+
                 }";
 
             String vertexShaderText =
@@ -1881,6 +1882,7 @@ namespace wwtlib
             projMatLoc = gl.getUniformLocation(prog, "uPMatrix");
             mvMatLoc = gl.getUniformLocation(prog, "uMVMatrix");
             sampLoc = gl.getUniformLocation(prog, "uSampler");
+            colorLoc = gl.getUniformLocation(prog, "colorSampler");
             blank = gl.getUniformLocation(prog, "blank");
             bzero = gl.getUniformLocation(prog, "bzero");
             bscale = gl.getUniformLocation(prog, "bscale");
@@ -1929,6 +1931,7 @@ namespace wwtlib
 
 
                 gl.uniform1i(sampLoc, 0);
+                gl.uniform1i(colorLoc, 1);
 
                 gl.uniform1f(blank, BlankValue);
                 gl.uniform1f(bzero, BZero);

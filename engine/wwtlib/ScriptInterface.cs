@@ -270,11 +270,19 @@ namespace wwtlib
             }
         }
 
-        public void ChangeCutsForFitsHips(string hipsName, double min, double max)
+        public void SetCutsForFitsHips(string hipsName, double min, double max)
         {
             if (WWTControl.Singleton != null)
             {
-                WWTControl.Singleton.ChangeCutsForFitsHips(hipsName, min , max);
+                WWTControl.Singleton.SetCutsForFitsHips(hipsName, min , max);
+            }
+        }
+
+        public void SetColorMapForFitsHips(string hipsName, string colorMapName)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.SetColorMapForFitsHips(hipsName, colorMapName);
             }
         }
 

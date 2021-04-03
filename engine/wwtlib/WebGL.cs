@@ -192,6 +192,7 @@ namespace System.Html
         public const int REPEAT = 10497;
         public const int REPLACE = 7681;
         public const int RGB = 6407;
+        public const int RGB8 = 32849;
         public const int RGB5_A1 = 32855;
         public const int RGB565 = 36194;
         public const int RGBA = 6408;

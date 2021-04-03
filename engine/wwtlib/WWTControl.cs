@@ -2598,7 +2598,7 @@ namespace wwtlib
             }
         }
 
-        public void ChangeCutsForFitsHips(string hipsName, double min, double max)
+        public void SetCutsForFitsHips(string hipsName, double min, double max)
         {
             Imageset hips = GetImagesetByName(hipsName);
             if (hips != null && hips.HipsProperties != null)
@@ -2611,8 +2611,21 @@ namespace wwtlib
             }
         }
 
+        public void SetColorMapForFitsHips(string hipsName, string colorMapName)
+        {
+            Imageset hips = GetImagesetByName(hipsName);
+            if (hips != null && hips.HipsProperties != null)
+            {
+                hips.HipsProperties.ColorMapName = colorMapName;
+            }
+            else
+            {
+                Script.Literal("console.log({0} + ' not found')", hipsName);
+            }
+        }
 
-private SimpleLineList crossHairs = null;
+
+        private SimpleLineList crossHairs = null;
 
         private void DrawCrosshairs(RenderContext context)
         {
