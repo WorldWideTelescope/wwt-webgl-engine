@@ -211,38 +211,84 @@ namespace wwtlib
 
         private Float32Array ReadDataUnit(DataView dataView, int bitpix)
         {
-            int i = 0;
             dataUnit = new Float32Array(this.BufferSize);
-            int dataUnitSize = Math.Abs(bitpix) / 8;
-            while (this.position < dataView.byteLength)
+            switch (bitpix)
             {
-                //TODO move switch outside loop
-                switch (bitpix)
-                {
-                    case -64:
-                        dataUnit[i] = dataView.getFloat64(this.position, false);
-                        break;
-                    case -32:
-                        dataUnit[i] = dataView.getFloat32(this.position, false);
-                        break;
-                    case 8:
-                        dataUnit[i] = dataView.getUint8(this.position);
-                        break;
-                    case 16:
-                        dataUnit[i] = dataView.getInt16(this.position, false);
-                        break;
-                    case 32:
-                        dataUnit[i] = dataView.getInt32(this.position, false);
-                        break;
-                    case 64:
-                        //buffer[i] = dataView.getInt64(this.position, false);
-                        break;
-                }
-                i++;
-                this.position += dataUnitSize;
+                case -64:
+                    ReadDataUnitFloat64(dataView);
+                    break;
+                case -32:
+                    ReadDataUnitFloat32(dataView);
+                    break;
+                case 8:
+                    ReadDataUnitUint8(dataView);
+                    break;
+                case 16:
+                    ReadDataUnitInt16(dataView);
+                    break;
+                case 32:
+                    ReadDataUnitInt32(dataView);
+                    break;
+                case 64:
+                    //ReadDataUnitInt64(dataView);
+                    break;
             }
 
             return dataUnit;
         }
+
+        private void ReadDataUnitFloat64(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getFloat64(this.position, false);
+                i++;
+                this.position += 8;
+            }
+        }
+
+        private void ReadDataUnitFloat32(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getFloat32(this.position, false);
+                i++;
+                this.position += 4;
+            }
+        }
+        private void ReadDataUnitUint8(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getUint8(this.position);
+                i++;
+                this.position += 1;
+            }
+        }
+        private void ReadDataUnitInt16(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getInt16(this.position, false);
+                i++;
+                this.position += 2;
+            }
+        }
+
+        private void ReadDataUnitInt32(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getInt32(this.position, false);
+                i++;
+                this.position += 4;
+            }
+        }
+
     }
 }
