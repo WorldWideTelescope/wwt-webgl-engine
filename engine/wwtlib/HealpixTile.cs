@@ -603,11 +603,7 @@ namespace wwtlib
                     case 0:
                     case 1:
                     case 2:
-                        step = 64;
-                        break;
                     case 3:
-                        step = 32;
-                        break;
                     case 4:
                         step = 16;
                         break;
