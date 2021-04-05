@@ -230,6 +230,8 @@ namespace wwtlib
                     ReadDataUnitInt32(dataView);
                     break;
                 case 64:
+                    // 64 bit integers not supported by Safari
+                    Script.Literal("console.log('64 bit integer FITS are not yet supported')");
                     //ReadDataUnitInt64(dataView);
                     break;
             }
