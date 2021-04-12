@@ -2559,6 +2559,11 @@ namespace wwtlib
             }
         }
 
+        public void AddCatalogHips(Imageset catalogHips)
+        {
+            RenderContext.AddCatalogHips(catalogHips, null);
+        }
+
         public void AddCatalogHipsByName(string name)
         {
             AddCatalogHipsByNameWithCallback(name, null);

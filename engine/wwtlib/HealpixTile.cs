@@ -617,8 +617,23 @@ namespace wwtlib
                     catalogData.Send();
                 }
             }
-            else
+            else if (GetHipsFileExtention() == ".fits")
             {
+                if(!Downloading && !ReadyToRender)
+                {
+                    Downloading = true;
+                    FitsImage image = FitsImage.CreateHipsTile(URL, delegate (WcsImage wcsImage)
+                    {
+                        texReady = true;
+                        Downloading = false;
+                        errored = false;
+                        ReadyToRender = texReady && (DemReady || !demTile);
+                        RequestPending = false;
+                        TileCache.RemoveFromQueue(this.Key, true);
+                        texture2d = wcsImage.GetBitmap().GetTexture();
+                    });
+                }
+            } else {
                 base.RequestImage();
             }
 

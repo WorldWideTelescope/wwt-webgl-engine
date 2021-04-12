@@ -1,5 +1,12 @@
 # rc: minor bump
 
+- Add an API to add catalog HiPS to the view using its imageset handle
+- Wire in simple support for FITS HiPS using Javascript parsing. Very slow, for
+  now.
+
+
+# @wwtelescope/engine 7.9.0 (2021-03-18)
+
 - Initial support for catalog HiPS data from @imbasimba (#84)! Documentation and
   TypeScript bindings currently lacking but this should get us on the patch of
   demoing the functionality in the web client and wiring it up in the classic
