@@ -26,7 +26,7 @@ namespace wwtlib
         public static int TileTargetLevel = -1;
 
         public int Level;
-       
+
         public int tileX;
 
         public int tileY;
@@ -49,7 +49,7 @@ namespace wwtlib
         protected Vector3d BottomLeft;
 
         public static double uvMultiple = 256;
-  
+
         public static List<Tile> GetFrustumList()
         {
             try
@@ -58,7 +58,7 @@ namespace wwtlib
             }
             catch
             {
-               // return "";
+                // return "";
                 return null;
             }
         }
@@ -79,12 +79,12 @@ namespace wwtlib
 
         public Vector3d localCenter = new Vector3d();
         public int RenderedAtOrBelowGeneration = 0;
- 
-        public void MakeTexture()
+
+        public virtual void MakeTexture()
         {
             if (PrepDevice != null)
             {
-           //     PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
+                //     PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
 
                 try
                 {
@@ -176,7 +176,7 @@ namespace wwtlib
 
         public virtual void RequestImage()
         {
-            if(Dataset.WcsImage != null)
+            if (Dataset.WcsImage != null)
             {
                 texReady = true;
                 Downloading = false;
@@ -193,7 +193,7 @@ namespace wwtlib
                 texture = (ImageElement)Document.CreateElement("img");
                 CrossDomainImage xdomimg = (CrossDomainImage)(object)texture;
 
-                texture.AddEventListener("load", delegate(ElementEvent e)
+                texture.AddEventListener("load", delegate (ElementEvent e)
                 {
                     texReady = true;
                     Downloading = false;
@@ -204,7 +204,7 @@ namespace wwtlib
                     MakeTexture();
                 }, false);
 
-                texture.AddEventListener("error", delegate(ElementEvent e)
+                texture.AddEventListener("error", delegate (ElementEvent e)
                 {
                     if (!texture.HasAttribute("proxyattempt"))
                     {
@@ -226,7 +226,8 @@ namespace wwtlib
                         // the one that may have been updated, `this.URL`.
                         string new_url = URLHelpers.singleton.activateProxy(texture.Src);
 
-                        if (new_url != null) {  // null => don't bother: we know that the proxy won't help
+                        if (new_url != null)
+                        {  // null => don't bother: we know that the proxy won't help
                             texture.Src = new_url;
                             return;
                         }
@@ -295,7 +296,7 @@ namespace wwtlib
 
                 callCount++;
                 XMLHttpRequest2 xhr = new XMLHttpRequest2();
-                xhr.AddEventListener("load", delegate(ElementEvent e)
+                xhr.AddEventListener("load", delegate (ElementEvent e)
                 {
                     DemReady = true;
                     demDownloading = false;
@@ -308,11 +309,11 @@ namespace wwtlib
                     catch
                     {
                     }
-                    
+
                     TileCache.RemoveFromQueue(this.Key, true);
                 }, false);
 
-                xhr.AddEventListener("error", delegate(ElementEvent e)
+                xhr.AddEventListener("error", delegate (ElementEvent e)
                 {
                     demDownloading = false;
                     DemReady = false;
@@ -328,23 +329,23 @@ namespace wwtlib
             }
         }
 
-        public virtual bool Draw3D(RenderContext  renderContext, double opacity)
+        public virtual bool Draw3D(RenderContext renderContext, double opacity)
         {
-   //         CanvasContext2D device = renderContext.Device;
+            //         CanvasContext2D device = renderContext.Device;
 
-            
+
 
             RenderedGeneration = CurrentRenderGeneration;
             TilesTouched++;
             AccessCount = TileCache.AccessID++;
- 
+
             if (errored)
             {
                 return false;
             }
- 
+
             int xMax = 2;
- 
+
             InViewFrustum = true;
 
             if (!ReadyToRender)
@@ -359,13 +360,13 @@ namespace wwtlib
             int childIndex = 0;
 
             int yOffset = 0;
-            if (dataset.Mercator || dataset.BottomsUp )
+            if (dataset.Mercator || dataset.BottomsUp)
             {
                 yOffset = 1;
             }
             int xOffset = 0;
 
-      //      try
+            //      try
             {
                 bool anythingToRender = false;
                 bool childRendered = false;
@@ -457,7 +458,7 @@ namespace wwtlib
                     }
                 }
             }
-   //         catch
+            //         catch
             {
             }
             return true;
@@ -509,7 +510,7 @@ namespace wwtlib
         }
         public virtual void RenderPart(RenderContext renderContext, int part, double opacity, bool combine)
         {
-            
+
             if (PrepDevice == null)
             {
                 bool lighting = renderContext.Lighting && renderContext.SunPosition != null;
@@ -533,7 +534,7 @@ namespace wwtlib
                         }
                         else
                         {
-                            light = Math.Min(1.0f, (light * 1) );
+                            light = Math.Min(1.0f, (light * 1));
                         }
 
                         // set lighting
@@ -552,13 +553,13 @@ namespace wwtlib
             else
             {
                 TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
-                renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3 , GL.UNSIGNED_SHORT, 0);
+                renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
             }
         }
- 
+
         public virtual void CleanUp(bool removeFromParent)
         {
-            
+
             ReadyToRender = false;
             DemData = null;
             demFile = null;
@@ -574,7 +575,7 @@ namespace wwtlib
 
             RenderTriangleLists = new List<RenderTriangle>[4];
             GeometryCreated = false;
-            if (removeFromParent && Parent != null )
+            if (removeFromParent && Parent != null)
             {
                 Parent.RemoveChild(this);
                 Parent = null;
@@ -597,12 +598,12 @@ namespace wwtlib
                 if (texture2d != null)
                 {
                     PrepDevice.deleteTexture(texture2d);
-      
+
                     texture2d = null;
                 }
             }
         }
-  
+
         public void RemoveChild(Tile child)
         {
             for (int i = 0; i < 4; i++)
@@ -615,9 +616,9 @@ namespace wwtlib
             }
         }
 
-//        bool blendMode = false;
+        //        bool blendMode = false;
 
-        
+
         public int AccessCount = 0;
         public bool Downloading = false;
         public bool GeometryCreated = false;
@@ -666,12 +667,12 @@ namespace wwtlib
 
         internal bool isHdTile = false;
         protected int demSize = 33 * 33;
-     
 
 
- //       public static Viewport Viewport;
+
+        //       public static Viewport Viewport;
         public static int maxLevel = 20;
-       
+
 
 
         Vector3d topLeftScreen = new Vector3d();
@@ -744,77 +745,6 @@ namespace wwtlib
 
             return true;
         }
-        
- //virtual public bool IsTileBigEnough(Device device)
- //       {
- //           //if (!IsTileInFrustum(frustum))
- //           //{
- //           //    outOfView = true;
- //           //    return false;
- //           //}
-
- //           if (level > 1)
- //           {
- //               if (this.Level < 25)
- //               {
- //                   deepestLevel = level > deepestLevel ? level : deepestLevel; 
- //                   return true;
- //                   bool a = true;
- //               }
-
- //               // Test for tile scale in view..
- //               topLeftScreen = TopLeft.Vector3;
- //               topLeftScreen.Project(Viewport, device.Transform.Projection, device.Transform.View, device.Transform.World);
-
- //               bottomRightScreen = BottomRight.Vector3;
- //               bottomRightScreen.Project(Viewport, device.Transform.Projection, device.Transform.View, device.Transform.World);
-
- //               topRightScreen = TopRight.Vector3;
- //               topRightScreen.Project(Viewport, device.Transform.Projection, device.Transform.View, device.Transform.World);
-
- //               bottomLeftScreen = BottomLeft.Vector3;
- //               bottomLeftScreen.Project(Viewport, device.Transform.Projection, device.Transform.View, device.Transform.World);
-
- //               Vector3 top = topLeftScreen;
- //               top.Subtract(topRightScreen);
- //               float topLength = top.Length();
-
- //               Vector3 bottom = bottomLeftScreen;
- //               bottom.Subtract(bottomRightScreen);
- //               float bottomLength = bottom.Length();
-
- //               Vector3 left = bottomLeftScreen;
- //               left.Subtract(topLeftScreen);
- //               float leftLength = left.Length();
-
- //               Vector3 right = bottomRightScreen;
- //               right.Subtract(topRightScreen);
- //               float rightLength = right.Length();
-
-
-
-
- //               float lengthMax = Math.Max(Math.Max(rightLength, leftLength), Math.Max(bottomLength, topLength));
-
- //               if (lengthMax < (400 - Tile.imageQuality)) // was 220
- //               {
- //                   //if (level > lastDeepestLevel || dataset.DataSetType == ImageSetType.Planet ||dataset.DataSetType == ImageSetType.Earth)
- //                   //if (!Earth3d.MainWindow.SolarSystemMode  && this.DemEnabled && level <= lastDeepestLevel && this is ToastTile)
- //                   //{
- //                   //    return true;
- //                   //}
- //                   //else
- //                   {
- //                       return false;
- //                   }
- //               }
- //               else
- //               {
- //                   deepestLevel = level > deepestLevel ? level : deepestLevel;
- //               }
- //           }
- //           return true;
- //       }
 
         public static int meshComplexity = 50;
         public static int imageQuality = 50;
@@ -850,7 +780,7 @@ namespace wwtlib
 
             if (this.Level < 2 && (dataset.Projection == ProjectionType.Mercator || dataset.Projection == ProjectionType.Toast))
             {
-            //    return true;
+                //    return true;
             }
             InViewFrustum = false;
 
@@ -858,7 +788,7 @@ namespace wwtlib
 
             for (int i = 0; i < 6; i++)
             {
-                if (frustum[i].Dot(centerV4)  < -sphereRadius)
+                if (frustum[i].Dot(centerV4) < -sphereRadius)
                 {
                     return false;
                 }
@@ -866,7 +796,7 @@ namespace wwtlib
             InViewFrustum = true;
 
             return true;
-        } 
+        }
 
 
         protected double sphereRadius;
@@ -884,13 +814,13 @@ namespace wwtlib
         {
             get { return sphereCenter; }
         }
- 
+
         protected const double RC = (3.1415927 / 180.0);
         protected float radius = 1;
         protected Vector3d GeoTo3d(double lat, double lng, bool useLocalCenter)
         {
 
-            if (dataset.DataSetType == ImageSetType.Panorama )
+            if (dataset.DataSetType == ImageSetType.Panorama)
             {
                 Vector3d retVal = Vector3d.Create(-(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius), (Math.Sin(lat * RC) * radius), (Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius));
 
@@ -906,7 +836,7 @@ namespace wwtlib
             }
 
         }
-     
+
         static protected int SubDivisions
         {
             get { return 32; /*DemEnabled ? 32 : 16; */ }
@@ -921,7 +851,7 @@ namespace wwtlib
 
         public virtual void OnCreateVertexBuffer(object sender, EventArgs e)
         {
- 
+
         }
 
         public int RequestHits;
@@ -953,8 +883,8 @@ namespace wwtlib
             }
 
         }
-  
-    
+
+
         // URL parameters
         //{0} ImageSetID
         //{1} level
@@ -983,7 +913,7 @@ namespace wwtlib
             {
                 string rewritten_url = URLHelpers.singleton.rewrite(dataset.Url, URLRewriteMode.AsIfAbsolute);
                 string returnUrl = rewritten_url;
-                
+
                 if (rewritten_url.IndexOf("{1}") > -1)
                 {
                     // Old style URL
@@ -1043,7 +973,7 @@ namespace wwtlib
                     returnUrl = returnUrl.Replace("//r{S}.ortho.tiles.virtualearth.net", "//ecn.t{S}.tiles.virtualearth.net");
                 }
 
-                
+
                 string id = this.GetTileID();
                 string server = "";
 
@@ -1053,7 +983,7 @@ namespace wwtlib
                 }
                 else
                 {
-                    server = id.Substr(id.Length-1, 1).ToString();
+                    server = id.Substr(id.Length - 1, 1).ToString();
                 }
 
                 //if (returnUrl == "//r{S}.ortho.tiles.virtualearth.net/tiles/wtl00{Q}?g=121&band=wwt_rgb" && id.Length > 7 && (id.StartsWith("2") || id.StartsWith("3")))
@@ -1063,7 +993,7 @@ namespace wwtlib
 
 
                 returnUrl = returnUrl.Replace("{Q}", id);
-                
+
                 returnUrl = returnUrl.Replace("{S}", server);
                 if (returnUrl.IndexOf("virtualearth.net") > -1)
                 {
@@ -1188,7 +1118,7 @@ namespace wwtlib
                     if ((netY & mask) != 0)
                         val += 2;
 
-                    sb.Append(tileMap.Substr(val,1));
+                    sb.Append(tileMap.Substr(val, 1));
 
                 }
                 tileId = sb.ToString();
@@ -1205,7 +1135,7 @@ namespace wwtlib
 
         protected int VertexCount
         {
-            get 
+            get
             {
 
                 return vertexCount;
@@ -1216,158 +1146,15 @@ namespace wwtlib
             }
         }
         protected BlendState[] renderChildPart = null;
-      
+
         public Tile()
         {
             renderChildPart = new BlendState[4];
-            for (int i = 0; i < 4; i++ )
+            for (int i = 0; i < 4; i++)
             {
                 renderChildPart[i] = BlendState.Create(false, 500);
             }
         }
     }
 
-//    public class Quad
-//    {
-//        public PointF TopLeft;
-//        public PointF TopRight;
-//        public PointF BottomLeft;
-//        public PointF BottomRight;
-//        public Quad()
-//        {
-//        }
-//        public Quad(PointF topLeft, PointF topRight, PointF bttomLeft, PointF bottomRight)
-//        {
-//            this.TopLeft = topLeft;
-//            this.TopRight = topRight;
-//            this.BottomLeft = bttomLeft;
-//            this.BottomRight = bottomRight;
-//        }
-
-//        public bool IntersectsRectangle(RectangleF rect)
-//        {
-//            if (rect.Contains(TopLeft))
-//            {
-//                return true;
-//            }
-//            if (rect.Contains(TopRight))
-//            {
-//                return true;
-//            }
-//            if (rect.Contains(BottomLeft))
-//            {
-//                return true;
-//            }
-//            if (rect.Contains(BottomRight))
-//            {
-//                return true;
-//            }
-
-
-
-//            // check all four sides
-//            if (LineSegmentInresectsRectangle(rect, TopLeft, TopRight))
-//            {
-//                return true;
-//            }
-
-//            if (LineSegmentInresectsRectangle(rect, TopRight, BottomRight))
-//            {
-//                return true;
-//            }
-
-//            if (LineSegmentInresectsRectangle(rect, BottomRight, BottomLeft))
-//            {
-//                return true;
-//            }
-
-//            if (LineSegmentInresectsRectangle(rect, BottomLeft, TopLeft))
-//            {
-//                return true;
-//            }
-//            // check for full containment of rect inside quad
-
-//            if (PointInQuad(new PointF(rect.Right, rect.Top)) &&
-//                PointInQuad(new PointF(rect.Right, rect.Bottom)) &&
-//                PointInQuad(new PointF(rect.Left, rect.Top)) &&
-//                PointInQuad(new PointF(rect.Left, rect.Bottom)))
-//            {
-//                return true;
-//            }   
-            
-//            return false;
-//        }
-
-//        public bool PointInQuad(PointF point)
-//        {
-//            if (!IsSameSideOfLine(TopLeft, TopRight, BottomRight, point))
-//            {
-//                return false;
-//            }
-//            if (!IsSameSideOfLine(TopRight, BottomRight, BottomLeft, point))
-//            {
-//                return false;
-//            }
-//            if (!IsSameSideOfLine(BottomRight, BottomLeft, TopLeft, point))
-//            {
-//                return false;
-//            }
-//            if (!IsSameSideOfLine(BottomLeft, TopLeft, TopRight, point))
-//            {
-//                return false;
-//            }
-
-//            return true;
-//        }
-
-//        public static bool LineSegmentInresectsRectangle(RectangleF rect, PointF seg1, PointF seg2)
-//        {
-//            if (LineSegmentCross(seg1, seg2, new PointF(rect.Left, rect.Top), new PointF(rect.Right, rect.Top)))
-//            {
-//                return true;
-//            }
-//            if (LineSegmentCross(seg1, seg2, new PointF(rect.Right, rect.Top), new PointF(rect.Right, rect.Bottom)))
-//            {
-//                return true;
-//            }
-//            if (LineSegmentCross(seg1, seg2, new PointF(rect.Right, rect.Bottom), new PointF(rect.Left, rect.Bottom)))
-//            {
-//                return true;
-//            }
-//            if (LineSegmentCross(seg1, seg2, new PointF(rect.Left, rect.Bottom), new PointF(rect.Left, rect.Top)))
-//            {
-//                return true;
-//            }
-//            return false;
-//        }
-//        /* (x1,y1),(x2,y2) defines a line.
-//* If the points (ax,ay) and (bx,by) are on 
-//* the same side of the line as each other, the 
-//* function returns 1. Otherwise it returns 0.
-//*/
-
-//        //public static int IsSameSideOfLine(float x1, float y1, float x2, float y2, float ax, float ay, float bx, float by)
-//        //{
-//        //    return ((x1 - x2) * (ay - y2) - (y1 - y2) * (ax - x2)) * ((x1 - x2) * (by - y2) - (y1 - y2) * (bx - x2)) >= 0;
-//        //}
-//        public static bool IsSameSideOfLine(PointF seg1, PointF seg2, PointF a, PointF b)
-//        {
-//            return ((seg1.X - seg2.X) * (a.Y - seg2.Y) - (seg1.Y - seg2.Y) * (a.X - seg2.X)) * ((seg1.X - seg2.X) * (b.Y - seg2.Y) - (seg1.Y - seg2.Y) * (b.X - seg2.X)) >= 0;
-//        }
-//        /* This is wonderful for collision detection, for example :/*(ax1,ay1),(ax2,ay2) define a line segment A.
-//     *(bx1,by1),(bx2,by2) define a line segment B.
-//     * If the two line segments intercept, the function returns 1, else 0
-//     */
-
-//        //public static int LineSegmentCross(float ax1, float ay1, float ax2, float ay2, float bx1, float by1, float bx2, float by2)
-//        //{
-//        //    return (!same_side_of_line(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) && !same_side_of_line(bx1, by1, bx2, by2, ax1, ay1, ax2, ay2));
-//        //}
-//        public static bool LineSegmentCross(PointF a1, PointF a2, PointF b1, PointF b2)
-//        {
-//            return (!IsSameSideOfLine(a1, a2, b1, b2) && !IsSameSideOfLine(b1, b2, a1, a2));
-//        }
-//    }
-
-    
 }

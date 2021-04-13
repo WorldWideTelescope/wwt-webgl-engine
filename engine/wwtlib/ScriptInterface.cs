@@ -270,6 +270,31 @@ namespace wwtlib
             }
         }
 
+        public void SetCutsForFitsHips(string hipsName, double min, double max)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.SetCutsForFitsHips(hipsName, min , max);
+            }
+        }
+
+        public void SetColorMapForFitsHips(string hipsName, string colorMapName)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.SetColorMapForFitsHips(hipsName, colorMapName);
+            }
+        }
+
+        public void SetScaleTypeForFitsHips(string hipsName, ScaleTypes scaleType)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.SetScaleTypeForFitsHips(hipsName, scaleType);
+            }
+        }
+
+
         public void HideUI(bool hide)
         {
             //todo enable

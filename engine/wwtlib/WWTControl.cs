@@ -1750,12 +1750,19 @@ namespace wwtlib
 
                 CanvasElement canvas = CreateCanvasElement(DivId);
 
-                String webgltext = "webgl";
-                GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
-
+                GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)"webgl2");
+                if(gl != null)
+                {
+                    RenderContext.UseGlVersion2 = true;
+                }
+                else 
+                {
+                    //TODO if safari -> recommend enabling webgl2 flag 
+                    //Else Recommend using a modern browser (Chrome, Firefox, Edge) to get the full AAS WWT experience
+                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)"webgl");
+                }
                 if (gl == null) {
-                    webgltext = "experimental-webgl";
-                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
+                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)"experimental-webgl");
                 }
 
                 if (gl == null) {
@@ -2595,6 +2602,46 @@ namespace wwtlib
                 RenderContext.GetCatalogHipsDataInView(catalogHips, limit, onComplete);
             }
         }
+
+        public void SetCutsForFitsHips(string hipsName, double min, double max)
+        {
+            Imageset hips = GetImagesetByName(hipsName);
+            if (hips != null && hips.HipsProperties != null)
+            {
+                hips.HipsProperties.MinVal = min;
+                hips.HipsProperties.MaxVal = max;
+            } else
+            {
+                Script.Literal("console.log({0} + ' not found')", hipsName);
+            }
+        }
+
+        public void SetColorMapForFitsHips(string hipsName, string colorMapName)
+        {
+            Imageset hips = GetImagesetByName(hipsName);
+            if (hips != null && hips.HipsProperties != null)
+            {
+                hips.HipsProperties.ColorMapName = colorMapName;
+            }
+            else
+            {
+                Script.Literal("console.log({0} + ' not found')", hipsName);
+            }
+        }
+
+        public void SetScaleTypeForFitsHips(string hipsName, ScaleTypes scaleType)
+        {
+            Imageset hips = GetImagesetByName(hipsName);
+            if (hips != null && hips.HipsProperties != null)
+            {
+                hips.HipsProperties.ScaleType = scaleType;
+            }
+            else
+            {
+                Script.Literal("console.log({0} + ' not found')", hipsName);
+            }
+        }
+        
 
         private SimpleLineList crossHairs = null;
 
