@@ -193,11 +193,11 @@ namespace wwtlib
             }
         }
 
-        public void GotoRaDecZoom(double ra, double dec, double zoom, bool instant)
+        public void GotoRaDecZoom(double ra, double dec, double zoom, bool instant, double? roll)
         {
             if (WWTControl.Singleton != null)
             {
-                WWTControl.Singleton.GotoRADecZoom(ra / 15, dec, zoom * 6, instant);
+                WWTControl.Singleton.GotoRADecZoom(ra / 15, dec, zoom * 6, instant, roll);
             }
         }
 

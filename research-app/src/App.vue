@@ -486,11 +486,13 @@ export default class App extends WWTAwareComponent {
     } else if (classicPywwt.isSetForegroundOpacityMessage(msg)) {
       this.setForegroundOpacity(msg.value);
     } else if (classicPywwt.isCenterOnCoordinatesMessage(msg)) {
+      const rollRad = msg.roll == undefined ? undefined : msg.roll * D2R;
       this.gotoRADecZoom({
         raRad: msg.ra * D2R,
         decRad: msg.dec * D2R,
         zoomDeg: msg.fov * 6,
         instant: msg.instant,
+        rollRad: rollRad,
       });
     } else if (classicPywwt.isModifySettingMessage(msg)) {
       const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any

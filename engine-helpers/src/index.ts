@@ -501,12 +501,25 @@ export class WWTInstance {
     });
   }
 
-  async gotoRADecZoom(raRad: number, decRad: number, zoomDeg: number, instant: boolean): Promise<void> {
+  /** Navigate the camera to the specified position, asynchronously.
+   *
+   * This wraps the underlying engine function of the same name, but homogenizing some
+   * of the angular arguments to use radians.
+   *
+   * @param raRad The RA to seek to, in radians
+   * @param decRad The declination to seek to, in radians
+   * @param zoomDeg The zoom setting, in *degrees*
+   * @param instant Whether to snap the camera instantly, or pan it
+   * @param rollRad If specified, the roll of the target camera position, in radians
+   * @returns A void promise that resolves when the camera arrives at the target position.
+   */
+  async gotoRADecZoom(raRad: number, decRad: number, zoomDeg: number, instant: boolean, rollRad?: number): Promise<void> {
     this.ctl.gotoRADecZoom(
       raRad * R2H,
       decRad * R2D,
       zoomDeg,
-      instant
+      instant,
+      rollRad === undefined ? undefined : rollRad * R2D
     );
     return this.makeArrivePromise(instant);
   }
