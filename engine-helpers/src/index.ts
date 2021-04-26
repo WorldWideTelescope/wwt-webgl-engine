@@ -285,9 +285,11 @@ export interface GotoTargetOptions {
   trackObject: boolean;
 }
 
-/** Options for [[WWTInstance.loadFitsLayer]]. */
-export interface LoadFitsLayerOptions {
-  /** The URL of the FITS file. */
+/** Options for [[WWTInstance.addImageSetLayer]]. */
+export interface AddImageSetLayerOptions {
+  /** The URL of the FITS file 
+   * OR The URL of the desired image set. This should mach an image set url
+   * previously loaded with [[LoadImageCollection]]. */
   url: string;
 
   /** A name to use for the new layer. */
@@ -546,29 +548,29 @@ export class WWTInstance {
   private collectionLoadedPromises: SavedPromise<string, Folder>[] = [];
   private collectionRequests: Map<string, Folder | null> = new Map();
 
-   /** Load a WTML collection and the imagesets that it contains.
-   *
-   * This function triggers a download of the specified URL, which should return
-   * an XML document in the [WTML collection][wtml] format. Any `ImageSet`
-   * entries in the collection, or `Place` entries containing image sets, will
-   * be added to the WWT instance’s list of available imagery. Subsequent calls
-   * to functions like [[setForegroundImageByName]] will be able to locate the
-   * new imagesets and display them to the user.
-   *
-   * Each unique URL is only requested once. Once a given URL has been
-   * successfully loaded, the promise returned by additional calls will resolve
-   * immediately. URL uniqueness is tested with simple string equality, so if
-   * you really want to load the same URL more than once you could add a
-   * fragment specifier.
-   *
-   * If the URL is not accessible due to CORS restrictions, the request will
-   * automatically be routed through the WWT’s CORS proxying service.
-   *
-   * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
-   *
-   * @param url: The URL of the WTML collection file to load.
-   * @returns: A promise that resolves to an initialized Folder object.
-   */
+  /** Load a WTML collection and the imagesets that it contains.
+  *
+  * This function triggers a download of the specified URL, which should return
+  * an XML document in the [WTML collection][wtml] format. Any `ImageSet`
+  * entries in the collection, or `Place` entries containing image sets, will
+  * be added to the WWT instance’s list of available imagery. Subsequent calls
+  * to functions like [[setForegroundImageByName]] will be able to locate the
+  * new imagesets and display them to the user.
+  *
+  * Each unique URL is only requested once. Once a given URL has been
+  * successfully loaded, the promise returned by additional calls will resolve
+  * immediately. URL uniqueness is tested with simple string equality, so if
+  * you really want to load the same URL more than once you could add a
+  * fragment specifier.
+  *
+  * If the URL is not accessible due to CORS restrictions, the request will
+  * automatically be routed through the WWT’s CORS proxying service.
+  *
+  * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
+  *
+  * @param url: The URL of the WTML collection file to load.
+  * @returns: A promise that resolves to an initialized Folder object.
+  */
   async loadImageCollection(url: string): Promise<Folder> {
     const curState = this.collectionRequests.get(url);
 
@@ -621,14 +623,16 @@ export class WWTInstance {
 
   // Layers
 
-  /** Load a remote FITS file into a data layer and display it.
+  /** Load an image set or a remote FITS file into a data layer and display it.
    *
    * The FITS file must be downloaded and processed, so this API is
    * asynchronous, and is not appropriate for files that might be large.
+   * 
+   * The image set must have previously been created with [[loadImageCollection]]
    */
-  async loadFitsLayer(options: LoadFitsLayerOptions): Promise<ImageSetLayer> {
+  async addImageSetLayer(options: AddImageSetLayerOptions): Promise<ImageSetLayer> {
     return new Promise((resolve, _reject) => {
-      this.si.loadFitsLayer(options.url, options.name, options.gotoTarget, (layer) => {
+      this.si.addImageSetLayer(options.url, options.name, options.gotoTarget, (layer) => {
         resolve(layer);
       })
     });

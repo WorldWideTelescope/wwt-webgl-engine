@@ -26,7 +26,7 @@ import {
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
-  LoadFitsLayerOptions,
+  AddImageSetLayerOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
@@ -511,12 +511,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Action({ rawError: true })
-  async loadFitsLayer(
-    options: LoadFitsLayerOptions
+  async addImageSetLayer(
+    options: AddImageSetLayerOptions
   ): Promise<ImageSetLayer> {
     if (Vue.$wwt.inst === null)
-      throw new Error('cannot loadFitsLayer without linking to WWTInstance');
-    return Vue.$wwt.inst.loadFitsLayer(options);
+      throw new Error('cannot addImageSetLayer without linking to WWTInstance');
+    return Vue.$wwt.inst.addImageSetLayer(options);
   }
 
   @Mutation

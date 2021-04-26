@@ -15,11 +15,11 @@
  * - [[SetViewerModeMessage]]
  * - [[TrackObjectMessage]]
  *
- * ### FITS Image Layers
+ * ### Image set Layers
  *
- * - [[CreateFitsLayerMessage]]
+ * - [[CreateImageSetLayerMessage]]
  * - [[ModifyFitsLayerMessage]]
- * - [[RemoveFitsLayerMessage]]
+ * - [[RemoveImageSetLayerMessage]]
  * - [[SetFitsLayerColormapMessage]]
  * - [[StretchFitsLayerMessage]]
  *
@@ -148,7 +148,6 @@ export function isCenterOnCoordinatesMessage(o: any): o is CenterOnCoordinatesMe
     (o.roll === undefined || typeof o.roll === "number");
 }
 
-
 /** A command to clear all of the current annotations. */
 export interface ClearAnnotationsMessage {
   /** The tag identifying this message type. */
@@ -187,21 +186,20 @@ export function isCreateAnnotationMessage(o: any): o is CreateAnnotationMessage 
 }
 
 
-/** A command to create an image layer corresponding to a web-accessible FITS
- * file. */
-export interface CreateFitsLayerMessage {
+/** A command to create an image set layer. */
+export interface CreateImageSetLayerMessage {
   /** The tag identifying this message type. */
   event: "image_layer_create";
 
   /** An identifier for referring to this image layer later. */
   id: string;
 
-  /** The URL from which to obtain the FITS file. */
+  /** The URL from which to obtain the FITS file or image set. */
   url: string;
 }
 
-/** Type guard function for CreateFitsLayerMessage. */
-export function isCreateFitsLayerMessage(o: any): o is CreateFitsLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+/** Type guard function for CreateImageSetLayerMessage. */
+export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "image_layer_create" &&
     typeof o.id === "string" &&
@@ -240,14 +238,14 @@ export interface LoadImageCollectionMessage {
   event: "load_image_collection";
 
   /** The URL of the collection to load. */
-  url: string;
+  url: string
 }
 
 /** Type guard function for LoadImageCollectionMessage. */
 export function isLoadImageCollectionMessage(o: any): o is LoadImageCollectionMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "load_image_collection" &&
-    typeof o.url === "string";
+    typeof o.url === "string");
 }
 
 
@@ -419,8 +417,8 @@ export function isRemoveAnnotationMessage(o: any): o is RemoveAnnotationMessage 
 }
 
 
-/** A command to remove a FITS layer. */
-export interface RemoveFitsLayerMessage {
+/** A command to remove a image set layer. */
+export interface RemoveImageSetLayerMessage {
   /** The tag identifying this message type. */
   event: "image_layer_remove";
 
@@ -428,8 +426,8 @@ export interface RemoveFitsLayerMessage {
   id: string;
 }
 
-/** Type guard function for RemoveFitsLayerMessage. */
-export function isRemoveFitsLayerMessage(o: any): o is RemoveFitsLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+/** Type guard function for RemoveImageSetLayerMessage. */
+export function isRemoveImageSetLayerMessage(o: any): o is RemoveImageSetLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "image_layer_remove" &&
     typeof o.id === "string";
@@ -711,7 +709,7 @@ export type PywwtMessage =
   CenterOnCoordinatesMessage |
   ClearAnnotationsMessage |
   CreateAnnotationMessage |
-  CreateFitsLayerMessage |
+  CreateImageSetLayerMessage |
   CreateTableLayerMessage |
   LoadImageCollectionMessage |
   LoadTourMessage |
@@ -722,7 +720,7 @@ export type PywwtMessage =
   PauseTimeMessage |
   PauseTourMessage |
   RemoveAnnotationMessage |
-  RemoveFitsLayerMessage |
+  RemoveImageSetLayerMessage |
   RemoveTableLayerMessage |
   ResumeTourMessage |
   ResumeTimeMessage |
@@ -750,7 +748,7 @@ export type PywwtMessage =
  * function enables. The input is modified in-place.
 */
 export function applyBaseUrlIfApplicable(o: any, baseurl: string): void {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  if (isCreateFitsLayerMessage(o)) {
+  if (isCreateImageSetLayerMessage(o)) {
     o.url = new URL(o.url, baseurl).toString();
   } else if (isLoadImageCollectionMessage(o)) {
     o.url = new URL(o.url, baseurl).toString();

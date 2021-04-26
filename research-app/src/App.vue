@@ -87,17 +87,17 @@ const R2D = 180.0 / Math.PI;
 type ToolType = "crossfade" | null;
 
 type AnyFitsLayerMessage =
-  classicPywwt.CreateFitsLayerMessage |
+  classicPywwt.CreateImageSetLayerMessage |
   classicPywwt.SetFitsLayerColormapMessage |
   classicPywwt.StretchFitsLayerMessage |
   classicPywwt.ModifyFitsLayerMessage |
-  classicPywwt.RemoveFitsLayerMessage;
+  classicPywwt.RemoveImageSetLayerMessage;
 
 /** Helper for handling messages that mutate FITS / ImageSet layers. Because
  * FITS loading is asynchronous, and messages might arrive out of order, we need
  * some logic to smooth everything out.
  */
-class FitsLayerMessageHandler {
+class ImageSetLayerMessageHandler {
   private owner: App;
   private created = false;
   private internalId: string | null = null;
@@ -106,17 +106,16 @@ class FitsLayerMessageHandler {
   private queuedStretch: classicPywwt.StretchFitsLayerMessage | null = null;
   private queuedColormap: classicPywwt.SetFitsLayerColormapMessage | null = null;
   private queuedSettings: ImageSetLayerSetting[] = [];
-  private queuedRemoval: classicPywwt.RemoveFitsLayerMessage | null = null;
+  private queuedRemoval: classicPywwt.RemoveImageSetLayerMessage | null = null;
 
   constructor(owner: App) {
     this.owner = owner;
   }
 
-  handleCreateMessage(msg: classicPywwt.CreateFitsLayerMessage) {
-    if (this.created)
-      return;
+  handleCreateMessage(msg: classicPywwt.CreateImageSetLayerMessage) {
+    if (this.created) {return;}
 
-    this.owner.loadFitsLayer({
+    this.owner.addImageSetLayer({
       url: msg.url,
       name: msg.id,
       gotoTarget: true, // pywwt expected behavior
@@ -207,7 +206,7 @@ class FitsLayerMessageHandler {
     }
   }
 
-  handleRemoveMessage(msg: classicPywwt.RemoveFitsLayerMessage) {
+  handleRemoveMessage(msg: classicPywwt.RemoveImageSetLayerMessage) {
     if (this.internalId === null) {
       // Layer not yet created or fully initialized. Queue up message for processing
       // once it's ready.
@@ -500,7 +499,7 @@ export default class App extends WWTAwareComponent {
       if (isEngineSetting(setting)) {
         this.applySetting(setting);
       }
-    } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
+    } else if (classicPywwt.isCreateImageSetLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleCreateMessage(msg);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleStretchMessage(msg);
@@ -508,7 +507,7 @@ export default class App extends WWTAwareComponent {
       this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
     } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleModifyMessage(msg);
-    } else if (classicPywwt.isRemoveFitsLayerMessage(msg)) {
+    } else if (classicPywwt.isRemoveImageSetLayerMessage(msg)) {
       // NB we never remove the handler! It's tricky due to async issues.
       this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
     } else if (classicPywwt.isCreateTableLayerMessage(msg)) {
@@ -576,13 +575,13 @@ export default class App extends WWTAwareComponent {
   }
 
   // Keyed by "external" layer IDs
-  private fitsLayers: Map<string, FitsLayerMessageHandler> = new Map();
+  private fitsLayers: Map<string, ImageSetLayerMessageHandler> = new Map();
 
-  private getFitsLayerHandler(msg: AnyFitsLayerMessage): FitsLayerMessageHandler {
+  private getFitsLayerHandler(msg: AnyFitsLayerMessage): ImageSetLayerMessageHandler {
     let handler = this.fitsLayers.get(msg.id);
 
     if (handler === undefined) {
-      handler = new FitsLayerMessageHandler(this);
+      handler = new ImageSetLayerMessageHandler(this);
       this.fitsLayers.set(msg.id, handler);
     }
 

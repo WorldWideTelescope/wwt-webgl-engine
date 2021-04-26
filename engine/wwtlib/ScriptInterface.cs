@@ -320,65 +320,93 @@ namespace wwtlib
 
         public ImageSetLayer LoadFitsLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            return AddImageSetLayer(url, name, gotoTarget, loaded);
+        }
+
+        public ImageSetLayer AddImageSetLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
+        {
+            Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
+            if (imageset != null)
             {
-                name = LayerManager.GetNextFitsName();
-            }
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    name = LayerManager.GetNextImageSetName();
+                }
+                ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayer(imageset, name);
 
-            ImageSetLayer imagesetLayer = new ImageSetLayer();
-
-            FitsImage img = new FitsImage(url, null, delegate (WcsImage wcsImage)
-            {
-                int width = (int)wcsImage.SizeX;
-                int height = (int)wcsImage.SizeY;
-
-                Imageset imageset = Imageset.Create(
-                            wcsImage.Description,
-                            Util.GetHashCode(wcsImage.Filename).ToString(),
-                            ImageSetType.Sky,
-                            BandPass.Visible,
-                            ProjectionType.SkyImage,
-                            Util.GetHashCode(wcsImage.Filename),
-                            0,
-                            0,
-                            256,
-                            wcsImage.ScaleY,
-                            ".tif",
-                            wcsImage.ScaleX > 0,
-                            "",
-                            wcsImage.CenterX,
-                            wcsImage.CenterY,
-                            wcsImage.Rotation,
-                            false,
-                            "",
-                            false,
-                            false,
-                            1,
-                            wcsImage.ReferenceX,
-                            wcsImage.ReferenceY,
-                            wcsImage.Copyright,
-                            wcsImage.CreditsUrl,
-                            "",
-                            "",
-                            0,
-                            ""
-                            );
-
-                imageset.WcsImage = wcsImage;
-                imagesetLayer.ImageSet = imageset;
-                LayerManager.AddFitsImageSetLayer(imagesetLayer, name);
-                LayerManager.LoadTree();
                 if (gotoTarget)
                 {
-                    WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false, null);
+                    WWTControl.Singleton.GotoRADecZoom(imageset.CenterX / 15, imageset.CenterY, 
+                        WWTControl.Singleton.RenderContext.ViewCamera.Zoom, false, null);
                 }
                 if (loaded != null)
                 {
                     loaded(imagesetLayer);
                 }
-            });
 
-            return imagesetLayer;
+                return imagesetLayer;
+            } else
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    name = LayerManager.GetNextFitsName();
+                }
+
+                ImageSetLayer imagesetLayer = new ImageSetLayer();
+
+                FitsImage img = new FitsImage(url, null, delegate (WcsImage wcsImage)
+                {
+                    int width = (int)wcsImage.SizeX;
+                    int height = (int)wcsImage.SizeY;
+
+                    imageset = Imageset.Create(
+                                wcsImage.Description,
+                                Util.GetHashCode(wcsImage.Filename).ToString(),
+                                ImageSetType.Sky,
+                                BandPass.Visible,
+                                ProjectionType.SkyImage,
+                                Util.GetHashCode(wcsImage.Filename),
+                                0,
+                                0,
+                                256,
+                                wcsImage.ScaleY,
+                                ".tif",
+                                wcsImage.ScaleX > 0,
+                                "",
+                                wcsImage.CenterX,
+                                wcsImage.CenterY,
+                                wcsImage.Rotation,
+                                false,
+                                "",
+                                false,
+                                false,
+                                1,
+                                wcsImage.ReferenceX,
+                                wcsImage.ReferenceY,
+                                wcsImage.Copyright,
+                                wcsImage.CreditsUrl,
+                                "",
+                                "",
+                                0,
+                                ""
+                                );
+
+                    imageset.WcsImage = wcsImage;
+                    imagesetLayer.ImageSet = imageset;
+                    LayerManager.AddFitsImageSetLayer(imagesetLayer, name);
+                    LayerManager.LoadTree();
+                    if (gotoTarget)
+                    {
+                        WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false, null);
+                    }
+                    if (loaded != null)
+                    {
+                        loaded(imagesetLayer);
+                    }
+                });
+
+                return imagesetLayer;
+            }
         }
 
 
