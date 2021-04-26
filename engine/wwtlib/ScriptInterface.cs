@@ -440,14 +440,12 @@ namespace wwtlib
             }
         }
 
-        private Folder imageFolder;
         private string imageUrl;
-        public void LoadImageCollection(string url)
+        public void LoadImageCollection(string url, bool loadChildFolders)
         {
 
             imageUrl = url;
-            imageFolder = new Folder();
-            imageFolder.LoadFromUrl(url, delegate { Wtml.LoadImagesets(imageFolder); FireCollectionLoaded(url); });
+            Wtml.GetWtmlFile(url, loadChildFolders, delegate { FireCollectionLoaded(url); });
 
         }
 

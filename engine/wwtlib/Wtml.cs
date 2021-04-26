@@ -1,52 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using System.Net;
 
 namespace wwtlib
 {
-    public class Wtml
+    public class FolderDownloadAction
     {
-        static public Folder GetWtmlFile(string url, Action complete)
+        public readonly bool loadChildFolders;
+        
+        private readonly Action onComplete;
+        private int numLoadingFolders = 0;
+
+        public FolderDownloadAction(Action action, bool loadChildFolders)
         {
-            Folder temp = new Folder();
-            temp.LoadFromUrl(url, delegate { LoadImagesets(temp); complete(); });
-            return temp;
+            this.onComplete = action;
+            this.loadChildFolders = loadChildFolders;
         }
 
-        static public void LoadImagesets(Folder folder)
+        private void FolderLoaded()
         {
-
-            foreach (object child in folder.Children)
+            numLoadingFolders--;
+            if (numLoadingFolders == 0)
             {
-                Imageset imageset = null;
+                onComplete();
+            }
+        }
 
+        public void StartingNewFolderLoad(Folder folder)
+        {
+            numLoadingFolders++;
+            folder.ChildLoadCallback(delegate {
+                Wtml.LoadImagesets(folder, this);
+                FolderLoaded();
+            });
+        }
+
+    }
+
+    public class Wtml
+    {
+
+        static public Folder GetWtmlFile(string url, bool loadChildFolders, Action complete)
+        {
+            Folder folder = new Folder();
+            folder.Url = url;
+            FolderDownloadAction folderDownloadAction = new FolderDownloadAction(complete, loadChildFolders);
+            folderDownloadAction.StartingNewFolderLoad(folder);
+            return folder;
+        }
+
+        static public void LoadImagesets(Folder folder, FolderDownloadAction folderDownloadAction)
+        {
+            List<IThumbnail> children = folder.Children;
+
+            foreach (object child in children)
+            {
                 if (child is Imageset)
                 {
-                    imageset = (Imageset)child;
-                    WWTControl.ImageSets.Add(imageset);
+                    Imageset imageSet = (Imageset)child;
+                    WWTControl.AddImageSet(imageSet);
                 }
                 if (child is Place)
                 {
                     Place place = (Place)child;
                     if (place.StudyImageset != null)
                     {
-                        WWTControl.ImageSets.Add(place.StudyImageset);
+                        WWTControl.AddImageSet(place.StudyImageset);
                     }
                     
                     if (place.BackgroundImageset != null)
                     {
-                        WWTControl.ImageSets.Add(place.BackgroundImageset);
+                        WWTControl.AddImageSet(place.BackgroundImageset);
                     }
                 }
+                if (child is Folder && folderDownloadAction.loadChildFolders)
+                {
+                    folderDownloadAction.StartingNewFolderLoad(((Folder)child));
+                }
             }
-                   
+
 
             if (!string.IsNullOrEmpty(WWTControl.ImageSetName))
             {
                 string name = WWTControl.ImageSetName.ToLowerCase();
-                foreach (Imageset imageset in WWTControl.ImageSets)
+                foreach (Imageset imageset in WWTControl.GetImageSets())
                 {
                     if (imageset.Name.ToLowerCase() == name)
                     {
@@ -55,50 +91,9 @@ namespace wwtlib
                 }
             }
 
+
         }
 
-        //static public void GetWtmlFile(string url, Action complete)
-        //{
-        //    XmlHttpRequest xhr = new XmlHttpRequest();
-        //    xhr.Open(HttpVerb.Get, url);
-        //    xhr.OnReadyStateChange = delegate()
-        //    {
-        //        if (xhr.ReadyState == ReadyState.Loaded)
-        //        {
-        //            ParseWtmlFile(xhr.ResponseXml);
-        //            complete();
-        //        }
-        //    };
-        //    xhr.Send();
-        //}
-        //static public void ParseWtmlFile(XmlDocument doc)
-        //{
-        //    XmlNode node = Util.SelectSingleNode(doc, "Folder");
-
-
-        //    foreach (XmlNode child in node.ChildNodes)
-        //    {
-        //        if (child.Attributes != null)
-        //        {
-        //            Imageset ish = Imageset.FromXMLNode(child);
-        //            //Place place = Place.Create(ish.Name, ish.CenterX, ish.CenterY, Classification.Star, "UMA", ish.DataSetType, 1);
-        //            //place.BackgroundImageSet = ish;
-        //            WWTControl.ImageSets.Add(ish);
-        //        }
-        //    }
-
-        //    if (!string.IsNullOrEmpty(WWTControl.ImageSetName))
-        //    {
-        //        string name = WWTControl.ImageSetName.ToLowerCase();
-        //        foreach (Imageset imageset in WWTControl.ImageSets)
-        //        {
-        //            if (imageset.Name.ToLowerCase() == name)
-        //            {
-        //                WWTControl.Singleton.RenderContext.BackgroundImageset = imageset;
-        //            }
-        //        }
-        //    }
-
-        //}
     }
+
 }

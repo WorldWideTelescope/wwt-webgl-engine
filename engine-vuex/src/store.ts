@@ -205,6 +205,8 @@ export interface LoadTourParams {
 export interface LoadImageCollectionParams {
   /** The WTML URL to load. */
   url: string;
+  /** Recursively load any child folders. */
+  loadChildFolders?: boolean;
 }
 
 @Module({
@@ -503,11 +505,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Action({ rawError: true })
   async loadImageCollection(
-    {url}: LoadImageCollectionParams
+    {url, loadChildFolders}: LoadImageCollectionParams
   ): Promise<Folder> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
-    return Vue.$wwt.inst.loadImageCollection(url);
+    return Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
   }
 
   @Action({ rawError: true })

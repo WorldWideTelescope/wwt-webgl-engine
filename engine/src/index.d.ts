@@ -948,8 +948,9 @@ export class ScriptInterface {
    * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
    *
    * @param url The URL of the WTML collection file to load.
+   * @param loadChildFolders Recursively load any child folders.
    */
-  loadImageCollection(url: string): void;
+  loadImageCollection(url: string, loadChildFolders: boolean): void;
 
   /** Set the opacity with which the foreground imageset is rendered.
    *
@@ -957,17 +958,26 @@ export class ScriptInterface {
    */
   setForegroundOpacity(opacity: number): void;
 
-  /** Initiate the loading of a single-file FITS layer
-   *
+  /** Initiate the loading of a image set or single-file FITS layer.
+   * 
+   * If the specified URL already exists in the image set collection, i.e. it
+   * has previously been created with [[loadImageCollection]], then this image set
+   * is added to the view.
+   * 
+   * If the specified URL is pointing to a FITS file, it will be downloaded and parsed.
+   * This API is therefore insufficient for large datasets, since they become
+   * impractical to download as whole files.
+   * 
    * Although this function will return an ImageSetLayer object immediately, the
-   * FITS information won't be ready until the FITS file is downloaded and
-   * parsed. The callback will be called after this completes.
+   * FITS / image set information won't be ready until the FITS file / image set
+   * is downloaded and parsed. The callback will be called after this completes.
    *
-   * The specified URL will be downloaded and parsed as a FITS file. This API is
-   * therefore insufficient for large datasets, since they become impractical to
-   * download as whole files.
+   * @param url The URL of a single-file FITS or
+   * the URL of an image set as specified in the WTML used in loadImageCollection.
+   * @param name The name of the image set layer.
+   * @param gotoTarget If true, camera will move to the center position of the image.
    */
-  loadFitsLayer(
+  addImageSetLayer(
     url: string,
     name: string,
     gotoTarget: boolean,
@@ -2126,11 +2136,13 @@ export namespace Wtml {
    * callback will be called.
    *
    * @param url The URL from which to retrieve the WTML data.
-   * @param complete A callback to be called after the folder is successfully
-   * loaded.
+   * @param loadChildFolders When true, this method will recursively 
+   * download and unpack all [[Folder]]s contained in the original WTML file.
+   * @param complete A callback to be called after the folder (and all child
+   * folders, if loadChildFolders is set to true) is successfully loaded.
    * @returns A folder object that will be populated asynchronously.
    */
-  export function getWtmlFile(url: string, complete: Action): Folder;
+  export function getWtmlFile(url: string, loadChildFolders: boolean, complete: Action): Folder;
 }
 
 export namespace WWTControl {

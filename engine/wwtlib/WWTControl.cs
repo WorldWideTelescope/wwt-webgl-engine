@@ -28,11 +28,27 @@ namespace wwtlib
             SpaceTimeController.UpdateClock();
         }
 
-        public static List<Imageset> ImageSets = new List<Imageset>();
+        private static List<Imageset> ImageSets = new List<Imageset>();
         public static Folder ExploreRoot = new Folder();
         public static string ImageSetName = "";
 
         public IUiController uiController = null;
+
+        public static void AddImageSet(Imageset imagesetToAdd)
+        {
+            foreach(Imageset imageset in ImageSets){
+                if(imageset.ImageSetID == imagesetToAdd.ImageSetID)
+                {
+                    return;
+                }
+            }
+            ImageSets.Add(imagesetToAdd);
+        }
+
+        public static List<Imageset> GetImageSets()
+        {
+            return ImageSets;
+        }
 
         List<Annotation> annotations = new List<Annotation>();
         internal void AddAnnotation(Annotation annotation)
@@ -1705,7 +1721,6 @@ namespace wwtlib
         public static ScriptInterface scriptInterface;
         CanvasElement foregroundCanvas = null;
         CanvasContext2D fgDevice = null;
-        Folder webFolder;
 
         // For backwards compatibility, we preserve the semantics that calling
         // this function kicks off the rendering loop.
@@ -1906,16 +1921,15 @@ namespace wwtlib
                 fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
             }
 
-            webFolder = new Folder();
-            webFolder.LoadFromUrl(
+            Wtml.GetWtmlFile(
                 URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
+                true,
                 SetupComplete
             );
         }
 
         void SetupComplete()
         {
-            Wtml.LoadImagesets(webFolder);
             scriptInterface.FireReady();
         }
 
@@ -2542,6 +2556,18 @@ namespace wwtlib
             foreach (Imageset imageset in ImageSets)
             {
                 if (imageset.Name.ToLowerCase().IndexOf(name.ToLowerCase()) > -1)
+                {
+                    return imageset;
+                }
+            }
+            return null;
+        }
+
+        public Imageset GetImageSetByUrl(string url)
+        {
+            foreach (Imageset imageset in ImageSets)
+            {
+                if (imageset.Url.ToLowerCase() == url.ToLowerCase())
                 {
                     return imageset;
                 }

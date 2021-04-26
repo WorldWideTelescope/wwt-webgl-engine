@@ -474,7 +474,7 @@ export default class App extends WWTAwareComponent {
 
   onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
     if (classicPywwt.isLoadImageCollectionMessage(msg)) {
-      this.loadImageCollection({ url: msg.url });
+      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders });
     } else if (classicPywwt.isSetBackgroundByNameMessage(msg)) {
       this.setBackgroundImageByName(msg.name);
     } else if (classicPywwt.isSetForegroundByNameMessage(msg)) {

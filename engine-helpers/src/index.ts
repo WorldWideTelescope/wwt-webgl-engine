@@ -569,9 +569,11 @@ export class WWTInstance {
   * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
   *
   * @param url: The URL of the WTML collection file to load.
+  * @param loadChildFolders When true, this method will recursively
+  * download and unpack the content of all [[Folder]]s contained in the WTML file.
   * @returns: A promise that resolves to an initialized Folder object.
   */
-  async loadImageCollection(url: string): Promise<Folder> {
+  async loadImageCollection(url: string, loadChildFolders?: boolean): Promise<Folder> {
     const curState = this.collectionRequests.get(url);
 
     // If we've already loaded the folder, insta-resolve to it.
@@ -589,7 +591,11 @@ export class WWTInstance {
       // the function.
       const holder: { f: Folder | null } = { f: null };
 
-      holder.f = Wtml.getWtmlFile(url, () => {
+      if (loadChildFolders === undefined) {
+        loadChildFolders = false;
+      }
+
+      holder.f = Wtml.getWtmlFile(url, loadChildFolders, () => {
         // The folder at this URL is now fully loaded.
         const f = holder.f as Folder;
         this.collectionRequests.set(url, f);

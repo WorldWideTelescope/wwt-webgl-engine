@@ -238,14 +238,18 @@ export interface LoadImageCollectionMessage {
   event: "load_image_collection";
 
   /** The URL of the collection to load. */
-  url: string
+  url: string;
+
+  /** Recursively load any child folders. */
+  loadChildFolders: boolean;
 }
 
 /** Type guard function for LoadImageCollectionMessage. */
 export function isLoadImageCollectionMessage(o: any): o is LoadImageCollectionMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "load_image_collection" &&
-    typeof o.url === "string");
+    typeof o.url === "string" &&
+    (o.loadChildFolders === undefined || typeof o.loadChildFolders === "boolean");
 }
 
 
