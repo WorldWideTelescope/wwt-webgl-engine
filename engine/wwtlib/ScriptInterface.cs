@@ -370,7 +370,7 @@ namespace wwtlib
                 LayerManager.LoadTree();
                 if (gotoTarget)
                 {
-                    WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false);
+                    WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false, null);
                 }
                 if (loaded != null)
                 {
