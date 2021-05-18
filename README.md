@@ -98,7 +98,10 @@ To build the engine library starting from C#:
 
 Otherwise, check out the latest continuous integration build of this repository, 
 download the `scriptsharp` artifact, and copy the `wwtlib.js` file to the location
-given above. (To find the artifact, go to the appropriate build in this project's [pipeline] on [Azure DevOps]). Under 'Related', select '9 published', and download artifacts for `scriptsharp`). If you want to change the C# code, you can file a pull request and access the artifacts associated with your pull request builds.
+given above. (To find the artifact, go to the appropriate build in this project's 
+[pipeline] on [Azure DevOps]). Under 'Related', select '9 published', and download 
+artifacts for `scriptsharp`). If you want to change the C# code, you can file a pull 
+request and access the artifacts associated with your pull request builds.
 
 [Azure DevOps]: https://azure.microsoft.com/en-us/services/devops/?nav=min
 [pipeline]: https://dev.azure.com/aasworldwidetelescope/WWT/_build?definitionId=21
