@@ -1911,6 +1911,7 @@ export class WWTControl {
    * @param dec_deg The target declination, in degrees.
    * @param zoom The target zoom level (see below)
    * @param instant Whether to snap the view instantly or move gradually.
+   * @param roll_deg Optional, The roll of the camera, in degrees.
    *
    * If `instant` is true or the commanded camera position is extremely close to the
    * current camera position, the view will update instantly. Otherwise it will
@@ -1920,7 +1921,7 @@ export class WWTControl {
    *
    * Navigating the view in this way ends any "tracking" status of the current view.
    */
-  gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean): void;
+  gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean, roll_deg?: number): void;
 
   /** Start navigating the view to the specified [[Place]].
    *

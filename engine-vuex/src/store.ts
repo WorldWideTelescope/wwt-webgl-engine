@@ -186,6 +186,9 @@ export interface GotoRADecZoomParams {
    * the view.
    */
   instant: boolean;
+
+  /** Optional: The target roll of the camera, in radians. */
+  rollRad?: number;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.loadTour]] action.
@@ -446,11 +449,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Action({ rawError: true })
   async gotoRADecZoom(
-    {raRad, decRad, zoomDeg, instant}: GotoRADecZoomParams
+    { raRad, decRad, zoomDeg, instant, rollRad }: GotoRADecZoomParams
   ): Promise<void> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
-    return Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant);
+    return Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad);
   }
 
   @Action({ rawError: true })

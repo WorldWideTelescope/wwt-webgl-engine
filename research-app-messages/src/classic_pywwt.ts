@@ -132,6 +132,9 @@ export interface CenterOnCoordinatesMessage {
    * low-resolution data have to be tiled in.
    */
   instant: boolean;
+
+  /** Optional, The roll of the camera, in degrees */
+  roll?: number;
 }
 
 /** Type guard function for CenterOnCoordinatesMessage. */
@@ -141,7 +144,8 @@ export function isCenterOnCoordinatesMessage(o: any): o is CenterOnCoordinatesMe
     typeof o.ra === "number" &&
     typeof o.dec === "number" &&
     typeof o.fov === "number" &&
-    typeof o.instant === "boolean";
+    typeof o.instant === "boolean" &&
+    (o.roll === undefined || typeof o.roll === "number");
 }
 
 

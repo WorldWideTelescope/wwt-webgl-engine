@@ -1949,11 +1949,12 @@ namespace wwtlib
             }
         }
 
-        public void GotoRADecZoom(double ra, double dec, double zoom, bool instant)
+        public void GotoRADecZoom(double ra, double dec, double zoom, bool instant, double? roll)
         {
             ra = DoubleUtilities.Clamp(ra, 0, 24);
             dec = DoubleUtilities.Clamp(dec, -90, 90);
             zoom = DoubleUtilities.Clamp(zoom, ZoomMin, ZoomMax);
+            double rotation = roll == null ? WWTControl.Singleton.RenderContext.ViewCamera.Rotation : (double)roll;
 
             tracking = false;
             trackingObject = null;
@@ -1965,7 +1966,7 @@ namespace wwtlib
                     dec,
                     WWTControl.Singleton.RenderContext.RAtoViewLng(ra),
                     zoom,
-                    WWTControl.Singleton.RenderContext.ViewCamera.Rotation,
+                    rotation,
                     WWTControl.Singleton.RenderContext.ViewCamera.Angle,
                     (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity
                 ),
@@ -2278,7 +2279,9 @@ namespace wwtlib
             if (instant ||
                 (Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 &&
                  Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 &&
-                 Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001))
+                 Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001 &&
+                 Math.Abs(RenderContext.ViewCamera.Rotation - cameraParams.Rotation) < .000000000001
+                 ))
             {
                 Mover = null;
                 RenderContext.TargetCamera = cameraParams.Copy();
