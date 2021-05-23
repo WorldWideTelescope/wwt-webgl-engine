@@ -282,16 +282,20 @@ export class FitsImage extends WcsImage {
   width: number;
   height: number;
   numAxis: number;
+  fitsProperties: FitsProperties;
+
+  computeHistogram(count: number): number[];
+}
+
+export class FitsProperties {
   bZero: number;
   bScale: number;
-  dataType: DataTypes;
-  containsBlanks: boolean;
   blankValue: number;
   maxVal: number;
   minVal: number;
+  lowerCut: number;
+  upperCut: number;
   transparentBlack: boolean;
-
-  computeHistogram(count: number): number[];
 }
 
 export class Folder implements Thumbnail {
@@ -415,6 +419,8 @@ export class Imageset implements Thumbnail {
 
   get_extension(): string;
   set_extension(ext: string): string;
+
+  get_fitsProperties(): FitsProperties;
 
   get_generic(): boolean;
   set_generic(g: boolean): boolean;

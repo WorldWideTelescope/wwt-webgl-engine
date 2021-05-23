@@ -16,13 +16,13 @@ namespace wwtlib
         public int[] Histogram;
         public int HistogramMaxCount;
         public Blob sourceBlob = null;
+        public FitsProperties fitsProperties;
 
         protected readonly Dictionary<String, String> header = new Dictionary<string, string>();
         protected const float NaN = 0f / 0f;
         protected int position = 0;
         protected int BufferSize = 1;
         protected Imageset dataset;
-        protected FitsProperties fitsProperties;
 
         private readonly WcsLoaded callBack;
         private WebFile webFile;

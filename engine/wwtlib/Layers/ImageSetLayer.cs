@@ -12,10 +12,6 @@ namespace wwtlib
     {
         Imageset imageSet = null;
 
-        ScaleTypes lastScale = ScaleTypes.Linear;
-        double min = 0;
-        double max = 0;
-
         public Imageset ImageSet
         {
             get { return imageSet; }
@@ -60,22 +56,22 @@ namespace wwtlib
 
             if (node.Attributes.GetNamedItem("ScaleType") != null)
             {
-                lastScale = (ScaleTypes)Enums.Parse("ScaleTypes", node.Attributes.GetNamedItem("ScaleType").Value);
+                ImageSet.FitsProperties.ScaleType = (ScaleTypes)Enums.Parse("ScaleTypes", node.Attributes.GetNamedItem("ScaleType").Value);
             }
 
             if (node.Attributes.GetNamedItem("MinValue") != null)
             {
-                min = double.Parse(node.Attributes.GetNamedItem("MinValue").Value);
+                ImageSet.FitsProperties.MinVal = double.Parse(node.Attributes.GetNamedItem("MinValue").Value);
             }
 
             if (node.Attributes.GetNamedItem("MaxValue") != null)
             {
-                max = double.Parse(node.Attributes.GetNamedItem("MaxValue").Value);
+                ImageSet.FitsProperties.MaxVal = double.Parse(node.Attributes.GetNamedItem("MaxValue").Value);
             }
 
             if (node.Attributes.GetNamedItem("ColorMapperName") != null)
             {
-                colorMapperName = node.Attributes.GetNamedItem("ColorMapperName").Value;
+                ImageSet.FitsProperties.ColorMapName = node.Attributes.GetNamedItem("ColorMapperName").Value;
             }
 
             if (node.Attributes.GetNamedItem("OverrideDefault") != null)
@@ -182,11 +178,11 @@ namespace wwtlib
 
         public void SetImageScaleRaw(ScaleTypes scaleType, double min, double max)
         {
-            this.min = min;
-            this.max = max;
-            this.lastScale = scaleType;
+            ImageSet.FitsProperties.LowerCut = min;
+            ImageSet.FitsProperties.UpperCut = max;
+            ImageSet.FitsProperties.ScaleType = scaleType;
 
-            if (imageSet.WcsImage is FitsImage)
+            if (imageSet.WcsImage is FitsImageJs)
             {
                 Histogram.UpdateScale(this, scaleType, min, max);
             }
@@ -214,17 +210,15 @@ namespace wwtlib
             }
         }
 
-        protected string colorMapperName = null;
-
         public string ColorMapperName
         {
-            get { return colorMapperName; }
+            get {
+                return ImageSet.FitsProperties.ColorMapName; }
             set
             {
                 if (ColorMapContainer.FromNamedColormap(value) == null)
                     throw new Exception("Invalid colormap name");
                 version++;
-                colorMapperName = value;
                 if(imageSet.WcsImage != null)
                 {
                     if (RenderContext.UseGlVersion2)
@@ -233,7 +227,7 @@ namespace wwtlib
                     }
                     else
                     {
-                        Histogram.UpdateColorMapper(this, colorMapperName);
+                        Histogram.UpdateColorMapper(this, value);
                     }
                 }
             }
@@ -243,10 +237,10 @@ namespace wwtlib
         {
             get
             {
-                if (colorMapperName == null) {
+                if (ImageSet.FitsProperties.ColorMapName == null) {
                     return null;
                 } else {
-                    return ColorMapContainer.FromNamedColormap(colorMapperName);
+                    return ColorMapContainer.FromNamedColormap(ImageSet.FitsProperties.ColorMapName);
                 }
             }
         }
@@ -268,12 +262,7 @@ namespace wwtlib
                     fi = new FitsImageJs(imageSet, "image.fit", blob, DoneLoading);
                 }
                 imageSet.WcsImage = fi;
-                if (max > 0 || min > 0)
-                {
-                    imageSet.FitsProperties.MaxVal = max;
-                    imageSet.FitsProperties.MinVal = min;
-                    imageSet.FitsProperties.ScaleType = lastScale;
-                }
+
             }
             else
             {
