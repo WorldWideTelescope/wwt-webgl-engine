@@ -122,11 +122,11 @@ namespace wwtlib
             if (imageSet.WcsImage is FitsImage)
             {
                 FitsImage fi = imageSet.WcsImage as FitsImage;
-                xmlWriter.WriteAttributeString("ScaleType", Enums.ToXml("ScaleTypes", (int)fi.lastScale));
-                xmlWriter.WriteAttributeString("MinValue", fi.lastBitmapMin.ToString());
-                xmlWriter.WriteAttributeString("MaxValue", fi.lastBitmapMax.ToString());
-                if (fi.lastBitmapColorMapperName != null) {
-                    xmlWriter.WriteAttributeString("ColorMapperName", fi.lastBitmapColorMapperName);
+                xmlWriter.WriteAttributeString("ScaleType", Enums.ToXml("ScaleTypes", (int)imageSet.FitsProperties.ScaleType));
+                xmlWriter.WriteAttributeString("MinValue", imageSet.FitsProperties.MinVal.ToString());
+                xmlWriter.WriteAttributeString("MaxValue", imageSet.FitsProperties.MaxVal.ToString());
+                if (imageSet.FitsProperties.ColorMapName != null) {
+                    xmlWriter.WriteAttributeString("ColorMapperName", imageSet.FitsProperties.ColorMapName);
                 }
 
             }
@@ -196,11 +196,12 @@ namespace wwtlib
         {
             double newMin = min;
             double newMax = max;
+            
             if (imageSet.WcsImage is FitsImage)
             {
                 FitsImage img = imageSet.WcsImage as FitsImage;
-                newMin = (newMin - img.BZero) / img.BScale;
-                newMax = (newMax - img.BZero) / img.BScale;
+                newMin = (newMin - imageSet.FitsProperties.BZero) / imageSet.FitsProperties.BScale;
+                newMax = (newMax - imageSet.FitsProperties.BZero) / imageSet.FitsProperties.BScale;
             }
             SetImageScaleRaw(scaleType, newMin, newMax);
         }
@@ -224,7 +225,17 @@ namespace wwtlib
                     throw new Exception("Invalid colormap name");
                 version++;
                 colorMapperName = value;
-                Histogram.UpdateColorMapper(this, colorMapperName);
+                if(imageSet.WcsImage != null)
+                {
+                    if (RenderContext.UseGlVersion2)
+                    {
+                        imageSet.FitsProperties.ColorMapName = value;
+                    }
+                    else
+                    {
+                        Histogram.UpdateColorMapper(this, colorMapperName);
+                    }
+                }
             }
         }
 
@@ -246,13 +257,22 @@ namespace wwtlib
             {
                 System.Html.Data.Files.Blob blob = tourDoc.GetFileBlob(filename.Replace(".txt", extension));
 
-                FitsImage fi = new FitsImage("image.fit", blob, DoneLoading);
+                FitsImage fi;
+                if (RenderContext.UseGlVersion2)
+                {
+                    fi = new FitsImage(imageSet, "image.fit", blob, DoneLoading);
+
+                }
+                else
+                {
+                    fi = new FitsImageJs(imageSet, "image.fit", blob, DoneLoading);
+                }
                 imageSet.WcsImage = fi;
                 if (max > 0 || min > 0)
                 {
-                    fi.lastBitmapMax = max;
-                    fi.lastBitmapMin = min;
-                    fi.lastScale = lastScale;
+                    imageSet.FitsProperties.MaxVal = max;
+                    imageSet.FitsProperties.MinVal = min;
+                    imageSet.FitsProperties.ScaleType = lastScale;
                 }
             }
             else

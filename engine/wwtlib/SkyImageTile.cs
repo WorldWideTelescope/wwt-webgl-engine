@@ -117,20 +117,49 @@ namespace wwtlib
                 return true;
             }
 
-            Bitmap bmp = null;
-
             if (dataset.WcsImage != null)
             {
-                WcsImage wcsImage = dataset.WcsImage as WcsImage;
-                bmp = wcsImage.GetBitmap();
-                texture2d = bmp.GetTexture();
-
-                if (bmp.Height != wcsImage.SizeY)
+                FitsImage fitsImage = dataset.WcsImage as FitsImage;
+                if(fitsImage != null)
                 {
-                    PixelCenterY += bmp.Height - wcsImage.SizeY;
+                    if(RenderContext.UseGlVersion2)
+                    {
+                        texture2d = PrepDevice.createTexture();
+                        PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+
+                        PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
+                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
+
+                        Width = fitsImage.SizeX;
+                        Height = fitsImage.SizeY;
+                    } else
+                    {
+                        WcsImage wcsImage = dataset.WcsImage as WcsImage;
+                        Bitmap bmp = wcsImage.GetBitmap();
+                        texture2d = bmp.GetTexture();
+                        if (bmp.Height != wcsImage.SizeY)
+                        {
+                            PixelCenterY += bmp.Height - wcsImage.SizeY;
+                        }
+                        if (renderContext.gl != null)
+                        {
+                            Height = bmp.Height;
+                            Width = bmp.Width;
+                        }
+                        else
+                        {
+                            Height = texture.NaturalHeight;
+                            Width = texture.NaturalWidth;
+                        }
+                    }
                 }
+
             }
-            
+
             GeometryCreated = true;
 
             for (int i = 0; i < 4; i++)
@@ -141,16 +170,6 @@ namespace wwtlib
 
             ComputeMatrix();
 
-            if (bmp != null && renderContext.gl != null)
-            {
-                Height = bmp.Height;
-                Width = bmp.Width;
-            }
-            else
-            {
-                Height = texture.NaturalHeight;
-                Width = texture.NaturalWidth;
-            }
             double latMin = 0 + (ScaleY * (Height - PixelCenterY));
             double latMax = 0 - (ScaleY * PixelCenterY);
             double lngMin = 0 + (ScaleX * PixelCenterX);
@@ -289,6 +308,25 @@ namespace wwtlib
                 }
             }
             return true;
+        }
+        public override void RenderPart(RenderContext renderContext, int part, double opacity, bool combine)
+        {
+            if (RenderContext.UseGlVersion2)
+            {
+                ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
+                FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
+                FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
+                FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
+                FitsShader.BZero = (float)dataset.FitsProperties.BZero;
+                FitsShader.BScale = (float)dataset.FitsProperties.BScale;
+                FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
+                FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
+                FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+            } else
+            {
+                TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float) opacity, false);
+            }
+            renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount* 3, GL.UNSIGNED_SHORT, 0);
         }
 
         //public override bool IsTileBigEnough(RenderContext renderContext)

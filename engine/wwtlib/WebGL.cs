@@ -474,6 +474,7 @@ namespace System.Html
         public void uniform1fv(WebGLUniformLocation location, float[] v) { return; }
         public void uniform1fv(WebGLUniformLocation location, WebGLFloatArray v) { return; }
         public void uniform1i(WebGLUniformLocation location, int x) { return; }
+        public void uniform1i(WebGLUniformLocation location, bool x) { return; }
         public void uniform1iv(WebGLUniformLocation location, int[] v) { return; }
         public void uniform1iv(WebGLUniformLocation location, WebGLIntArray v) { return; }
         public void uniform2f(WebGLUniformLocation location, float x, float y) { return; }
@@ -913,6 +914,8 @@ namespace System.Html
         public DataView(object data) { }
         [ScriptField]
         public int byteLength { get { return 0; } }
+        [ScriptField]
+        public int buffer { get { return 0; } }
 
         public int getUint8 (int position) { return 0; }
         public int getFloat64 (int position, bool littleEndian) { return 0; }

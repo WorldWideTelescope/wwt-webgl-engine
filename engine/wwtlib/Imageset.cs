@@ -61,7 +61,7 @@ namespace wwtlib
                     {
                         if (imageset.HipsProperties == null)
                         {
-                            imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
+                            imageset.HipsProperties = new HipsProperties(imageset);
                         }
                         if (imageset.HipsProperties.DownloadComplete)
                         {
@@ -328,6 +328,14 @@ namespace wwtlib
         {
             get { return hipsProperties; }
             set { hipsProperties = value; }
+        }
+
+        FitsProperties fitsProperties = new FitsProperties();
+
+        public FitsProperties FitsProperties
+        {
+            get { return fitsProperties; }
+            set { fitsProperties = value; }
         }
 
         public static Imageset FromXMLNode(XmlNode node)
@@ -829,38 +837,43 @@ namespace wwtlib
         {
             Imageset temp = new Imageset();
 
-            temp.ReferenceFrame = referenceFrame;
-            temp.MeanRadius = meanRadius;
-            temp.altUrl = alturl;
-            temp.demUrl = demUrlIn;
-            temp.creditsText = credits;
-            temp.creditsUrl = creditsUrl;
-            temp.offsetY = offsetY;
-            temp.offsetX = offsetX;
-            temp.widthFactor = wf;
-            temp.elevationModel = elevationModel;
-            temp.defaultSet = defaultSet;
-            temp.name = name;
-            temp.sparse = sparse;
-            temp.dataSetType = dataSetType;
-            temp.bandPass = bandPass;
-            temp.quadTreeTileMap = quadTreeMap;
-            temp.url = url;
-            temp.levels = levels;
-            temp.baseTileDegrees = baseTileDegrees;
-            temp.imageSetID = imageSetID;
-            temp.extension = extension;
-            temp.projection = projection;
-            temp.bottomsUp = bottomsUp;
-            temp.baseLevel = baseLevel;
-            temp.mercator = (projection == ProjectionType.Mercator);
-            temp.centerX = centerX;
-            temp.centerY = centerY;
-            temp.rotation = rotation;
-            temp.thumbnailUrl = thumbnailUrl;
-            temp.ComputeMatrix();
+            temp.SetInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame);
 
             return temp;
+        }
+
+        public void SetInitialParameters(string name, string url, ImageSetType dataSetType, BandPass bandPass, ProjectionType projection, int imageSetID, int baseLevel, int levels, double baseTileDegrees, string extension, bool bottomsUp, string quadTreeMap, double centerX, double centerY, double rotation, bool sparse, string thumbnailUrl, bool defaultSet, bool elevationModel, int wf, double offsetX, double offsetY, string credits, string creditsUrl, string demUrlIn, string alturl, double meanRadius, string referenceFrame)
+        {
+            this.ReferenceFrame = referenceFrame;
+            this.MeanRadius = meanRadius;
+            this.altUrl = alturl;
+            this.demUrl = demUrlIn;
+            this.creditsText = credits;
+            this.creditsUrl = creditsUrl;
+            this.offsetY = offsetY;
+            this.offsetX = offsetX;
+            this.widthFactor = wf;
+            this.elevationModel = elevationModel;
+            this.defaultSet = defaultSet;
+            this.name = name;
+            this.sparse = sparse;
+            this.dataSetType = dataSetType;
+            this.bandPass = bandPass;
+            this.quadTreeTileMap = quadTreeMap;
+            this.url = url;
+            this.levels = levels;
+            this.baseTileDegrees = baseTileDegrees;
+            this.imageSetID = imageSetID;
+            this.extension = extension;
+            this.projection = projection;
+            this.bottomsUp = bottomsUp;
+            this.baseLevel = baseLevel;
+            this.mercator = (projection == ProjectionType.Mercator);
+            this.centerX = centerX;
+            this.centerY = centerY;
+            this.rotation = rotation;
+            this.thumbnailUrl = thumbnailUrl;
+            this.ComputeMatrix();
         }
 
 

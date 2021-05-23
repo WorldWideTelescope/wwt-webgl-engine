@@ -325,7 +325,7 @@ namespace wwtlib
 
             if (imageset.HipsProperties == null)
             {
-                imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
+                imageset.HipsProperties = new HipsProperties(imageset);
                 imageset.HipsProperties.SetDownloadCompleteListener(onHeaderInfoLoad);
             }
             else if (imageset.HipsProperties != null && imageset.HipsProperties.DownloadComplete)
@@ -405,7 +405,7 @@ namespace wwtlib
             }
             if (imageset.HipsProperties == null)
             {
-                imageset.HipsProperties = new HipsProperties(imageset.Url, imageset.Name);
+                imageset.HipsProperties = new HipsProperties(imageset);
                 imageset.HipsProperties.SetDownloadCompleteListener(onLoad);
             }
             else if (imageset.HipsProperties != null && imageset.HipsProperties.DownloadComplete)
