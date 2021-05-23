@@ -270,27 +270,27 @@ namespace wwtlib
             }
         }
 
-        public void SetCutsForFitsHips(string hipsName, double min, double max)
+        public void SetCutsForFits(string imagesetName, double min, double max)
         {
             if (WWTControl.Singleton != null)
             {
-                WWTControl.Singleton.SetCutsForFitsHips(hipsName, min , max);
+                WWTControl.Singleton.SetCutsForFits(imagesetName, min , max);
             }
         }
 
-        public void SetColorMapForFitsHips(string hipsName, string colorMapName)
+        public void SetColorMapForFits(string imagesetName, string colorMapName)
         {
             if (WWTControl.Singleton != null)
             {
-                WWTControl.Singleton.SetColorMapForFitsHips(hipsName, colorMapName);
+                WWTControl.Singleton.SetColorMapForFits(imagesetName, colorMapName);
             }
         }
 
-        public void SetScaleTypeForFitsHips(string hipsName, ScaleTypes scaleType)
+        public void SetScaleTypeForFits(string imagesetName, ScaleTypes scaleType)
         {
             if (WWTControl.Singleton != null)
             {
-                WWTControl.Singleton.SetScaleTypeForFitsHips(hipsName, scaleType);
+                WWTControl.Singleton.SetScaleTypeForFits(imagesetName, scaleType);
             }
         }
 
@@ -320,19 +320,20 @@ namespace wwtlib
 
         public ImageSetLayer LoadFitsLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = LayerManager.GetNextFitsName();
-            }
-
             ImageSetLayer imagesetLayer = new ImageSetLayer();
-
-            FitsImage img = new FitsImage(url, null, delegate (WcsImage wcsImage)
+            Imageset imageset = new Imageset();
+            
+            WcsLoaded wcsLoaded = delegate (WcsImage wcsImage)
             {
+                if (((FitsImage)wcsImage).errored)
+                {
+                    return;
+                }
+
                 int width = (int)wcsImage.SizeX;
                 int height = (int)wcsImage.SizeY;
-
-                Imageset imageset = Imageset.Create(
+                //TODO make sure dataset URL is unique
+                imageset.SetInitialParameters(
                             wcsImage.Description,
                             Util.GetHashCode(wcsImage.Filename).ToString(),
                             ImageSetType.Sky,
@@ -341,9 +342,8 @@ namespace wwtlib
                             Util.GetHashCode(wcsImage.Filename),
                             0,
                             0,
-                            256,
                             wcsImage.ScaleY,
-                            ".tif",
+                            ".fits",
                             wcsImage.ScaleX > 0,
                             "",
                             wcsImage.CenterX,
@@ -376,8 +376,20 @@ namespace wwtlib
                 {
                     loaded(imagesetLayer);
                 }
-            });
+            };
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = LayerManager.GetNextFitsName();
+            }
 
+            if (RenderContext.UseGlVersion2)
+            {
+                new FitsImage(imageset, url, null, wcsLoaded);
+            }
+            else
+            {
+                new FitsImageJs(imageset, url, null, wcsLoaded);
+            }
             return imagesetLayer;
         }
 

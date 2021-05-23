@@ -2606,42 +2606,42 @@ namespace wwtlib
             }
         }
 
-        public void SetCutsForFitsHips(string hipsName, double min, double max)
+        public void SetCutsForFits(string imagesetName, double min, double max)
         {
-            Imageset hips = GetImagesetByName(hipsName);
-            if (hips != null && hips.HipsProperties != null)
+            Imageset imageset = GetImagesetByName(imagesetName);
+            if (imageset != null && imageset.FitsProperties != null)
             {
-                hips.HipsProperties.MinVal = min;
-                hips.HipsProperties.MaxVal = max;
+                imageset.FitsProperties.MinVal = min;
+                imageset.FitsProperties.MaxVal = max;
             } else
             {
-                Script.Literal("console.log({0} + ' not found')", hipsName);
+                Script.Literal("console.log({0} + ' not found')", imagesetName);
             }
         }
 
-        public void SetColorMapForFitsHips(string hipsName, string colorMapName)
+        public void SetColorMapForFits(string imagesetName, string colorMapName)
         {
-            Imageset hips = GetImagesetByName(hipsName);
-            if (hips != null && hips.HipsProperties != null)
+            Imageset imageset = GetImagesetByName(imagesetName);
+            if (imageset != null && imageset.FitsProperties != null)
             {
-                hips.HipsProperties.ColorMapName = colorMapName;
+                imageset.FitsProperties.ColorMapName = colorMapName;
             }
             else
             {
-                Script.Literal("console.log({0} + ' not found')", hipsName);
+                Script.Literal("console.log({0} + ' not found')", imagesetName);
             }
         }
 
-        public void SetScaleTypeForFitsHips(string hipsName, ScaleTypes scaleType)
+        public void SetScaleTypeForFits(string imagesetName, ScaleTypes scaleType)
         {
-            Imageset hips = GetImagesetByName(hipsName);
-            if (hips != null && hips.HipsProperties != null)
+            Imageset imageset = GetImagesetByName(imagesetName);
+            if (imageset != null && imageset.FitsProperties != null)
             {
-                hips.HipsProperties.ScaleType = scaleType;
+                imageset.FitsProperties.ScaleType = scaleType;
             }
             else
             {
-                Script.Literal("console.log({0} + ' not found')", hipsName);
+                Script.Literal("console.log({0} + ' not found')", imagesetName);
             }
         }
         
