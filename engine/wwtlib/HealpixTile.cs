@@ -428,8 +428,8 @@ namespace wwtlib
             else
             {
                 ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
-                FitsShader.Min = (float)dataset.FitsProperties.MinVal;
-                FitsShader.Max = (float)dataset.FitsProperties.MaxVal;
+                FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
+                FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
                 FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
                 FitsShader.BZero = (float)dataset.FitsProperties.BZero;
                 FitsShader.BScale = (float)dataset.FitsProperties.BScale;

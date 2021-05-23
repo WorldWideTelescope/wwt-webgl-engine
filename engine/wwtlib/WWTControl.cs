@@ -2611,8 +2611,8 @@ namespace wwtlib
             Imageset imageset = GetImagesetByName(imagesetName);
             if (imageset != null && imageset.FitsProperties != null)
             {
-                imageset.FitsProperties.MinVal = min;
-                imageset.FitsProperties.MaxVal = max;
+                imageset.FitsProperties.LowerCut = min;
+                imageset.FitsProperties.UpperCut = max;
             } else
             {
                 Script.Literal("console.log({0} + ' not found')", imagesetName);
