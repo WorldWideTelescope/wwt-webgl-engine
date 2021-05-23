@@ -65,11 +65,26 @@ namespace wwtlib
                     catalogColumnInfo = VoTable.LoadFromUrl(url.Replace("/properties", "/metadata.xml"), OnCatalogMetadataDownloadComplete);
                 } else
                 {
+                    if (Properties.ContainsKey("hips_data_range"))
+                    {
+                        string hips_data_range = Properties["hips_data_range"];
+                        this.dataset.FitsProperties.MinVal = Double.Parse(hips_data_range.Split(" ")[0]);
+                        this.dataset.FitsProperties.MaxVal = Double.Parse(hips_data_range.Split(" ")[1]);
+                        this.dataset.FitsProperties.LowerCut = this.dataset.FitsProperties.MinVal;
+                        this.dataset.FitsProperties.UpperCut = this.dataset.FitsProperties.MaxVal;
+                    }
                     if (Properties.ContainsKey("hips_pixel_cut"))
                     {
                         string hips_pixel_cut = Properties["hips_pixel_cut"];
-                        this.dataset.FitsProperties.MinVal = Double.Parse(Properties["hips_pixel_cut"].Split(" ")[0]);
-                        this.dataset.FitsProperties.MaxVal = Double.Parse(Properties["hips_pixel_cut"].Split(" ")[1]);
+                        this.dataset.FitsProperties.LowerCut = Double.Parse(hips_pixel_cut.Split(" ")[0]);
+                        this.dataset.FitsProperties.UpperCut = Double.Parse(hips_pixel_cut.Split(" ")[1]);
+                        if(!Properties.ContainsKey("hips_data_range"))
+                        {
+                            this.dataset.FitsProperties.MinVal = this.dataset.FitsProperties.LowerCut;
+                            this.dataset.FitsProperties.MaxVal = this.dataset.FitsProperties.UpperCut;
+                        }
+
+                            
                     }
                     downloadComplete = true;
                     if(onDownloadComplete != null)
