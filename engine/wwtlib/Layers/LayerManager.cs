@@ -443,25 +443,29 @@ namespace wwtlib
 
         private static string getNextName(string type){
             int currentNumber = 0;
-            foreach (Layer layer in AllMaps["Sky"].Layers)
+            foreach (string key in AllMaps.Keys)
             {
-                if (layer.Name.StartsWith(type + " "))
+                foreach (Layer layer in AllMaps[key].Layers)
                 {
-                    string number = layer.Name.Replace(type + " ", "");
-                    try
+                    if (layer.Name.StartsWith(type + " "))
                     {
-                        int num = Int32.Parse(number);
-                        if (num > currentNumber)
+                        string number = layer.Name.Replace(type + " ", "");
+                        try
                         {
-                            currentNumber = num;
+                            int num = Int32.Parse(number);
+                            if (num > currentNumber)
+                            {
+                                currentNumber = num;
+                            }
                         }
-                    }
-                    catch
-                    {
+                        catch
+                        {
 
+                        }
                     }
                 }
             }
+
             return string.Format("{0} {1}", type, currentNumber + 1);
         }
 
