@@ -205,7 +205,7 @@ export interface LoadTourParams {
 export interface LoadImageCollectionParams {
   /** The WTML URL to load. */
   url: string;
-  /** Recursively load any child folders. */
+  /** Optional, Recursively load any child folders. Defaults to false*/
   loadChildFolders?: boolean;
 }
 

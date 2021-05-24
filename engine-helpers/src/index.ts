@@ -595,7 +595,7 @@ export class WWTInstance {
         loadChildFolders = false;
       }
 
-      holder.f = Wtml.getWtmlFile(url, loadChildFolders, () => {
+      holder.f = Wtml.getWtmlFile(url, () => {
         // The folder at this URL is now fully loaded.
         const f = holder.f as Folder;
         this.collectionRequests.set(url, f);
@@ -609,7 +609,7 @@ export class WWTInstance {
           // Don't filter out promises for other URLs.
           return true;
         });
-      });
+      }, loadChildFolders);
     }
 
     return new Promise((resolve, reject) => {

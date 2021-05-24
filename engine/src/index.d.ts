@@ -2136,13 +2136,14 @@ export namespace Wtml {
    * callback will be called.
    *
    * @param url The URL from which to retrieve the WTML data.
-   * @param loadChildFolders When true, this method will recursively 
-   * download and unpack all [[Folder]]s contained in the original WTML file.
    * @param complete A callback to be called after the folder (and all child
    * folders, if loadChildFolders is set to true) is successfully loaded.
+   * @param loadChildFolders Optional, When true, this method will recursively 
+   * download and unpack all [[Folder]]s contained in the original WTML file.
+   * Defaults to false.
    * @returns A folder object that will be populated asynchronously.
    */
-  export function getWtmlFile(url: string, loadChildFolders: boolean, complete: Action): Folder;
+  export function getWtmlFile(url: string, complete: Action, loadChildFolders?: boolean): Folder;
 }
 
 export namespace WWTControl {

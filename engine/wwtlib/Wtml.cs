@@ -39,11 +39,15 @@ namespace wwtlib
     public class Wtml
     {
 
-        static public Folder GetWtmlFile(string url, bool loadChildFolders, Action complete)
+        static public Folder GetWtmlFile(string url, Action complete, bool? loadChildFolders)
         {
+            if (loadChildFolders == null)
+            {
+                loadChildFolders = false;
+            }
             Folder folder = new Folder();
             folder.Url = url;
-            FolderDownloadAction folderDownloadAction = new FolderDownloadAction(complete, loadChildFolders);
+            FolderDownloadAction folderDownloadAction = new FolderDownloadAction(complete, (bool)loadChildFolders);
             folderDownloadAction.StartingNewFolderLoad(folder);
             return folder;
         }

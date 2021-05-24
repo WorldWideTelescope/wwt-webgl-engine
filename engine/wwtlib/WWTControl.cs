@@ -1923,8 +1923,8 @@ namespace wwtlib
 
             Wtml.GetWtmlFile(
                 URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
-                true,
-                SetupComplete
+                SetupComplete,
+                true
             );
         }
 
@@ -2567,7 +2567,7 @@ namespace wwtlib
         {
             foreach (Imageset imageset in ImageSets)
             {
-                if (imageset.Url.ToLowerCase() == url.ToLowerCase())
+                if (imageset.Url == url)
                 {
                     return imageset;
                 }

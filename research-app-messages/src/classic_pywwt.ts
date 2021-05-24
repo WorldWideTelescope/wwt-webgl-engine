@@ -240,7 +240,7 @@ export interface LoadImageCollectionMessage {
   /** The URL of the collection to load. */
   url: string;
 
-  /** Recursively load any child folders. */
+  /** Optional, Recursively load any child folders. Defaults to False*/
   loadChildFolders: boolean;
 }
 
