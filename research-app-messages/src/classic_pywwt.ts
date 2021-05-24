@@ -241,7 +241,7 @@ export interface LoadImageCollectionMessage {
   url: string;
 
   /** Optional, Recursively load any child folders. Defaults to False*/
-  loadChildFolders: boolean;
+  loadChildFolders?: boolean;
 }
 
 /** Type guard function for LoadImageCollectionMessage. */

@@ -948,9 +948,10 @@ export class ScriptInterface {
    * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
    *
    * @param url The URL of the WTML collection file to load.
-   * @param loadChildFolders Recursively load any child folders.
+   * @param loadChildFolders Optional, Recursively load any child folders.
+   * Defaults to False
    */
-  loadImageCollection(url: string, loadChildFolders: boolean): void;
+  loadImageCollection(url: string, loadChildFolders?: boolean): void;
 
   /** Set the opacity with which the foreground imageset is rendered.
    *
