@@ -113,7 +113,9 @@ class ImageSetLayerMessageHandler {
   }
 
   handleCreateMessage(msg: classicPywwt.CreateImageSetLayerMessage) {
-    if (this.created) {return;}
+    if (this.created) {
+      return;
+    }
 
     this.owner.addImageSetLayer({
       url: msg.url,

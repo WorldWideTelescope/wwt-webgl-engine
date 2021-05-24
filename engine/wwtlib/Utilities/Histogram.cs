@@ -71,7 +71,10 @@ namespace wwtlib
         public static void UpdateImage(ImageSetLayer isl, double z)
         {
             FitsImage image = isl.ImageSet.WcsImage as FitsImage;
-            if(image == null) { return; }
+            if(image == null) 
+            { 
+                return; 
+            }
             SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
             double low = image.lastBitmapMin;
             double hi = image.lastBitmapMax;
@@ -81,7 +84,10 @@ namespace wwtlib
         public static void UpdateScale(ImageSetLayer isl, ScaleTypes scale, double low, double hi)
         {
             FitsImage image = isl.ImageSet.WcsImage as FitsImage;
-            if(image == null) { return; }
+            if (image == null)
+            {
+                return;
+            }
             SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
             int z = image.lastBitmapZ;
             string colorMapperName = image.lastBitmapColorMapperName;
@@ -91,7 +97,10 @@ namespace wwtlib
         public static void UpdateColorMapper(ImageSetLayer isl, string colorMapperName)
         {
             FitsImage image = isl.ImageSet.WcsImage as FitsImage;
-            if(image == null) { return; }
+            if (image == null)
+            {
+                return;
+            }
             SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
             double low = image.lastBitmapMin;
             double hi = image.lastBitmapMax;
