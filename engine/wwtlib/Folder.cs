@@ -287,6 +287,9 @@ namespace wwtlib
                 proxyFolder.Parent = Parent;
             }
 
+            //Also listening to errors, to make sure clients do not wait forever in the case of a 404 or similar.
+            //Especially useful for recursive downloads, where potentially dussins of URL's are downloaded.
+            //In case of errors during downloads, the clients will have an empty folder during the callback.
             proxyFolder.LoadFromUrlWithErrorCallback(urlField, childReadyCallback, childReadyCallback);
             childReadyCallback = null;
         }
