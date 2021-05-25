@@ -27,6 +27,7 @@ import {
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
   AddImageSetLayerOptions,
+  LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
@@ -519,6 +520,22 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot addImageSetLayer without linking to WWTInstance');
     return Vue.$wwt.inst.addImageSetLayer(options);
+  }
+
+  @Action({ rawError: true })
+  async loadFitsLayer(
+    options: LoadFitsLayerOptions
+  ): Promise<ImageSetLayer> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot loadFitsLayer without linking to WWTInstance');
+    const addImageSetLayerOptions: AddImageSetLayerOptions = {
+      url: options.url, 
+      mode: "fits",
+      name: options.name,
+      gotoTarget: options.gotoTarget
+    };
+    
+    return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
   }
 
   @Mutation

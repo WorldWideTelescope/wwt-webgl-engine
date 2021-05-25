@@ -21,6 +21,7 @@ import {
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
   AddImageSetLayerOptions,
+  LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
@@ -264,6 +265,7 @@ export class WWTAwareComponent extends Vue {
         "gotoRADecZoom",
         "gotoTarget",
         "loadImageCollection",
+        "loadFitsLayer",
         "addImageSetLayer",
         "loadTour",
         "waitForReady",
@@ -615,6 +617,14 @@ export class WWTAwareComponent extends Vue {
    * It’s asynchronous because the specified WTML file has to be downloaded.
    */
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
+
+  /** Deprecated. Use addImageSetLayer instead.
+   * Request the creation of a FITS image layer.
+   *
+   * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
+   * It’s asynchronous because the requested FITS file has to be downloaded.
+   */
+   loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
 
   /** Request the creation of a image layer. Either a single FITS or an image set.
    *

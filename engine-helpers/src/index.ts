@@ -285,19 +285,38 @@ export interface GotoTargetOptions {
   trackObject: boolean;
 }
 
+
+/** Deprecated, use AddImageSetLayerOptions instead.
+ *  Options for [[WWTInstance.addImageSetLayer]]. */
+export interface LoadFitsLayerOptions {
+  /** The URL of the FITS file. */
+  url: string;
+  
+  /** A name to use for the new layer. */
+  name: string;
+
+  /** Whether to seek the view to the positon of the FITS file on the sky,
+   * if/when it successfully loads. */
+  gotoTarget: boolean;
+}
+
 /** Options for [[WWTInstance.addImageSetLayer]]. */
 export interface AddImageSetLayerOptions {
   /** The URL of the FITS file 
    * OR The URL of the desired image set. This should mach an image set url
    * previously loaded with [[LoadImageCollection]]. */
   url: string;
+  
+  /** Tell WWT what type of layer you are Adding.
+   * OR let WWT try to autodetect the type of the data.
+   * Default, autodetect. */
+  mode: "autodetect" | "fits" | "preloaded";
 
   /** A name to use for the new layer. */
   name: string;
 
   /** Whether to seek the view to the positon of the FITS file on the sky,
-   * if/when it successfully loads.
-   */
+   * if/when it successfully loads. */
   gotoTarget: boolean;
 }
 

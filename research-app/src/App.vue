@@ -117,8 +117,10 @@ class ImageSetLayerMessageHandler {
       return;
     }
 
+    const mode = msg.mode || "autodetect";
     this.owner.addImageSetLayer({
       url: msg.url,
+      mode: mode,
       name: msg.id,
       gotoTarget: true, // pywwt expected behavior
     }).then((layer) => this.layerInitialized(layer));
@@ -503,6 +505,14 @@ export default class App extends WWTAwareComponent {
       }
     } else if (classicPywwt.isCreateImageSetLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleCreateMessage(msg);
+    } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
+      const creatImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
+        event: msg.event,
+        url: msg.url,
+        id: msg.id,
+        mode: "fits",
+      }
+      this.getFitsLayerHandler(creatImageSetMessage).handleCreateMessage(creatImageSetMessage);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleStretchMessage(msg);
     } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {

@@ -320,95 +320,131 @@ namespace wwtlib
 
         public ImageSetLayer LoadFitsLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
         {
-            return AddImageSetLayer(url, name, gotoTarget, loaded);
+            return AddImageSetLayer(url, "fits", name, gotoTarget, loaded);
         }
 
-        public ImageSetLayer AddImageSetLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
+        public ImageSetLayer AddImageSetLayer(string url, string mode, string name, bool gotoTarget, ImagesetLoaded loaded)
         {
-            Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
-            if (imageset != null)
+            if (mode.ToLowerCase() == "fits")
             {
-                if (string.IsNullOrWhiteSpace(name))
+                return AddFitsLayer(url, name, gotoTarget, loaded);
+            }
+            else if (mode.ToLowerCase() == "preloaded")
+            {
+                Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
+                if (imageset != null)
                 {
-                    name = LayerManager.GetNextImageSetName();
+                    return AddImageSet(name, gotoTarget, loaded, imageset);
                 }
-                ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayer(imageset, name);
+            }
+            else
+            {
+                Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
+                if (imageset != null)
+                {
+                    return AddImageSet(name, gotoTarget, loaded, imageset);
+                }
+                else if (ContainsFitsLikeExtentsion(url))
+                {
+                    return AddFitsLayer(url, name, gotoTarget, loaded);
+                }
+            }
+            return null;
+        }
 
+        private static bool ContainsFitsLikeExtentsion(string url)
+        {
+            string lowerCaseUrl = url.ToLowerCase();
+            return (lowerCaseUrl.EndsWith("fits")
+                || lowerCaseUrl.EndsWith("ftz")
+                || lowerCaseUrl.EndsWith("fit")
+                || lowerCaseUrl.EndsWith("fts")
+                );
+        }
+
+        private static ImageSetLayer AddImageSet(string name, bool gotoTarget, ImagesetLoaded loaded, Imageset imageset)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = LayerManager.GetNextImageSetName();
+            }
+            ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayer(imageset, name);
+
+            if (gotoTarget)
+            {
+                WWTControl.Singleton.GotoRADecZoom(imageset.CenterX / 15, imageset.CenterY,
+                    WWTControl.Singleton.RenderContext.ViewCamera.Zoom, false, null);
+            }
+            if (loaded != null)
+            {
+                loaded(imagesetLayer);
+            }
+
+            return imagesetLayer;
+        }
+
+        private static ImageSetLayer AddFitsLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = LayerManager.GetNextFitsName();
+            }
+
+            ImageSetLayer imagesetLayer = new ImageSetLayer();
+
+            FitsImage img = new FitsImage(url, null, delegate (WcsImage wcsImage)
+            {
+                int width = (int)wcsImage.SizeX;
+                int height = (int)wcsImage.SizeY;
+
+                Imageset imageset = Imageset.Create(
+                            wcsImage.Description,
+                            Util.GetHashCode(wcsImage.Filename).ToString(),
+                            ImageSetType.Sky,
+                            BandPass.Visible,
+                            ProjectionType.SkyImage,
+                            Util.GetHashCode(wcsImage.Filename),
+                            0,
+                            0,
+                            256,
+                            wcsImage.ScaleY,
+                            ".tif",
+                            wcsImage.ScaleX > 0,
+                            "",
+                            wcsImage.CenterX,
+                            wcsImage.CenterY,
+                            wcsImage.Rotation,
+                            false,
+                            "",
+                            false,
+                            false,
+                            1,
+                            wcsImage.ReferenceX,
+                            wcsImage.ReferenceY,
+                            wcsImage.Copyright,
+                            wcsImage.CreditsUrl,
+                            "",
+                            "",
+                            0,
+                            ""
+                            );
+
+                imageset.WcsImage = wcsImage;
+                imagesetLayer.ImageSet = imageset;
+                LayerManager.AddFitsImageSetLayer(imagesetLayer, name);
+                LayerManager.LoadTree();
                 if (gotoTarget)
                 {
-                    WWTControl.Singleton.GotoRADecZoom(imageset.CenterX / 15, imageset.CenterY, 
-                        WWTControl.Singleton.RenderContext.ViewCamera.Zoom, false, null);
+                    WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false, null);
                 }
                 if (loaded != null)
                 {
                     loaded(imagesetLayer);
                 }
+            });
 
-                return imagesetLayer;
-            } else
-            {
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    name = LayerManager.GetNextFitsName();
-                }
-
-                ImageSetLayer imagesetLayer = new ImageSetLayer();
-
-                FitsImage img = new FitsImage(url, null, delegate (WcsImage wcsImage)
-                {
-                    int width = (int)wcsImage.SizeX;
-                    int height = (int)wcsImage.SizeY;
-
-                    imageset = Imageset.Create(
-                                wcsImage.Description,
-                                Util.GetHashCode(wcsImage.Filename).ToString(),
-                                ImageSetType.Sky,
-                                BandPass.Visible,
-                                ProjectionType.SkyImage,
-                                Util.GetHashCode(wcsImage.Filename),
-                                0,
-                                0,
-                                256,
-                                wcsImage.ScaleY,
-                                ".tif",
-                                wcsImage.ScaleX > 0,
-                                "",
-                                wcsImage.CenterX,
-                                wcsImage.CenterY,
-                                wcsImage.Rotation,
-                                false,
-                                "",
-                                false,
-                                false,
-                                1,
-                                wcsImage.ReferenceX,
-                                wcsImage.ReferenceY,
-                                wcsImage.Copyright,
-                                wcsImage.CreditsUrl,
-                                "",
-                                "",
-                                0,
-                                ""
-                                );
-
-                    imageset.WcsImage = wcsImage;
-                    imagesetLayer.ImageSet = imageset;
-                    LayerManager.AddFitsImageSetLayer(imagesetLayer, name);
-                    LayerManager.LoadTree();
-                    if (gotoTarget)
-                    {
-                        WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false, null);
-                    }
-                    if (loaded != null)
-                    {
-                        loaded(imagesetLayer);
-                    }
-                });
-
-                return imagesetLayer;
-            }
+            return imagesetLayer;
         }
-
 
         public bool hideTourFeedback = false;
         public bool HideTourFeedback

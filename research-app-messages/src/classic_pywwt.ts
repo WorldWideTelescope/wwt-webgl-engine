@@ -196,10 +196,35 @@ export interface CreateImageSetLayerMessage {
 
   /** The URL from which to obtain the FITS file or image set. */
   url: string;
-}
+
+  /** Tell WWT what type of layer you are Adding.
+   * OR let WWT try to autodetect the type of the data.
+   * Default, autodetect. */
+  mode: "autodetect" | "fits" | "preloaded";
+  }
 
 /** Type guard function for CreateImageSetLayerMessage. */
 export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return typeof o.event === "string" &&
+    o.event == "image_layer_create" &&
+    typeof o.id === "string" &&
+    typeof o.url === "string" &&
+    typeof o.mode  === "string";
+}
+
+/** Deprecated, use CreateImageSetLayerMessage instead.
+ *  A command to create a fits layer. */
+export interface CreateFitsLayerMessage {
+  /** The tag identifying this message type. */
+  event: "image_layer_create";
+  /** An identifier for referring to this fits layer later. */
+  id: string;
+  /** The URL from which to obtain the FITS file. */
+  url: string;
+}
+
+/** Type guard function for CreateFitsLayerMessage. */
+export function isCreateFitsLayerMessage(o: any): o is CreateFitsLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "image_layer_create" &&
     typeof o.id === "string" &&

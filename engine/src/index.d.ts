@@ -975,11 +975,14 @@ export class ScriptInterface {
    *
    * @param url The URL of a single-file FITS or
    * the URL of an image set as specified in the WTML used in loadImageCollection.
+   * @param mode Tell WWT what type of layer you are Adding.
+   * OR let WWT try to autodetect the type of the data.
    * @param name The name of the image set layer.
    * @param gotoTarget If true, camera will move to the center position of the image.
    */
   addImageSetLayer(
     url: string,
+    mode: string,
     name: string,
     gotoTarget: boolean,
     callback: ImagesetLoadedCallback
