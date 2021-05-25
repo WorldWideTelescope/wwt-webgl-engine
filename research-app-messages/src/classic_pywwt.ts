@@ -201,6 +201,9 @@ export interface CreateImageSetLayerMessage {
    * OR let WWT try to autodetect the type of the data.
    * Default, autodetect. */
   mode: "autodetect" | "fits" | "preloaded";
+
+  /** Go to centre of the data. Defaults to true.*/
+  gotoTarget?: boolean;
   }
 
 /** Type guard function for CreateImageSetLayerMessage. */
@@ -209,7 +212,8 @@ export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMe
     o.event == "image_layer_create" &&
     typeof o.id === "string" &&
     typeof o.url === "string" &&
-    typeof o.mode  === "string";
+    typeof o.mode  === "string" &&
+    (o.gotoTarget === undefined || typeof o.gotoTarget === "boolean");
 }
 
 /** Deprecated, use CreateImageSetLayerMessage instead.
