@@ -657,7 +657,7 @@ export class WWTInstance {
    */
   async addImageSetLayer(options: AddImageSetLayerOptions): Promise<ImageSetLayer> {
     return new Promise((resolve, _reject) => {
-      this.si.addImageSetLayer(options.url, options.name, options.gotoTarget, (layer) => {
+      this.si.addImageSetLayer(options.url, options.mode, options.name, options.gotoTarget, (layer) => {
         resolve(layer);
       })
     });
