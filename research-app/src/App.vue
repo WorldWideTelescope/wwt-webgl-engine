@@ -119,12 +119,13 @@ class ImageSetLayerMessageHandler {
     }
 
     const mode = msg.mode || "autodetect";
-    const gotoTarget = msg.gotoTarget || true; // pywwt expected behavior
+    const gotoTarget = msg.goto == undefined ? true : msg.goto;
+
     this.owner.addImageSetLayer({
       url: msg.url,
       mode: mode,
       name: msg.id,
-      gotoTarget: gotoTarget,
+      goto: gotoTarget,
     }).then((layer) => this.layerInitialized(layer));
 
     this.created = true;

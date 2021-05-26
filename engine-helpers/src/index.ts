@@ -297,7 +297,7 @@ export interface LoadFitsLayerOptions {
 
   /** Whether to seek the view to the positon of the FITS file on the sky,
    * if/when it successfully loads. */
-  gotoTarget: boolean;
+  goto: boolean;
 }
 
 /** Options for [[WWTInstance.addImageSetLayer]]. */
@@ -317,7 +317,7 @@ export interface AddImageSetLayerOptions {
 
   /** Whether to seek the view to the positon of the FITS file on the sky,
    * if/when it successfully loads. */
-  gotoTarget: boolean;
+  goto: boolean;
 }
 
 /** Options for [[WWTInstance.setLayerOrder]]. */
@@ -667,7 +667,7 @@ export class WWTInstance {
    */
   async addImageSetLayer(options: AddImageSetLayerOptions): Promise<ImageSetLayer> {
     return new Promise((resolve, _reject) => {
-      this.si.addImageSetLayer(options.url, options.mode, options.name, options.gotoTarget, (layer) => {
+      this.si.addImageSetLayer(options.url, options.mode, options.name, options.goto, (layer) => {
         resolve(layer);
       })
     });

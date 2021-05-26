@@ -533,7 +533,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       url: options.url, 
       mode: "fits",
       name: options.name,
-      gotoTarget: options.gotoTarget
+      goto: options.goto
     };
     
     return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);

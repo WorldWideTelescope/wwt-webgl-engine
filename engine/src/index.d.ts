@@ -978,13 +978,13 @@ export class ScriptInterface {
    * @param mode Tell WWT what type of layer you are Adding.
    * OR let WWT try to autodetect the type of the data.
    * @param name The name of the image set layer.
-   * @param gotoTarget If true, camera will move to the center position of the image.
+   * @param goto If true, camera will move to the center position of the image.
    */
   addImageSetLayer(
     url: string,
     mode: string,
     name: string,
-    gotoTarget: boolean,
+    goto: boolean,
     callback: ImagesetLoadedCallback
   ): ImageSetLayer;
 
