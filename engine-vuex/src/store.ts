@@ -32,7 +32,8 @@ import {
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
   UpdateTableLayerOptions,
-  WWTInstance
+  WWTInstance,
+  SetLayerOrderOptions
 } from "@wwtelescope/engine-helpers";
 
 interface WWTLinkedCallback {
@@ -537,6 +538,14 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     
     return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
   }
+
+  @Mutation
+  setImageSetLayerOrder(options: SetLayerOrderOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
+    return Vue.$wwt.inst.setImageSetLayerOrder(options);
+  }
+
 
   @Mutation
   stretchFitsLayer(options: StretchFitsLayerOptions): void {

@@ -320,6 +320,16 @@ export interface AddImageSetLayerOptions {
   gotoTarget: boolean;
 }
 
+/** Options for [[WWTInstance.setLayerOrder]]. */
+export interface SetLayerOrderOptions {
+  /** An identifier for referring to this layer. */
+  id: string;
+  /** The prefered position of the layer in the draw cycle.
+   * 0 being the first layer to be drawn. */
+  order: number;
+}
+
+
 /** Options for [[WWTInstance.stretchFitsLayer]]. */
 export interface StretchFitsLayerOptions {
   /** The ID of the FITS layer. */
@@ -661,6 +671,10 @@ export class WWTInstance {
         resolve(layer);
       })
     });
+  }
+
+  setImageSetLayerOrder(options: SetLayerOrderOptions): void {
+    this.si.setImageSetLayerOrder(options.id, options.order);
   }
 
   /** Change the "stretch" settings of a FITS image layer. */

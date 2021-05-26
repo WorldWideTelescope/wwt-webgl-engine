@@ -89,6 +89,7 @@ type ToolType = "crossfade" | null;
 type AnyFitsLayerMessage =
   classicPywwt.CreateImageSetLayerMessage |
   classicPywwt.SetFitsLayerColormapMessage |
+  classicPywwt.SetLayerOrderMessage |
   classicPywwt.StretchFitsLayerMessage |
   classicPywwt.ModifyFitsLayerMessage |
   classicPywwt.RemoveImageSetLayerMessage;
@@ -152,6 +153,13 @@ class ImageSetLayerMessageHandler {
       this.handleRemoveMessage(this.queuedRemoval);
       this.queuedRemoval = null;
     }
+  }
+
+  handleSetLayerOrderMessage(msg: classicPywwt.SetLayerOrderMessage) {
+    this.owner.setImageSetLayerOrder({
+      id: msg.id,
+      order: msg.order,
+    });
   }
 
   handleStretchMessage(msg: classicPywwt.StretchFitsLayerMessage) {
@@ -514,6 +522,8 @@ export default class App extends WWTAwareComponent {
         mode: "fits",
       }
       this.getFitsLayerHandler(creatImageSetMessage).handleCreateMessage(creatImageSetMessage);
+    } else if (classicPywwt.isSetLayerOrderMessage(msg)) {
+      this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleStretchMessage(msg);
     } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {

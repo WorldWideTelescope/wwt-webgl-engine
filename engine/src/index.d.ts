@@ -988,6 +988,10 @@ export class ScriptInterface {
     callback: ImagesetLoadedCallback
   ): ImageSetLayer;
 
+  /** Change the ImageSetLayer position in the layer stack.
+   */
+  setImageSetLayerOrder(id: string, order: number): void;
+  
   /** Create a circle annotation.
    *
    * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
