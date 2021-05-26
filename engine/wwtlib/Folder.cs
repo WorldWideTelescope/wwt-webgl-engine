@@ -54,6 +54,14 @@ namespace wwtlib
 
         WebFile webFile;
         Action onComplete;
+        Action onError;
+
+        public void LoadFromUrlWithErrorCallback(string url, Action complete, Action onError)
+        {
+            this.onError = onError;
+            this.LoadFromUrl(url, complete);
+        }
+
         public void LoadFromUrl(string url, Action complete)
         {
             onComplete = complete;
@@ -68,7 +76,11 @@ namespace wwtlib
         {
             if (webFile.State == StateType.Error)
             {
-                Script.Literal("alert({0})", webFile.Message);
+                Script.Literal("console.error({0})", webFile.Message);
+                if(onError != null)
+                {
+                    onError();
+                }
             }
             else if (webFile.State == StateType.Received)
             {
@@ -275,7 +287,10 @@ namespace wwtlib
                 proxyFolder.Parent = Parent;
             }
 
-            proxyFolder.LoadFromUrl(urlField, childReadyCallback);
+            //Also listening to errors, to make sure clients do not wait forever in the case of a 404 or similar.
+            //Especially useful for recursive downloads, where potentially dozens of URL's are downloaded.
+            //In case of errors during downloads, the clients will have an empty folder during the callback.
+            proxyFolder.LoadFromUrlWithErrorCallback(urlField, childReadyCallback, childReadyCallback);
             childReadyCallback = null;
         }
 
@@ -357,7 +372,7 @@ namespace wwtlib
                     // TOdo add add Move Complete Auto Update
                     // todo add URL formating for Ambient Parameters
                     // TODO remove true when perth fixes refresh type on server
-                    if (true || RefreshType == FolderRefreshType.ConditionalGet || proxyFolder == null ||
+                    if (RefreshType == FolderRefreshType.ConditionalGet || proxyFolder == null ||
                         (this.RefreshType == FolderRefreshType.Interval && (int.Parse(refreshIntervalField) < ts)))
                     {
                         Refresh();

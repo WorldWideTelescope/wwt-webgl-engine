@@ -433,27 +433,40 @@ namespace wwtlib
 
         public static string GetNextFitsName()
         {
-            int currentNumber = 0;
-            foreach (Layer layer in AllMaps["Sky"].Layers)
-            {
-                if (layer.Name.StartsWith("Fits Image "))
-                {
-                    string number = layer.Name.Replace("Fits Image ", "");
-                    try
-                    {
-                        int num = Int32.Parse(number);
-                        if (num > currentNumber)
-                        {
-                            currentNumber = num;
-                        }
-                    }
-                    catch
-                    {
+            return getNextName("Fits Image");
+        }
 
+        public static string GetNextImageSetName()
+        {
+            return getNextName("Image Set");
+        }
+
+        private static string getNextName(string type){
+            int currentNumber = 0;
+            foreach (string key in AllMaps.Keys)
+            {
+                foreach (Layer layer in AllMaps[key].Layers)
+                {
+                    if (layer.Name.StartsWith(type + " "))
+                    {
+                        string number = layer.Name.Replace(type + " ", "");
+                        try
+                        {
+                            int num = Int32.Parse(number);
+                            if (num > currentNumber)
+                            {
+                                currentNumber = num;
+                            }
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
             }
-            return string.Format("Fits Image {0}", currentNumber + 1);
+
+            return string.Format("{0} {1}", type, currentNumber + 1);
         }
 
         internal static void CloseAllTourLoadedLayers()

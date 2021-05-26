@@ -320,6 +320,71 @@ namespace wwtlib
 
         public ImageSetLayer LoadFitsLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
         {
+            return AddImageSetLayer(url, "fits", name, gotoTarget, loaded);
+        }
+
+        public ImageSetLayer AddImageSetLayer(string url, string mode, string name, bool gotoTarget, ImagesetLoaded loaded)
+        {
+            if (mode.ToLowerCase() == "fits")
+            {
+                return AddFitsLayer(url, name, gotoTarget, loaded);
+            }
+            else if (mode.ToLowerCase() == "preloaded")
+            {
+                Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
+                if (imageset != null)
+                {
+                    return AddImageSet(name, gotoTarget, loaded, imageset);
+                }
+            }
+            else
+            {
+                Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
+                if (imageset != null)
+                {
+                    return AddImageSet(name, gotoTarget, loaded, imageset);
+                }
+                else if (ContainsFitsLikeExtentsion(url))
+                {
+                    return AddFitsLayer(url, name, gotoTarget, loaded);
+                }
+            }
+            return null;
+        }
+
+        private static bool ContainsFitsLikeExtentsion(string url)
+        {
+            string lowerCaseUrl = url.ToLowerCase();
+            return (lowerCaseUrl.EndsWith("fits")
+                || lowerCaseUrl.EndsWith("ftz")
+                || lowerCaseUrl.EndsWith("fit")
+                || lowerCaseUrl.EndsWith("fts")
+                );
+        }
+
+        private static ImageSetLayer AddImageSet(string name, bool gotoTarget, ImagesetLoaded loaded, Imageset imageset)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = LayerManager.GetNextImageSetName();
+            }
+            ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayer(imageset, name);
+
+            if (gotoTarget)
+            {
+                WWTControl.Singleton.GotoRADecZoom(imageset.CenterX / 15, imageset.CenterY,
+                    WWTControl.Singleton.RenderContext.ViewCamera.Zoom, false, null);
+            }
+            if (loaded != null)
+            {
+                loaded(imagesetLayer);
+            }
+
+            return imagesetLayer;
+        }
+
+        private static ImageSetLayer AddFitsLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
+        {
             if (string.IsNullOrWhiteSpace(name))
             {
                 name = LayerManager.GetNextFitsName();
@@ -381,7 +446,6 @@ namespace wwtlib
             return imagesetLayer;
         }
 
-
         public bool hideTourFeedback = false;
         public bool HideTourFeedback
         {
@@ -412,15 +476,11 @@ namespace wwtlib
             }
         }
 
-        private Folder imageFolder;
         private string imageUrl;
-        public void LoadImageCollection(string url)
+        public void LoadImageCollection(string url, bool? loadChildFolders)
         {
-
             imageUrl = url;
-            imageFolder = new Folder();
-            imageFolder.LoadFromUrl(url, delegate { Wtml.LoadImagesets(imageFolder); FireCollectionLoaded(url); });
-
+            Wtml.GetWtmlFile(url, delegate { FireCollectionLoaded(url); }, loadChildFolders);
         }
 
         private void ImageFileLoaded()
