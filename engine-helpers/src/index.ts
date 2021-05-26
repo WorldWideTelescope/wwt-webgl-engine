@@ -540,7 +540,7 @@ export class WWTInstance {
       decRad * R2D,
       zoomDeg,
       instant,
-      rollRad === undefined ? undefined : rollRad * R2D
+      rollRad
     );
     return this.makeArrivePromise(instant);
   }
