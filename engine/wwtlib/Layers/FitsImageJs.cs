@@ -288,7 +288,7 @@ namespace wwtlib
                         int datR = buf[(x + indexY * stride)];
                         int datG = buf[(x + indexY * stride) + page];
                         int datB = buf[(x + indexY * stride) + page * 2];
-                        if ((double)datR == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)datR == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -303,7 +303,7 @@ namespace wwtlib
                     else
                     {
                         int dataValue = buf[x + indexY * stride + page];
-                        if ((double)dataValue == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)dataValue == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -336,7 +336,7 @@ namespace wwtlib
                         double datR = buf[(x + indexY * stride)];
                         double datG = buf[(x + indexY * stride) + page];
                         double datB = buf[(x + indexY * stride) + page * 2];
-                        if ((double)datR == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)datR == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -351,7 +351,7 @@ namespace wwtlib
                     else
                     {
                         double dataValue = buf[x + indexY * stride + page];
-                        if ((double)dataValue == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)dataValue == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -384,7 +384,7 @@ namespace wwtlib
                         double datR = buf[(x + indexY * stride)];
                         double datG = buf[(x + indexY * stride) + page];
                         double datB = buf[(x + indexY * stride) + page * 2];
-                        if ((double)datR == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)datR == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -399,7 +399,7 @@ namespace wwtlib
                     else
                     {
                         double dataValue = buf[x + indexY * stride + page];
-                        if ((double)dataValue == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)dataValue == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -432,7 +432,7 @@ namespace wwtlib
                         int datR = buf[(x + indexY * stride)];
                         int datG = buf[(x + indexY * stride) + page];
                         int datB = buf[(x + indexY * stride) + page * 2];
-                        if ((double)datR == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)datR == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -447,7 +447,7 @@ namespace wwtlib
                     else
                     {
                         int dataValue = buf[x + indexY * stride + page];
-                        if ((double)dataValue == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)dataValue == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -481,7 +481,7 @@ namespace wwtlib
                         int datR = buf[(x + indexY * stride)];
                         int datG = buf[(x + indexY * stride) + page];
                         int datB = buf[(x + indexY * stride) + page * 2];
-                        if ((double)datR == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)datR == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }
@@ -496,7 +496,7 @@ namespace wwtlib
                     else
                     {
                         int dataValue = buf[x + indexY * stride + page];
-                        if ((double)dataValue == fitsProperties.BlankValue)
+                        if (fitsProperties.ContainsBlanks && (double)dataValue == fitsProperties.BlankValue)
                         {
                             bmp.SetPixel(x, y, 0, 0, 0, 0);
                         }

@@ -9,6 +9,7 @@ namespace wwtlib
     {
         public double BZero = 0;
         public double BScale = 1;
+        public bool ContainsBlanks = false;
         public double BlankValue = double.MinValue;
         public double MaxVal = double.MinValue;
         public double MinVal = double.MaxValue;

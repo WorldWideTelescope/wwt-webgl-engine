@@ -168,6 +168,7 @@ namespace wwtlib
             if (header.ContainsKey("BLANK"))
             {
                 fitsProperties.BlankValue = Double.Parse(header["BLANK"]);
+                fitsProperties.ContainsBlanks = true;
             }
 
             if (header.ContainsKey("BZERO"))
