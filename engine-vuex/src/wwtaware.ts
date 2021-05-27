@@ -20,6 +20,7 @@ import {
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
+  AddImageSetLayerOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
@@ -164,7 +165,7 @@ import {
  *
  * Actions:
  *
- * - [[loadFitsLayer]]
+ * - [[addImageSetLayer]]
  *
  * #### Tabular Data Layers
  *
@@ -265,6 +266,7 @@ export class WWTAwareComponent extends Vue {
         "gotoTarget",
         "loadImageCollection",
         "loadFitsLayer",
+        "addImageSetLayer",
         "loadTour",
         "waitForReady",
       ]),
@@ -616,12 +618,20 @@ export class WWTAwareComponent extends Vue {
    */
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
 
-  /** Request the creation of a FITS image layer.
+  /** Deprecated. Use addImageSetLayer instead.
+   * Request the creation of a FITS image layer.
    *
    * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
    * It’s asynchronous because the requested FITS file has to be downloaded.
    */
-  loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
+   loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
+
+  /** Request the creation of a image layer. Either a single FITS or an image set.
+   *
+   * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
+   * It’s asynchronous because the requested url has to be downloaded.
+   */
+  addImageSetLayer!: (_o: AddImageSetLayerOptions) => Promise<ImageSetLayer>;
 
   /** Request the engine to load a tour file.
    *
