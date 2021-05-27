@@ -135,11 +135,11 @@ namespace wwtlib
             {
                 dragType = DragType.Center;
             }
-            else if (Math.Abs(x - lowPosition) < 3)
+            else if (Math.Abs(x - lowPosition) < 10)
             {
                 dragType = DragType.Low;
             }
-            else if (Math.Abs(x - highPosition) < 3)
+            else if (Math.Abs(x - highPosition) < 10)
             {
                 dragType = DragType.High;
             }
