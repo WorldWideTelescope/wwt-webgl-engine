@@ -31,9 +31,9 @@ namespace wwtlib
             Window.RemoveEventListener("click", Close, true);
 
             ImageElement image = Document.GetElementById<ImageElement>("graph");
-            image.RemoveEventListener("mousedown", MouseDown, false);
-            image.RemoveEventListener("mousemove", mousemove, false);
-            image.RemoveEventListener("mouseup", mouseup, false);
+            image.RemoveEventListener("mousedown", OnPointerDown, false);
+            image.RemoveEventListener("mousemove", OnPointerMove, false);
+            image.RemoveEventListener("mouseup", OnPointerUp, false);
             dropDown.RemoveEventListener("change", CurveStyleSelected, false);
             dropDown.RemoveEventListener("click", IgnoreMe, true);
 
@@ -60,9 +60,9 @@ namespace wwtlib
             dropDown.AddEventListener("click", IgnoreMe, true);
             CanvasElement canvas = Document.GetElementById<CanvasElement>("graph");
 
-            canvas.AddEventListener("mousedown", MouseDown, false);
-            canvas.AddEventListener("mousemove", mousemove, false);
-            canvas.AddEventListener("mouseup", mouseup, false);
+            canvas.AddEventListener("pointerdown", OnPointerDown, false);
+            canvas.AddEventListener("pointermove", OnPointerMove, false);
+            canvas.AddEventListener("pointerup", OnPointerUp, false);
             closeBtn.AddEventListener("click", Close, true);
 
             Draw();
@@ -124,12 +124,12 @@ namespace wwtlib
 
         DragType dragType = DragType.None;
 
-        public void MouseDown(ElementEvent e)
+        public void OnPointerDown(ElementEvent e)
         {
             CanvasElement canvas = Document.GetElementById<CanvasElement>("graph");
             int x = Mouse.OffsetX(canvas, e);
             int y = Mouse.OffsetY(canvas, e);
-            Script.Literal("{0}.setPointerCapture(1)", canvas);
+            Script.Literal("{0}.setPointerCapture({1}.pointerId)", canvas, e);
 
             if ((Math.Abs(x - center) < 10) && Math.Abs(y - 75) < 10)
             {
@@ -153,7 +153,7 @@ namespace wwtlib
             e.CancelBubble = true;
         }
 
-        public void mousemove(ElementEvent e)
+        public void OnPointerMove(ElementEvent e)
         {
             CanvasElement canvas = Document.GetElementById<CanvasElement>("graph");
             int x = Mouse.OffsetX(canvas, e);
@@ -197,9 +197,9 @@ namespace wwtlib
             e.CancelBubble = true;
         }
 
-        public void mouseup(ElementEvent e)
+        public void OnPointerUp(ElementEvent e)
         {
-            Script.Literal("{0}.releasePointerCapture(1)", e.SrcElement);
+            Script.Literal("{0}.releasePointerCapture({1}.pointerId)", e.SrcElement, e);
             if (dragType != DragType.None)
             {
                 dragType = DragType.None;
@@ -227,7 +227,7 @@ namespace wwtlib
                 return;
             }
 
-            if (!RenderContext.UseGlVersion2 && image is FitsImageJs)
+            if (image is FitsImageJs)
             {
                 double factor = (layer.ImageSet.FitsProperties.MaxVal - layer.ImageSet.FitsProperties.MinVal) / 256.0;
                 double low = layer.ImageSet.FitsProperties.MinVal + (lowPosition * factor);
