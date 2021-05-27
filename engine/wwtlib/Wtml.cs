@@ -61,19 +61,19 @@ namespace wwtlib
                 if (child is Imageset)
                 {
                     Imageset imageSet = (Imageset)child;
-                    WWTControl.AddImageSet(imageSet);
+                    WWTControl.AddImageSetToRepository(imageSet);
                 }
                 if (child is Place)
                 {
                     Place place = (Place)child;
                     if (place.StudyImageset != null)
                     {
-                        WWTControl.AddImageSet(place.StudyImageset);
+                        WWTControl.AddImageSetToRepository(place.StudyImageset);
                     }
                     
                     if (place.BackgroundImageset != null)
                     {
-                        WWTControl.AddImageSet(place.BackgroundImageset);
+                        WWTControl.AddImageSetToRepository(place.BackgroundImageset);
                     }
                 }
                 if (child is Folder && folderDownloadAction.loadChildFolders)
