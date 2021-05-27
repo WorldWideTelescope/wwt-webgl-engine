@@ -62,11 +62,15 @@ namespace wwtlib
             if (node.Attributes.GetNamedItem("MinValue") != null)
             {
                 ImageSet.FitsProperties.MinVal = double.Parse(node.Attributes.GetNamedItem("MinValue").Value);
+                ImageSet.FitsProperties.LowerCut = node.Attributes.GetNamedItem("LowerCut") != null
+                    ? double.Parse(node.Attributes.GetNamedItem("LowerCut").Value) : ImageSet.FitsProperties.MinVal;
             }
 
             if (node.Attributes.GetNamedItem("MaxValue") != null)
             {
                 ImageSet.FitsProperties.MaxVal = double.Parse(node.Attributes.GetNamedItem("MaxValue").Value);
+                ImageSet.FitsProperties.UpperCut = node.Attributes.GetNamedItem("UpperCut") != null
+                    ? double.Parse(node.Attributes.GetNamedItem("UpperCut").Value) : ImageSet.FitsProperties.MaxVal;
             }
 
             if (node.Attributes.GetNamedItem("ColorMapperName") != null)
@@ -121,6 +125,8 @@ namespace wwtlib
                 xmlWriter.WriteAttributeString("ScaleType", Enums.ToXml("ScaleTypes", (int)imageSet.FitsProperties.ScaleType));
                 xmlWriter.WriteAttributeString("MinValue", imageSet.FitsProperties.MinVal.ToString());
                 xmlWriter.WriteAttributeString("MaxValue", imageSet.FitsProperties.MaxVal.ToString());
+                xmlWriter.WriteAttributeString("LowerCut", imageSet.FitsProperties.LowerCut.ToString());
+                xmlWriter.WriteAttributeString("UpperCut", imageSet.FitsProperties.UpperCut.ToString());
                 if (imageSet.FitsProperties.ColorMapName != null) {
                     xmlWriter.WriteAttributeString("ColorMapperName", imageSet.FitsProperties.ColorMapName);
                 }
