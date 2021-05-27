@@ -26,6 +26,7 @@ import {
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
+  AddImageSetLayerOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
@@ -205,6 +206,8 @@ export interface LoadTourParams {
 export interface LoadImageCollectionParams {
   /** The WTML URL to load. */
   url: string;
+  /** Optional, Recursively load any child folders. Defaults to false*/
+  loadChildFolders?: boolean;
 }
 
 @Module({
@@ -503,11 +506,20 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Action({ rawError: true })
   async loadImageCollection(
-    {url}: LoadImageCollectionParams
+    {url, loadChildFolders}: LoadImageCollectionParams
   ): Promise<Folder> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
-    return Vue.$wwt.inst.loadImageCollection(url);
+    return Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
+  }
+
+  @Action({ rawError: true })
+  async addImageSetLayer(
+    options: AddImageSetLayerOptions
+  ): Promise<ImageSetLayer> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot addImageSetLayer without linking to WWTInstance');
+    return Vue.$wwt.inst.addImageSetLayer(options);
   }
 
   @Action({ rawError: true })
@@ -516,7 +528,14 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   ): Promise<ImageSetLayer> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadFitsLayer without linking to WWTInstance');
-    return Vue.$wwt.inst.loadFitsLayer(options);
+    const addImageSetLayerOptions: AddImageSetLayerOptions = {
+      url: options.url, 
+      mode: "fits",
+      name: options.name,
+      gotoTarget: options.gotoTarget
+    };
+    
+    return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
   }
 
   @Mutation
