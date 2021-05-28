@@ -636,14 +636,12 @@ namespace wwtlib
 
                     if (GetHipsFileExtention() == ".fits" && RenderContext.UseGlVersion2)
                     {
-                        PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
                         PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
                     }
                     else
                     {
-                        PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 0);
                         ImageElement image = texture;
                         PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);

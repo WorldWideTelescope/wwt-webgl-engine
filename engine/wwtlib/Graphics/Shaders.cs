@@ -1818,7 +1818,8 @@ namespace wwtlib
                 float e = 2.71828182845904523536028747135266249775724709369995;
                 
                 void main(void) {
-                    vec4 color = texture(uSampler, vTextureCoord);
+                    //FITS images are flipped on the y axis
+                    vec4 color = texture(uSampler, vec2(vTextureCoord.x, 1.0 - vTextureCoord.y));
                     if(isnan(color.r) || (containsBlanks && abs(blank - color.r) < 0.00000001)){
                         fragmentColor = vec4(0.0, 0.0, 0.0, 0.0);
                     } else {
