@@ -773,6 +773,15 @@ export default class App extends WWTAwareComponent {
       this.zoom(1.3);
     }
   }
+
+  doMove(x: number, y: number) {
+    this.move({ x: x, y: y});
+  }
+
+  doTilt(x: number, y: number) {
+    this.tilt({ x: x, y: y});
+  }
+  
 }
 </script>
 

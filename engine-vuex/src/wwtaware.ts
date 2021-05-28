@@ -294,6 +294,8 @@ export class WWTAwareComponent extends Vue {
         "toggleTourPlayPauseState",
         "updateTableLayer",
         "zoom",
+        "move",
+        "tilt"
       ]),
     };
   }
@@ -581,6 +583,12 @@ export class WWTAwareComponent extends Vue {
    * [[gotoRADecZoom]].
    */
   zoom!: (f: number) => void;
+
+  /** Moves the position of the view */
+  move!: ({ x, y }: { x: number; y: number }) => void;
+
+  /** Tilts the position of the view */
+  tilt!: ({ x, y }: { x: number; y: number }) => void;
 
   // Actions
 
