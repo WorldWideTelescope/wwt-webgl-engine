@@ -325,11 +325,11 @@ namespace wwtlib
 
         public ImageSetLayer AddImageSetLayer(string url, string mode, string name, bool gotoTarget, ImagesetLoaded loaded)
         {
-            if (mode.ToLowerCase() == "fits")
+            if (mode != null && mode.ToLowerCase() == "fits")
             {
                 return AddFitsLayer(url, name, gotoTarget, loaded);
             }
-            else if (mode.ToLowerCase() == "preloaded")
+            else if (mode != null && mode.ToLowerCase() == "preloaded")
             {
                 Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
                 if (imageset != null)
@@ -405,7 +405,7 @@ namespace wwtlib
                 //TODO make sure dataset URL is unique
                 imageset.SetInitialParameters(
                             wcsImage.Description,
-                            Util.GetHashCode(wcsImage.Filename).ToString(),
+                            wcsImage.Filename,
                             ImageSetType.Sky,
                             BandPass.Visible,
                             ProjectionType.SkyImage,
@@ -437,7 +437,6 @@ namespace wwtlib
                 imageset.WcsImage = wcsImage;
                 imagesetLayer.ImageSet = imageset;
                 LayerManager.AddFitsImageSetLayer(imagesetLayer, name);
-                LayerManager.LoadTree();
                 if (gotoTarget)
                 {
                     WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false, null);
