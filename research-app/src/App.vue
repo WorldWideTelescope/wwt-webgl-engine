@@ -427,11 +427,53 @@ class AnnotationMessageHandler {
   }
 }
 
+/** This simple class encapsulates how we handle key bindings */
+class KeyboardControlSettings {
+  zoomIn: string;
+  zoomOut: string;
+  moveUp: string;
+  moveDown: string;
+  moveLeft: string;
+  moveRight: string;
+  tiltCW: string;
+  tiltCCW: string;
+  moveAmount: number;
+  tiltAmount: number;
+
+  constructor({
+    zoomIn = "ArrowUp",
+    zoomOut = "ArrowDown",
+    moveUp = "w",
+    moveDown = "s",
+    moveLeft = "d",
+    moveRight = "a",
+    tiltCW = "ArrowLeft",
+    tiltCCW = "ArrowRight",
+    moveAmount = 20,
+    tiltAmount = 20
+  }) {
+    this.zoomIn = zoomIn;
+    this.zoomOut = zoomOut;
+    this.moveUp = moveUp;
+    this.moveDown = moveDown;
+    this.moveLeft = moveLeft;
+    this.moveRight = moveRight;
+    this.tiltCW = tiltCW;
+    this.tiltCCW = tiltCCW;
+    this.moveAmount = moveAmount;
+    this.tiltAmount = tiltAmount;
+  }
+}
+
 
 /** The main "research app" Vue component. */
 @Component
 export default class App extends WWTAwareComponent {
   @Prop({default: null}) readonly allowedOrigin!: string | null;
+
+  // For handling key presses
+  private _keyListener: ((e: KeyboardEvent) => void) | null = null;
+  private _keyboardControlSettings: KeyboardControlSettings | null = null;
 
   // Lifecycle management
 
@@ -461,6 +503,34 @@ export default class App extends WWTAwareComponent {
         this.onMessage(event.data);
       }
     }, false);
+
+    // Handling key presses
+    this._keyboardControlSettings = new KeyboardControlSettings({});
+    this._keyListener = function(e: KeyboardEvent) {
+      const kcs = this._keyboardControlSettings;
+      if (kcs == null || kcs == undefined) { return; }
+      const movementAmount = kcs.moveAmount;
+      const tiltAmount = kcs.tiltAmount;
+      if (e.key === kcs.zoomIn) {
+        this.doZoom(true);
+      } else if (e.key === kcs.zoomOut) {
+        this.doZoom(false);
+      } else if (e.key === kcs.tiltCW) {
+        this.doTilt(tiltAmount, 0);
+      } else if (e.key === kcs.tiltCCW) {
+        this.doTilt(-tiltAmount, 0);
+      } else if (e.key === kcs.moveUp) {
+        this.doMove(0, movementAmount);
+      } else if (e.key === kcs.moveDown) {
+        this.doMove(0, -movementAmount);
+      } else if (e.key === kcs.moveLeft) {
+        this.doMove(-movementAmount, 0);
+      } else if (e.key === kcs.moveRight) {
+        this.doMove(movementAmount, 0);
+      }
+    };
+    window.addEventListener('keydown', this._keyListener.bind(this as App));
+
   }
 
   destroyed() {
@@ -781,7 +851,7 @@ export default class App extends WWTAwareComponent {
   doTilt(x: number, y: number) {
     this.tilt({ x: x, y: y});
   }
-  
+
 }
 </script>
 
