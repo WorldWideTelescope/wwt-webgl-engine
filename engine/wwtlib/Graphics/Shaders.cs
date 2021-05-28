@@ -1817,10 +1817,14 @@ namespace wwtlib
                 uniform float opacity;
                 float e = 2.71828182845904523536028747135266249775724709369995;
                 
+                bool isNaN(float value){
+                    return !(value < 0.0 || 0.0 < value || value == 0.0);
+                }
+
                 void main(void) {
                     //FITS images are flipped on the y axis
                     vec4 color = texture(uSampler, vec2(vTextureCoord.x, 1.0 - vTextureCoord.y));
-                    if(isnan(color.r) || (containsBlanks && abs(blank - color.r) < 0.00000001)){
+                    if(isNaN(color.r) || (containsBlanks && abs(blank - color.r) < 0.00000001)){
                         fragmentColor = vec4(0.0, 0.0, 0.0, 0.0);
                     } else {
                         float physicalValue = (bzero + bscale * color.r - min) / (max - min);
