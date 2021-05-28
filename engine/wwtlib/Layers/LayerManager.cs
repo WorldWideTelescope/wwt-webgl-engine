@@ -1204,9 +1204,9 @@ namespace wwtlib
                     ImageSetLayer layer = selectedLayer as ImageSetLayer;
                     if (layer != null && layer.ImageSet.WcsImage is FitsImage)
                     {
-                        WWTControl.scriptInterface.SetTimeSlider("left", "0");
-                        WWTControl.scriptInterface.SetTimeSlider("right", (layer.GetFitsImage().Depth - 1).ToString());
-                        WWTControl.scriptInterface.SetTimeSlider("title", "Velocity");
+                        //WWTControl.scriptInterface.SetTimeSlider("left", "0");
+                        //WWTControl.scriptInterface.SetTimeSlider("right", (layer.GetFitsImage().Depth - 1).ToString());
+                        //WWTControl.scriptInterface.SetTimeSlider("title", "Velocity");
                         //Histogram.UpdateImage(layer, timeScrubber.Value);
                         //timeSeries.Checked = false;
                         //startDate.Text = "0";
@@ -1225,13 +1225,13 @@ namespace wwtlib
             WWTControl.scriptInterface.SetTimeSlider("title", Language.GetLocalizedText(667, "Time Scrubber"));
         }
 
+        //Fits time slider not implemented for webgl engine (only Windows version)
         static public void SetTimeSliderValue(double pos)
         {
             ImageSetLayer layer = selectedLayer as ImageSetLayer;
             if (layer != null && layer.ImageSet.WcsImage is FitsImage)
             {
-                Histogram.UpdateImage(layer, pos);
-                WWTControl.scriptInterface.SetTimeSlider("title", layer.GetFitsImage().GetZDescription());
+                //WWTControl.scriptInterface.SetTimeSlider("title", layer.GetFitsImage().GetZDescription());
             }
         }
 

@@ -23,7 +23,7 @@ namespace wwtlib
         private bool subDivided = false;
         private readonly List<List<string>> catalogRows = new List<List<string>>();
         private WebFile catalogData;
-        private FitsImageWebGL fitsImage;
+        private FitsImageTile fitsImage;
         private static readonly Matrix3d galacticMatrix = Matrix3d.Create(
                     -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
                     -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
@@ -427,13 +427,15 @@ namespace wwtlib
             }
             else
             {
-                ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.HipsProperties.ColorMapName);
-                FitsShader.Min = (float)dataset.HipsProperties.MinVal;
-                FitsShader.Max = (float)dataset.HipsProperties.MaxVal;
-                FitsShader.BlankValue = (float)dataset.HipsProperties.BlankValue;
-                FitsShader.BZero = (float)dataset.HipsProperties.BZero;
-                FitsShader.BScale = (float)dataset.HipsProperties.BScale;
-                FitsShader.ScaleType = (int)dataset.HipsProperties.ScaleType;
+                ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
+                FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
+                FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
+                FitsShader.ContainsBlanks = dataset.FitsProperties.ContainsBlanks;
+                FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
+                FitsShader.BZero = (float)dataset.FitsProperties.BZero;
+                FitsShader.BScale = (float)dataset.FitsProperties.BScale;
+                FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
+                FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
                 FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
             }
             renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
@@ -634,14 +636,12 @@ namespace wwtlib
 
                     if (GetHipsFileExtention() == ".fits" && RenderContext.UseGlVersion2)
                     {
-                        PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
                         PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
                     }
                     else
                     {
-                        PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 0);
                         ImageElement image = texture;
                         PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
@@ -678,7 +678,7 @@ namespace wwtlib
                     Downloading = true;
                     if (RenderContext.UseGlVersion2)
                     {
-                        fitsImage = new FitsImageWebGL(URL, delegate (WcsImage wcsImage)
+                        fitsImage = new FitsImageTile(dataset, URL, delegate (WcsImage wcsImage)
                         {
                             Downloading = false;
                             errored = fitsImage.errored;
@@ -689,15 +689,11 @@ namespace wwtlib
                                 ReadyToRender = texReady && (DemReady || !demTile);
                                 RequestPending = false;
                                 MakeTexture();
-                                dataset.HipsProperties.BlankValue = fitsImage.BlankValue;
-                                dataset.HipsProperties.BZero= fitsImage.BZero;
-                                dataset.HipsProperties.BScale = fitsImage.BScale;
-                                dataset.HipsProperties.ContainsBlanks = fitsImage.ContainsBlanks;
                             }
                         });
                     } else
                     {
-                        FitsImage image = FitsImage.CreateHipsTile(URL, delegate (WcsImage wcsImage)
+                        FitsImageJs image = FitsImageJs.CreateHipsTile(dataset, URL, delegate (WcsImage wcsImage)
                         {
                             texReady = true;
                             Downloading = false;

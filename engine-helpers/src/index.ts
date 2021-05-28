@@ -672,7 +672,7 @@ export class WWTInstance {
       // This is kind of random, but follows the pywwt API implementation.
       const fits = layer.getFitsImage();
       if (fits !== null) {
-        fits.transparentBlack = false;
+        layer.get_imageSet().get_fitsProperties().transparentBlack = false;
       }
     }
   }

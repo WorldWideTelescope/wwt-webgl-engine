@@ -1787,6 +1787,8 @@ namespace wwtlib
         public static WebGLUniformLocation bscale;
         public static WebGLUniformLocation minLoc;
         public static WebGLUniformLocation maxLoc;
+        public static WebGLUniformLocation transparentBlackLoc;
+        public static WebGLUniformLocation containsBlanksLoc;
         public static WebGLUniformLocation scalingLocation;
         public static WebGLUniformLocation opacityLoc;
 
@@ -1809,19 +1811,32 @@ namespace wwtlib
                 uniform float bscale;
                 uniform float min;
                 uniform float max;
+                uniform bool containsBlanks;
+                uniform bool transparentBlack;
                 uniform int scaleType;
                 uniform float opacity;
-                float e = 2.71828182845904523536028747135266249775724709369995;
+                
+                bool isNaN(float value){
+                    return !(value < 0.0 || 0.0 < value || value == 0.0);
+                }
+
                 void main(void) {
-                    vec4 color = texture(uSampler, vTextureCoord);
-                    if(abs(blank - color.r) < 0.00000001){
+                    //FITS images are flipped on the y axis
+                    vec4 color = texture(uSampler, vec2(vTextureCoord.x, 1.0 - vTextureCoord.y));
+                    if(isNaN(color.r) || (containsBlanks && abs(blank - color.r) < 0.00000001)){
                         fragmentColor = vec4(0.0, 0.0, 0.0, 0.0);
                     } else {
-                        float physicalValue = clamp((bzero + bscale * color.r - min) / (max - min), 0.0, 1.0);
+                        float physicalValue = (bzero + bscale * color.r - min) / (max - min);
+                        if(transparentBlack && physicalValue <= 0.0){
+                            fragmentColor = vec4(0.0, 0.0, 0.0, 0.0);
+                            return;
+                        }
+                            
+                        physicalValue = clamp(physicalValue, 0.0, 1.0);
 
                         switch(scaleType){
                             case 1:
-                                physicalValue = log(physicalValue * (e - 1.0) + 1.0);
+                                physicalValue = log(physicalValue * 255.0 + 1.0 ) / log(256.0);
                                 break;
                             case 2:
                                 physicalValue = physicalValue * physicalValue;
@@ -1830,12 +1845,13 @@ namespace wwtlib
                                 physicalValue = sqrt(physicalValue);
                                 break;
                         }
-
-		                vec4 colorFromColorMapper = texture(colorSampler, vec2(physicalValue, 0.5));
-		                fragmentColor = vec4(colorFromColorMapper.rgb, 1.0);
+                        vec4 colorFromColorMapper = texture(colorSampler, vec2(physicalValue, 0.5));
+                        fragmentColor = vec4(colorFromColorMapper.rgb, 1.0);
                     }
 
-                }";
+                }
+
+                ";
 
             String vertexShaderText =
                       "#version 300 es  \n" +
@@ -1902,6 +1918,8 @@ namespace wwtlib
             bscale = gl.getUniformLocation(prog, "bscale");
             minLoc = gl.getUniformLocation(prog, "min");
             maxLoc = gl.getUniformLocation(prog, "max");
+            transparentBlackLoc = gl.getUniformLocation(prog, "transparentBlack");
+            containsBlanksLoc = gl.getUniformLocation(prog, "containsBlanks");
             scalingLocation = gl.getUniformLocation(prog, "scaleType");
             opacityLoc = gl.getUniformLocation(prog, "opacity");
 
@@ -1919,6 +1937,8 @@ namespace wwtlib
         public static float BZero = 0f;
         public static float Min = 0f;
         public static float Max = 0f;
+        public static bool TransparentBlack = false;
+        public static bool ContainsBlanks = false;
         public static int ScaleType = 0;
         public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth)
         {
@@ -1952,6 +1972,8 @@ namespace wwtlib
                 gl.uniform1f(bscale, BScale);
                 gl.uniform1f(minLoc, Min);
                 gl.uniform1f(maxLoc, Max);
+                gl.uniform1i(transparentBlackLoc, TransparentBlack);
+                gl.uniform1i(containsBlanksLoc, ContainsBlanks);
                 gl.uniform1i(scalingLocation, ScaleType);
 
                 if (renderContext.Space || noDepth)
