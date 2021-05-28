@@ -1961,6 +1961,12 @@ export class WWTControl {
    */
   zoom(factor: number): void;
 
+  /** Moves the position of the view */
+  move(x: number, y: number): void;
+
+  /** Tilts the position of the view */
+  _tilt(x: number, y: number): void;
+
   /** Look up an imageset by its name.
    *
    * The name matching is case-insensitive, matches on substrings, and moves
