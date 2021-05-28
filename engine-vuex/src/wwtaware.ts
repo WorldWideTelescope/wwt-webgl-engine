@@ -295,7 +295,7 @@ export class WWTAwareComponent extends Vue {
         "updateTableLayer",
         "zoom",
         "move",
-        "tilt"
+        "tilt",
       ]),
     };
   }
