@@ -1815,7 +1815,6 @@ namespace wwtlib
                 uniform bool transparentBlack;
                 uniform int scaleType;
                 uniform float opacity;
-                float e = 2.71828182845904523536028747135266249775724709369995;
                 
                 bool isNaN(float value){
                     return !(value < 0.0 || 0.0 < value || value == 0.0);
@@ -1837,7 +1836,7 @@ namespace wwtlib
 
                         switch(scaleType){
                             case 1:
-                                physicalValue = log(physicalValue * (e - 1.0) + 1.0);
+                                physicalValue = log(physicalValue * 255.0 + 1.0 ) / log(256.0);
                                 break;
                             case 2:
                                 physicalValue = physicalValue * physicalValue;
