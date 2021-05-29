@@ -37,11 +37,11 @@ describe('ColorMapContainer', function() {
 
   it('should get a colormap by name', function() {
     var cmap = wwtlib.ColorMapContainer.fromNamedColormap('greys');
-    assert.equal(cmap.findClosestColor(0.51).toString(), '#999999');
+    assert.equal(cmap.findClosestColor(0.51).toString(), '#939393');
     var cmap = wwtlib.ColorMapContainer.fromNamedColormap('GREYS');
-    assert.equal(cmap.findClosestColor(0.51).toString(), '#999999');
+    assert.equal(cmap.findClosestColor(0.51).toString(), '#939393');
     var cmap = wwtlib.ColorMapContainer.fromNamedColormap('Viridis');
-    assert.equal(cmap.findClosestColor(0.51).toString(), '#218E8D');
+    assert.equal(cmap.findClosestColor(0.51).toString(), '#20928C');
   });
 
 });
