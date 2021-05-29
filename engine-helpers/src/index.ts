@@ -322,7 +322,7 @@ export interface AddImageSetLayerOptions {
 
 /** Options for [[WWTInstance.setLayerOrder]]. */
 export interface SetLayerOrderOptions {
-  /** An identifier for referring to this layer. */
+  /** The ID of the layer. */
   id: string;
   /** The prefered position of the layer in the draw cycle.
    * 0 being the first layer to be drawn. */

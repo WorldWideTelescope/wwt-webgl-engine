@@ -235,22 +235,26 @@ export function isCreateFitsLayerMessage(o: any): o is CreateFitsLayerMessage { 
     typeof o.url === "string";
 }
 
+/** A command to set a layer's order in the draw cycle. */
+export interface SetLayerOrderMessage {
+  /** The tag identifying this message type. */
+  event: "image_layer_order";
+  /** An identifier for referring to this layer. */
+  id: string;
+  /** A sequence number, in case messages arrive out-of-order. */
+  version: number;
+  /** The prefered position of the layer in the draw cycle.
+   * 0 being the first layer to be drawn. */
+  order: number;
+}
+
 /** Type guard function for SetLayerOrderMessage. */
 export function isSetLayerOrderMessage(o: any): o is SetLayerOrderMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "image_layer_order" &&
     typeof o.id === "string" &&
+    typeof o.version === "number" &&
     typeof o.order === "number";
-}
-/** A command to set a layer's order in the draw cycle. */
- export interface SetLayerOrderMessage {
-  /** The tag identifying this message type. */
-  event: "image_layer_order";
-  /** An identifier for referring to this layer. */
-  id: string;
-  /** The prefered position of the layer in the draw cycle.
-   * 0 being the first layer to be drawn. */
-  order: number;
 }
 
 /** A command to create a table layer. */

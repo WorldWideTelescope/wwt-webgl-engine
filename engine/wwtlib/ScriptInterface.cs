@@ -446,30 +446,13 @@ namespace wwtlib
             return imagesetLayer;
         }
 
-        public void SetImageSetLayerOrder(string id, int order)
+        public void SetImageSetLayerOrder(Guid id, int order)
         {
-            foreach (string referenceFrame in LayerManager.AllMaps.Keys)
-            {
-                Layer layerToMode = GetLayerFromReferenceFrame(id, referenceFrame);
-                
-                if(order >= 0 && layerToMode != null)
-                {
-                    LayerManager.AllMaps[referenceFrame].Layers.Remove(layerToMode);
-                    LayerManager.AllMaps[referenceFrame].Layers.Insert(order, layerToMode);
-                }
+            Layer layer = LayerManager.LayerList[id];
+            if (layer is ImageSetLayer && order >= 0) {
+                LayerManager.AllMaps[layer.ReferenceFrame].Layers.Remove(layer);
+                LayerManager.AllMaps[layer.ReferenceFrame].Layers.Insert(order, layer);
             }
-        }
-
-        private Layer GetLayerFromReferenceFrame(string name, string referenceFrame)
-        {
-            foreach (Layer layer in LayerManager.AllMaps[referenceFrame].Layers)
-            {
-                if (layer.Name == name)
-                {
-                    return layer;
-                }
-            }
-            return null;
         }
 
         public bool hideTourFeedback = false;
