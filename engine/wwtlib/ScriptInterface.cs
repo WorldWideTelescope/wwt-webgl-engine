@@ -451,6 +451,7 @@ namespace wwtlib
             Layer layer = LayerManager.LayerList[id];
             if (layer is ImageSetLayer && order >= 0) {
                 LayerManager.AllMaps[layer.ReferenceFrame].Layers.Remove(layer);
+                //In case of order > Layers.length, the layer is properly put at the end of the list
                 LayerManager.AllMaps[layer.ReferenceFrame].Layers.Insert(order, layer);
             }
         }
