@@ -297,7 +297,7 @@ export interface LoadFitsLayerOptions {
 
   /** Whether to seek the view to the positon of the FITS file on the sky,
    * if/when it successfully loads. */
-  goto: boolean;
+  gotoTarget: boolean;
 }
 
 /** Options for [[WWTInstance.addImageSetLayer]]. */
