@@ -34,7 +34,7 @@ namespace wwtlib
 
         public IUiController uiController = null;
 
-        public static void AddImageSet(Imageset imagesetToAdd)
+        public static void AddImageSetToRepository(Imageset imagesetToAdd)
         {
             foreach(Imageset imageset in ImageSets){
                 if(imageset.ImageSetID == imagesetToAdd.ImageSetID)
