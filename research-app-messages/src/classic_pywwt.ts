@@ -212,7 +212,6 @@ export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMe
     o.event == "image_layer_create" &&
     typeof o.id === "string" &&
     typeof o.url === "string" &&
-    typeof o.mode  === "string" &&
     (o.mode == "autodetect" || o.mode == "fits" || o.mode == "preloaded") &&
     (o.goto === undefined || typeof o.goto === "boolean");
 }
