@@ -673,6 +673,7 @@ export class WWTInstance {
     });
   }
 
+  /** Change the ImageSetLayer position in the layer stack. */
   setImageSetLayerOrder(options: SetLayerOrderOptions): void {
     this.si.setImageSetLayerOrder(options.id, options.order);
   }

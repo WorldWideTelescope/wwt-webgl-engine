@@ -988,8 +988,7 @@ export class ScriptInterface {
     callback: ImagesetLoadedCallback
   ): ImageSetLayer;
 
-  /** Change the ImageSetLayer position in the layer stack.
-   */
+  /** Change the ImageSetLayer position in the layer stack. */
   setImageSetLayerOrder(id: string, order: number): void;
   
   /** Create a circle annotation.
