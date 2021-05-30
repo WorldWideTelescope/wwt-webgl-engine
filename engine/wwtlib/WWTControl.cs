@@ -1772,8 +1772,9 @@ namespace wwtlib
                 }
                 else 
                 {
-                    //TODO if safari -> recommend enabling webgl2 flag 
-                    //Else Recommend using a modern browser (Chrome, Firefox, Edge) to get the full AAS WWT experience
+                    Script.Literal("console.warn('This browser does not support WebGL 2.0. Some features will be working suboptimally. " +
+                        "To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge. " +
+                        "In case you would like to use Safari, we recommend that you enable WebGL 2.0')");
                     gl = (GL)(Object)canvas.GetContext((Rendering)(object)"webgl");
                 }
                 if (gl == null) {
