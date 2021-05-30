@@ -462,6 +462,11 @@ namespace wwtlib
             return imagesetLayer;
         }
 
+        public bool IsUsingWebGl2()
+        {
+            return RenderContext.UseGlVersion2;
+        }
+
         public bool hideTourFeedback = false;
         public bool HideTourFeedback
         {

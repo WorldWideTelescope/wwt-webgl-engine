@@ -891,6 +891,9 @@ export class ScriptInterface {
   /** Get the current declination of the view, in degrees. */
   getDec(): number;
 
+  /** Check whether the engine is using the most optimal rendering technology (WebGL 2.0). */
+  isUsingWebGl2(): boolean;
+
   /** Register a callback to be called when the WWT view arrives at a commanded
    * position.
    * */
