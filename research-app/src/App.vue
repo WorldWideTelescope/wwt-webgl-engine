@@ -427,30 +427,58 @@ class AnnotationMessageHandler {
   }
 }
 
+class KeyPressInfo {
+  code: string;
+  ctrl: boolean;
+  alt: boolean;
+  shift: boolean;
+  meta: boolean;
+
+  constructor(code: string, modifiers?: { ctrl?: boolean, alt?: boolean, shift?: boolean, meta?: boolean } ) {
+    this.code = code;
+    this.ctrl = modifiers?.ctrl ?? false;
+    this.alt = modifiers?.alt ?? false;
+    this.shift = modifiers?.shift ?? false;
+    this.meta = modifiers?.meta ?? false;
+  }
+
+  matches(event: KeyboardEvent): boolean {
+    return event.code === this.code 
+        && event.ctrlKey === this.ctrl
+        && event.altKey === this.alt
+        && event.shiftKey === this.shift
+        && event.metaKey === this.meta;
+  }
+}
+
 /** This simple class encapsulates how we handle key bindings */
 class KeyboardControlSettings {
-  zoomIn: string;
-  zoomOut: string;
-  moveUp: string;
-  moveDown: string;
-  moveLeft: string;
-  moveRight: string;
-  tiltCW: string;
-  tiltCCW: string;
+  zoomIn: KeyPressInfo[];
+  zoomOut: KeyPressInfo[];
+  moveUp: KeyPressInfo[];
+  moveDown: KeyPressInfo[];
+  moveLeft: KeyPressInfo[];
+  moveRight: KeyPressInfo[];
+  tiltUp: KeyPressInfo[];
+  tiltDown: KeyPressInfo[];
+  tiltLeft: KeyPressInfo[];
+  tiltRight: KeyPressInfo[];
   moveAmount: number;
   tiltAmount: number;
 
   constructor({
-    zoomIn = "ArrowUp",
-    zoomOut = "ArrowDown",
-    moveUp = "w",
-    moveDown = "s",
-    moveLeft = "d",
-    moveRight = "a",
-    tiltCW = "ArrowLeft",
-    tiltCCW = "ArrowRight",
+    zoomIn = [ new KeyPressInfo("KeyZ") ],
+    zoomOut = [ new KeyPressInfo("KeyX") ],
+    moveUp = [ new KeyPressInfo("KeyI") ],
+    moveDown = [ new KeyPressInfo("KeyK") ],
+    moveLeft = [ new KeyPressInfo("KeyJ") ],
+    moveRight = [ new KeyPressInfo("KeyL") ],
+    tiltUp = [ new KeyPressInfo("KeyI", { alt: true }) ],
+    tiltDown = [ new KeyPressInfo("KeyK", { alt: true }) ],
+    tiltLeft = [ new KeyPressInfo("KeyJ", { alt: true }) ],
+    tiltRight = [ new KeyPressInfo("KeyL", { alt: true }) ],
     moveAmount = 20,
-    tiltAmount = 20
+    tiltAmount = 20,
   }) {
     this.zoomIn = zoomIn;
     this.zoomOut = zoomOut;
@@ -458,11 +486,27 @@ class KeyboardControlSettings {
     this.moveDown = moveDown;
     this.moveLeft = moveLeft;
     this.moveRight = moveRight;
-    this.tiltCW = tiltCW;
-    this.tiltCCW = tiltCCW;
+    this.tiltUp = tiltUp;
+    this.tiltDown = tiltDown;
+    this.tiltLeft = tiltLeft;
+    this.tiltRight = tiltRight;
     this.moveAmount = moveAmount;
     this.tiltAmount = tiltAmount;
   }
+
+  // This is to make sure that we can't make a listener for an action type that doesn't exist
+  readonly actionTypes = [ "zoomIn", "zoomOut", "moveUp", "moveDown", "moveLeft", "moveRight", "tiltUp", "tiltDown", "tiltLeft", "tiltRight" ] as const;
+
+  makeListener(actionName: KeyboardControlSettings["actionTypes"][number], action: () => void): (e: KeyboardEvent) => void {
+    return (e) => {
+      for (const keyPress of this[actionName]) {
+        if (keyPress.matches(e)) {
+          action();
+        }
+      }
+    }
+  }
+
 }
 
 
@@ -471,9 +515,7 @@ class KeyboardControlSettings {
 export default class App extends WWTAwareComponent {
   @Prop({default: null}) readonly allowedOrigin!: string | null;
 
-  // For handling key presses
-  private _keyListener: ((e: KeyboardEvent) => void) | null = null;
-  private _keyboardControlSettings: KeyboardControlSettings | null = null;
+  @Prop({default: new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
   // Lifecycle management
 
@@ -505,31 +547,17 @@ export default class App extends WWTAwareComponent {
     }, false);
 
     // Handling key presses
-    this._keyboardControlSettings = new KeyboardControlSettings({});
-    this._keyListener = function(e: KeyboardEvent) {
-      const kcs = this._keyboardControlSettings;
-      if (kcs == null || kcs == undefined) { return; }
-      const movementAmount = kcs.moveAmount;
-      const tiltAmount = kcs.tiltAmount;
-      if (e.key === kcs.zoomIn) {
-        this.doZoom(true);
-      } else if (e.key === kcs.zoomOut) {
-        this.doZoom(false);
-      } else if (e.key === kcs.tiltCW) {
-        this.doTilt(tiltAmount, 0);
-      } else if (e.key === kcs.tiltCCW) {
-        this.doTilt(-tiltAmount, 0);
-      } else if (e.key === kcs.moveUp) {
-        this.doMove(0, movementAmount);
-      } else if (e.key === kcs.moveDown) {
-        this.doMove(0, -movementAmount);
-      } else if (e.key === kcs.moveLeft) {
-        this.doMove(-movementAmount, 0);
-      } else if (e.key === kcs.moveRight) {
-        this.doMove(movementAmount, 0);
-      }
-    };
-    window.addEventListener('keydown', this._keyListener.bind(this as App));
+
+    window.addEventListener('keydown', this._kcs.makeListener("moveUp", () => this.doMove(0, this._kcs.moveAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("moveDown", () => this.doMove(0, -this._kcs.moveAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("moveLeft", () => this.doMove(-this._kcs.moveAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("moveRight", () => this.doMove(this._kcs.moveAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltLeft", () => this.doTilt(-this._kcs.tiltAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltRight", () => this.doTilt(this._kcs.tiltAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltUp", () => this.doTilt(0, this._kcs.tiltAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltDown", () => this.doTilt(0, -this._kcs.tiltAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
+    window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
 
   }
 
