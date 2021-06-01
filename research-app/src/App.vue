@@ -545,7 +545,7 @@ class KeyboardControlSettings {
 export default class App extends WWTAwareComponent {
   @Prop({default: null}) readonly allowedOrigin!: string | null;
 
-  @Prop({default: new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
+  @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
   // Lifecycle management
 
