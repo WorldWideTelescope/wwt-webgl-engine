@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
 import Vue from "vue";
@@ -24,16 +24,16 @@ import {
 
 import {
   ApplyFitsLayerSettingsOptions,
+  AddImageSetLayerOptions,
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
-  AddImageSetLayerOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
+  SetLayerOrderOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
   UpdateTableLayerOptions,
   WWTInstance,
-  SetLayerOrderOptions
 } from "@wwtelescope/engine-helpers";
 
 interface WWTLinkedCallback {
