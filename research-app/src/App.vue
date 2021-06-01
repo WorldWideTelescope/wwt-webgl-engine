@@ -582,8 +582,8 @@ export default class App extends WWTAwareComponent {
     window.addEventListener('keydown', this._kcs.makeListener("moveDown", () => this.doMove(0, -this._kcs.moveAmount)));
     window.addEventListener('keydown', this._kcs.makeListener("moveLeft", () => this.doMove(this._kcs.moveAmount, 0)));
     window.addEventListener('keydown', this._kcs.makeListener("moveRight", () => this.doMove(-this._kcs.moveAmount, 0)));
-    window.addEventListener('keydown', this._kcs.makeListener("tiltLeft", () => this.doTilt(-this._kcs.tiltAmount, 0)));
-    window.addEventListener('keydown', this._kcs.makeListener("tiltRight", () => this.doTilt(this._kcs.tiltAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltLeft", () => this.doTilt(this._kcs.tiltAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltRight", () => this.doTilt(-this._kcs.tiltAmount, 0)));
     window.addEventListener('keydown', this._kcs.makeListener("tiltUp", () => this.doTilt(0, this._kcs.tiltAmount)));
     window.addEventListener('keydown', this._kcs.makeListener("tiltDown", () => this.doTilt(0, -this._kcs.tiltAmount)));
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
