@@ -463,8 +463,13 @@ class KeyboardControlSettings {
   tiltDown: KeyPressInfo[];
   tiltLeft: KeyPressInfo[];
   tiltRight: KeyPressInfo[];
+  bigMoveUp: KeyPressInfo[];
+  bigMoveDown: KeyPressInfo[];
+  bigMoveLeft: KeyPressInfo[];
+  bigMoveRight: KeyPressInfo[];
   moveAmount: number;
   tiltAmount: number;
+  bigMoveFactor: number;
 
   constructor({
     zoomIn = [
@@ -507,8 +512,25 @@ class KeyboardControlSettings {
       new KeyPressInfo("KeyL", { alt: true }),
       new KeyPressInfo("ArrowRight", { alt: true }),
     ],
+    bigMoveUp = [
+      new KeyPressInfo("KeyI", { shift: true }),
+      new KeyPressInfo("ArrowUp", { shift: true }),
+    ],
+    bigMoveDown = [
+      new KeyPressInfo("KeyK", { shift: true }),
+      new KeyPressInfo("ArrowDown", { shift: true }),
+    ],
+    bigMoveLeft = [
+      new KeyPressInfo("KeyJ", { shift: true }),
+      new KeyPressInfo("ArrowLeft", { shift: true }),
+    ],
+    bigMoveRight = [
+      new KeyPressInfo("KeyL", { shift: true }),
+      new KeyPressInfo("ArrowRight", { shift: true }),
+    ],
     moveAmount = 20,
     tiltAmount = 20,
+    bigMoveFactor = 6,
   }) {
     this.zoomIn = zoomIn;
     this.zoomOut = zoomOut;
@@ -520,12 +542,32 @@ class KeyboardControlSettings {
     this.tiltDown = tiltDown;
     this.tiltLeft = tiltLeft;
     this.tiltRight = tiltRight;
+    this.bigMoveUp = bigMoveUp;
+    this.bigMoveDown = bigMoveDown;
+    this.bigMoveLeft = bigMoveLeft;
+    this.bigMoveRight = bigMoveRight;
     this.moveAmount = moveAmount;
     this.tiltAmount = tiltAmount;
+    this.bigMoveFactor = bigMoveFactor;
   }
 
   // This is to make sure that we can't make a listener for an action type that doesn't exist
-  readonly actionTypes = [ "zoomIn", "zoomOut", "moveUp", "moveDown", "moveLeft", "moveRight", "tiltUp", "tiltDown", "tiltLeft", "tiltRight" ] as const;
+  readonly actionTypes = [
+    "zoomIn",
+    "zoomOut",
+    "moveUp",
+    "moveDown",
+    "moveLeft",
+    "moveRight",
+    "tiltUp",
+    "tiltDown",
+    "tiltLeft",
+    "tiltRight",
+    "bigMoveUp",
+    "bigMoveDown",
+    "bigMoveLeft",
+    "bigMoveRight",
+  ] as const;
 
   makeListener(actionName: KeyboardControlSettings["actionTypes"][number], action: () => void): (e: KeyboardEvent) => void {
     return (e) => {
@@ -536,7 +578,6 @@ class KeyboardControlSettings {
       }
     }
   }
-
 }
 
 
@@ -578,6 +619,8 @@ export default class App extends WWTAwareComponent {
 
     // Handling key presses
 
+    window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
+    window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
     window.addEventListener('keydown', this._kcs.makeListener("moveUp", () => this.doMove(0, this._kcs.moveAmount)));
     window.addEventListener('keydown', this._kcs.makeListener("moveDown", () => this.doMove(0, -this._kcs.moveAmount)));
     window.addEventListener('keydown', this._kcs.makeListener("moveLeft", () => this.doMove(this._kcs.moveAmount, 0)));
@@ -586,9 +629,10 @@ export default class App extends WWTAwareComponent {
     window.addEventListener('keydown', this._kcs.makeListener("tiltRight", () => this.doTilt(-this._kcs.tiltAmount, 0)));
     window.addEventListener('keydown', this._kcs.makeListener("tiltUp", () => this.doTilt(0, this._kcs.tiltAmount)));
     window.addEventListener('keydown', this._kcs.makeListener("tiltDown", () => this.doTilt(0, -this._kcs.tiltAmount)));
-    window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
-    window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
-
+    window.addEventListener('keydown', this._kcs.makeListener("bigMoveUp", () => this.doMove(0, this._kcs.bigMoveFactor * this._kcs.moveAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("bigMoveDown", () => this.doMove(0, this._kcs.bigMoveFactor * -this._kcs.moveAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("bigMoveLeft", () => this.doMove(this._kcs.bigMoveFactor * this._kcs.moveAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("bigMoveRight", () => this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)));
   }
 
   destroyed() {
