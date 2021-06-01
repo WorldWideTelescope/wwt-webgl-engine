@@ -434,7 +434,7 @@ class KeyPressInfo {
   shift: boolean;
   meta: boolean;
 
-  constructor(code: string, modifiers?: { ctrl?: boolean, alt?: boolean, shift?: boolean, meta?: boolean } ) {
+  constructor(code: string, modifiers?: { ctrl?: boolean; alt?: boolean; shift?: boolean; meta?: boolean } ) {
     this.code = code;
     this.ctrl = modifiers?.ctrl ?? false;
     this.alt = modifiers?.alt ?? false;
@@ -443,7 +443,7 @@ class KeyPressInfo {
   }
 
   matches(event: KeyboardEvent): boolean {
-    return event.code === this.code 
+    return event.code === this.code
         && event.ctrlKey === this.ctrl
         && event.altKey === this.alt
         && event.shiftKey === this.shift
@@ -467,16 +467,46 @@ class KeyboardControlSettings {
   tiltAmount: number;
 
   constructor({
-    zoomIn = [ new KeyPressInfo("KeyZ") ],
-    zoomOut = [ new KeyPressInfo("KeyX") ],
-    moveUp = [ new KeyPressInfo("KeyI") ],
-    moveDown = [ new KeyPressInfo("KeyK") ],
-    moveLeft = [ new KeyPressInfo("KeyJ") ],
-    moveRight = [ new KeyPressInfo("KeyL") ],
-    tiltUp = [ new KeyPressInfo("KeyI", { alt: true }) ],
-    tiltDown = [ new KeyPressInfo("KeyK", { alt: true }) ],
-    tiltLeft = [ new KeyPressInfo("KeyJ", { alt: true }) ],
-    tiltRight = [ new KeyPressInfo("KeyL", { alt: true }) ],
+    zoomIn = [
+      new KeyPressInfo("KeyZ"),
+      new KeyPressInfo("PageUp"),
+    ],
+    zoomOut = [
+      new KeyPressInfo("KeyX"),
+      new KeyPressInfo("PageDown"),
+    ],
+    moveUp = [
+      new KeyPressInfo("KeyI"),
+      new KeyPressInfo("ArrowUp"),
+    ],
+    moveDown = [
+      new KeyPressInfo("KeyK"),
+      new KeyPressInfo("ArrowDown"),
+    ],
+    moveLeft = [
+      new KeyPressInfo("KeyJ"),
+      new KeyPressInfo("ArrowLeft"),
+    ],
+    moveRight = [
+      new KeyPressInfo("KeyL"),
+      new KeyPressInfo("ArrowRight"),
+    ],
+    tiltUp = [
+      new KeyPressInfo("KeyI", { alt: true }),
+      new KeyPressInfo("ArrowUp", { alt: true }),
+    ],
+    tiltDown = [
+      new KeyPressInfo("KeyK", { alt: true }),
+      new KeyPressInfo("ArrowDown", { alt: true }),
+    ],
+    tiltLeft = [
+      new KeyPressInfo("KeyJ", { alt: true }),
+      new KeyPressInfo("ArrowLeft", { alt: true }),
+    ],
+    tiltRight = [
+      new KeyPressInfo("KeyL", { alt: true }),
+      new KeyPressInfo("ArrowRight", { alt: true }),
+    ],
     moveAmount = 20,
     tiltAmount = 20,
   }) {
