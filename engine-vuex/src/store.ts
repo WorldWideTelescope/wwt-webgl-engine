@@ -350,6 +350,20 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
+  move(obj: { x: number; y: number }): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot move without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.move(obj.x, obj.y);
+  }
+
+  @Mutation
+  tilt(obj: { x: number; y: number}): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot tilt without linking to WWTInstance');
+    Vue.$wwt.inst.ctl._tilt(obj.x, obj.y);
+  }
+
+  @Mutation
   setTime(time: Date): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setTime without linking to WWTInstance');
