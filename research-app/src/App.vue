@@ -121,6 +121,8 @@ class ImageSetLayerMessageHandler {
     }
 
     const mode = msg.mode || "autodetect";
+    // Compatibility with older pywwt requires that if goto(Target) is
+    // unspecified, we treat it as true.
     const gotoTarget = msg.goto == undefined ? true : msg.goto;
 
     this.owner.addImageSetLayer({
