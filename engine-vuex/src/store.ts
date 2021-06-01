@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
 import Vue from "vue";
@@ -24,15 +24,16 @@ import {
 
 import {
   ApplyFitsLayerSettingsOptions,
+  AddImageSetLayerOptions,
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
-  AddImageSetLayerOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
+  SetLayerOrderOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
   UpdateTableLayerOptions,
-  WWTInstance
+  WWTInstance,
 } from "@wwtelescope/engine-helpers";
 
 interface WWTLinkedCallback {
@@ -532,11 +533,19 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       url: options.url, 
       mode: "fits",
       name: options.name,
-      gotoTarget: options.gotoTarget
+      goto: options.gotoTarget
     };
     
     return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
   }
+
+  @Mutation
+  setImageSetLayerOrder(options: SetLayerOrderOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
+    return Vue.$wwt.inst.setImageSetLayerOrder(options);
+  }
+
 
   @Mutation
   stretchFitsLayer(options: StretchFitsLayerOptions): void {

@@ -22,6 +22,7 @@ import {
   GotoTargetOptions,
   AddImageSetLayerOptions,
   LoadFitsLayerOptions,
+  SetLayerOrderOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
@@ -161,6 +162,7 @@ import {
  * - [[applyFitsLayerSettings]]
  * - [[setFitsLayerColormap]]
  * - [[stretchFitsLayer]]
+ * - [[setImageSetLayerOrder]]
  * - [[deleteLayer]]
  *
  * Actions:
@@ -285,6 +287,7 @@ export class WWTAwareComponent extends Vue {
         "setFitsLayerColormap",
         "setForegroundImageByName",
         "setForegroundOpacity",
+        "setImageSetLayerOrder",
         "setTourPlayerLeaveSettingsWhenStopped",
         "setTime",
         "setTrackedObject",
@@ -517,6 +520,11 @@ export class WWTAwareComponent extends Vue {
    * Valid values are between 0 (invisible) and 100 (fully opaque).
    */
   setForegroundOpacity!: (o: number) => void;
+
+  /** Change the [ImageSetLayer](../../engine/classes/imagesetlayer.html) 
+   * position in the draw cycle.
+   */
+  setImageSetLayerOrder!: (_o: SetLayerOrderOptions) => void;
 
   /** Set the current time of WWT's internal clock.
    *

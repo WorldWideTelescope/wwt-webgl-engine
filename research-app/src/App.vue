@@ -89,6 +89,7 @@ type ToolType = "crossfade" | null;
 type AnyFitsLayerMessage =
   classicPywwt.CreateImageSetLayerMessage |
   classicPywwt.SetFitsLayerColormapMessage |
+  classicPywwt.SetLayerOrderMessage |
   classicPywwt.StretchFitsLayerMessage |
   classicPywwt.ModifyFitsLayerMessage |
   classicPywwt.RemoveImageSetLayerMessage;
@@ -103,10 +104,12 @@ class ImageSetLayerMessageHandler {
   private internalId: string | null = null;
   private colormapVersion = -1;
   private stretchVersion = -1;
+  private orderVersion = -1;
   private queuedStretch: classicPywwt.StretchFitsLayerMessage | null = null;
   private queuedColormap: classicPywwt.SetFitsLayerColormapMessage | null = null;
   private queuedSettings: ImageSetLayerSetting[] = [];
   private queuedRemoval: classicPywwt.RemoveImageSetLayerMessage | null = null;
+  private queuedOrder: classicPywwt.SetLayerOrderMessage | null = null;
 
   constructor(owner: App) {
     this.owner = owner;
@@ -118,11 +121,15 @@ class ImageSetLayerMessageHandler {
     }
 
     const mode = msg.mode || "autodetect";
+    // Compatibility with older pywwt requires that if goto(Target) is
+    // unspecified, we treat it as true.
+    const gotoTarget = msg.goto == undefined ? true : msg.goto;
+
     this.owner.addImageSetLayer({
       url: msg.url,
       mode: mode,
       name: msg.id,
-      gotoTarget: true, // pywwt expected behavior
+      goto: gotoTarget,
     }).then((layer) => this.layerInitialized(layer));
 
     this.created = true;
@@ -150,6 +157,24 @@ class ImageSetLayerMessageHandler {
     if (this.queuedRemoval !== null) {
       this.handleRemoveMessage(this.queuedRemoval);
       this.queuedRemoval = null;
+    }
+  }
+
+  handleSetLayerOrderMessage(msg: classicPywwt.SetLayerOrderMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedOrder === null || msg.version > this.queuedOrder.version) {
+        this.queuedOrder = msg;
+      }
+    } else {
+      if (msg.version > this.orderVersion) {
+        this.owner.setImageSetLayerOrder({
+          id: this.internalId,
+          order: msg.order
+        });
+        this.orderVersion = msg.version;
+      }
     }
   }
 
@@ -506,13 +531,15 @@ export default class App extends WWTAwareComponent {
     } else if (classicPywwt.isCreateImageSetLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleCreateMessage(msg);
     } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
-      const creatImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
+      const createImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
         event: msg.event,
         url: msg.url,
         id: msg.id,
         mode: "fits",
       }
-      this.getFitsLayerHandler(creatImageSetMessage).handleCreateMessage(creatImageSetMessage);
+      this.getFitsLayerHandler(createImageSetMessage).handleCreateMessage(createImageSetMessage);
+    } else if (classicPywwt.isSetLayerOrderMessage(msg)) {
+      this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleStretchMessage(msg);
     } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {

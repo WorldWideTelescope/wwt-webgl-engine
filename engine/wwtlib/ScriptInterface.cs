@@ -462,6 +462,16 @@ namespace wwtlib
             return imagesetLayer;
         }
 
+        public void SetImageSetLayerOrder(Guid id, int order)
+        {
+            Layer layer = LayerManager.LayerList[id];
+            if (layer is ImageSetLayer && order >= 0) {
+                LayerManager.AllMaps[layer.ReferenceFrame].Layers.Remove(layer);
+                //In case of order > Layers.length, the layer is properly put at the end of the list
+                LayerManager.AllMaps[layer.ReferenceFrame].Layers.Insert(order, layer);
+            }
+        }
+
         public bool hideTourFeedback = false;
         public bool HideTourFeedback
         {

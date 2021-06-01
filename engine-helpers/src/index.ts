@@ -317,8 +317,18 @@ export interface AddImageSetLayerOptions {
 
   /** Whether to seek the view to the positon of the FITS file on the sky,
    * if/when it successfully loads. */
-  gotoTarget: boolean;
+  goto: boolean;
 }
+
+/** Options for [[WWTInstance.setLayerOrder]]. */
+export interface SetLayerOrderOptions {
+  /** The ID of the layer. */
+  id: string;
+  /** The prefered position of the layer in the draw cycle.
+   * 0 being the first layer to be drawn. */
+  order: number;
+}
+
 
 /** Options for [[WWTInstance.stretchFitsLayer]]. */
 export interface StretchFitsLayerOptions {
@@ -657,10 +667,15 @@ export class WWTInstance {
    */
   async addImageSetLayer(options: AddImageSetLayerOptions): Promise<ImageSetLayer> {
     return new Promise((resolve, _reject) => {
-      this.si.addImageSetLayer(options.url, options.mode, options.name, options.gotoTarget, (layer) => {
+      this.si.addImageSetLayer(options.url, options.mode, options.name, options.goto, (layer) => {
         resolve(layer);
       })
     });
+  }
+
+  /** Change the ImageSetLayer position in the layer stack. */
+  setImageSetLayerOrder(options: SetLayerOrderOptions): void {
+    this.si.setImageSetLayerOrder(options.id, options.order);
   }
 
   /** Change the "stretch" settings of a FITS image layer. */
