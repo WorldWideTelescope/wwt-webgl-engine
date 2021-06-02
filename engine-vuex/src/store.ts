@@ -147,7 +147,7 @@ export interface WWTEngineVuexState {
    */
   tourTimecode: number;
 
-  shouldShowBrowserWarning: boolean;
+  showWebGl2Warning: boolean;
   
   /** The current zoom level of the view, in degrees.
    *
@@ -233,7 +233,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   tourRunTime: number | null = null;
   tourStopStartTimes: number[] = [];
   tourTimecode = 0.0;
-  shouldShowBrowserWarning = false;
+  showWebGl2Warning = false;
   zoomDeg = 0.0;
 
   get lookupImageset() {
@@ -303,10 +303,10 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       this.isTourPlaying = false;
     }
 
-    const shouldShowBrowserWarning = !wwt.si.isUsingWebGl2()
+    const showWebGl2Warning = !wwt.si.isUsingWebGl2()
       && (Date.now() - this.timeAtStartup) < 15000;
-    if (this.shouldShowBrowserWarning != shouldShowBrowserWarning) {
-      this.shouldShowBrowserWarning = shouldShowBrowserWarning;
+    if (this.showWebGl2Warning != showWebGl2Warning) {
+      this.showWebGl2Warning = showWebGl2Warning;
     }
   }
 

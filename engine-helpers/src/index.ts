@@ -663,11 +663,6 @@ export class WWTInstance {
     });
   }
 
-  /** Check whether the engine is using the most optimal rendering technology (WebGL 2.0). */
-  isUsingWebGl2(): boolean {
-    return this.si.isUsingWebGl2();
-  }
-
   /** Change the "stretch" settings of a FITS image layer. */
   stretchFitsLayer(options: StretchFitsLayerOptions): void {
     const layer = this.lm.get_layerList()[options.id];

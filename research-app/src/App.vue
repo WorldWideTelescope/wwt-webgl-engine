@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div id="webgl2-popup" v-show="shouldShowBrowserWarning">
+    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning">
       To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
       In case you would like to use Safari, we recommend that you 
       <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
@@ -713,11 +713,6 @@ export default class App extends WWTAwareComponent {
     if (screenfull.isEnabled) {
       this.fullscreenModeActive = screenfull.isFullscreen;
     }
-  }
-
-  //Suggest browser change
-  get shouldShowBrowserWarning() {
-    return this.wwtShouldShowBrowserWarning;
   }
 
   // Background / foreground imagesets
