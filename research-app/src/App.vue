@@ -12,24 +12,24 @@
 
     <ul id="controls">
       <li v-show="showToolMenu">
-        <v-popover placement="left">
-          <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
-          <template slot="popover">
-            <ul class="tooltip-content tool-menu">
-              <li v-show="showCrossfader"><a href="#" v-close-popover @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
+        <v-popover placement="left" trigger="manual" :open="showPopover">
+          <font-awesome-icon class="tooltip-target tooltip-icon" icon="sliders-h" size="lg" tabindex="0" @keyup.enter="showPopover = !showPopover" @click="showPopover = !showPopover" ></font-awesome-icon>
+          <template slot="popover" tabindex="-1" show="showPopover" style="background: green">
+            <ul class="tooltip-content tool-menu" tabindex="-1" style="background: pink">
+              <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')" tabindex="0"><font-awesome-icon icon="mountain"/> Choose background</a></li>
             </ul>
           </template>
         </v-popover>
       </li>
       <li v-show="!wwtIsTourPlaying">
-        <font-awesome-icon icon="search-plus" size="lg" @click="doZoom(true)"></font-awesome-icon>
+        <font-awesome-icon icon="search-plus" size="lg" class="tooltip-icon" @keyup.enter="doZoom(true)" @click="doZoom(true)" tabindex="0"></font-awesome-icon>
       </li>
       <li v-show="!wwtIsTourPlaying">
-        <font-awesome-icon icon="search-minus" size="lg" @click="doZoom(false)"></font-awesome-icon>
+        <font-awesome-icon icon="search-minus" size="lg" class="tooltip-icon" @keyup.enter="doZoom(false)" @click="doZoom(false)" tabindex="0"></font-awesome-icon>
       </li>
       <li v-show="fullscreenAvailable">
         <font-awesome-icon v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
-          size="lg" class="nudgeright1" @click="toggleFullscreen()"></font-awesome-icon>
+          size="lg" class="nudgeright1 tooltip-icon" @keyup.enter="toggleFullscreen()" @click="toggleFullscreen()" tabindex="0"></font-awesome-icon>
       </li>
     </ul>
 
@@ -37,6 +37,25 @@
       <div class="tool-container">
       <template v-if="currentTool == 'crossfade'">
         <span>Foreground opacity:</span> <input class="opacity-range" type="range" v-model="foregroundOpacity">
+      </template>
+      <template v-else-if="currentTool == 'choose-background'">
+        <div id="bg-select-container">
+          <span id="bg-select-title">Background imagery:</span>
+          <v-select v-model="curBackgroundImagesetName"
+                  id="bg-select"
+                  :searchable="true"
+                  :clearable="false"
+                  :close-on-select="true"
+                  :reduce="bg => bg.get_name()"
+                  label="_name"
+                  placeholder="Background"
+                  >
+                  <template #option="option">
+                    <h4 style="margin:0">{{ option._name}}</h4>
+                    <em style="margin:0; font-size:small;">{{option._creditsText}}</em>
+                  </template>
+          </v-select>
+        </div>
       </template>
       </div>
     </div>
@@ -46,8 +65,13 @@
 <script lang="ts">
 import * as moment from "moment";
 import * as screenfull from "screenfull";
+import vSelect from 'vue-select';
+import Vue from 'vue';
+import 'vue-select/dist/vue-select.css';
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+
+Vue.component("v-select", vSelect);
 
 import {
   ImageSetType,
@@ -942,9 +966,13 @@ export default class App extends WWTAwareComponent {
     return this.wwtForegroundImageset != this.wwtBackgroundImageset;
   }
 
+  get showBackgroundChooser() {
+    return !this.wwtIsTourPlaying;
+  }
+
   get showToolMenu() {
     // This should return true if there are any tools to show.
-    return this.showCrossfader;
+    return this.showCrossfader || this.showBackgroundChooser;
   }
 
   selectTool(name: ToolType) {
@@ -979,6 +1007,12 @@ export default class App extends WWTAwareComponent {
 
   doTilt(x: number, y: number) {
     this.tilt({ x: x, y: y});
+  }
+
+  data() {
+    return {
+      showPopover: false
+    }
   }
 
 }
@@ -1066,7 +1100,7 @@ body {
 #tools {
   position: absolute;
   z-index: 10;
-  bottom: 3rem;
+  top: 4rem;
   left: 50%;
   color: #FFF;
 
@@ -1215,6 +1249,37 @@ ul.tool-menu {
       color: #FFF;
     }
   }
+}
+
+#bg-select {
+  width: 500px;
+  vertical-align: middle;
+  padding: 5px;
+}
+
+#bg-select-container {
+  display: flex;
+}
+
+#bg-select-title {
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  background: none;
+  float: left;
+  height: 100%;
+  margin: auto;
+  padding: 0px 10px 0px 0px;
+}
+
+#bg-select * {
+  background: #cccccc;
+
+  .vs__dropdown-option--highlight {
+    color: red;
+  }
+
 }
 
 </style>

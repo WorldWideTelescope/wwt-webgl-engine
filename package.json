@@ -12,6 +12,7 @@
     "serve-research": "cd research-app && npm run serve"
   },
   "dependencies": {
+    "@types/vue-select": "^3.11.1",
     "@wwtelescope/astro": "file:astro",
     "@wwtelescope/embed": "file:embed",
     "@wwtelescope/embed-common": "file:embed-common",
@@ -21,7 +22,8 @@
     "@wwtelescope/engine-types": "file:engine-types",
     "@wwtelescope/engine-vuex": "file:engine-vuex",
     "@wwtelescope/research-app": "file:research-app",
-    "@wwtelescope/research-app-messages": "file:research-app-messages"
+    "@wwtelescope/research-app-messages": "file:research-app-messages",
+    "vue-select": "^3.11.2"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.7.0",
