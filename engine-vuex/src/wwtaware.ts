@@ -34,7 +34,8 @@ import {
   GotoRADecZoomParams,
   LoadTourParams,
   LoadImageCollectionParams,
-  WWTEngineVuexState
+  WWTEngineVuexState,
+  ImagesetInfo
 } from "./store";
 
 /** A class for Vue components that wish to interact with a [[WWTComponent]]
@@ -233,6 +234,7 @@ export class WWTAwareComponent extends Vue {
 
     this.$options.computed = {
       ...mapState({
+        wwtAvailableImagesets: (state, _getters) => (state as WWTEngineVuexState).availableImagesets,
         wwtBackgroundImageset: (state, _getters) => (state as WWTEngineVuexState).backgroundImageset,
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
         wwtClockDiscontinuities: (state, _getters) => (state as WWTEngineVuexState).clockDiscontinuities,
@@ -296,6 +298,7 @@ export class WWTAwareComponent extends Vue {
         "stretchFitsLayer",
         "toggleTourPlayPauseState",
         "updateTableLayer",
+        "updateAvailableImagesets",
         "zoom",
         "move",
         "tilt",
@@ -304,6 +307,12 @@ export class WWTAwareComponent extends Vue {
   }
 
   // Teach TypeScript about everything we wired up. State:
+
+  /** Information about the imagesets that are available to be used as a background
+   * The info includes the name, which can then be used to set the background image
+   * via the [[setBackgroundImageByName]] mutation.
+   */
+  wwtAvailableImagesets!: ImagesetInfo[];
 
   /** The current background [Imageset](../../engine/classes/imageset.html), or
    * null if it is undefined.

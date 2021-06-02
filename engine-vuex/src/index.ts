@@ -9,6 +9,7 @@ export { SetupForImagesetOptions } from "@wwtelescope/engine-helpers";
 export {
   CreateTableLayerParams,
   GotoRADecZoomParams,
+  ImagesetInfo,
   LoadImageCollectionParams,
   LoadTourParams,
   WWTEngineVuexModule,

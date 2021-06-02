@@ -14,8 +14,8 @@
       <li v-show="showToolMenu">
         <v-popover placement="left" trigger="manual" :open="showPopover">
           <font-awesome-icon class="tooltip-target tooltip-icon" icon="sliders-h" size="lg" tabindex="0" @keyup.enter="showPopover = !showPopover" @click="showPopover = !showPopover" ></font-awesome-icon>
-          <template slot="popover" tabindex="-1" show="showPopover" style="background: green">
-            <ul class="tooltip-content tool-menu" tabindex="-1" style="background: pink">
+          <template slot="popover" tabindex="-1" show="showPopover">
+            <ul class="tooltip-content tool-menu" tabindex="-1">
               <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')" tabindex="0"><font-awesome-icon icon="mountain"/> Choose background</a></li>
             </ul>
           </template>
@@ -45,14 +45,16 @@
                   id="bg-select"
                   :searchable="true"
                   :clearable="false"
+                  :options="curAvailableImagesets"
+                  :filter="filterImagesets"
                   :close-on-select="true"
-                  :reduce="bg => bg.get_name()"
-                  label="_name"
+                  :reduce="bg => bg.name"
+                  label="name"
                   placeholder="Background"
                   >
                   <template #option="option">
-                    <h4 style="margin:0">{{ option._name}}</h4>
-                    <em style="margin:0; font-size:small;">{{option._creditsText}}</em>
+                    <h4 style="margin:0">{{ option.name}}</h4>
+                    <em style="margin:0; font-size:small;">{{option.description}}</em>
                   </template>
           </v-select>
         </div>
@@ -99,7 +101,7 @@ import {
   isPolyLineAnnotationSetting,
 } from "@wwtelescope/engine-helpers";
 
-import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
+import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 
 import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
 
@@ -637,6 +639,8 @@ export default class App extends WWTAwareComponent {
 
   @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
+  hipsUrl: string = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
+
   // Lifecycle management
 
   created() {
@@ -647,6 +651,12 @@ export default class App extends WWTAwareComponent {
     if (screenfull.isEnabled) {
       screenfull.on('change', this.onFullscreenEvent);
     }
+
+    (async() => {
+      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
+    })();
+
+    
 
     // For now let's just not worry about removing this listener ...
     window.addEventListener('message', (event) => {
@@ -666,7 +676,7 @@ export default class App extends WWTAwareComponent {
       }
     }, false);
 
-    // Handling key presses
+  // Handling key presses
 
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
     window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
@@ -934,6 +944,12 @@ export default class App extends WWTAwareComponent {
 
   // Background / foreground imagesets
 
+  get curAvailableImagesets() {
+    if (this.wwtAvailableImagesets == null)
+      return [];
+    return this.wwtAvailableImagesets.filter(info => info.type != ImageSetType.panorama);
+  }
+
   get curBackgroundImagesetName() {
     if (this.wwtBackgroundImageset == null)
       return "";
@@ -1007,6 +1023,12 @@ export default class App extends WWTAwareComponent {
 
   doTilt(x: number, y: number) {
     this.tilt({ x: x, y: y});
+  }
+
+  // For filtering imagesets
+  filterImagesets(imagesets: ImagesetInfo[], searchText: string) {
+    return imagesets
+    .filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
   }
 
   data() {

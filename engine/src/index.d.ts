@@ -1906,6 +1906,10 @@ export class WcsImage {
  *
  * */
 export class WWTControl {
+
+  /** The image sets that have been loaded into the engine */
+  static getImageSets(): Imageset[];
+
   /** Special UI state that may be active such as a [[TourPlayer]]. */
   uiController: UiController | null;
 
