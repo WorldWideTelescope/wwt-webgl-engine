@@ -12,7 +12,7 @@ namespace wwtlib
         public event EventHandler<EventArgs> Ready;
         internal void FireReady()
         {
-            
+
             if (Ready != null)
             {
                 Ready.Invoke(this, new EventArgs());
@@ -24,24 +24,24 @@ namespace wwtlib
         }
 
         public event EventHandler<CollectionLoadedEventArgs> CollectionLoaded;
-        
+
         internal void FireCollectionLoaded(string url)
         {
             if (CollectionLoaded != null)
             {
                 CollectionLoaded.Invoke(this, new CollectionLoadedEventArgs(url));
-            }          
+            }
         }
 
         public event EventHandler<EventArgs> ColorPickerDisplay;
 
         public event EventHandler<EventArgs> VOTableDisplay;
         public event EventHandler<EventArgs> RefreshLayerManager;
-      
+
         public event EventHandler<ArrivedEventArgs> Arrived;
         public event EventHandler<ArrivedEventArgs> Clicked;
         public event EventHandler<AnnotationClickEventArgs> AnnotationClicked;
-        
+
         public event EventHandler<EventArgs> ImageryLoaded;
 
         public event EventHandler<EventArgs> TourReady;
@@ -56,7 +56,7 @@ namespace wwtlib
 
 
         public event EventHandler TimeScrubberHook;
-        //UI will set this to a function that takes 2 string properties (prop,val) 
+        //UI will set this to a function that takes 2 string properties (prop,val)
         //("title", "left", or "right" for the labels, "pos" for the slider pos)
         //Pass a 0-1 float to set the slider position (stringify it if you need to for strong typing)
 
@@ -193,11 +193,11 @@ namespace wwtlib
             }
         }
 
-        public void GotoRaDecZoom(double ra, double dec, double zoom, bool instant)
+        public void GotoRaDecZoom(double ra, double dec, double zoom, bool instant, double? roll)
         {
             if (WWTControl.Singleton != null)
             {
-                WWTControl.Singleton.GotoRADecZoom(ra / 15, dec, zoom * 6, instant);
+                WWTControl.Singleton.GotoRADecZoom(ra / 15, dec, zoom * 6, instant, roll);
             }
         }
 
@@ -229,7 +229,7 @@ namespace wwtlib
             }
         }
 
-       
+
         public void SetForegroundOpacity(double opacity)
         {
             if (WWTControl.Singleton != null)
@@ -270,6 +270,31 @@ namespace wwtlib
             }
         }
 
+        public void SetCutsForFits(string imagesetName, double min, double max)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.SetCutsForFits(imagesetName, min , max);
+            }
+        }
+
+        public void SetColorMapForFits(string imagesetName, string colorMapName)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.SetColorMapForFits(imagesetName, colorMapName);
+            }
+        }
+
+        public void SetScaleTypeForFits(string imagesetName, ScaleTypes scaleType)
+        {
+            if (WWTControl.Singleton != null)
+            {
+                WWTControl.Singleton.SetScaleTypeForFits(imagesetName, scaleType);
+            }
+        }
+
+
         public void HideUI(bool hide)
         {
             //todo enable
@@ -295,30 +320,100 @@ namespace wwtlib
 
         public ImageSetLayer LoadFitsLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
         {
+            return AddImageSetLayer(url, "fits", name, gotoTarget, loaded);
+        }
+
+        public ImageSetLayer AddImageSetLayer(string url, string mode, string name, bool gotoTarget, ImagesetLoaded loaded)
+        {
+            if (mode != null && mode.ToLowerCase() == "fits")
+            {
+                return AddFitsLayer(url, name, gotoTarget, loaded);
+            }
+            else if (mode != null && mode.ToLowerCase() == "preloaded")
+            {
+                Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
+                if (imageset != null)
+                {
+                    return AddImageSet(name, gotoTarget, loaded, imageset);
+                }
+            }
+            else
+            {
+                Imageset imageset = WWTControl.Singleton.GetImageSetByUrl(url);
+                if (imageset != null)
+                {
+                    return AddImageSet(name, gotoTarget, loaded, imageset);
+                }
+                else if (ContainsFitsLikeExtentsion(url))
+                {
+                    return AddFitsLayer(url, name, gotoTarget, loaded);
+                }
+            }
+            return null;
+        }
+
+        private static bool ContainsFitsLikeExtentsion(string url)
+        {
+            string lowerCaseUrl = url.ToLowerCase();
+            return (lowerCaseUrl.EndsWith("fits")
+                || lowerCaseUrl.EndsWith("ftz")
+                || lowerCaseUrl.EndsWith("fit")
+                || lowerCaseUrl.EndsWith("fts")
+                );
+        }
+
+        private static ImageSetLayer AddImageSet(string name, bool gotoTarget, ImagesetLoaded loaded, Imageset imageset)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = LayerManager.GetNextImageSetName();
+            }
+            ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayer(imageset, name);
+
+            if (gotoTarget)
+            {
+                WWTControl.Singleton.GotoRADecZoom(imageset.CenterX / 15, imageset.CenterY,
+                    WWTControl.Singleton.RenderContext.ViewCamera.Zoom, false, null);
+            }
+            if (loaded != null)
+            {
+                loaded(imagesetLayer);
+            }
+
+            return imagesetLayer;
+        }
+
+        private static ImageSetLayer AddFitsLayer(string url, string name, bool gotoTarget, ImagesetLoaded loaded)
+        {
             if (string.IsNullOrWhiteSpace(name))
             {
                 name = LayerManager.GetNextFitsName();
             }
 
             ImageSetLayer imagesetLayer = new ImageSetLayer();
+            Imageset imageset = new Imageset();
 
-            FitsImage img = new FitsImage(url, null, delegate (WcsImage wcsImage)
+            WcsLoaded wcsLoaded = delegate (WcsImage wcsImage)
             {
+                if (((FitsImage)wcsImage).errored)
+                {
+                    return;
+                }
+
                 int width = (int)wcsImage.SizeX;
                 int height = (int)wcsImage.SizeY;
-
-                Imageset imageset = Imageset.Create(
+                //TODO make sure dataset URL is unique
+                imageset.SetInitialParameters(
                             wcsImage.Description,
-                            Util.GetHashCode(wcsImage.Filename).ToString(),
+                            wcsImage.Filename,
                             ImageSetType.Sky,
                             BandPass.Visible,
                             ProjectionType.SkyImage,
                             Util.GetHashCode(wcsImage.Filename),
                             0,
                             0,
-                            256,
                             wcsImage.ScaleY,
-                            ".tif",
+                            ".fits",
                             wcsImage.ScaleX > 0,
                             "",
                             wcsImage.CenterX,
@@ -342,20 +437,45 @@ namespace wwtlib
                 imageset.WcsImage = wcsImage;
                 imagesetLayer.ImageSet = imageset;
                 LayerManager.AddFitsImageSetLayer(imagesetLayer, name);
-                LayerManager.LoadTree();
                 if (gotoTarget)
                 {
-                    WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false);
+                    WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false, null);
                 }
                 if (loaded != null)
                 {
                     loaded(imagesetLayer);
                 }
-            });
+            };
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = LayerManager.GetNextFitsName();
+            }
 
+            if (RenderContext.UseGlVersion2)
+            {
+                new FitsImage(imageset, url, null, wcsLoaded);
+            }
+            else
+            {
+                new FitsImageJs(imageset, url, null, wcsLoaded);
+            }
             return imagesetLayer;
         }
 
+        public void SetImageSetLayerOrder(Guid id, int order)
+        {
+            Layer layer = LayerManager.LayerList[id];
+            if (layer is ImageSetLayer && order >= 0) {
+                LayerManager.AllMaps[layer.ReferenceFrame].Layers.Remove(layer);
+                //In case of order > Layers.length, the layer is properly put at the end of the list
+                LayerManager.AllMaps[layer.ReferenceFrame].Layers.Insert(order, layer);
+            }
+        }
+
+        public bool IsUsingWebGl2()
+        {
+            return RenderContext.UseGlVersion2;
+        }
 
         public bool hideTourFeedback = false;
         public bool HideTourFeedback
@@ -387,15 +507,11 @@ namespace wwtlib
             }
         }
 
-        private Folder imageFolder;
         private string imageUrl;
-        public void LoadImageCollection(string url)
+        public void LoadImageCollection(string url, bool? loadChildFolders)
         {
-
             imageUrl = url;
-            imageFolder = new Folder();
-            imageFolder.LoadFromUrl(url, delegate { Wtml.LoadImagesets(imageFolder); FireCollectionLoaded(url); });
-
+            Wtml.GetWtmlFile(url, delegate { FireCollectionLoaded(url); }, loadChildFolders);
         }
 
         private void ImageFileLoaded()
@@ -534,7 +650,7 @@ namespace wwtlib
             get { return showCaptions; }
             set { showCaptions = value; }
         }
-        
+
 
         public void LoadVOTable(string url, bool useCurrentView)
         {
@@ -567,7 +683,7 @@ namespace wwtlib
         }
 
         public Settings Settings;
-       
+
     }
 
 

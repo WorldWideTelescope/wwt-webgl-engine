@@ -40,6 +40,12 @@
       </template>
       </div>
     </div>
+
+    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning">
+      To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
+      In case you would like to use Safari, we recommend that you 
+      <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
+    </div>
   </div>
 </template>
 
@@ -87,39 +93,49 @@ const R2D = 180.0 / Math.PI;
 type ToolType = "crossfade" | null;
 
 type AnyFitsLayerMessage =
-  classicPywwt.CreateFitsLayerMessage |
+  classicPywwt.CreateImageSetLayerMessage |
   classicPywwt.SetFitsLayerColormapMessage |
+  classicPywwt.SetLayerOrderMessage |
   classicPywwt.StretchFitsLayerMessage |
   classicPywwt.ModifyFitsLayerMessage |
-  classicPywwt.RemoveFitsLayerMessage;
+  classicPywwt.RemoveImageSetLayerMessage;
 
 /** Helper for handling messages that mutate FITS / ImageSet layers. Because
  * FITS loading is asynchronous, and messages might arrive out of order, we need
  * some logic to smooth everything out.
  */
-class FitsLayerMessageHandler {
+class ImageSetLayerMessageHandler {
   private owner: App;
   private created = false;
   private internalId: string | null = null;
   private colormapVersion = -1;
   private stretchVersion = -1;
+  private orderVersion = -1;
   private queuedStretch: classicPywwt.StretchFitsLayerMessage | null = null;
   private queuedColormap: classicPywwt.SetFitsLayerColormapMessage | null = null;
   private queuedSettings: ImageSetLayerSetting[] = [];
-  private queuedRemoval: classicPywwt.RemoveFitsLayerMessage | null = null;
+  private queuedRemoval: classicPywwt.RemoveImageSetLayerMessage | null = null;
+  private queuedOrder: classicPywwt.SetLayerOrderMessage | null = null;
 
   constructor(owner: App) {
     this.owner = owner;
   }
 
-  handleCreateMessage(msg: classicPywwt.CreateFitsLayerMessage) {
-    if (this.created)
+  handleCreateMessage(msg: classicPywwt.CreateImageSetLayerMessage) {
+    if (this.created) {
       return;
+    }
 
-    this.owner.loadFitsLayer({
+    const mode = msg.mode || "autodetect";
+    // Compatibility with older pywwt requires that if goto(Target) is
+    // unspecified, we treat it as true.
+    const gotoTarget = msg.goto == undefined ? true : msg.goto;
+
+    this.owner.addImageSetLayer({
       url: msg.url,
+      mode: mode,
       name: msg.id,
-      gotoTarget: true, // pywwt expected behavior
+      goto: gotoTarget,
     }).then((layer) => this.layerInitialized(layer));
 
     this.created = true;
@@ -147,6 +163,24 @@ class FitsLayerMessageHandler {
     if (this.queuedRemoval !== null) {
       this.handleRemoveMessage(this.queuedRemoval);
       this.queuedRemoval = null;
+    }
+  }
+
+  handleSetLayerOrderMessage(msg: classicPywwt.SetLayerOrderMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedOrder === null || msg.version > this.queuedOrder.version) {
+        this.queuedOrder = msg;
+      }
+    } else {
+      if (msg.version > this.orderVersion) {
+        this.owner.setImageSetLayerOrder({
+          id: this.internalId,
+          order: msg.order
+        });
+        this.orderVersion = msg.version;
+      }
     }
   }
 
@@ -207,7 +241,7 @@ class FitsLayerMessageHandler {
     }
   }
 
-  handleRemoveMessage(msg: classicPywwt.RemoveFitsLayerMessage) {
+  handleRemoveMessage(msg: classicPywwt.RemoveImageSetLayerMessage) {
     if (this.internalId === null) {
       // Layer not yet created or fully initialized. Queue up message for processing
       // once it's ready.
@@ -424,11 +458,166 @@ class AnnotationMessageHandler {
   }
 }
 
+class KeyPressInfo {
+  code: string;
+  ctrl: boolean;
+  alt: boolean;
+  shift: boolean;
+  meta: boolean;
+
+  constructor(code: string, modifiers?: { ctrl?: boolean; alt?: boolean; shift?: boolean; meta?: boolean } ) {
+    this.code = code;
+    this.ctrl = modifiers?.ctrl ?? false;
+    this.alt = modifiers?.alt ?? false;
+    this.shift = modifiers?.shift ?? false;
+    this.meta = modifiers?.meta ?? false;
+  }
+
+  matches(event: KeyboardEvent): boolean {
+    return event.code === this.code
+        && event.ctrlKey === this.ctrl
+        && event.altKey === this.alt
+        && event.shiftKey === this.shift
+        && event.metaKey === this.meta;
+  }
+}
+
+/** This simple class encapsulates how we handle key bindings */
+class KeyboardControlSettings {
+  zoomIn: KeyPressInfo[];
+  zoomOut: KeyPressInfo[];
+  moveUp: KeyPressInfo[];
+  moveDown: KeyPressInfo[];
+  moveLeft: KeyPressInfo[];
+  moveRight: KeyPressInfo[];
+  tiltUp: KeyPressInfo[];
+  tiltDown: KeyPressInfo[];
+  tiltLeft: KeyPressInfo[];
+  tiltRight: KeyPressInfo[];
+  bigMoveUp: KeyPressInfo[];
+  bigMoveDown: KeyPressInfo[];
+  bigMoveLeft: KeyPressInfo[];
+  bigMoveRight: KeyPressInfo[];
+  moveAmount: number;
+  tiltAmount: number;
+  bigMoveFactor: number;
+
+  constructor({
+    zoomIn = [
+      new KeyPressInfo("KeyZ"),
+      new KeyPressInfo("PageUp"),
+    ],
+    zoomOut = [
+      new KeyPressInfo("KeyX"),
+      new KeyPressInfo("PageDown"),
+    ],
+    moveUp = [
+      new KeyPressInfo("KeyI"),
+      new KeyPressInfo("ArrowUp"),
+    ],
+    moveDown = [
+      new KeyPressInfo("KeyK"),
+      new KeyPressInfo("ArrowDown"),
+    ],
+    moveLeft = [
+      new KeyPressInfo("KeyJ"),
+      new KeyPressInfo("ArrowLeft"),
+    ],
+    moveRight = [
+      new KeyPressInfo("KeyL"),
+      new KeyPressInfo("ArrowRight"),
+    ],
+    tiltUp = [
+      new KeyPressInfo("KeyI", { alt: true }),
+      new KeyPressInfo("ArrowUp", { alt: true }),
+    ],
+    tiltDown = [
+      new KeyPressInfo("KeyK", { alt: true }),
+      new KeyPressInfo("ArrowDown", { alt: true }),
+    ],
+    tiltLeft = [
+      new KeyPressInfo("KeyJ", { alt: true }),
+      new KeyPressInfo("ArrowLeft", { alt: true }),
+    ],
+    tiltRight = [
+      new KeyPressInfo("KeyL", { alt: true }),
+      new KeyPressInfo("ArrowRight", { alt: true }),
+    ],
+    bigMoveUp = [
+      new KeyPressInfo("KeyI", { shift: true }),
+      new KeyPressInfo("ArrowUp", { shift: true }),
+    ],
+    bigMoveDown = [
+      new KeyPressInfo("KeyK", { shift: true }),
+      new KeyPressInfo("ArrowDown", { shift: true }),
+    ],
+    bigMoveLeft = [
+      new KeyPressInfo("KeyJ", { shift: true }),
+      new KeyPressInfo("ArrowLeft", { shift: true }),
+    ],
+    bigMoveRight = [
+      new KeyPressInfo("KeyL", { shift: true }),
+      new KeyPressInfo("ArrowRight", { shift: true }),
+    ],
+    moveAmount = 20,
+    tiltAmount = 20,
+    bigMoveFactor = 6,
+  }) {
+    this.zoomIn = zoomIn;
+    this.zoomOut = zoomOut;
+    this.moveUp = moveUp;
+    this.moveDown = moveDown;
+    this.moveLeft = moveLeft;
+    this.moveRight = moveRight;
+    this.tiltUp = tiltUp;
+    this.tiltDown = tiltDown;
+    this.tiltLeft = tiltLeft;
+    this.tiltRight = tiltRight;
+    this.bigMoveUp = bigMoveUp;
+    this.bigMoveDown = bigMoveDown;
+    this.bigMoveLeft = bigMoveLeft;
+    this.bigMoveRight = bigMoveRight;
+    this.moveAmount = moveAmount;
+    this.tiltAmount = tiltAmount;
+    this.bigMoveFactor = bigMoveFactor;
+  }
+
+  // This is to make sure that we can't make a listener for an action type that doesn't exist
+  readonly actionTypes = [
+    "zoomIn",
+    "zoomOut",
+    "moveUp",
+    "moveDown",
+    "moveLeft",
+    "moveRight",
+    "tiltUp",
+    "tiltDown",
+    "tiltLeft",
+    "tiltRight",
+    "bigMoveUp",
+    "bigMoveDown",
+    "bigMoveLeft",
+    "bigMoveRight",
+  ] as const;
+
+  makeListener(actionName: KeyboardControlSettings["actionTypes"][number], action: () => void): (e: KeyboardEvent) => void {
+    return (e) => {
+      for (const keyPress of this[actionName]) {
+        if (keyPress.matches(e)) {
+          action();
+        }
+      }
+    }
+  }
+}
+
 
 /** The main "research app" Vue component. */
 @Component
 export default class App extends WWTAwareComponent {
   @Prop({default: null}) readonly allowedOrigin!: string | null;
+
+  @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
   // Lifecycle management
 
@@ -458,6 +647,23 @@ export default class App extends WWTAwareComponent {
         this.onMessage(event.data);
       }
     }, false);
+
+    // Handling key presses
+
+    window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
+    window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
+    window.addEventListener('keydown', this._kcs.makeListener("moveUp", () => this.doMove(0, this._kcs.moveAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("moveDown", () => this.doMove(0, -this._kcs.moveAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("moveLeft", () => this.doMove(this._kcs.moveAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("moveRight", () => this.doMove(-this._kcs.moveAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltLeft", () => this.doTilt(this._kcs.tiltAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltRight", () => this.doTilt(-this._kcs.tiltAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltUp", () => this.doTilt(0, this._kcs.tiltAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("tiltDown", () => this.doTilt(0, -this._kcs.tiltAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("bigMoveUp", () => this.doMove(0, this._kcs.bigMoveFactor * this._kcs.moveAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("bigMoveDown", () => this.doMove(0, this._kcs.bigMoveFactor * -this._kcs.moveAmount)));
+    window.addEventListener('keydown', this._kcs.makeListener("bigMoveLeft", () => this.doMove(this._kcs.bigMoveFactor * this._kcs.moveAmount, 0)));
+    window.addEventListener('keydown', this._kcs.makeListener("bigMoveRight", () => this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)));
   }
 
   destroyed() {
@@ -475,7 +681,7 @@ export default class App extends WWTAwareComponent {
 
   onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
     if (classicPywwt.isLoadImageCollectionMessage(msg)) {
-      this.loadImageCollection({ url: msg.url });
+      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders });
     } else if (classicPywwt.isSetBackgroundByNameMessage(msg)) {
       this.setBackgroundImageByName(msg.name);
     } else if (classicPywwt.isSetForegroundByNameMessage(msg)) {
@@ -486,11 +692,13 @@ export default class App extends WWTAwareComponent {
     } else if (classicPywwt.isSetForegroundOpacityMessage(msg)) {
       this.setForegroundOpacity(msg.value);
     } else if (classicPywwt.isCenterOnCoordinatesMessage(msg)) {
+      const rollRad = msg.roll == undefined ? undefined : msg.roll * D2R;
       this.gotoRADecZoom({
         raRad: msg.ra * D2R,
         decRad: msg.dec * D2R,
         zoomDeg: msg.fov * 6,
         instant: msg.instant,
+        rollRad: rollRad,
       });
     } else if (classicPywwt.isModifySettingMessage(msg)) {
       const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -498,15 +706,25 @@ export default class App extends WWTAwareComponent {
       if (isEngineSetting(setting)) {
         this.applySetting(setting);
       }
-    } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
+    } else if (classicPywwt.isCreateImageSetLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleCreateMessage(msg);
+    } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
+      const createImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
+        event: msg.event,
+        url: msg.url,
+        id: msg.id,
+        mode: "fits",
+      }
+      this.getFitsLayerHandler(createImageSetMessage).handleCreateMessage(createImageSetMessage);
+    } else if (classicPywwt.isSetLayerOrderMessage(msg)) {
+      this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
     } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleStretchMessage(msg);
     } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {
       this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
     } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
       this.getFitsLayerHandler(msg).handleModifyMessage(msg);
-    } else if (classicPywwt.isRemoveFitsLayerMessage(msg)) {
+    } else if (classicPywwt.isRemoveImageSetLayerMessage(msg)) {
       // NB we never remove the handler! It's tricky due to async issues.
       this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
     } else if (classicPywwt.isCreateTableLayerMessage(msg)) {
@@ -574,13 +792,13 @@ export default class App extends WWTAwareComponent {
   }
 
   // Keyed by "external" layer IDs
-  private fitsLayers: Map<string, FitsLayerMessageHandler> = new Map();
+  private fitsLayers: Map<string, ImageSetLayerMessageHandler> = new Map();
 
-  private getFitsLayerHandler(msg: AnyFitsLayerMessage): FitsLayerMessageHandler {
+  private getFitsLayerHandler(msg: AnyFitsLayerMessage): ImageSetLayerMessageHandler {
     let handler = this.fitsLayers.get(msg.id);
 
     if (handler === undefined) {
-      handler = new FitsLayerMessageHandler(this);
+      handler = new ImageSetLayerMessageHandler(this);
       this.fitsLayers.set(msg.id, handler);
     }
 
@@ -760,6 +978,15 @@ export default class App extends WWTAwareComponent {
       this.zoom(1.3);
     }
   }
+
+  doMove(x: number, y: number) {
+    this.move({ x: x, y: y});
+  }
+
+  doTilt(x: number, y: number) {
+    this.tilt({ x: x, y: y});
+  }
+
 }
 </script>
 
@@ -839,6 +1066,19 @@ body {
     .nudgeright1 {
       padding-left: 3px;
     }
+  }
+}
+
+#webgl2-popup {
+  position: absolute;
+  z-index: 10;
+  bottom: 3rem;
+  left: 50%;
+  color: #FFF;
+  transform: translate(-50%, -50%);
+
+  a {
+    color: #5588FF;
   }
 }
 

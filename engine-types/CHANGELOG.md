@@ -1,3 +1,9 @@
+# @wwtelescope/engine-types 0.4.0 (2021-06-03)
+
+- Expose new core catalog-HiPS types used by the engine; namely,
+  `BaseVoTableLayerSetting` and related items.
+
+
 # @wwtelescope/engine-types 0.3.0 (2021-01-27)
 
 This release contains a **breaking change** relating to a rework of how

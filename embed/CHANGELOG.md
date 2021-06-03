@@ -1,6 +1,11 @@
+# @wwtelescope/embed 1.4.2 (2021-06-03)
+
+- Loosen version requirements for Vue CLI tooling
+
+
 # @wwtelescope/embed 1.4.1 (2021-01-27)
 
-- embed: update v-tooltip, hopefully making Lerna a bit happier
+- Update v-tooltip, hopefully making Lerna a bit happier
 - Correct temporary GitHub URLs in the package.json files
 
 

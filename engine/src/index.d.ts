@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 //
 // TypeScript definitions for the WWT WebGL engine. Base data types that do not
@@ -17,6 +17,7 @@ import {
   BaseImageSetLayerSetting,
   BaseLayerSetting,
   BaseSpreadSheetLayerSetting,
+  BaseVoTableLayerSetting,
   Classification,
   ConstellationFilterInterface,
   CoordinatesType,
@@ -281,16 +282,20 @@ export class FitsImage extends WcsImage {
   width: number;
   height: number;
   numAxis: number;
+  fitsProperties: FitsProperties;
+
+  computeHistogram(count: number): number[];
+}
+
+export class FitsProperties {
   bZero: number;
   bScale: number;
-  dataType: DataTypes;
-  containsBlanks: boolean;
   blankValue: number;
   maxVal: number;
   minVal: number;
+  lowerCut: number;
+  upperCut: number;
   transparentBlack: boolean;
-
-  computeHistogram(count: number): number[];
 }
 
 export class Folder implements Thumbnail {
@@ -414,6 +419,8 @@ export class Imageset implements Thumbnail {
 
   get_extension(): string;
   set_extension(ext: string): string;
+
+  get_fitsProperties(): FitsProperties;
 
   get_generic(): boolean;
   set_generic(g: boolean): boolean;
@@ -542,6 +549,27 @@ export interface ImagesetLoadedCallback {
   (layer: ImageSetLayer): void;
 }
 
+/** Data returned when querying for dynamic catalog data within the current
+ * view.
+ *
+ * See [[RenderContext.getCatalogHipsDataInView]].
+ * */
+export interface InViewReturnMessage {
+  /** The table data, as tab-separated values with Windows (\r\n) newlines. */
+  table: string;
+
+  /** A flag indicating whether the data-fetch operation was aborted,
+   * potentially due to a timeout or hitting a limit on the amount of data to be
+   * returned at once.
+   * */
+  aborted: boolean;
+}
+
+/** A callback for querying dynamic catalog data within the current view. */
+export interface InViewReturnMessageCallback {
+  (msg: InViewReturnMessage): void;
+}
+
 /** An abstract class for graphical layers that are incorporated into the WWT
  * rendering engine. */
 export class Layer {
@@ -591,9 +619,26 @@ export namespace LayerManager {
   export function add(layer: Layer, updateTree: boolean): void;
   export function addFitsImageSetLayer(imageset: ImageSetLayer, title: string): ImageSetLayer;
   export function addImageSetLayer(imageset: Imageset, title: string): ImageSetLayer;
+  export function addSpreadsheetLayer(layer: SpreadSheetLayer, frame: string): void;
   export function createSpreadsheetLayer(frame: string, name: string, data: string): SpreadSheetLayer;
   export function deleteLayerByID(id: Guid, removeFromParent: boolean, updateTree: boolean): void;
-  // addVoTableLayer
+
+  /** Add a new [[VoTableLayer]] to the manager with a default plot type.
+   *
+   * This is the same as [[addVoTableLayerWithPlotType]] with the plot type
+   * defaulted to `PlotTypes.Circle`.
+   * */
+  export function addVoTableLayer(table: VoTable, title: string): VoTableLayer;
+
+  /** Add a new [[VoTableLayer]] to the manager.
+   *
+   * @param table The [[VoTable]] that will underlie the new layer.
+   * @param title The name that will be given to the new layer.
+   * @param plotType The point plotting type that the new layer will use.
+   * @returns The newly-created layer.
+   * */
+  export function addVoTableLayerWithPlotType(table: VoTable, title: string, plotType: PlotTypes): VoTableLayer;
+
   export function getMoonFile(url: string): void;
   export function initLayers(): void;
   export function mergeToursLayers(): void;
@@ -723,6 +768,28 @@ export interface ReadyEventCallback {
   (si: ScriptInterface): void;
 }
 
+/** The core state of the WWT rendering engine.
+ *
+ * This class contains most of the information about the WWT camera, view
+ * configuration, and core datasets being rendered.
+ *
+ * ### The Camera
+ *
+ * - [[viewCamera]]
+ * - [[targetCamera]]
+ *
+ * ### Core Datasets
+ *
+ * - [[get_backgroundImageset]], [[set_backgroundImageset]]
+ * - [[get_foregroundImageset]], [[set_foregroundImageset]]
+ * - [[get_catalogHipsImagesets]]
+ * - [[addCatalogHips]], [[removeCatalogHips]]
+ * - [[getCatalogHipsDataInView]]
+ *
+ * ### The Viewport
+ *
+ * - [[width]], [[height]]
+ */
 export class RenderContext {
   height: number;
   width: number;
@@ -741,6 +808,15 @@ export class RenderContext {
 
   get_backgroundImageset(): Imageset | null;
   set_backgroundImageset(v: Imageset | null): Imageset | null;
+
+  /** Get a list of all active "catalog HiPS" imagesets.
+   *
+   * These are the items that have been added with the [[addCatalogHips]] API.
+   *
+   * @returns The list of active catalog HiPS imagesets
+   * */
+  get_catalogHipsImagesets(): Imageset[];
+
   get_dec(): number;
   get_foregroundImageset(): Imageset | null;
   set_foregroundImageset(v: Imageset | null): Imageset | null;
@@ -761,6 +837,42 @@ export class RenderContext {
   get_twoSidedLighting(): boolean;
   set_twoSidedLighting(v: boolean): boolean;
 
+  /** Add a new "catalog HiPS" imageset to the view.
+   *
+   * Each catalog HiPS imageset is associated with a [[SpreadSheetLayer]] that
+   * is updated with dynamically-loaded data as the WWT camera moves around.
+   * This API adds this layer to the [[LayerManager]] and invokes the *onLoad*
+   * callback when the imageset's initial loading has completed.
+   *
+   * The caller must ensure that the *imageset* argument actually does
+   * correspond to a "catalog HiPS" dataset.
+   *
+   * @param imageset The imageset to load.
+   * @param onLoad An optional callback to invoke after the initial load is completed.
+   * */
+  addCatalogHips(imageset: Imageset, onLoad: Action | null): void;
+
+  /** Fetch the subset of catalog HiPS data contained within the current view.
+   *
+   * The imageset should have been loaded with the [[addCatalogHips]] call. The
+   * *limit* parameter should almost always be true, since if false the
+   * data-fetch operation can potentially attempt to download and return
+   * gigabytes of data.
+   *
+   * @param imageset The catalog HiPS imageset to query
+   * @param limit If true, limit the amount of data returned
+   * @param onComplete A callback to be invoked when the data have been fetched.
+   * */
+  getCatalogHipsDataInView(imageset: Imageset, limit: boolean, onComplete: InViewReturnMessageCallback): void;
+
+  /** Remove a "catalog HiPS" imageset from the view.
+   *
+   * The argument must be an imageset previously passed to [[addCatalogHips]].
+   *
+   * @param imageset The imageset to remove.
+   * */
+  removeCatalogHips(imageset: Imageset): void;
+
   getAltitudeForLatLongForPlanet(
     planetID: number,
     viewLat: number,
@@ -778,6 +890,9 @@ export class ScriptInterface {
 
   /** Get the current declination of the view, in degrees. */
   getDec(): number;
+
+  /** Check whether the engine is using the most optimal rendering technology (WebGL 2.0). */
+  isUsingWebGl2(): boolean;
 
   /** Register a callback to be called when the WWT view arrives at a commanded
    * position.
@@ -842,8 +957,10 @@ export class ScriptInterface {
    * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
    *
    * @param url The URL of the WTML collection file to load.
+   * @param loadChildFolders Optional, Recursively load any child folders.
+   * Defaults to False
    */
-  loadImageCollection(url: string): void;
+  loadImageCollection(url: string, loadChildFolders?: boolean): void;
 
   /** Set the opacity with which the foreground imageset is rendered.
    *
@@ -851,23 +968,38 @@ export class ScriptInterface {
    */
   setForegroundOpacity(opacity: number): void;
 
-  /** Initiate the loading of a single-file FITS layer
-   *
+  /** Initiate the loading of a image set or single-file FITS layer.
+   * 
+   * If the specified URL already exists in the image set collection, i.e. it
+   * has previously been created with [[loadImageCollection]], then this image set
+   * is added to the view.
+   * 
+   * If the specified URL is pointing to a FITS file, it will be downloaded and parsed.
+   * This API is therefore insufficient for large datasets, since they become
+   * impractical to download as whole files.
+   * 
    * Although this function will return an ImageSetLayer object immediately, the
-   * FITS information won't be ready until the FITS file is downloaded and
-   * parsed. The callback will be called after this completes.
+   * FITS / image set information won't be ready until the FITS file / image set
+   * is downloaded and parsed. The callback will be called after this completes.
    *
-   * The specified URL will be downloaded and parsed as a FITS file. This API is
-   * therefore insufficient for large datasets, since they become impractical to
-   * download as whole files.
+   * @param url The URL of a single-file FITS or
+   * the URL of an image set as specified in the WTML used in loadImageCollection.
+   * @param mode Tell WWT what type of layer you are Adding.
+   * OR let WWT try to autodetect the type of the data.
+   * @param name The name of the image set layer.
+   * @param goto If true, camera will move to the center position of the image.
    */
-  loadFitsLayer(
+  addImageSetLayer(
     url: string,
+    mode: string,
     name: string,
-    gotoTarget: boolean,
+    goto: boolean,
     callback: ImagesetLoadedCallback
   ): ImageSetLayer;
 
+  /** Change the ImageSetLayer position in the layer stack. */
+  setImageSetLayerOrder(id: string, order: number): void;
+  
   /** Create a circle annotation.
    *
    * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
@@ -1233,6 +1365,27 @@ export class SpreadSheetLayer extends Layer {
   get_zAxisReverse(): boolean;
   set_zAxisReverse(v: boolean): boolean;
 
+  /** Return the data in this table that are within the current camera view, as
+   * tab-separated values with Windows (\r\n) newlines. All columns defined in
+   * the table header are returned.
+   *
+   * This function is useful for HiPS catalog layers, which will responsively
+   * update their contents as the camera moves around. You can use this function
+   * to enable workflows where the user interactively zooms in on an area of
+   * interest, then wishes to "export" the selected data for further analysis.
+   *
+   * @return The data, as tab-separated values with Windows (\r\n) newlines.
+   */
+  getTableDataInView(): string;
+
+  /** Guess header semantics using a [[VoTable]] with similarly named columns as
+   * a reference. This can exploit the typed "UCD" annotations associated with
+   * such tables.
+   *
+   * @param votable The table template to use.
+   **/
+  guessHeaderAssignmentsFromVoTable(votable: VoTable): void;
+
   updateData(data: string, purgeOld: boolean, purgeAll: boolean, hasHeader: boolean): boolean;
 }
 
@@ -1499,13 +1652,142 @@ export class TourStop implements SettingsInterface {
 }
 
 
-/** Items implement IUiController in WWT can, well, control the UI. It's
+/** Items implementing IUiController in WWT can, well, control the UI. It's
  * implemented by Object3d, TourEditor, and TourPlayer.
  *
  * This interface doesn't implement any methods that are generically useful to
  * library consumers.
  * */
 export interface UiController { }
+
+
+/** A VOTable dataset.
+ *
+ * The TypeScript API exposed for VOTables is currently minimal, but in the
+ * underyling implementation one has full access to row and column data and
+ * metadata.
+ * */
+export class VoTable {
+  /** Express the table’s data as tab-separated values.
+   *
+   * @returns The table data as tab-separated values.
+   * */
+  toString(): string;
+}
+
+export namespace VoTable {
+  /** Load a VOTable from the web.
+   *
+   * @param url The URL of the VOTable XML document to load.
+   * @param complete A callback to invoke when the table has been loaded.
+   * @returns A new VOTable instance.
+   * */
+  export function loadFromUrl(url: string, complete: Action): VoTable;
+
+  /** Load a VOTable from a string
+   *
+   * @param data The VOTable XML content to parse.
+   * @returns A new VOTable instance.
+   * */
+  export function loadFromString(data: string): VoTable;
+}
+
+
+/** A [[VoTable]] rendered as a layer.
+ *
+ * This class is highly similar to [[SpreadSheetLayer]], and the latter class is
+ * generally more featureful. It should be preferred when possible.
+ */
+export class VoTableLayer extends Layer {
+  get_altColumn(): number;
+  set_altColumn(v: number): number;
+  get_altType(): AltTypes;
+  set_altType(v: AltTypes): AltTypes;
+  get_altUnit(): AltUnits;
+  set_altUnit(v: AltUnits): AltUnits;
+  get_autoUpdate(): boolean;
+  set_autoUpdate(v: boolean): boolean;
+  get_beginRange(): Date;
+  set_beginRange(v: Date): Date;
+  get_cartesianCustomScale(): number;
+  set_cartesianCustomScale(v: number): number;
+  get_cartesianScale(): AltUnits;
+  set_cartesianScale(v: AltUnits): AltUnits;
+  // get_colorMap
+  get_colorMapColumn(): number;
+  set_colorMapColumn(v: number): number;
+  get_coordinatesType(): CoordinatesType;
+  set_coordinatesType(v: CoordinatesType): CoordinatesType;
+  get_dataSourceUrl(): string;
+  set_dataSourceUrl(v: string): string;
+  get_decay(): number;
+  set_decay(v: number): number;
+  get_dynamicData(): boolean;
+  set_dynamicData(v: boolean): boolean;
+  get_endDateColumn(): number;
+  set_endDateColumn(v: number): number;
+  get_endRange(): Date;
+  set_endRange(v: Date): Date;
+  get_hyperlinkColumn(): number;
+  set_hyperlinkColumn(v: number): number;
+  get_hyperlinkFormat(): string;
+  set_hyperlinkFormat(v: string): string;
+  get_latColumn(): number;
+  set_latColumn(v: number): number;
+  get_lngColumn(): number;
+  set_lngColumn(v: number): number;
+  get_markerColumn(): number;
+  set_markerColumn(v: number): number;
+  get_markerIndex(): number;
+  set_markerIndex(v: number): number;
+  // get_markerMix
+  get_markerScale(): MarkerScales;
+  set_markerScale(v: MarkerScales): MarkerScales;
+  get_nameColumn(): number;
+  set_nameColumn(v: number): number;
+  get_plotType(): PlotTypes;
+  set_plotType(v: PlotTypes): PlotTypes;
+  get_pointScaleType(): PointScaleTypes;
+  set_pointScaleType(v: PointScaleTypes): PointScaleTypes;
+  get_raUnits(): RAUnits;
+  set_raUnits(v: RAUnits): RAUnits;
+  get_scaleFactor(): number;
+  set_scaleFactor(v: number): number;
+  get_showFarSide(): boolean;
+  set_showFarSide(v: boolean): boolean;
+  get_sizeColumn(): number;
+  set_sizeColumn(v: number): number;
+  get_startDateColumn(): number;
+  set_startDateColumn(v: number): number;
+  get_table(): VoTable;
+  set_table(v: VoTable): VoTable;
+  get_timeSeries(): boolean;
+  set_timeSeries(v: boolean): boolean;
+  get_xAxisColumn(): number;
+  set_xAxisColumn(v: number): number;
+  get_xAxisReverse(): boolean;
+  set_xAxisReverse(v: boolean): boolean;
+  get_yAxisColumn(): number;
+  set_yAxisColumn(v: number): number;
+  get_yAxisReverse(): boolean;
+  set_yAxisReverse(v: boolean): boolean;
+  get_zAxisColumn(): number;
+  set_zAxisColumn(v: number): number;
+  get_zAxisReverse(): boolean;
+  set_zAxisReverse(v: boolean): boolean;
+
+  get_header(): string[];
+}
+
+export namespace VoTableLayer {
+  /** Create a new [[VoTableLayer]] for the specified [[VoTable]]. */
+  export function create(table: VoTable, plotType: PlotTypes): VoTableLayer;
+}
+
+/** The full VoTableLayerSetting type, which augments engine-types' BaseVoTableLayerSetting
+ * with types that are only provided within the engine itself.
+ */
+export type VoTableLayerSetting = LayerSetting | BaseVoTableLayerSetting;
 
 
 export class WcsImage {
@@ -1579,6 +1861,53 @@ export class WcsImage {
   calculateScaleFromCD(): void;
 }
 
+/** The primary WWT engine state object.
+ *
+ * The main state of the WWT rendering engine is stored in a global
+ * [[WWTControl]] singleton object. As such, this class has APIs relating to
+ * nearly every single feature offered by WWT. The [[ScriptInterface]] object
+ * adds a few additional features, but it primarily delegates its work to this
+ * class.
+ *
+ * ### Rendering
+ *
+ * - [[renderContext]], the core renderer state
+ * - [[renderType]], the current renderer mode
+ * - [[renderOneFrame]], a method to render a single frame
+ *
+ * ### UI Plumbing
+ *
+ * - [[uiController]], special UI state
+ *
+ * ### Basic Camera Controls
+ *
+ * - [[gotoRADecZoom]]
+ * - [[gotoTarget]]
+ * - [[zoom]]
+ *
+ * ### Core Datasets
+ *
+ * - [[getImagesetByName]]
+ * - [[getDefaultImageset]]
+ * - [[setBackgroundImageByName]]
+ * - [[setForegroundImageByName]]
+ * - [[addCatalogHipsByName]], [[addCatalogHipsByNameWithCallback]]
+ * - [[removeCatalogHipsByName]]
+ *
+ * ### Tours
+ *
+ * - [[loadTour]]
+ * - [[playTour]]
+ * - [[playCurrentTour]]
+ * - [[pauseCurrentTour]]
+ * - [[stopCurrentTour]]
+ *
+ * ### Other Settings
+ *
+ * - [[set_zoomMax]], [[set_zoomMin]]
+ * - [[setSolarSystemMaxZoom]], [[setSolarSystemMinZoom]]
+ *
+ * */
 export class WWTControl {
   /** Special UI state that may be active such as a [[TourPlayer]]. */
   uiController: UiController | null;
@@ -1608,6 +1937,7 @@ export class WWTControl {
    * @param dec_deg The target declination, in degrees.
    * @param zoom The target zoom level (see below)
    * @param instant Whether to snap the view instantly or move gradually.
+   * @param roll_deg Optional, The roll of the camera, in degrees.
    *
    * If `instant` is true or the commanded camera position is extremely close to the
    * current camera position, the view will update instantly. Otherwise it will
@@ -1617,7 +1947,7 @@ export class WWTControl {
    *
    * Navigating the view in this way ends any "tracking" status of the current view.
    */
-  gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean): void;
+  gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean, roll_deg?: number): void;
 
   /** Start navigating the view to the specified [[Place]].
    *
@@ -1642,6 +1972,12 @@ export class WWTControl {
    *
    */
   zoom(factor: number): void;
+
+  /** Moves the position of the view */
+  move(x: number, y: number): void;
+
+  /** Tilts the position of the view */
+  _tilt(x: number, y: number): void;
 
   /** Look up an imageset by its name.
    *
@@ -1700,6 +2036,40 @@ export class WWTControl {
    */
   setForegroundImageByName(imagesetName: string): void;
 
+  /** Add a "catalog HiPS" dataset to the current view.
+   *
+   * The [[SpreadSheetLayer]] of data associated with this special imageset will
+   * be added to the [[LayerManager]]. The caller must know *a priori* that the
+   * named imageset indeed corresponds to a catalog HiPS dataset.
+   *
+   * See also [[addCatalogHipsByName]], [[addCatalogHipsByNameWithCallback]].
+   * */
+   addCatalogHips(imageset: Imageset): void;
+
+  /** Add a "catalog HiPS" dataset to the current view, by name.
+   *
+   * The catalog HiPS is loaded from the engine’s listing of recognized
+   * imagesets using the [[getImagesetByName]] mechanism. The
+   * [[SpreadSheetLayer]] of data associated with this special imageset will be
+   * added to the [[LayerManager]]. The caller must know *a priori* that the
+   * named imageset indeed corresponds to a catalog HiPS dataset.
+   *
+   * See also [[addCatalogHips]], [[addCatalogHipsByNameWithCallback]].
+   * */
+  addCatalogHipsByName(name: string): void;
+
+  /** Add a "catalog HiPS" dataset to the current view, by name, with a
+   * callback.
+   *
+   * Same as [[addCatalogHipsByName]], with the addition that the *onLoad*
+   * callback will be called once the initial data loading of the catalog HiPS
+   * data has completed. See also [[addCatalogHips]].
+   * */
+  addCatalogHipsByNameWithCallback(name: string, onLoad: Action): void;
+
+  /** Remove a previously loaded "catalog HiPS" dataset from the view. */
+  removeCatalogHipsByName(name: string): void;
+
   /** Start loading the tour stored at the specified URL.
    *
    * When loading is complete, a `tourReady` event will be issued, which you can
@@ -1713,7 +2083,7 @@ export class WWTControl {
    *   // ...
    * }
    * ```
-   */
+   * */
   loadTour(url: string): void;
 
   /** Load the tour stored at the specified URL and start playing it.
@@ -1788,11 +2158,14 @@ export namespace Wtml {
    * callback will be called.
    *
    * @param url The URL from which to retrieve the WTML data.
-   * @param complete A callback to be called after the folder is successfully
-   * loaded.
+   * @param complete A callback to be called after the folder (and all child
+   * folders, if loadChildFolders is set to true) is successfully loaded.
+   * @param loadChildFolders Optional, When true, this method will recursively 
+   * download and unpack all [[Folder]]s contained in the original WTML file.
+   * Defaults to false.
    * @returns A folder object that will be populated asynchronously.
    */
-  export function getWtmlFile(url: string, complete: Action): Folder;
+  export function getWtmlFile(url: string, complete: Action, loadChildFolders?: boolean): Folder;
 }
 
 export namespace WWTControl {

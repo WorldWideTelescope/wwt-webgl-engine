@@ -1,3 +1,8 @@
+# @wwtelescope/embed-creator 0.3.4 (2021-06-03)
+
+- Loosen version requirements for Vue CLI tooling
+
+
 # @wwtelescope/embed-creator 0.3.3 (2021-01-27)
 
 - Remove superfluous no-op "doc" script in the `package.json`

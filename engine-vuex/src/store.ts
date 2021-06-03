@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
 import Vue from "vue";
@@ -24,14 +24,16 @@ import {
 
 import {
   ApplyFitsLayerSettingsOptions,
+  AddImageSetLayerOptions,
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
+  SetLayerOrderOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
   UpdateTableLayerOptions,
-  WWTInstance
+  WWTInstance,
 } from "@wwtelescope/engine-helpers";
 
 interface WWTLinkedCallback {
@@ -146,6 +148,8 @@ export interface WWTEngineVuexState {
    */
   tourTimecode: number;
 
+  showWebGl2Warning: boolean;
+  
   /** The current zoom level of the view, in degrees.
    *
    * The zoom level is the angular height of the viewport, times size.
@@ -186,6 +190,9 @@ export interface GotoRADecZoomParams {
    * the view.
    */
   instant: boolean;
+
+  /** Optional: The target roll of the camera, in radians. */
+  rollRad?: number;
 }
 
 /** The parameters for the [[WWTEngineVuexModule.loadTour]] action.
@@ -202,6 +209,8 @@ export interface LoadTourParams {
 export interface LoadImageCollectionParams {
   /** The WTML URL to load. */
   url: string;
+  /** Optional, Recursively load any child folders. Defaults to false*/
+  loadChildFolders?: boolean;
 }
 
 @Module({
@@ -220,10 +229,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   isTourPlaying = false;
   raRad = 0.0;
   renderType = ImageSetType.sky;
+  timeAtStartup = Date.now();
   tourCompletions = 0;
   tourRunTime: number | null = null;
   tourStopStartTimes: number[] = [];
   tourTimecode = 0.0;
+  showWebGl2Warning = false;
   zoomDeg = 0.0;
 
   get lookupImageset() {
@@ -292,6 +303,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       this.isTourPlayerActive = false;
       this.isTourPlaying = false;
     }
+
+    const showWebGl2Warning = !wwt.si.isUsingWebGl2()
+      && (Date.now() - this.timeAtStartup) < 15000;
+    if (this.showWebGl2Warning != showWebGl2Warning) {
+      this.showWebGl2Warning = showWebGl2Warning;
+    }
   }
 
   @Mutation
@@ -340,6 +357,20 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot zoom without linking to WWTInstance');
     Vue.$wwt.inst.ctl.zoom(factor);
+  }
+
+  @Mutation
+  move(obj: { x: number; y: number }): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot move without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.move(obj.x, obj.y);
+  }
+
+  @Mutation
+  tilt(obj: { x: number; y: number}): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot tilt without linking to WWTInstance');
+    Vue.$wwt.inst.ctl._tilt(obj.x, obj.y);
   }
 
   @Mutation
@@ -446,11 +477,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Action({ rawError: true })
   async gotoRADecZoom(
-    {raRad, decRad, zoomDeg, instant}: GotoRADecZoomParams
+    { raRad, decRad, zoomDeg, instant, rollRad }: GotoRADecZoomParams
   ): Promise<void> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
-    return Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant);
+    return Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad);
   }
 
   @Action({ rawError: true })
@@ -500,11 +531,20 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Action({ rawError: true })
   async loadImageCollection(
-    {url}: LoadImageCollectionParams
+    {url, loadChildFolders}: LoadImageCollectionParams
   ): Promise<Folder> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
-    return Vue.$wwt.inst.loadImageCollection(url);
+    return Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
+  }
+
+  @Action({ rawError: true })
+  async addImageSetLayer(
+    options: AddImageSetLayerOptions
+  ): Promise<ImageSetLayer> {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot addImageSetLayer without linking to WWTInstance');
+    return Vue.$wwt.inst.addImageSetLayer(options);
   }
 
   @Action({ rawError: true })
@@ -513,8 +553,23 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   ): Promise<ImageSetLayer> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadFitsLayer without linking to WWTInstance');
-    return Vue.$wwt.inst.loadFitsLayer(options);
+    const addImageSetLayerOptions: AddImageSetLayerOptions = {
+      url: options.url, 
+      mode: "fits",
+      name: options.name,
+      goto: options.gotoTarget
+    };
+    
+    return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
   }
+
+  @Mutation
+  setImageSetLayerOrder(options: SetLayerOrderOptions): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
+    return Vue.$wwt.inst.setImageSetLayerOrder(options);
+  }
+
 
   @Mutation
   stretchFitsLayer(options: StretchFitsLayerOptions): void {

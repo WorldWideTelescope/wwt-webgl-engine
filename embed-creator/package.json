@@ -17,8 +17,8 @@
   },
   "description": "An web app for creating AAS WorldWide Telescope embeds",
   "devDependencies": {
-    "@vue/cli-plugin-eslint": "~4.3.0",
-    "@vue/cli-plugin-typescript": "~4.3.0"
+    "@vue/cli-plugin-eslint": "^4.3.0",
+    "@vue/cli-plugin-typescript": "^4.3.0"
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
@@ -38,5 +38,5 @@
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },
-  "version": "0.3.3"
+  "version": "0.3.4"
 }

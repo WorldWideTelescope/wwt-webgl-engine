@@ -20,7 +20,9 @@ import {
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
+  AddImageSetLayerOptions,
   LoadFitsLayerOptions,
+  SetLayerOrderOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
@@ -160,11 +162,12 @@ import {
  * - [[applyFitsLayerSettings]]
  * - [[setFitsLayerColormap]]
  * - [[stretchFitsLayer]]
+ * - [[setImageSetLayerOrder]]
  * - [[deleteLayer]]
  *
  * Actions:
  *
- * - [[loadFitsLayer]]
+ * - [[addImageSetLayer]]
  *
  * #### Tabular Data Layers
  *
@@ -246,6 +249,7 @@ export class WWTAwareComponent extends Vue {
         wwtTourStopStartTimes: (state, _getters) => (state as WWTEngineVuexState).tourStopStartTimes,
         wwtTourTimecode: (state, _getters) => (state as WWTEngineVuexState).tourTimecode,
         wwtZoomDeg: (state, _getters) => (state as WWTEngineVuexState).zoomDeg,
+        wwtShowWebGl2Warning: (state, _getters) => (state as WWTEngineVuexState).showWebGl2Warning,
       }),
       ...mapGetters([
         "lookupImageset",
@@ -265,6 +269,7 @@ export class WWTAwareComponent extends Vue {
         "gotoTarget",
         "loadImageCollection",
         "loadFitsLayer",
+        "addImageSetLayer",
         "loadTour",
         "waitForReady",
       ]),
@@ -283,6 +288,7 @@ export class WWTAwareComponent extends Vue {
         "setFitsLayerColormap",
         "setForegroundImageByName",
         "setForegroundOpacity",
+        "setImageSetLayerOrder",
         "setTourPlayerLeaveSettingsWhenStopped",
         "setTime",
         "setTrackedObject",
@@ -292,6 +298,8 @@ export class WWTAwareComponent extends Vue {
         "toggleTourPlayPauseState",
         "updateTableLayer",
         "zoom",
+        "move",
+        "tilt",
       ]),
     };
   }
@@ -410,6 +418,8 @@ export class WWTAwareComponent extends Vue {
    */
   wwtZoomDeg!: number;
 
+  wwtShowWebGl2Warning!: boolean;
+
   // Getters
 
   /** Look up an [Imageset](../../engine/classes/imageset.html) in the engine’s
@@ -516,6 +526,11 @@ export class WWTAwareComponent extends Vue {
    */
   setForegroundOpacity!: (o: number) => void;
 
+  /** Change the [ImageSetLayer](../../engine/classes/imagesetlayer.html) 
+   * position in the draw cycle.
+   */
+  setImageSetLayerOrder!: (_o: SetLayerOrderOptions) => void;
+
   /** Set the current time of WWT's internal clock.
    *
    * Altering this causes an increment in [[wwtClockDiscontinuities]].
@@ -580,6 +595,12 @@ export class WWTAwareComponent extends Vue {
    */
   zoom!: (f: number) => void;
 
+  /** Moves the position of the view */
+  move!: ({ x, y }: { x: number; y: number }) => void;
+
+  /** Tilts the position of the view */
+  tilt!: ({ x, y }: { x: number; y: number }) => void;
+
   // Actions
 
   /** Request the creation of a tabular data layer.
@@ -616,12 +637,20 @@ export class WWTAwareComponent extends Vue {
    */
   loadImageCollection!: (_o: LoadImageCollectionParams) => Promise<Folder>;
 
-  /** Request the creation of a FITS image layer.
+  /** Deprecated. Use addImageSetLayer instead.
+   * Request the creation of a FITS image layer.
    *
    * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
    * It’s asynchronous because the requested FITS file has to be downloaded.
    */
-  loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
+   loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
+
+  /** Request the creation of a image layer. Either a single FITS or an image set.
+   *
+   * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
+   * It’s asynchronous because the requested url has to be downloaded.
+   */
+  addImageSetLayer!: (_o: AddImageSetLayerOptions) => Promise<ImageSetLayer>;
 
   /** Request the engine to load a tour file.
    *

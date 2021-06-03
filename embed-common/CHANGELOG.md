@@ -1,3 +1,8 @@
+# @wwtelescope/embed-common 0.3.1 (2021-06-03)
+
+- No code changes, just syncing up Cranko with changes in the repository.
+
+
 # @wwtelescope/embed-common 0.3.0 (2021-01-27)
 
 This release contains a **breaking change** relating to a rework of how

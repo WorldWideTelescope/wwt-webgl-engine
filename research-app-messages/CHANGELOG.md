@@ -1,3 +1,16 @@
+# @wwtelescope/research-app-messages 0.5.0 (2021-06-03)
+
+This release contains a fairly trivial breaking change.
+
+- Add a new `SetLayerOrder` message to control imageset layer stacking
+  (@imbasimba)
+- Add a new URL-based `CreateImageSetLayer` API that makes it easier to
+  load generic imagery into layers (not just FITS) (@imbasimba)
+- Add a new optional `roll` parameter to `CenterOnCoordinates` (@imbasima)
+- Add an optional `loadChildFolders` setting to `LoadImageCollection` (@imbasima)
+- BREAKING: rename `RemoveFitsLayer` to `RemoveImageSetLayer` (@imbasima)
+
+
 # @wwtelescope/research-app-messages 0.4.0 (2021-01-27)
 
 - Add a typing layer for pywwt spreadsheet settings

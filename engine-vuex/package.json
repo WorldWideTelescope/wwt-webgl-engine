@@ -6,21 +6,21 @@
     "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/engine": "^7.8.0",
-    "@wwtelescope/engine-helpers": "^0.5.0",
+    "@wwtelescope/engine": "^7.11.0",
+    "@wwtelescope/engine-helpers": "^0.6.0",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
   },
   "description": "The AAS WorldWide Telescope WebGL engine wrapped into a Vue/Vuex component",
   "devDependencies": {
-    "@vue/cli-plugin-eslint": "~4.3.0",
-    "@vue/cli-plugin-typescript": "~4.3.0",
-    "@vue/cli-plugin-vuex": "~4.3.0"
+    "@vue/cli-plugin-eslint": "^4.3.0",
+    "@vue/cli-plugin-typescript": "^4.3.0",
+    "@vue/cli-plugin-vuex": "^4.3.0"
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine": "c82477033d2bedfdfdde185b56ccaf9dfa552225",
-    "@wwtelescope/engine-helpers": "d251682276bb8c8a86c9150c8a53484be9225a5a"
+    "@wwtelescope/engine": "68f56f0585354ec471ffe8efd2a8f6236ad82c27",
+    "@wwtelescope/engine-helpers": "68f56f0585354ec471ffe8efd2a8f6236ad82c27"
   },
   "keywords": [
     "AAS WorldWide Telescope"

@@ -227,6 +227,9 @@ namespace wwtlib
         }
 
 
-        abstract public Bitmap GetBitmap();
+        public virtual Bitmap GetBitmap()
+        {
+            return null;
+        }
     }
 }

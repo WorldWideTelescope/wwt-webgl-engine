@@ -28,11 +28,27 @@ namespace wwtlib
             SpaceTimeController.UpdateClock();
         }
 
-        public static List<Imageset> ImageSets = new List<Imageset>();
+        private static List<Imageset> ImageSets = new List<Imageset>();
         public static Folder ExploreRoot = new Folder();
         public static string ImageSetName = "";
 
         public IUiController uiController = null;
+
+        public static void AddImageSetToRepository(Imageset imagesetToAdd)
+        {
+            foreach(Imageset imageset in ImageSets){
+                if(imageset.ImageSetID == imagesetToAdd.ImageSetID)
+                {
+                    return;
+                }
+            }
+            ImageSets.Add(imagesetToAdd);
+        }
+
+        public static List<Imageset> GetImageSets()
+        {
+            return ImageSets;
+        }
 
         List<Annotation> annotations = new List<Annotation>();
         internal void AddAnnotation(Annotation annotation)
@@ -1705,7 +1721,6 @@ namespace wwtlib
         public static ScriptInterface scriptInterface;
         CanvasElement foregroundCanvas = null;
         CanvasContext2D fgDevice = null;
-        Folder webFolder;
 
         // For backwards compatibility, we preserve the semantics that calling
         // this function kicks off the rendering loop.
@@ -1750,12 +1765,18 @@ namespace wwtlib
 
                 CanvasElement canvas = CreateCanvasElement(DivId);
 
-                String webgltext = "webgl";
-                GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
-
+                GL gl = (GL)(Object)canvas.GetContext((Rendering)(object)"webgl2");
+                if(gl != null)
+                {
+                    RenderContext.UseGlVersion2 = true;
+                }
+                else 
+                {
+                    Script.Literal("console.warn('This browser does not support WebGL 2.0. Some features will work suboptimally. To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge. In case you would like to use Safari, we recommend that you enable WebGL 2.0')");
+                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)"webgl");
+                }
                 if (gl == null) {
-                    webgltext = "experimental-webgl";
-                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)webgltext);
+                    gl = (GL)(Object)canvas.GetContext((Rendering)(object)"experimental-webgl");
                 }
 
                 if (gl == null) {
@@ -1899,16 +1920,15 @@ namespace wwtlib
                 fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
             }
 
-            webFolder = new Folder();
-            webFolder.LoadFromUrl(
+            Wtml.GetWtmlFile(
                 URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
-                SetupComplete
+                SetupComplete,
+                true
             );
         }
 
         void SetupComplete()
         {
-            Wtml.LoadImagesets(webFolder);
             scriptInterface.FireReady();
         }
 
@@ -1942,11 +1962,12 @@ namespace wwtlib
             }
         }
 
-        public void GotoRADecZoom(double ra, double dec, double zoom, bool instant)
+        public void GotoRADecZoom(double ra, double dec, double zoom, bool instant, double? roll)
         {
             ra = DoubleUtilities.Clamp(ra, 0, 24);
             dec = DoubleUtilities.Clamp(dec, -90, 90);
             zoom = DoubleUtilities.Clamp(zoom, ZoomMin, ZoomMax);
+            double rotation = roll == null ? WWTControl.Singleton.RenderContext.ViewCamera.Rotation : (double)roll;
 
             tracking = false;
             trackingObject = null;
@@ -1958,7 +1979,7 @@ namespace wwtlib
                     dec,
                     WWTControl.Singleton.RenderContext.RAtoViewLng(ra),
                     zoom,
-                    WWTControl.Singleton.RenderContext.ViewCamera.Rotation,
+                    rotation,
                     WWTControl.Singleton.RenderContext.ViewCamera.Angle,
                     (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity
                 ),
@@ -2271,7 +2292,9 @@ namespace wwtlib
             if (instant ||
                 (Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 &&
                  Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 &&
-                 Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001))
+                 Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001 &&
+                 Math.Abs(RenderContext.ViewCamera.Rotation - cameraParams.Rotation) < .000000000001
+                 ))
             {
                 Mover = null;
                 RenderContext.TargetCamera = cameraParams.Copy();
@@ -2539,6 +2562,18 @@ namespace wwtlib
             return null;
         }
 
+        public Imageset GetImageSetByUrl(string url)
+        {
+            foreach (Imageset imageset in ImageSets)
+            {
+                if (imageset.Url == url)
+                {
+                    return imageset;
+                }
+            }
+            return null;
+        }
+
         public void SetBackgroundImageByName(string name)
         {
             Imageset newBackground = GetImagesetByName(name);
@@ -2595,6 +2630,46 @@ namespace wwtlib
                 RenderContext.GetCatalogHipsDataInView(catalogHips, limit, onComplete);
             }
         }
+
+        public void SetCutsForFits(string imagesetName, double min, double max)
+        {
+            Imageset imageset = GetImagesetByName(imagesetName);
+            if (imageset != null && imageset.FitsProperties != null)
+            {
+                imageset.FitsProperties.LowerCut = min;
+                imageset.FitsProperties.UpperCut = max;
+            } else
+            {
+                Script.Literal("console.log({0} + ' not found')", imagesetName);
+            }
+        }
+
+        public void SetColorMapForFits(string imagesetName, string colorMapName)
+        {
+            Imageset imageset = GetImagesetByName(imagesetName);
+            if (imageset != null && imageset.FitsProperties != null)
+            {
+                imageset.FitsProperties.ColorMapName = colorMapName;
+            }
+            else
+            {
+                Script.Literal("console.log({0} + ' not found')", imagesetName);
+            }
+        }
+
+        public void SetScaleTypeForFits(string imagesetName, ScaleTypes scaleType)
+        {
+            Imageset imageset = GetImagesetByName(imagesetName);
+            if (imageset != null && imageset.FitsProperties != null)
+            {
+                imageset.FitsProperties.ScaleType = scaleType;
+            }
+            else
+            {
+                Script.Literal("console.log({0} + ' not found')", imagesetName);
+            }
+        }
+        
 
         private SimpleLineList crossHairs = null;
 

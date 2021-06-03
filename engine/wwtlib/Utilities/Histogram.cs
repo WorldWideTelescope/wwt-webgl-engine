@@ -31,9 +31,9 @@ namespace wwtlib
             Window.RemoveEventListener("click", Close, true);
 
             ImageElement image = Document.GetElementById<ImageElement>("graph");
-            image.RemoveEventListener("mousedown", MouseDown, false);
-            image.RemoveEventListener("mousemove", mousemove, false);
-            image.RemoveEventListener("mouseup", mouseup, false);
+            image.RemoveEventListener("mousedown", OnPointerDown, false);
+            image.RemoveEventListener("mousemove", OnPointerMove, false);
+            image.RemoveEventListener("mouseup", OnPointerUp, false);
             dropDown.RemoveEventListener("change", CurveStyleSelected, false);
             dropDown.RemoveEventListener("click", IgnoreMe, true);
 
@@ -51,7 +51,7 @@ namespace wwtlib
             picker.Style.Left = position.X.ToString() + "px";
             picker.Style.Top = position.Y.ToString() + "px";
 
-            SelectedCurveStyle = (int)image.lastScale;
+            SelectedCurveStyle = (int)layer.ImageSet.FitsProperties.ScaleType;
 
             
             dropDown = Document.GetElementById<SelectElement>("ScaleTypePicker");
@@ -60,9 +60,9 @@ namespace wwtlib
             dropDown.AddEventListener("click", IgnoreMe, true);
             CanvasElement canvas = Document.GetElementById<CanvasElement>("graph");
 
-            canvas.AddEventListener("mousedown", MouseDown, false);
-            canvas.AddEventListener("mousemove", mousemove, false);
-            canvas.AddEventListener("mouseup", mouseup, false);
+            canvas.AddEventListener("pointerdown", OnPointerDown, false);
+            canvas.AddEventListener("pointermove", OnPointerMove, false);
+            canvas.AddEventListener("pointerup", OnPointerUp, false);
             closeBtn.AddEventListener("click", Close, true);
 
             Draw();
@@ -70,33 +70,38 @@ namespace wwtlib
 
         public static void UpdateImage(ImageSetLayer isl, double z)
         {
-            FitsImage image = isl.ImageSet.WcsImage as FitsImage;
-            SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
-            double low = image.lastBitmapMin;
-            double hi = image.lastBitmapMax;
-            Tile.texture2d = image.GetScaledBitmap(low, hi, image.lastScale, Math.Floor(z* (image.Depth-1)), null).GetTexture();
+            if (!RenderContext.UseGlVersion2)
+            {
+                FitsImageJs image = isl.ImageSet.WcsImage as FitsImageJs;
+                SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
+                Tile.texture2d = image.GetBitmap().GetTexture();
+            }
         }
 
         public static void UpdateScale(ImageSetLayer isl, ScaleTypes scale, double low, double hi)
         {
-            FitsImage image = isl.ImageSet.WcsImage as FitsImage;
-            SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
-            int z = image.lastBitmapZ;
-            string colorMapperName = image.lastBitmapColorMapperName;
-            Tile.texture2d = image.GetScaledBitmap(low, hi, scale, z, colorMapperName).GetTexture();
+            isl.ImageSet.FitsProperties.ScaleType = scale;
+            isl.ImageSet.FitsProperties.LowerCut = low;
+            isl.ImageSet.FitsProperties.UpperCut = hi;
+            if (!RenderContext.UseGlVersion2)
+            {
+                FitsImageJs image = isl.ImageSet.WcsImage as FitsImageJs;
+                SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
+                Tile.texture2d = image.GetBitmap().GetTexture();
+            }
         }
 
         public static void UpdateColorMapper(ImageSetLayer isl, string colorMapperName)
         {
-            FitsImage image = isl.ImageSet.WcsImage as FitsImage;
-            SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
-            double low = image.lastBitmapMin;
-            double hi = image.lastBitmapMax;
-            ScaleTypes scale = image.lastScale;
-            int z = image.lastBitmapZ;
-            Tile.texture2d = image.GetScaledBitmap(low, hi, scale, z, colorMapperName).GetTexture();
+            isl.ImageSet.FitsProperties.ColorMapName = colorMapperName;
+            if (!RenderContext.UseGlVersion2)
+            {
+                FitsImageJs image = isl.ImageSet.WcsImage as FitsImageJs;
+                SkyImageTile Tile = (SkyImageTile)TileCache.GetTile(0, 0, 0, isl.ImageSet, null);
+                Tile.texture2d = image.GetBitmap().GetTexture();
+            }
         }
-
+        
         public void IgnoreMe(ElementEvent e)
         {
             ignoreNextClick = true;
@@ -106,6 +111,7 @@ namespace wwtlib
         {
             SelectedCurveStyle = dropDown.SelectedIndex;
             SetUpdateTimer();
+            layer.ImageSet.FitsProperties.ScaleType = (ScaleTypes)SelectedCurveStyle;
             Draw();
             ignoreNextClick = true;
         }
@@ -118,21 +124,22 @@ namespace wwtlib
 
         DragType dragType = DragType.None;
 
-        public void MouseDown(ElementEvent e)
+        public void OnPointerDown(ElementEvent e)
         {
             CanvasElement canvas = Document.GetElementById<CanvasElement>("graph");
             int x = Mouse.OffsetX(canvas, e);
             int y = Mouse.OffsetY(canvas, e);
+            Script.Literal("{0}.setPointerCapture({1}.pointerId)", canvas, e);
 
             if ((Math.Abs(x - center) < 10) && Math.Abs(y - 75) < 10)
             {
                 dragType = DragType.Center;
             }
-            else if (Math.Abs(x - lowPosition) < 3)
+            else if (Math.Abs(x - lowPosition) < 10)
             {
                 dragType = DragType.Low;
             }
-            else if (Math.Abs(x - highPosition) < 3)
+            else if (Math.Abs(x - highPosition) < 10)
             {
                 dragType = DragType.High;
             }
@@ -146,7 +153,7 @@ namespace wwtlib
             e.CancelBubble = true;
         }
 
-        public void mousemove(ElementEvent e)
+        public void OnPointerMove(ElementEvent e)
         {
             CanvasElement canvas = Document.GetElementById<CanvasElement>("graph");
             int x = Mouse.OffsetX(canvas, e);
@@ -177,18 +184,22 @@ namespace wwtlib
             }
             center = (lowPosition + highPosition) / 2;
             Draw();
-            double factor = (image.MaxVal - image.MinVal) / 256.0;
-            double low = image.MinVal + (lowPosition * factor);
-            double hi = image.MinVal + (highPosition * factor);
+            double factor = (layer.ImageSet.FitsProperties.MaxVal - layer.ImageSet.FitsProperties.MinVal) / 256.0;
+            double low = layer.ImageSet.FitsProperties.MinVal + (lowPosition * factor);
+            double hi = layer.ImageSet.FitsProperties.MinVal + (highPosition * factor);
 
             SetUpdateTimer();
-            image.lastMax = highPosition;
-            image.lastMin = lowPosition;
+
+            layer.ImageSet.FitsProperties.UpperCut = hi;
+            layer.ImageSet.FitsProperties.LowerCut = low;
+            layer.ImageSet.FitsProperties.ScaleType = (ScaleTypes)SelectedCurveStyle;
+
             e.CancelBubble = true;
         }
 
-        public void mouseup(ElementEvent e)
+        public void OnPointerUp(ElementEvent e)
         {
+            Script.Literal("{0}.releasePointerCapture({1}.pointerId)", e.SrcElement, e);
             if (dragType != DragType.None)
             {
                 dragType = DragType.None;
@@ -202,8 +213,11 @@ namespace wwtlib
 
         public void SetUpdateTimer()
         {
-            Script.SetTimeout(delegate () { Update(); }, 500);
-            updated = false;
+            if (!RenderContext.UseGlVersion2)
+            {
+                Script.SetTimeout(delegate () { Update(); }, 500);
+                updated = false;
+            }
         }
 
         public void Update()
@@ -213,13 +227,12 @@ namespace wwtlib
                 return;
             }
 
-            if (image != null)
+            if (image is FitsImageJs)
             {
-                double factor = (image.MaxVal - image.MinVal) / 256.0;
-                double low = image.MinVal + (lowPosition * factor);
-                double hi = image.MinVal + (highPosition * factor);
-                int z = image.lastBitmapZ;
-                tile.texture2d = image.GetScaledBitmap(low, hi, (ScaleTypes)SelectedCurveStyle, z, null).GetTexture();
+                double factor = (layer.ImageSet.FitsProperties.MaxVal - layer.ImageSet.FitsProperties.MinVal) / 256.0;
+                double low = layer.ImageSet.FitsProperties.MinVal + (lowPosition * factor);
+                double hi = layer.ImageSet.FitsProperties.MinVal + (highPosition * factor);
+                tile.texture2d = ((FitsImageJs)image).GetScaledBitmap(low, hi, (ScaleTypes)SelectedCurveStyle, 0, null).GetTexture();
             }
             updated = true;
         }

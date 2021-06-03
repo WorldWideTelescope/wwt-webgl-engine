@@ -23,6 +23,7 @@ namespace wwtlib
         private bool subDivided = false;
         private readonly List<List<string>> catalogRows = new List<List<string>>();
         private WebFile catalogData;
+        private FitsImageTile fitsImage;
         private static readonly Matrix3d galacticMatrix = Matrix3d.Create(
                     -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
                     -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
@@ -100,7 +101,7 @@ namespace wwtlib
 
         public override bool CreateGeometry(RenderContext renderContext)
         {
-            if(vertexList != null)
+            if (vertexList != null)
             {
                 return true;
             }
@@ -108,7 +109,7 @@ namespace wwtlib
 
             PopulateVertexList(vertexList, step);
 
-            if (dataset.HipsProperties.Properties.ContainsKey("hips_frame") 
+            if (dataset.HipsProperties.Properties.ContainsKey("hips_frame")
                 && dataset.HipsProperties.Properties["hips_frame"] == "galactic")
             {
                 for (int i = 0; i < vertexList.Count; i++)
@@ -191,12 +192,6 @@ namespace wwtlib
                 }
             }
             ProcessIndexBuffer(indexArray, x * 2 + y);
-        }
-
-        private static string ReplaceInvalidChars(string filename)
-        {
-            return filename;
-            //return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
         }
 
         private string GetUrl(Imageset dataset, int level, int x, int y)
@@ -312,7 +307,8 @@ namespace wwtlib
                 if (errored && Level < 3) //Level 0-2 sometimes deleted in favor of allsky.jpg/tsv
                 {
                     onlyDrawChildren = true;
-                } else
+                }
+                else
                 {
                     return false;
                 }
@@ -350,6 +346,7 @@ namespace wwtlib
                             InViewFrustum = true;
                             if (children[childIndex].IsTileBigEnough(renderContext) || onlyDrawChildren)
                             {
+                                //renderChildPart[childIndex].TargetState = true;
                                 renderChildPart[childIndex].TargetState = !children[childIndex].Draw3D(renderContext, opacity);
                                 if (renderChildPart[childIndex].TargetState)
                                 {
@@ -422,6 +419,28 @@ namespace wwtlib
             return true;
         }
 
+        public override void RenderPart(RenderContext renderContext, int part, double opacity, bool combine)
+        {
+            if (fitsImage == null)
+            {
+                TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+            }
+            else
+            {
+                ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
+                FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
+                FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
+                FitsShader.ContainsBlanks = dataset.FitsProperties.ContainsBlanks;
+                FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
+                FitsShader.BZero = (float)dataset.FitsProperties.BZero;
+                FitsShader.BScale = (float)dataset.FitsProperties.BScale;
+                FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
+                FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
+                FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+            }
+            renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
+        }
+
         public void DrawCatalogTile(RenderContext renderContext, double opacity)
         {
             RenderedGeneration = CurrentRenderGeneration;
@@ -486,7 +505,8 @@ namespace wwtlib
             if (Level == 0 && !anyChildInFrustum && !onlyDrawChildren)
             {
                 RemoveCatalogTile();
-            } else if (anyChildInFrustum)
+            }
+            else if (anyChildInFrustum)
             {
                 TilesInView++;
                 AddCatalogTile();
@@ -534,7 +554,8 @@ namespace wwtlib
                     {
                         return false;
                     }
-                } else if(Level >= 3) //Level 0-2 sometimes deleted in favor of allsky.jpg/tsv
+                }
+                else if (Level >= 3) //Level 0-2 sometimes deleted in favor of allsky.jpg/tsv
                 {
                     return true;
                 }
@@ -576,18 +597,15 @@ namespace wwtlib
             if (IsCatalogTile)
             {
                 step = 2;
-            } else
+            }
+            else
             {
                 switch (Level)
                 {
                     case 0:
                     case 1:
                     case 2:
-                        step = 64;
-                        break;
                     case 3:
-                        step = 32;
-                        break;
                     case 4:
                         step = 16;
                         break;
@@ -600,6 +618,42 @@ namespace wwtlib
                     default:
                         step = 2;
                         break;
+                }
+            }
+        }
+
+        public override void MakeTexture()
+        {
+            if (PrepDevice != null)
+            {
+                try
+                {
+                    texture2d = PrepDevice.createTexture();
+
+                    PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
+                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+
+                    if (GetHipsFileExtention() == ".fits" && RenderContext.UseGlVersion2)
+                    {
+                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
+                    }
+                    else
+                    {
+                        ImageElement image = texture;
+                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+                        PrepDevice.generateMipmap(GL.TEXTURE_2D);
+                    }
+
+                    PrepDevice.bindTexture(GL.TEXTURE_2D, null);
+                }
+                catch
+                {
+                    errored = true;
+
                 }
             }
         }
@@ -619,21 +673,41 @@ namespace wwtlib
             }
             else if (GetHipsFileExtention() == ".fits")
             {
-                if(!Downloading && !ReadyToRender)
+                if (!Downloading && !ReadyToRender)
                 {
                     Downloading = true;
-                    FitsImage image = FitsImage.CreateHipsTile(URL, delegate (WcsImage wcsImage)
+                    if (RenderContext.UseGlVersion2)
                     {
-                        texReady = true;
-                        Downloading = false;
-                        errored = false;
-                        ReadyToRender = texReady && (DemReady || !demTile);
-                        RequestPending = false;
-                        TileCache.RemoveFromQueue(this.Key, true);
-                        texture2d = wcsImage.GetBitmap().GetTexture();
-                    });
+                        fitsImage = new FitsImageTile(dataset, URL, delegate (WcsImage wcsImage)
+                        {
+                            Downloading = false;
+                            errored = fitsImage.errored;
+                            TileCache.RemoveFromQueue(this.Key, true);
+                            if (!fitsImage.errored)
+                            {
+                                texReady = true;
+                                ReadyToRender = texReady && (DemReady || !demTile);
+                                RequestPending = false;
+                                MakeTexture();
+                            }
+                        });
+                    } else
+                    {
+                        FitsImageJs image = FitsImageJs.CreateHipsTile(dataset, URL, delegate (WcsImage wcsImage)
+                        {
+                            texReady = true;
+                            Downloading = false;
+                            errored = false;
+                            ReadyToRender = texReady && (DemReady || !demTile);
+                            RequestPending = false;
+                            TileCache.RemoveFromQueue(this.Key, true);
+                            texture2d = wcsImage.GetBitmap().GetTexture();
+                        });
+                    }
                 }
-            } else {
+            }
+            else
+            {
                 base.RequestImage();
             }
 
@@ -867,7 +941,7 @@ namespace wwtlib
             }
         }
     }
- 
+
     public class Xyf
     {
         public int ix;

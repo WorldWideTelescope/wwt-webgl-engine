@@ -1,3 +1,12 @@
+# @wwtelescope/engine-helpers 0.6.0 (2021-06-03)
+
+- Add helpers relating to some of the new APIs in the 7.11 series of the engine.
+  These include roll controls, optional recursive loading of WTML collections,
+  showing warnings if WebGL 2.0 isn't available, URL-based loading of imageset
+  layers, controlling "goto" functionality when loading imageset layers, and
+  catalog HiPS APIs.
+
+
 # @wwtelescope/engine-helpers 0.5.0 (2021-01-27)
 
 This release contains a **breaking change** relating to a rework of how
