@@ -63,17 +63,27 @@ export class WWTGlobalState {
   }
 }
 
+/** This class holds basic information about an image set
+ * Member values include
+ * @member url: URL of the image data
+ * @member name: Name of the image set
+ * @member type: The type of the image set (panorama, sky, ...)
+ * @member description: An (application-specific) string giving some additional info about the image set
+ * @member extension: The extension(s) of the image files
+*/
 export class ImagesetInfo {
   url: string;
   name: string;
   type: ImageSetType;
   description: string;
+  extension: string;
 
-  constructor(url: string, name: string, type: ImageSetType, description: string) {
+  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string) {
     this.url = url;
     this.name = name;
     this.type = type;
     this.description = description;
+    this.extension = extension
   }
 }
 
@@ -542,7 +552,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   @Mutation
   updateAvailableImagesets(): void {
     this.availableImagesets = WWTControl.getImageSets()
-      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText()));
+      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
   }
 
   @Action({ rawError: true })

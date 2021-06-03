@@ -32,10 +32,10 @@ import {
 import {
   CreateTableLayerParams,
   GotoRADecZoomParams,
+  ImagesetInfo,
   LoadTourParams,
   LoadImageCollectionParams,
   WWTEngineVuexState,
-  ImagesetInfo
 } from "./store";
 
 /** A class for Vue components that wish to interact with a [[WWTComponent]]
