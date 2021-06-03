@@ -40,6 +40,12 @@
       </template>
       </div>
     </div>
+
+    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning">
+      To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
+      In case you would like to use Safari, we recommend that you 
+      <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
+    </div>
   </div>
 </template>
 
@@ -1060,6 +1066,19 @@ body {
     .nudgeright1 {
       padding-left: 3px;
     }
+  }
+}
+
+#webgl2-popup {
+  position: absolute;
+  z-index: 10;
+  bottom: 3rem;
+  left: 50%;
+  color: #FFF;
+  transform: translate(-50%, -50%);
+
+  a {
+    color: #5588FF;
   }
 }
 

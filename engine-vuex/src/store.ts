@@ -148,6 +148,8 @@ export interface WWTEngineVuexState {
    */
   tourTimecode: number;
 
+  showWebGl2Warning: boolean;
+  
   /** The current zoom level of the view, in degrees.
    *
    * The zoom level is the angular height of the viewport, times size.
@@ -227,10 +229,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   isTourPlaying = false;
   raRad = 0.0;
   renderType = ImageSetType.sky;
+  timeAtStartup = Date.now();
   tourCompletions = 0;
   tourRunTime: number | null = null;
   tourStopStartTimes: number[] = [];
   tourTimecode = 0.0;
+  showWebGl2Warning = false;
   zoomDeg = 0.0;
 
   get lookupImageset() {
@@ -298,6 +302,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     } else {
       this.isTourPlayerActive = false;
       this.isTourPlaying = false;
+    }
+
+    const showWebGl2Warning = !wwt.si.isUsingWebGl2()
+      && (Date.now() - this.timeAtStartup) < 15000;
+    if (this.showWebGl2Warning != showWebGl2Warning) {
+      this.showWebGl2Warning = showWebGl2Warning;
     }
   }
 

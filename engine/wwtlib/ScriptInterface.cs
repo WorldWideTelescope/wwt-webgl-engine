@@ -12,7 +12,7 @@ namespace wwtlib
         public event EventHandler<EventArgs> Ready;
         internal void FireReady()
         {
-            
+
             if (Ready != null)
             {
                 Ready.Invoke(this, new EventArgs());
@@ -24,24 +24,24 @@ namespace wwtlib
         }
 
         public event EventHandler<CollectionLoadedEventArgs> CollectionLoaded;
-        
+
         internal void FireCollectionLoaded(string url)
         {
             if (CollectionLoaded != null)
             {
                 CollectionLoaded.Invoke(this, new CollectionLoadedEventArgs(url));
-            }          
+            }
         }
 
         public event EventHandler<EventArgs> ColorPickerDisplay;
 
         public event EventHandler<EventArgs> VOTableDisplay;
         public event EventHandler<EventArgs> RefreshLayerManager;
-      
+
         public event EventHandler<ArrivedEventArgs> Arrived;
         public event EventHandler<ArrivedEventArgs> Clicked;
         public event EventHandler<AnnotationClickEventArgs> AnnotationClicked;
-        
+
         public event EventHandler<EventArgs> ImageryLoaded;
 
         public event EventHandler<EventArgs> TourReady;
@@ -56,7 +56,7 @@ namespace wwtlib
 
 
         public event EventHandler TimeScrubberHook;
-        //UI will set this to a function that takes 2 string properties (prop,val) 
+        //UI will set this to a function that takes 2 string properties (prop,val)
         //("title", "left", or "right" for the labels, "pos" for the slider pos)
         //Pass a 0-1 float to set the slider position (stringify it if you need to for strong typing)
 
@@ -229,7 +229,7 @@ namespace wwtlib
             }
         }
 
-       
+
         public void SetForegroundOpacity(double opacity)
         {
             if (WWTControl.Singleton != null)
@@ -392,7 +392,7 @@ namespace wwtlib
 
             ImageSetLayer imagesetLayer = new ImageSetLayer();
             Imageset imageset = new Imageset();
-            
+
             WcsLoaded wcsLoaded = delegate (WcsImage wcsImage)
             {
                 if (((FitsImage)wcsImage).errored)
@@ -470,6 +470,11 @@ namespace wwtlib
                 //In case of order > Layers.length, the layer is properly put at the end of the list
                 LayerManager.AllMaps[layer.ReferenceFrame].Layers.Insert(order, layer);
             }
+        }
+
+        public bool IsUsingWebGl2()
+        {
+            return RenderContext.UseGlVersion2;
         }
 
         public bool hideTourFeedback = false;
@@ -645,7 +650,7 @@ namespace wwtlib
             get { return showCaptions; }
             set { showCaptions = value; }
         }
-        
+
 
         public void LoadVOTable(string url, bool useCurrentView)
         {
@@ -678,7 +683,7 @@ namespace wwtlib
         }
 
         public Settings Settings;
-       
+
     }
 
 

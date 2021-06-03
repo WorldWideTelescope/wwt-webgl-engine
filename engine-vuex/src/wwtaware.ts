@@ -249,6 +249,7 @@ export class WWTAwareComponent extends Vue {
         wwtTourStopStartTimes: (state, _getters) => (state as WWTEngineVuexState).tourStopStartTimes,
         wwtTourTimecode: (state, _getters) => (state as WWTEngineVuexState).tourTimecode,
         wwtZoomDeg: (state, _getters) => (state as WWTEngineVuexState).zoomDeg,
+        wwtShowWebGl2Warning: (state, _getters) => (state as WWTEngineVuexState).showWebGl2Warning,
       }),
       ...mapGetters([
         "lookupImageset",
@@ -416,6 +417,8 @@ export class WWTAwareComponent extends Vue {
    * *times six*.
    */
   wwtZoomDeg!: number;
+
+  wwtShowWebGl2Warning!: boolean;
 
   // Getters
 
