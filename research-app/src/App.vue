@@ -67,13 +67,9 @@
 <script lang="ts">
 import * as moment from "moment";
 import * as screenfull from "screenfull";
-import vSelect from 'vue-select';
-import Vue from 'vue';
 import 'vue-select/dist/vue-select.css';
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-
-Vue.component("v-select", vSelect);
 
 import {
   ImageSetType,
@@ -639,7 +635,7 @@ export default class App extends WWTAwareComponent {
 
   @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
-  hipsUrl: string = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
+  hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
 
   // Lifecycle management
 
@@ -652,11 +648,7 @@ export default class App extends WWTAwareComponent {
       screenfull.on('change', this.onFullscreenEvent);
     }
 
-    (async() => {
-      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
-    })();
-
-    
+    this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
 
     // For now let's just not worry about removing this listener ...
     window.addEventListener('message', (event) => {
@@ -947,7 +939,7 @@ export default class App extends WWTAwareComponent {
   get curAvailableImagesets() {
     if (this.wwtAvailableImagesets == null)
       return [];
-    return this.wwtAvailableImagesets.filter(info => info.type != ImageSetType.panorama);
+    return this.wwtAvailableImagesets.filter(info => info.type == this.wwtRenderType && !info.extension.includes("tsv"));
   }
 
   get curBackgroundImagesetName() {
@@ -1122,7 +1114,7 @@ body {
 #tools {
   position: absolute;
   z-index: 10;
-  top: 4rem;
+  top: 0.5rem;
   left: 50%;
   color: #FFF;
 
