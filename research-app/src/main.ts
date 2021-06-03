@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VTooltip from "v-tooltip";
 import Vuex from "vuex";
+import vSelect from 'vue-select';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -38,6 +39,7 @@ library.add(faSearchMinus);
 library.add(faSearchPlus);
 library.add(faSlidersH);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component("v-select", vSelect);
 
 // If postMessages are to be allowed, our creator has to tell us where they'll
 // come from. This only trivially prevents unexpected messages; it of course
