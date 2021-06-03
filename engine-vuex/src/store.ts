@@ -20,6 +20,7 @@ import {
   Imageset,
   ImageSetLayer,
   SpreadSheetLayer,
+  WWTControl,
 } from "@wwtelescope/engine";
 
 import {
@@ -62,10 +63,38 @@ export class WWTGlobalState {
   }
 }
 
+/** This class holds basic information about an image set
+ * Member values include
+ * @member url: URL of the image data
+ * @member name: Name of the image set
+ * @member type: The type of the image set (panorama, sky, ...)
+ * @member description: An (application-specific) string giving some additional info about the image set
+ * @member extension: The extension(s) of the image files
+*/
+export class ImagesetInfo {
+  url: string;
+  name: string;
+  type: ImageSetType;
+  description: string;
+  extension: string;
+
+  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string) {
+    this.url = url;
+    this.name = name;
+    this.type = type;
+    this.description = description;
+    this.extension = extension
+  }
+}
+
 /** This interface expresses the properties exposed by the WWT Engine’s
  * Vuex store module.
  */
 export interface WWTEngineVuexState {
+
+  /** Info about the imagesets that are available in the engine to be used as backgrounds */
+  availableImagesets: ImagesetInfo[];
+
   /** The current imageset acting as the background imagery, if defined. */
   backgroundImageset: Imageset | null;
 
@@ -218,6 +247,7 @@ export interface LoadImageCollectionParams {
   stateFactory: true,
 })
 export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexState {
+  availableImagesets: ImagesetInfo[] = [];
   backgroundImageset: Imageset | null = null;
   clockDiscontinuities = 0;
   clockRate = 1.0;
@@ -529,13 +559,22 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return { tourRunTime, tourStopStartTimes };
   }
 
+  @Mutation
+  updateAvailableImagesets(): void {
+    this.availableImagesets = WWTControl.getImageSets()
+      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
+  }
+
   @Action({ rawError: true })
   async loadImageCollection(
     {url, loadChildFolders}: LoadImageCollectionParams
   ): Promise<Folder> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
-    return Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
+    const result = await Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
+    this.context.commit('updateAvailableImagesets');
+    return result;
+
   }
 
   @Action({ rawError: true })

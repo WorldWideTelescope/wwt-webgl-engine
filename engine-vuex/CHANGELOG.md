@@ -1,3 +1,20 @@
+# @wwtelescope/engine-vuex 0.8.0 (2021-06-03)
+
+- Expose information about the imagesets that the engine knows about, with a
+  small `ImageSetInfo` structure that gives core information (@Carifio24). This
+  is used by the research app to present the user with a menu of choices for
+  background imagery sets.
+- Wire up a flag suggesting to UIs whether they should warn the user about their
+  browser's (lack of) support for WebGL 2.0 (@imbasimba). This should probably
+  be generalized, but we wanted to get something going.
+- Plumb through some of the new interfaces needed for OpenSpace support
+  (@imbasimba).
+- Plumb through some of the new interfaces needed for more view controls in the
+  research app: basic move and tilt controls (@Carifio24).
+- Loosen version requirements for Vue CLI tooling (@pkgw).
+- Write a first pass of real docs! (@pkgw)
+
+
 # @wwtelescope/engine-vuex 0.7.0 (2021-01-27)
 
 This release contains a **breaking change** relating to a rework of how
