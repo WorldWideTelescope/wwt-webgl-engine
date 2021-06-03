@@ -1,8 +1,32 @@
-# See elsewhere for changelog
+# rc: minor bump
 
-This project’s release notes are curated from the Git history of its main
-branch. You can find them by looking at [the version of this file on the
-`release` branch][branch] or the [GitHub release history][gh-releases].
+Lots of new features!
 
-[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/research-app/CHANGELOG.md
-[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases
+- Add a background chooser UI (@Carifio24). Unlike the background chooser in the
+  embed app, this one is "research-grade", allowing access to the full suite of
+  WWT all-sky imagery, including the many HiPS datasets that we can now render,
+  with slick autocompletion.
+- Use the new 7.11 series of the engine with WebGL-based FITS rendering, and show
+  a warning if the user's browser doesn't support it (@imbasimba). This is motivated
+  because almost everyone supports WebGL 2.0 now, but for a little while longer in
+  Safari you need to turn it on as an "advanced" option.
+- Add a core set of view-control keybindings mirroring the pywwt widget
+  (@Carifio24).
+- Start implementing keyboard accessibility for the main app (@Carifio24).
+- Handle some new messages needed for the OpenSpace integration work
+  (@imbasimba): there are new JSON messages letting you reorder imageset layers,
+  control the roll of the viewer, have more control over imagesets to load, control
+  whether to "goto" those imagesets when they are loaded, and control whether to load
+  WTML collections recursively.
+- Loosen version requirements for Vue CLI tooling (@pkgw).
+
+
+# @wwtelescope/research-app 0.1.0 (2021-01-27)
+
+First release of the new "research application". This will be the embeddable UI
+for use in Jupyter, reseacher-oriented interfaces, etc.
+
+This version can handle all of the messages from the pywwt "JSON API", which
+means that it can be dropped in as a replacement for the pywwt widget with the
+proper JupyterLab glue, as implemented in what is currently called the
+`wwt-research-kit` repo.

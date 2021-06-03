@@ -28,7 +28,9 @@ namespace wwtlib
             SpaceTimeController.UpdateClock();
         }
 
-        private static List<Imageset> ImageSets = new List<Imageset>();
+        // Note: ImageSets must remain public because there is JS code in the
+        // wild that accesses `WWTControl.imageSets`.
+        public static List<Imageset> ImageSets = new List<Imageset>();
         public static Folder ExploreRoot = new Folder();
         public static string ImageSetName = "";
 

@@ -1,4 +1,12 @@
-# rc: minor bump
+# rc: micro bump
+
+- Fix an unintentional API breakage that broke the webclient (@pkgw). We
+  made a struct field private.
+- Expose the new API related to that breakage since it *is* better, though
+  (@carifio24).
+
+
+# @wwtelescope/engine 7.11.0 (2021-06-03)
 
 This release features a lot of exciting work, mainly centered on accelerated
 FITS rendering and new APIs to support a growing range of client applications!
