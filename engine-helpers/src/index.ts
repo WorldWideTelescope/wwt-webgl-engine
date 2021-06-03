@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
 import { D2H, R2D, R2H } from "@wwtelescope/astro";
@@ -9,6 +9,7 @@ import {
   isBaseLayerSetting,
   isBaseImageSetLayerSetting,
   isBaseSpreadSheetLayerSetting,
+  isBaseVoTableLayerSetting,
 } from "@wwtelescope/engine-types";
 
 import {
@@ -40,6 +41,8 @@ import {
   SpaceTimeController,
   SpreadSheetLayer,
   SpreadSheetLayerSetting,
+  VoTableLayer,
+  VoTableLayerSetting,
 } from "@wwtelescope/engine";
 
 
@@ -210,6 +213,20 @@ export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: S
 }
 
 
+/** Type guard function for VoTableLayerSetting. */
+export function isVoTableLayerSetting(obj: [string, any]): obj is VoTableLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  // No special settings specific to non-base VoTableLayerSetting.
+  return isLayerSetting(obj) || isBaseVoTableLayerSetting(obj);
+}
+
+/** Apply a setting to a VoTableLayer. */
+export function applyVoTableLayerSetting(layer: VoTableLayer, setting: VoTableLayerSetting): void {
+  const funcName = "set_" + setting[0];
+  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+
 // The WWTInstance wrapper class and friends.
 
 export const enum InitControlViewType {
@@ -268,19 +285,50 @@ export interface GotoTargetOptions {
   trackObject: boolean;
 }
 
-/** Options for [[WWTInstance.loadFitsLayer]]. */
+
+/** Deprecated, use AddImageSetLayerOptions instead.
+ *  Options for [[WWTInstance.addImageSetLayer]]. */
 export interface LoadFitsLayerOptions {
   /** The URL of the FITS file. */
   url: string;
+  
+  /** A name to use for the new layer. */
+  name: string;
+
+  /** Whether to seek the view to the positon of the FITS file on the sky,
+   * if/when it successfully loads. */
+  gotoTarget: boolean;
+}
+
+/** Options for [[WWTInstance.addImageSetLayer]]. */
+export interface AddImageSetLayerOptions {
+  /** The URL of the FITS file 
+   * OR The URL of the desired image set. This should mach an image set url
+   * previously loaded with [[LoadImageCollection]]. */
+  url: string;
+  
+  /** Tell WWT what type of layer you are Adding.
+   * OR let WWT try to autodetect the type of the data.
+   * Default, autodetect. */
+  mode: "autodetect" | "fits" | "preloaded";
 
   /** A name to use for the new layer. */
   name: string;
 
   /** Whether to seek the view to the positon of the FITS file on the sky,
-   * if/when it successfully loads.
-   */
-  gotoTarget: boolean;
+   * if/when it successfully loads. */
+  goto: boolean;
 }
+
+/** Options for [[WWTInstance.setLayerOrder]]. */
+export interface SetLayerOrderOptions {
+  /** The ID of the layer. */
+  id: string;
+  /** The prefered position of the layer in the draw cycle.
+   * 0 being the first layer to be drawn. */
+  order: number;
+}
+
 
 /** Options for [[WWTInstance.stretchFitsLayer]]. */
 export interface StretchFitsLayerOptions {
@@ -484,12 +532,25 @@ export class WWTInstance {
     });
   }
 
-  async gotoRADecZoom(raRad: number, decRad: number, zoomDeg: number, instant: boolean): Promise<void> {
+  /** Navigate the camera to the specified position, asynchronously.
+   *
+   * This wraps the underlying engine function of the same name, but homogenizing some
+   * of the angular arguments to use radians.
+   *
+   * @param raRad The RA to seek to, in radians
+   * @param decRad The declination to seek to, in radians
+   * @param zoomDeg The zoom setting, in *degrees*
+   * @param instant Whether to snap the camera instantly, or pan it
+   * @param rollRad If specified, the roll of the target camera position, in radians
+   * @returns A void promise that resolves when the camera arrives at the target position.
+   */
+  async gotoRADecZoom(raRad: number, decRad: number, zoomDeg: number, instant: boolean, rollRad?: number): Promise<void> {
     this.ctl.gotoRADecZoom(
       raRad * R2H,
       decRad * R2D,
       zoomDeg,
-      instant
+      instant,
+      rollRad
     );
     return this.makeArrivePromise(instant);
   }
@@ -516,30 +577,32 @@ export class WWTInstance {
   private collectionLoadedPromises: SavedPromise<string, Folder>[] = [];
   private collectionRequests: Map<string, Folder | null> = new Map();
 
-   /** Load a WTML collection and the imagesets that it contains.
-   *
-   * This function triggers a download of the specified URL, which should return
-   * an XML document in the [WTML collection][wtml] format. Any `ImageSet`
-   * entries in the collection, or `Place` entries containing image sets, will
-   * be added to the WWT instance’s list of available imagery. Subsequent calls
-   * to functions like [[setForegroundImageByName]] will be able to locate the
-   * new imagesets and display them to the user.
-   *
-   * Each unique URL is only requested once. Once a given URL has been
-   * successfully loaded, the promise returned by additional calls will resolve
-   * immediately. URL uniqueness is tested with simple string equality, so if
-   * you really want to load the same URL more than once you could add a
-   * fragment specifier.
-   *
-   * If the URL is not accessible due to CORS restrictions, the request will
-   * automatically be routed through the WWT’s CORS proxying service.
-   *
-   * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
-   *
-   * @param url: The URL of the WTML collection file to load.
-   * @returns: A promise that resolves to an initialized Folder object.
-   */
-  async loadImageCollection(url: string): Promise<Folder> {
+  /** Load a WTML collection and the imagesets that it contains.
+  *
+  * This function triggers a download of the specified URL, which should return
+  * an XML document in the [WTML collection][wtml] format. Any `ImageSet`
+  * entries in the collection, or `Place` entries containing image sets, will
+  * be added to the WWT instance’s list of available imagery. Subsequent calls
+  * to functions like [[setForegroundImageByName]] will be able to locate the
+  * new imagesets and display them to the user.
+  *
+  * Each unique URL is only requested once. Once a given URL has been
+  * successfully loaded, the promise returned by additional calls will resolve
+  * immediately. URL uniqueness is tested with simple string equality, so if
+  * you really want to load the same URL more than once you could add a
+  * fragment specifier.
+  *
+  * If the URL is not accessible due to CORS restrictions, the request will
+  * automatically be routed through the WWT’s CORS proxying service.
+  *
+  * [wtml]: https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/
+  *
+  * @param url: The URL of the WTML collection file to load.
+  * @param loadChildFolders When true, this method will recursively
+  * download and unpack the content of all [[Folder]]s contained in the WTML file.
+  * @returns: A promise that resolves to an initialized Folder object.
+  */
+  async loadImageCollection(url: string, loadChildFolders?: boolean): Promise<Folder> {
     const curState = this.collectionRequests.get(url);
 
     // If we've already loaded the folder, insta-resolve to it.
@@ -557,6 +620,10 @@ export class WWTInstance {
       // the function.
       const holder: { f: Folder | null } = { f: null };
 
+      if (loadChildFolders === undefined) {
+        loadChildFolders = false;
+      }
+
       holder.f = Wtml.getWtmlFile(url, () => {
         // The folder at this URL is now fully loaded.
         const f = holder.f as Folder;
@@ -571,7 +638,7 @@ export class WWTInstance {
           // Don't filter out promises for other URLs.
           return true;
         });
-      });
+      }, loadChildFolders);
     }
 
     return new Promise((resolve, reject) => {
@@ -591,17 +658,24 @@ export class WWTInstance {
 
   // Layers
 
-  /** Load a remote FITS file into a data layer and display it.
+  /** Load an image set or a remote FITS file into a data layer and display it.
    *
    * The FITS file must be downloaded and processed, so this API is
    * asynchronous, and is not appropriate for files that might be large.
+   * 
+   * The image set must have previously been created with [[loadImageCollection]]
    */
-  async loadFitsLayer(options: LoadFitsLayerOptions): Promise<ImageSetLayer> {
+  async addImageSetLayer(options: AddImageSetLayerOptions): Promise<ImageSetLayer> {
     return new Promise((resolve, _reject) => {
-      this.si.loadFitsLayer(options.url, options.name, options.gotoTarget, (layer) => {
+      this.si.addImageSetLayer(options.url, options.mode, options.name, options.goto, (layer) => {
         resolve(layer);
       })
     });
+  }
+
+  /** Change the ImageSetLayer position in the layer stack. */
+  setImageSetLayerOrder(options: SetLayerOrderOptions): void {
+    this.si.setImageSetLayerOrder(options.id, options.order);
   }
 
   /** Change the "stretch" settings of a FITS image layer. */
@@ -613,7 +687,7 @@ export class WWTInstance {
       // This is kind of random, but follows the pywwt API implementation.
       const fits = layer.getFitsImage();
       if (fits !== null) {
-        fits.transparentBlack = false;
+        layer.get_imageSet().get_fitsProperties().transparentBlack = false;
       }
     }
   }

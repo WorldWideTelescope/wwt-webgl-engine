@@ -1,38 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Html;
-using System.Xml;
-using System.Net;
 using System.Html.Data.Files;
 using System.Html.Media.Graphics;
 
 namespace wwtlib
 {
-    public enum DataTypes { ByteT=0, Int16T=1, Int32T=2, FloatT=3, DoubleT=4, None=5 };
-    public enum ScaleTypes { Linear=0, Log=1, Power=2, SquareRoot=3, HistogramEqualization=4 };
-
-
     public delegate void WcsLoaded(WcsImage wcsImage);
-
     public class FitsImage : WcsImage
     {
-        Dictionary<String, String> header = new Dictionary<string, string>();
-        public static FitsImage Last = null;
+        public bool errored = false;
+        public int NumAxis = 0;
+        public int[] AxisSize;
+        public Float32Array dataUnit;
+        public int[] Histogram;
+        public int HistogramMaxCount;
+        public Blob sourceBlob = null;
+        public FitsProperties fitsProperties;
 
-        private WcsLoaded callBack;
+        protected readonly Dictionary<String, String> header = new Dictionary<string, string>();
+        protected const float NaN = 0f / 0f;
+        protected int position = 0;
+        protected int BufferSize = 1;
+        protected Imageset dataset;
 
-        public bool isHipsTile = false;
-        public static FitsImage CreateHipsTile(string file, WcsLoaded callMeBack)
+        private readonly WcsLoaded callBack;
+        private WebFile webFile;
+        private bool parseSuccessful = false;
+
+        public FitsImage(Imageset dataset, string file, Blob blob, WcsLoaded callMeBack)
         {
-            FitsImage fits = new FitsImage(file, null, callMeBack);
-            fits.isHipsTile = true;
-            return fits;
-        }
-
-        public FitsImage(string file, Blob blob, WcsLoaded callMeBack)
-        {
-            Last = this;
+            this.dataset = dataset;
+            this.fitsProperties = dataset.FitsProperties;
             callBack = callMeBack;
             filename = file;
             if (blob != null)
@@ -44,8 +43,6 @@ namespace wwtlib
                 GetFile(file);
             }
         }
-
-        WebFile webFile;
 
         public void GetFile(string url)
         {
@@ -59,16 +56,19 @@ namespace wwtlib
         {
             if (webFile.State == StateType.Error)
             {
-                Script.Literal("console.log({0})", webFile.Message);
+                errored = true;
+                if (callBack != null)
+                {
+                    callBack.Invoke(this);
+                }
+
             }
             else if (webFile.State == StateType.Received)
             {
-                System.Html.Data.Files.Blob mainBlob = (System.Html.Data.Files.Blob)webFile.GetBlob();
+                Blob mainBlob = webFile.GetBlob();
                 ReadFromBlob(mainBlob);
             }
         }
-
-        public Blob sourceBlob = null;
 
         private void ReadFromBlob(Blob blob)
         {
@@ -76,8 +76,9 @@ namespace wwtlib
             FileReader chunck = new FileReader();
             chunck.OnLoadEnd = delegate (System.Html.Data.Files.FileProgressEvent e)
             {
-                ReadFromBin(new BinaryReader(new Uint8Array(chunck.Result)));
-                if (callBack != null && parseSuccessful)
+                ReadFromBin(new DataView(chunck.Result));
+                errored = !parseSuccessful;
+                if (callBack != null)
                 {
                     callBack.Invoke(this);
                 }
@@ -85,74 +86,40 @@ namespace wwtlib
             chunck.ReadAsArrayBuffer(blob);
         }
 
-        private void ReadFromBin(BinaryReader br)
+        private string ReadByteString(DataView dataView, int count)
         {
-            ParseHeader(br);
+            string data = "";
+            for (int i = 0; i < count; i++)
+            {
+                data += string.FromCharCode(dataView.getUint8(this.position));
+                this.position++;
+            }
+            return data;
         }
 
-
-        public int[] Histogram;
-        public int HistogramMaxCount;
-        public int Width = 0;
-        public int Height = 0;
-        public int NumAxis = 0;
-        public double BZero = 0;
-        public double BScale = 1;
-        public int[] AxisSize;
-        public object DataBuffer;
-        public DataTypes DataType = DataTypes.None;
-        public bool ContainsBlanks = false;
-        public double BlankValue = double.MinValue;
-        public double MaxVal = int.MinValue;
-        public double MinVal = int.MaxValue;
-        public bool TransparentBlack = true;
-
-        public int lastMin = 0;
-        public int lastMax = 255;
-        bool color = false;
-        private bool parseSuccessful = false;
-
-        public static bool IsGzip(BinaryReader br)
+        private bool ValidateFitsSimple(DataView dataView)
         {
-
-            byte[] line = br.ReadBytes(2);
-            br.Seek(0);
-            if (line[0] == 31 && line[1] == 139)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private bool ValidateFitsSimple (BinaryReader br)
-        {
-            int pos = br.Position;
-            br.Seek(0);
-            string data = br.ReadByteString(8);
+            string data = this.ReadByteString(dataView, 8);
             string keyword = data.TrimEnd();
-            br.Seek(pos);
+            this.position -= 8;
             return keyword.ToUpperCase() == "SIMPLE";
         }
 
-        public void ParseHeader(BinaryReader br)
+        public virtual void ReadFromBin(DataView dataView)
         {
-            if (!ValidateFitsSimple(br))
+            if (!ValidateFitsSimple(dataView))
             {
-                Script.Literal("alert('The requested file is not a valid FITS file.')");
+                Script.Literal("console.log('The requested file is not a valid FITS file.')");
                 return;
             }
 
             bool foundEnd = false;
 
-
-            while (!foundEnd && !br.EndOfStream)
+            while (!foundEnd)
             {
                 for (int i = 0; i < 36; i++)
                 {
-                    string data = br.ReadByteString(80);
+                    string data = this.ReadByteString(dataView, 80);
 
                     if (!foundEnd)
                     {
@@ -163,14 +130,13 @@ namespace wwtlib
                             foundEnd = true;
                             // Check for XTENSION
                             i++;
-                            data = br.ReadByteString(80);
+                            data = this.ReadByteString(dataView, 80);
                             while (String.IsNullOrWhiteSpace(data))
                             {
                                 i++;
-                                data = br.ReadByteString(80);
+                                data = this.ReadByteString(dataView, 80);
                             }
                             keyword = data.Substring(0, 8).TrimEnd();
-                            values = data.Substring(10).Split("/");
                             if (keyword.ToUpperCase() == "XTENSION")
                             {
                                 // We have additional headers
@@ -179,7 +145,7 @@ namespace wwtlib
                             else
                             {
                                 // Rewind these 80 bytes which could be data
-                                br.SeekRelative(-80);
+                                this.position -= 80;
                             }
                         }
                         else
@@ -193,27 +159,26 @@ namespace wwtlib
 
             if (!foundEnd)
             {
-                Script.Literal("alert('Unable to parse requested FITS file.')");
+                Script.Literal("console.log('Unable to parse requested FITS file.')");
                 return;
             }
 
             NumAxis = Int32.Parse(header["NAXIS"]);
 
-            ContainsBlanks = header.ContainsKey("BLANK");
-
-            if (ContainsBlanks)
+            if (header.ContainsKey("BLANK"))
             {
-                BlankValue = Double.Parse(header["BLANK"]);
+                fitsProperties.BlankValue = Double.Parse(header["BLANK"]);
+                fitsProperties.ContainsBlanks = true;
             }
 
             if (header.ContainsKey("BZERO"))
             {
-                BZero = Double.Parse(header["BZERO"]);
+                fitsProperties.BZero = Double.Parse(header["BZERO"]);
             }
 
             if (header.ContainsKey("BSCALE"))
             {
-                BScale = Double.Parse(header["BSCALE"]);
+                fitsProperties.BScale = Double.Parse(header["BSCALE"]);
             }
 
             AxisSize = new int[NumAxis];
@@ -224,87 +189,23 @@ namespace wwtlib
                 BufferSize *= AxisSize[axis];
             }
 
-            int bitsPix = Int32.Parse(header["BITPIX"]);
+            int bitpix = Int32.Parse(header["BITPIX"]);
 
-
-            switch (bitsPix)
-            {
-                case 8:
-                    this.DataType = DataTypes.ByteT;
-                    InitDataBytes(br);
-                    break;
-                case 16:
-                    this.DataType = DataTypes.Int16T;
-                    InitDataShort(br);
-                    break;
-                case 32:
-                    this.DataType = DataTypes.Int32T;
-                    InitDataInt(br);
-                    break;
-                case -32:
-                    this.DataType = DataTypes.FloatT;
-                    InitDataFloat(br);
-                    break;
-                case -64:
-                    this.DataType = DataTypes.DoubleT;
-                    InitDataDouble(br);
-                    break;
-                default:
-                    this.DataType = DataTypes.None;
-                    break;
-            }
+            this.ReadDataUnit(dataView, bitpix);
 
             if (NumAxis > 1)
             {
-                if (NumAxis == 3)
-                {
-                    if (AxisSize[2] == 3)
-                    {
-                        color = true;
-                    }
-                }
-
-                if (NumAxis > 2)
-                {
-                    sizeZ = Depth = AxisSize[2];
-                    lastBitmapZ = (int)(sizeZ / 2);
-                }
-                sizeX = Width = AxisSize[0];
-                sizeY = Height = AxisSize[1];
-                if (!isHipsTile)
-                {
-                    ComputeWcs();
-                }
+                sizeX = AxisSize[0];
+                sizeY = AxisSize[1];
                 Histogram = ComputeHistogram(256);
                 HistogramMaxCount = Histogram[256];
             }
+
+            ComputeWcs();
+
             parseSuccessful = true;
         }
 
-        public string GetZDescription()
-        {
-            string description = "";
-
-            if (header["RESTFREQ"] != null && header["CRPIX3"] != null
-                && header["CDELT3"] != null && header["CRVAL3"] != null)
-            {
-                double c = 299792.458;
-                double f0 = double.Parse(header["RESTFREQ"]);
-                double crpix3 = double.Parse(header["CRPIX3"]);
-                double cdelt3 = double.Parse(header["CDELT3"]);
-                double crval3 = double.Parse(header["CRVAL3"]);
-
-                double f = ((lastBitmapZ + 1) - crpix3) * cdelt3 + crval3;
-                double fval = ((f0 - f) / f0) * c;
-                description = string.Format("Velocity {0} km/s", (int)fval);
-            }
-
-            return description;
-        }
-
-
-        private int sizeZ = 1;
-        public int Depth = 1;
 
         private void AddKeyword(string keyword, string[] values)
         {
@@ -320,7 +221,6 @@ namespace wwtlib
                     {
                         header[keyword.ToUpperCase()] = values[0].Trim();
                     }
-
                 }
                 catch
                 {
@@ -328,7 +228,142 @@ namespace wwtlib
             }
         }
 
-        private void ComputeWcs()
+        protected virtual void ReadDataUnit(DataView dataView, int bitpix)
+        {
+            dataUnit = new Float32Array(this.BufferSize);
+            switch (bitpix)
+            {
+                case -64:
+                    ReadDataUnitFloat64(dataView);
+                    break;
+                case -32:
+                    ReadDataUnitFloat32(dataView);
+                    break;
+                case 8:
+                    ReadDataUnitUint8(dataView);
+                    break;
+                case 16:
+                    ReadDataUnitInt16(dataView);
+                    break;
+                case 32:
+                    ReadDataUnitInt32(dataView);
+                    break;
+                case 64:
+                    // 64 bit integers not supported by Safari
+                    Script.Literal("console.log('64 bit integer FITS are not yet supported')");
+                    //ReadDataUnitInt64(dataView);
+                    break;
+            }
+
+        }
+
+        protected virtual void ReadDataUnitFloat64(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getFloat64(this.position, false);
+                double physicalValue = dataUnit[i] * fitsProperties.BScale + fitsProperties.BZero;
+                if (fitsProperties.MinVal > physicalValue)
+                {
+                    fitsProperties.MinVal = physicalValue;
+                }
+                if (fitsProperties.MaxVal < physicalValue)
+                {
+                    fitsProperties.MaxVal = physicalValue;
+                }
+                i++;
+                this.position += 8;
+            }
+            fitsProperties.LowerCut = fitsProperties.MinVal;
+            fitsProperties.UpperCut = fitsProperties.MaxVal;
+
+        }
+
+        protected virtual void ReadDataUnitFloat32(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getFloat32(this.position, false);
+                double physicalValue = dataUnit[i] * fitsProperties.BScale + fitsProperties.BZero;
+                if (fitsProperties.MinVal > physicalValue)
+                {
+                    fitsProperties.MinVal = physicalValue;
+                }
+                if (fitsProperties.MaxVal < physicalValue)
+                {
+                    fitsProperties.MaxVal = physicalValue;
+                }
+                i++;
+                this.position += 4;
+            }
+            fitsProperties.LowerCut = fitsProperties.MinVal;
+            fitsProperties.UpperCut = fitsProperties.MaxVal;
+        }
+        protected virtual void ReadDataUnitUint8(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getUint8(this.position);
+                if (fitsProperties.MinVal > dataUnit[i])
+                {
+                    fitsProperties.MinVal = dataUnit[i];
+                }
+                if (fitsProperties.MaxVal < dataUnit[i])
+                {
+                    fitsProperties.MaxVal = dataUnit[i];
+                }
+                i++;
+                this.position += 1;
+            }
+            fitsProperties.LowerCut = fitsProperties.MinVal;
+            fitsProperties.UpperCut = fitsProperties.MaxVal;
+        }
+        protected virtual void ReadDataUnitInt16(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getInt16(this.position, false);
+                if (fitsProperties.MinVal > dataUnit[i])
+                {
+                    fitsProperties.MinVal = dataUnit[i];
+                }
+                if (fitsProperties.MaxVal < dataUnit[i])
+                {
+                    fitsProperties.MaxVal = dataUnit[i];
+                }
+                i++;
+                this.position += 2;
+            }
+            fitsProperties.LowerCut = fitsProperties.MinVal;
+            fitsProperties.UpperCut = fitsProperties.MaxVal;
+        }
+
+        protected virtual void ReadDataUnitInt32(DataView dataView)
+        {
+            int i = 0;
+            while (this.position < dataView.byteLength)
+            {
+                dataUnit[i] = dataView.getInt32(this.position, false);
+                if (fitsProperties.MinVal > dataUnit[i])
+                {
+                    fitsProperties.MinVal = dataUnit[i];
+                }
+                if (fitsProperties.MaxVal < dataUnit[i])
+                {
+                    fitsProperties.MaxVal = dataUnit[i];
+                }
+                i++;
+                this.position += 4;
+            }
+            fitsProperties.LowerCut = fitsProperties.MinVal;
+            fitsProperties.UpperCut = fitsProperties.MaxVal;
+        }
+
+        protected virtual void ComputeWcs()
         {
             if (header.ContainsKey("CROTA2"))
             {
@@ -432,29 +467,41 @@ namespace wwtlib
             ValidWcs = hasScale && hasRotation && hasPixel && hasLocation;
         }
 
-        public Bitmap GetHistogramBitmap(int max)
+        public int[] ComputeHistogram(int count)
         {
-            Bitmap bmp = Bitmap.Create(Histogram.Length, 150);
-            //Graphics g = Graphics.FromImage(bmp);
-            //g.Clear(Color.FromArgb(68, 82, 105));
-            //Pen pen = new Pen(Color.FromArgb(127, 137, 157));
-            //double logMax = Math.Log(HistogramMaxCount);
-            //for (int i = 0; i < Histogram.Length; i++)
-            //{
-            //    double height = Math.Log(Histogram[i]) / logMax;
-            //    if (height < 0)
-            //    {
-            //        height = 0;
-            //    }
+            int[] histogram = new int[count + 1];
 
+            for (int i = 0; i < count + 1; i++)
+            {
+                histogram[i] = 0;
+            }
 
-            //    g.DrawLine(Pens.White, new Point(i, 150), new Point(i, (int)(150 - (height * 150))));
-            //}
-            //pen.Dispose();
-            //g.Flush();
-            //g.Dispose();
+            PopulateHistogram(histogram);
+            int maxCounter = 1;
+            foreach (int val in histogram)
+            {
+                if (val > maxCounter)
+                {
+                    maxCounter = val;
+                }
+            }
+            histogram[count] = maxCounter;
+            return histogram;
+        }
 
-            return bmp;
+        protected virtual void PopulateHistogram(int[] histogram)
+        {
+            int buckets = histogram.Length;
+            
+            double factor = (fitsProperties.MaxVal - fitsProperties.MinVal) / buckets;
+
+            for (int i = 0; i < dataUnit.length; i++)
+            {
+                if (!(dataUnit[i] == NaN))
+                {
+                    histogram[Math.Min(buckets - 1, (int)((fitsProperties.BZero + fitsProperties.BScale * dataUnit[i] - fitsProperties.MinVal) / factor))]++;
+                }
+            }
         }
 
         public void DrawHistogram(CanvasContext2D ctx)
@@ -476,699 +523,6 @@ namespace wwtlib
                 ctx.Stroke();
             }
 
-        }
-
-        public int[] ComputeHistogram(int count)
-        {
-            int[] histogram = new int[count+1];
-
-            for(int i = 0; i < count+1; i++)
-            {
-                histogram[i] = 0;
-            }
-
-            switch (DataType)
-            {
-                case DataTypes.ByteT:
-                    ComputeHistogramByte(histogram);
-                    break;
-                case DataTypes.Int16T:
-                    ComputeHistogramInt16(histogram);
-                    break;
-                case DataTypes.Int32T:
-                    ComputeHistogramInt32(histogram);
-                    break;
-                case DataTypes.FloatT:
-                    ComputeHistogramFloat(histogram);
-                    break;
-                case DataTypes.DoubleT:
-                    ComputeHistogramDouble(histogram);
-                    break;
-                case DataTypes.None:
-                default:
-                    break;
-            }
-            int maxCounter = 1;
-            foreach (int val in histogram)
-            {
-                if (val > maxCounter)
-                {
-                    maxCounter = val;
-                }
-            }
-            histogram[count] = maxCounter;
-            return histogram;
-        }
-
-        private void ComputeHistogramDouble(int[] histogram)
-        {
-            int buckets = histogram.Length;
-            double[] buf = (double[])DataBuffer;
-            double factor = (MaxVal - MinVal) / buckets;
-
-            foreach (double val in buf)
-            {
-                if (!(val == double.NaN))
-                {
-                    histogram[Math.Min(buckets - 1, (int)((val - MinVal) / factor))]++;
-                }
-            }
-        }
-        const float NaN = 0f / 0f;
-
-        private void ComputeHistogramFloat(int[] histogram)
-        {
-            int buckets = histogram.Length;
-            float[] buf = (float[])DataBuffer;
-            double factor = (MaxVal - MinVal) / buckets;
-
-            foreach (float val in buf)
-            {
-                if (!(val == NaN))
-                {
-                    histogram[Math.Min(buckets - 1, (int)((val - MinVal) / factor))]++;
-                }
-            }
-        }
-
-        private void ComputeHistogramInt32(int[] histogram)
-        {
-            int buckets = histogram.Length;
-            Int32[] buf = (Int32[])DataBuffer;
-            double factor = (MaxVal - MinVal) / buckets;
-
-            foreach (Int32 val in buf)
-            {
-                histogram[Math.Min(buckets - 1, (int)((val - MinVal) / factor))]++;
-            }
-        }
-
-
-
-        private void ComputeHistogramInt16(int[] histogram)
-        {
-            int buckets = histogram.Length;
-            short[] buf = (short[])DataBuffer;
-            double factor = (MaxVal - MinVal) / buckets;
-
-            foreach (Int16 val in buf)
-            {
-                histogram[Math.Min(buckets - 1, (int)((val - MinVal) / factor))]++;
-            }
-        }
-
-        private void ComputeHistogramByte(int[] histogram)
-        {
-            int buckets = histogram.Length;
-            Byte[] buf = (Byte[])DataBuffer;
-            double factor = (MaxVal - MinVal) / buckets;
-
-            foreach (Byte val in buf)
-            {
-                histogram[Math.Min(buckets - 1, (int)((val - MinVal) / factor))]++;
-            }
-        }
-
-
-        int BufferSize = 1;
-
-        private void InitDataBytes(BinaryReader br)
-        {
-            byte[] buffer = new byte[BufferSize];
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                buffer[i] = br.ReadByte();
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-
-        private void InitDataShort(BinaryReader br)
-        {
-            short[] buffer = new Int16[BufferSize];
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                buffer[i] = (short)((br.ReadSByte() * 256) + (short)br.ReadByte());
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-
-        private void InitDataUnsignedShort(BinaryReader br)
-        {
-            int[] buffer = new int[BufferSize];
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                buffer[i] = (int)((((short)br.ReadSByte() * 256) + (short)br.ReadByte()) + 32768);
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-
-        private void InitDataInt(BinaryReader br)
-        {
-            int[] buffer = new int[BufferSize];
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                buffer[i] = (br.ReadSByte() << 24) + (br.ReadSByte() << 16) + (br.ReadSByte() << 8) + br.ReadByte();
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-
-        private void InitDataFloat(BinaryReader br)
-        {
-            float[] buffer = new float[BufferSize];
-            DataBuffer = buffer;
-            Uint8Array part = new Uint8Array(4);
-            for (int i = 0; i < BufferSize; i++)
-            {
-                part[3] = br.ReadByte();
-                part[2] = br.ReadByte();
-                part[1] = br.ReadByte();
-                part[0] = br.ReadByte();
-
-                buffer[i] = (new Float32Array(part.buffer, 0, 1))[0];
-
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-
-        private void InitDataDouble(BinaryReader br)
-        {
-            double[] buffer = new double[BufferSize];
-            Uint8Array part = new Uint8Array(8);
-            DataBuffer = buffer;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                part[7] = br.ReadByte();
-                part[6] = br.ReadByte();
-                part[5] = br.ReadByte();
-                part[4] = br.ReadByte();
-                part[3] = br.ReadByte();
-                part[2] = br.ReadByte();
-                part[1] = br.ReadByte();
-                part[0] = br.ReadByte();
-                buffer[i] = (new Float64Array(part.buffer, 0, 1))[0];
-
-                if (MinVal > (double)buffer[i])
-                {
-                    MinVal = (double)buffer[i];
-                }
-                if (MaxVal < (double)buffer[i])
-                {
-                    MaxVal = (double)buffer[i];
-                }
-            }
-        }
-        public ScaleTypes lastScale = ScaleTypes.Linear;
-        public double lastBitmapMin = 0;
-        public double lastBitmapMax = 0;
-        public int lastBitmapZ = 0;
-        public string lastBitmapColorMapperName = null;
-
-        override public Bitmap GetBitmap()
-        {
-            if (lastBitmapMax == 0 && lastBitmapMin == 0)
-            {
-                lastBitmapMin = MinVal;
-                lastBitmapMax = MaxVal;
-            }
-
-            return GetScaledBitmap(lastBitmapMin, lastBitmapMax, lastScale, lastBitmapZ, lastBitmapColorMapperName);
-        }
-
-        public Bitmap GetScaledBitmap(double min, double max, ScaleTypes scaleType, int z, string colorMapperName)
-        {
-            z = Math.Min(z, sizeZ);
-            ScaleMap scale;
-            lastScale = scaleType;
-            lastBitmapMin = min;
-            lastBitmapMax = max;
-            lastBitmapZ = z;
-            lastBitmapColorMapperName = colorMapperName;
-
-            ColorMapContainer colorMapper = ColorMapContainer.FromNamedColormap(colorMapperName);
-
-            switch (scaleType)
-            {
-                default:
-                case ScaleTypes.Linear:
-                    scale = new ScaleLinear(min, max);
-                    break;
-                case ScaleTypes.Log:
-                    scale = new ScaleLog(min, max);
-                    break;
-                case ScaleTypes.Power:
-                    scale = new ScalePow(min, max);
-                    break;
-                case ScaleTypes.SquareRoot:
-                    scale = new ScaleSqrt(min, max);
-                    break;
-                case ScaleTypes.HistogramEqualization:
-                    scale = new HistogramEqualization(this, min, max);
-                    break;
-            }
-
-            try
-            {
-                switch (DataType)
-                {
-                    case DataTypes.ByteT:
-                        return GetBitmapByte(min, max, scale, lastBitmapZ, colorMapper);
-                    case DataTypes.Int16T:
-                        return GetBitmapShort(min, max, scale, lastBitmapZ, colorMapper);
-                    case DataTypes.Int32T:
-                        return GetBitmapInt(min, max, scale, lastBitmapZ, colorMapper);
-                    case DataTypes.FloatT:
-                        return GetBitmapFloat(min, max, scale, lastBitmapZ, colorMapper);
-                    case DataTypes.DoubleT:
-                        return GetBitmapDouble(min, max, scale, lastBitmapZ, colorMapper);
-                    case DataTypes.None:
-                    default:
-                        return  Bitmap.Create(100, 100);
-                }
-            }
-            catch
-            {
-                return Bitmap.Create(10, 10);
-            }
-        }
-
-        private void SetPixelWithColorMap(Bitmap bmp, int x, int y, Byte val, ColorMapContainer colorMapper) {
-            if (colorMapper == null) {
-                bmp.SetPixel(x, y, val, val, val, (TransparentBlack && val == 0) ? 0 : 255);
-                return;
-            }
-
-            float pixel_value = (float)val / 255;
-            if (pixel_value != pixel_value) {
-                // The above test is an unpleasant way of checking if
-                // pixel_value is NaN, since ScriptSharp seems not to support
-                // Float.IsNaN(). This case "can't happen" in C#, but due to
-                // JavaScript's numerical model, it *can* in the transpiled
-                // SDK.
-                bmp.SetPixel(x, y, 0, 0, 0, 0);
-                return;
-            }
-
-            Color pixel_color = colorMapper.FindClosestColor(pixel_value);
-            bmp.SetPixel(x, y, (int)pixel_color.R, (int)pixel_color.G, (int)pixel_color.B, (TransparentBlack && val == 0) ? 0 : 255);
-        }
-
-        private Bitmap GetBitmapByte(double min, double max, ScaleMap scale, int z, ColorMapContainer colorMapper)
-        {
-            byte[] buf = (byte[])DataBuffer;
-            double factor = max - min;
-            int stride = AxisSize[0];
-            int page = AxisSize[0] * AxisSize[1] * z;
-            Bitmap bmp = Bitmap.Create(AxisSize[0], AxisSize[1]);
-
-            for (int y = 0; y < AxisSize[1]; y++)
-            {
-                int indexY = ((AxisSize[1] - 1) - y);
-
-                for (int x = 0; x < AxisSize[0]; x++)
-                {
-                    if (color)
-                    {
-                        int datR = buf[(x + indexY * stride)];
-                        int datG = buf[(x + indexY * stride) + page];
-                        int datB = buf[(x + indexY * stride) + page * 2];
-                        if (ContainsBlanks && (double)datR == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            int r = scale.Map(datR);
-                            int g = scale.Map(datG);
-                            int b = scale.Map(datB);
-                            bmp.SetPixel(x, y, r, g, b, 255);
-                        }
-                    }
-                    else
-                    {
-                        int dataValue = buf[x + indexY * stride + page];
-                        if (ContainsBlanks && (double)dataValue == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            Byte val = scale.Map(dataValue);
-                            SetPixelWithColorMap(bmp, x, y, val, colorMapper);
-                        }
-                    }
-                }
-            }
-            return bmp;
-        }
-
-        private Bitmap GetBitmapDouble(double min, double max, ScaleMap scale, int z, ColorMapContainer colorMapper)
-        {
-            double[] buf = (double[])DataBuffer;
-            double factor = max - min;
-            int stride = AxisSize[0];
-            int page = AxisSize[0] * AxisSize[1] * z ;
-            Bitmap bmp = Bitmap.Create(AxisSize[0], AxisSize[1]);
-
-            for (int y = 0; y < AxisSize[1]; y++)
-            {
-                int indexY = ((AxisSize[1] - 1) - y);
-                for (int x = 0; x < AxisSize[0]; x++)
-                {
-                    if (color)
-                    {
-                        double datR = buf[(x + indexY * stride)];
-                        double datG = buf[(x + indexY * stride) + page];
-                        double datB = buf[(x + indexY * stride) + page * 2];
-                        if (ContainsBlanks && (double)datR == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            int r = scale.Map(datR);
-                            int g = scale.Map(datG);
-                            int b = scale.Map(datB);
-                            bmp.SetPixel(x, y, r, g, b, 255);
-                        }
-                    }
-                    else
-                    {
-                        double dataValue = buf[x + indexY * stride + page];
-                        if (ContainsBlanks && (double)dataValue == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            Byte val = scale.Map(dataValue);
-                            SetPixelWithColorMap(bmp, x, y, val, colorMapper);
-                        }
-                    }
-                }
-            }
-            return bmp;
-        }
-
-        private Bitmap GetBitmapFloat(double min, double max, ScaleMap scale, int z, ColorMapContainer colorMapper)
-        {
-            float[] buf = (float[])DataBuffer;
-            double factor = max - min;
-            int stride = AxisSize[0];
-            int page = AxisSize[0] * AxisSize[1] * z;
-            Bitmap bmp = Bitmap.Create(AxisSize[0], AxisSize[1]);
-
-            for (int y = 0; y < AxisSize[1]; y++)
-            {
-                int indexY = ((AxisSize[1] - 1) - y);
-                for (int x = 0; x < AxisSize[0]; x++)
-                {
-                    if (color)
-                    {
-                        double datR = buf[(x + indexY * stride)];
-                        double datG = buf[(x + indexY * stride) + page];
-                        double datB = buf[(x + indexY * stride) + page * 2];
-                        if (ContainsBlanks && (double)datR == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            int r = scale.Map(datR);
-                            int g = scale.Map(datG);
-                            int b = scale.Map(datB);
-                            bmp.SetPixel(x, y, r, g, b, 255);
-                        }
-                    }
-                    else
-                    {
-                        double dataValue = buf[x + indexY * stride + page];
-                        if (ContainsBlanks && (double)dataValue == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            Byte val = scale.Map(dataValue);
-                            SetPixelWithColorMap(bmp, x, y, val, colorMapper);
-                        }
-                    }
-                }
-            }
-            return bmp;
-        }
-
-        private Bitmap GetBitmapInt(double min, double max, ScaleMap scale, int z, ColorMapContainer colorMapper)
-        {
-            int[] buf = (int[])DataBuffer;
-            double factor = max - min;
-            int stride = AxisSize[0];
-            int page = AxisSize[0] * AxisSize[1] * z;
-            Bitmap bmp = Bitmap.Create(AxisSize[0], AxisSize[1]);
-
-            for (int y = 0; y < AxisSize[1]; y++)
-            {
-                int indexY = ((AxisSize[1] - 1) - y);
-                for (int x = 0; x < AxisSize[0]; x++)
-                {
-                    if (color)
-                    {
-                        int datR = buf[(x + indexY * stride)];
-                        int datG = buf[(x + indexY * stride) + page];
-                        int datB = buf[(x + indexY * stride) + page * 2];
-                        if (ContainsBlanks && (double)datR == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            int r = scale.Map(datR);
-                            int g = scale.Map(datG);
-                            int b = scale.Map(datB);
-                            bmp.SetPixel(x, y, r, g, b, 255);
-                        }
-                    }
-                    else
-                    {
-                        int dataValue = buf[x + indexY * stride + page];
-                        if (ContainsBlanks && (double)dataValue == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            Byte val = scale.Map(dataValue);
-                            SetPixelWithColorMap(bmp, x, y, val, colorMapper);
-                        }
-                    }
-                }
-            }
-
-            return bmp;
-        }
-        public Bitmap GetBitmapShort(double min, double max, ScaleMap scale, int z, ColorMapContainer colorMapper)
-        {
-            short[] buf = (short[])DataBuffer;
-            double factor = max - min;
-            int stride = AxisSize[0];
-            int page = AxisSize[0] * AxisSize[1] * z;
-            Bitmap bmp = Bitmap.Create(AxisSize[0], AxisSize[1]);
-
-            for (int y = 0; y < AxisSize[1]; y++)
-            {
-                int indexY = ((AxisSize[1] - 1) - y);
-
-                for (int x = 0; x < AxisSize[0]; x++)
-                {
-                    if (color)
-                    {
-                        int datR = buf[(x + indexY * stride)];
-                        int datG = buf[(x + indexY * stride) + page];
-                        int datB = buf[(x + indexY * stride) + page * 2];
-                        if (ContainsBlanks && (double)datR == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            int r = scale.Map(datR);
-                            int g = scale.Map(datG);
-                            int b = scale.Map(datB);
-                            bmp.SetPixel(x, y, r, g, b, 255);
-                        }
-                    }
-                    else
-                    {
-                        int dataValue = buf[x + indexY * stride + page];
-                        if (ContainsBlanks && (double)dataValue == BlankValue)
-                        {
-                            bmp.SetPixel(x, y, 0, 0, 0, 0);
-                        }
-                        else
-                        {
-                            Byte val = scale.Map(dataValue);
-                            SetPixelWithColorMap(bmp, x, y, val, colorMapper);
-                        }
-                    }
-
-                }
-            }
-            return bmp;
-        }
-    }
-
-
-    public abstract class ScaleMap
-    {
-        public abstract byte Map(double val);
-    }
-
-    public class ScaleLinear : ScaleMap
-    {
-        double min;
-        double max;
-        double factor;
-        double logFactor;
-        public ScaleLinear(double min, double max)
-        {
-            this.min = min;
-            this.max = max;
-            factor = max - min;
-        }
-
-        public override byte Map(double val)
-        {
-            return (Byte)Math.Min(255, Math.Max(0, (int)((double)(val - min) / factor * 255)));
-        }
-    }
-
-    public class ScaleLog : ScaleMap
-    {
-        double min;
-        double max;
-        double factor;
-        double logFactor;
-        public ScaleLog(double min, double max)
-        {
-            this.min = min;
-            this.max = max;
-            factor = max - min;
-            logFactor = 255 / Math.Log(255);
-        }
-
-        public override byte Map(double val)
-        {
-            return (Byte)Math.Min(255, Math.Max(0, (int)((double)Math.Log((val - min) / factor * 255) * logFactor)));
-        }
-    }
-
-    public class ScalePow : ScaleMap
-    {
-        double min;
-        double max;
-        double factor;
-        double powFactor;
-        public ScalePow(double min, double max)
-        {
-            this.min = min;
-            this.max = max;
-            factor = max - min;
-            powFactor = 255 / Math.Pow(255, 2);
-        }
-
-        public override byte Map(double val)
-        {
-            return (Byte)Math.Min(255, Math.Max(0, (int)((double)Math.Pow((val - min) / factor * 255, 2) * powFactor)));
-        }
-    }
-
-    public class ScaleSqrt : ScaleMap
-    {
-        double min;
-        double max;
-        double factor;
-        double sqrtFactor;
-        public ScaleSqrt(double min, double max)
-        {
-            this.min = min;
-            this.max = max;
-            factor = max - min;
-            sqrtFactor = 255 / Math.Sqrt(255);
-        }
-
-        public override byte Map(double val)
-        {
-            return (Byte)Math.Min(255, Math.Max(0, (int)((double)Math.Sqrt((val - min) / factor * 255) * sqrtFactor)));
-        }
-    }
-
-    public class HistogramEqualization : ScaleMap
-    {
-        double min;
-        double max;
-        double factor;
-        int[] Histogram;
-        int maxHistogramValue = 1;
-        Byte[] lookup;
-        const int buckets = 10000;
-        public HistogramEqualization(FitsImage image, double min, double max)
-        {
-            this.min = min;
-            this.max = max;
-            factor = max - min;
-            Histogram = image.ComputeHistogram(buckets);
-            maxHistogramValue = Histogram[buckets];
-            lookup = new Byte[buckets];
-            int totalCounts = image.Width * image.Height;
-            int sum = 0;
-            for (int i = 0; i < buckets; i++)
-            {
-                sum += Histogram[i];
-                lookup[i] = (Byte)(Math.Min(255, ((sum * 255.0)) / totalCounts) + .5);
-            }
-        }
-
-        public override byte Map(double val)
-        {
-            return (Byte)lookup[Math.Min(buckets - 1, Math.Max(0, (int)((double)(val - min) / factor * (buckets - 1.0))))];
         }
     }
 }

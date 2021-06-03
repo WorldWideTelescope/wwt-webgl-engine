@@ -1,5 +1,44 @@
 # rc: minor bump
 
+This release features a lot of exciting work, mainly centered on accelerated
+FITS rendering and new APIs to support a growing range of client applications!
+
+- Start rendering FITS files using WebGL, as opposed to pure JavaScript data
+  processing. This gives us a large performance boost, making it feasible to
+  render all-sky FITS/HiPS data sets among other things. (@imbasimba)
+- The WebGL-based FITS rendering requires WebGL 2.0. If this is note available,
+  the previous JavaScript code will be used as a fallback. The engine now
+  exports a warning indicator so that users can be notified if this is the case.
+  While WebGL 2.0 is widely supported, it is still behind a feature gate in
+  Safari. (@imbasimba)
+- Related to these changes, make some fixes to the histogram UI widget (@imbasimba)
+- The Python-based colormaps built into the engine, used for rendering FITS
+  data, weren't quite using the full range of each colormap, seemingly due to an
+  oversight. Fix that. (@imbasimba)
+- New APIs to support OpenSpace integration. Some of these are genuinely new
+  (e.g. `SetImageSetLayerOrder`) and others expose existing functionality to
+  TypeScript. The `LoadFitsLayer` API was generalized to allow more flexible
+  URL-based loading of image data, which should come in handy (@imbasimba)
+- Expose new APIs to TypeScript to support new controls in the apps: `move` and
+  `_tilt`. The leading underscore for the latter is a bit unfortunate, but is needed
+  to preserve compatibility with code in production. (@Carifio24)
+- Loading of a WTML collection now supports recursive loading of folder
+  hierarchies. This is not the default, but sometimes it is useful, and the
+  presence of the option helps clarify what the default behavior is (@imbasimba)
+- More pieces of the code now identify imagesets by their URL, including the
+  WTML loading which deduplicates by URL. One can think of situations where it
+  might be valid to have two usefully different imagesets that share the same
+  image-data URL, but these cases ought to be rare, and they can in principle be
+  worked around by adding a URL fragment or unused query-string parameter. On
+  the flip side, it is quite helpful to have global and stable unique
+  identifiers for imagesets. (@imbasimba)
+- Expose some new APIs relating to "catalog HiPS" datasets. (@imbasimba, @pkgw)
+- Improvements to handling of FITS HiPS data sets, such as reading the built-in
+  suggested minimum and maximum values for the data stretch (@imbasimba).
+
+
+# @wwtelescope/engine 7.10.0 (2021-04-12)
+
 - Add an API to add catalog HiPS to the view using its imageset handle
 - Wire in simple support for FITS HiPS using Javascript parsing. Very slow, for
   now.

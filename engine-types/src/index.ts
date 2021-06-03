@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 //
 // Based types used in the WWT WebGL engine.
@@ -631,6 +631,117 @@ export function isBaseSpreadSheetLayerSetting(obj: [string, any]): obj is BaseSp
     return obj[1] in RAUnits;
   } else {
     throw new Error('internal bug isBaseSpreadSheetLayerSetting');
+  }
+}
+
+/** Settings specifically for instances of the VoTableLayer type.
+ *
+ * These are nearly, but not exactly, identical to [[BaseSpreadSheetLayerSetting]].
+ * */
+export type BaseVoTableLayerSetting =
+  ["altColumn", number] |
+  ["altType", AltTypes] |
+  ["altUnit", AltUnits] |
+  ["beginRange", Date] |
+  ["cartesianCustomScale", number] |
+  ["cartesianScale", AltUnits] |
+  ["colorMapColumn", number] |
+  ["coordinatesType", CoordinatesType] |
+  ["dataSourceUrl", string] |
+  ["decay", number] |
+  ["dynamicData", boolean] |
+  ["endDateColumn", number] |
+  ["endRange", Date] |
+  ["hyperlinkColumn", number] |
+  ["hyperlinkFormat", string] |
+  ["latColumn", number] |
+  ["lngColumn", number] |
+  ["markerColumn", number] |
+  ["markerIndex", number] |
+  ["markerScale", MarkerScales] |
+  ["nameColumn", number] |
+  ["plotType", PlotTypes] |
+  ["pointScaleType", PointScaleTypes] |
+  ["raUnits", RAUnits] |
+  ["scaleFactor", number] |
+  ["showFarSide", boolean] |
+  ["sizeColumn", number] |
+  ["startDateColumn", number] |
+  ["timeSeries", boolean] |
+  ["xAxisColumn", number] |
+  ["xAxisReverse", boolean] |
+  ["yAxisColumn", number] |
+  ["yAxisReverse", boolean] |
+  ["zAxisColumn", number] |
+  ["zAxisReverse", boolean] |
+  BaseLayerSetting;
+
+// See implementation below -- we need to handle enums specially
+// to make sure that inputs are in-range.
+const baseVoTableLayerSettingTypeInfo: {[k: string]: string} = {
+  "altColumn/number": "",
+  "altType/number": "AltTypes",
+  "altUnit/number": "AltUnits",
+  "beginRange/Date": "",
+  "cartesianCustomScale/number": "",
+  "cartesianScale/number": "AltUnits",
+  "colorMapColumn/number": "",
+  "coordinatesType/number": "CoordinatesType",
+  "dataSourceUrl/string": "",
+  "decay/number": "",
+  "dynamicData/boolean": "",
+  "endDateColumn/number": "",
+  "endRange/Date": "",
+  "hyperlinkColumn/number": "",
+  "hyperlinkFormat/string": "",
+  "latColumn/number": "",
+  "lngColumn/number": "",
+  "markerColumn/number": "",
+  "markerIndex/number": "",
+  "markerScale/number": "",
+  "nameColumn/number": "",
+  "plotType/number": "PlotTypes",
+  "pointScaleType/number": "PointScaleTypes",
+  "raUnits/number": "RAUnits",
+  "scaleFactor/number": "",
+  "showFarSide/boolean": "",
+  "sizeColumn/number": "",
+  "startDateColumn/number": "",
+  "timeSeries/boolean": "",
+  "xAxisColumn/number": "",
+  "xAxisReverse/boolean": "",
+  "yAxisColumn/number": "",
+  "yAxisReverse/boolean": "",
+  "zAxisColumn/number": "",
+  "zAxisReverse/boolean": "",
+};
+
+/** Type guard function for BaseVoTableLayerSetting. */
+export function isBaseVoTableLayerSetting(obj: [string, any]): obj is BaseVoTableLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (isBaseLayerSetting(obj))
+    return true;
+
+  const key = obj[0] + "/" + typeof obj[1];
+  const enumType = baseVoTableLayerSettingTypeInfo[key];
+
+  if (enumType === undefined) {
+    return false;
+  } else if (enumType == "") {
+    return true;
+  } else if (enumType == "AltTypes") {
+    return obj[1] in AltTypes;
+  } else if (enumType == "AltUnits") {
+    return obj[1] in AltUnits;
+  } else if (enumType == "CoordinatesType") {
+    return obj[1] in CoordinatesType;
+  } else if (enumType == "PlotTypes") {
+    return obj[1] in PlotTypes;
+  } else if (enumType == "PointScaleTypes") {
+    return obj[1] in PointScaleTypes;
+  } else if (enumType == "RAUnits") {
+    return obj[1] in RAUnits;
+  } else {
+    throw new Error('internal bug isBaseVoTableLayerSetting');
   }
 }
 

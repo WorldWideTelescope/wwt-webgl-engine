@@ -74,6 +74,16 @@ namespace wwtlib
             return buf;
         }
 
+        public Float32Array ReadRemainingI16(int i16Remaining)
+        {
+            Float32Array data = new Float32Array(i16Remaining);
+            for (int i = 0; i < i16Remaining; i++)
+            {
+                data[i] = (float)this.ReadInt16(true);
+            }
+            return data;
+        }
+
         public string ReadByteString(int count)
         {
             string data = "";
@@ -127,6 +137,29 @@ namespace wwtlib
             UInt16 result = (UInt16)(this.data[this.position] + (this.data[this.position + 1] << 8) );
             this.position += 2;
             return result;
+
+        }
+
+        public UInt16 ReadUInt16LittleEndian()
+        {
+            UInt16 result = (UInt16)((this.data[this.position] << 8) + (this.data[this.position + 1]));
+            this.position += 2;
+            return result;
+        }
+
+        public Int16 ReadInt16(bool littleEndian)
+        {
+
+            UInt16 result = littleEndian ? this.ReadUInt16LittleEndian() : this.ReadUInt16();
+
+            if ((result & 0x8000) != 0)
+            {
+
+                return (Int16)(-((result - 1) ^ 0xffff));
+
+            }
+
+            return (Int16)result;
 
         }
 

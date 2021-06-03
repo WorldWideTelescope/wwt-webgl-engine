@@ -433,27 +433,40 @@ namespace wwtlib
 
         public static string GetNextFitsName()
         {
-            int currentNumber = 0;
-            foreach (Layer layer in AllMaps["Sky"].Layers)
-            {
-                if (layer.Name.StartsWith("Fits Image "))
-                {
-                    string number = layer.Name.Replace("Fits Image ", "");
-                    try
-                    {
-                        int num = Int32.Parse(number);
-                        if (num > currentNumber)
-                        {
-                            currentNumber = num;
-                        }
-                    }
-                    catch
-                    {
+            return getNextName("Fits Image");
+        }
 
+        public static string GetNextImageSetName()
+        {
+            return getNextName("Image Set");
+        }
+
+        private static string getNextName(string type){
+            int currentNumber = 0;
+            foreach (string key in AllMaps.Keys)
+            {
+                foreach (Layer layer in AllMaps[key].Layers)
+                {
+                    if (layer.Name.StartsWith(type + " "))
+                    {
+                        string number = layer.Name.Replace(type + " ", "");
+                        try
+                        {
+                            int num = Int32.Parse(number);
+                            if (num > currentNumber)
+                            {
+                                currentNumber = num;
+                            }
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
             }
-            return string.Format("Fits Image {0}", currentNumber + 1);
+
+            return string.Format("{0} {1}", type, currentNumber + 1);
         }
 
         internal static void CloseAllTourLoadedLayers()
@@ -1191,9 +1204,9 @@ namespace wwtlib
                     ImageSetLayer layer = selectedLayer as ImageSetLayer;
                     if (layer != null && layer.ImageSet.WcsImage is FitsImage)
                     {
-                        WWTControl.scriptInterface.SetTimeSlider("left", "0");
-                        WWTControl.scriptInterface.SetTimeSlider("right", (layer.GetFitsImage().Depth - 1).ToString());
-                        WWTControl.scriptInterface.SetTimeSlider("title", "Velocity");
+                        //WWTControl.scriptInterface.SetTimeSlider("left", "0");
+                        //WWTControl.scriptInterface.SetTimeSlider("right", (layer.GetFitsImage().Depth - 1).ToString());
+                        //WWTControl.scriptInterface.SetTimeSlider("title", "Velocity");
                         //Histogram.UpdateImage(layer, timeScrubber.Value);
                         //timeSeries.Checked = false;
                         //startDate.Text = "0";
@@ -1212,13 +1225,13 @@ namespace wwtlib
             WWTControl.scriptInterface.SetTimeSlider("title", Language.GetLocalizedText(667, "Time Scrubber"));
         }
 
+        //Fits time slider not implemented for webgl engine (only Windows version)
         static public void SetTimeSliderValue(double pos)
         {
             ImageSetLayer layer = selectedLayer as ImageSetLayer;
             if (layer != null && layer.ImageSet.WcsImage is FitsImage)
             {
-                Histogram.UpdateImage(layer, pos);
-                WWTControl.scriptInterface.SetTimeSlider("title", layer.GetFitsImage().GetZDescription());
+                //WWTControl.scriptInterface.SetTimeSlider("title", layer.GetFitsImage().GetZDescription());
             }
         }
 

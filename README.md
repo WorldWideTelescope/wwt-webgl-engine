@@ -84,7 +84,7 @@ actually C# code in the directory `engine/wwtlib/`. It’s forked from
 [wwt-windows-client] and is transpiled into JavaScript using an unreleased
 version of [ScriptSharp], an unmaintained tool. Fortunately, that build process
 results in a single file, `engine/wwtlib/bin/wwtlib.js`, that you can download
-from our CI systems if you’re not able to perform a Visual Stdio build.
+from our CI systems if you’re not able to perform a Visual Studio build.
 
 [wwt-windows-client]: https://github.com/WorldWideTelescope/wwt-windows-client
 [ScriptSharp]: https://github.com/nikhilk/scriptsharp
@@ -96,10 +96,16 @@ To build the engine library starting from C#:
 1. Open the `engine/WebGLEngine.sln` solution and build the project it contains.
    This should create the file `engine/wwtlib/bin/wwtlib.js`.
 
-Otherwise, check out the latest continuous integration build of this repository,
-download the `scriptsharp` artifact, and copy the `wwtlib.js` file to the
-location given above. If you want to change the C# code, you can file a pull
+Otherwise, check out the latest continuous integration build of this repository, 
+download the `scriptsharp` artifact, and copy the `wwtlib.js` file to the location
+given above. (To find the artifact, go to the appropriate build in this project's 
+[pipeline] on [Azure DevOps]). Under 'Related', select '9 published', and download 
+artifacts for `scriptsharp`). If you want to change the C# code, you can file a pull 
 request and access the artifacts associated with your pull request builds.
+
+[Azure DevOps]: https://azure.microsoft.com/en-us/services/devops/?nav=min
+[pipeline]: https://dev.azure.com/aasworldwidetelescope/WWT/_build?definitionId=21
+
 
 
 ## Building the rest of the code

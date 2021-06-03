@@ -31,15 +31,19 @@ namespace wwtlib
         private string datasetName;
         private Action onDownloadComplete;
 
-        public HipsProperties (string datasetUrl, string datasetName)
+        public Imageset dataset;
+
+        public HipsProperties (Imageset dataset)
         {
-            this.datasetName = datasetName;
-            if (datasetUrl.ToLowerCase().IndexOf("norder") > -1)
+            this.dataset = dataset;
+            this.datasetName = dataset.Name;
+            url = dataset.Url;
+            if (url.ToLowerCase().IndexOf("norder") > -1)
             {
-                datasetUrl = datasetUrl.Substring(0, datasetUrl.ToLowerCase().IndexOf("norder"));
+                url = url.Substring(0, url.ToLowerCase().IndexOf("norder"));
             }
 
-            url = datasetUrl + "properties";
+            url += "properties";
 
             Download();
         }
@@ -61,6 +65,27 @@ namespace wwtlib
                     catalogColumnInfo = VoTable.LoadFromUrl(url.Replace("/properties", "/metadata.xml"), OnCatalogMetadataDownloadComplete);
                 } else
                 {
+                    if (Properties.ContainsKey("hips_data_range"))
+                    {
+                        string hips_data_range = Properties["hips_data_range"];
+                        this.dataset.FitsProperties.MinVal = Double.Parse(hips_data_range.Split(" ")[0]);
+                        this.dataset.FitsProperties.MaxVal = Double.Parse(hips_data_range.Split(" ")[1]);
+                        this.dataset.FitsProperties.LowerCut = this.dataset.FitsProperties.MinVal;
+                        this.dataset.FitsProperties.UpperCut = this.dataset.FitsProperties.MaxVal;
+                    }
+                    if (Properties.ContainsKey("hips_pixel_cut"))
+                    {
+                        string hips_pixel_cut = Properties["hips_pixel_cut"];
+                        this.dataset.FitsProperties.LowerCut = Double.Parse(hips_pixel_cut.Split(" ")[0]);
+                        this.dataset.FitsProperties.UpperCut = Double.Parse(hips_pixel_cut.Split(" ")[1]);
+                        if(!Properties.ContainsKey("hips_data_range"))
+                        {
+                            this.dataset.FitsProperties.MinVal = this.dataset.FitsProperties.LowerCut;
+                            this.dataset.FitsProperties.MaxVal = this.dataset.FitsProperties.UpperCut;
+                        }
+
+                            
+                    }
                     downloadComplete = true;
                     if(onDownloadComplete != null)
                     {

@@ -45,6 +45,7 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FitsProperties.cs" />
     <Compile Include="HipsProperties.cs" />
     <Compile Include="FastMath.cs" />
     <Compile Include="Fxyf.cs" />
@@ -52,6 +53,8 @@
     <Compile Include="HealpixTile.cs" />
     <Compile Include="HealpixUtils.cs" />
     <Compile Include="Hploc.cs" />
+    <Compile Include="Layers\FitsImage.cs" />
+    <Compile Include="Layers\FitsImageTile.cs" />
     <Compile Include="Pointing.cs" />
     <Compile Include="URLHelpers.cs" />
     <Compile Include="Annotation.cs" />
@@ -120,7 +123,7 @@
     <Compile Include="IUIController.cs" />
     <Compile Include="IViewMover.cs" />
     <Compile Include="KeplerVertex.cs" />
-    <Compile Include="Layers\FitsImage.cs" />
+    <Compile Include="Layers\FitsImageJs.cs" />
     <Compile Include="Layers\ColorMapContainer.cs" />
     <Compile Include="Layers\GreatCircleRouteLayer.cs" />
     <Compile Include="Layers\GridLayer.cs" />
