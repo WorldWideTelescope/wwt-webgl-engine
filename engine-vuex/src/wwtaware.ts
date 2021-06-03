@@ -22,6 +22,7 @@ import {
   GotoTargetOptions,
   AddImageSetLayerOptions,
   LoadFitsLayerOptions,
+  SetLayerOrderOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
   StretchFitsLayerOptions,
@@ -161,6 +162,7 @@ import {
  * - [[applyFitsLayerSettings]]
  * - [[setFitsLayerColormap]]
  * - [[stretchFitsLayer]]
+ * - [[setImageSetLayerOrder]]
  * - [[deleteLayer]]
  *
  * Actions:
@@ -286,6 +288,7 @@ export class WWTAwareComponent extends Vue {
         "setFitsLayerColormap",
         "setForegroundImageByName",
         "setForegroundOpacity",
+        "setImageSetLayerOrder",
         "setTourPlayerLeaveSettingsWhenStopped",
         "setTime",
         "setTrackedObject",
@@ -295,6 +298,8 @@ export class WWTAwareComponent extends Vue {
         "toggleTourPlayPauseState",
         "updateTableLayer",
         "zoom",
+        "move",
+        "tilt",
       ]),
     };
   }
@@ -521,6 +526,11 @@ export class WWTAwareComponent extends Vue {
    */
   setForegroundOpacity!: (o: number) => void;
 
+  /** Change the [ImageSetLayer](../../engine/classes/imagesetlayer.html) 
+   * position in the draw cycle.
+   */
+  setImageSetLayerOrder!: (_o: SetLayerOrderOptions) => void;
+
   /** Set the current time of WWT's internal clock.
    *
    * Altering this causes an increment in [[wwtClockDiscontinuities]].
@@ -584,6 +594,12 @@ export class WWTAwareComponent extends Vue {
    * [[gotoRADecZoom]].
    */
   zoom!: (f: number) => void;
+
+  /** Moves the position of the view */
+  move!: ({ x, y }: { x: number; y: number }) => void;
+
+  /** Tilts the position of the view */
+  tilt!: ({ x, y }: { x: number; y: number }) => void;
 
   // Actions
 

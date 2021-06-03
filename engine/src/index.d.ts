@@ -987,16 +987,19 @@ export class ScriptInterface {
    * @param mode Tell WWT what type of layer you are Adding.
    * OR let WWT try to autodetect the type of the data.
    * @param name The name of the image set layer.
-   * @param gotoTarget If true, camera will move to the center position of the image.
+   * @param goto If true, camera will move to the center position of the image.
    */
   addImageSetLayer(
     url: string,
     mode: string,
     name: string,
-    gotoTarget: boolean,
+    goto: boolean,
     callback: ImagesetLoadedCallback
   ): ImageSetLayer;
 
+  /** Change the ImageSetLayer position in the layer stack. */
+  setImageSetLayerOrder(id: string, order: number): void;
+  
   /** Create a circle annotation.
    *
    * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
@@ -1969,6 +1972,12 @@ export class WWTControl {
    *
    */
   zoom(factor: number): void;
+
+  /** Moves the position of the view */
+  move(x: number, y: number): void;
+
+  /** Tilts the position of the view */
+  _tilt(x: number, y: number): void;
 
   /** Look up an imageset by its name.
    *
