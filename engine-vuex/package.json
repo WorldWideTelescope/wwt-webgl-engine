@@ -19,8 +19,8 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine": "68f56f0585354ec471ffe8efd2a8f6236ad82c27",
-    "@wwtelescope/engine-helpers": "68f56f0585354ec471ffe8efd2a8f6236ad82c27"
+    "@wwtelescope/engine": "thiscommit:2021-06-03:PoIPPv9",
+    "@wwtelescope/engine-helpers": "37e2cf42895becd14698bf9d2058594bfc61d53f"
   },
   "keywords": [
     "AAS WorldWide Telescope"
