@@ -1,3 +1,8 @@
+# @wwtelescope/engine 7.11.2 (2021-06-04)
+
+- Fix opacity settings for the new WebGL FITS renderer (#106, #108, @imbasimba)
+
+
 # @wwtelescope/engine 7.11.1 (2021-06-03)
 
 - Fix an unintentional API breakage that broke the webclient (@pkgw). We

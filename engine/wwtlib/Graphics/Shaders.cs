@@ -1846,7 +1846,7 @@ namespace wwtlib
                                 break;
                         }
                         vec4 colorFromColorMapper = texture(colorSampler, vec2(physicalValue, 0.5));
-                        fragmentColor = vec4(colorFromColorMapper.rgb, 1.0);
+                        fragmentColor = vec4(colorFromColorMapper.rgb, opacity);
                     }
 
                 }

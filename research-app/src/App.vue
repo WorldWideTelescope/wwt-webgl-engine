@@ -1132,7 +1132,6 @@ body {
 
 #tools {
   position: absolute;
-  z-index: 10;
   top: 0.5rem;
   left: 50%;
   color: #FFF;
@@ -1140,6 +1139,7 @@ body {
   .tool-container {
     position: relative;
     left: -50%;
+    z-index: 10;
   }
 
   .opacity-range {
@@ -1286,8 +1286,12 @@ ul.tool-menu {
 
 #bg-select {
   width: 500px;
+  max-width: 30vw;
   vertical-align: middle;
   padding: 5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  // Note: `overflow: hidden` breaks the dropdown
 }
 
 #bg-select-container {
@@ -1312,7 +1316,6 @@ ul.tool-menu {
   .vs__dropdown-option--highlight {
     color: red;
   }
-
 }
 
 </style>
