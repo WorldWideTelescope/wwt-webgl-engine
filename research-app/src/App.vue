@@ -1132,7 +1132,6 @@ body {
 
 #tools {
   position: absolute;
-  z-index: 10;
   top: 0.5rem;
   left: 50%;
   color: #FFF;
@@ -1140,6 +1139,7 @@ body {
   .tool-container {
     position: relative;
     left: -50%;
+    z-index: 10;
   }
 
   .opacity-range {
