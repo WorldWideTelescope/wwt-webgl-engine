@@ -1,4 +1,11 @@
-# rc: minor bump
+# rc: micro bump
+
+- Tweak some of the background selector CSS so that it doesn't cover up the
+  hamburger menu, and so that it shrinks better in a narrow viewport (#107,
+  #110, @Carifio24, @pkgw)
+
+
+# @wwtelescope/research-app 0.2.0 (2021-06-03)
 
 Lots of new features!
 

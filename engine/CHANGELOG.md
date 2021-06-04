@@ -1,5 +1,10 @@
 # rc: micro bump
 
+- Fix opacity settings for the new WebGL FITS renderer (#106, #108, @imbasimba)
+
+
+# @wwtelescope/engine 7.11.1 (2021-06-03)
+
 - Fix an unintentional API breakage that broke the webclient (@pkgw). We
   made a struct field private.
 - Expose the new API related to that breakage since it *is* better, though
