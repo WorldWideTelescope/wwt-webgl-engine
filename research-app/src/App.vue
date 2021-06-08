@@ -663,8 +663,9 @@ export default class App extends WWTAwareComponent {
         // destinations, but let's start simple. TypeScript currently requires
         // us to do an odd type guard here.
         if (this.statusMessageDestination === null) {
-          if (!(event.source instanceof MessagePort) && !(event.source instanceof ServiceWorker)) {
-            this.statusMessageDestination = event.source;
+          //ServiceWorker is only defined on https connections and localhost
+          if (!(event.source instanceof MessagePort) && (typeof ServiceWorker === 'undefined' || !(event.source instanceof ServiceWorker))) {
+            this.statusMessageDestination = event.source as Window;
             // Hardcode the status update rate to max out at 5 Hz.
             this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
           }
