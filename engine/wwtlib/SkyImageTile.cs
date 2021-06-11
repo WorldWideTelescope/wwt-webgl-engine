@@ -34,13 +34,19 @@ namespace wwtlib
 
             if (wcsImage != null && RenderContext.UseGl)
             {
-                if (wcsImage.SizeX != wcsImage.SizeY)
+                if (RenderContext.UseGlVersion2)
                 {
-                    PixelCenterY += wcsImage.SizeX - wcsImage.SizeY;
+                    Width = wcsImage.SizeX;
+                    Height = wcsImage.SizeY;
+                } else
+                {
+                    Height = bmp.Height;
+                    Width = bmp.Width;
+                    if (wcsImage.SizeX != wcsImage.SizeY)
+                    {
+                        PixelCenterY += bmp.Height - wcsImage.SizeY;
+                    }
                 }
-
-                Width = wcsImage.SizeX;
-                Height = wcsImage.SizeY;
             }
             else
             {

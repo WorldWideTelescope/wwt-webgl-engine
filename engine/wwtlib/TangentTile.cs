@@ -8,6 +8,10 @@ namespace wwtlib
     public class TangentTile : Tile
     {
         bool topDown = true;
+
+        //Cached bitmap for performance reasons
+        //Only used in legacy rendering of FITS (WebGL 1.0) inside SkyImageTile
+        protected Bitmap bmp;
         protected void ComputeBoundingSphere()
         {
             //insideOut = this.Dataset.DataSetType == ImageSetType.Sky || this.Dataset.DataSetType == ImageSetType.Panorama;
@@ -61,10 +65,11 @@ namespace wwtlib
                 if (RenderContext.UseGlVersion2)
                 {
                     MakeTexture();
+                    ReadyToRender = true;
                 }
                 else
                 {
-                    Bitmap bmp = fitsImage.GetBitmap();
+                    bmp = fitsImage.GetBitmap();
                     texture2d = bmp.GetTexture();
                     ReadyToRender = true;
                 }
@@ -88,6 +93,7 @@ namespace wwtlib
                                 ReadyToRender = texReady && (DemReady || !demTile);
                                 RequestPending = false;
                                 MakeTexture();
+                                ReadyToRender = true;
                             }
                         });
                     }
@@ -101,7 +107,9 @@ namespace wwtlib
                             ReadyToRender = texReady && (DemReady || !demTile);
                             RequestPending = false;
                             TileCache.RemoveFromQueue(this.Key, true);
-                            texture2d = wcsImage.GetBitmap().GetTexture();
+                            bmp = wcsImage.GetBitmap();
+                            texture2d = bmp.GetTexture();
+                            ReadyToRender = true;
                         });
                     }
 
@@ -110,43 +118,6 @@ namespace wwtlib
             else
             {
                 base.RequestImage();
-            }
-        }
-
-        public override void MakeTexture()
-        {
-            if (PrepDevice != null)
-            {
-                try
-                {
-                    texture2d = PrepDevice.createTexture();
-
-                    PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
-                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-
-                    if (dataset.Extension == ".fits" && RenderContext.UseGlVersion2)
-                    {
-                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
-                    }
-                    else
-                    {
-                        ImageElement image = texture;
-                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-                        PrepDevice.generateMipmap(GL.TEXTURE_2D);
-                    }
-
-                    PrepDevice.bindTexture(GL.TEXTURE_2D, null);
-                    ReadyToRender = true;
-                }
-                catch
-                {
-                    errored = true;
-
-                }
             }
         }
 
@@ -274,7 +245,7 @@ namespace wwtlib
                     }
                     IndexBuffers[i] = PrepDevice.createBuffer();
                     PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, IndexBuffers[i]);
-                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, ui16array, GL.STATIC_DRAW);   
+                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, ui16array, GL.STATIC_DRAW);
 
                 }
             }
