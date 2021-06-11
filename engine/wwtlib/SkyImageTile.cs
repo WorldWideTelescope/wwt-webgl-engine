@@ -1,343 +1,59 @@
 ﻿
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Html;
-
 
 namespace wwtlib
 {
-    public class SkyImageTile : Tile
+    public class SkyImageTile : TangentTile
     {
-
-        public SkyImageTile()
-        {
-        }
-
-
-        public Matrix3d Matrix;
-
-        public void ComputeMatrix()
-        {
-            Matrix = Matrix3d.Identity;
-            Matrix.Multiply(Matrix3d.RotationX((float)(((Rotation)) / 180f * Math.PI)));
-            Matrix.Multiply(Matrix3d.RotationZ((float)((LatCenter) / 180f * Math.PI)));
-            Matrix.Multiply(Matrix3d.RotationY((float)(((360 - LngCenter)) / 180f * Math.PI)));
-        }
-
         public double PixelCenterX = 0.0;
         public double PixelCenterY = 0.0;
-        public double LatCenter = 0.0;
-        public double LngCenter = 0.0;
-        public double Rotation = 0.0;
         public double ScaleX = .01;
         public double ScaleY = .01;
         public double Height = 0;
         public double Width = 0;
-        public static SkyImageTile Create(int level, int x, int y, Imageset dataset, Tile parent)
-        {
-            SkyImageTile temp = new SkyImageTile();
-            temp.Parent = parent;
-            temp.Level = level;
-            temp.tileX = x;
-            temp.tileY = y;
-            temp.dataset = dataset;
-            temp.GetParameters();
-            temp.ComputeMatrix();
-            temp.sphereCenter = temp.GeoTo3dTan(0, 0);
-            temp.radius = 1.25f;
-            return temp;
-        }
-
-        private void GetParameters()
+        public SkyImageTile(int level, int x, int y, Imageset dataset, Tile parent) : base(level, x, y, dataset, parent)
         {
             PixelCenterX = dataset.OffsetX;
             PixelCenterY = dataset.OffsetY;
-            LatCenter = dataset.CenterY;
-            LngCenter = dataset.CenterX;
-            Rotation = dataset.Rotation;
             ScaleX = -(ScaleY = dataset.BaseTileDegrees);
             if (dataset.BottomsUp)
             {
                 ScaleX = -ScaleX;
-                Rotation = 360 - Rotation;
             }
-
+            this.sphereCenter = this.GeoTo3dTan(0, 0);
+            this.radius = 1.25f;
+            this.ComputeBoundingSphere();
         }
 
-        protected Vector3d GeoTo3dTan(double lat, double lng)
+        protected override LatLngEdges GetLatLngEdges()
         {
-            lng = -lng;
-            double fac1 = (this.dataset.BaseTileDegrees );
-            //double fac1 = (this.dataset.BaseTileDegrees ) / 2;
-            double factor = Math.Tan(fac1 * RC);
+            LatLngEdges edges = new LatLngEdges();
 
-            //return (Vector3d)dataset.Matrix.Transform(Vector3d.Create(1, (lat / fac1 * factor), (lng / fac1 * factor)));
-            return (Vector3d)Matrix.Transform(Vector3d.Create(1, (lat / fac1 * factor), (lng / fac1 * factor)));
+            WcsImage wcsImage = dataset.WcsImage as WcsImage;
 
-        }
-
-
-
-
-        //protected void ComputeBoundingSphereBottomsUp()
-        //{
-        //    double tileDegrees = (double)this.dataset.BaseTileDegrees / ((double)Math.Pow(2, this.Level));
-
-
-        //    double latMin = ((double)this.dataset.BaseTileDegrees / 2 + (((double)(this.tileY + 1)) * tileDegrees)) + dataset.OffsetY;
-        //    double latMax = ((double)this.dataset.BaseTileDegrees / 2 + (((double)this.tileY) * tileDegrees)) + dataset.OffsetY;
-        //    double lngMin = (((double)this.tileX * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
-        //    double lngMax = ((((double)(this.tileX + 1)) * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
-
-        //    double latCenter = (latMin + latMax) / 2.0;
-        //    double lngCenter = (lngMin + lngMax) / 2.0;
-
-
-        //    TopLeft = GeoTo3dTan(latMin, lngMin);
-        //    BottomRight = GeoTo3dTan(latMax, lngMax);
-        //    TopRight = GeoTo3dTan(latMin, lngMax);
-        //    BottomLeft = GeoTo3dTan(latMax, lngMin);
-        //    Vector3d distVect = TopLeft;
-        //    tileDegrees = lngMax - lngMin;
-        //}
-
-
-        List<PositionTexture> vertexList = null;
-        List<Triangle> childTriangleList = null;
-
-        public override bool CreateGeometry(RenderContext renderContext)
-        {
-            base.CreateGeometry(renderContext);
-
-            if (GeometryCreated)
+            if (wcsImage != null && RenderContext.UseGl)
             {
-                return true;
-            }
-
-            if (dataset.WcsImage != null)
-            {
-                FitsImage fitsImage = dataset.WcsImage as FitsImage;
-                if(fitsImage != null)
+                if (wcsImage.SizeX != wcsImage.SizeY)
                 {
-                    if(RenderContext.UseGlVersion2)
-                    {
-                        texture2d = PrepDevice.createTexture();
-                        PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-
-                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
-
-                        Width = fitsImage.SizeX;
-                        Height = fitsImage.SizeY;
-                    } else
-                    {
-                        WcsImage wcsImage = dataset.WcsImage as WcsImage;
-                        Bitmap bmp = wcsImage.GetBitmap();
-                        texture2d = bmp.GetTexture();
-                        if (bmp.Height != wcsImage.SizeY)
-                        {
-                            PixelCenterY += bmp.Height - wcsImage.SizeY;
-                        }
-                        if (renderContext.gl != null)
-                        {
-                            Height = bmp.Height;
-                            Width = bmp.Width;
-                        }
-                        else
-                        {
-                            Height = texture.NaturalHeight;
-                            Width = texture.NaturalWidth;
-                        }
-                    }
+                    PixelCenterY += wcsImage.SizeX - wcsImage.SizeY;
                 }
 
-            }
-
-            GeometryCreated = true;
-
-            for (int i = 0; i < 4; i++)
-            {
-                RenderTriangleLists[i] = new List<RenderTriangle>();
-            }
-
-
-            ComputeMatrix();
-
-            double latMin = 0 + (ScaleY * (Height - PixelCenterY));
-            double latMax = 0 - (ScaleY * PixelCenterY);
-            double lngMin = 0 + (ScaleX * PixelCenterX);
-            double lngMax = 0 - (ScaleX * (Width - PixelCenterX));
-
-
-            TopLeft = GeoTo3dTan(latMin, lngMin);
-            BottomRight = GeoTo3dTan(latMax, lngMax);
-            TopRight = GeoTo3dTan(latMin, lngMax);
-            BottomLeft = GeoTo3dTan(latMax, lngMin);
-
-
-
-            Vector3d topCenter = Vector3d.Lerp(TopLeft, TopRight, .5f);
-            Vector3d bottomCenter = Vector3d.Lerp(BottomLeft, BottomRight, .5f);
-            Vector3d center = Vector3d.Lerp(topCenter, bottomCenter, .5f);
-            Vector3d rightCenter = Vector3d.Lerp(TopRight, BottomRight, .5f);
-            Vector3d leftCenter = Vector3d.Lerp(TopLeft, BottomLeft, .5f);
-
-
-            if (renderContext.gl == null)
-            {
-                 vertexList = new List<PositionTexture>();
-
-                vertexList.Add(PositionTexture.CreatePosSize(TopLeft, 0, 0, Width, Height));
-                vertexList.Add(PositionTexture.CreatePosSize(TopRight, 1, 0, Width, Height));
-                vertexList.Add(PositionTexture.CreatePosSize(BottomLeft, 0, 1, Width, Height));
-                vertexList.Add(PositionTexture.CreatePosSize(BottomRight, 1, 1, Width, Height));
-
-                childTriangleList = new List<Triangle>();
-
-                if (dataset.BottomsUp)
-                {
-                    childTriangleList.Add(Triangle.Create(0, 1, 2));
-                    childTriangleList.Add(Triangle.Create(2, 1, 3));
-                }
-                else
-                {
-                    childTriangleList.Add(Triangle.Create(0, 2, 1));
-                    childTriangleList.Add(Triangle.Create(2, 3, 1));
-
-                }
-
-                int count = 3;
-                while (count-- > 1)
-                {
-                    List<Triangle> newList = new List<Triangle>();
-                    foreach (Triangle tri in childTriangleList)
-                    {
-                        tri.SubDivide(newList, vertexList);
-                    }
-                    childTriangleList = newList;
-                }
-
-                double miter = .6 / (Width/256);
-                foreach (Triangle tri in childTriangleList)
-                {
-                    PositionTexture p1 = vertexList[tri.A];
-                    PositionTexture p2 = vertexList[tri.B];
-                    PositionTexture p3 = vertexList[tri.C];
-
-
-                    RenderTriangleLists[0].Add(RenderTriangle.CreateWithMiter(p1, p2, p3, texture, Level, miter));
-                }
-
+                Width = wcsImage.SizeX;
+                Height = wcsImage.SizeY;
             }
             else
             {
-
-                //process vertex list
-                VertexBuffer = PrepDevice.createBuffer();
-                PrepDevice.bindBuffer(GL.ARRAY_BUFFER, VertexBuffer);
-                Float32Array f32array = new Float32Array(9 * 5);
-                float[] buffer = (float[])(object)f32array;
-                int index = 0;
-
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(bottomCenter, .5, 1)); //0
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(BottomLeft, 0, 1));    //1
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(BottomRight, 1, 1));   //2
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(center, .5, .5));      //3
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(leftCenter, 0, .5));   //4
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(rightCenter, 1, .5));  //5
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(topCenter, .5, 0));    //6
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(TopLeft, 0, 0));       //7
-                index = AddVertex(buffer, index, PositionTexture.CreatePos(TopRight, 1, 0));      //8
-                PrepDevice.bufferData(GL.ARRAY_BUFFER, f32array, GL.STATIC_DRAW);
-
-                // process index buffers
-
-                for (int i = 0; i < 4; i++)
-                {
-                    index = 0;
-                    TriangleCount = 2;
-                    Uint16Array ui16array = new Uint16Array(TriangleCount * 3);
-
-                    UInt16[] indexArray = (UInt16[])(object)ui16array;
-                    switch (i)
-                    {
-                        case 0:
-                            indexArray[index++] = 7;
-                            indexArray[index++] = 4;
-                            indexArray[index++] = 6;
-                            indexArray[index++] = 4;
-                            indexArray[index++] = 3;
-                            indexArray[index++] = 6;
-                            break;
-                        case 1:
-                            indexArray[index++] = 6;
-                            indexArray[index++] = 5;
-                            indexArray[index++] = 8;
-                            indexArray[index++] = 6;
-                            indexArray[index++] = 3;
-                            indexArray[index++] = 5;
-                            break;
-                        case 2:
-                            indexArray[index++] = 4;
-                            indexArray[index++] = 0;
-                            indexArray[index++] = 3;
-                            indexArray[index++] = 4;
-                            indexArray[index++] = 1;
-                            indexArray[index++] = 0;
-                            break;
-                        case 3:
-                            indexArray[index++] = 3;
-                            indexArray[index++] = 2;
-                            indexArray[index++] = 5;
-                            indexArray[index++] = 3;
-                            indexArray[index++] = 0;
-                            indexArray[index++] = 2;
-                            break;
-                    }
-                    IndexBuffers[i] = PrepDevice.createBuffer();
-                    PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, IndexBuffers[i]);
-                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, ui16array, GL.STATIC_DRAW);
-
-                }
+                Height = texture.NaturalHeight;
+                Width = texture.NaturalWidth;
             }
-            return true;
+
+            edges.latMin = 0 + (ScaleY * (Height - PixelCenterY));
+            edges.latMax = 0 - (ScaleY * PixelCenterY);
+            edges.lngMin = 0 + (ScaleX * PixelCenterX);
+            edges.lngMax = 0 - (ScaleX * (Width - PixelCenterX));
+            return edges;
         }
-        public override void RenderPart(RenderContext renderContext, int part, double opacity, bool combine)
-        {
-            if (RenderContext.UseGlVersion2)
-            {
-                ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
-                FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
-                FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
-                FitsShader.ContainsBlanks = dataset.FitsProperties.ContainsBlanks;
-                FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
-                FitsShader.BZero = (float)dataset.FitsProperties.BZero;
-                FitsShader.BScale = (float)dataset.FitsProperties.BScale;
-                FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
-                FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
-                FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
-            } else
-            {
-                TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float) opacity, false);
-            }
-            renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount* 3, GL.UNSIGNED_SHORT, 0);
-        }
-
-        //public override bool IsTileBigEnough(RenderContext renderContext)
-        //{   
-        //    //to check this
-        //    double arcPixels = ((dataset.BaseTileDegrees / 256) / Math.Pow(2, Level)) * 3600;
-        //    return (renderContext.FovScale < arcPixels);
-        //}
-
-
-
 
     }
 }

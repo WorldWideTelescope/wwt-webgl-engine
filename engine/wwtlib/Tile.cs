@@ -33,6 +33,7 @@ namespace wwtlib
         public ImageElement texture = null;
         public WebGLTexture texture2d = null;
         public bool IsCatalogTile = false;
+        protected FitsImage fitsImage;
 
         public bool ReadyToRender = false;
         public bool InViewFrustum = true;
@@ -552,7 +553,23 @@ namespace wwtlib
             }
             else
             {
-                TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+                if (RenderContext.UseGlVersion2 && fitsImage != null)
+                {
+                    ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
+                    FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
+                    FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
+                    FitsShader.ContainsBlanks = dataset.FitsProperties.ContainsBlanks;
+                    FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
+                    FitsShader.BZero = (float)dataset.FitsProperties.BZero;
+                    FitsShader.BScale = (float)dataset.FitsProperties.BScale;
+                    FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
+                    FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
+                    FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+                }
+                else
+                {
+                    TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+                }
                 renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
             }
         }
