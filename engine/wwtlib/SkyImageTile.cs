@@ -117,44 +117,41 @@ namespace wwtlib
                 return true;
             }
 
-            if (dataset.WcsImage != null)
+            if(dataset.WcsImage is FitsImage && RenderContext.UseGlVersion2)
             {
                 FitsImage fitsImage = dataset.WcsImage as FitsImage;
-                if(fitsImage != null)
+                texture2d = PrepDevice.createTexture();
+                PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
+                PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+
+                PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
+                PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+                PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
+
+                Width = fitsImage.SizeX;
+                Height = fitsImage.SizeY;
+            } else
+            {
+                WcsImage wcsImage = dataset.WcsImage as WcsImage;
+                if(wcsImage != null)
                 {
-                    if(RenderContext.UseGlVersion2)
+                    Bitmap bmp = wcsImage.GetBitmap();
+                    texture2d = bmp.GetTexture();
+                    if (bmp.Height != wcsImage.SizeY)
                     {
-                        texture2d = PrepDevice.createTexture();
-                        PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-
-                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
-
-                        Width = fitsImage.SizeX;
-                        Height = fitsImage.SizeY;
-                    } else
-                    {
-                        WcsImage wcsImage = dataset.WcsImage as WcsImage;
-                        Bitmap bmp = wcsImage.GetBitmap();
-                        texture2d = bmp.GetTexture();
-                        if (bmp.Height != wcsImage.SizeY)
-                        {
-                            PixelCenterY += bmp.Height - wcsImage.SizeY;
-                        }
-                        if (renderContext.gl != null)
-                        {
-                            Height = bmp.Height;
-                            Width = bmp.Width;
-                        }
-                        else
-                        {
-                            Height = texture.NaturalHeight;
-                            Width = texture.NaturalWidth;
-                        }
+                        PixelCenterY += bmp.Height - wcsImage.SizeY;
                     }
+                    if (renderContext.gl != null)
+                    {
+                        Height = bmp.Height;
+                        Width = bmp.Width;
+                    }
+                }
+                else
+                {
+                    Height = texture.NaturalHeight;
+                    Width = texture.NaturalWidth;
                 }
 
             }
@@ -310,7 +307,7 @@ namespace wwtlib
         }
         public override void RenderPart(RenderContext renderContext, int part, double opacity, bool combine)
         {
-            if (RenderContext.UseGlVersion2)
+            if (RenderContext.UseGlVersion2 && dataset.WcsImage is FitsImage)
             {
                 ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
                 FitsShader.Min = (float)dataset.FitsProperties.LowerCut;

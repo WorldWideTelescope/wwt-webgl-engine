@@ -1,5 +1,11 @@
 # rc: micro bump
 
+- Avoid a crash when running in browser environments that do not defined the
+  `ServiceWorker` type (#111, @imbasimba)
+
+
+# @wwtelescope/research-app 0.2.1 (2021-06-04)
+
 - Tweak some of the background selector CSS so that it doesn't cover up the
   hamburger menu, and so that it shrinks better in a narrow viewport (#107,
   #110, @Carifio24, @pkgw)
