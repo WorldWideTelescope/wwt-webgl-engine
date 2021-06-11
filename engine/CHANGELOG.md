@@ -1,3 +1,8 @@
+# @wwtelescope/engine 7.11.3 (2021-06-11)
+
+- Fix rendering of non-FITS SkyImages (#113, #114, @imbasimba)
+
+
 # @wwtelescope/engine 7.11.2 (2021-06-04)
 
 - Fix opacity settings for the new WebGL FITS renderer (#106, #108, @imbasimba)
