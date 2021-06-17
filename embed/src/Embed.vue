@@ -282,11 +282,18 @@ export default class Embed extends WWTAwareComponent {
           const img = this.lookupImageset(this.embedSettings.foregroundImagesetName);
 
           if (img !== null) {
+            // If the imageset is a panorama, we want to set it to be the background
+            const isPanorama = img.get_dataSetType() == ImageSetType.panorama;
             const options: SetupForImagesetOptions = { foreground: img };
+            if (isPanorama) {
+              options.background = img;
+              backgroundWasInitialized = true;
+            }
 
             // For setup of planetary modes to work, we need to pass the specified
             // background imageset to setupForImageset().
-            if (bgName.length) {
+            // For a panorama, we've already set the imageset itself as the background
+            if (!isPanorama && bgName.length) {
               const bkg = this.lookupImageset(bgName);
               if (bkg !== null) {
                 options.background = bkg;
