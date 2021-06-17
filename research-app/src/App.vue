@@ -660,12 +660,10 @@ export default class App extends WWTAwareComponent {
     window.addEventListener('message', (event) => {
       if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
         // You could imagine wanting to send status updates to multiple
-        // destinations, but let's start simple. TypeScript currently requires
-        // us to do an odd type guard here.
+        // destinations, but let's start simple.
         if (this.statusMessageDestination === null) {
-          //ServiceWorker is only defined on https connections and localhost
-          if (!(event.source instanceof MessagePort) && (typeof ServiceWorker === 'undefined' || !(event.source instanceof ServiceWorker))) {
-            this.statusMessageDestination = event.source as Window;
+          if (event.source instanceof Window) {
+            this.statusMessageDestination = event.source;
             // Hardcode the status update rate to max out at 5 Hz.
             this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
           }

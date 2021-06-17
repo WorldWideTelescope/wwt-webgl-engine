@@ -1,3 +1,10 @@
+# @wwtelescope/embed 1.5.0 (2021-06-17)
+
+- Add support for panorama images (#117, @Carifio24)
+
+[#117]: https://github.com/WorldWideTelescope/wwt-webgl-engine/pull/117
+
+
 # @wwtelescope/embed 1.4.2 (2021-06-03)
 
 - Loosen version requirements for Vue CLI tooling
