@@ -4,11 +4,21 @@
       wwt-namespace="wwt-research"
     ></WorldWideTelescope>
 
-    <transition name="fade">
-      <div id="overlays">
-        <p>{{ coordText }}</p>
+    <div id='display-panel'>
+      <transition name="catalog-transition">
+        <div id="overlays">
+          <p>{{ coordText }}</p>
+        </div>
+      </transition>
+      <div id="layers-container" v-if="haveLayers">
+        <div class="layers-header">
+          <label>Layers:</label>
+        </div>
+        <div v-if="showLayers">
+          <catalog-item v-for="[index, catalog] of catalogs.entries()" v-bind:key="catalog.name" v-bind:item="catalog" v-bind:toggleAction="toggleCatalogVisibility" v-bind:deleteAction="removeCatalog" v-bind:class="['catalog-row', { 'last-row': index == catalogs.length-1 }]"/>
+        </div>
       </div>
-    </transition>
+    </div>
 
     <ul id="controls">
       <li v-show="showToolMenu">
@@ -16,7 +26,8 @@
           <font-awesome-icon class="tooltip-target tooltip-icon" icon="sliders-h" size="lg" tabindex="0" @keyup.enter="showPopover = !showPopover" @click="showPopover = !showPopover" ></font-awesome-icon>
           <template slot="popover" tabindex="-1" show="showPopover">
             <ul class="tooltip-content tool-menu" tabindex="-1">
-              <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')" tabindex="0"><font-awesome-icon icon="mountain"/> Choose background</a></li>
+              <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background'); showPopover=false" tabindex="0"><font-awesome-icon icon="mountain"/> Choose background</a></li>
+              <li v-show="showCatalogTool"><a href="#" v-close-popover @click="selectTool('choose-catalog'); showPopover=false" tabindex="0"><font-awesome-icon icon="map-marked-alt"/> Add catalogs</a></li>
             </ul>
           </template>
         </v-popover>
@@ -55,6 +66,30 @@
                   <template #option="option">
                     <h4 style="margin:0">{{ option.name}}</h4>
                     <em style="margin:0; font-size:small;">{{option.description}}</em>
+                  </template>
+          </v-select>
+        </div>
+      </template>
+      <template v-else-if="showCatalogChooser">
+        <div id="catalog-select-container-tool" class="item-select-container">
+          <span class="item-select-title">Add catalog:</span>
+          <v-select
+                  v-model="catalogToAdd"
+                  id="catalog-select-tool" class="item-selector"
+                  :searchable="true"
+                  :clearable="false"
+                  :options="curAvailableCatalogs"
+                  :filter="filterCatalogs"
+                  @change="cat => addHipsByName(cat.name)"
+                  label="name"
+                  placeholder="Catalog"
+                  >
+                  <template #option="option">
+                    <h4 style="margin:0">{{ option.name}}</h4>
+                    <em style="margin:0; font-size:small;">{{option.description}}</em>
+                  </template>
+                  <template #selected-option-container="{ option, deselect, multiple, disabled }">
+                    <div></div>
                   </template>
           </v-select>
         </div>
@@ -112,7 +147,7 @@ import { convertPywwtSpreadSheetLayerSetting } from "./settings";
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
 
-type ToolType = "crossfade" | null;
+type ToolType = "crossfade" | "choose-background" | "choose-catalog" | null;
 
 type AnyFitsLayerMessage =
   classicPywwt.CreateImageSetLayerMessage |
@@ -642,6 +677,8 @@ export default class App extends WWTAwareComponent {
   @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
+  catalogs: ImagesetInfo[] = [];
+  catalogVisibilities: boolean[] = [];
 
   // Lifecycle management
 
@@ -947,6 +984,12 @@ export default class App extends WWTAwareComponent {
     return this.wwtAvailableImagesets.filter(info => info.type == this.wwtRenderType && !info.extension.includes("tsv"));
   }
 
+  get curAvailableCatalogs() {
+    if (this.wwtAvailableImagesets == null)
+      return [];
+    return this.wwtAvailableImagesets.filter(info => info.type == this.wwtRenderType && info.extension.includes("tsv"));
+  }
+
   get curBackgroundImagesetName() {
     if (this.wwtBackgroundImageset == null)
       return "";
@@ -965,6 +1008,52 @@ export default class App extends WWTAwareComponent {
     this.setForegroundOpacity(o);
   }
 
+    // Catalogs
+  addHipsByName(name: string) {
+    console.log(`Adding catalog with name ${name}`);
+    this.addCatalogHipsByName(name);
+  }
+
+  removeHipsByName(name: string) {
+    this.removeCatalogHipsByName(name);
+  }
+
+  get catalogToAdd() {
+    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
+  }
+
+  set catalogToAdd(catalog: ImagesetInfo) {
+    const index = this.catalogs.indexOf(catalog);
+    if (index >= 0) {
+      return;
+    }
+    this.catalogs.push(catalog);
+    this.catalogVisibilities.push(true);
+    this.addHipsByName(catalog.name);
+  }
+
+  toggleCatalogVisibility(catalog: ImagesetInfo) {
+    const index = this.catalogs.indexOf(catalog);
+    if (index < 0) {
+      return;
+    }
+    if (this.catalogVisibilities[index]) {
+      this.removeHipsByName(catalog.name);
+    } else {
+      this.addHipsByName(catalog.name);
+    }
+    this.catalogVisibilities[index] = !this.catalogVisibilities[index];
+  }
+
+  removeCatalog(catalog: ImagesetInfo) {
+    const index = this.catalogs.indexOf(catalog);
+    if (index < 0) {
+      return;
+    }
+    this.catalogs.splice(index, 1);
+    this.removeHipsByName(catalog.name);
+  }
+
   // "Tools" menu
 
   currentTool: ToolType = null;
@@ -981,6 +1070,18 @@ export default class App extends WWTAwareComponent {
 
   get showBackgroundChooser() {
     return !this.wwtIsTourPlaying;
+  }
+
+  get showCatalogTool() {
+    return !this.wwtIsTourPlaying;
+  }
+
+  get showCatalogChooser() {
+    return this.currentTool == 'choose-catalog';
+  }
+
+  get haveLayers() {
+    return this.catalogs.length > 0;
   }
 
   get showToolMenu() {
@@ -1024,13 +1125,17 @@ export default class App extends WWTAwareComponent {
 
   // For filtering imagesets
   filterImagesets(imagesets: ImagesetInfo[], searchText: string) {
-    return imagesets
-    .filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
+    return imagesets.filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
+  }
+
+  filterCatalogs(imagesets: ImagesetInfo[], searchText: string) {
+    return imagesets.filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
   }
 
   data() {
     return {
-      showPopover: false
+      showPopover: false,
+      showLayers: true,
     }
   }
 
@@ -1072,26 +1177,8 @@ body {
   }
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .3s;
-}
-
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-}
-
 #overlays {
-  position: absolute;
-  z-index: 10;
-  top: 0.5rem;
-  left: 0.5rem;
-  color: #FFF;
-
-  p {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-  }
+  margin: 10px;
 }
 
 #controls {
@@ -1144,6 +1231,60 @@ body {
   .opacity-range {
     width: 50vw;
   }
+}
+
+#display-panel {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  width: 500px;
+  max-width: 30vw;
+  border-radius: 5px;
+  opacity: 0.6;
+  color: white;
+  font-weight: bold;
+  background: #404040;
+}
+
+#add-catalog {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  margin: auto;
+  font-size: 12pt;
+
+  & a {
+    text-align: center;
+    color: white;
+    text-decoration: none;
+  }
+
+  & a .icon {
+    padding: 0px 7px;
+  }
+
+}
+
+.layers-header {
+  width: 100%;
+  font-size: 18pt;
+  text-align: center;
+}
+
+.catalog-row {
+  padding: 5px;
+  width: calc(100% - 10px);
+  background: orange;
+}
+
+.last-row {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.icon {
+  padding: 0px 5px;
+  color: white;
 }
 
 /* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */
@@ -1283,7 +1424,7 @@ ul.tool-menu {
   }
 }
 
-#bg-select {
+.item-selector {
   width: 500px;
   max-width: 30vw;
   vertical-align: middle;
@@ -1293,11 +1434,11 @@ ul.tool-menu {
   // Note: `overflow: hidden` breaks the dropdown
 }
 
-#bg-select-container {
+.item-select-container {
   display: flex;
 }
 
-#bg-select-title {
+.item-select-title {
   text-align: center;
   color: white;
   font-weight: bold;
@@ -1309,7 +1450,7 @@ ul.tool-menu {
   padding: 0px 10px 0px 0px;
 }
 
-#bg-select * {
+.item-selector * {
   background: #cccccc;
 
   .vs__dropdown-option--highlight {

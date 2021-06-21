@@ -334,11 +334,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       this.isTourPlaying = false;
     }
 
-    const showWebGl2Warning = !wwt.si.isUsingWebGl2()
-      && (Date.now() - this.timeAtStartup) < 15000;
-    if (this.showWebGl2Warning != showWebGl2Warning) {
-      this.showWebGl2Warning = showWebGl2Warning;
-    }
+    // const showWebGl2Warning = !wwt.si.isUsingWebGl2()
+    //   && (Date.now() - this.timeAtStartup) < 15000;
+    // if (this.showWebGl2Warning != showWebGl2Warning) {
+    //   this.showWebGl2Warning = showWebGl2Warning;
+    // }
   }
 
   @Mutation
@@ -380,6 +380,20 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setupForImageset without linking to WWTInstance');
     Vue.$wwt.inst.setupForImageset(options);
+  }
+
+  @Mutation
+  addCatalogHipsByName(name: string): void {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot addHiPSCatalogByName without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.addCatalogHipsByName(name);
+  }
+
+  @Mutation
+  removeCatalogHipsByName(name: string): void {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot removeHiPSCatalogByName without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
   }
 
   @Mutation

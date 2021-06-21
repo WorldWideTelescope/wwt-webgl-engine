@@ -277,12 +277,14 @@ export class WWTAwareComponent extends Vue {
       ]),
       ...mapMutations([
         "addAnnotation",
+        "addCatalogHipsByName",
         "applyFitsLayerSettings",
         "applyTableLayerSettings",
         "applySetting",
         "clearAnnotations",
         "deleteLayer",
         "removeAnnotation",
+        "removeCatalogHipsByName",
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setClockRate",
@@ -450,6 +452,9 @@ export class WWTAwareComponent extends Vue {
   /** Add an [Annotation](../../engine/classes/annotation.html) to the view. */
   addAnnotation!: (_a: Annotation) => void;
 
+  /** Add a "catalog HiPS" dataset to the current view, by name. */
+  addCatalogHipsByName!: (name: string) => void;
+
   /** Alter one or more settings of the specified FITS image layer as specified
    * in [the options](../../engine-helpers/interfaces/applyfitslayersettingsoptions.html).
    */
@@ -474,6 +479,9 @@ export class WWTAwareComponent extends Vue {
 
   /** Remove the specified [Annotation](../../engine/classes/annotation.html) from the view. */
   removeAnnotation!: (_a: Annotation) => void;
+
+  /** Remove a "catalog HiPS" dataset to the current view, by name. */
+  removeCatalogHipsByName!: (name: string) => void;
 
   /** Seek tour playback to the specified timecode.
    *

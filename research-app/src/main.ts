@@ -12,12 +12,22 @@ import {
   faSearchMinus,
   faSearchPlus,
   faSlidersH,
+  faEyeSlash,
+  faEye,
+  faChevronDown,
+  faChevronUp,
+  faPlus,
+  faWindowClose,
+  faTimes,
+  faMapMarkedAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { createPlugin } from "@wwtelescope/engine-vuex";
 
 import App from "./App.vue";
+import CatalogItem from "./CatalogItem.vue";
+import TransitionExpand from "./TransitionExpand.vue";
 
 Vue.config.productionTip = false;
 
@@ -38,8 +48,18 @@ library.add(faMountain);
 library.add(faSearchMinus);
 library.add(faSearchPlus);
 library.add(faSlidersH);
+library.add(faEyeSlash);
+library.add(faEye);
+library.add(faChevronUp);
+library.add(faChevronDown);
+library.add(faPlus);
+library.add(faWindowClose);
+library.add(faTimes);
+library.add(faMapMarkedAlt);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component("v-select", vSelect);
+Vue.component('catalog-item', CatalogItem);
+Vue.component('transition-expand', TransitionExpand);
 
 // If postMessages are to be allowed, our creator has to tell us where they'll
 // come from. This only trivially prevents unexpected messages; it of course
