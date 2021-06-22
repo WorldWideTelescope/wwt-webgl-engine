@@ -14,6 +14,7 @@ import {
 
 import {
   Annotation,
+  Color,
   EngineSetting,
   Folder,
   Guid,
@@ -385,15 +386,24 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   @Mutation
   addCatalogHipsByName(name: string): void {
     if (Vue.$wwt.inst == null)
-      throw new Error('cannot addHiPSCatalogByName without linking to WWTInstance');
+      throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
     Vue.$wwt.inst.ctl.addCatalogHipsByName(name);
   }
 
   @Mutation
   removeCatalogHipsByName(name: string): void {
     if (Vue.$wwt.inst == null)
-      throw new Error('cannot removeHiPSCatalogByName without linking to WWTInstance');
+      throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
     Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
+  }
+
+  @Mutation
+  setCatalogHipsColorByName(obj: { name: string; color: Color }): void {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot setCatalogHipsColorByName without linking to WWTInstance');
+    const layer = Vue.$wwt.inst.lm.get_layerList()[obj.name];
+    layer.set_color(obj.color);
+    layer.set_opacity(obj.color.a);
   }
 
   @Mutation
@@ -411,7 +421,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
-  tilt(obj: { x: number; y: number}): void {
+  tilt(obj: { x: number; y: number }): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot tilt without linking to WWTInstance');
     Vue.$wwt.inst.ctl._tilt(obj.x, obj.y);

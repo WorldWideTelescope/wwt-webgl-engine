@@ -8,6 +8,7 @@ import {
 
 import {
   Annotation,
+  Color,
   EngineSetting,
   Folder,
   Guid,
@@ -287,6 +288,7 @@ export class WWTAwareComponent extends Vue {
         "removeCatalogHipsByName",
         "seekToTourTimecode",
         "setBackgroundImageByName",
+        "setCatalogHipsColorByName",
         "setClockRate",
         "setClockSync",
         "setFitsLayerColormap",
@@ -503,6 +505,9 @@ export class WWTAwareComponent extends Vue {
    * and the overall "mode" of the WWT renderer.
    */
   setBackgroundImageByName!: (_n: string) => void;
+
+  /** Set the display color of the HiPS catalog with the given name */
+  setCatalogHipsColorByName!: ({ name, color }: { name: string; color: Color}) => void;
 
   /** Set the rate at which the WWT clock progresses compared to wall-clock time.
    *

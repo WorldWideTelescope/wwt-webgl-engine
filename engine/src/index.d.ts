@@ -600,6 +600,7 @@ export class Layer {
   set_name(v: string): string;
   get_opacity(): number;
   set_opaciy(v: number): number;
+  set_opacity(v: number): number;
   get_opened(): boolean;
   set_opened(v: boolean): boolean;
   get_referenceFrame(): string;

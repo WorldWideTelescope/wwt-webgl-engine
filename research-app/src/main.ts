@@ -1,7 +1,9 @@
 import Vue from "vue";
 import VTooltip from "v-tooltip";
 import Vuex from "vuex";
+
 import vSelect from 'vue-select';
+import { Chrome } from 'vue-color';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -60,6 +62,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component("v-select", vSelect);
 Vue.component('catalog-item', CatalogItem);
 Vue.component('transition-expand', TransitionExpand);
+Vue.component('vue-color-chrome', Chrome);
 
 // If postMessages are to be allowed, our creator has to tell us where they'll
 // come from. This only trivially prevents unexpected messages; it of course

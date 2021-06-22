@@ -15,7 +15,13 @@
           <label>Layers:</label>
         </div>
         <div v-if="showLayers">
-          <catalog-item v-for="[index, catalog] of catalogs.entries()" v-bind:key="catalog.name" v-bind:item="catalog" v-bind:toggleAction="toggleCatalogVisibility" v-bind:deleteAction="removeCatalog" v-bind:class="['catalog-row', { 'last-row': index == catalogs.length-1 }]"/>
+          <catalog-item v-for="[index, catalog] of catalogs.entries()"
+          v-bind:key="catalog.name"
+          v-bind:item="catalog"
+          v-bind:toggleAction="toggleCatalogVisibility"
+          v-bind:deleteAction="removeCatalog"
+          v-bind:changeColorAction="setCatalogColor"
+          v-bind:class="['catalog-row', { 'last-row': index == catalogs.length-1 }]"/>
         </div>
       </div>
     </div>
@@ -50,10 +56,10 @@
         <span>Foreground opacity:</span> <input class="opacity-range" type="range" v-model="foregroundOpacity">
       </template>
       <template v-else-if="currentTool == 'choose-background'">
-        <div id="bg-select-container">
-          <span id="bg-select-title">Background imagery:</span>
+        <div id="bg-select-container" class="item-select-container">
+          <span id="bg-select-title" class="item-select-title">Background imagery:</span>
           <v-select v-model="curBackgroundImagesetName"
-                  id="bg-select"
+                  id="bg-select" class="item-selector"
                   :searchable="true"
                   :clearable="false"
                   :options="curAvailableImagesets"
@@ -120,6 +126,7 @@ import {
 import {
   Annotation,
   Circle,
+  Color,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
@@ -679,6 +686,7 @@ export default class App extends WWTAwareComponent {
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
   catalogs: ImagesetInfo[] = [];
   catalogVisibilities: boolean[] = [];
+  catalogColors: Color[] = [];
 
   // Lifecycle management
 
@@ -1010,7 +1018,6 @@ export default class App extends WWTAwareComponent {
 
     // Catalogs
   addHipsByName(name: string) {
-    console.log(`Adding catalog with name ${name}`);
     this.addCatalogHipsByName(name);
   }
 
@@ -1029,6 +1036,7 @@ export default class App extends WWTAwareComponent {
     }
     this.catalogs.push(catalog);
     this.catalogVisibilities.push(true);
+    this.catalogColors.push(Color.fromHex("#FFFFFF"));
     this.addHipsByName(catalog.name);
   }
 
@@ -1037,12 +1045,9 @@ export default class App extends WWTAwareComponent {
     if (index < 0) {
       return;
     }
-    if (this.catalogVisibilities[index]) {
-      this.removeHipsByName(catalog.name);
-    } else {
-      this.addHipsByName(catalog.name);
-    }
     this.catalogVisibilities[index] = !this.catalogVisibilities[index];
+    const color = this.catalogVisibilities[index] ? this.catalogColors[index] : Color.fromArgb(0, 0, 0, 0);
+    this.setCatalogHipsColorByName({name: catalog.name, color: color})
   }
 
   removeCatalog(catalog: ImagesetInfo) {
@@ -1052,6 +1057,17 @@ export default class App extends WWTAwareComponent {
     }
     this.catalogs.splice(index, 1);
     this.removeHipsByName(catalog.name);
+  }
+
+  setCatalogColor(catalog: ImagesetInfo, color: Color) {
+    const index = this.catalogs.indexOf(catalog);
+    if (index < 0) {
+      return;
+    }
+    this.catalogColors[index] = color;
+    if (this.catalogVisibilities[index]) {
+      this.setCatalogHipsColorByName({name: catalog.name, color: color});
+    }
   }
 
   // "Tools" menu
@@ -1269,12 +1285,6 @@ body {
   width: 100%;
   font-size: 18pt;
   text-align: center;
-}
-
-.catalog-row {
-  padding: 5px;
-  width: calc(100% - 10px);
-  background: orange;
 }
 
 .last-row {
