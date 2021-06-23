@@ -33,7 +33,7 @@
           <template slot="popover" tabindex="-1" show="showPopover">
             <ul class="tooltip-content tool-menu" tabindex="-1">
               <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background'); showPopover=false" tabindex="0"><font-awesome-icon icon="mountain"/> Choose background</a></li>
-              <li v-show="showCatalogTool"><a href="#" v-close-popover @click="selectTool('choose-catalog'); showPopover=false" tabindex="0"><font-awesome-icon icon="map-marked-alt"/> Add catalogs</a></li>
+              <li v-show="showCatalogTool"><a href="#" v-close-popover @click="selectTool('choose-catalog'); showPopover=false" tabindex="0"><font-awesome-icon icon="map-marked-alt"/> Add HiPS catalogs</a></li>
             </ul>
           </template>
         </v-popover>
@@ -1260,7 +1260,7 @@ body {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
-  width: 30vw;
+  width: 25vw;
   border-radius: 5px;
   opacity: 0.6;
   color: white;
@@ -1442,7 +1442,7 @@ ul.tool-menu {
 }
 
 .item-selector {
-  width: 30vw;
+  width: 25vw;
   vertical-align: middle;
   padding: 5px;
   white-space: nowrap;
@@ -1458,7 +1458,7 @@ ul.tool-menu {
   text-align: center;
   color: white;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 19px;
   background: none;
   float: left;
   height: 100%;
