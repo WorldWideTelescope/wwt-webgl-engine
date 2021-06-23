@@ -407,6 +407,14 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
+  setCatalogHipsOpacityByName(obj: { name: string; opacity: number }): void {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot setCatalogHipsOpacityByName without linking to WWTInstance');
+    const layer = Vue.$wwt.inst.lm.get_layerList()[obj.name];
+    layer.set_opacity(obj.opacity);
+  }
+
+  @Mutation
   zoom(factor: number): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot zoom without linking to WWTInstance');

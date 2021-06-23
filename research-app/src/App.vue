@@ -11,7 +11,7 @@
         </div>
       </transition>
       <div id="layers-container" v-if="haveLayers">
-        <div class="layers-header">
+        <div class="display-section-header">
           <label>Layers:</label>
         </div>
         <div v-if="showLayers">
@@ -70,8 +70,11 @@
                   placeholder="Background"
                   >
                   <template #option="option">
-                    <h4 style="margin:0">{{ option.name}}</h4>
+                    <h4 style="margin:0">{{option.name}}</h4>
                     <em style="margin:0; font-size:small;">{{option.description}}</em>
+                  </template>
+                  <template #selected-option="option">
+                    <div>{{option.name}}</div>
                   </template>
           </v-select>
         </div>
@@ -1036,7 +1039,7 @@ export default class App extends WWTAwareComponent {
     }
     this.catalogs.push(catalog);
     this.catalogVisibilities.push(true);
-    this.catalogColors.push(Color.fromHex("#FFFFFF"));
+    this.catalogColors.push(Color.fromArgb(1, 255, 255, 255));
     this.addHipsByName(catalog.name);
   }
 
@@ -1045,9 +1048,13 @@ export default class App extends WWTAwareComponent {
     if (index < 0) {
       return;
     }
-    this.catalogVisibilities[index] = !this.catalogVisibilities[index];
-    const color = this.catalogVisibilities[index] ? this.catalogColors[index] : Color.fromArgb(0, 0, 0, 0);
-    this.setCatalogHipsColorByName({name: catalog.name, color: color})
+    const nowVisible = !this.catalogVisibilities[index];
+    this.catalogVisibilities[index] = nowVisible;
+    if (nowVisible) {
+      this.setCatalogHipsColorByName({name: catalog.name, color: this.catalogColors[index]});
+    } else {
+      this.setCatalogHipsOpacityByName({name: catalog.name, opacity: 0});
+    }
   }
 
   removeCatalog(catalog: ImagesetInfo) {
@@ -1253,8 +1260,7 @@ body {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
-  width: 500px;
-  max-width: 30vw;
+  width: 30vw;
   border-radius: 5px;
   opacity: 0.6;
   color: white;
@@ -1281,10 +1287,11 @@ body {
 
 }
 
-.layers-header {
+.display-section-header {
   width: 100%;
   font-size: 18pt;
   text-align: center;
+  padding: 5px 0px;
 }
 
 .last-row {
@@ -1435,8 +1442,7 @@ ul.tool-menu {
 }
 
 .item-selector {
-  width: 500px;
-  max-width: 30vw;
+  width: 30vw;
   vertical-align: middle;
   padding: 5px;
   white-space: nowrap;

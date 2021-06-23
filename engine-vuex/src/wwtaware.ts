@@ -289,6 +289,7 @@ export class WWTAwareComponent extends Vue {
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setCatalogHipsColorByName",
+        "setCatalogHipsOpacityByName",
         "setClockRate",
         "setClockSync",
         "setFitsLayerColormap",
@@ -507,7 +508,10 @@ export class WWTAwareComponent extends Vue {
   setBackgroundImageByName!: (_n: string) => void;
 
   /** Set the display color of the HiPS catalog with the given name */
-  setCatalogHipsColorByName!: ({ name, color }: { name: string; color: Color}) => void;
+  setCatalogHipsColorByName!: (obj: { name: string; color: Color }) => void;
+
+  /** Set the display opacity color of the HiPS catalog with the given name */
+  setCatalogHipsOpacityByName!: (obj: { name: string; opacity: number }) => void;
 
   /** Set the rate at which the WWT clock progresses compared to wall-clock time.
    *
@@ -618,10 +622,10 @@ export class WWTAwareComponent extends Vue {
   zoom!: (f: number) => void;
 
   /** Moves the position of the view */
-  move!: ({ x, y }: { x: number; y: number }) => void;
+  move!: (obj: { x: number; y: number }) => void;
 
   /** Tilts the position of the view */
-  tilt!: ({ x, y }: { x: number; y: number }) => void;
+  tilt!: (obj: { x: number; y: number }) => void;
 
   // Actions
 

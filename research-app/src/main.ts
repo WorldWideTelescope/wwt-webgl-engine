@@ -3,7 +3,7 @@ import VTooltip from "v-tooltip";
 import Vuex from "vuex";
 
 import vSelect from 'vue-select';
-import { Chrome } from 'vue-color';
+import Chrome from 'vue-color/src/components/Chrome.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -22,6 +22,7 @@ import {
   faWindowClose,
   faTimes,
   faMapMarkedAlt,
+  faCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -58,6 +59,7 @@ library.add(faPlus);
 library.add(faWindowClose);
 library.add(faTimes);
 library.add(faMapMarkedAlt);
+library.add(faCircle);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component("v-select", vSelect);
 Vue.component('catalog-item', CatalogItem);
