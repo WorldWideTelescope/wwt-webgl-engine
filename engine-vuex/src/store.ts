@@ -398,20 +398,27 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
-  setCatalogHipsColorByName(obj: { name: string; color: Color }): void {
+  addCatalogHipsByNameWithCallback(args: { name: string; callback: () => void }): void {
     if (Vue.$wwt.inst == null)
-      throw new Error('cannot setCatalogHipsColorByName without linking to WWTInstance');
-    const layer = Vue.$wwt.inst.lm.get_layerList()[obj.name];
-    layer.set_color(obj.color);
-    layer.set_opacity(obj.color.a);
+      throw new Error('cannot addCatalogHipsByNameWithCallback without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.addCatalogHipsByNameWithCallback(args.name, args.callback);
   }
 
   @Mutation
-  setCatalogHipsOpacityByName(obj: { name: string; opacity: number }): void {
+  setCatalogHipsColorByName(args: { name: string; color: Color }): void {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot setCatalogHipsColorByName without linking to WWTInstance');
+    const layer = Vue.$wwt.inst.lm.get_layerList()[args.name];
+    layer.set_color(args.color);
+    layer.set_opacity(args.color.a);
+  }
+
+  @Mutation
+  setCatalogHipsOpacityByName(args: { name: string; opacity: number }): void {
     if (Vue.$wwt.inst == null)
       throw new Error('cannot setCatalogHipsOpacityByName without linking to WWTInstance');
-    const layer = Vue.$wwt.inst.lm.get_layerList()[obj.name];
-    layer.set_opacity(obj.opacity);
+    const layer = Vue.$wwt.inst.lm.get_layerList()[args.name];
+    layer.set_opacity(args.opacity);
   }
 
   @Mutation
@@ -422,17 +429,17 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
-  move(obj: { x: number; y: number }): void {
+  move(args: { x: number; y: number }): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot move without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.move(obj.x, obj.y);
+    Vue.$wwt.inst.ctl.move(args.x, args.y);
   }
 
   @Mutation
-  tilt(obj: { x: number; y: number }): void {
+  tilt(args: { x: number; y: number }): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot tilt without linking to WWTInstance');
-    Vue.$wwt.inst.ctl._tilt(obj.x, obj.y);
+    Vue.$wwt.inst.ctl._tilt(args.x, args.y);
   }
 
   @Mutation

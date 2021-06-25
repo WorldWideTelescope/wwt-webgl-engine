@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <WorldWideTelescope
-      wwt-namespace="wwt-research"
+      wwt-namespace="wwt-engine"
     ></WorldWideTelescope>
 
     <div id='display-panel'>
@@ -15,13 +15,11 @@
           <label>Layers:</label>
         </div>
         <div v-if="showLayers">
-          <catalog-item v-for="[index, catalog] of catalogs.entries()"
+          <catalog-item v-for="[index, catalog] of hipsCatalogs.entries()"
           v-bind:key="catalog.name"
-          v-bind:item="catalog"
-          v-bind:toggleAction="toggleCatalogVisibility"
-          v-bind:deleteAction="removeCatalog"
-          v-bind:changeColorAction="setCatalogColor"
-          v-bind:class="['catalog-row', { 'last-row': index == catalogs.length-1 }]"/>
+          v-bind:catalog="catalog"
+          v-bind:defaultColor="defaultColor"
+          v-bind:class="['catalog-row', { 'last-row': index == hipsCatalogs.length-1 }]"/>
         </div>
       </div>
     </div>
@@ -120,6 +118,8 @@ import * as screenfull from "screenfull";
 import 'vue-select/dist/vue-select.css';
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import WWTResearchAppModule from "./store";
+import { mapMutations, mapState } from "vuex";
 
 import {
   ImageSetType,
@@ -153,6 +153,7 @@ import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
 
 import { convertPywwtSpreadSheetLayerSetting } from "./settings";
+import { createNamespacedHelpers } from "vuex";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -683,15 +684,34 @@ class KeyboardControlSettings {
 @Component
 export default class App extends WWTAwareComponent {
   @Prop({default: null}) readonly allowedOrigin!: string | null;
-
   @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
+  defaultColor = Color.fromArgb(1, 255, 255, 255);
+  hipsCatalogs!: ImagesetInfo[];
+  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
-  catalogs: ImagesetInfo[] = [];
-  catalogVisibilities: boolean[] = [];
-  catalogColors: Color[] = [];
 
   // Lifecycle management
+
+  beforeCreate(): void {
+    const wwtResearchAppNamespace = "wwt-research";
+
+    this.$options.computed = {
+      ...mapState(wwtResearchAppNamespace, {
+        hipsCatalogs: (state, _getters) => (state as WWTResearchAppModule).hipsCatalogs,
+      }),
+      ...this.$options.computed,
+    }
+
+    this.$options.methods = {
+      ...this.$options.methods,
+      ...mapMutations(wwtResearchAppNamespace, [
+          "addResearchAppCatalogHips"
+      ])
+    }
+
+  }
 
   created() {
     this.statusMessageDestination = null;
@@ -1020,12 +1040,9 @@ export default class App extends WWTAwareComponent {
   }
 
     // Catalogs
-  addHipsByName(name: string) {
-    this.addCatalogHipsByName(name);
-  }
-
-  removeHipsByName(name: string) {
-    this.removeCatalogHipsByName(name);
+  addHips(catalog: ImagesetInfo) {
+    this.addResearchAppCatalogHips(catalog);
+    this.addCatalogHipsByNameWithCallback({ name: catalog.name, callback: () => this.setCatalogHipsColorByName({ name: catalog.name, color: this.defaultColor }) });
   }
 
   get catalogToAdd() {
@@ -1033,48 +1050,7 @@ export default class App extends WWTAwareComponent {
   }
 
   set catalogToAdd(catalog: ImagesetInfo) {
-    const index = this.catalogs.indexOf(catalog);
-    if (index >= 0) {
-      return;
-    }
-    this.catalogs.push(catalog);
-    this.catalogVisibilities.push(true);
-    this.catalogColors.push(Color.fromArgb(1, 255, 255, 255));
-    this.addHipsByName(catalog.name);
-  }
-
-  toggleCatalogVisibility(catalog: ImagesetInfo) {
-    const index = this.catalogs.indexOf(catalog);
-    if (index < 0) {
-      return;
-    }
-    const nowVisible = !this.catalogVisibilities[index];
-    this.catalogVisibilities[index] = nowVisible;
-    if (nowVisible) {
-      this.setCatalogHipsColorByName({name: catalog.name, color: this.catalogColors[index]});
-    } else {
-      this.setCatalogHipsOpacityByName({name: catalog.name, opacity: 0});
-    }
-  }
-
-  removeCatalog(catalog: ImagesetInfo) {
-    const index = this.catalogs.indexOf(catalog);
-    if (index < 0) {
-      return;
-    }
-    this.catalogs.splice(index, 1);
-    this.removeHipsByName(catalog.name);
-  }
-
-  setCatalogColor(catalog: ImagesetInfo, color: Color) {
-    const index = this.catalogs.indexOf(catalog);
-    if (index < 0) {
-      return;
-    }
-    this.catalogColors[index] = color;
-    if (this.catalogVisibilities[index]) {
-      this.setCatalogHipsColorByName({name: catalog.name, color: color});
-    }
+    this.addHips(catalog);
   }
 
   // "Tools" menu
@@ -1104,7 +1080,7 @@ export default class App extends WWTAwareComponent {
   }
 
   get haveLayers() {
-    return this.catalogs.length > 0;
+    return this.hipsCatalogs.length > 0;
   }
 
   get showToolMenu() {

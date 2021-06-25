@@ -31,17 +31,22 @@ import { createPlugin } from "@wwtelescope/engine-vuex";
 import App from "./App.vue";
 import CatalogItem from "./CatalogItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
+import WWTResearchAppModule from "./store";
 
 Vue.config.productionTip = false;
 
 Vue.use(VTooltip);
 Vue.use(Vuex);
 
-const store = new Vuex.Store({});
+const store = new Vuex.Store({
+  modules: {
+    'wwt-research': WWTResearchAppModule,
+  }
+});
 
 Vue.use(createPlugin(), {
   store,
-  namespace: "wwt-research"
+  namespace: "wwt-engine"
 });
 
 library.add(faAdjust);
@@ -83,7 +88,7 @@ new Vue({
   render: createElement => {
     return createElement(App, {
       props: {
-        "wwtNamespace": "wwt-research",
+        "wwtNamespace": "wwt-engine",
         "allowedOrigin": allowedOrigin,
       }
     });

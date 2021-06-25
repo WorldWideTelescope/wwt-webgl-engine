@@ -1,22 +1,22 @@
 <template>
   <div id="root-container">
     <div id="main-container" @mouseenter="hasFocus = true" @mouseleave="hasFocus = false" @focus="hasFocus = true" @blur="hasFocus = false">
-      <label focusable="false" id="name-label" @click="isSelected = !isSelected" @keyup.enter="isSelected = !isSelected" >{{item.name}}</label>
+      <label focusable="false" id="name-label" @click="isSelected = !isSelected" @keyup.enter="isSelected = !isSelected" >{{catalog.name}}</label>
       <span id="buttons-container">
         <a href="#" v-hide="!hasFocus" @click="handleDelete" class="icon-link"><font-awesome-icon class="icon" icon="times"/></a>
-        <a href="#" v-hide="!hasFocus" @click="handleToggle" class="icon-link"><font-awesome-icon v-if="eyeToggle" class="icon" icon="eye"/><font-awesome-icon v-if="!eyeToggle" class="icon" icon="eye-slash"/></a>
+        <a href="#" v-hide="!hasFocus" @click="handleToggle" class="icon-link"><font-awesome-icon v-if="visible" class="icon" icon="eye"/><font-awesome-icon v-if="!visible" class="icon" icon="eye-slash"/></a>
       </span>
     </div>
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
-        <div class="detail-row"><span class="prompt">URL:</span><span class="url-holder">{{ item.url }}</span></div>
-        <div class="detail-row" v-if="item.description.length > 0"><span class="prompt">Description:</span><span>{{ item.description }}</span></div>
+        <div class="detail-row"><span class="prompt">URL:</span><span class="url-holder">{{ catalog.url }}</span></div>
+        <div class="detail-row" v-if="catalog.description.length > 0"><span class="prompt">Description:</span><span>{{ catalog.description }}</span></div>
         <div class="detail-row"><span class="prompt">Color:</span>
           <v-popover class="circle-popover">
-            <font-awesome-icon icon="circle" size="lg" :style="{ 'color' : `rgba(${this.$data.color.r}, ${this.$data.color.g}, ${this.$data.color.b}, ${this.$data.color.a})` }"></font-awesome-icon>
+            <font-awesome-icon icon="circle" size="lg" :style="{ 'color' : `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a})` }"></font-awesome-icon>
             <template slot="popover">
               <vue-color-chrome
-              :value="this.$data.color"
+              :value="this.color"
               @input="handleColorChange"
               ></vue-color-chrome>
             </template>
@@ -32,7 +32,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { ImagesetInfo } from "@wwtelescope/engine-vuex";
 import { VNode, VNodeDirective } from 'vue';
 import { Color } from '@wwtelescope/engine';
-import { ImageSetType } from "@wwtelescope/engine-types";
+import { mapGetters, mapMutations, mapState } from "vuex";
 
 /** v-hide directive take from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
@@ -62,51 +62,68 @@ interface VueColorData {
 
 @Component
 export default class CatalogItem extends Vue {
-    @Prop({default: new ImagesetInfo("","",ImageSetType.sky, "", ""), required: false}) item!: ImagesetInfo;
-    @Prop({required: true}) toggleAction!: (info: ImagesetInfo) => void;
-    @Prop({required: true}) deleteAction!: (info: ImagesetInfo) => void;
-    @Prop({required: true}) changeColorAction!: (info: ImagesetInfo, color: Color) => void;
+    @Prop({required: true}) catalog!: ImagesetInfo;
+    @Prop({required: false, default: Color.fromArgb(1, 251, 249, 249)}) defaultColor!: Color;
+    hasFocus = false;
+    isSelected = false;
+    visible = true;
+    color = new Color();
+    
+    beforeCreate(): void {
+      const wwtEngineNamespace = "wwt-engine";
+      const wwtResearchAppNamespace = "wwt-research";
 
+      this.$options.computed = {
+        ...mapGetters(wwtEngineNamespace, [
+          "hipsCatalogColorByName",
+        ]),
+        ...this.$options.computed,
+      }
+      
+      this.$options.methods = {
+        ...this.$options.methods,
+        ...mapMutations(wwtEngineNamespace, [
+          "removeCatalogHipsByName",
+          "setCatalogHipsColorByName",
+          "setCatalogHipsOpacityByName",
+        ]),
+        ...mapMutations(wwtResearchAppNamespace, [
+          "removeResearchAppCatalogHips"
+        ])
+      };
+    }
+
+    mounted() {
+      this.color = this.defaultColor;
+    }
+
+    removeCatalogHipsByName!: (name: string) => void;
+    removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+    setCatalogHipsColorByName!: (obj: { name: string; color: Color }) => void;
+    setCatalogHipsOpacityByName!: (obj: { name: string; opacity: number }) => void;
 
     handleDelete() {
-        this.deleteAction(this.item);
+      this.removeResearchAppCatalogHips(this.catalog);
+      this.removeCatalogHipsByName(this.catalog.name);
     }
 
     handleToggle() {
-        this.$data.eyeToggle = !this.$data.eyeToggle;
-        this.toggleAction(this.item);
+      this.visible = !this.visible;
+      if (this.visible) {
+        this.setCatalogHipsColorByName({ name: this.catalog.name, color: this.color });
+      } else {
+        this.setCatalogHipsOpacityByName({ name: this.catalog.name, opacity: 0 });
+      }
     }
 
     handleColorChange(colorData: VueColorData) {
       const rgba = colorData['rgba'];
       const newColor = Color.fromArgb(rgba['a'], rgba['r'], rgba['g'], rgba['b']);
-      this.$data.color = newColor;
-      this.changeColorAction(this.item, newColor);
-    }
-
-    // handleBrightnessChange(value: number) {
-    //   console.log(`value is ${JSON.stringify(value)}`);
-    //   value = value / 100;
-    //   const smoothed = 4*value*(value*value-1.5*value+0.75);
-    //   console.log(`sig is ${smoothed}`);
-    //   this.changeBrightnessAction(smoothed);
-    // }
-
-    data() {
-        return {
-            hasFocus: false,
-            isSelected: false,
-            eyeToggle: true,
-            color: Color.fromArgb(1, 255, 255, 255),
-        }
-    }
-
-    computed() {
-      return {
-        dotColor: this.$data.color.toString(),
+      this.color = newColor;
+      if (this.visible) {
+        this.setCatalogHipsColorByName({name: this.catalog.name, color: newColor});
       }
     }
-
 
 }
 </script>
