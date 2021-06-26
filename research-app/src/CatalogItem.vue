@@ -32,14 +32,14 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { ImagesetInfo } from "@wwtelescope/engine-vuex";
 import { VNode, VNodeDirective } from 'vue';
 import { Color } from '@wwtelescope/engine';
-import { mapGetters, mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 
 /** v-hide directive take from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
 const update = (el: HTMLElement,
     binding: VNodeDirective,
-    vnode: VNode,
-    oldVnode: VNode) => el.style.visibility = (binding.value) ? "hidden" : "";
+    _vnode: VNode,
+    _oldVnode: VNode) => el.style.visibility = (binding.value) ? "hidden" : "";
 
 /**
  * Hides an HTML element, keeping the space it would have used if it were visible (css: Visibility)
@@ -53,17 +53,17 @@ Vue.directive("hide", {
 
 interface VueColorData {
   'rgba': {
-    'a': number,
-    'r': number,
-    'g': number,
-    'b': number,
-  }
+    'a': number;
+    'r': number;
+    'g': number;
+    'b': number;
+  };
 }
 
 @Component
 export default class CatalogItem extends Vue {
     @Prop({required: true}) catalog!: ImagesetInfo;
-    @Prop({required: false, default: Color.fromArgb(1, 251, 249, 249)}) defaultColor!: Color;
+    @Prop({required: false, default: Color.fromArgb(1, 255, 255, 255)}) defaultColor!: Color;
     hasFocus = false;
     isSelected = false;
     visible = true;

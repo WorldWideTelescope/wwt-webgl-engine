@@ -95,7 +95,7 @@
                     <h4 style="margin:0">{{ option.name}}</h4>
                     <em style="margin:0; font-size:small;">{{option.description}}</em>
                   </template>
-                  <template #selected-option-container="{ option, deselect, multiple, disabled }">
+                  <template #selected-option-container="">
                     <div></div>
                   </template>
           </v-select>
@@ -153,7 +153,6 @@ import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
 
 import { convertPywwtSpreadSheetLayerSetting } from "./settings";
-import { createNamespacedHelpers } from "vuex";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
