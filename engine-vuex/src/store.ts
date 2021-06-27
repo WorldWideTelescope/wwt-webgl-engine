@@ -335,11 +335,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       this.isTourPlaying = false;
     }
 
-    // const showWebGl2Warning = !wwt.si.isUsingWebGl2()
-    //   && (Date.now() - this.timeAtStartup) < 15000;
-    // if (this.showWebGl2Warning != showWebGl2Warning) {
-    //   this.showWebGl2Warning = showWebGl2Warning;
-    // }
+    const showWebGl2Warning = !wwt.si.isUsingWebGl2()
+      && (Date.now() - this.timeAtStartup) < 15000;
+    if (this.showWebGl2Warning != showWebGl2Warning) {
+      this.showWebGl2Warning = showWebGl2Warning;
+    }
   }
 
   @Mutation
