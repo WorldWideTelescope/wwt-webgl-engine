@@ -706,7 +706,15 @@ export default class App extends WWTAwareComponent {
 
   onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
     if (classicPywwt.isLoadImageCollectionMessage(msg)) {
-      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders });
+      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(()=> {
+        if(this.statusMessageDestination != null && this.allowedOrigin != null){
+          const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
+            event: "load_image_collection_completed",
+            url: msg.url
+          };
+          this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
+        }
+      });
     } else if (classicPywwt.isSetBackgroundByNameMessage(msg)) {
       this.setBackgroundImageByName(msg.name);
     } else if (classicPywwt.isSetForegroundByNameMessage(msg)) {
