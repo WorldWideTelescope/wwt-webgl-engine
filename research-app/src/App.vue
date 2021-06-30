@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <WorldWideTelescope
-      wwt-namespace="wwt-engine"
+      :wwt-namespace="wwtComponentNamespace"
     ></WorldWideTelescope>
 
     <div id='display-panel'>
@@ -68,8 +68,10 @@
                   placeholder="Background"
                   >
                   <template #option="option">
-                    <h4 style="margin:0">{{option.name}}</h4>
-                    <em style="margin:0; font-size:small;">{{option.description}}</em>
+                    <div class="item-option">
+                      <h4>{{option.name}}</h4>
+                      <em>{{option.description}}</em>
+                    </div>
                   </template>
                   <template #selected-option="option">
                     <div>{{option.name}}</div>
@@ -92,8 +94,10 @@
                   placeholder="Catalog"
                   >
                   <template #option="option">
-                    <h4 style="margin:0">{{ option.name}}</h4>
-                    <em style="margin:0; font-size:small;">{{option.description}}</em>
+                    <div class="item-option">
+                      <h4>{{option.name}}</h4>
+                      <em>{{option.description}}</em>
+                    </div>
                   </template>
                   <template #selected-option-container="">
                     <div></div>
@@ -117,9 +121,12 @@ import * as moment from "moment";
 import * as screenfull from "screenfull";
 import 'vue-select/dist/vue-select.css';
 import { Component, Prop, Watch } from "vue-property-decorator";
-import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import WWTResearchAppModule from "./store";
 import { mapMutations, mapState } from "vuex";
+
+import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+
+import WWTResearchAppModule from "./store";
+import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 import {
   ImageSetType,
@@ -688,14 +695,13 @@ export default class App extends WWTAwareComponent {
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   hipsCatalogs!: ImagesetInfo[];
   addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+  wwtComponentNamespace = wwtEngineNamespace;
 
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
 
   // Lifecycle management
 
   beforeCreate(): void {
-    const wwtResearchAppNamespace = "wwt-research";
-
     this.$options.computed = {
       ...mapState(wwtResearchAppNamespace, {
         hipsCatalogs: (state, _getters) => (state as WWTResearchAppModule).hipsCatalogs,
@@ -1446,6 +1452,17 @@ ul.tool-menu {
 
   .vs__dropdown-option--highlight {
     color: red;
+  }
+}
+
+.item-option {
+  & h4 {
+    margin: 0;
+  }
+
+  & em {
+    margin: 0;
+    font-size: small;
   }
 }
 

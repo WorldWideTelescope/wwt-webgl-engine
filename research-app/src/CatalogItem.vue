@@ -28,11 +28,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { ImagesetInfo } from "@wwtelescope/engine-vuex";
 import { VNode, VNodeDirective } from 'vue';
-import { Color } from '@wwtelescope/engine';
 import { mapGetters, mapMutations } from "vuex";
+import { Component, Prop, Vue } from "vue-property-decorator";
+
+import { ImagesetInfo } from "@wwtelescope/engine-vuex";
+import { Color } from '@wwtelescope/engine';
+
+import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 /** v-hide directive take from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
@@ -70,9 +73,6 @@ export default class CatalogItem extends Vue {
     color = new Color();
     
     beforeCreate(): void {
-      const wwtEngineNamespace = "wwt-engine";
-      const wwtResearchAppNamespace = "wwt-research";
-
       this.$options.computed = {
         ...mapGetters(wwtEngineNamespace, [
           "hipsCatalogColorByName",
