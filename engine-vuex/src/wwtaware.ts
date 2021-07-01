@@ -8,6 +8,7 @@ import {
 
 import {
   Annotation,
+  Color,
   EngineSetting,
   Folder,
   Guid,
@@ -255,6 +256,7 @@ export class WWTAwareComponent extends Vue {
       }),
       ...mapGetters([
         "lookupImageset",
+        "hipsCatalogColorByName",
       ]),
       ...this.$options.computed,
     };
@@ -277,14 +279,19 @@ export class WWTAwareComponent extends Vue {
       ]),
       ...mapMutations([
         "addAnnotation",
+        "addCatalogHipsByName",
+        "addCatalogHipsByNameWithCallback",
         "applyFitsLayerSettings",
         "applyTableLayerSettings",
         "applySetting",
         "clearAnnotations",
         "deleteLayer",
         "removeAnnotation",
+        "removeCatalogHipsByName",
         "seekToTourTimecode",
         "setBackgroundImageByName",
+        "setCatalogHipsColorByName",
+        "setCatalogHipsOpacityByName",
         "setClockRate",
         "setClockSync",
         "setFitsLayerColormap",
@@ -450,6 +457,13 @@ export class WWTAwareComponent extends Vue {
   /** Add an [Annotation](../../engine/classes/annotation.html) to the view. */
   addAnnotation!: (_a: Annotation) => void;
 
+  /** Add a "catalog HiPS" dataset to the current view, by name. */
+  addCatalogHipsByName!: (name: string) => void;
+
+  /** Add a "catalog HiPS" dataset to the current view, by name, along
+   * with a callback that is executed after the catalog layer has been added */
+  addCatalogHipsByNameWithCallback!: (args: { name: string; callback: () => void }) => void;
+
   /** Alter one or more settings of the specified FITS image layer as specified
    * in [the options](../../engine-helpers/interfaces/applyfitslayersettingsoptions.html).
    */
@@ -475,6 +489,9 @@ export class WWTAwareComponent extends Vue {
   /** Remove the specified [Annotation](../../engine/classes/annotation.html) from the view. */
   removeAnnotation!: (_a: Annotation) => void;
 
+  /** Remove a "catalog HiPS" dataset to the current view, by name. */
+  removeCatalogHipsByName!: (name: string) => void;
+
   /** Seek tour playback to the specified timecode.
    *
    * See [[wwtTourTimecode]] for a definition of the tour timecode.
@@ -495,6 +512,12 @@ export class WWTAwareComponent extends Vue {
    * and the overall "mode" of the WWT renderer.
    */
   setBackgroundImageByName!: (_n: string) => void;
+
+  /** Set the display color of the HiPS catalog with the given name */
+  setCatalogHipsColorByName!: (args: { name: string; color: Color }) => void;
+
+  /** Set the display opacity color of the HiPS catalog with the given name */
+  setCatalogHipsOpacityByName!: (args: { name: string; opacity: number }) => void;
 
   /** Set the rate at which the WWT clock progresses compared to wall-clock time.
    *
@@ -605,10 +628,10 @@ export class WWTAwareComponent extends Vue {
   zoom!: (f: number) => void;
 
   /** Moves the position of the view */
-  move!: ({ x, y }: { x: number; y: number }) => void;
+  move!: (args: { x: number; y: number }) => void;
 
   /** Tilts the position of the view */
-  tilt!: ({ x, y }: { x: number; y: number }) => void;
+  tilt!: (args: { x: number; y: number }) => void;
 
   // Actions
 
