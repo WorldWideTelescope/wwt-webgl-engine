@@ -29,11 +29,11 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:^0.1.0",
-    "@wwtelescope/engine": "thiscommit:2021-06-03:LsnTHkJ",
+    "@wwtelescope/engine": "f477fa5422b1548741ffca37e533b80799d0eede",
     "@wwtelescope/engine-helpers": "37e2cf42895becd14698bf9d2058594bfc61d53f",
     "@wwtelescope/engine-types": "fe25c086751bf45aad29fda93bdb2cc1f4c6e3ef",
-    "@wwtelescope/engine-vuex": "thiscommit:2021-06-03:5oi4JVl",
-    "@wwtelescope/research-app-messages": "f39ce5b29e0284d252ccc8d24a8e4f51e24ace99"
+    "@wwtelescope/engine-vuex": "7a4dec277f30efb6d217ff0c8f0c41276c0fb25c",
+    "@wwtelescope/research-app-messages": "7aee43eaada4d7cec8a06ed313bf490f26a0060d"
   },
   "keywords": [
     "AAS WorldWide Telescope"
