@@ -1,3 +1,8 @@
+# @wwtelescope/research-app-messages 0.6.0 (2021-07-06)
+
+- Define a new `LoadImageCollectionCompletedMessage` type (#118, @imbasimba)
+
+
 # @wwtelescope/research-app-messages 0.5.0 (2021-06-03)
 
 This release contains a fairly trivial breaking change.

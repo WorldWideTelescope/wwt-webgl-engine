@@ -1,6 +1,17 @@
+# @wwtelescope/research-app 0.3.0 (2021-07-06)
+
+- Add MVP UI for loading and visualizing HiPS progressive catalogs (#119,
+  @Carifio24). You can now overlay sources from well-known catalogs like Gaia
+  DR2, 2MASS, and more. Currently there are only a couple of controls for
+  catalog rendering, but more will be added in subsequent releases.
+- Post a `load_image_collection_completed` message to the app's owner, if
+  present, allowing it to know when WTML file loads have completed (#118,
+  @imbasimba).
+
+
 # @wwtelescope/research-app 0.2.2 (2021-06-11)
 
-- Avoid a crash when running in browser environments that do not defined the
+- Avoid a crash when running in browser environments that do not define the
   `ServiceWorker` type (#111, @imbasimba)
 
 

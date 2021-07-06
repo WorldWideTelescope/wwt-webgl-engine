@@ -1,3 +1,9 @@
+# @wwtelescope/engine-vuex 0.9.0 (2021-07-06)
+
+- Expose interfaces for loading and controlling HiPS progressive catalogs
+  (#119, @Carifio24).
+
+
 # @wwtelescope/engine-vuex 0.8.0 (2021-06-03)
 
 - Expose information about the imagesets that the engine knows about, with a

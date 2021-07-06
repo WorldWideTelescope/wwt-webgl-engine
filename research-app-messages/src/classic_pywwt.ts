@@ -32,6 +32,7 @@
  *
  * ### Image Sets
  *
+ * - [[ImageCollectionLoadedMessage]]
  * - [[LoadImageCollectionMessage]]
  * - [[SetBackgroundByNameMessage]]
  * - [[SetForegroundByNameMessage]]
@@ -302,6 +303,14 @@ export function isLoadImageCollectionMessage(o: any): o is LoadImageCollectionMe
     (o.loadChildFolders === undefined || typeof o.loadChildFolders === "boolean");
 }
 
+
+/** A message sent to the user when an image collection has finished loading, and is available for use. */
+export interface LoadImageCollectionCompletedMessage {
+  /** The tag identifying this message type. */
+  event: "load_image_collection_completed";
+  /** The URL of the loaded collection. */
+  url: string;
+}
 
 /** A command to load and play a WWT guided tour file. */
 export interface LoadTourMessage {
@@ -766,6 +775,7 @@ export type PywwtMessage =
   CreateImageSetLayerMessage |
   CreateTableLayerMessage |
   LoadImageCollectionMessage |
+  LoadImageCollectionCompletedMessage |
   LoadTourMessage |
   ModifyAnnotationMessage |
   ModifyFitsLayerMessage |

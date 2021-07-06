@@ -1,3 +1,10 @@
+# @wwtelescope/engine 7.12.0 (2021-07-06)
+
+- Remove misspelled, unused `set_opaciy` declaration from Layer API.
+- Expose interfaces needed to change HiPS catalog display colors in the research
+  app (#119, @Carifio24)
+
+
 # @wwtelescope/engine 7.11.3 (2021-06-11)
 
 - Fix rendering of non-FITS SkyImages (#113, #114, @imbasimba)
