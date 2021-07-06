@@ -51,7 +51,7 @@ namespace wwtlib
                     }
                 case ProjectionType.SkyImage:
                     {
-                        return SkyImageTile.Create(level, x, y, imageset, parent);
+                        return new SkyImageTile(level, x, y, imageset, parent);
                     }
                 case ProjectionType.Plotted:
                     {
@@ -74,7 +74,7 @@ namespace wwtlib
 
                 case ProjectionType.Tangent:
                     {
-                        TangentTile newTile = TangentTile.Create(level, x, y, imageset, parent);
+                        TangentTile newTile = new TangentTile(level, x, y, imageset, parent);
                         return newTile;
                     }
             }

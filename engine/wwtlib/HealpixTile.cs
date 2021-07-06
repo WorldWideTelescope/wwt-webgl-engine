@@ -23,7 +23,6 @@ namespace wwtlib
         private bool subDivided = false;
         private readonly List<List<string>> catalogRows = new List<List<string>>();
         private WebFile catalogData;
-        private FitsImageTile fitsImage;
         private static readonly Matrix3d galacticMatrix = Matrix3d.Create(
                     -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
                     -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
@@ -419,28 +418,6 @@ namespace wwtlib
             return true;
         }
 
-        public override void RenderPart(RenderContext renderContext, int part, double opacity, bool combine)
-        {
-            if (fitsImage == null)
-            {
-                TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
-            }
-            else
-            {
-                ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
-                FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
-                FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
-                FitsShader.ContainsBlanks = dataset.FitsProperties.ContainsBlanks;
-                FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
-                FitsShader.BZero = (float)dataset.FitsProperties.BZero;
-                FitsShader.BScale = (float)dataset.FitsProperties.BScale;
-                FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
-                FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
-                FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
-            }
-            renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
-        }
-
         public void DrawCatalogTile(RenderContext renderContext, double opacity)
         {
             RenderedGeneration = CurrentRenderGeneration;
@@ -693,7 +670,7 @@ namespace wwtlib
                         });
                     } else
                     {
-                        FitsImageJs image = FitsImageJs.CreateHipsTile(dataset, URL, delegate (WcsImage wcsImage)
+                        FitsImageJs image = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
                         {
                             texReady = true;
                             Downloading = false;

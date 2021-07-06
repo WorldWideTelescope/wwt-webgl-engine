@@ -33,6 +33,7 @@ namespace wwtlib
         public ImageElement texture = null;
         public WebGLTexture texture2d = null;
         public bool IsCatalogTile = false;
+        protected FitsImage fitsImage;
 
         public bool ReadyToRender = false;
         public bool InViewFrustum = true;
@@ -90,27 +91,41 @@ namespace wwtlib
                 {
                     texture2d = PrepDevice.createTexture();
 
-
-                    ImageElement image = texture;
-
-                    // Before we bind resize to a power of two if nessesary so we can MIPMAP
-                    if (!Texture.IsPowerOfTwo(texture.Height) | !Texture.IsPowerOfTwo(texture.Width))
+                    if (dataset.Extension == ".fits" && RenderContext.UseGlVersion2)
                     {
-                        CanvasElement temp = (CanvasElement)Document.CreateElement("canvas");
-                        temp.Height = Texture.FitPowerOfTwo(image.Height);
-                        temp.Width = Texture.FitPowerOfTwo(image.Width);
-                        CanvasContext2D ctx = (CanvasContext2D)temp.GetContext(Rendering.Render2D);
-                        ctx.DrawImage(image, 0, 0, temp.Width, temp.Height);
-                        //Substitute the resized image
-                        image = (ImageElement)(Element)temp;
+                        PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+
+                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
+                    }
+                    else
+                    {
+                        ImageElement image = texture;
+
+                        // Before we bind resize to a power of two if nessesary so we can MIPMAP
+                        if (!Texture.IsPowerOfTwo(texture.Height) | !Texture.IsPowerOfTwo(texture.Width))
+                        {
+                            CanvasElement temp = (CanvasElement)Document.CreateElement("canvas");
+                            temp.Height = Texture.FitPowerOfTwo(image.Height);
+                            temp.Width = Texture.FitPowerOfTwo(image.Width);
+                            CanvasContext2D ctx = (CanvasContext2D)temp.GetContext(Rendering.Render2D);
+                            ctx.DrawImage(image, 0, 0, temp.Width, temp.Height);
+                            //Substitute the resized image
+                            image = (ImageElement)(Element)temp;
+                        }
+
+                        PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
+                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+                        PrepDevice.generateMipmap(GL.TEXTURE_2D);
                     }
 
-                    PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
-                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-                    PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
-                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-                    PrepDevice.generateMipmap(GL.TEXTURE_2D);
+
 
                     PrepDevice.bindTexture(GL.TEXTURE_2D, null);
                 }
@@ -552,7 +567,23 @@ namespace wwtlib
             }
             else
             {
-                TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+                if (RenderContext.UseGlVersion2 && fitsImage != null)
+                {
+                    ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
+                    FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
+                    FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
+                    FitsShader.ContainsBlanks = dataset.FitsProperties.ContainsBlanks;
+                    FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
+                    FitsShader.BZero = (float)dataset.FitsProperties.BZero;
+                    FitsShader.BScale = (float)dataset.FitsProperties.BScale;
+                    FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
+                    FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
+                    FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+                }
+                else
+                {
+                    TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+                }
                 renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
             }
         }
