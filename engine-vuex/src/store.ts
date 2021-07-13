@@ -15,6 +15,7 @@ import {
 import {
   Annotation,
   Color,
+  Constellations,
   EngineSetting,
   Folder,
   Guid,
@@ -274,6 +275,60 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       if (Vue.$wwt.inst === null)
         throw new Error('cannot lookupImageset without linking to WWTInstance');
       return Vue.$wwt.inst.ctl.getImagesetByName(imagesetName);
+    }
+  }
+
+  get findRADecForScreenPoint() {
+    return function (pt: { x: number; y: number }): { ra: number; dec: number } {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
+      const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
+      return { ra: (15 * coords.x + 720) % 360, dec : coords.y };
+    }
+  }
+
+  get currentHipsCatalogData() {
+    return function (name: string): string {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get currentHipsCatalogData without linking to WWTInstance');
+      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
+      if (layer != null && layer instanceof SpreadSheetLayer) {
+        return layer.getTableDataInView();
+      } else {
+        return ''
+      }
+    }
+  }
+
+  get findLngColumn() {
+    return function (name: string): number {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get findLngColumn without linking to WWTInstance');
+      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
+      if (layer != null && layer instanceof SpreadSheetLayer) {
+        return layer.get_lngColumn();
+      } else {
+        return -1;
+      }
+    }
+  }
+
+  get findLatColumn() {
+    return function (name: string): number {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get findLatColumn without linking to WWTInstance');
+      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
+      if (layer != null && layer instanceof SpreadSheetLayer) {
+        return layer.get_latColumn();
+      } else {
+        return -1;
+      }
+    }
+  }
+
+  get findConstellationForPoint() {
+    return function(pt: { ra: number; dec: number }): string {
+      return Constellations.containment.findConstellationForPoint(pt.ra, pt.dec);
     }
   }
 
@@ -757,4 +812,5 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('cannot clearAnnotations without linking to WWTInstance');
     Vue.$wwt.inst.si.clearAnnotations();
   }
+
 }

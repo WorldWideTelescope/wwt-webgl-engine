@@ -255,8 +255,12 @@ export class WWTAwareComponent extends Vue {
         wwtShowWebGl2Warning: (state, _getters) => (state as WWTEngineVuexState).showWebGl2Warning,
       }),
       ...mapGetters([
+        "currentHipsCatalogData",
+        "findConstellationForPoint",
+        "findLatColumn",
+        "findLngColumn",
+        "findRADecForScreenPoint",
         "lookupImageset",
-        "hipsCatalogColorByName",
       ]),
       ...this.$options.computed,
     };
@@ -438,6 +442,8 @@ export class WWTAwareComponent extends Vue {
 
   // Getters
 
+  currentHipsCatalogData!: (name: string) => string;
+
   /** Look up an [Imageset](../../engine/classes/imageset.html) in the engine’s
    * table of ones with registered names.
    *
@@ -451,6 +457,15 @@ export class WWTAwareComponent extends Vue {
    * folder must have been loaded using the [[loadImageCollection]] action.
    */
   lookupImageset!: (_n: string) => Imageset | null;
+
+  /** Get the constellation closest to the given point */
+  findConstellationForPoint!: (pt: {ra: number; dec: number}) => string;
+
+  /** Get the right ascension and declination, in degrees, for x, y coordinates on the screen */
+  findRADecForScreenPoint!: (pt: { x: number; y: number }) => { ra: number; dec: number };
+
+  findLngColumn!: (name: string) => number;
+  findLatColumn!: (name: string) => number;
 
   // Mutations
 
