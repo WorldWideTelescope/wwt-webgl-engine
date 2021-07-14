@@ -32,8 +32,8 @@
  *
  * ### Image Sets
  *
- * - [[ImageCollectionLoadedMessage]]
  * - [[LoadImageCollectionMessage]]
+ * - [[LoadImageCollectionCompletedMessage]]
  * - [[SetBackgroundByNameMessage]]
  * - [[SetForegroundByNameMessage]]
  * - [[SetForegroundOpacityMessage]]
