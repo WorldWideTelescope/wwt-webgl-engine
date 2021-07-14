@@ -5,7 +5,6 @@
 
 import * as classicPywwt from './classic_pywwt';
 
-/** The "classic" message formats used by pywwt. */
 export { classicPywwt };
 
 
