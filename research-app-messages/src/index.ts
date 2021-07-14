@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
 // Toplevel documentation found at @/docs/engine/research-app-messages-index.md
@@ -82,4 +82,52 @@ export function isViewStateMessage(o: any): o is ViewStateMessage {  // eslint-d
     typeof o.engineClockISOT === "string" &&
     typeof o.systemClockISOT === "string" &&
     typeof o.engineClockRateFactor === "number";
+}
+
+
+/** A "ping" or "pong" message.
+ *
+ * If you send this message to the app, it will reply with its own
+ * [[PingPongMessage]] that repeats your [[threadId]] and [[sessionId]].
+ *
+ * If you're trying to communicate with the WWT research app through the
+ * [postMessage()] web API, there's no surefire way to know that the app is
+ * actually receiving your messages. This is a particular issue when the app is
+ * starting up. The least-bad way to account for this is to periodically send
+ * pings and wait until you start getting replies. The [[threadId]] parameter
+ * makes it possible to distinguish messages between multiple instances of the
+ * app and multiple app clients.
+ *
+ * [postMessage()]:
+ * https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+ *
+ * This message also includes a [[sessionId]] field that allows clients to set
+ * up customized tagging in [[ViewStateMessage]] updates, which is helpful when
+ * a client is messaging with multiple apps and needs to distinguish their
+ * replies.
+ * */
+export interface PingPongMessage {
+  /** The tag identifying this message type. */
+  type: "wwt_ping_pong";
+
+  /** Arbitrary text that will be included in message responses. */
+  threadId: string;
+
+  /** A client session identifier string.
+   *
+   * If specified, the app will start sending [[ViewStateMessage]] updates to
+   * the sender of this ping-pong message, and those updates will be tagged with
+   * this session ID. This is useful if a client is communicating with multiple
+   * apps and its messaging transport mechanism prevents it from identifying the
+   * origin of the various messages that it receives.
+   */
+  sessionId?: string;
+}
+
+/** Type guard function for [[PingPongMessage]]. */
+export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return typeof o.type === "string" &&
+    o.type == "wwt_ping_pong" &&
+    typeof o.threadId === "string" &&
+    (typeof o.sessionId === "undefined" || typeof o.sessionId === "string");
 }
