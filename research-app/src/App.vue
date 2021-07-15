@@ -110,7 +110,7 @@
 
     <div id="webgl2-popup" v-show="wwtShowWebGl2Warning">
       To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
-      In case you would like to use Safari, we recommend that you 
+      In case you would like to use Safari, we recommend that you
       <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
     </div>
   </div>
@@ -157,7 +157,11 @@ import {
 
 import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 
-import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
+import {
+  classicPywwt,
+  isPingPongMessage,
+  ViewStateMessage,
+} from "@wwtelescope/research-app-messages";
 
 import { convertPywwtSpreadSheetLayerSetting } from "./settings";
 
@@ -742,11 +746,27 @@ export default class App extends WWTAwareComponent {
           }
         }
 
-        this.onMessage(event.data);
+        const message = event.data;
+
+        // Special handling for ping-pong to specifically reply to the pinger --
+        // one day we should get better about talking to multiple clients.
+        if (isPingPongMessage(message)) {
+          if (event.source instanceof Window) {
+            if (message.sessionId !== undefined) {
+              this.statusMessageSessionId = message.sessionId;
+            }
+
+            event.source.postMessage(message, event.origin);
+          } else if (event.source !== null) {
+            event.source.postMessage(message);
+          }
+        } else {
+          this.onMessage(message);
+        }
       }
     }, false);
 
-  // Handling key presses
+    // Handling key presses
 
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
     window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
@@ -945,6 +965,7 @@ export default class App extends WWTAwareComponent {
   // try to make it reactive, which would cause it to try to read fields that
   // are prohibited in cross-origin situations:
   private statusMessageDestination!: Window | null;
+  statusMessageSessionId = "default";
   lastUpdatedRA = 0.0;
   lastUpdatedDec = 0.0;
   lastUpdatedFov = 1.0;
@@ -972,6 +993,7 @@ export default class App extends WWTAwareComponent {
 
     const message: ViewStateMessage = {
       type: "wwt_view_state",
+      sessionId: this.statusMessageSessionId,
       raRad: ra,
       decRad: dec,
       fovDeg: fov,
