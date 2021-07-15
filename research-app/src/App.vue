@@ -799,12 +799,14 @@ export default class App extends WWTAwareComponent {
 
   onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
     if (classicPywwt.isLoadImageCollectionMessage(msg)) {
-      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(()=> {
-        if(this.statusMessageDestination != null && this.allowedOrigin != null){
+      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(() => {
+        if (this.statusMessageDestination != null && this.allowedOrigin != null){
           const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
             event: "load_image_collection_completed",
+            threadId: msg.threadId,
             url: msg.url
           };
+
           this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
         }
       });
