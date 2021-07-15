@@ -751,45 +751,54 @@ export default class App extends WWTAwareComponent {
       screenfull.on('change', this.onFullscreenEvent);
     }
 
-    this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
+    this.waitForReady().then(() => {
+      // This returns a promise but I don't think that we need to wait for that
+      // to resolve before going ahead and starting to listen for messages.
+      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
 
-    // For now let's just not worry about removing this listener ...
-    window.addEventListener('message', (event) => {
-      // We have to be careful with event.source -- see this function's docs.
-      const sourceAsWindow = eventSourceAsWindow(event);
+      // Don't start listening for messages until the engine is ready to go.
+      // There's no point in returning a "not ready yet" error or anything since
+      // the client has to handle the "app isn't yet listening for messages"
+      // state anyway.
+      //
+      // For now let's just not worry about removing this listener ...
+      window.addEventListener('message', (event) => {
+        // We have to be careful with event.source -- see this function's docs.
+        const sourceAsWindow = eventSourceAsWindow(event);
 
-      if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
-        // You could imagine wanting to send status updates to multiple
-        // destinations, but let's start simple.
-        if (this.statusMessageDestination === null) {
-          if (sourceAsWindow !== null) {
-            this.statusMessageDestination = sourceAsWindow;
-            // Hardcode the status update rate to max out at 5 Hz.
-            this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
-          }
-        }
-
-        const message = event.data;
-
-        // Special handling for ping-pong to specifically reply to the pinger --
-        // one day we should get better about talking to multiple clients.
-        if (isPingPongMessage(message)) {
-          if (sourceAsWindow !== null) {
-            if (message.sessionId !== undefined) {
-              this.statusMessageSessionId = message.sessionId;
+        if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
+          // You could imagine wanting to send status updates to multiple
+          // destinations, but let's start simple.
+          if (this.statusMessageDestination === null) {
+            if (sourceAsWindow !== null) {
+              this.statusMessageDestination = sourceAsWindow;
+              // Hardcode the status update rate to max out at 5 Hz.
+              this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
             }
-
-            sourceAsWindow.postMessage(message, event.origin);
-          } else if (event.source instanceof Window) {
-            /* can't-happen, but needed to make TypeScript happy */
-          } else if (event.source !== null) {
-            event.source.postMessage(message);
           }
-        } else {
-          this.onMessage(message);
+
+          const message = event.data;
+
+          // Special handling for ping-pong to specifically reply to the pinger --
+          // one day we should get better about talking to multiple clients.
+          if (isPingPongMessage(message)) {
+            if (sourceAsWindow !== null) {
+              if (message.sessionId !== undefined) {
+                this.statusMessageSessionId = message.sessionId;
+              }
+
+              sourceAsWindow.postMessage(message, event.origin);
+            } else if (event.source instanceof Window) {
+              /* can't-happen, but needed to make TypeScript happy */
+            } else if (event.source !== null) {
+              event.source.postMessage(message);
+            }
+          } else {
+            this.onMessage(message);
+          }
         }
-      }
-    }, false);
+      }, false);
+    });
 
     // Handling key presses
 
