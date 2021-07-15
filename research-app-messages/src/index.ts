@@ -140,5 +140,5 @@ export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-dis
   return typeof o.type === "string" &&
     o.type == "wwt_ping_pong" &&
     typeof o.threadId === "string" &&
-    (typeof o.sessionId === "undefined" || typeof o.sessionId === "string");
+    (o.sessionId === undefined || typeof o.sessionId === "string");
 }
