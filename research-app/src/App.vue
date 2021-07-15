@@ -689,6 +689,26 @@ class KeyboardControlSettings {
   }
 }
 
+/** Get the source of a MessageEvent as a Window, if it is one.
+ *
+ * The problem here is that on Chrome, if the event is a cross-origin message
+ * event, `event.source instanceof Window` returns false even if the source is a
+ * window, because that object comes from a different JS context than the one
+ * that is currently executing, so its `Window` type is different than ours. On
+ * other browsers, or same-origin events, the problem doesn't manifest.
+ * Meanwhile, the ServiceWorker type is only defined on HTTPS connections and
+ * localhost, so it's sometimes missing.
+ *
+ * See:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof#instanceof_and_multiple_context_e.g._frames_or_windows
+ */
+function eventSourceAsWindow(e: MessageEvent): Window | null {
+  if (!(e.source instanceof MessagePort) && (typeof ServiceWorker === 'undefined' || !(e.source instanceof ServiceWorker))) {
+    return e.source as Window;
+  }
+
+  return null;
+}
 
 /** The main "research app" Vue component. */
 @Component
@@ -735,12 +755,15 @@ export default class App extends WWTAwareComponent {
 
     // For now let's just not worry about removing this listener ...
     window.addEventListener('message', (event) => {
+      // We have to be careful with event.source -- see this function's docs.
+      const sourceAsWindow = eventSourceAsWindow(event);
+
       if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
         // You could imagine wanting to send status updates to multiple
         // destinations, but let's start simple.
         if (this.statusMessageDestination === null) {
-          if (event.source instanceof Window) {
-            this.statusMessageDestination = event.source;
+          if (sourceAsWindow !== null) {
+            this.statusMessageDestination = sourceAsWindow;
             // Hardcode the status update rate to max out at 5 Hz.
             this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
           }
@@ -751,12 +774,14 @@ export default class App extends WWTAwareComponent {
         // Special handling for ping-pong to specifically reply to the pinger --
         // one day we should get better about talking to multiple clients.
         if (isPingPongMessage(message)) {
-          if (event.source instanceof Window) {
+          if (sourceAsWindow !== null) {
             if (message.sessionId !== undefined) {
               this.statusMessageSessionId = message.sessionId;
             }
 
-            event.source.postMessage(message, event.origin);
+            sourceAsWindow.postMessage(message, event.origin);
+          } else if (event.source instanceof Window) {
+            /* can't-happen, but needed to make TypeScript happy */
           } else if (event.source !== null) {
             event.source.postMessage(message);
           }
