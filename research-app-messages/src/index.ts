@@ -46,6 +46,16 @@ export interface ViewStateMessage {
   /** A message type identifier. */
   type: "wwt_view_state";
 
+  /** An app/client session identifier.
+   *
+   * If a single client is communicating with multiple apps, it needs to be able
+   * to tell which app is the source of any update messages. This session
+   * identifier allows clients to do so. The default value is "default". But if
+   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * that value will start appearing in these view state update messages.
+   */
+  sessionId: string;
+
   /** The current right ascension of the view, in radians. */
   raRad: number;
 
@@ -76,6 +86,7 @@ export interface ViewStateMessage {
 export function isViewStateMessage(o: any): o is ViewStateMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.type === "string" &&
     o.type == "wwt_view_state" &&
+    typeof o.sessionId === "string" &&
     typeof o.raRad === "number" &&
     typeof o.decRad === "number" &&
     typeof o.fovDeg === "number" &&
