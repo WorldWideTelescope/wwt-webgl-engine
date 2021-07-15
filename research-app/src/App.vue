@@ -2,6 +2,9 @@
   <div id="app">
     <WorldWideTelescope
       :wwt-namespace="wwtComponentNamespace"
+      :class="['wwt', { 'pointer' : this.lastClosePt !== null }]"
+      @mousemove.native="wwtOnMouseMove"
+      @click.native="wwtOnClick"
     ></WorldWideTelescope>
 
     <div id='display-panel'>
@@ -15,11 +18,22 @@
           <label>Layers:</label>
         </div>
         <div v-if="showLayers">
-          <catalog-item v-for="[index, catalog] of hipsCatalogs.entries()"
+          <catalog-item v-for="catalog of hipsCatalogs"
           v-bind:key="catalog.name"
           v-bind:catalog="catalog"
           v-bind:defaultColor="defaultColor"
-          v-bind:class="['catalog-row', { 'last-row': index == hipsCatalogs.length-1 }]"/>
+          />
+        </div>
+      </div>
+      <div id="sources-container" v-if="haveSources">
+        <div class="display-section-header">
+          <label>Sources:</label>
+        </div>
+        <div v-if="showSources">
+          <source-item v-for="source of sources"
+            v-bind:key="source.name"
+            v-bind:source="source"
+            />
         </div>
       </div>
     </div>
@@ -120,12 +134,13 @@
 import * as moment from "moment";
 import * as screenfull from "screenfull";
 import 'vue-select/dist/vue-select.css';
+import { debounce } from 'debounce';
 import { Component, Prop, Watch } from "vue-property-decorator";
-import { mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations, mapState } from "vuex";
 
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
-import WWTResearchAppModule from "./store";
+import { Source, WWTResearchAppModule } from "./store";
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 import {
@@ -685,6 +700,12 @@ class KeyboardControlSettings {
   }
 }
 
+interface AngleCoordinates {
+  ra: number;
+  dec: number;
+  [x: string]: any;
+}
+
 
 /** The main "research app" Vue component. */
 @Component
@@ -693,11 +714,19 @@ export default class App extends WWTAwareComponent {
   @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
   defaultColor = Color.fromArgb(1, 255, 255, 255);
-  hipsCatalogs!: ImagesetInfo[];
-  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   wwtComponentNamespace = wwtEngineNamespace;
-
+  lastClosePt: Source | null = null;
+  distanceThreshold: number = 0.01;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
+
+  // From the store
+  hipsCatalogs!: ImagesetInfo[];
+  nameColumns!: string[];
+  sources!: Source[];
+  
+  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+  addSource!: (source: Source) => void;
+  visibleHipsCatalogs!: () => ImagesetInfo[];
 
   // Lifecycle management
 
@@ -705,14 +734,20 @@ export default class App extends WWTAwareComponent {
     this.$options.computed = {
       ...mapState(wwtResearchAppNamespace, {
         hipsCatalogs: (state, _getters) => (state as WWTResearchAppModule).hipsCatalogs,
+        nameColumns: (state, _getters) => (state as WWTResearchAppModule).nameColumns,
+        sources: (state, _getters) => (state as WWTResearchAppModule).sources,
       }),
+      ...mapGetters(wwtResearchAppNamespace, [
+        "visibleHipsCatalogs",
+      ]),
       ...this.$options.computed,
     }
 
     this.$options.methods = {
       ...this.$options.methods,
       ...mapMutations(wwtResearchAppNamespace, [
-          "addResearchAppCatalogHips"
+          "addResearchAppCatalogHips",
+          "addSource",
       ])
     }
 
@@ -746,8 +781,7 @@ export default class App extends WWTAwareComponent {
       }
     }, false);
 
-  // Handling key presses
-
+    // Handling key presses
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
     window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
     window.addEventListener('keydown', this._kcs.makeListener("moveUp", () => this.doMove(0, this._kcs.moveAmount)));
@@ -762,6 +796,8 @@ export default class App extends WWTAwareComponent {
     window.addEventListener('keydown', this._kcs.makeListener("bigMoveDown", () => this.doMove(0, this._kcs.bigMoveFactor * -this._kcs.moveAmount)));
     window.addEventListener('keydown', this._kcs.makeListener("bigMoveLeft", () => this.doMove(this._kcs.bigMoveFactor * this._kcs.moveAmount, 0)));
     window.addEventListener('keydown', this._kcs.makeListener("bigMoveRight", () => this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)));
+
+
   }
 
   destroyed() {
@@ -895,6 +931,50 @@ export default class App extends WWTAwareComponent {
     } else {
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
+  }
+
+  wwtOnMouseMove(event: MouseEvent) {
+    if (this.hipsCatalogs.length == 0) {
+        return;
+      }
+      const pt = { x: event.offsetX, y: event.offsetY };
+      const raDecDeg = this.findRADecForScreenPoint(pt);
+      const raDecRad = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
+      const closestPt = this.closestInView(raDecRad, this.distanceThreshold);
+      if (closestPt == null && this.lastClosePt == null) {
+        return;
+      }
+      const needsUpdate = (closestPt == null || this.lastClosePt == null) || ((this.lastClosePt.ra != closestPt.ra) || (this.lastClosePt.dec != closestPt.dec));
+      if (needsUpdate) {
+        this.lastClosePt = closestPt;
+      }
+  }
+
+  wwtOnClick(_event: MouseEvent) {
+    if (this.lastClosePt !== null) {
+      const source: Source = { ...this.lastClosePt, zoomDeg: this.wwtZoomDeg, name: this.generateName(this.lastClosePt) };
+      this.addSource(source);
+      //console.log(JSON.stringify(source, null, 4));
+    }
+  }
+
+  // Increment the counter by 1 every time this is called
+  newSourceName = (function () {
+    let count = 0;
+
+    return function() {
+      count += 1;
+      return `Source ${count}`;
+    }
+  })();
+
+  generateName(item: any): string {
+    for (const col of this.nameColumns) {
+      if (col in item) {
+        return `${col} ${item[col]}`;
+      }
+    }
+    return this.newSourceName();
   }
 
   // Keyed by "external" layer IDs
@@ -1096,6 +1176,10 @@ export default class App extends WWTAwareComponent {
     return this.hipsCatalogs.length > 0;
   }
 
+  get haveSources() {
+    return this.sources.length > 0;
+  }
+
   get showToolMenu() {
     // This should return true if there are any tools to show.
     return this.showCrossfader || this.showBackgroundChooser;
@@ -1144,12 +1228,86 @@ export default class App extends WWTAwareComponent {
     return imagesets.filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
   }
 
+  // RA, Dec in radians
+  distance(pt1: AngleCoordinates, pt2: AngleCoordinates): number {
+    // Using the last formula from https://en.wikipedia.org/wiki/Great-circle_distance#Computational_formulas
+    // which Wikipedia says is accurate at all distances
+    const dAbsRA = Math.abs(pt1.ra - pt2.ra);
+    const nt1 = (Math.cos(pt2.dec) * Math.sin(dAbsRA)) ** 2;
+    const nt2 = (Math.cos(pt1.dec) * Math.sin(pt2.dec) - Math.sin(pt1.dec) * Math.cos(pt2.dec) * Math.cos(dAbsRA)) ** 2;
+    const num = Math.sqrt(nt1 + nt2);
+    const den = Math.sin(pt1.dec) * Math.sin(pt2.dec) + Math.cos(pt1.dec) * Math.cos(pt2.dec) * Math.cos(dAbsRA);
+    return Math.atan2(num, den);
+  }
+
+  closestInView(target: AngleCoordinates, threshold?: number): Source | null {
+    let minDist = Infinity;
+    let closestPt = null;
+
+    //const pointsInView = this.dataInView();
+    //const result = this.closest(target, pointsInView);
+    // const closePt = result.pt
+    // const minDist = result.dist
+
+    const rowSeparator = "\r\n";
+    const colSeparator = "\t";
+
+    for (const catalog of this.visibleHipsCatalogs()) {
+      const name = catalog.name;
+      const hipsStr = this.currentHipsCatalogData(name);
+      const rows = hipsStr.split(rowSeparator);
+      const header = rows.shift();
+      if (!header) {
+        return null;
+      }
+      const colNames = header.split(colSeparator);
+
+      const lngCol = this.findLngColumn(name);
+      const latCol = this.findLatColumn(name);
+
+      const itemCreator = function (values: string[]): Source {
+        let obj: any = {};
+        for (let i = 0; i < values.length; i++) {
+          obj[colNames[i]] = values[i];
+        }
+        return { ...obj, ra: D2R * Number(values[lngCol]), dec: D2R * Number(values[latCol]), catalogName: name };
+      };
+      
+      for (const row of rows) {
+        const items = row.split(colSeparator);
+        const ra = Number(items[lngCol]);
+        const dec = Number(items[latCol]);
+        const pt = { ra: D2R * ra, dec: D2R * dec };
+        const dist = this.distance(target, pt);
+        if (dist < minDist) {
+          closestPt = itemCreator(items);
+          minDist = dist;
+        }
+      }
+    }
+    if (!threshold || minDist < threshold) {
+      return closestPt;
+    }
+    return null;
+  }
+
   data() {
     return {
       showPopover: false,
       showLayers: true,
+      showSources: true,
     }
   }
+
+  updateDistanceThreshold = debounce((newZoom: number) => {
+    this.distanceThreshold = 0.00002 * newZoom;
+  }, 25);
+
+  @Watch('wwtZoomDeg', { immediate: true })
+  onZoomChange(val: number, oldVal: number) {
+    this.updateDistanceThreshold(val);
+  }
+
 
 }
 </script>
@@ -1472,6 +1630,21 @@ ul.tool-menu {
     margin: 0;
     font-size: small;
   }
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+/**
+This makes the last element of the last list item in the
+display panel have the rounded bottom edge
+The alternative to this is to have Vue bind a class to the last element
+Since I'm using 
+*/
+#display-panel > *:last-child > *:last-child > *:last-child {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 </style>
