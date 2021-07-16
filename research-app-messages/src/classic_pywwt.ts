@@ -32,8 +32,8 @@
  *
  * ### Image Sets
  *
- * - [[ImageCollectionLoadedMessage]]
  * - [[LoadImageCollectionMessage]]
+ * - [[LoadImageCollectionCompletedMessage]]
  * - [[SetBackgroundByNameMessage]]
  * - [[SetForegroundByNameMessage]]
  * - [[SetForegroundOpacityMessage]]
@@ -291,8 +291,17 @@ export interface LoadImageCollectionMessage {
   /** The URL of the collection to load. */
   url: string;
 
-  /** Optional, Recursively load any child folders. Defaults to False*/
+  /** Optional, Recursively load any child folders. Defaults to False. */
   loadChildFolders?: boolean;
+
+  /** An optional, arbitrary "thread" identifier that will be included in the
+   * reply message.
+   *
+   * The client can set this field so that it can properly associate response
+   * messages with the particular app and request that caused it. This
+   * disambiguation is needed when one client is talking to multiple apps.
+   * */
+  threadId?: string;
 }
 
 /** Type guard function for LoadImageCollectionMessage. */
@@ -300,16 +309,30 @@ export function isLoadImageCollectionMessage(o: any): o is LoadImageCollectionMe
   return typeof o.event === "string" &&
     o.event == "load_image_collection" &&
     typeof o.url === "string" &&
-    (o.loadChildFolders === undefined || typeof o.loadChildFolders === "boolean");
+    (o.loadChildFolders === undefined || typeof o.loadChildFolders === "boolean") &&
+    (o.threadId === undefined || typeof o.threadId === "string");
 }
 
 
-/** A message sent to the user when an image collection has finished loading, and is available for use. */
+/** A message sent to the user when an image collection has finished loading,
+ * and is available for use. */
 export interface LoadImageCollectionCompletedMessage {
   /** The tag identifying this message type. */
   event: "load_image_collection_completed";
+
   /** The URL of the loaded collection. */
   url: string;
+
+  /** The thread ID of the triggering message, if it was provided. */
+  threadId?: string;
+}
+
+/** Type guard function for [[LoadImageCollectionCompletedMessage]]. */
+export function isLoadImageCollectionCompletedMessage(o: any): o is LoadImageCollectionCompletedMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return typeof o.event === "string" &&
+    o.event == "load_image_collection_completed" &&
+    typeof o.url === "string" &&
+    (o.threadId === undefined || typeof o.threadId === "string");
 }
 
 /** A command to load and play a WWT guided tour file. */
