@@ -1,4 +1,10 @@
-# rc: minor bump
+# rc: micro bump
+
+- Fix an accidental backwards-compatibility breakage: the `mode` field of
+  CreateImageSetLayerMessage has to remain optional (#122, @pkgw)
+
+
+# @wwtelescope/research-app-messages 0.7.0 (2021-07-16)
 
 Add a few new attributes to improve our positioning for allowing multiple
 clients to talk to multiple apps, all through a single messaging hub (#121,
