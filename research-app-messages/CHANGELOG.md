@@ -1,3 +1,9 @@
+# @wwtelescope/research-app-messages 0.7.1 (2021-07-16)
+
+- Fix an accidental backwards-compatibility breakage: the `mode` field of
+  CreateImageSetLayerMessage has to remain optional (#122, @pkgw)
+
+
 # @wwtelescope/research-app-messages 0.7.0 (2021-07-16)
 
 Add a few new attributes to improve our positioning for allowing multiple
