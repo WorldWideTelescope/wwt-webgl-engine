@@ -4,7 +4,8 @@
       :wwt-namespace="wwtComponentNamespace"
       :class="['wwt', { 'pointer' : this.lastClosePt !== null }]"
       @mousemove.native="wwtOnMouseMove"
-      @click.native="wwtOnClick"
+      @mouseup.native="wwtOnMouseUp"
+      @mousedown.native="wwtOnMouseDown"
     ></WorldWideTelescope>
 
     <div id='display-panel'>
@@ -718,6 +719,7 @@ export default class App extends WWTAwareComponent {
   lastClosePt: Source | null = null;
   distanceThreshold: number = 0.01;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
+  drag = false;
 
   // From the store
   hipsCatalogs!: ImagesetInfo[];
@@ -935,27 +937,33 @@ export default class App extends WWTAwareComponent {
 
   wwtOnMouseMove(event: MouseEvent) {
     if (this.hipsCatalogs.length == 0) {
-        return;
-      }
-      const pt = { x: event.offsetX, y: event.offsetY };
-      const raDecDeg = this.findRADecForScreenPoint(pt);
-      const raDecRad = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
-      const closestPt = this.closestInView(raDecRad, this.distanceThreshold);
-      if (closestPt == null && this.lastClosePt == null) {
-        return;
-      }
-      const needsUpdate = (closestPt == null || this.lastClosePt == null) || ((this.lastClosePt.ra != closestPt.ra) || (this.lastClosePt.dec != closestPt.dec));
-      if (needsUpdate) {
-        this.lastClosePt = closestPt;
-      }
+      return;
+    }
+    const pt = { x: event.offsetX, y: event.offsetY };
+    const raDecDeg = this.findRADecForScreenPoint(pt);
+    const raDecRad = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
+    const closestPt = this.closestInView(raDecRad, this.distanceThreshold);
+    if (closestPt == null && this.lastClosePt == null) {
+      return;
+    }
+    const needsUpdate = (closestPt == null || this.lastClosePt == null) || ((this.lastClosePt.ra != closestPt.ra) || (this.lastClosePt.dec != closestPt.dec));
+    if (needsUpdate) {
+      this.lastClosePt = closestPt;
+    }
+    this.drag = true;
   }
 
-  wwtOnClick(_event: MouseEvent) {
-    if (this.lastClosePt !== null) {
-      const source: Source = { ...this.lastClosePt, zoomDeg: this.wwtZoomDeg, name: this.generateName(this.lastClosePt) };
+  wwtOnMouseDown(_event: MouseEvent) {
+    this.drag = false;
+  }
+
+  wwtOnMouseUp(_event: MouseEvent) {
+    if (!this.drag && this.lastClosePt !== null) {
+      const source: Source = { ...this.lastClosePt, name: this.generateName(this.lastClosePt) };
       this.addSource(source);
       //console.log(JSON.stringify(source, null, 4));
     }
+    this.drag = false;
   }
 
   // Increment the counter by 1 every time this is called
