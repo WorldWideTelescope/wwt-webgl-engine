@@ -1,4 +1,4 @@
-import { Module, VuexModule, Mutation } from 'vuex-module-decorators';
+import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
 import { ImagesetInfo } from '@wwtelescope/engine-vuex';
 import Vue from 'vue';
 export interface Source {
@@ -13,8 +13,22 @@ export interface HipsCatalogStatus {
     visible: boolean;
 }
 
-function addToArrayWithoutDuplication<T>(array: T[], item: T): boolean {
-    const index = array.indexOf(item);
+type EquivalenceTest<T> = (t1: T, t2: T) => boolean;
+
+function getIndex<T>(array: T[], item: T, equivalent: EquivalenceTest<T> | null = null): number {
+    if (!equivalent) {
+        return array.indexOf(item);
+    }
+    for (const [index, value] of array.entries()) {
+        if (equivalent(item, value)) {
+            return index;
+        }
+    }
+    return -1;
+}
+
+function addToArrayWithoutDuplication<T>(array: T[], item: T, equivalent: EquivalenceTest<T> | null = null): boolean {
+    const index = getIndex(array, item, equivalent);
     if (index < 0) {
         array.push(item);
         return true;
@@ -22,12 +36,16 @@ function addToArrayWithoutDuplication<T>(array: T[], item: T): boolean {
     return false;
 }
 
-function removeFromArray<T>(array: T[], item: T): number {
-    const index = array.indexOf(item);
+function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> | null = null): number {
+    const index = getIndex(array, item, equivalent);
     if (index >= 0) {
         array.splice(index, 1);
     }
     return index;
+}
+
+function sourcesEqual(s1: Source, s2: Source) {
+    return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (s1.name === s2.name) && (s1.catalogName === s2.catalogName);
 }
 
 @Module({
@@ -48,7 +66,7 @@ export class WWTResearchAppModule extends VuexModule {
 
    get researchAppHipsCatalogVisibility() {
     return (catalog: ImagesetInfo) =>  {
-        const index = this.hipsCatalogs.indexOf(catalog);
+        const index = getIndex(this.hipsCatalogs, catalog);
         return (index >= 0) ? this.hipsCatalogVisibilities[index] : false;
     }
 }
@@ -76,7 +94,7 @@ export class WWTResearchAppModule extends VuexModule {
 
     @Mutation
     setResearchAppCatalogHipsVisibility(args: { catalog: ImagesetInfo, visible: boolean}) {
-        const index = this.hipsCatalogs.indexOf(args.catalog);
+        const index = getIndex(this.hipsCatalogs, args.catalog);
         if (index >= 0) {
             Vue.set(this.hipsCatalogVisibilities, index, args.visible);
         }
@@ -84,7 +102,7 @@ export class WWTResearchAppModule extends VuexModule {
 
     @Mutation
     addSource(source: Source) {
-        addToArrayWithoutDuplication(this.sources, source);
+        addToArrayWithoutDuplication(this.sources, source, sourcesEqual);
     }
 
     @Mutation

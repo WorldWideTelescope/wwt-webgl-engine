@@ -69,7 +69,6 @@ export default class SourceItem extends Vue {
     }
 
     handleMarkerClick() {
-      console.log(`In radians: ${this.source.ra}, ${this.source.dec}`);
       this.gotoRADecZoom({ zoomDeg: this.source.zoomDeg ?? this.wwtDegZoom, raRad: this.source.ra, decRad: this.source.dec, instant: false }).catch(err => console.log(err));
     }
 
