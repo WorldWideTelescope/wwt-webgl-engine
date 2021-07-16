@@ -1,5 +1,18 @@
 # rc: minor bump
 
+Add a few new attributes to improve our positioning for allowing multiple
+clients to talk to multiple apps, all through a single messaging hub (#121,
+@pkgw):
+
+- add a threadId field to LoadImageCollection
+- add a sessionId field to ViewStateMessage
+- define the PingPongMessage
+
+Also fix up some docs overrides.
+
+
+# @wwtelescope/research-app-messages 0.6.0 (2021-07-06)
+
 - Define a new `LoadImageCollectionCompletedMessage` type (#118, @imbasimba)
 
 
