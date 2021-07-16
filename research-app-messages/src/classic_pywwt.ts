@@ -198,10 +198,14 @@ export interface CreateImageSetLayerMessage {
   /** The URL from which to obtain the FITS file or image set. */
   url: string;
 
-  /** Tell WWT what type of layer you are Adding.
-   * OR let WWT try to autodetect the type of the data.
-   * Default, autodetect. */
-  mode: "autodetect" | "fits" | "preloaded";
+  /** The type of layer that is being loaded.
+   *
+   * With "fits", the URL will be treated as a FITS file to be downloaded and
+   * displayed. With "preloaded", the URL will be assumed to correspond to an
+   * imageset that has already been loaded into the engine. The default is
+   * "autodetect", which will assume "fits" if the URL ends in a FITS-like
+   * extension, otherwise "preloaded". */
+  mode?: "autodetect" | "fits" | "preloaded";
 
   /** Go to centre of the data. Defaults to true.*/
   goto?: boolean;
@@ -213,7 +217,7 @@ export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMe
     o.event == "image_layer_create" &&
     typeof o.id === "string" &&
     typeof o.url === "string" &&
-    (o.mode == "autodetect" || o.mode == "fits" || o.mode == "preloaded") &&
+    (o.mode === undefined || o.mode == "autodetect" || o.mode == "fits" || o.mode == "preloaded") &&
     (o.goto === undefined || typeof o.goto === "boolean");
 }
 
