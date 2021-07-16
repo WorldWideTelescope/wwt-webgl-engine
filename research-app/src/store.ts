@@ -61,7 +61,11 @@ export class WWTResearchAppModule extends VuexModule {
    nameColumns: string[] = [
     "2MASS",
     "GSC",          // Guide Star Catalog
-    "PPM",
+    "PPMXL_ID",     // PPXML
+    "SPMID",        // SPM Catalog
+    "UCAC4",        // UCAC4 Catalog
+    "JNAME",        // SDSS Release 7
+    "SDSS9"         // SDSS Release 9
    ];
 
    get researchAppHipsCatalogVisibility() {
