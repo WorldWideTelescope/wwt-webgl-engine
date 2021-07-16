@@ -961,7 +961,6 @@ export default class App extends WWTAwareComponent {
     if (!this.drag && this.lastClosePt !== null) {
       const source: Source = { ...this.lastClosePt, name: this.generateName(this.lastClosePt) };
       this.addSource(source);
-      //console.log(JSON.stringify(source, null, 4));
     }
     this.drag = false;
   }
@@ -1307,13 +1306,13 @@ export default class App extends WWTAwareComponent {
     }
   }
 
-  updateDistanceThreshold = debounce((newZoom: number) => {
-    this.distanceThreshold = 0.00002 * newZoom;
-  }, 25);
+  updateDistanceThreshold = debounce((app: App, newZoom: number) => {
+    app.distanceThreshold = 0.00002 * newZoom;
+  }, 20);
 
   @Watch('wwtZoomDeg', { immediate: true })
   onZoomChange(val: number, oldVal: number) {
-    this.updateDistanceThreshold(val);
+    this.updateDistanceThreshold(this, val);
   }
 
 
