@@ -838,10 +838,6 @@ export default class App extends WWTAwareComponent {
     });
 
     // Handling key presses
-<<<<<<< HEAD
-=======
-
->>>>>>> master
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
     window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
     window.addEventListener('keydown', this._kcs.makeListener("moveUp", () => this.doMove(0, this._kcs.moveAmount)));

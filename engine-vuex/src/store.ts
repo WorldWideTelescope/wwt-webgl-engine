@@ -15,7 +15,6 @@ import {
 import {
   Annotation,
   Color,
-  Constellations,
   EngineSetting,
   Folder,
   Guid,
@@ -323,12 +322,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       } else {
         return -1;
       }
-    }
-  }
-
-  get findConstellationForPoint() {
-    return function(pt: { ra: number; dec: number }): string {
-      return Constellations.containment.findConstellationForPoint(pt.ra, pt.dec);
     }
   }
 
