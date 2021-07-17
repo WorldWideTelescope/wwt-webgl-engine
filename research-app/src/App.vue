@@ -125,7 +125,7 @@
 
     <div id="webgl2-popup" v-show="wwtShowWebGl2Warning">
       To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
-      In case you would like to use Safari, we recommend that you 
+      In case you would like to use Safari, we recommend that you
       <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
     </div>
   </div>
@@ -173,7 +173,11 @@ import {
 
 import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 
-import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
+import {
+  classicPywwt,
+  isPingPongMessage,
+  ViewStateMessage,
+} from "@wwtelescope/research-app-messages";
 
 import { convertPywwtSpreadSheetLayerSetting } from "./settings";
 
@@ -707,6 +711,26 @@ interface AngleCoordinates {
   [x: string]: any;
 }
 
+/** Get the source of a MessageEvent as a Window, if it is one.
+ *
+ * The problem here is that on Chrome, if the event is a cross-origin message
+ * event, `event.source instanceof Window` returns false even if the source is a
+ * window, because that object comes from a different JS context than the one
+ * that is currently executing, so its `Window` type is different than ours. On
+ * other browsers, or same-origin events, the problem doesn't manifest.
+ * Meanwhile, the ServiceWorker type is only defined on HTTPS connections and
+ * localhost, so it's sometimes missing.
+ *
+ * See:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof#instanceof_and_multiple_context_e.g._frames_or_windows
+ */
+function eventSourceAsWindow(e: MessageEvent): Window | null {
+  if (!(e.source instanceof MessagePort) && (typeof ServiceWorker === 'undefined' || !(e.source instanceof ServiceWorker))) {
+    return e.source as Window;
+  }
+
+  return null;
+}
 
 /** The main "research app" Vue component. */
 @Component
@@ -764,26 +788,60 @@ export default class App extends WWTAwareComponent {
       screenfull.on('change', this.onFullscreenEvent);
     }
 
-    this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
+    this.waitForReady().then(() => {
+      // This returns a promise but I don't think that we need to wait for that
+      // to resolve before going ahead and starting to listen for messages.
+      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
 
-    // For now let's just not worry about removing this listener ...
-    window.addEventListener('message', (event) => {
-      if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
-        // You could imagine wanting to send status updates to multiple
-        // destinations, but let's start simple.
-        if (this.statusMessageDestination === null) {
-          if (event.source instanceof Window) {
-            this.statusMessageDestination = event.source;
-            // Hardcode the status update rate to max out at 5 Hz.
-            this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
+      // Don't start listening for messages until the engine is ready to go.
+      // There's no point in returning a "not ready yet" error or anything since
+      // the client has to handle the "app isn't yet listening for messages"
+      // state anyway.
+      //
+      // For now let's just not worry about removing this listener ...
+      window.addEventListener('message', (event) => {
+        // We have to be careful with event.source -- see this function's docs.
+        const sourceAsWindow = eventSourceAsWindow(event);
+
+        if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
+          // You could imagine wanting to send status updates to multiple
+          // destinations, but let's start simple.
+          if (this.statusMessageDestination === null) {
+            if (sourceAsWindow !== null) {
+              this.statusMessageDestination = sourceAsWindow;
+              // Hardcode the status update rate to max out at 5 Hz.
+              this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
+            }
+          }
+
+          const message = event.data;
+
+          // Special handling for ping-pong to specifically reply to the pinger --
+          // one day we should get better about talking to multiple clients.
+          if (isPingPongMessage(message)) {
+            if (sourceAsWindow !== null) {
+              if (message.sessionId !== undefined) {
+                this.statusMessageSessionId = message.sessionId;
+              }
+
+              sourceAsWindow.postMessage(message, event.origin);
+            } else if (event.source instanceof Window) {
+              /* can't-happen, but needed to make TypeScript happy */
+            } else if (event.source !== null) {
+              event.source.postMessage(message);
+            }
+          } else {
+            this.onMessage(message);
           }
         }
-
-        this.onMessage(event.data);
-      }
-    }, false);
+      }, false);
+    });
 
     // Handling key presses
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
     window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
     window.addEventListener('keydown', this._kcs.makeListener("moveUp", () => this.doMove(0, this._kcs.moveAmount)));
@@ -817,12 +875,14 @@ export default class App extends WWTAwareComponent {
 
   onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
     if (classicPywwt.isLoadImageCollectionMessage(msg)) {
-      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(()=> {
-        if(this.statusMessageDestination != null && this.allowedOrigin != null){
+      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(() => {
+        if (this.statusMessageDestination != null && this.allowedOrigin != null){
           const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
             event: "load_image_collection_completed",
+            threadId: msg.threadId,
             url: msg.url
           };
+
           this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
         }
       });
@@ -1034,6 +1094,7 @@ export default class App extends WWTAwareComponent {
   // try to make it reactive, which would cause it to try to read fields that
   // are prohibited in cross-origin situations:
   private statusMessageDestination!: Window | null;
+  statusMessageSessionId = "default";
   lastUpdatedRA = 0.0;
   lastUpdatedDec = 0.0;
   lastUpdatedFov = 1.0;
@@ -1061,6 +1122,7 @@ export default class App extends WWTAwareComponent {
 
     const message: ViewStateMessage = {
       type: "wwt_view_state",
+      sessionId: this.statusMessageSessionId,
       raRad: ra,
       decRad: dec,
       fovDeg: fov,

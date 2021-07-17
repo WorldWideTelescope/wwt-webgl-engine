@@ -35,3 +35,10 @@ research app’s window with an event type of `message`.
 
 [ViewStateMessage]: ./interfaces/viewstatemessage.html
 [listen]: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage#the_dispatched_event
+
+The [PingPongMessage] interface is also special. If you send this message to the
+app, it will reply with an identical message. This is useful for checking
+whether the app has started up, because usually there is no alternative to
+polling it.
+
+[PingPongMessage]: ./interfaces/pingpongmessage.html
