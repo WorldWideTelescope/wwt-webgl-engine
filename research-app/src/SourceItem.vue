@@ -41,7 +41,7 @@ export default class SourceItem extends Vue {
 
     // From the stores
     wwtDegZoom!: number;
-    gotoRADecZoom!: (args: { raRad: number, decRad: number, zoomDeg: number, instant: boolean, rollRad?: number }) => Promise<void>;
+    gotoRADecZoom!: (args: { raRad: number; decRad: number; zoomDeg: number; instant: boolean; rollRad?: number }) => Promise<void>;
     removeSource!: (source: Source) => void;
 
     beforeCreate(): void {
@@ -69,7 +69,7 @@ export default class SourceItem extends Vue {
     }
 
     handleMarkerClick() {
-      this.gotoRADecZoom({ zoomDeg: this.source.zoomDeg ?? this.wwtDegZoom, raRad: this.source.ra, decRad: this.source.dec, instant: false }).catch(err => console.log(err));
+      this.gotoRADecZoom({ zoomDeg: this.source.zoomDeg ?? this.wwtDegZoom, raRad: this.source.raRad, decRad: this.source.decRad, instant: false }).catch(err => console.log(err));
     }
 
 
@@ -88,11 +88,11 @@ export default class SourceItem extends Vue {
     }
 
     get raStr() {
-      return fmtHours(this.source.ra);
+      return fmtHours(this.source.raRad);
     }
 
     get decStr() {
-      return fmtDegLat(this.source.dec);
+      return fmtDegLat(this.source.decRad);
     }
 
     get searchRadius() {
@@ -111,7 +111,7 @@ export default class SourceItem extends Vue {
       const baseURL = "http://simbad.u-strasbg.fr/simbad/sim-coo?";
       const params = {
         'output.format': 'HTML',
-        'Coord': `${this.source.ra*R2D} ${this.source.dec*R2D}`,
+        'Coord': `${this.source.raRad*R2D} ${this.source.decRad*R2D}`,
         'Radius': String(this.searchRadius),
         'Radius.unit': 'arcmin', 
       }
@@ -119,8 +119,8 @@ export default class SourceItem extends Vue {
     }
 
     get nedCoordinatesURL() {
-      const raString = fmtHours(this.source.ra, "h", "m") + "s";
-      const decString = fmtDegLat(this.source.dec, "d", "m") + "s";
+      const raString = fmtHours(this.source.raRad, "h", "m") + "s";
+      const decString = fmtDegLat(this.source.decRad, "d", "m") + "s";
       const baseURL = "https://ned.ipac.caltech.edu/conesearch?";
       const params = {
         'in_csys': 'Equatorial',

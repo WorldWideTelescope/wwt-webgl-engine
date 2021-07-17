@@ -279,11 +279,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   get findRADecForScreenPoint() {
-    return function (pt: { x: number; y: number }): { ra: number; dec: number } {
+    return function (pt: { x: number; y: number }): { raDeg: number; decDeg: number } {
       if (Vue.$wwt.inst === null)
         throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
       const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
-      return { ra: (15 * coords.x + 720) % 360, dec : coords.y };
+      return { raDeg: (15 * coords.x + 720) % 360, decDeg : coords.y };
     }
   }
 

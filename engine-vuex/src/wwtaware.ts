@@ -462,7 +462,7 @@ export class WWTAwareComponent extends Vue {
   findConstellationForPoint!: (pt: {ra: number; dec: number}) => string;
 
   /** Get the right ascension and declination, in degrees, for x, y coordinates on the screen */
-  findRADecForScreenPoint!: (pt: { x: number; y: number }) => { ra: number; dec: number };
+  findRADecForScreenPoint!: (pt: { x: number; y: number }) => { raDeg: number; decDeg: number };
 
   findLngColumn!: (name: string) => number;
   findLatColumn!: (name: string) => number;

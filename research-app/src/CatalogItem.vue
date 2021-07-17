@@ -89,7 +89,7 @@ export default class CatalogItem extends Vue {
     removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
     setCatalogHipsColorByName!: (obj: { name: string; color: Color }) => void;
     setCatalogHipsOpacityByName!: (obj: { name: string; opacity: number }) => void;
-    setResearchAppCatalogHipsVisibility!: (args: { catalog: ImagesetInfo, visibility: boolean}) => void;
+    setResearchAppCatalogHipsVisibility!: (args: { catalog: ImagesetInfo; visibility: boolean}) => void;
 
     handleDelete() {
       this.removeResearchAppCatalogHips(this.catalog);

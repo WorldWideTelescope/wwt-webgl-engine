@@ -702,8 +702,8 @@ class KeyboardControlSettings {
 }
 
 interface AngleCoordinates {
-  ra: number;
-  dec: number;
+  raRad: number;
+  decRad: number;
   [x: string]: any;
 }
 
@@ -717,7 +717,7 @@ export default class App extends WWTAwareComponent {
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
   lastClosePt: Source | null = null;
-  distanceThreshold: number = 0.01;
+  distanceThreshold = 0.01;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
   drag = false;
 
@@ -939,18 +939,20 @@ export default class App extends WWTAwareComponent {
     if (this.hipsCatalogs.length == 0) {
       return;
     }
+    this.drag = true;
     const pt = { x: event.offsetX, y: event.offsetY };
     const raDecDeg = this.findRADecForScreenPoint(pt);
-    const raDecRad = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
+    const raDecRad = { raRad: D2R * raDecDeg.raDeg, decRad: D2R * raDecDeg.decDeg };
     const closestPt = this.closestInView(raDecRad, this.distanceThreshold);
     if (closestPt == null && this.lastClosePt == null) {
       return;
     }
-    const needsUpdate = (closestPt == null || this.lastClosePt == null) || ((this.lastClosePt.ra != closestPt.ra) || (this.lastClosePt.dec != closestPt.dec));
+    const needsUpdate = (closestPt == null || this.lastClosePt == null)
+      || ((this.lastClosePt.raRad != closestPt.raRad)
+      || (this.lastClosePt.decRad != closestPt.decRad));
     if (needsUpdate) {
       this.lastClosePt = closestPt;
     }
-    this.drag = true;
   }
 
   wwtOnMouseDown(_event: MouseEvent) {
@@ -966,7 +968,7 @@ export default class App extends WWTAwareComponent {
   }
 
   // Increment the counter by 1 every time this is called
-  newSourceName = (function () {
+  genericSourceName = (function () {
     let count = 0;
 
     return function() {
@@ -981,7 +983,7 @@ export default class App extends WWTAwareComponent {
         return `${col} ${item[col]}`;
       }
     }
-    return this.newSourceName();
+    return this.genericSourceName();
   }
 
   // Keyed by "external" layer IDs
@@ -1239,11 +1241,11 @@ export default class App extends WWTAwareComponent {
   distance(pt1: AngleCoordinates, pt2: AngleCoordinates): number {
     // Using the last formula from https://en.wikipedia.org/wiki/Great-circle_distance#Computational_formulas
     // which Wikipedia says is accurate at all distances
-    const dAbsRA = Math.abs(pt1.ra - pt2.ra);
-    const nt1 = (Math.cos(pt2.dec) * Math.sin(dAbsRA)) ** 2;
-    const nt2 = (Math.cos(pt1.dec) * Math.sin(pt2.dec) - Math.sin(pt1.dec) * Math.cos(pt2.dec) * Math.cos(dAbsRA)) ** 2;
+    const dAbsRA = Math.abs(pt1.raRad - pt2.raRad);
+    const nt1 = (Math.cos(pt2.decRad) * Math.sin(dAbsRA)) ** 2;
+    const nt2 = (Math.cos(pt1.decRad) * Math.sin(pt2.decRad) - Math.sin(pt1.decRad) * Math.cos(pt2.decRad) * Math.cos(dAbsRA)) ** 2;
     const num = Math.sqrt(nt1 + nt2);
-    const den = Math.sin(pt1.dec) * Math.sin(pt2.dec) + Math.cos(pt1.dec) * Math.cos(pt2.dec) * Math.cos(dAbsRA);
+    const den = Math.sin(pt1.decRad) * Math.sin(pt2.decRad) + Math.cos(pt1.decRad) * Math.cos(pt2.decRad) * Math.cos(dAbsRA);
     return Math.atan2(num, den);
   }
 
@@ -1273,18 +1275,18 @@ export default class App extends WWTAwareComponent {
       const latCol = this.findLatColumn(name);
 
       const itemCreator = function (values: string[]): Source {
-        let obj: any = {};
+        const obj: any = {};
         for (let i = 0; i < values.length; i++) {
           obj[colNames[i]] = values[i];
         }
-        return { ...obj, ra: D2R * Number(values[lngCol]), dec: D2R * Number(values[latCol]), catalogName: name };
+        return { ...obj, raRad: D2R * Number(values[lngCol]), decRad: D2R * Number(values[latCol]), catalogName: name };
       };
       
       for (const row of rows) {
         const items = row.split(colSeparator);
-        const ra = Number(items[lngCol]);
-        const dec = Number(items[latCol]);
-        const pt = { ra: D2R * ra, dec: D2R * dec };
+        const raDeg = Number(items[lngCol]);
+        const decDeg = Number(items[latCol]);
+        const pt = { raRad: D2R * raDeg, decRad: D2R * decDeg };
         const dist = this.distance(target, pt);
         if (dist < minDist) {
           closestPt = itemCreator(items);
