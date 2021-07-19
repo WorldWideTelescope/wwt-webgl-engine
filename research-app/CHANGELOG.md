@@ -1,3 +1,17 @@
+# @wwtelescope/research-app 0.4.0 (2021-07-19)
+
+A few new messages and bugfixes that are important to handle situations where
+multiple clients might be talking to multiple apps (#121, #122, #124, @pkgw):
+
+- Handle ping-pong messages and sessionId assignment
+- Implement threadId in LoadImageCollection
+- Avoid a startup race condition in message handling
+- Fix cross-origin messaging on Chrome (related to `instanceof Window` failing
+  with cross-origin messages)
+- Require the latest research-app-messages, which fixes a backwards-compatibility
+  issue with CreateImageSetLayerMessage
+
+
 # @wwtelescope/research-app 0.3.0 (2021-07-06)
 
 - Add MVP UI for loading and visualizing HiPS progressive catalogs (#119,
