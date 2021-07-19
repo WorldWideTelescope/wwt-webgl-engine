@@ -1,60 +1,8 @@
-# rc: micro bump
+# See elsewhere for changelog
 
-- Fix an accidental backwards-compatibility breakage: the `mode` field of
-  CreateImageSetLayerMessage has to remain optional (#122, @pkgw)
+This project’s release notes are curated from the Git history of its main
+branch. You can find them by looking at [the version of this file on the
+`release` branch][branch] or the [GitHub release history][gh-releases].
 
-
-# @wwtelescope/research-app-messages 0.7.0 (2021-07-16)
-
-Add a few new attributes to improve our positioning for allowing multiple
-clients to talk to multiple apps, all through a single messaging hub (#121,
-@pkgw):
-
-- add a threadId field to LoadImageCollection
-- add a sessionId field to ViewStateMessage
-- define the PingPongMessage
-
-Also fix up some docs overrides.
-
-
-# @wwtelescope/research-app-messages 0.6.0 (2021-07-06)
-
-- Define a new `LoadImageCollectionCompletedMessage` type (#118, @imbasimba)
-
-
-# @wwtelescope/research-app-messages 0.5.0 (2021-06-03)
-
-This release contains a fairly trivial breaking change.
-
-- Add a new `SetLayerOrder` message to control imageset layer stacking
-  (@imbasimba)
-- Add a new URL-based `CreateImageSetLayer` API that makes it easier to
-  load generic imagery into layers (not just FITS) (@imbasimba)
-- Add a new optional `roll` parameter to `CenterOnCoordinates` (@imbasima)
-- Add an optional `loadChildFolders` setting to `LoadImageCollection` (@imbasima)
-- BREAKING: rename `RemoveFitsLayer` to `RemoveImageSetLayer` (@imbasima)
-
-
-# @wwtelescope/research-app-messages 0.4.0 (2021-01-27)
-
-- Add a typing layer for pywwt spreadsheet settings
-- Fix detection of the SpreadSheetLayer modify message
-- Wire up the TrackObjectMessage
-- Fix another linter complaint
-
-
-# @wwtelescope/research-app-messages 0.3.0 (2021-01-12)
-
-- Add `classicPywwt.applyBaseUrlIfApplicable`.
-
-
-# @wwtelescope/research-app-messages 0.2.0 (2021-01-07)
-
-- Update NPM/TypeScript meta-foo to try to play nice with Jupyter.
-
-
-# @wwtelescope/research-app-messages 0.1.0 (2021-01-07)
-
-- Initial release of message types module for the prototype research application
-  and Jupyer extension. It looks like we might need to make this publicly
-  available for the extension to work.
+[branch]: https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/release/research-app-messages/CHANGELOG.md
+[gh-releases]: https://github.com/WorldWideTelescope/wwt-webgl-engine/releases
