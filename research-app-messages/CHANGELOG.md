@@ -1,3 +1,9 @@
+# @wwtelescope/research-app-messages 0.8.0 (2021-07-20)
+
+- Define a simple new app-level settings framework (#125, @pkgw). This
+  currently provides one setting, `hideAllChrome`, needed to help pywwt.
+
+
 # @wwtelescope/research-app-messages 0.7.1 (2021-07-16)
 
 - Fix an accidental backwards-compatibility breakage: the `mode` field of

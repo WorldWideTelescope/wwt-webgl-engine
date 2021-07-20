@@ -28,7 +28,8 @@ Learn more about WWT [here][wwt-home].
 
 1. Check out this repository to a machine with [Node.js] and [npm].
 1. `git submodule update --init`
-1. `npx lerna bootstrap`
+1. `npx lerna bootstrap -- --legacy-peer-deps` (You may be able to omit
+   the arguments here, depending on your version of NPM. See [this bug][vue6270].)
 1. Either build or obtain the file `engine/wwtlib/bin/wwtlib.js` as described
    below.
 1. `npm run lint` (uses [ESLint])
@@ -47,6 +48,7 @@ Learn more about WWT [here][wwt-home].
 
 [Node.js]: https://nodejs.org/en/
 [npm]: https://www.npmjs.com/get-npm
+[vue6270]: https://github.com/vuejs/vue-cli/issues/6270
 [Vue]: https://vuejs.org/
 [Vuex]: https://vuex.vuejs.org/
 [ESLint]: https://eslint.org/

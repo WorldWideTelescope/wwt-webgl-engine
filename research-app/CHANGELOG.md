@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.5.0 (2021-07-20)
+
+- Implement the new `hideAllChrome` setting, and some engine color settings, for
+  pywwt (#125, @pkgw)
+
+
 # @wwtelescope/research-app 0.4.0 (2021-07-19)
 
 A few new messages and bugfixes that are important to handle situations where

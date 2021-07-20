@@ -1,3 +1,10 @@
+# @wwtelescope/engine-types 0.5.0 (2021-07-20)
+
+- Expose some engine color settings (#125, @pkgw). Unlike certain other
+  settings, these are exposed in the API as strings, so they can go
+  into this package.
+
+
 # @wwtelescope/engine-types 0.4.0 (2021-06-03)
 
 - Expose new core catalog-HiPS types used by the engine; namely,
