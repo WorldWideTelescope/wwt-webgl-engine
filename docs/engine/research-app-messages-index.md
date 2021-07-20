@@ -27,6 +27,13 @@ The research app understands and handles all of these messages.
 [classicPywwt]: ./modules/classicpywwt.html
 [pywwt]: https://pywwt.readthedocs.io/
 
+The [settings] module defines messages and types related to various high-level
+settings for the research app. Settings relating to the WWT engine and its
+graphical components, such as layers and annotations, are defined in the
+[classicPywwt] module.
+
+[settings]: ./modules/settings.html
+
 The [ViewStateMessage] interface is special: it defines a message that is
 periodically emitted *by* the research app, if you have embedded it somewhere.
 This message keeps your app updated with the basic status of the WWT view. You

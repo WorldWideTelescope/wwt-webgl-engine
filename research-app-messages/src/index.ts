@@ -4,9 +4,12 @@
 // Toplevel documentation found at @/docs/engine/research-app-messages-index.md
 
 import * as classicPywwt from './classic_pywwt';
+import * as settings from './settings';
 
-export { classicPywwt };
-
+export {
+  classicPywwt,
+  settings,
+};
 
 /** Information about the current position of the WWT view.
  *

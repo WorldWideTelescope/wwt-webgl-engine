@@ -4,7 +4,7 @@
       :wwt-namespace="wwtComponentNamespace"
     ></WorldWideTelescope>
 
-    <div id='display-panel'>
+    <div id='display-panel' v-if="!hideAllChrome">
       <transition name="catalog-transition">
         <div id="overlays">
           <p>{{ coordText }}</p>
@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <ul id="controls">
+    <ul id="controls" v-if="!hideAllChrome">
       <li v-show="showToolMenu">
         <v-popover placement="left" trigger="manual" :open="showPopover">
           <font-awesome-icon class="tooltip-target tooltip-icon" icon="sliders-h" size="lg" tabindex="0" @keyup.enter="showPopover = !showPopover" @click="showPopover = !showPopover" ></font-awesome-icon>
@@ -48,7 +48,7 @@
       </li>
     </ul>
 
-    <div id="tools">
+    <div id="tools" v-if="!hideAllChrome">
       <div class="tool-container">
       <template v-if="currentTool == 'crossfade'">
         <span>Foreground opacity:</span> <input class="opacity-range" type="range" v-model="foregroundOpacity">
@@ -108,7 +108,7 @@
       </div>
     </div>
 
-    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning">
+    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning" v-if="!hideAllChrome">
       To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
       In case you would like to use Safari, we recommend that you
       <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
@@ -160,6 +160,7 @@ import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 import {
   classicPywwt,
   isPingPongMessage,
+  settings,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
 
@@ -721,6 +722,7 @@ export default class App extends WWTAwareComponent {
   addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   wwtComponentNamespace = wwtEngineNamespace;
 
+  hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
 
   // Lifecycle management
@@ -949,6 +951,17 @@ export default class App extends WWTAwareComponent {
         this.setTrackedObject(msg.code as SolarSystemObjects);
       }
     } else {
+      const appModified = settings.maybeAsModifiedAppSettings(msg);
+
+      if (appModified !== null) {
+        for (const s of appModified) {
+          if (s[0] == "hideAllChrome")
+            this.hideAllChrome = s[1];
+        }
+
+        return;
+      }
+
       console.warn("WWT research app received unrecognized message, as follows:", msg);
     }
   }
