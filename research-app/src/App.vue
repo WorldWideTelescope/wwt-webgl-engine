@@ -161,6 +161,7 @@ import {
   classicPywwt,
   isPingPongMessage,
   settings,
+  ApplicationStateMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
 
@@ -1396,6 +1397,22 @@ export default class App extends WWTAwareComponent {
 
   set catalogToAdd(catalog: ImagesetInfo) {
     this.addHips(catalog);
+  }
+
+  @Watch('curAvailableCatalogs')
+  onAvailableCatalogsChanged(catalogs: ImagesetInfo[]) {
+    // Notify clients about the new catalogs
+
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+
+    const msg: ApplicationStateMessage = {
+      type: "wwt_application_state",
+      sessionId: this.statusMessageSessionId,
+      hipsCatalogNames: catalogs.map((img) => img.name)
+    }
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
   }
 
   // "Tools" menu

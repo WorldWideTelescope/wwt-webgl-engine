@@ -99,6 +99,39 @@ export function isViewStateMessage(o: any): o is ViewStateMessage {  // eslint-d
 }
 
 
+/** Information about the current state of the WWT application.
+ *
+ * This message may be broadcasted by the application in response to various
+ * events such as loading of imagery catalogs. Clients can monitor these
+ * messages and synchronize their internal state as needed. Implementors should
+ * keep in mind that each application might have multiple clients, so state
+ * updates may seem to arrive "spontaneously" in response to actions initiated
+ * by third parties.
+ *
+ * Not all fields of this message will always be present, depending on the
+ * nature of the event triggering the emission of this message. A message
+ * missing a particular field should be treated as conveying no information
+ * about the state described by that field.
+ */
+ export interface ApplicationStateMessage {
+  /** A message type identifier. */
+  type: "wwt_application_state";
+
+  /** An app/client session identifier.
+   *
+   * If a single client is communicating with multiple apps, it needs to be able
+   * to tell which app is the source of any unsolicited messages. This session
+   * identifier allows clients to do so. The default value is "default". But if
+   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * that value will start appearing in these view state update messages.
+   */
+  sessionId: string;
+
+  /** The names of the available HiPS catalog datasets. */
+  hipsCatalogNames?: string[];
+ }
+
+
 /** A "ping" or "pong" message.
  *
  * If you send this message to the app, it will reply with its own
