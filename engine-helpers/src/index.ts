@@ -304,7 +304,7 @@ export interface LoadFitsLayerOptions {
 export interface AddImageSetLayerOptions {
   /** The URL of the FITS file 
    * OR The URL of the desired image set. This should mach an image set url
-   * previously loaded with [[LoadImageCollection]]. */
+   * previously loaded with [[WWTInstance.loadImageCollection]]. */
   url: string;
   
   /** Tell WWT what type of layer you are Adding.
@@ -320,7 +320,7 @@ export interface AddImageSetLayerOptions {
   goto: boolean;
 }
 
-/** Options for [[WWTInstance.setLayerOrder]]. */
+/** Options for [[WWTInstance.setImageSetLayerOrder]]. */
 export interface SetLayerOrderOptions {
   /** The ID of the layer. */
   id: string;
@@ -599,7 +599,7 @@ export class WWTInstance {
   *
   * @param url: The URL of the WTML collection file to load.
   * @param loadChildFolders When true, this method will recursively
-  * download and unpack the content of all [[Folder]]s contained in the WTML file.
+  * download and unpack the content of all Folders contained in the WTML file.
   * @returns: A promise that resolves to an initialized Folder object.
   */
   async loadImageCollection(url: string, loadChildFolders?: boolean): Promise<Folder> {
