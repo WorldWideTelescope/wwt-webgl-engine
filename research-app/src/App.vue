@@ -137,6 +137,7 @@ import {
   Annotation,
   Circle,
   Color,
+  Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
@@ -148,6 +149,7 @@ import {
   applyCircleAnnotationSetting,
   applyPolyAnnotationSetting,
   applyPolyLineAnnotationSetting,
+  extractSpreadSheetLayerSettings,
   isCircleAnnotationSetting,
   isEngineSetting,
   isImageSetLayerSetting,
@@ -160,12 +162,16 @@ import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 import {
   classicPywwt,
   isPingPongMessage,
+  layers,
   settings,
   ApplicationStateMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
 
-import { convertPywwtSpreadSheetLayerSetting } from "./settings";
+import {
+  convertPywwtSpreadSheetLayerSetting,
+  convertSpreadSheetLayerSetting,
+} from "./settings";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -346,6 +352,7 @@ type AnyTableLayerMessage =
 class TableLayerMessageHandler {
   private owner: App;
   private created = false;
+  private isHips = false;
   private internalId: string | null = null;
   private layer: SpreadSheetLayer | null = null; // hack for settings
   private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
@@ -369,6 +376,12 @@ class TableLayerMessageHandler {
     }).then((layer) => this.layerInitialized(layer));
 
     this.created = true;
+  }
+
+  setupHipsCatalog(layer: SpreadSheetLayer) {
+    this.created = true;
+    this.isHips = true;
+    this.layerInitialized(layer);
   }
 
   private layerInitialized(layer: SpreadSheetLayer) {
@@ -411,10 +424,12 @@ class TableLayerMessageHandler {
       // once it's ready.
       this.queuedUpdate = msg;
     } else {
-      this.owner.updateTableLayer({
-        id: this.internalId,
-        dataCsv: atob(msg.table),
-      });
+      if (!this.isHips) {
+        this.owner.updateTableLayer({
+          id: this.internalId,
+          dataCsv: atob(msg.table),
+        });
+      }
     }
   }
 
@@ -453,9 +468,13 @@ class TableLayerMessageHandler {
         this.queuedRemoval = msg;
       }
     } else {
-      this.owner.deleteLayer(this.internalId);
-      this.internalId = null;
-      this.created = false;
+      if (!this.isHips) {
+        // TODO: HiPS catalog layers need special handling. We should do that
+        // correctly here.
+        this.owner.deleteLayer(this.internalId);
+        this.internalId = null;
+        this.created = false;
+      }
     }
   }
 }
@@ -868,6 +887,8 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set('table_layer_update', this.handleUpdateTableLayer);
     this.messageHandlers.set('table_layer_set', this.handleModifyTableLayer);
     this.messageHandlers.set('table_layer_remove', this.handleRemoveTableLayer);
+
+    this.messageHandlers.set('layer_hipscat_load', this.handleLoadHipsCatalog);
 
     this.messageHandlers.set('annotation_create', this.handleCreateAnnotation);
     this.messageHandlers.set('annotation_set', this.handleModifyAnnotation);
@@ -1386,9 +1407,9 @@ export default class App extends WWTAwareComponent {
 
   // HiPS catalogs (see also the table layer support)
 
-  addHips(catalog: ImagesetInfo) {
+  addHips(catalog: ImagesetInfo): Promise<Imageset> {
     this.addResearchAppCatalogHips(catalog);
-    this.addCatalogHipsByName({name: catalog.name}).then((imgset) => {
+    return this.addCatalogHipsByName({name: catalog.name}).then((imgset) => {
       const hips = imgset.get_hipsProperties();
 
       if (hips !== null) {
@@ -1401,6 +1422,8 @@ export default class App extends WWTAwareComponent {
           ],
         });
       }
+
+      return imgset;
     });
   }
 
@@ -1426,6 +1449,70 @@ export default class App extends WWTAwareComponent {
     }
 
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
+  // A client has requested that we load a HiPS catalog. Once it's loaded we
+  // reply to the client with the details of the catalog-as-spreadsheet-layer,
+  // so that it can know what the catalog's characteristics are.
+  private handleLoadHipsCatalog(msg: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!layers.isLoadHipsCatalogMessage(msg))
+      return false;
+
+    for (const cat of this.curAvailableCatalogs) {
+      if (cat.name == msg.name) {
+        this.addHips(cat).then((imgset) => {
+          const hips = imgset.get_hipsProperties();
+          if (hips === null)
+            throw new Error('internal consistency failure');
+
+          const layer = hips.get_catalogSpreadSheetLayer();
+
+          // Register in the table-layer framework
+
+          let handler = this.tableLayers.get(msg.tableId);
+
+          if (handler === undefined) {
+            handler = new TableLayerMessageHandler(this);
+            this.tableLayers.set(msg.tableId, handler);
+          }
+
+          handler.setupHipsCatalog(layer);
+
+          // Reply?
+
+          if (msg.threadId === undefined)
+            return;
+
+          if (this.statusMessageDestination === null || this.allowedOrigin === null)
+            return;
+
+          const settings = extractSpreadSheetLayerSettings(layer);
+          const pysettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
+
+          for (const s of settings) {
+            const ps = convertSpreadSheetLayerSetting(s);
+            if (ps !== null)
+              pysettings.push(ps);
+          }
+
+          const ssli: layers.SpreadSheetLayerInfo = {
+            settings: pysettings,
+          };
+
+          const reply: layers.LoadHipsCatalogCompletedMessage = {
+            event: "layer_hipscat_load_completed",
+            threadId: msg.threadId,
+            spreadsheetInfo: ssli,
+          }
+
+          this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+        });
+
+        break;
+      }
+    }
+
+    return true;
   }
 
   // "Tools" menu
