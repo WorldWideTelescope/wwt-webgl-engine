@@ -212,6 +212,73 @@ export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: S
   (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
+/** Extract all of the current settings of a SpreadSheetLayer. */
+export function extractSpreadSheetLayerSettings(layer: SpreadSheetLayer): SpreadSheetLayerSetting[] {
+  // Sigh, is there a smarter way to do this? I hate hardcording all of these
+  // lists over and over.
+  const s: SpreadSheetLayerSetting[] = [];
+
+  // BaseLayerSetting
+  s.push(["astronomical", layer.get_astronomical()]);
+  s.push(["fadeSpan", layer.get_fadeSpan()]);
+  s.push(["name", layer.get_name()]);
+  s.push(["opacity", layer.get_opacity()]);
+  s.push(["opened", layer.get_opened()]);
+  s.push(["referenceFrame", layer.get_referenceFrame()]);
+  s.push(["version", layer.get_version()]);
+
+  // LayerSetting
+  s.push(["color", layer.get_color()]);
+
+  // BaseSpreadSheetLayerSetting
+  s.push(["altColumn", layer.get_altColumn()]);
+  s.push(["altType", layer.get_altType()]);
+  s.push(["altUnit", layer.get_altUnit()]);
+  s.push(["barChartBitmask", layer.get_barChartBitmask()]);
+  s.push(["beginRange", layer.get_beginRange()]);
+  s.push(["cartesianCustomScale", layer.get_cartesianCustomScale()]);
+  s.push(["cartesianScale", layer.get_cartesianScale()]);
+  s.push(["colorMapColumn", layer.get_colorMapColumn()]);
+  s.push(["colorMapperName", layer.get_colorMapperName()]);
+  s.push(["coordinatesType", layer.get_coordinatesType()]);
+  s.push(["decay", layer.get_decay()]);
+  s.push(["dynamicColor", layer.get_dynamicColor()]);
+  s.push(["dynamicData", layer.get_dynamicData()]);
+  s.push(["endDateColumn", layer.get_endDateColumn()]);
+  s.push(["endRange", layer.get_endRange()]);
+  s.push(["geometryColumn", layer.get_geometryColumn()]);
+  s.push(["hyperlinkColumn", layer.get_hyperlinkColumn()]);
+  s.push(["hyperlinkFormat", layer.get_hyperlinkFormat()]);
+  s.push(["latColumn", layer.get_latColumn()]);
+  s.push(["lngColumn", layer.get_lngColumn()]);
+  s.push(["markerColumn", layer.get_markerColumn()]);
+  s.push(["markerIndex", layer.get_markerIndex()]);
+  s.push(["markerScale", layer.get_markerScale()]);
+  s.push(["nameColumn", layer.get_nameColumn()]);
+  s.push(["normalizeColorMap", layer.get_normalizeColorMap()]);
+  s.push(["normalizeColorMapMax", layer.get_normalizeColorMapMax()]);
+  s.push(["normalizeColorMapMin", layer.get_normalizeColorMapMin()]);
+  s.push(["normalizeSize", layer.get_normalizeSize()]);
+  s.push(["normalizeSizeClip", layer.get_normalizeSizeClip()]);
+  s.push(["normalizeSizeMax", layer.get_normalizeSizeMax()]);
+  s.push(["normalizeSizeMin", layer.get_normalizeSizeMin()]);
+  s.push(["plotType", layer.get_plotType()]);
+  s.push(["pointScaleType", layer.get_pointScaleType()]);
+  s.push(["raUnits", layer.get_raUnits()]);
+  s.push(["scaleFactor", layer.get_scaleFactor()]);
+  s.push(["showFarSide", layer.get_showFarSide()]);
+  s.push(["sizeColumn", layer.get_sizeColumn()]);
+  s.push(["startDateColumn", layer.get_startDateColumn()]);
+  s.push(["timeSeries", layer.get_timeSeries()]);
+  s.push(["xAxisColumn", layer.get_xAxisColumn()]);
+  s.push(["xAxisReverse", layer.get_xAxisReverse()]);
+  s.push(["yAxisColumn", layer.get_yAxisColumn()]);
+  s.push(["yAxisReverse", layer.get_yAxisReverse()]);
+  s.push(["zAxisColumn", layer.get_zAxisColumn()]);
+  s.push(["zAxisReverse", layer.get_zAxisReverse()]);
+
+  return s;
+}
 
 /** Type guard function for VoTableLayerSetting. */
 export function isVoTableLayerSetting(obj: [string, any]): obj is VoTableLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
