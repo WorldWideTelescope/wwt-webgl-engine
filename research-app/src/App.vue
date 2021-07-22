@@ -1388,7 +1388,20 @@ export default class App extends WWTAwareComponent {
 
   addHips(catalog: ImagesetInfo) {
     this.addResearchAppCatalogHips(catalog);
-    this.addCatalogHipsByNameWithCallback({ name: catalog.name, callback: () => this.setCatalogHipsColorByName({ name: catalog.name, color: this.defaultColor }) });
+    this.addCatalogHipsByName({name: catalog.name}).then((imgset) => {
+      const hips = imgset.get_hipsProperties();
+
+      if (hips !== null) {
+        const catId = hips.get_catalogSpreadSheetLayer().id.toString();
+        this.applyTableLayerSettings({
+          id: catId,
+          settings: [
+            ["color", this.defaultColor],
+            ["opacity", this.defaultColor.a],
+          ],
+        });
+      }
+    });
   }
 
   get catalogToAdd() {
