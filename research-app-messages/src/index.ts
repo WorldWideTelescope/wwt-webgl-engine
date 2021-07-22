@@ -4,10 +4,12 @@
 // Toplevel documentation found at @/docs/engine/research-app-messages-index.md
 
 import * as classicPywwt from './classic_pywwt';
+import * as layers from './layers';
 import * as settings from './settings';
 
 export {
   classicPywwt,
+  layers,
   settings,
 };
 
