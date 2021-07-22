@@ -14,7 +14,6 @@ import {
 
 import {
   Annotation,
-  Color,
   EngineSetting,
   Folder,
   Guid,
@@ -25,8 +24,9 @@ import {
 } from "@wwtelescope/engine";
 
 import {
-  ApplyFitsLayerSettingsOptions,
+  AddCatalogHipsByNameOptions,
   AddImageSetLayerOptions,
+  ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
@@ -383,11 +383,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.$wwt.inst.setupForImageset(options);
   }
 
-  @Mutation
-  addCatalogHipsByName(name: string): void {
+  @Action({ rawError: true })
+  addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
     if (Vue.$wwt.inst == null)
       throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.addCatalogHipsByName(name);
+    return Vue.$wwt.inst.addCatalogHipsByName(options);
   }
 
   @Mutation
@@ -395,30 +395,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst == null)
       throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
     Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
-  }
-
-  @Mutation
-  addCatalogHipsByNameWithCallback(args: { name: string; callback: () => void }): void {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot addCatalogHipsByNameWithCallback without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.addCatalogHipsByNameWithCallback(args.name, args.callback);
-  }
-
-  @Mutation
-  setCatalogHipsColorByName(args: { name: string; color: Color }): void {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot setCatalogHipsColorByName without linking to WWTInstance');
-    const layer = Vue.$wwt.inst.lm.get_layerList()[args.name];
-    layer.set_color(args.color);
-    layer.set_opacity(args.color.a);
-  }
-
-  @Mutation
-  setCatalogHipsOpacityByName(args: { name: string; opacity: number }): void {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot setCatalogHipsOpacityByName without linking to WWTInstance');
-    const layer = Vue.$wwt.inst.lm.get_layerList()[args.name];
-    layer.set_opacity(args.opacity);
   }
 
   @Mutation
