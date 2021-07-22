@@ -205,7 +205,7 @@ export function isSpreadSheetLayerSetting(obj: [string, any]): obj is SpreadShee
   return isLayerSetting(obj) || isBaseSpreadSheetLayerSetting(obj);
 }
 
-/** Apply a setting to an SpreadSheetLayer. */
+/** Apply a setting to a SpreadSheetLayer. */
 export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: SpreadSheetLayerSetting): void {
   const funcName = "set_" + setting[0];
   const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -291,7 +291,7 @@ export interface GotoTargetOptions {
 export interface LoadFitsLayerOptions {
   /** The URL of the FITS file. */
   url: string;
-  
+
   /** A name to use for the new layer. */
   name: string;
 
@@ -302,14 +302,20 @@ export interface LoadFitsLayerOptions {
 
 /** Options for [[WWTInstance.addImageSetLayer]]. */
 export interface AddImageSetLayerOptions {
-  /** The URL of the FITS file 
-   * OR The URL of the desired image set. This should mach an image set url
-   * previously loaded with [[WWTInstance.loadImageCollection]]. */
+  /** The URL of the FITS file *or* the URL of the desired image set.
+   *
+   * This should match an image set URL previously loaded with
+   * [[WWTInstance.loadImageCollection]]. */
   url: string;
-  
-  /** Tell WWT what type of layer you are Adding.
-   * OR let WWT try to autodetect the type of the data.
-   * Default, autodetect. */
+
+  /** Indicates what type of layer you are adding.
+   *
+   * If "fits", the [[url]] will be taken to point to a single FITS File that
+   * should be added. If "preloaded", it will be taken to match the URL
+   * associated with an imageset that has already been added to WWT's internal
+   * catalogs via [[WWTInstance.loadImageCollection]]. If "autodetect", WWT will
+   * guess: if the URL ends with a FITS-like extension, "fits" mode will be
+   * activated; otherwise it will use "preloaded" mode. */
   mode: "autodetect" | "fits" | "preloaded";
 
   /** A name to use for the new layer. */
@@ -376,6 +382,11 @@ export interface ApplyTableLayerSettingsOptions {
 
   /** The settings to apply. */
   settings: SpreadSheetLayerSetting[];
+}
+
+export interface AddCatalogHipsByNameOptions {
+  /** The name of the HiPS catalog imageset to load. */
+  name: string;
 }
 
 /** Options for [[setupForImageset]]. */
@@ -662,7 +673,7 @@ export class WWTInstance {
    *
    * The FITS file must be downloaded and processed, so this API is
    * asynchronous, and is not appropriate for files that might be large.
-   * 
+   *
    * The image set must have previously been created with [[loadImageCollection]]
    */
   async addImageSetLayer(options: AddImageSetLayerOptions): Promise<ImageSetLayer> {
@@ -727,6 +738,40 @@ export class WWTInstance {
       }
     }
   }
+
+  /** Add a new HiPS catalog to the view, by name.
+   *
+   * The promise will resolve when the catalog metadata have fully downloaded.
+   * It will reject if the name is unrecognized.
+   *
+   * HiPS catalogs are something of an awkward hybrid. They are managed like
+   * imagesets, but rendered like spreadsheet layers. To get the
+   * `SpreadSheetLayer` associated with a HiPS catalog imageset, access:
+   *
+   * ```
+   * imgset.get_hipsProperties().get_catalogSpreadSheetLayer()
+   * ```
+   *
+   * You can use methods like [[applyTableLayerSettings]] to modify the settings
+   * of this layer by extracting its ID string with `layer.id.toString()`.
+   *
+   * The contents of this catalog will update dynamically as the user navigates
+   * the WWT view.
+   */
+  async addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
+    return new Promise((resolve, reject) => {
+      const imgset = this.ctl.getImagesetByName(options.name);
+
+      if (imgset === null) {
+        reject();
+      } else {
+        this.ctl.renderContext.addCatalogHips(imgset, () => {
+          resolve(imgset);
+        });
+      }
+    });
+  }
+
 
   // "Mutator" type operations -- not async.
 
