@@ -33,7 +33,8 @@ import { mapGetters, mapMutations } from "vuex";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 import { ImagesetInfo } from "@wwtelescope/engine-vuex";
-import { Color } from '@wwtelescope/engine';
+import { Color, Imageset, SpreadSheetLayerSetting } from '@wwtelescope/engine';
+import { ApplyTableLayerSettingsOptions } from '@wwtelescope/engine-helpers';
 
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
@@ -71,21 +72,23 @@ export default class CatalogItem extends Vue {
     isSelected = false;
     visible = true;
     color = new Color();
-    
+    tableId = "";
+
+    // Vuex integration
+
     beforeCreate(): void {
       this.$options.computed = {
         ...mapGetters(wwtEngineNamespace, [
-          "hipsCatalogColorByName",
+          "lookupImageset",
         ]),
         ...this.$options.computed,
       }
-      
+
       this.$options.methods = {
         ...this.$options.methods,
         ...mapMutations(wwtEngineNamespace, [
+          "applyTableLayerSettings",
           "removeCatalogHipsByName",
-          "setCatalogHipsColorByName",
-          "setCatalogHipsOpacityByName",
         ]),
         ...mapMutations(wwtResearchAppNamespace, [
           "removeResearchAppCatalogHips"
@@ -93,14 +96,38 @@ export default class CatalogItem extends Vue {
       };
     }
 
+    applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
+    lookupImageset!: (_n: string) => Imageset | null;
+    removeCatalogHipsByName!: (name: string) => void;
+    removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+
+    // Implementation
+
     mounted() {
       this.color = this.defaultColor;
     }
 
-    removeCatalogHipsByName!: (name: string) => void;
-    removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
-    setCatalogHipsColorByName!: (obj: { name: string; color: Color }) => void;
-    setCatalogHipsOpacityByName!: (obj: { name: string; opacity: number }) => void;
+    private applySettings(settings: SpreadSheetLayerSetting[]) {
+      if (!this.tableId) {
+        // This is potentially a bit racey -- the table ID isn't set up until
+        // the HiPS catalog has loaded its metadata, which is asynchronous and
+        // depends on a network request.
+        const imgset = this.lookupImageset(this.catalog.name);
+
+        if (imgset !== null) {
+          const hips = imgset.get_hipsProperties();
+
+          if (hips !== null) {
+            this.tableId = hips.get_catalogSpreadSheetLayer().id.toString();
+          }
+        }
+      }
+
+      this.applyTableLayerSettings({
+        id: this.tableId,
+        settings: settings,
+      });
+    }
 
     handleDelete() {
       this.removeResearchAppCatalogHips(this.catalog);
@@ -109,10 +136,16 @@ export default class CatalogItem extends Vue {
 
     handleToggle() {
       this.visible = !this.visible;
+
       if (this.visible) {
-        this.setCatalogHipsColorByName({ name: this.catalog.name, color: this.color });
+        this.applySettings([
+          ["color", this.color],
+          ["opacity", this.color.a],
+        ]);
       } else {
-        this.setCatalogHipsOpacityByName({ name: this.catalog.name, opacity: 0 });
+        this.applySettings([
+          ["opacity", 0],
+        ]);
       }
     }
 
@@ -120,8 +153,12 @@ export default class CatalogItem extends Vue {
       const rgba = colorData['rgba'];
       const newColor = Color.fromArgb(rgba['a'], rgba['r'], rgba['g'], rgba['b']);
       this.color = newColor;
+
       if (this.visible) {
-        this.setCatalogHipsColorByName({name: this.catalog.name, color: newColor});
+        this.applySettings([
+          ["color", this.color],
+          ["opacity", this.color.a],
+        ]);
       }
     }
 

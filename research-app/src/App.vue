@@ -137,6 +137,7 @@ import {
   Annotation,
   Circle,
   Color,
+  Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
@@ -148,6 +149,7 @@ import {
   applyCircleAnnotationSetting,
   applyPolyAnnotationSetting,
   applyPolyLineAnnotationSetting,
+  extractSpreadSheetLayerSettings,
   isCircleAnnotationSetting,
   isEngineSetting,
   isImageSetLayerSetting,
@@ -160,11 +162,16 @@ import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 import {
   classicPywwt,
   isPingPongMessage,
+  layers,
   settings,
+  ApplicationStateMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
 
-import { convertPywwtSpreadSheetLayerSetting } from "./settings";
+import {
+  convertPywwtSpreadSheetLayerSetting,
+  convertSpreadSheetLayerSetting,
+} from "./settings";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -345,8 +352,10 @@ type AnyTableLayerMessage =
 class TableLayerMessageHandler {
   private owner: App;
   private created = false;
+  private isHips = false;
   private internalId: string | null = null;
   private layer: SpreadSheetLayer | null = null; // hack for settings
+  private imageset: Imageset | null = null; // hack for HiPS catalogs
   private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
   private queuedSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
   private queuedRemoval: classicPywwt.RemoveTableLayerMessage | null = null;
@@ -368,6 +377,13 @@ class TableLayerMessageHandler {
     }).then((layer) => this.layerInitialized(layer));
 
     this.created = true;
+  }
+
+  setupHipsCatalog(imageset: Imageset, layer: SpreadSheetLayer) {
+    this.created = true;
+    this.isHips = true;
+    this.imageset = imageset;
+    this.layerInitialized(layer);
   }
 
   private layerInitialized(layer: SpreadSheetLayer) {
@@ -410,10 +426,12 @@ class TableLayerMessageHandler {
       // once it's ready.
       this.queuedUpdate = msg;
     } else {
-      this.owner.updateTableLayer({
-        id: this.internalId,
-        dataCsv: atob(msg.table),
-      });
+      if (!this.isHips) {
+        this.owner.updateTableLayer({
+          id: this.internalId,
+          dataCsv: atob(msg.table),
+        });
+      }
     }
   }
 
@@ -444,6 +462,26 @@ class TableLayerMessageHandler {
     }
   }
 
+  async handleGetHipsDataInViewMessage(msg: layers.GetHipsCatalogDataInViewMessage): Promise<layers.GetHipsCatalogDataInViewReply | null> {
+    if (this.imageset === null || this.layer === null || this.internalId === null)
+      return null; // Sorry!
+
+    if (!this.isHips)
+      return null;
+
+    return this.owner.getCatalogHipsDataInView({
+      imageset: this.imageset,
+      limit: msg.limit,
+    }).then((info) => {
+      return {
+        event: "layer_hipscat_datainview_reply",
+        threadId: msg.threadId,
+        data: info.table,
+        aborted: info.aborted
+      };
+    });
+  }
+
   handleRemoveMessage(msg: classicPywwt.RemoveTableLayerMessage) {
     if (this.internalId === null) {
       // Layer not yet created or fully initialized. Queue up message for processing
@@ -452,9 +490,21 @@ class TableLayerMessageHandler {
         this.queuedRemoval = msg;
       }
     } else {
-      this.owner.deleteLayer(this.internalId);
-      this.internalId = null;
-      this.created = false;
+      if (this.isHips && this.imageset !== null) {
+        // This is a little kludgey ...
+        const name = this.imageset.get_name();
+
+        for (const cat of this.owner.curAvailableCatalogs) {
+          if (cat.name == name) {
+            this.owner.removeResearchAppCatalogHips(cat);
+            this.owner.removeCatalogHipsByName(name);
+          }
+        }
+      } else {
+        this.owner.deleteLayer(this.internalId);
+        this.internalId = null;
+        this.created = false;
+      }
     }
   }
 }
@@ -718,14 +768,16 @@ export default class App extends WWTAwareComponent {
   @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
   defaultColor = Color.fromArgb(1, 255, 255, 255);
-  hipsCatalogs!: ImagesetInfo[];
-  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   wwtComponentNamespace = wwtEngineNamespace;
 
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
 
   // Lifecycle management
+
+  hipsCatalogs!: ImagesetInfo[];
+  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+  removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
 
   beforeCreate(): void {
     this.$options.computed = {
@@ -738,7 +790,8 @@ export default class App extends WWTAwareComponent {
     this.$options.methods = {
       ...this.$options.methods,
       ...mapMutations(wwtResearchAppNamespace, [
-          "addResearchAppCatalogHips"
+          "addResearchAppCatalogHips",
+          "removeResearchAppCatalogHips"
       ])
     }
 
@@ -746,6 +799,7 @@ export default class App extends WWTAwareComponent {
 
   created() {
     this.statusMessageDestination = null;
+    this.initializeHandlers();
   }
 
   mounted() {
@@ -833,140 +887,171 @@ export default class App extends WWTAwareComponent {
 
   // Incoming message handling
 
+  private messageHandlers: Map<string, (msg: any) => boolean> = new Map();  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+  private initializeHandlers() {
+    // These handlers must take care to type-check that the input
+    // message actually fully obeys the expected schema!
+
+    this.messageHandlers.set('load_image_collection', this.handleLoadImageCollection);
+
+    this.messageHandlers.set('set_background_by_name', this.handleSetBackgroundByName);
+    this.messageHandlers.set('set_foreground_by_name', this.handleSetForegroundByName);
+    this.messageHandlers.set('set_foreground_opacity', this.handleSetForegroundOpacity);
+    this.messageHandlers.set('set_viewer_mode', this.handleSetViewerMode);
+
+    this.messageHandlers.set('center_on_coordinates', this.handleCenterOnCoordinates);
+    this.messageHandlers.set('track_object', this.handleTrackObject);
+    this.messageHandlers.set('set_datetime', this.handleSetDatetime);
+    this.messageHandlers.set('pause_time', this.handlePauseTime);
+    this.messageHandlers.set('resume_time', this.handleResumeTime);
+
+    this.messageHandlers.set('modify_settings', this.handleModifySettings);
+    this.messageHandlers.set('setting_set', this.handleModifyEngineSetting);
+
+    this.messageHandlers.set('image_layer_create', this.handleCreateImageSetLayer);
+    this.messageHandlers.set('image_layer_order', this.handleSetLayerOrder);
+    this.messageHandlers.set('image_layer_stretch', this.handleStretchFitsLayer);
+    this.messageHandlers.set('image_layer_cmap', this.handleSetFitsLayerColormap);
+    this.messageHandlers.set('image_layer_set', this.handleModifyFitsLayer);
+    this.messageHandlers.set('image_layer_remove', this.handleRemoveImageSetLayer);
+
+    this.messageHandlers.set('table_layer_create', this.handleCreateTableLayer);
+    this.messageHandlers.set('table_layer_update', this.handleUpdateTableLayer);
+    this.messageHandlers.set('table_layer_set', this.handleModifyTableLayer);
+    this.messageHandlers.set('table_layer_remove', this.handleRemoveTableLayer);
+
+    this.messageHandlers.set('layer_hipscat_load', this.handleLoadHipsCatalog);
+    this.messageHandlers.set('layer_hipscat_datainview', this.handleGetHipsCatalogDataInView);
+
+    this.messageHandlers.set('annotation_create', this.handleCreateAnnotation);
+    this.messageHandlers.set('annotation_set', this.handleModifyAnnotation);
+    this.messageHandlers.set('circle_set_center', this.handleSetCircleCenter);
+    this.messageHandlers.set('line_add_point', this.handleAddLinePoint);
+    this.messageHandlers.set('polygon_add_point', this.handleAddPolygonPoint);
+    this.messageHandlers.set('remove_annotation', this.handleRemoveAnnotation);
+    this.messageHandlers.set('clear_annotations', this.handleClearAnnotations);
+
+    this.messageHandlers.set('load_tour', this.handleLoadTour);
+    this.messageHandlers.set('pause_tour', this.handlePauseTour);
+    this.messageHandlers.set('resume_tour', this.handleResumeTour);
+  }
+
   onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (classicPywwt.isLoadImageCollectionMessage(msg)) {
-      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(() => {
-        if (this.statusMessageDestination != null && this.allowedOrigin != null){
-          const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
-            event: "load_image_collection_completed",
-            threadId: msg.threadId,
-            url: msg.url
-          };
+    const key = String(msg.type || msg.event);
+    const handler = this.messageHandlers.get(key);
+    let handled = false;
 
-          this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
-        }
-      });
-    } else if (classicPywwt.isSetBackgroundByNameMessage(msg)) {
-      this.setBackgroundImageByName(msg.name);
-    } else if (classicPywwt.isSetForegroundByNameMessage(msg)) {
-      this.setForegroundImageByName(msg.name);
-    } else if (classicPywwt.isSetViewerModeMessage(msg)) {
-      this.setBackgroundImageByName(msg.mode);
-      this.setForegroundImageByName(msg.mode);
-    } else if (classicPywwt.isSetForegroundOpacityMessage(msg)) {
-      this.setForegroundOpacity(msg.value);
-    } else if (classicPywwt.isCenterOnCoordinatesMessage(msg)) {
-      const rollRad = msg.roll == undefined ? undefined : msg.roll * D2R;
-      this.gotoRADecZoom({
-        raRad: msg.ra * D2R,
-        decRad: msg.dec * D2R,
-        zoomDeg: msg.fov * 6,
-        instant: msg.instant,
-        rollRad: rollRad,
-      });
-    } else if (classicPywwt.isModifySettingMessage(msg)) {
-      const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (handler !== undefined) {
+      handled = handler(msg);
+    }
 
-      if (isEngineSetting(setting)) {
-        this.applySetting(setting);
-      }
-    } else if (classicPywwt.isCreateImageSetLayerMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleCreateMessage(msg);
-    } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
-      const createImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
-        event: msg.event,
-        url: msg.url,
-        id: msg.id,
-        mode: "fits",
-      }
-      this.getFitsLayerHandler(createImageSetMessage).handleCreateMessage(createImageSetMessage);
-    } else if (classicPywwt.isSetLayerOrderMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
-    } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleStretchMessage(msg);
-    } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
-    } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleModifyMessage(msg);
-    } else if (classicPywwt.isRemoveImageSetLayerMessage(msg)) {
-      // NB we never remove the handler! It's tricky due to async issues.
-      this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
-    } else if (classicPywwt.isCreateTableLayerMessage(msg)) {
-      this.getTableLayerHandler(msg).handleCreateMessage(msg);
-    } else if (classicPywwt.isUpdateTableLayerMessage(msg)) {
-      this.getTableLayerHandler(msg).handleUpdateMessage(msg);
-    } else if (classicPywwt.isModifyTableLayerMessage(msg)) {
-      this.getTableLayerHandler(msg).handleModifyMessage(msg);
-    } else if (classicPywwt.isRemoveTableLayerMessage(msg)) {
-      // NB we never remove the handler! It's tricky due to async issues.
-      this.getTableLayerHandler(msg).handleRemoveMessage(msg);
-    } else if (classicPywwt.isCreateAnnotationMessage(msg)) {
-      this.createAnnotationHandler(msg);
-    } else if (classicPywwt.isModifyAnnotationMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleModifyAnnotationMessage(msg);
-      }
-    } else if (classicPywwt.isSetCircleCenterMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleSetCircleCenterMessage(msg);
-      }
-    } else if (classicPywwt.isAddLinePointMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleAddLinePointMessage(msg);
-      }
-    } else if (classicPywwt.isAddPolygonPointMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleAddPolygonPointMessage(msg);
-      }
-    } else if (classicPywwt.isRemoveAnnotationMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleRemoveAnnotationMessage(msg);
-      }
-      this.annotations.delete(msg.id);
-    } else if (classicPywwt.isClearAnnotationsMessage(msg)) {
-      this.clearAnnotations();
-    } else if (classicPywwt.isLoadTourMessage(msg)) {
-      this.loadTour({
-        url: msg.url,
-        play: true,
-      });
-    } else if (classicPywwt.isPauseTourMessage(msg)) {
-      this.toggleTourPlayPauseState();  // note half-assed semantics here!
-    } else if (classicPywwt.isResumeTourMessage(msg)) {
-      this.toggleTourPlayPauseState();  // note half-assed semantics here!
-    } else if (classicPywwt.isSetDatetimeMessage(msg)) {
-      this.setTime(moment.utc(msg.isot).toDate());
-    } else if (classicPywwt.isPauseTimeMessage(msg)) {
-      this.setClockSync(false);
-    } else if (classicPywwt.isResumeTimeMessage(msg)) {
-      this.setClockSync(true);
-      this.setClockRate(msg.rate);
-    } else if (classicPywwt.isTrackObjectMessage(msg)) {
-      if (msg.code in SolarSystemObjects) {
-        this.setTrackedObject(msg.code as SolarSystemObjects);
-      }
-    } else {
-      const appModified = settings.maybeAsModifiedAppSettings(msg);
-
-      if (appModified !== null) {
-        for (const s of appModified) {
-          if (s[0] == "hideAllChrome")
-            this.hideAllChrome = s[1];
-        }
-
-        return;
-      }
-
-      console.warn("WWT research app received unrecognized message, as follows:", msg);
+    if (!handled) {
+      console.warn("WWT research app received unhandled message, as follows:", msg);
     }
   }
 
-  // Keyed by "external" layer IDs
+  // Various message handlers that don't comfortably fit elsewhere:
+
+  private handleLoadImageCollection(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isLoadImageCollectionMessage(msg))
+      return false;
+
+    this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(() => {
+      if (this.statusMessageDestination != null && this.allowedOrigin != null){
+        const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
+          event: "load_image_collection_completed",
+          threadId: msg.threadId,
+          url: msg.url
+        };
+
+        this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
+      }
+    });
+    return true;
+  }
+
+  private handleCenterOnCoordinates(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isCenterOnCoordinatesMessage(msg))
+      return false;
+
+    const rollRad = msg.roll == undefined ? undefined : msg.roll * D2R;
+    this.gotoRADecZoom({
+      raRad: msg.ra * D2R,
+      decRad: msg.dec * D2R,
+      zoomDeg: msg.fov * 6,
+      instant: msg.instant,
+      rollRad: rollRad,
+    });
+    return true;
+  }
+
+  private handleModifyEngineSetting(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isModifySettingMessage(msg))
+      return false;
+
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (!isEngineSetting(setting))
+      return false;
+
+    this.applySetting(setting);
+    return true;
+  }
+
+  private handleSetDatetime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetDatetimeMessage(msg))
+      return false;
+
+    this.setTime(moment.utc(msg.isot).toDate());
+    return true;
+  }
+
+  private handlePauseTime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isPauseTimeMessage(msg))
+      return false;
+
+    this.setClockSync(false);
+    return true;
+  }
+
+  private handleResumeTime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isResumeTimeMessage(msg))
+      return false;
+
+    this.setClockSync(true);
+    this.setClockRate(msg.rate);
+    return true;
+  }
+
+  private handleTrackObject(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isTrackObjectMessage(msg))
+      return false;
+
+    if (msg.code in SolarSystemObjects) {
+      this.setTrackedObject(msg.code as SolarSystemObjects);
+    }
+    return true;
+  }
+
+  private handleModifySettings(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    const appModified = settings.maybeAsModifiedAppSettings(msg);
+
+    if (appModified !== null) {
+      for (const s of appModified) {
+        if (s[0] == "hideAllChrome")
+          this.hideAllChrome = s[1];
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
+  // ImageSet layers, including FITS layers:
+
+  // These maps are keyed by "external" layer IDs
   private fitsLayers: Map<string, ImageSetLayerMessageHandler> = new Map();
 
   private getFitsLayerHandler(msg: AnyFitsLayerMessage): ImageSetLayerMessageHandler {
@@ -979,6 +1064,69 @@ export default class App extends WWTAwareComponent {
 
     return handler;
   }
+
+  private handleCreateImageSetLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (classicPywwt.isCreateFitsLayerMessage(msg)) {
+      const createImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
+        event: msg.event,
+        url: msg.url,
+        id: msg.id,
+        mode: "fits",
+      }
+      this.getFitsLayerHandler(createImageSetMessage).handleCreateMessage(createImageSetMessage);
+      return true;
+    }
+
+    if (classicPywwt.isCreateImageSetLayerMessage(msg)) {
+      this.getFitsLayerHandler(msg).handleCreateMessage(msg);
+      return true;
+    }
+
+    return false;
+  }
+
+  private handleSetLayerOrder(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetLayerOrderMessage(msg))
+      return false;
+
+    this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
+    return true;
+  }
+
+  private handleStretchFitsLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isStretchFitsLayerMessage(msg))
+      return false;
+
+    this.getFitsLayerHandler(msg).handleStretchMessage(msg);
+    return true;
+  }
+
+  private handleSetFitsLayerColormap(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetFitsLayerColormapMessage(msg))
+      return false;
+
+    this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
+    return true;
+  }
+
+  private handleModifyFitsLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isModifyFitsLayerMessage(msg))
+      return false;
+
+    this.getFitsLayerHandler(msg).handleModifyMessage(msg);
+    return true;
+  }
+
+  private handleRemoveImageSetLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isRemoveImageSetLayerMessage(msg))
+      return false;
+
+    // NB we never remove the handler! It's tricky due to async issues.
+    this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
+    return true;
+  }
+
+  // Table layers:
 
   private tableLayers: Map<string, TableLayerMessageHandler> = new Map();
 
@@ -993,6 +1141,41 @@ export default class App extends WWTAwareComponent {
     return handler;
   }
 
+  private handleCreateTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isCreateTableLayerMessage(msg))
+      return false;
+
+    this.getTableLayerHandler(msg).handleCreateMessage(msg);
+    return true;
+  }
+
+  private handleUpdateTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isUpdateTableLayerMessage(msg))
+      return false;
+
+    this.getTableLayerHandler(msg).handleUpdateMessage(msg);
+    return true;
+  }
+
+  private handleModifyTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isModifyTableLayerMessage(msg))
+      return false;
+
+    this.getTableLayerHandler(msg).handleModifyMessage(msg);
+    return true;
+  }
+
+  private handleRemoveTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isRemoveTableLayerMessage(msg))
+      return false;
+
+    // NB we never remove the handler! It's tricky due to async issues.
+    this.getTableLayerHandler(msg).handleRemoveMessage(msg);
+    return true;
+  }
+
+  // Annotations:
+
   private annotations: Map<string, AnnotationMessageHandler> = new Map();
 
   private createAnnotationHandler(msg: classicPywwt.CreateAnnotationMessage): void {
@@ -1005,6 +1188,107 @@ export default class App extends WWTAwareComponent {
 
   private lookupAnnotationHandler(msg: AnyAnnotationMessage): AnnotationMessageHandler | undefined {
     return this.annotations.get(msg.id);
+  }
+
+  private handleCreateAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isCreateAnnotationMessage(msg))
+      return false;
+
+    this.createAnnotationHandler(msg);
+    return true;
+  }
+
+  private handleModifyAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isModifyAnnotationMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleModifyAnnotationMessage(msg);
+    }
+    return true;
+  }
+
+  private handleSetCircleCenter(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetCircleCenterMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleSetCircleCenterMessage(msg);
+    }
+    return true;
+  }
+
+  private handleAddLinePoint(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isAddLinePointMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleAddLinePointMessage(msg);
+    }
+    return true;
+  }
+
+  private handleAddPolygonPoint(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isAddPolygonPointMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleAddPolygonPointMessage(msg);
+    }
+    return true;
+  }
+
+  private handleRemoveAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isRemoveAnnotationMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleRemoveAnnotationMessage(msg);
+    }
+    this.annotations.delete(msg.id);
+    return true;
+  }
+
+  private handleClearAnnotations(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isClearAnnotationsMessage(msg))
+      return false;
+
+    this.clearAnnotations();
+    return true;
+  }
+
+  // Tours:
+
+  private handleLoadTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isLoadTourMessage(msg))
+      return false;
+
+    this.loadTour({
+      url: msg.url,
+      play: true,
+    });
+    return true;
+  }
+
+  private handlePauseTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isPauseTourMessage(msg))
+      return false;
+
+    this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    return true;
+  }
+
+  private handleResumeTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isResumeTourMessage(msg))
+      return false;
+
+    this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    return true;
   }
 
   // Outgoing messages
@@ -1068,7 +1352,6 @@ export default class App extends WWTAwareComponent {
     this.lastUpdatedTimestamp = 0;
   }
 
-
   // Fullscreening
 
   fullscreenModeActive = false;
@@ -1123,10 +1406,59 @@ export default class App extends WWTAwareComponent {
     this.setForegroundOpacity(o);
   }
 
-    // Catalogs
-  addHips(catalog: ImagesetInfo) {
+  private handleSetBackgroundByName(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetBackgroundByNameMessage(msg))
+      return false;
+
+    this.setBackgroundImageByName(msg.name);
+    return true;
+  }
+
+  private handleSetForegroundByName(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetForegroundByNameMessage(msg))
+      return false;
+
+    this.setForegroundImageByName(msg.name);
+    return true;
+  }
+
+  private handleSetForegroundOpacity(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetForegroundOpacityMessage(msg))
+      return false;
+
+    this.setForegroundOpacity(msg.value);
+    return true;
+  }
+
+  private handleSetViewerMode(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetViewerModeMessage(msg))
+      return false;
+
+    this.setBackgroundImageByName(msg.mode);
+    this.setForegroundImageByName(msg.mode);
+    return true;
+  }
+
+  // HiPS catalogs (see also the table layer support)
+
+  addHips(catalog: ImagesetInfo): Promise<Imageset> {
     this.addResearchAppCatalogHips(catalog);
-    this.addCatalogHipsByNameWithCallback({ name: catalog.name, callback: () => this.setCatalogHipsColorByName({ name: catalog.name, color: this.defaultColor }) });
+    return this.addCatalogHipsByName({name: catalog.name}).then((imgset) => {
+      const hips = imgset.get_hipsProperties();
+
+      if (hips !== null) {
+        const catId = hips.get_catalogSpreadSheetLayer().id.toString();
+        this.applyTableLayerSettings({
+          id: catId,
+          settings: [
+            ["color", this.defaultColor],
+            ["opacity", this.defaultColor.a],
+          ],
+        });
+      }
+
+      return imgset;
+    });
   }
 
   get catalogToAdd() {
@@ -1135,6 +1467,107 @@ export default class App extends WWTAwareComponent {
 
   set catalogToAdd(catalog: ImagesetInfo) {
     this.addHips(catalog);
+  }
+
+  @Watch('curAvailableCatalogs')
+  onAvailableCatalogsChanged(catalogs: ImagesetInfo[]) {
+    // Notify clients about the new catalogs
+
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+
+    const msg: ApplicationStateMessage = {
+      type: "wwt_application_state",
+      sessionId: this.statusMessageSessionId,
+      hipsCatalogNames: catalogs.map((img) => img.name)
+    }
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
+  // A client has requested that we load a HiPS catalog. Once it's loaded we
+  // reply to the client with the details of the catalog-as-spreadsheet-layer,
+  // so that it can know what the catalog's characteristics are.
+  private handleLoadHipsCatalog(msg: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!layers.isLoadHipsCatalogMessage(msg))
+      return false;
+
+    for (const cat of this.curAvailableCatalogs) {
+      if (cat.name == msg.name) {
+        this.addHips(cat).then((imgset) => {
+          const hips = imgset.get_hipsProperties();
+          if (hips === null)
+            throw new Error('internal consistency failure');
+
+          const layer = hips.get_catalogSpreadSheetLayer();
+
+          // Register in the table-layer framework
+
+          let handler = this.tableLayers.get(msg.tableId);
+
+          if (handler === undefined) {
+            handler = new TableLayerMessageHandler(this);
+            this.tableLayers.set(msg.tableId, handler);
+          }
+
+          handler.setupHipsCatalog(imgset, layer);
+
+          // Reply?
+
+          if (msg.threadId === undefined)
+            return;
+
+          if (this.statusMessageDestination === null || this.allowedOrigin === null)
+            return;
+
+          const settings = extractSpreadSheetLayerSettings(layer);
+          const pysettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
+
+          for (const s of settings) {
+            const ps = convertSpreadSheetLayerSetting(s);
+            if (ps !== null)
+              pysettings.push(ps);
+          }
+
+          const ssli: layers.SpreadSheetLayerInfo = {
+            header: layer.get_header(),
+            settings: pysettings,
+          };
+
+          const reply: layers.LoadHipsCatalogCompletedMessage = {
+            event: "layer_hipscat_load_completed",
+            threadId: msg.threadId,
+            spreadsheetInfo: ssli,
+          }
+
+          this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+        });
+
+        break;
+      }
+    }
+
+    return true;
+  }
+
+  private handleGetHipsCatalogDataInView(msg: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!layers.isGetHipsCatalogDataInViewMessage(msg))
+      return false;
+
+    // Unlike most table-layer messages, here we don't bother to try to work
+    // well when messages are out-of-order or what have you.
+
+    const handler = this.tableLayers.get(msg.tableId);
+    if (handler !== undefined) {
+      handler.handleGetHipsDataInViewMessage(msg).then((reply) => {
+        if (reply !== null) {
+          if (this.statusMessageDestination !== null && this.allowedOrigin !== null)
+            this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+        }
+      })
+    }
+
+    return true;
   }
 
   // "Tools" menu

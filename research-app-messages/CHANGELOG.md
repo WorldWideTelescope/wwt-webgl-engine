@@ -1,5 +1,18 @@
 # rc: minor bump
 
+- Add new messages for interacting with HiPS catalogs (#126, @pkgw). These are a
+  bit funky since they're sort of simultaneously imagesets and spreadsheet
+  layers. The new messages allow them to be created and controlled using the
+  existing spreadsheet layer APIs. You can also download the data that they
+  contain.
+- Also add an ApplicationStateMessage that currently allows clients to learn the
+  names of available HiPS catalogs. It will be expanded to convey the other
+  pieces of state that clients will want to track (e.g., current foreground and
+  background imagery).
+
+
+# @wwtelescope/research-app-messages 0.8.0 (2021-07-20)
+
 - Define a simple new app-level settings framework (#125, @pkgw). This
   currently provides one setting, `hideAllChrome`, needed to help pywwt.
 

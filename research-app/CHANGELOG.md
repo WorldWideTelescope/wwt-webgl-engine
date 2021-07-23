@@ -1,5 +1,12 @@
 # rc: minor bump
 
+- Add support for HiPS catalog control messages (#126, @pkgw). These enable
+  pywwt to work with HiPS catalogs and download their data. This includes a
+  minor rework to track the API changes in the engine-vuex module.
+
+
+# @wwtelescope/research-app 0.5.0 (2021-07-20)
+
 - Implement the new `hideAllChrome` setting, and some engine color settings, for
   pywwt (#125, @pkgw)
 
