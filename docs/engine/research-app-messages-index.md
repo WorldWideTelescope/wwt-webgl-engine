@@ -43,6 +43,14 @@ research app’s window with an event type of `message`.
 [ViewStateMessage]: ./interfaces/viewstatemessage.html
 [listen]: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage#the_dispatched_event
 
+The [ApplicationStateMessage] is likewise emitted by the application in response
+to various events that modify its non-view state. Client implementors should
+keep in mind that the application may be talking to multiple clients
+simultaneously, so such updates may arrive unexpectedly if another client has
+triggered a state change.
+
+[ApplicationStateMessage]: ./interfaces/applicationstatemessage.md
+
 The [PingPongMessage] interface is also special. If you send this message to the
 app, it will reply with an identical message. This is useful for checking
 whether the app has started up, because usually there is no alternative to

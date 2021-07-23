@@ -8,18 +8,20 @@ import {
 
 import {
   Annotation,
-  Color,
   EngineSetting,
   Folder,
   Guid,
   Imageset,
   ImageSetLayer,
+  InViewReturnMessage,
   SpreadSheetLayer,
 } from "@wwtelescope/engine";
 
 import {
+  AddCatalogHipsByNameOptions,
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
+  GetCatalogHipsDataInViewOptions,
   GotoTargetOptions,
   AddImageSetLayerOptions,
   LoadFitsLayerOptions,
@@ -256,7 +258,6 @@ export class WWTAwareComponent extends Vue {
       }),
       ...mapGetters([
         "lookupImageset",
-        "hipsCatalogColorByName",
       ]),
       ...this.$options.computed,
     };
@@ -268,7 +269,9 @@ export class WWTAwareComponent extends Vue {
     this.$options.methods = {
       ...this.$options.methods,
       ...mapActions([
+        "addCatalogHipsByName",
         "createTableLayer",
+        "getCatalogHipsDataInView",
         "gotoRADecZoom",
         "gotoTarget",
         "loadImageCollection",
@@ -279,8 +282,6 @@ export class WWTAwareComponent extends Vue {
       ]),
       ...mapMutations([
         "addAnnotation",
-        "addCatalogHipsByName",
-        "addCatalogHipsByNameWithCallback",
         "applyFitsLayerSettings",
         "applyTableLayerSettings",
         "applySetting",
@@ -290,8 +291,6 @@ export class WWTAwareComponent extends Vue {
         "removeCatalogHipsByName",
         "seekToTourTimecode",
         "setBackgroundImageByName",
-        "setCatalogHipsColorByName",
-        "setCatalogHipsOpacityByName",
         "setClockRate",
         "setClockSync",
         "setFitsLayerColormap",
@@ -457,13 +456,6 @@ export class WWTAwareComponent extends Vue {
   /** Add an [Annotation](../../engine/classes/annotation.html) to the view. */
   addAnnotation!: (_a: Annotation) => void;
 
-  /** Add a "catalog HiPS" dataset to the current view, by name. */
-  addCatalogHipsByName!: (name: string) => void;
-
-  /** Add a "catalog HiPS" dataset to the current view, by name, along
-   * with a callback that is executed after the catalog layer has been added */
-  addCatalogHipsByNameWithCallback!: (args: { name: string; callback: () => void }) => void;
-
   /** Alter one or more settings of the specified FITS image layer as specified
    * in [the options](../../engine-helpers/interfaces/applyfitslayersettingsoptions.html).
    */
@@ -513,12 +505,6 @@ export class WWTAwareComponent extends Vue {
    */
   setBackgroundImageByName!: (_n: string) => void;
 
-  /** Set the display color of the HiPS catalog with the given name */
-  setCatalogHipsColorByName!: (args: { name: string; color: Color }) => void;
-
-  /** Set the display opacity color of the HiPS catalog with the given name */
-  setCatalogHipsOpacityByName!: (args: { name: string; opacity: number }) => void;
-
   /** Set the rate at which the WWT clock progresses compared to wall-clock time.
    *
    * A value of 10 means that the WWT clock progresses ten times faster than
@@ -558,7 +544,7 @@ export class WWTAwareComponent extends Vue {
    */
   setForegroundOpacity!: (o: number) => void;
 
-  /** Change the [ImageSetLayer](../../engine/classes/imagesetlayer.html) 
+  /** Change the [ImageSetLayer](../../engine/classes/imagesetlayer.html)
    * position in the draw cycle.
    */
   setImageSetLayerOrder!: (_o: SetLayerOrderOptions) => void;
@@ -635,11 +621,20 @@ export class WWTAwareComponent extends Vue {
 
   // Actions
 
+  /** Add a "catalog HiPS" dataset to the current view, by name.
+   *
+   * If the catalog name is not in the engine's registry, the promise rejects.
+   */
+  addCatalogHipsByName!: (_o: AddCatalogHipsByNameOptions) => Promise<Imageset>;
+
   /** Request the creation of a tabular data layer.
    *
    * The action resolves to a new [SpreadSheetLayer](../../engine/classes/spreadsheetlayer.html) instance.
    */
   createTableLayer!: (_o: CreateTableLayerParams) => Promise<SpreadSheetLayer>;
+
+  /** Request an export of the catalog HiPS data within the current viewport. */
+  getCatalogHipsDataInView!: (o: GetCatalogHipsDataInViewOptions) => Promise<InViewReturnMessage>;
 
   /** Command the view to steer to a specific configuration.
    *
