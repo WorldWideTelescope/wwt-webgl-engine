@@ -10,7 +10,9 @@
  *
  * The defined messages are:
  *
- * - [[LoadHipsCatalogMessage]]
+ * - [[LoadHipsCatalogMessage]] leading to [[LoadHipsCatalogCompletedMessage]]
+ * - [[GetHipsCatalogDataInViewMessage]] leading to [[GetHipsCatalogDataInViewReply]]
+ *
  * */
 
 import { PywwtSpreadSheetLayerSetting } from './classic_pywwt';
@@ -50,7 +52,7 @@ export interface LoadHipsCatalogMessage {
   threadId?: string;
 }
 
-/** A type-guard function for of [[LoadHipsCatalogMessage]]. */
+/** A type-guard function for [[LoadHipsCatalogMessage]]. */
 export function isLoadHipsCatalogMessage(o: any): o is LoadHipsCatalogMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event === 'layer_hipscat_load' &&
     typeof o.tableId === 'string' &&
@@ -75,6 +77,62 @@ export interface LoadHipsCatalogCompletedMessage {
  * that it didn't create.
  */
 export interface SpreadSheetLayerInfo {
+  /** The names of the columns in the data table. */
+  header: string[];
+
   /** Various settings controlling the later's presentation. */
   settings: PywwtSpreadSheetLayerSetting[];
+}
+
+
+/** Ask the app to return the HiPS catalog data in the current viewport.
+ *
+ * This message will result in a [[GetHipsCatalogDataInViewReply]] if the
+ * input parameters are all correct.
+ */
+ export interface GetHipsCatalogDataInViewMessage {
+  /** The tag identifying this message type. */
+  event: 'layer_hipscat_datainview';
+
+  /** A "thread id" that will be used for the response message with
+   * the tabular data.
+   */
+  threadId: string;
+
+  /** The client's identifier for this HiPS catalog. */
+  tableId: string;
+
+  /** Whether to limit the amount of data downloaded.
+   *
+   * It is *strongly* recommended that you set this to true. HiPS catalogs may
+   * contain gigabytes of data, and if the viewport is zoomed out, an unlimited
+   * request may attempt to download and transfer that much information.
+   */
+  limit: boolean;
+}
+
+/** A type-guard function for [[GetHipsCatalogDataInViewMessage]]. */
+export function isGetHipsCatalogDataInViewMessage(o: any): o is GetHipsCatalogDataInViewMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return o.event === 'layer_hipscat_datainview' &&
+    typeof o.threadId === 'string' &&
+    typeof o.tableId === 'string' &&
+    typeof o.limit === 'boolean';
+}
+
+export interface GetHipsCatalogDataInViewReply {
+  /** The tag identifying this message type. */
+  event: 'layer_hipscat_datainview_reply';
+
+  /** The threadId of the triggering message. */
+  threadId: string;
+
+  /** The table data, as tab-separated textual values with Windows (\r\n) newlines. */
+  data: string;
+
+  /** A flag indicating whether the data-fetch operation was aborted.
+   *
+   * The operation could potentially have been aborted due to a timeout or
+   * hitting a limit on the amount of data to be returned at once.
+   * */
+  aborted: boolean;
 }
