@@ -355,6 +355,7 @@ class TableLayerMessageHandler {
   private isHips = false;
   private internalId: string | null = null;
   private layer: SpreadSheetLayer | null = null; // hack for settings
+  private imageset: Imageset | null = null; // hack for HiPS catalogs
   private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
   private queuedSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
   private queuedRemoval: classicPywwt.RemoveTableLayerMessage | null = null;
@@ -378,9 +379,10 @@ class TableLayerMessageHandler {
     this.created = true;
   }
 
-  setupHipsCatalog(layer: SpreadSheetLayer) {
+  setupHipsCatalog(imageset: Imageset, layer: SpreadSheetLayer) {
     this.created = true;
     this.isHips = true;
+    this.imageset = imageset;
     this.layerInitialized(layer);
   }
 
@@ -460,6 +462,26 @@ class TableLayerMessageHandler {
     }
   }
 
+  async handleGetHipsDataInViewMessage(msg: layers.GetHipsCatalogDataInViewMessage): Promise<layers.GetHipsCatalogDataInViewReply | null> {
+    if (this.imageset === null || this.layer === null || this.internalId === null)
+      return null; // Sorry!
+
+    if (!this.isHips)
+      return null;
+
+    return this.owner.getCatalogHipsDataInView({
+      imageset: this.imageset,
+      limit: msg.limit,
+    }).then((info) => {
+      return {
+        event: "layer_hipscat_datainview_reply",
+        threadId: msg.threadId,
+        data: info.table,
+        aborted: info.aborted
+      };
+    });
+  }
+
   handleRemoveMessage(msg: classicPywwt.RemoveTableLayerMessage) {
     if (this.internalId === null) {
       // Layer not yet created or fully initialized. Queue up message for processing
@@ -468,9 +490,17 @@ class TableLayerMessageHandler {
         this.queuedRemoval = msg;
       }
     } else {
-      if (!this.isHips) {
-        // TODO: HiPS catalog layers need special handling. We should do that
-        // correctly here.
+      if (this.isHips && this.imageset !== null) {
+        // This is a little kludgey ...
+        const name = this.imageset.get_name();
+
+        for (const cat of this.owner.curAvailableCatalogs) {
+          if (cat.name == name) {
+            this.owner.removeResearchAppCatalogHips(cat);
+            this.owner.removeCatalogHipsByName(name);
+          }
+        }
+      } else {
         this.owner.deleteLayer(this.internalId);
         this.internalId = null;
         this.created = false;
@@ -738,14 +768,16 @@ export default class App extends WWTAwareComponent {
   @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
 
   defaultColor = Color.fromArgb(1, 255, 255, 255);
-  hipsCatalogs!: ImagesetInfo[];
-  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   wwtComponentNamespace = wwtEngineNamespace;
 
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
 
   // Lifecycle management
+
+  hipsCatalogs!: ImagesetInfo[];
+  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+  removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
 
   beforeCreate(): void {
     this.$options.computed = {
@@ -758,7 +790,8 @@ export default class App extends WWTAwareComponent {
     this.$options.methods = {
       ...this.$options.methods,
       ...mapMutations(wwtResearchAppNamespace, [
-          "addResearchAppCatalogHips"
+          "addResearchAppCatalogHips",
+          "removeResearchAppCatalogHips"
       ])
     }
 
@@ -889,6 +922,7 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set('table_layer_remove', this.handleRemoveTableLayer);
 
     this.messageHandlers.set('layer_hipscat_load', this.handleLoadHipsCatalog);
+    this.messageHandlers.set('layer_hipscat_datainview', this.handleGetHipsCatalogDataInView);
 
     this.messageHandlers.set('annotation_create', this.handleCreateAnnotation);
     this.messageHandlers.set('annotation_set', this.handleModifyAnnotation);
@@ -1476,7 +1510,7 @@ export default class App extends WWTAwareComponent {
             this.tableLayers.set(msg.tableId, handler);
           }
 
-          handler.setupHipsCatalog(layer);
+          handler.setupHipsCatalog(imgset, layer);
 
           // Reply?
 
@@ -1496,6 +1530,7 @@ export default class App extends WWTAwareComponent {
           }
 
           const ssli: layers.SpreadSheetLayerInfo = {
+            header: layer.get_header(),
             settings: pysettings,
           };
 
@@ -1510,6 +1545,26 @@ export default class App extends WWTAwareComponent {
 
         break;
       }
+    }
+
+    return true;
+  }
+
+  private handleGetHipsCatalogDataInView(msg: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!layers.isGetHipsCatalogDataInViewMessage(msg))
+      return false;
+
+    // Unlike most table-layer messages, here we don't bother to try to work
+    // well when messages are out-of-order or what have you.
+
+    const handler = this.tableLayers.get(msg.tableId);
+    if (handler !== undefined) {
+      handler.handleGetHipsDataInViewMessage(msg).then((reply) => {
+        if (reply !== null) {
+          if (this.statusMessageDestination !== null && this.allowedOrigin !== null)
+            this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+        }
+      })
     }
 
     return true;
