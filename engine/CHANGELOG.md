@@ -1,3 +1,9 @@
+# @wwtelescope/engine 7.13.0 (2021-07-23)
+
+- Expose Imageset HiPS properties in the TypeScript API, for use by
+  downstream applications (#126, @pkgw)
+
+
 # @wwtelescope/engine 7.12.0 (2021-07-06)
 
 - Remove misspelled, unused `set_opaciy` declaration from Layer API.

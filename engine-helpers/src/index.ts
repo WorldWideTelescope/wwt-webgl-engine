@@ -24,6 +24,7 @@ import {
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
+  InViewReturnMessage,
   Layer,
   LayerManager,
   LayerManagerObject,
@@ -205,13 +206,80 @@ export function isSpreadSheetLayerSetting(obj: [string, any]): obj is SpreadShee
   return isLayerSetting(obj) || isBaseSpreadSheetLayerSetting(obj);
 }
 
-/** Apply a setting to an SpreadSheetLayer. */
+/** Apply a setting to a SpreadSheetLayer. */
 export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: SpreadSheetLayerSetting): void {
   const funcName = "set_" + setting[0];
   const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
   (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
+/** Extract all of the current settings of a SpreadSheetLayer. */
+export function extractSpreadSheetLayerSettings(layer: SpreadSheetLayer): SpreadSheetLayerSetting[] {
+  // Sigh, is there a smarter way to do this? I hate hardcording all of these
+  // lists over and over.
+  const s: SpreadSheetLayerSetting[] = [];
+
+  // BaseLayerSetting
+  s.push(["astronomical", layer.get_astronomical()]);
+  s.push(["fadeSpan", layer.get_fadeSpan()]);
+  s.push(["name", layer.get_name()]);
+  s.push(["opacity", layer.get_opacity()]);
+  s.push(["opened", layer.get_opened()]);
+  s.push(["referenceFrame", layer.get_referenceFrame()]);
+  s.push(["version", layer.get_version()]);
+
+  // LayerSetting
+  s.push(["color", layer.get_color()]);
+
+  // BaseSpreadSheetLayerSetting
+  s.push(["altColumn", layer.get_altColumn()]);
+  s.push(["altType", layer.get_altType()]);
+  s.push(["altUnit", layer.get_altUnit()]);
+  s.push(["barChartBitmask", layer.get_barChartBitmask()]);
+  s.push(["beginRange", layer.get_beginRange()]);
+  s.push(["cartesianCustomScale", layer.get_cartesianCustomScale()]);
+  s.push(["cartesianScale", layer.get_cartesianScale()]);
+  s.push(["colorMapColumn", layer.get_colorMapColumn()]);
+  s.push(["colorMapperName", layer.get_colorMapperName()]);
+  s.push(["coordinatesType", layer.get_coordinatesType()]);
+  s.push(["decay", layer.get_decay()]);
+  s.push(["dynamicColor", layer.get_dynamicColor()]);
+  s.push(["dynamicData", layer.get_dynamicData()]);
+  s.push(["endDateColumn", layer.get_endDateColumn()]);
+  s.push(["endRange", layer.get_endRange()]);
+  s.push(["geometryColumn", layer.get_geometryColumn()]);
+  s.push(["hyperlinkColumn", layer.get_hyperlinkColumn()]);
+  s.push(["hyperlinkFormat", layer.get_hyperlinkFormat()]);
+  s.push(["latColumn", layer.get_latColumn()]);
+  s.push(["lngColumn", layer.get_lngColumn()]);
+  s.push(["markerColumn", layer.get_markerColumn()]);
+  s.push(["markerIndex", layer.get_markerIndex()]);
+  s.push(["markerScale", layer.get_markerScale()]);
+  s.push(["nameColumn", layer.get_nameColumn()]);
+  s.push(["normalizeColorMap", layer.get_normalizeColorMap()]);
+  s.push(["normalizeColorMapMax", layer.get_normalizeColorMapMax()]);
+  s.push(["normalizeColorMapMin", layer.get_normalizeColorMapMin()]);
+  s.push(["normalizeSize", layer.get_normalizeSize()]);
+  s.push(["normalizeSizeClip", layer.get_normalizeSizeClip()]);
+  s.push(["normalizeSizeMax", layer.get_normalizeSizeMax()]);
+  s.push(["normalizeSizeMin", layer.get_normalizeSizeMin()]);
+  s.push(["plotType", layer.get_plotType()]);
+  s.push(["pointScaleType", layer.get_pointScaleType()]);
+  s.push(["raUnits", layer.get_raUnits()]);
+  s.push(["scaleFactor", layer.get_scaleFactor()]);
+  s.push(["showFarSide", layer.get_showFarSide()]);
+  s.push(["sizeColumn", layer.get_sizeColumn()]);
+  s.push(["startDateColumn", layer.get_startDateColumn()]);
+  s.push(["timeSeries", layer.get_timeSeries()]);
+  s.push(["xAxisColumn", layer.get_xAxisColumn()]);
+  s.push(["xAxisReverse", layer.get_xAxisReverse()]);
+  s.push(["yAxisColumn", layer.get_yAxisColumn()]);
+  s.push(["yAxisReverse", layer.get_yAxisReverse()]);
+  s.push(["zAxisColumn", layer.get_zAxisColumn()]);
+  s.push(["zAxisReverse", layer.get_zAxisReverse()]);
+
+  return s;
+}
 
 /** Type guard function for VoTableLayerSetting. */
 export function isVoTableLayerSetting(obj: [string, any]): obj is VoTableLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -291,7 +359,7 @@ export interface GotoTargetOptions {
 export interface LoadFitsLayerOptions {
   /** The URL of the FITS file. */
   url: string;
-  
+
   /** A name to use for the new layer. */
   name: string;
 
@@ -302,14 +370,20 @@ export interface LoadFitsLayerOptions {
 
 /** Options for [[WWTInstance.addImageSetLayer]]. */
 export interface AddImageSetLayerOptions {
-  /** The URL of the FITS file 
-   * OR The URL of the desired image set. This should mach an image set url
-   * previously loaded with [[LoadImageCollection]]. */
+  /** The URL of the FITS file *or* the URL of the desired image set.
+   *
+   * This should match an image set URL previously loaded with
+   * [[WWTInstance.loadImageCollection]]. */
   url: string;
-  
-  /** Tell WWT what type of layer you are Adding.
-   * OR let WWT try to autodetect the type of the data.
-   * Default, autodetect. */
+
+  /** Indicates what type of layer you are adding.
+   *
+   * If "fits", the [[url]] will be taken to point to a single FITS File that
+   * should be added. If "preloaded", it will be taken to match the URL
+   * associated with an imageset that has already been added to WWT's internal
+   * catalogs via [[WWTInstance.loadImageCollection]]. If "autodetect", WWT will
+   * guess: if the URL ends with a FITS-like extension, "fits" mode will be
+   * activated; otherwise it will use "preloaded" mode. */
   mode: "autodetect" | "fits" | "preloaded";
 
   /** A name to use for the new layer. */
@@ -320,7 +394,7 @@ export interface AddImageSetLayerOptions {
   goto: boolean;
 }
 
-/** Options for [[WWTInstance.setLayerOrder]]. */
+/** Options for [[WWTInstance.setImageSetLayerOrder]]. */
 export interface SetLayerOrderOptions {
   /** The ID of the layer. */
   id: string;
@@ -376,6 +450,23 @@ export interface ApplyTableLayerSettingsOptions {
 
   /** The settings to apply. */
   settings: SpreadSheetLayerSetting[];
+}
+
+export interface AddCatalogHipsByNameOptions {
+  /** The name of the HiPS catalog imageset to load. */
+  name: string;
+}
+
+export interface GetCatalogHipsDataInViewOptions {
+  /** The HiPS catalog to query, expressed as an imageset. */
+  imageset: Imageset;
+
+  /** Whether to limit the amount of data returned.
+   *
+   * It is *strongly* recommended to apply a limit, since the total size of HiPS
+   * catalogs can reach terabytes of data.
+   */
+  limit: boolean;
 }
 
 /** Options for [[setupForImageset]]. */
@@ -599,7 +690,7 @@ export class WWTInstance {
   *
   * @param url: The URL of the WTML collection file to load.
   * @param loadChildFolders When true, this method will recursively
-  * download and unpack the content of all [[Folder]]s contained in the WTML file.
+  * download and unpack the content of all Folders contained in the WTML file.
   * @returns: A promise that resolves to an initialized Folder object.
   */
   async loadImageCollection(url: string, loadChildFolders?: boolean): Promise<Folder> {
@@ -662,7 +753,7 @@ export class WWTInstance {
    *
    * The FITS file must be downloaded and processed, so this API is
    * asynchronous, and is not appropriate for files that might be large.
-   * 
+   *
    * The image set must have previously been created with [[loadImageCollection]]
    */
   async addImageSetLayer(options: AddImageSetLayerOptions): Promise<ImageSetLayer> {
@@ -727,6 +818,54 @@ export class WWTInstance {
       }
     }
   }
+
+  /** Add a new HiPS catalog to the view, by name.
+   *
+   * The promise will resolve when the catalog metadata have fully downloaded.
+   * It will reject if the name is unrecognized.
+   *
+   * HiPS catalogs are something of an awkward hybrid. They are managed like
+   * imagesets, but rendered like spreadsheet layers. To get the
+   * `SpreadSheetLayer` associated with a HiPS catalog imageset, access:
+   *
+   * ```
+   * imgset.get_hipsProperties().get_catalogSpreadSheetLayer()
+   * ```
+   *
+   * You can use methods like [[applyTableLayerSettings]] to modify the settings
+   * of this layer by extracting its ID string with `layer.id.toString()`.
+   *
+   * The contents of this catalog will update dynamically as the user navigates
+   * the WWT view.
+   */
+  async addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
+    return new Promise((resolve, reject) => {
+      const imgset = this.ctl.getImagesetByName(options.name);
+
+      if (imgset === null) {
+        reject();
+      } else {
+        this.ctl.renderContext.addCatalogHips(imgset, () => {
+          resolve(imgset);
+        });
+      }
+    });
+  }
+
+  /** Fetch the subset of catalog HiPS data contained within the current view.
+   *
+   * The imageset should have been loaded with the [[addCatalogHipsByName]]
+   * call. The *limit* option should almost always be true, since if it is false
+   * the data-fetch operation can potentially attempt to download and return
+   * gigabytes of data.
+   * */
+   async getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+    return new Promise((resolve, _reject) => {
+      this.ctl.renderContext.getCatalogHipsDataInView(options.imageset, options.limit, (msg) => {
+        resolve(msg);
+      });
+    });
+   }
 
   // "Mutator" type operations -- not async.
 

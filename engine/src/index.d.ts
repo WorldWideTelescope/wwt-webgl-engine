@@ -374,6 +374,19 @@ export namespace Guid {
   export function fromString(id: string): Guid;
 }
 
+/** Properties of HiPS imagesets */
+
+export class HipsProperties {
+  get_properties(): {[index: string]: string};
+
+  get_catalogColumnInfo(): VoTable | null;
+  set_catalogColumnInfo(vt: VoTable | null): VoTable | null;
+
+  // Note: this is actually a CatalogSpreadSheetLayer subclass, but it doesn't
+  // add any new APIs that we care about. But let's not exposed the setter.
+  get_catalogSpreadSheetLayer(): SpreadSheetLayer;
+}
+
 /** Imagery that can be displayed in WWT. */
 export class Imageset implements Thumbnail {
   get_altUrl(): string;
@@ -424,6 +437,8 @@ export class Imageset implements Thumbnail {
 
   get_generic(): boolean;
   set_generic(g: boolean): boolean;
+
+  get_hipsProperties(): HipsProperties | null;
 
   get_imageSetID(): number;
   set_imageSetID(id: number): number;
@@ -969,15 +984,15 @@ export class ScriptInterface {
   setForegroundOpacity(opacity: number): void;
 
   /** Initiate the loading of a image set or single-file FITS layer.
-   * 
+   *
    * If the specified URL already exists in the image set collection, i.e. it
    * has previously been created with [[loadImageCollection]], then this image set
    * is added to the view.
-   * 
+   *
    * If the specified URL is pointing to a FITS file, it will be downloaded and parsed.
    * This API is therefore insufficient for large datasets, since they become
    * impractical to download as whole files.
-   * 
+   *
    * Although this function will return an ImageSetLayer object immediately, the
    * FITS / image set information won't be ready until the FITS file / image set
    * is downloaded and parsed. The callback will be called after this completes.
@@ -999,7 +1014,7 @@ export class ScriptInterface {
 
   /** Change the ImageSetLayer position in the layer stack. */
   setImageSetLayerOrder(id: string, order: number): void;
-  
+
   /** Create a circle annotation.
    *
    * It is *not* automatically added to the renderer. Use [[addAnnotation]] to do that.
@@ -2164,7 +2179,7 @@ export namespace Wtml {
    * @param url The URL from which to retrieve the WTML data.
    * @param complete A callback to be called after the folder (and all child
    * folders, if loadChildFolders is set to true) is successfully loaded.
-   * @param loadChildFolders Optional, When true, this method will recursively 
+   * @param loadChildFolders Optional, When true, this method will recursively
    * download and unpack all [[Folder]]s contained in the original WTML file.
    * Defaults to false.
    * @returns A folder object that will be populated asynchronously.

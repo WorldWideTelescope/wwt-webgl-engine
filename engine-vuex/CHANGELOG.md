@@ -1,3 +1,12 @@
+# @wwtelescope/engine-vuex 0.10.0 (2021-07-23)
+
+BREAKING: rework the catalog HiPS APIs (#126, @pkgw). The first approach used
+callbacks, which should be replaced with `async` interfaces at this level of the
+stack. There were also some APIs which were redundant with the existing
+SpreadSheetLayer APIs, except that the lower levels didn't give us a way to
+access those. That's now been fixed, so we can consolidate things here.
+
+
 # @wwtelescope/engine-vuex 0.9.0 (2021-07-06)
 
 - Expose interfaces for loading and controlling HiPS progressive catalogs

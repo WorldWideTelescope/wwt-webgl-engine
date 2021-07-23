@@ -1,3 +1,10 @@
+# @wwtelescope/engine-helpers 0.7.0 (2021-07-23)
+
+- Add various wrappers for catalog HiPS functionality: an async-ified wrapper
+  for getCatalogHipsDataInView, an API to pull settings out of a spreadsheet
+  layer, and a new async addCatalogHipsByName implementation (#126, @pkgw)
+
+
 # @wwtelescope/engine-helpers 0.6.0 (2021-06-03)
 
 - Add helpers relating to some of the new APIs in the 7.11 series of the engine.
