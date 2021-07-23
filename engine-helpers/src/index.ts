@@ -24,6 +24,7 @@ import {
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
+  InViewReturnMessage,
   Layer,
   LayerManager,
   LayerManagerObject,
@@ -456,6 +457,18 @@ export interface AddCatalogHipsByNameOptions {
   name: string;
 }
 
+export interface GetCatalogHipsDataInViewOptions {
+  /** The HiPS catalog to query, expressed as an imageset. */
+  imageset: Imageset;
+
+  /** Whether to limit the amount of data returned.
+   *
+   * It is *strongly* recommended to apply a limit, since the total size of HiPS
+   * catalogs can reach terabytes of data.
+   */
+  limit: boolean;
+}
+
 /** Options for [[setupForImageset]]. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
@@ -839,6 +852,20 @@ export class WWTInstance {
     });
   }
 
+  /** Fetch the subset of catalog HiPS data contained within the current view.
+   *
+   * The imageset should have been loaded with the [[addCatalogHipsByName]]
+   * call. The *limit* option should almost always be true, since if it is false
+   * the data-fetch operation can potentially attempt to download and return
+   * gigabytes of data.
+   * */
+   async getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+    return new Promise((resolve, _reject) => {
+      this.ctl.renderContext.getCatalogHipsDataInView(options.imageset, options.limit, (msg) => {
+        resolve(msg);
+      });
+    });
+   }
 
   // "Mutator" type operations -- not async.
 
