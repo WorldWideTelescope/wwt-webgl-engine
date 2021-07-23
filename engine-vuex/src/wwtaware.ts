@@ -13,6 +13,7 @@ import {
   Guid,
   Imageset,
   ImageSetLayer,
+  InViewReturnMessage,
   SpreadSheetLayer,
 } from "@wwtelescope/engine";
 
@@ -20,6 +21,7 @@ import {
   AddCatalogHipsByNameOptions,
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
+  GetCatalogHipsDataInViewOptions,
   GotoTargetOptions,
   AddImageSetLayerOptions,
   LoadFitsLayerOptions,
@@ -269,6 +271,7 @@ export class WWTAwareComponent extends Vue {
       ...mapActions([
         "addCatalogHipsByName",
         "createTableLayer",
+        "getCatalogHipsDataInView",
         "gotoRADecZoom",
         "gotoTarget",
         "loadImageCollection",
@@ -629,6 +632,9 @@ export class WWTAwareComponent extends Vue {
    * The action resolves to a new [SpreadSheetLayer](../../engine/classes/spreadsheetlayer.html) instance.
    */
   createTableLayer!: (_o: CreateTableLayerParams) => Promise<SpreadSheetLayer>;
+
+  /** Request an export of the catalog HiPS data within the current viewport. */
+  getCatalogHipsDataInView!: (o: GetCatalogHipsDataInViewOptions) => Promise<InViewReturnMessage>;
 
   /** Command the view to steer to a specific configuration.
    *

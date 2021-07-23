@@ -19,6 +19,7 @@ import {
   Guid,
   Imageset,
   ImageSetLayer,
+  InViewReturnMessage,
   SpreadSheetLayer,
   WWTControl,
 } from "@wwtelescope/engine";
@@ -28,6 +29,7 @@ import {
   AddImageSetLayerOptions,
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
+  GetCatalogHipsDataInViewOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
@@ -179,7 +181,7 @@ export interface WWTEngineVuexState {
   tourTimecode: number;
 
   showWebGl2Warning: boolean;
-  
+
   /** The current zoom level of the view, in degrees.
    *
    * The zoom level is the angular height of the viewport, times size.
@@ -388,6 +390,13 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst == null)
       throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
     return Vue.$wwt.inst.addCatalogHipsByName(options);
+  }
+
+  @Action({ rawError: true })
+  getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot getCatalogHipsDataInView without linking to WWTInstance');
+    return Vue.$wwt.inst.getCatalogHipsDataInView(options);
   }
 
   @Mutation
@@ -608,12 +617,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadFitsLayer without linking to WWTInstance');
     const addImageSetLayerOptions: AddImageSetLayerOptions = {
-      url: options.url, 
+      url: options.url,
       mode: "fits",
       name: options.name,
       goto: options.gotoTarget
     };
-    
+
     return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
   }
 
