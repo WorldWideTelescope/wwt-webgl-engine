@@ -125,7 +125,7 @@
 
     <div id="webgl2-popup" v-show="wwtShowWebGl2Warning">
       To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
-      In case you would like to use Safari, we recommend that you
+      In case you would like to use Safari, we recommend that you 
       <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
     </div>
   </div>
@@ -173,11 +173,7 @@ import {
 
 import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 
-import {
-  classicPywwt,
-  isPingPongMessage,
-  ViewStateMessage,
-} from "@wwtelescope/research-app-messages";
+import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
 
 import { convertPywwtSpreadSheetLayerSetting } from "./settings";
 
@@ -706,31 +702,11 @@ class KeyboardControlSettings {
 }
 
 interface AngleCoordinates {
-  raRad: number;
-  decRad: number;
+  ra: number;
+  dec: number;
   [x: string]: any;
 }
 
-/** Get the source of a MessageEvent as a Window, if it is one.
- *
- * The problem here is that on Chrome, if the event is a cross-origin message
- * event, `event.source instanceof Window` returns false even if the source is a
- * window, because that object comes from a different JS context than the one
- * that is currently executing, so its `Window` type is different than ours. On
- * other browsers, or same-origin events, the problem doesn't manifest.
- * Meanwhile, the ServiceWorker type is only defined on HTTPS connections and
- * localhost, so it's sometimes missing.
- *
- * See:
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof#instanceof_and_multiple_context_e.g._frames_or_windows
- */
-function eventSourceAsWindow(e: MessageEvent): Window | null {
-  if (!(e.source instanceof MessagePort) && (typeof ServiceWorker === 'undefined' || !(e.source instanceof ServiceWorker))) {
-    return e.source as Window;
-  }
-
-  return null;
-}
 
 /** The main "research app" Vue component. */
 @Component
@@ -741,7 +717,7 @@ export default class App extends WWTAwareComponent {
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
   lastClosePt: Source | null = null;
-  distanceThreshold = 0.01;
+  distanceThreshold: number = 0.01;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
   drag = false;
 
@@ -788,54 +764,24 @@ export default class App extends WWTAwareComponent {
       screenfull.on('change', this.onFullscreenEvent);
     }
 
-    this.waitForReady().then(() => {
-      // This returns a promise but I don't think that we need to wait for that
-      // to resolve before going ahead and starting to listen for messages.
-      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
+    this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
 
-      // Don't start listening for messages until the engine is ready to go.
-      // There's no point in returning a "not ready yet" error or anything since
-      // the client has to handle the "app isn't yet listening for messages"
-      // state anyway.
-      //
-      // For now let's just not worry about removing this listener ...
-      window.addEventListener('message', (event) => {
-        // We have to be careful with event.source -- see this function's docs.
-        const sourceAsWindow = eventSourceAsWindow(event);
-
-        if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
-          // You could imagine wanting to send status updates to multiple
-          // destinations, but let's start simple.
-          if (this.statusMessageDestination === null) {
-            if (sourceAsWindow !== null) {
-              this.statusMessageDestination = sourceAsWindow;
-              // Hardcode the status update rate to max out at 5 Hz.
-              this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
-            }
-          }
-
-          const message = event.data;
-
-          // Special handling for ping-pong to specifically reply to the pinger --
-          // one day we should get better about talking to multiple clients.
-          if (isPingPongMessage(message)) {
-            if (sourceAsWindow !== null) {
-              if (message.sessionId !== undefined) {
-                this.statusMessageSessionId = message.sessionId;
-              }
-
-              sourceAsWindow.postMessage(message, event.origin);
-            } else if (event.source instanceof Window) {
-              /* can't-happen, but needed to make TypeScript happy */
-            } else if (event.source !== null) {
-              event.source.postMessage(message);
-            }
-          } else {
-            this.onMessage(message);
+    // For now let's just not worry about removing this listener ...
+    window.addEventListener('message', (event) => {
+      if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
+        // You could imagine wanting to send status updates to multiple
+        // destinations, but let's start simple.
+        if (this.statusMessageDestination === null) {
+          if (event.source instanceof Window) {
+            this.statusMessageDestination = event.source;
+            // Hardcode the status update rate to max out at 5 Hz.
+            this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
           }
         }
-      }, false);
-    });
+
+        this.onMessage(event.data);
+      }
+    }, false);
 
     // Handling key presses
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
@@ -871,14 +817,12 @@ export default class App extends WWTAwareComponent {
 
   onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
     if (classicPywwt.isLoadImageCollectionMessage(msg)) {
-      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(() => {
-        if (this.statusMessageDestination != null && this.allowedOrigin != null){
+      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(()=> {
+        if(this.statusMessageDestination != null && this.allowedOrigin != null){
           const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
             event: "load_image_collection_completed",
-            threadId: msg.threadId,
             url: msg.url
           };
-
           this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
         }
       });
@@ -995,20 +939,18 @@ export default class App extends WWTAwareComponent {
     if (this.hipsCatalogs.length == 0) {
       return;
     }
-    this.drag = true;
     const pt = { x: event.offsetX, y: event.offsetY };
     const raDecDeg = this.findRADecForScreenPoint(pt);
-    const raDecRad = { raRad: D2R * raDecDeg.raDeg, decRad: D2R * raDecDeg.decDeg };
+    const raDecRad = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
     const closestPt = this.closestInView(raDecRad, this.distanceThreshold);
     if (closestPt == null && this.lastClosePt == null) {
       return;
     }
-    const needsUpdate = (closestPt == null || this.lastClosePt == null)
-      || ((this.lastClosePt.raRad != closestPt.raRad)
-      || (this.lastClosePt.decRad != closestPt.decRad));
+    const needsUpdate = (closestPt == null || this.lastClosePt == null) || ((this.lastClosePt.ra != closestPt.ra) || (this.lastClosePt.dec != closestPt.dec));
     if (needsUpdate) {
       this.lastClosePt = closestPt;
     }
+    this.drag = true;
   }
 
   wwtOnMouseDown(_event: MouseEvent) {
@@ -1024,7 +966,7 @@ export default class App extends WWTAwareComponent {
   }
 
   // Increment the counter by 1 every time this is called
-  genericSourceName = (function () {
+  newSourceName = (function () {
     let count = 0;
 
     return function() {
@@ -1039,7 +981,7 @@ export default class App extends WWTAwareComponent {
         return `${col} ${item[col]}`;
       }
     }
-    return this.genericSourceName();
+    return this.newSourceName();
   }
 
   // Keyed by "external" layer IDs
@@ -1090,7 +1032,6 @@ export default class App extends WWTAwareComponent {
   // try to make it reactive, which would cause it to try to read fields that
   // are prohibited in cross-origin situations:
   private statusMessageDestination!: Window | null;
-  statusMessageSessionId = "default";
   lastUpdatedRA = 0.0;
   lastUpdatedDec = 0.0;
   lastUpdatedFov = 1.0;
@@ -1118,7 +1059,6 @@ export default class App extends WWTAwareComponent {
 
     const message: ViewStateMessage = {
       type: "wwt_view_state",
-      sessionId: this.statusMessageSessionId,
       raRad: ra,
       decRad: dec,
       fovDeg: fov,
@@ -1299,11 +1239,11 @@ export default class App extends WWTAwareComponent {
   distance(pt1: AngleCoordinates, pt2: AngleCoordinates): number {
     // Using the last formula from https://en.wikipedia.org/wiki/Great-circle_distance#Computational_formulas
     // which Wikipedia says is accurate at all distances
-    const dAbsRA = Math.abs(pt1.raRad - pt2.raRad);
-    const nt1 = (Math.cos(pt2.decRad) * Math.sin(dAbsRA)) ** 2;
-    const nt2 = (Math.cos(pt1.decRad) * Math.sin(pt2.decRad) - Math.sin(pt1.decRad) * Math.cos(pt2.decRad) * Math.cos(dAbsRA)) ** 2;
+    const dAbsRA = Math.abs(pt1.ra - pt2.ra);
+    const nt1 = (Math.cos(pt2.dec) * Math.sin(dAbsRA)) ** 2;
+    const nt2 = (Math.cos(pt1.dec) * Math.sin(pt2.dec) - Math.sin(pt1.dec) * Math.cos(pt2.dec) * Math.cos(dAbsRA)) ** 2;
     const num = Math.sqrt(nt1 + nt2);
-    const den = Math.sin(pt1.decRad) * Math.sin(pt2.decRad) + Math.cos(pt1.decRad) * Math.cos(pt2.decRad) * Math.cos(dAbsRA);
+    const den = Math.sin(pt1.dec) * Math.sin(pt2.dec) + Math.cos(pt1.dec) * Math.cos(pt2.dec) * Math.cos(dAbsRA);
     return Math.atan2(num, den);
   }
 
@@ -1333,18 +1273,18 @@ export default class App extends WWTAwareComponent {
       const latCol = this.findLatColumn(name);
 
       const itemCreator = function (values: string[]): Source {
-        const obj: any = {};
+        let obj: any = {};
         for (let i = 0; i < values.length; i++) {
           obj[colNames[i]] = values[i];
         }
-        return { ...obj, raRad: D2R * Number(values[lngCol]), decRad: D2R * Number(values[latCol]), catalogName: name };
+        return { ...obj, ra: D2R * Number(values[lngCol]), dec: D2R * Number(values[latCol]), catalogName: name };
       };
       
       for (const row of rows) {
         const items = row.split(colSeparator);
-        const raDeg = Number(items[lngCol]);
-        const decDeg = Number(items[latCol]);
-        const pt = { raRad: D2R * raDeg, decRad: D2R * decDeg };
+        const ra = Number(items[lngCol]);
+        const dec = Number(items[latCol]);
+        const pt = { ra: D2R * ra, dec: D2R * dec };
         const dist = this.distance(target, pt);
         if (dist < minDist) {
           closestPt = itemCreator(items);

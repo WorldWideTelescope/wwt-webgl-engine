@@ -32,8 +32,8 @@
  *
  * ### Image Sets
  *
+ * - [[ImageCollectionLoadedMessage]]
  * - [[LoadImageCollectionMessage]]
- * - [[LoadImageCollectionCompletedMessage]]
  * - [[SetBackgroundByNameMessage]]
  * - [[SetForegroundByNameMessage]]
  * - [[SetForegroundOpacityMessage]]
@@ -198,14 +198,10 @@ export interface CreateImageSetLayerMessage {
   /** The URL from which to obtain the FITS file or image set. */
   url: string;
 
-  /** The type of layer that is being loaded.
-   *
-   * With "fits", the URL will be treated as a FITS file to be downloaded and
-   * displayed. With "preloaded", the URL will be assumed to correspond to an
-   * imageset that has already been loaded into the engine. The default is
-   * "autodetect", which will assume "fits" if the URL ends in a FITS-like
-   * extension, otherwise "preloaded". */
-  mode?: "autodetect" | "fits" | "preloaded";
+  /** Tell WWT what type of layer you are Adding.
+   * OR let WWT try to autodetect the type of the data.
+   * Default, autodetect. */
+  mode: "autodetect" | "fits" | "preloaded";
 
   /** Go to centre of the data. Defaults to true.*/
   goto?: boolean;
@@ -217,7 +213,7 @@ export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMe
     o.event == "image_layer_create" &&
     typeof o.id === "string" &&
     typeof o.url === "string" &&
-    (o.mode === undefined || o.mode == "autodetect" || o.mode == "fits" || o.mode == "preloaded") &&
+    (o.mode == "autodetect" || o.mode == "fits" || o.mode == "preloaded") &&
     (o.goto === undefined || typeof o.goto === "boolean");
 }
 
@@ -295,17 +291,8 @@ export interface LoadImageCollectionMessage {
   /** The URL of the collection to load. */
   url: string;
 
-  /** Optional, Recursively load any child folders. Defaults to False. */
+  /** Optional, Recursively load any child folders. Defaults to False*/
   loadChildFolders?: boolean;
-
-  /** An optional, arbitrary "thread" identifier that will be included in the
-   * reply message.
-   *
-   * The client can set this field so that it can properly associate response
-   * messages with the particular app and request that caused it. This
-   * disambiguation is needed when one client is talking to multiple apps.
-   * */
-  threadId?: string;
 }
 
 /** Type guard function for LoadImageCollectionMessage. */
@@ -313,30 +300,16 @@ export function isLoadImageCollectionMessage(o: any): o is LoadImageCollectionMe
   return typeof o.event === "string" &&
     o.event == "load_image_collection" &&
     typeof o.url === "string" &&
-    (o.loadChildFolders === undefined || typeof o.loadChildFolders === "boolean") &&
-    (o.threadId === undefined || typeof o.threadId === "string");
+    (o.loadChildFolders === undefined || typeof o.loadChildFolders === "boolean");
 }
 
 
-/** A message sent to the user when an image collection has finished loading,
- * and is available for use. */
+/** A message sent to the user when an image collection has finished loading, and is available for use. */
 export interface LoadImageCollectionCompletedMessage {
   /** The tag identifying this message type. */
   event: "load_image_collection_completed";
-
   /** The URL of the loaded collection. */
   url: string;
-
-  /** The thread ID of the triggering message, if it was provided. */
-  threadId?: string;
-}
-
-/** Type guard function for [[LoadImageCollectionCompletedMessage]]. */
-export function isLoadImageCollectionCompletedMessage(o: any): o is LoadImageCollectionCompletedMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  return typeof o.event === "string" &&
-    o.event == "load_image_collection_completed" &&
-    typeof o.url === "string" &&
-    (o.threadId === undefined || typeof o.threadId === "string");
 }
 
 /** A command to load and play a WWT guided tour file. */

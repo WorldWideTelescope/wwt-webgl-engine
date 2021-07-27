@@ -15,6 +15,7 @@ import {
 import {
   Annotation,
   Color,
+  Constellations,
   EngineSetting,
   Folder,
   Guid,
@@ -278,11 +279,11 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   get findRADecForScreenPoint() {
-    return function (pt: { x: number; y: number }): { raDeg: number; decDeg: number } {
+    return function (pt: { x: number; y: number }): { ra: number; dec: number } {
       if (Vue.$wwt.inst === null)
         throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
       const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
-      return { raDeg: (15 * coords.x + 720) % 360, decDeg : coords.y };
+      return { ra: (15 * coords.x + 720) % 360, dec : coords.y };
     }
   }
 
@@ -322,6 +323,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       } else {
         return -1;
       }
+    }
+  }
+
+  get findConstellationForPoint() {
+    return function(pt: { ra: number; dec: number }): string {
+      return Constellations.containment.findConstellationForPoint(pt.ra, pt.dec);
     }
   }
 

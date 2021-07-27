@@ -89,7 +89,7 @@ export default class CatalogItem extends Vue {
     removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
     setCatalogHipsColorByName!: (obj: { name: string; color: Color }) => void;
     setCatalogHipsOpacityByName!: (obj: { name: string; opacity: number }) => void;
-    setResearchAppCatalogHipsVisibility!: (args: { catalog: ImagesetInfo; visibility: boolean}) => void;
+    setResearchAppCatalogHipsVisibility!: (args: { catalog: ImagesetInfo, visible: boolean}) => void;
 
     handleDelete() {
       this.removeResearchAppCatalogHips(this.catalog);
@@ -97,7 +97,7 @@ export default class CatalogItem extends Vue {
     }
 
     handleToggle() {
-      this.setResearchAppCatalogHipsVisibility({ catalog: this.catalog, visibility: !this.visible });
+      this.setResearchAppCatalogHipsVisibility({ catalog: this.catalog, visible: !this.visible });
     }
 
     handleColorChange(colorData: VueColorData) {
