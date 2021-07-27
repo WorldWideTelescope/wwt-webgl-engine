@@ -722,8 +722,8 @@ export default class App extends WWTAwareComponent {
   drag = false;
 
   // From the store
+  catalogNameMappings!: { [catalogName: string]: [string, string] };
   hipsCatalogs!: ImagesetInfo[];
-  nameColumns!: string[];
   sources!: Source[];
   
   addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
@@ -735,8 +735,8 @@ export default class App extends WWTAwareComponent {
   beforeCreate(): void {
     this.$options.computed = {
       ...mapState(wwtResearchAppNamespace, {
+        catalogNameMappings: (state, _getters) => (state as WWTResearchAppModule).catalogNameMappings,
         hipsCatalogs: (state, _getters) => (state as WWTResearchAppModule).hipsCatalogs,
-        nameColumns: (state, _getters) => (state as WWTResearchAppModule).nameColumns,
         sources: (state, _getters) => (state as WWTResearchAppModule).sources,
       }),
       ...mapGetters(wwtResearchAppNamespace, [
@@ -959,7 +959,7 @@ export default class App extends WWTAwareComponent {
 
   wwtOnMouseUp(_event: MouseEvent) {
     if (!this.drag && this.lastClosePt !== null) {
-      const source: Source = { ...this.lastClosePt, name: this.generateName(this.lastClosePt) };
+      const source: Source = { ...this.lastClosePt, name: this.nameForSource(this.lastClosePt) };
       this.addSource(source);
     }
     this.drag = false;
@@ -975,10 +975,10 @@ export default class App extends WWTAwareComponent {
     }
   })();
 
-  generateName(item: any): string {
-    for (const col of this.nameColumns) {
-      if (col in item) {
-        return `${col} ${item[col]}`;
+  nameForSource(source: any): string {
+    for (const [ key, [from, to]] of Object.entries(this.catalogNameMappings)) {
+      if (from in source && source["catalogName"] === key) {
+        return `${to}: ${source[from]}`;
       }
     }
     return this.newSourceName();
