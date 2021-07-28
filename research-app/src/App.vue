@@ -139,7 +139,7 @@ import { debounce } from 'debounce';
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { mapGetters, mapMutations, mapState } from "vuex";
 
-import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
 import { Source, WWTResearchAppModule } from "./store";
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
@@ -794,7 +794,7 @@ export default class App extends WWTAwareComponent {
   distanceThreshold = 0.01;
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
-  drag = false;
+  isMouseMoving = false;
 
   // From the store
   catalogNameMappings!: { [catalogName: string]: [string, string] };
@@ -1100,19 +1100,19 @@ export default class App extends WWTAwareComponent {
     if (needsUpdate) {
       this.lastClosePt = closestPt;
     }
-    this.drag = true;
+    this.isMouseMoving = true;
   }
 
   wwtOnMouseDown(_event: MouseEvent) {
-    this.drag = false;
+    this.isMouseMoving = false;
   }
 
   wwtOnMouseUp(_event: MouseEvent) {
-    if (!this.drag && this.lastClosePt !== null) {
+    if (!this.isMouseMoving && this.lastClosePt !== null) {
       const source: Source = { ...this.lastClosePt, name: this.nameForSource(this.lastClosePt) };
       this.addSource(source);
     }
-    this.drag = false;
+    this.isMouseMoving = false;
   }
 
   // Increment the counter by 1 every time this is called
@@ -1737,33 +1737,20 @@ export default class App extends WWTAwareComponent {
     return imagesets.filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
   }
 
-  // RA, Dec in radians
-  distance(pt1: AngleCoordinates, pt2: AngleCoordinates): number {
-    // Using the last formula from https://en.wikipedia.org/wiki/Great-circle_distance#Computational_formulas
-    // which Wikipedia says is accurate at all distances
-    const dAbsRA = Math.abs(pt1.ra - pt2.ra);
-    const nt1 = (Math.cos(pt2.dec) * Math.sin(dAbsRA)) ** 2;
-    const nt2 = (Math.cos(pt1.dec) * Math.sin(pt2.dec) - Math.sin(pt1.dec) * Math.cos(pt2.dec) * Math.cos(dAbsRA)) ** 2;
-    const num = Math.sqrt(nt1 + nt2);
-    const den = Math.sin(pt1.dec) * Math.sin(pt2.dec) + Math.cos(pt1.dec) * Math.cos(pt2.dec) * Math.cos(dAbsRA);
-    return Math.atan2(num, den);
-  }
-
   closestInView(target: AngleCoordinates, threshold?: number): Source | null {
     let minDist = Infinity;
     let closestPt = null;
-
-    //const pointsInView = this.dataInView();
-    //const result = this.closest(target, pointsInView);
-    // const closePt = result.pt
-    // const minDist = result.dist
 
     const rowSeparator = "\r\n";
     const colSeparator = "\t";
 
     for (const catalog of this.visibleHipsCatalogs()) {
       const name = catalog.name;
-      const hipsStr = this.currentHipsCatalogData(name);
+      const layer = this.layerForHipsCatalog(name);
+      if (layer == null) {
+        continue;
+      }
+      const hipsStr = layer.getTableDataInView();
       const rows = hipsStr.split(rowSeparator);
       const header = rows.shift();
       if (!header) {
@@ -1771,8 +1758,8 @@ export default class App extends WWTAwareComponent {
       }
       const colNames = header.split(colSeparator);
 
-      const lngCol = this.findLngColumn(name);
-      const latCol = this.findLatColumn(name);
+      const lngCol = layer.get_lngColumn();
+      const latCol = layer.get_latColumn();
 
       const itemCreator = function (values: string[]): Source {
         const obj: any = {};  // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -1787,7 +1774,7 @@ export default class App extends WWTAwareComponent {
         const ra = Number(items[lngCol]);
         const dec = Number(items[latCol]);
         const pt = { ra: D2R * ra, dec: D2R * dec };
-        const dist = this.distance(target, pt);
+        const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
         if (dist < minDist) {
           closestPt = itemCreator(items);
           minDist = dist;
@@ -2147,7 +2134,6 @@ ul.tool-menu {
 This makes the last element of the last list item in the
 display panel have the rounded bottom edge
 The alternative to this is to have Vue bind a class to the last element
-Since I'm using
 */
 #display-panel > *:last-child > *:last-child > *:last-child {
   border-bottom-left-radius: 5px;
