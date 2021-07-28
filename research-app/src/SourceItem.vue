@@ -96,7 +96,9 @@ export default class SourceItem extends Vue {
     }
 
     get searchRadius() {
-      return 2 * this.wwtDegZoom / 360; // In arcminutes
+      // The return value is in arcminutes
+      // The minimum value that this can return is 1/6 arcminute = 10 arcseconds
+      return Math.max(2 * this.wwtDegZoom / 360, 1 / 6);
     }
 
     get sourceName(): string {
