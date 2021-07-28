@@ -96,7 +96,7 @@ export class WWTResearchAppModule extends VuexModule {
   }
 
   @Mutation
-  setResearchAppCatalogHipsVisibility(args: { catalog: ImagesetInfo, visible: boolean }) {
+  setResearchAppCatalogHipsVisibility(args: { catalog: ImagesetInfo; visible: boolean }) {
     const index = getIndex(this.hipsCatalogs, args.catalog);
     if (index >= 0) {
       Vue.set(this.hipsCatalogVisibilities, index, args.visible);

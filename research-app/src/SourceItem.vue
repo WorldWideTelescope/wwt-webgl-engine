@@ -41,7 +41,7 @@ export default class SourceItem extends Vue {
 
     // From the stores
     wwtDegZoom!: number;
-    gotoRADecZoom!: (args: { raRad: number, decRad: number, zoomDeg: number, instant: boolean, rollRad?: number }) => Promise<void>;
+    gotoRADecZoom!: (args: { raRad: number; decRad: number; zoomDeg: number; instant: boolean; rollRad?: number }) => Promise<void>;
     removeSource!: (source: Source) => void;
 
     beforeCreate(): void {

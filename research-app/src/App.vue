@@ -8,7 +8,7 @@
       @mousedown.native="wwtOnMouseDown"
     ></WorldWideTelescope>
 
-    <div id='display-panel'>
+    <div id='display-panel' v-if="!hideAllChrome">
       <transition name="catalog-transition">
         <div id="overlays">
           <p>{{ coordText }}</p>
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <ul id="controls">
+    <ul id="controls" v-if="!hideAllChrome">
       <li v-show="showToolMenu">
         <v-popover placement="left" trigger="manual" :open="showPopover">
           <font-awesome-icon class="tooltip-target tooltip-icon" icon="sliders-h" size="lg" tabindex="0" @keyup.enter="showPopover = !showPopover" @click="showPopover = !showPopover" ></font-awesome-icon>
@@ -63,7 +63,7 @@
       </li>
     </ul>
 
-    <div id="tools">
+    <div id="tools" v-if="!hideAllChrome">
       <div class="tool-container">
       <template v-if="currentTool == 'crossfade'">
         <span>Foreground opacity:</span> <input class="opacity-range" type="range" v-model="foregroundOpacity">
@@ -123,9 +123,9 @@
       </div>
     </div>
 
-    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning">
+    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning" v-if="!hideAllChrome">
       To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
-      In case you would like to use Safari, we recommend that you 
+      In case you would like to use Safari, we recommend that you
       <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
     </div>
   </div>
@@ -153,6 +153,7 @@ import {
   Annotation,
   Circle,
   Color,
+  Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
@@ -164,6 +165,7 @@ import {
   applyCircleAnnotationSetting,
   applyPolyAnnotationSetting,
   applyPolyLineAnnotationSetting,
+  extractSpreadSheetLayerSettings,
   isCircleAnnotationSetting,
   isEngineSetting,
   isImageSetLayerSetting,
@@ -173,9 +175,19 @@ import {
 
 import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
 
-import { classicPywwt, ViewStateMessage } from "@wwtelescope/research-app-messages";
+import {
+  classicPywwt,
+  isPingPongMessage,
+  layers,
+  settings,
+  ApplicationStateMessage,
+  ViewStateMessage,
+} from "@wwtelescope/research-app-messages";
 
-import { convertPywwtSpreadSheetLayerSetting } from "./settings";
+import {
+  convertPywwtSpreadSheetLayerSetting,
+  convertSpreadSheetLayerSetting,
+} from "./settings";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -356,8 +368,10 @@ type AnyTableLayerMessage =
 class TableLayerMessageHandler {
   private owner: App;
   private created = false;
+  private isHips = false;
   private internalId: string | null = null;
   private layer: SpreadSheetLayer | null = null; // hack for settings
+  private imageset: Imageset | null = null; // hack for HiPS catalogs
   private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
   private queuedSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
   private queuedRemoval: classicPywwt.RemoveTableLayerMessage | null = null;
@@ -379,6 +393,13 @@ class TableLayerMessageHandler {
     }).then((layer) => this.layerInitialized(layer));
 
     this.created = true;
+  }
+
+  setupHipsCatalog(imageset: Imageset, layer: SpreadSheetLayer) {
+    this.created = true;
+    this.isHips = true;
+    this.imageset = imageset;
+    this.layerInitialized(layer);
   }
 
   private layerInitialized(layer: SpreadSheetLayer) {
@@ -421,10 +442,12 @@ class TableLayerMessageHandler {
       // once it's ready.
       this.queuedUpdate = msg;
     } else {
-      this.owner.updateTableLayer({
-        id: this.internalId,
-        dataCsv: atob(msg.table),
-      });
+      if (!this.isHips) {
+        this.owner.updateTableLayer({
+          id: this.internalId,
+          dataCsv: atob(msg.table),
+        });
+      }
     }
   }
 
@@ -455,6 +478,26 @@ class TableLayerMessageHandler {
     }
   }
 
+  async handleGetHipsDataInViewMessage(msg: layers.GetHipsCatalogDataInViewMessage): Promise<layers.GetHipsCatalogDataInViewReply | null> {
+    if (this.imageset === null || this.layer === null || this.internalId === null)
+      return null; // Sorry!
+
+    if (!this.isHips)
+      return null;
+
+    return this.owner.getCatalogHipsDataInView({
+      imageset: this.imageset,
+      limit: msg.limit,
+    }).then((info) => {
+      return {
+        event: "layer_hipscat_datainview_reply",
+        threadId: msg.threadId,
+        data: info.table,
+        aborted: info.aborted
+      };
+    });
+  }
+
   handleRemoveMessage(msg: classicPywwt.RemoveTableLayerMessage) {
     if (this.internalId === null) {
       // Layer not yet created or fully initialized. Queue up message for processing
@@ -463,9 +506,21 @@ class TableLayerMessageHandler {
         this.queuedRemoval = msg;
       }
     } else {
-      this.owner.deleteLayer(this.internalId);
-      this.internalId = null;
-      this.created = false;
+      if (this.isHips && this.imageset !== null) {
+        // This is a little kludgey ...
+        const name = this.imageset.get_name();
+
+        for (const cat of this.owner.curAvailableCatalogs) {
+          if (cat.name == name) {
+            this.owner.removeResearchAppCatalogHips(cat);
+            this.owner.removeCatalogHipsByName(name);
+          }
+        }
+      } else {
+        this.owner.deleteLayer(this.internalId);
+        this.internalId = null;
+        this.created = false;
+      }
     }
   }
 }
@@ -704,9 +759,28 @@ class KeyboardControlSettings {
 interface AngleCoordinates {
   ra: number;
   dec: number;
-  [x: string]: any;
 }
 
+/** Get the source of a MessageEvent as a Window, if it is one.
+ *
+ * The problem here is that on Chrome, if the event is a cross-origin message
+ * event, `event.source instanceof Window` returns false even if the source is a
+ * window, because that object comes from a different JS context than the one
+ * that is currently executing, so its `Window` type is different than ours. On
+ * other browsers, or same-origin events, the problem doesn't manifest.
+ * Meanwhile, the ServiceWorker type is only defined on HTTPS connections and
+ * localhost, so it's sometimes missing.
+ *
+ * See:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof#instanceof_and_multiple_context_e.g._frames_or_windows
+ */
+function eventSourceAsWindow(e: MessageEvent): Window | null {
+  if (!(e.source instanceof MessagePort) && (typeof ServiceWorker === 'undefined' || !(e.source instanceof ServiceWorker))) {
+    return e.source as Window;
+  }
+
+  return null;
+}
 
 /** The main "research app" Vue component. */
 @Component
@@ -717,7 +791,8 @@ export default class App extends WWTAwareComponent {
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
   lastClosePt: Source | null = null;
-  distanceThreshold: number = 0.01;
+  distanceThreshold = 0.01;
+  hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
   drag = false;
 
@@ -725,9 +800,10 @@ export default class App extends WWTAwareComponent {
   catalogNameMappings!: { [catalogName: string]: [string, string] };
   hipsCatalogs!: ImagesetInfo[];
   sources!: Source[];
-  
+
   addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   addSource!: (source: Source) => void;
+  removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   visibleHipsCatalogs!: () => ImagesetInfo[];
 
   // Lifecycle management
@@ -750,6 +826,7 @@ export default class App extends WWTAwareComponent {
       ...mapMutations(wwtResearchAppNamespace, [
           "addResearchAppCatalogHips",
           "addSource",
+          "removeResearchAppCatalogHips"
       ])
     }
 
@@ -757,6 +834,7 @@ export default class App extends WWTAwareComponent {
 
   created() {
     this.statusMessageDestination = null;
+    this.initializeHandlers();
   }
 
   mounted() {
@@ -764,24 +842,54 @@ export default class App extends WWTAwareComponent {
       screenfull.on('change', this.onFullscreenEvent);
     }
 
-    this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
+    this.waitForReady().then(() => {
+      // This returns a promise but I don't think that we need to wait for that
+      // to resolve before going ahead and starting to listen for messages.
+      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
 
-    // For now let's just not worry about removing this listener ...
-    window.addEventListener('message', (event) => {
-      if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
-        // You could imagine wanting to send status updates to multiple
-        // destinations, but let's start simple.
-        if (this.statusMessageDestination === null) {
-          if (event.source instanceof Window) {
-            this.statusMessageDestination = event.source;
-            // Hardcode the status update rate to max out at 5 Hz.
-            this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
+      // Don't start listening for messages until the engine is ready to go.
+      // There's no point in returning a "not ready yet" error or anything since
+      // the client has to handle the "app isn't yet listening for messages"
+      // state anyway.
+      //
+      // For now let's just not worry about removing this listener ...
+      window.addEventListener('message', (event) => {
+        // We have to be careful with event.source -- see this function's docs.
+        const sourceAsWindow = eventSourceAsWindow(event);
+
+        if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
+          // You could imagine wanting to send status updates to multiple
+          // destinations, but let's start simple.
+          if (this.statusMessageDestination === null) {
+            if (sourceAsWindow !== null) {
+              this.statusMessageDestination = sourceAsWindow;
+              // Hardcode the status update rate to max out at 5 Hz.
+              this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
+            }
+          }
+
+          const message = event.data;
+
+          // Special handling for ping-pong to specifically reply to the pinger --
+          // one day we should get better about talking to multiple clients.
+          if (isPingPongMessage(message)) {
+            if (sourceAsWindow !== null) {
+              if (message.sessionId !== undefined) {
+                this.statusMessageSessionId = message.sessionId;
+              }
+
+              sourceAsWindow.postMessage(message, event.origin);
+            } else if (event.source instanceof Window) {
+              /* can't-happen, but needed to make TypeScript happy */
+            } else if (event.source !== null) {
+              event.source.postMessage(message);
+            }
+          } else {
+            this.onMessage(message);
           }
         }
-
-        this.onMessage(event.data);
-      }
-    }, false);
+      }, false);
+    });
 
     // Handling key presses
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
@@ -815,124 +923,166 @@ export default class App extends WWTAwareComponent {
 
   // Incoming message handling
 
-  onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (classicPywwt.isLoadImageCollectionMessage(msg)) {
-      this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(()=> {
-        if(this.statusMessageDestination != null && this.allowedOrigin != null){
-          const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
-            event: "load_image_collection_completed",
-            url: msg.url
-          };
-          this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
-        }
-      });
-    } else if (classicPywwt.isSetBackgroundByNameMessage(msg)) {
-      this.setBackgroundImageByName(msg.name);
-    } else if (classicPywwt.isSetForegroundByNameMessage(msg)) {
-      this.setForegroundImageByName(msg.name);
-    } else if (classicPywwt.isSetViewerModeMessage(msg)) {
-      this.setBackgroundImageByName(msg.mode);
-      this.setForegroundImageByName(msg.mode);
-    } else if (classicPywwt.isSetForegroundOpacityMessage(msg)) {
-      this.setForegroundOpacity(msg.value);
-    } else if (classicPywwt.isCenterOnCoordinatesMessage(msg)) {
-      const rollRad = msg.roll == undefined ? undefined : msg.roll * D2R;
-      this.gotoRADecZoom({
-        raRad: msg.ra * D2R,
-        decRad: msg.dec * D2R,
-        zoomDeg: msg.fov * 6,
-        instant: msg.instant,
-        rollRad: rollRad,
-      });
-    } else if (classicPywwt.isModifySettingMessage(msg)) {
-      const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+  private messageHandlers: Map<string, (msg: any) => boolean> = new Map();  // eslint-disable-line @typescript-eslint/no-explicit-any
 
-      if (isEngineSetting(setting)) {
-        this.applySetting(setting);
-      }
-    } else if (classicPywwt.isCreateImageSetLayerMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleCreateMessage(msg);
-    } else if (classicPywwt.isCreateFitsLayerMessage(msg)) {
-      const createImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
-        event: msg.event,
-        url: msg.url,
-        id: msg.id,
-        mode: "fits",
-      }
-      this.getFitsLayerHandler(createImageSetMessage).handleCreateMessage(createImageSetMessage);
-    } else if (classicPywwt.isSetLayerOrderMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
-    } else if (classicPywwt.isStretchFitsLayerMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleStretchMessage(msg);
-    } else if (classicPywwt.isSetFitsLayerColormapMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
-    } else if (classicPywwt.isModifyFitsLayerMessage(msg)) {
-      this.getFitsLayerHandler(msg).handleModifyMessage(msg);
-    } else if (classicPywwt.isRemoveImageSetLayerMessage(msg)) {
-      // NB we never remove the handler! It's tricky due to async issues.
-      this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
-    } else if (classicPywwt.isCreateTableLayerMessage(msg)) {
-      this.getTableLayerHandler(msg).handleCreateMessage(msg);
-    } else if (classicPywwt.isUpdateTableLayerMessage(msg)) {
-      this.getTableLayerHandler(msg).handleUpdateMessage(msg);
-    } else if (classicPywwt.isModifyTableLayerMessage(msg)) {
-      this.getTableLayerHandler(msg).handleModifyMessage(msg);
-    } else if (classicPywwt.isRemoveTableLayerMessage(msg)) {
-      // NB we never remove the handler! It's tricky due to async issues.
-      this.getTableLayerHandler(msg).handleRemoveMessage(msg);
-    } else if (classicPywwt.isCreateAnnotationMessage(msg)) {
-      this.createAnnotationHandler(msg);
-    } else if (classicPywwt.isModifyAnnotationMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleModifyAnnotationMessage(msg);
-      }
-    } else if (classicPywwt.isSetCircleCenterMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleSetCircleCenterMessage(msg);
-      }
-    } else if (classicPywwt.isAddLinePointMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleAddLinePointMessage(msg);
-      }
-    } else if (classicPywwt.isAddPolygonPointMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleAddPolygonPointMessage(msg);
-      }
-    } else if (classicPywwt.isRemoveAnnotationMessage(msg)) {
-      const handler = this.lookupAnnotationHandler(msg);
-      if (handler !== undefined) {
-        handler.handleRemoveAnnotationMessage(msg);
-      }
-      this.annotations.delete(msg.id);
-    } else if (classicPywwt.isClearAnnotationsMessage(msg)) {
-      this.clearAnnotations();
-    } else if (classicPywwt.isLoadTourMessage(msg)) {
-      this.loadTour({
-        url: msg.url,
-        play: true,
-      });
-    } else if (classicPywwt.isPauseTourMessage(msg)) {
-      this.toggleTourPlayPauseState();  // note half-assed semantics here!
-    } else if (classicPywwt.isResumeTourMessage(msg)) {
-      this.toggleTourPlayPauseState();  // note half-assed semantics here!
-    } else if (classicPywwt.isSetDatetimeMessage(msg)) {
-      this.setTime(moment.utc(msg.isot).toDate());
-    } else if (classicPywwt.isPauseTimeMessage(msg)) {
-      this.setClockSync(false);
-    } else if (classicPywwt.isResumeTimeMessage(msg)) {
-      this.setClockSync(true);
-      this.setClockRate(msg.rate);
-    } else if (classicPywwt.isTrackObjectMessage(msg)) {
-      if (msg.code in SolarSystemObjects) {
-        this.setTrackedObject(msg.code as SolarSystemObjects);
-      }
-    } else {
-      console.warn("WWT research app received unrecognized message, as follows:", msg);
+  private initializeHandlers() {
+    // These handlers must take care to type-check that the input
+    // message actually fully obeys the expected schema!
+
+    this.messageHandlers.set('load_image_collection', this.handleLoadImageCollection);
+
+    this.messageHandlers.set('set_background_by_name', this.handleSetBackgroundByName);
+    this.messageHandlers.set('set_foreground_by_name', this.handleSetForegroundByName);
+    this.messageHandlers.set('set_foreground_opacity', this.handleSetForegroundOpacity);
+    this.messageHandlers.set('set_viewer_mode', this.handleSetViewerMode);
+
+    this.messageHandlers.set('center_on_coordinates', this.handleCenterOnCoordinates);
+    this.messageHandlers.set('track_object', this.handleTrackObject);
+    this.messageHandlers.set('set_datetime', this.handleSetDatetime);
+    this.messageHandlers.set('pause_time', this.handlePauseTime);
+    this.messageHandlers.set('resume_time', this.handleResumeTime);
+
+    this.messageHandlers.set('modify_settings', this.handleModifySettings);
+    this.messageHandlers.set('setting_set', this.handleModifyEngineSetting);
+
+    this.messageHandlers.set('image_layer_create', this.handleCreateImageSetLayer);
+    this.messageHandlers.set('image_layer_order', this.handleSetLayerOrder);
+    this.messageHandlers.set('image_layer_stretch', this.handleStretchFitsLayer);
+    this.messageHandlers.set('image_layer_cmap', this.handleSetFitsLayerColormap);
+    this.messageHandlers.set('image_layer_set', this.handleModifyFitsLayer);
+    this.messageHandlers.set('image_layer_remove', this.handleRemoveImageSetLayer);
+
+    this.messageHandlers.set('table_layer_create', this.handleCreateTableLayer);
+    this.messageHandlers.set('table_layer_update', this.handleUpdateTableLayer);
+    this.messageHandlers.set('table_layer_set', this.handleModifyTableLayer);
+    this.messageHandlers.set('table_layer_remove', this.handleRemoveTableLayer);
+
+    this.messageHandlers.set('layer_hipscat_load', this.handleLoadHipsCatalog);
+    this.messageHandlers.set('layer_hipscat_datainview', this.handleGetHipsCatalogDataInView);
+
+    this.messageHandlers.set('annotation_create', this.handleCreateAnnotation);
+    this.messageHandlers.set('annotation_set', this.handleModifyAnnotation);
+    this.messageHandlers.set('circle_set_center', this.handleSetCircleCenter);
+    this.messageHandlers.set('line_add_point', this.handleAddLinePoint);
+    this.messageHandlers.set('polygon_add_point', this.handleAddPolygonPoint);
+    this.messageHandlers.set('remove_annotation', this.handleRemoveAnnotation);
+    this.messageHandlers.set('clear_annotations', this.handleClearAnnotations);
+
+    this.messageHandlers.set('load_tour', this.handleLoadTour);
+    this.messageHandlers.set('pause_tour', this.handlePauseTour);
+    this.messageHandlers.set('resume_tour', this.handleResumeTour);
+  }
+
+  onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    const key = String(msg.type || msg.event);
+    const handler = this.messageHandlers.get(key);
+    let handled = false;
+
+    if (handler !== undefined) {
+      handled = handler(msg);
     }
+
+    if (!handled) {
+      console.warn("WWT research app received unhandled message, as follows:", msg);
+    }
+  }
+
+  // Various message handlers that don't comfortably fit elsewhere:
+
+  private handleLoadImageCollection(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isLoadImageCollectionMessage(msg))
+      return false;
+
+    this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(() => {
+      if (this.statusMessageDestination != null && this.allowedOrigin != null){
+        const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
+          event: "load_image_collection_completed",
+          threadId: msg.threadId,
+          url: msg.url
+        };
+
+        this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
+      }
+    });
+    return true;
+  }
+
+  private handleCenterOnCoordinates(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isCenterOnCoordinatesMessage(msg))
+      return false;
+
+    const rollRad = msg.roll == undefined ? undefined : msg.roll * D2R;
+    this.gotoRADecZoom({
+      raRad: msg.ra * D2R,
+      decRad: msg.dec * D2R,
+      zoomDeg: msg.fov * 6,
+      instant: msg.instant,
+      rollRad: rollRad,
+    });
+    return true;
+  }
+
+  private handleModifyEngineSetting(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isModifySettingMessage(msg))
+      return false;
+
+    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (!isEngineSetting(setting))
+      return false;
+
+    this.applySetting(setting);
+    return true;
+  }
+
+  private handleSetDatetime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetDatetimeMessage(msg))
+      return false;
+
+    this.setTime(moment.utc(msg.isot).toDate());
+    return true;
+  }
+
+  private handlePauseTime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isPauseTimeMessage(msg))
+      return false;
+
+    this.setClockSync(false);
+    return true;
+  }
+
+  private handleResumeTime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isResumeTimeMessage(msg))
+      return false;
+
+    this.setClockSync(true);
+    this.setClockRate(msg.rate);
+    return true;
+  }
+
+  private handleTrackObject(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isTrackObjectMessage(msg))
+      return false;
+
+    if (msg.code in SolarSystemObjects) {
+      this.setTrackedObject(msg.code as SolarSystemObjects);
+    }
+    return true;
+  }
+
+  private handleModifySettings(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    const appModified = settings.maybeAsModifiedAppSettings(msg);
+
+    if (appModified !== null) {
+      for (const s of appModified) {
+        if (s[0] == "hideAllChrome")
+          this.hideAllChrome = s[1];
+      }
+
+      return true;
+    }
+
+    return false;
   }
 
   wwtOnMouseMove(event: MouseEvent) {
@@ -975,7 +1125,7 @@ export default class App extends WWTAwareComponent {
     }
   })();
 
-  nameForSource(source: any): string {
+  nameForSource(source: any): string {  // eslint-disable-line @typescript-eslint/no-explicit-any
     for (const [ key, [from, to]] of Object.entries(this.catalogNameMappings)) {
       if (from in source && source["catalogName"] === key) {
         return `${to}: ${source[from]}`;
@@ -984,7 +1134,9 @@ export default class App extends WWTAwareComponent {
     return this.newSourceName();
   }
 
-  // Keyed by "external" layer IDs
+  // ImageSet layers, including FITS layers:
+
+  // These maps are keyed by "external" layer IDs
   private fitsLayers: Map<string, ImageSetLayerMessageHandler> = new Map();
 
   private getFitsLayerHandler(msg: AnyFitsLayerMessage): ImageSetLayerMessageHandler {
@@ -998,6 +1150,69 @@ export default class App extends WWTAwareComponent {
     return handler;
   }
 
+  private handleCreateImageSetLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (classicPywwt.isCreateFitsLayerMessage(msg)) {
+      const createImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
+        event: msg.event,
+        url: msg.url,
+        id: msg.id,
+        mode: "fits",
+      }
+      this.getFitsLayerHandler(createImageSetMessage).handleCreateMessage(createImageSetMessage);
+      return true;
+    }
+
+    if (classicPywwt.isCreateImageSetLayerMessage(msg)) {
+      this.getFitsLayerHandler(msg).handleCreateMessage(msg);
+      return true;
+    }
+
+    return false;
+  }
+
+  private handleSetLayerOrder(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetLayerOrderMessage(msg))
+      return false;
+
+    this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
+    return true;
+  }
+
+  private handleStretchFitsLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isStretchFitsLayerMessage(msg))
+      return false;
+
+    this.getFitsLayerHandler(msg).handleStretchMessage(msg);
+    return true;
+  }
+
+  private handleSetFitsLayerColormap(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetFitsLayerColormapMessage(msg))
+      return false;
+
+    this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
+    return true;
+  }
+
+  private handleModifyFitsLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isModifyFitsLayerMessage(msg))
+      return false;
+
+    this.getFitsLayerHandler(msg).handleModifyMessage(msg);
+    return true;
+  }
+
+  private handleRemoveImageSetLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isRemoveImageSetLayerMessage(msg))
+      return false;
+
+    // NB we never remove the handler! It's tricky due to async issues.
+    this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
+    return true;
+  }
+
+  // Table layers:
+
   private tableLayers: Map<string, TableLayerMessageHandler> = new Map();
 
   private getTableLayerHandler(msg: AnyTableLayerMessage): TableLayerMessageHandler {
@@ -1010,6 +1225,41 @@ export default class App extends WWTAwareComponent {
 
     return handler;
   }
+
+  private handleCreateTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isCreateTableLayerMessage(msg))
+      return false;
+
+    this.getTableLayerHandler(msg).handleCreateMessage(msg);
+    return true;
+  }
+
+  private handleUpdateTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isUpdateTableLayerMessage(msg))
+      return false;
+
+    this.getTableLayerHandler(msg).handleUpdateMessage(msg);
+    return true;
+  }
+
+  private handleModifyTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isModifyTableLayerMessage(msg))
+      return false;
+
+    this.getTableLayerHandler(msg).handleModifyMessage(msg);
+    return true;
+  }
+
+  private handleRemoveTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isRemoveTableLayerMessage(msg))
+      return false;
+
+    // NB we never remove the handler! It's tricky due to async issues.
+    this.getTableLayerHandler(msg).handleRemoveMessage(msg);
+    return true;
+  }
+
+  // Annotations:
 
   private annotations: Map<string, AnnotationMessageHandler> = new Map();
 
@@ -1025,6 +1275,107 @@ export default class App extends WWTAwareComponent {
     return this.annotations.get(msg.id);
   }
 
+  private handleCreateAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isCreateAnnotationMessage(msg))
+      return false;
+
+    this.createAnnotationHandler(msg);
+    return true;
+  }
+
+  private handleModifyAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isModifyAnnotationMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleModifyAnnotationMessage(msg);
+    }
+    return true;
+  }
+
+  private handleSetCircleCenter(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetCircleCenterMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleSetCircleCenterMessage(msg);
+    }
+    return true;
+  }
+
+  private handleAddLinePoint(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isAddLinePointMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleAddLinePointMessage(msg);
+    }
+    return true;
+  }
+
+  private handleAddPolygonPoint(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isAddPolygonPointMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleAddPolygonPointMessage(msg);
+    }
+    return true;
+  }
+
+  private handleRemoveAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isRemoveAnnotationMessage(msg))
+      return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleRemoveAnnotationMessage(msg);
+    }
+    this.annotations.delete(msg.id);
+    return true;
+  }
+
+  private handleClearAnnotations(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isClearAnnotationsMessage(msg))
+      return false;
+
+    this.clearAnnotations();
+    return true;
+  }
+
+  // Tours:
+
+  private handleLoadTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isLoadTourMessage(msg))
+      return false;
+
+    this.loadTour({
+      url: msg.url,
+      play: true,
+    });
+    return true;
+  }
+
+  private handlePauseTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isPauseTourMessage(msg))
+      return false;
+
+    this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    return true;
+  }
+
+  private handleResumeTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isResumeTourMessage(msg))
+      return false;
+
+    this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    return true;
+  }
+
   // Outgoing messages
 
   updateIntervalId: number | null = null;
@@ -1032,6 +1383,7 @@ export default class App extends WWTAwareComponent {
   // try to make it reactive, which would cause it to try to read fields that
   // are prohibited in cross-origin situations:
   private statusMessageDestination!: Window | null;
+  statusMessageSessionId = "default";
   lastUpdatedRA = 0.0;
   lastUpdatedDec = 0.0;
   lastUpdatedFov = 1.0;
@@ -1059,6 +1411,7 @@ export default class App extends WWTAwareComponent {
 
     const message: ViewStateMessage = {
       type: "wwt_view_state",
+      sessionId: this.statusMessageSessionId,
       raRad: ra,
       decRad: dec,
       fovDeg: fov,
@@ -1083,7 +1436,6 @@ export default class App extends WWTAwareComponent {
     // Force a clock update message.
     this.lastUpdatedTimestamp = 0;
   }
-
 
   // Fullscreening
 
@@ -1139,10 +1491,59 @@ export default class App extends WWTAwareComponent {
     this.setForegroundOpacity(o);
   }
 
-    // Catalogs
-  addHips(catalog: ImagesetInfo) {
+  private handleSetBackgroundByName(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetBackgroundByNameMessage(msg))
+      return false;
+
+    this.setBackgroundImageByName(msg.name);
+    return true;
+  }
+
+  private handleSetForegroundByName(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetForegroundByNameMessage(msg))
+      return false;
+
+    this.setForegroundImageByName(msg.name);
+    return true;
+  }
+
+  private handleSetForegroundOpacity(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetForegroundOpacityMessage(msg))
+      return false;
+
+    this.setForegroundOpacity(msg.value);
+    return true;
+  }
+
+  private handleSetViewerMode(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!classicPywwt.isSetViewerModeMessage(msg))
+      return false;
+
+    this.setBackgroundImageByName(msg.mode);
+    this.setForegroundImageByName(msg.mode);
+    return true;
+  }
+
+  // HiPS catalogs (see also the table layer support)
+
+  addHips(catalog: ImagesetInfo): Promise<Imageset> {
     this.addResearchAppCatalogHips(catalog);
-    this.addCatalogHipsByNameWithCallback({ name: catalog.name, callback: () => this.setCatalogHipsColorByName({ name: catalog.name, color: this.defaultColor }) });
+    return this.addCatalogHipsByName({name: catalog.name}).then((imgset) => {
+      const hips = imgset.get_hipsProperties();
+
+      if (hips !== null) {
+        const catId = hips.get_catalogSpreadSheetLayer().id.toString();
+        this.applyTableLayerSettings({
+          id: catId,
+          settings: [
+            ["color", this.defaultColor],
+            ["opacity", this.defaultColor.a],
+          ],
+        });
+      }
+
+      return imgset;
+    });
   }
 
   get catalogToAdd() {
@@ -1151,6 +1552,107 @@ export default class App extends WWTAwareComponent {
 
   set catalogToAdd(catalog: ImagesetInfo) {
     this.addHips(catalog);
+  }
+
+  @Watch('curAvailableCatalogs')
+  onAvailableCatalogsChanged(catalogs: ImagesetInfo[]) {
+    // Notify clients about the new catalogs
+
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+
+    const msg: ApplicationStateMessage = {
+      type: "wwt_application_state",
+      sessionId: this.statusMessageSessionId,
+      hipsCatalogNames: catalogs.map((img) => img.name)
+    }
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
+  // A client has requested that we load a HiPS catalog. Once it's loaded we
+  // reply to the client with the details of the catalog-as-spreadsheet-layer,
+  // so that it can know what the catalog's characteristics are.
+  private handleLoadHipsCatalog(msg: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!layers.isLoadHipsCatalogMessage(msg))
+      return false;
+
+    for (const cat of this.curAvailableCatalogs) {
+      if (cat.name == msg.name) {
+        this.addHips(cat).then((imgset) => {
+          const hips = imgset.get_hipsProperties();
+          if (hips === null)
+            throw new Error('internal consistency failure');
+
+          const layer = hips.get_catalogSpreadSheetLayer();
+
+          // Register in the table-layer framework
+
+          let handler = this.tableLayers.get(msg.tableId);
+
+          if (handler === undefined) {
+            handler = new TableLayerMessageHandler(this);
+            this.tableLayers.set(msg.tableId, handler);
+          }
+
+          handler.setupHipsCatalog(imgset, layer);
+
+          // Reply?
+
+          if (msg.threadId === undefined)
+            return;
+
+          if (this.statusMessageDestination === null || this.allowedOrigin === null)
+            return;
+
+          const settings = extractSpreadSheetLayerSettings(layer);
+          const pysettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
+
+          for (const s of settings) {
+            const ps = convertSpreadSheetLayerSetting(s);
+            if (ps !== null)
+              pysettings.push(ps);
+          }
+
+          const ssli: layers.SpreadSheetLayerInfo = {
+            header: layer.get_header(),
+            settings: pysettings,
+          };
+
+          const reply: layers.LoadHipsCatalogCompletedMessage = {
+            event: "layer_hipscat_load_completed",
+            threadId: msg.threadId,
+            spreadsheetInfo: ssli,
+          }
+
+          this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+        });
+
+        break;
+      }
+    }
+
+    return true;
+  }
+
+  private handleGetHipsCatalogDataInView(msg: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!layers.isGetHipsCatalogDataInViewMessage(msg))
+      return false;
+
+    // Unlike most table-layer messages, here we don't bother to try to work
+    // well when messages are out-of-order or what have you.
+
+    const handler = this.tableLayers.get(msg.tableId);
+    if (handler !== undefined) {
+      handler.handleGetHipsDataInViewMessage(msg).then((reply) => {
+        if (reply !== null) {
+          if (this.statusMessageDestination !== null && this.allowedOrigin !== null)
+            this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+        }
+      })
+    }
+
+    return true;
   }
 
   // "Tools" menu
@@ -1273,13 +1775,13 @@ export default class App extends WWTAwareComponent {
       const latCol = this.findLatColumn(name);
 
       const itemCreator = function (values: string[]): Source {
-        let obj: any = {};
+        const obj: any = {};  // eslint-disable-line @typescript-eslint/no-explicit-any
         for (let i = 0; i < values.length; i++) {
           obj[colNames[i]] = values[i];
         }
         return { ...obj, ra: D2R * Number(values[lngCol]), dec: D2R * Number(values[latCol]), catalogName: name };
       };
-      
+
       for (const row of rows) {
         const items = row.split(colSeparator);
         const ra = Number(items[lngCol]);
@@ -1311,11 +1813,9 @@ export default class App extends WWTAwareComponent {
   }, 20);
 
   @Watch('wwtZoomDeg', { immediate: true })
-  onZoomChange(val: number, oldVal: number) {
+  onZoomChange(val: number) {
     this.updateDistanceThreshold(this, val);
   }
-
-
 }
 </script>
 
@@ -1647,7 +2147,7 @@ ul.tool-menu {
 This makes the last element of the last list item in the
 display panel have the rounded bottom edge
 The alternative to this is to have Vue bind a class to the last element
-Since I'm using 
+Since I'm using
 */
 #display-panel > *:last-child > *:last-child > *:last-child {
   border-bottom-left-radius: 5px;
