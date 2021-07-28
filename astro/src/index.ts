@@ -68,6 +68,27 @@ export function angnorm(angleRad: number): number {
   return angleRad;
 }
 
+/**
+ * Find the great-circle distance between two points
+ *
+ * This implementation uses a special case of the Vincenty formula
+ * See the last formula in https://en.wikipedia.org/wiki/Great-circle_distance#Computational_formulas
+ *
+ * @param ra1 The right ascension of the first point, in radians
+ * @param dec1 The declination of the first point, in radians
+ * @param ra2 The right ascension of the second point, in radians
+ * @param dec2 The declination of the second point, in radians
+ * @returns The great-circle distance
+ */
+ export function distance(ra1: number, dec1: number, ra2: number, dec2: number): number {
+  const dAbsRA = Math.abs(ra1 - ra2);
+  const nt1 = (Math.cos(dec2) * Math.sin(dAbsRA)) ** 2;
+  const nt2 = (Math.cos(dec1) * Math.sin(dec2) - Math.sin(dec1) * Math.cos(dec2) * Math.cos(dAbsRA)) ** 2;
+  const num = Math.sqrt(nt1 + nt2);
+  const den = Math.sin(dec1) * Math.sin(dec2) + Math.cos(dec1) * Math.cos(dec2) * Math.cos(dAbsRA);
+  return Math.atan2(num, den);
+}
+
 function _formatSexagesimal(
   value: number,
   showPlus: boolean,
