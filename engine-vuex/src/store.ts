@@ -289,48 +289,16 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     }
   }
 
-  get currentHipsCatalogData() {
-    return function (name: string): string {
+  get layerForHipsCatalog() {
+    return function(name: string): SpreadSheetLayer | null {
       if (Vue.$wwt.inst === null)
-        throw new Error('cannot get currentHipsCatalogData without linking to WWTInstance');
+        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
       const layer = Vue.$wwt.inst.lm.get_layerList()[name];
-      if (layer != null && layer instanceof SpreadSheetLayer) {
-        return layer.getTableDataInView();
+      if (layer !== null && layer instanceof SpreadSheetLayer) {
+        return layer;
       } else {
-        return ''
+        return null;
       }
-    }
-  }
-
-  get findLngColumn() {
-    return function (name: string): number {
-      if (Vue.$wwt.inst === null)
-        throw new Error('cannot get findLngColumn without linking to WWTInstance');
-      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
-      if (layer != null && layer instanceof SpreadSheetLayer) {
-        return layer.get_lngColumn();
-      } else {
-        return -1;
-      }
-    }
-  }
-
-  get findLatColumn() {
-    return function (name: string): number {
-      if (Vue.$wwt.inst === null)
-        throw new Error('cannot get findLatColumn without linking to WWTInstance');
-      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
-      if (layer != null && layer instanceof SpreadSheetLayer) {
-        return layer.get_latColumn();
-      } else {
-        return -1;
-      }
-    }
-  }
-
-  get findConstellationForPoint() {
-    return function(pt: { ra: number; dec: number }): string {
-      return Constellations.containment.findConstellationForPoint(pt.ra, pt.dec);
     }
   }
 
