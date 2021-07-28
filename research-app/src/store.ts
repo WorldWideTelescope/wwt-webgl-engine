@@ -61,7 +61,7 @@ export class WWTResearchAppModule extends VuexModule {
   catalogNameMappings: { [catalogName: string]: [string, string] } = {
     "2MASS All-Sky Catalog of Point Sources (Cutri+ 2003)" : [ "2MASS", "2MASS" ],
     "The Guide Star Catalog, Version 2.3.2 (GSC2.3) (STScI, 2006)" : [ "GSC23", "GSC 2.3" ],
-    "The PPMXL Catalog (Roeser+ 2010)" : [ "PPXML_ID", "PPXML" ],
+    "The PPMXL Catalog (Roeser+ 2010)" : [ "PPMXL_ID", "PPMXL" ],
     "UCAC5 Catalogue (Zacharias+ 2017) (ucac5)" : [ "SrcIDgaia", "GAIA ID" ],
     "Gaia DR2 (Gaia Collaboration, 2018) (gaia2)" : [ "source_id", "GAIA ID" ],
     "The SDSS Photometric Catalogue, Release 12 (Alam+, 2015) (sdss12)" : [ "SDSS12", "SDSS12" ],
