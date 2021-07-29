@@ -1795,6 +1795,11 @@ export default class App extends WWTAwareComponent {
     }
   }
 
+  /** The factor of 0.00002 converts between the WWT 
+   * engine zoom and the distance between points.
+   * This value doesn't come from anywhere in particular,
+   * other than the cursor -> pointer change feeling natural
+   */
   updateDistanceThreshold = debounce((app: App, newZoom: number) => {
     app.distanceThreshold = 0.00002 * newZoom;
   }, 20);
