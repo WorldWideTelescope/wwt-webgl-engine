@@ -257,6 +257,8 @@ export class WWTAwareComponent extends Vue {
         wwtShowWebGl2Warning: (state, _getters) => (state as WWTEngineVuexState).showWebGl2Warning,
       }),
       ...mapGetters([
+        "findRADecForScreenPoint",
+        "layerForHipsCatalog",
         "lookupImageset",
       ]),
       ...this.$options.computed,
@@ -450,6 +452,14 @@ export class WWTAwareComponent extends Vue {
    * folder must have been loaded using the [[loadImageCollection]] action.
    */
   lookupImageset!: (_n: string) => Imageset | null;
+
+  /** Get the right ascension and declination, in degrees, for x, y coordinates on the screen */
+  findRADecForScreenPoint!: (pt: { x: number; y: number }) => { ra: number; dec: number };
+
+  /** Get the SpreadSheetLayer corresponding to the HiPS catalog with the given name
+   * Returns null if such a catalog has not been loaded into the engine
+   */
+  layerForHipsCatalog!: (name: string) => SpreadSheetLayer | null;
 
   // Mutations
 

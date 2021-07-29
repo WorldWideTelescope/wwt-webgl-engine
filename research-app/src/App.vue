@@ -2,6 +2,10 @@
   <div id="app">
     <WorldWideTelescope
       :wwt-namespace="wwtComponentNamespace"
+      :class="['wwt', { 'pointer' : this.lastClosePt !== null }]"
+      @mousemove.native="wwtOnMouseMove"
+      @mouseup.native="wwtOnMouseUp"
+      @mousedown.native="wwtOnMouseDown"
     ></WorldWideTelescope>
 
     <div id='display-panel' v-if="!hideAllChrome">
@@ -15,11 +19,22 @@
           <label>Layers:</label>
         </div>
         <div v-if="showLayers">
-          <catalog-item v-for="[index, catalog] of hipsCatalogs.entries()"
+          <catalog-item v-for="catalog of hipsCatalogs"
           v-bind:key="catalog.name"
           v-bind:catalog="catalog"
           v-bind:defaultColor="defaultColor"
-          v-bind:class="['catalog-row', { 'last-row': index == hipsCatalogs.length-1 }]"/>
+          />
+        </div>
+      </div>
+      <div id="sources-container" v-if="haveSources">
+        <div class="display-section-header">
+          <label>Sources:</label>
+        </div>
+        <div v-if="showSources">
+          <source-item v-for="source of sources"
+            v-bind:key="source.name"
+            v-bind:source="source"
+            />
         </div>
       </div>
     </div>
@@ -120,12 +135,13 @@
 import * as moment from "moment";
 import * as screenfull from "screenfull";
 import 'vue-select/dist/vue-select.css';
+import { debounce } from 'debounce';
 import { Component, Prop, Watch } from "vue-property-decorator";
-import { mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations, mapState } from "vuex";
 
-import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
-import WWTResearchAppModule from "./store";
+import { Source, WWTResearchAppModule } from "./store";
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 import {
@@ -740,6 +756,11 @@ class KeyboardControlSettings {
   }
 }
 
+interface AngleCoordinates {
+  ra: number;
+  dec: number;
+}
+
 /** Get the source of a MessageEvent as a Window, if it is one.
  *
  * The problem here is that on Chrome, if the event is a cross-origin message
@@ -769,21 +790,34 @@ export default class App extends WWTAwareComponent {
 
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
-
+  lastClosePt: Source | null = null;
+  distanceThreshold = 0.01;
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
+  isMouseMoving = false;
+
+  // From the store
+  catalogNameMappings!: { [catalogName: string]: [string, string] };
+  hipsCatalogs!: ImagesetInfo[];
+  sources!: Source[];
+
+  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+  addSource!: (source: Source) => void;
+  removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+  visibleHipsCatalogs!: () => ImagesetInfo[];
 
   // Lifecycle management
-
-  hipsCatalogs!: ImagesetInfo[];
-  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
-  removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
 
   beforeCreate(): void {
     this.$options.computed = {
       ...mapState(wwtResearchAppNamespace, {
+        catalogNameMappings: (state, _getters) => (state as WWTResearchAppModule).catalogNameMappings,
         hipsCatalogs: (state, _getters) => (state as WWTResearchAppModule).hipsCatalogs,
+        sources: (state, _getters) => (state as WWTResearchAppModule).sources,
       }),
+      ...mapGetters(wwtResearchAppNamespace, [
+        "visibleHipsCatalogs",
+      ]),
       ...this.$options.computed,
     }
 
@@ -791,6 +825,7 @@ export default class App extends WWTAwareComponent {
       ...this.$options.methods,
       ...mapMutations(wwtResearchAppNamespace, [
           "addResearchAppCatalogHips",
+          "addSource",
           "removeResearchAppCatalogHips"
       ])
     }
@@ -857,7 +892,6 @@ export default class App extends WWTAwareComponent {
     });
 
     // Handling key presses
-
     window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
     window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
     window.addEventListener('keydown', this._kcs.makeListener("moveUp", () => this.doMove(0, this._kcs.moveAmount)));
@@ -872,6 +906,8 @@ export default class App extends WWTAwareComponent {
     window.addEventListener('keydown', this._kcs.makeListener("bigMoveDown", () => this.doMove(0, this._kcs.bigMoveFactor * -this._kcs.moveAmount)));
     window.addEventListener('keydown', this._kcs.makeListener("bigMoveLeft", () => this.doMove(this._kcs.bigMoveFactor * this._kcs.moveAmount, 0)));
     window.addEventListener('keydown', this._kcs.makeListener("bigMoveRight", () => this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)));
+
+
   }
 
   destroyed() {
@@ -1047,6 +1083,55 @@ export default class App extends WWTAwareComponent {
     }
 
     return false;
+  }
+
+  wwtOnMouseMove(event: MouseEvent) {
+    if (this.hipsCatalogs.length == 0) {
+      return;
+    }
+    const pt = { x: event.offsetX, y: event.offsetY };
+    const raDecDeg = this.findRADecForScreenPoint(pt);
+    const raDecRad = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
+    const closestPt = this.closestInView(raDecRad, this.distanceThreshold);
+    if (closestPt == null && this.lastClosePt == null) {
+      return;
+    }
+    const needsUpdate = (closestPt == null || this.lastClosePt == null) || ((this.lastClosePt.ra != closestPt.ra) || (this.lastClosePt.dec != closestPt.dec));
+    if (needsUpdate) {
+      this.lastClosePt = closestPt;
+    }
+    this.isMouseMoving = true;
+  }
+
+  wwtOnMouseDown(_event: MouseEvent) {
+    this.isMouseMoving = false;
+  }
+
+  wwtOnMouseUp(_event: MouseEvent) {
+    if (!this.isMouseMoving && this.lastClosePt !== null) {
+      const source: Source = { ...this.lastClosePt, name: this.nameForSource(this.lastClosePt) };
+      this.addSource(source);
+    }
+    this.isMouseMoving = false;
+  }
+
+  // Increment the counter by 1 every time this is called
+  newSourceName = (function () {
+    let count = 0;
+
+    return function() {
+      count += 1;
+      return `Source ${count}`;
+    }
+  })();
+
+  nameForSource(source: any): string {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    for (const [ key, [from, to]] of Object.entries(this.catalogNameMappings)) {
+      if (from in source && source["catalogName"] === key) {
+        return `${to}: ${source[from]}`;
+      }
+    }
+    return this.newSourceName();
   }
 
   // ImageSet layers, including FITS layers:
@@ -1600,6 +1685,10 @@ export default class App extends WWTAwareComponent {
     return this.hipsCatalogs.length > 0;
   }
 
+  get haveSources() {
+    return this.sources.length > 0;
+  }
+
   get showToolMenu() {
     // This should return true if there are any tools to show.
     return this.showCrossfader || this.showBackgroundChooser;
@@ -1648,13 +1737,77 @@ export default class App extends WWTAwareComponent {
     return imagesets.filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
   }
 
+  closestInView(target: AngleCoordinates, threshold?: number): Source | null {
+    let minDist = Infinity;
+    let closestPt = null;
+
+    const rowSeparator = "\r\n";
+    const colSeparator = "\t";
+
+    for (const catalog of this.visibleHipsCatalogs()) {
+      const name = catalog.name;
+      const layer = this.layerForHipsCatalog(name);
+      if (layer == null) {
+        continue;
+      }
+      const hipsStr = layer.getTableDataInView();
+      const rows = hipsStr.split(rowSeparator);
+      const header = rows.shift();
+      if (!header) {
+        return null;
+      }
+      const colNames = header.split(colSeparator);
+
+      const lngCol = layer.get_lngColumn();
+      const latCol = layer.get_latColumn();
+
+      const itemCreator = function (values: string[]): Source {
+        const obj: any = {};  // eslint-disable-line @typescript-eslint/no-explicit-any
+        for (let i = 0; i < values.length; i++) {
+          obj[colNames[i]] = values[i];
+        }
+        return { ...obj, ra: D2R * Number(values[lngCol]), dec: D2R * Number(values[latCol]), catalogName: name };
+      };
+
+      for (const row of rows) {
+        const items = row.split(colSeparator);
+        const ra = Number(items[lngCol]);
+        const dec = Number(items[latCol]);
+        const pt = { ra: D2R * ra, dec: D2R * dec };
+        const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
+        if (dist < minDist) {
+          closestPt = itemCreator(items);
+          minDist = dist;
+        }
+      }
+    }
+    if (!threshold || minDist < threshold) {
+      return closestPt;
+    }
+    return null;
+  }
+
   data() {
     return {
       showPopover: false,
       showLayers: true,
+      showSources: true,
     }
   }
 
+  /** The factor of 0.00002 converts between the WWT 
+   * engine zoom and the distance between points.
+   * This value doesn't come from anywhere in particular,
+   * other than the cursor -> pointer change feeling natural
+   */
+  updateDistanceThreshold = debounce((app: App, newZoom: number) => {
+    app.distanceThreshold = 0.00002 * newZoom;
+  }, 20);
+
+  @Watch('wwtZoomDeg', { immediate: true })
+  onZoomChange(val: number) {
+    this.updateDistanceThreshold(this, val);
+  }
 }
 </script>
 
@@ -1976,6 +2129,20 @@ ul.tool-menu {
     margin: 0;
     font-size: small;
   }
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+/**
+This makes the last element of the last list item in the
+display panel have the rounded bottom edge
+The alternative to this is to have Vue bind a class to the last element
+*/
+#display-panel > *:last-child > *:last-child > *:last-child {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 </style>

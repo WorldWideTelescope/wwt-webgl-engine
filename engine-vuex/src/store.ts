@@ -14,6 +14,7 @@ import {
 
 import {
   Annotation,
+  Constellations,
   EngineSetting,
   Folder,
   Guid,
@@ -276,6 +277,28 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       if (Vue.$wwt.inst === null)
         throw new Error('cannot lookupImageset without linking to WWTInstance');
       return Vue.$wwt.inst.ctl.getImagesetByName(imagesetName);
+    }
+  }
+
+  get findRADecForScreenPoint() {
+    return function (pt: { x: number; y: number }): { ra: number; dec: number } {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
+      const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
+      return { ra: (15 * coords.x + 720) % 360, dec : coords.y };
+    }
+  }
+
+  get layerForHipsCatalog() {
+    return function(name: string): SpreadSheetLayer | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
+      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
+      if (layer !== null && layer instanceof SpreadSheetLayer) {
+        return layer;
+      } else {
+        return null;
+      }
     }
   }
 
@@ -742,4 +765,5 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('cannot clearAnnotations without linking to WWTInstance');
     Vue.$wwt.inst.si.clearAnnotations();
   }
+
 }

@@ -28,32 +28,14 @@
 </template>
 
 <script lang="ts">
-import { VNode, VNodeDirective } from 'vue';
-import { mapGetters, mapMutations } from "vuex";
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { mapGetters, mapMutations, mapState } from "vuex";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 import { ImagesetInfo } from "@wwtelescope/engine-vuex";
 import { Color, Imageset, SpreadSheetLayerSetting } from '@wwtelescope/engine';
 import { ApplyTableLayerSettingsOptions } from '@wwtelescope/engine-helpers';
 
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
-
-/** v-hide directive take from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
-// Extract the function out, up here, so I'm not writing it twice
-const update = (el: HTMLElement,
-    binding: VNodeDirective,
-    _vnode: VNode,
-    _oldVnode: VNode) => el.style.visibility = (binding.value) ? "hidden" : "";
-
-/**
- * Hides an HTML element, keeping the space it would have used if it were visible (css: Visibility)
- */
-Vue.directive("hide", {
-    // Run on initialisation (first render) of the directive on the element
-    bind: update,
-    // Run on subsequent updates to the value supplied to the directive
-    update: update
-})
 
 interface VueColorData {
   'rgba': {
@@ -68,16 +50,22 @@ interface VueColorData {
 export default class CatalogItem extends Vue {
     @Prop({required: true}) catalog!: ImagesetInfo;
     @Prop({required: false, default: Color.fromArgb(1, 255, 255, 255)}) defaultColor!: Color;
+
     hasFocus = false;
     isSelected = false;
-    visible = true;
     color = new Color();
+    // Tied to the store value
+    visible!: boolean;
+
     tableId = "";
 
     // Vuex integration
 
     beforeCreate(): void {
       this.$options.computed = {
+        ...mapState(wwtResearchAppNamespace, {
+          visible: (_state, getters) => getters['researchAppHipsCatalogVisibility'](this.catalog),
+        }),
         ...mapGetters(wwtEngineNamespace, [
           "lookupImageset",
         ]),
@@ -91,7 +79,8 @@ export default class CatalogItem extends Vue {
           "removeCatalogHipsByName",
         ]),
         ...mapMutations(wwtResearchAppNamespace, [
-          "removeResearchAppCatalogHips"
+          "removeResearchAppCatalogHips",
+          "setResearchAppCatalogHipsVisibility",
         ])
       };
     }
@@ -100,6 +89,7 @@ export default class CatalogItem extends Vue {
     lookupImageset!: (_n: string) => Imageset | null;
     removeCatalogHipsByName!: (name: string) => void;
     removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+    setResearchAppCatalogHipsVisibility!: (args: { catalog: ImagesetInfo; visible: boolean}) => void;
 
     // Implementation
 
@@ -135,18 +125,7 @@ export default class CatalogItem extends Vue {
     }
 
     handleToggle() {
-      this.visible = !this.visible;
-
-      if (this.visible) {
-        this.applySettings([
-          ["color", this.color],
-          ["opacity", this.color.a],
-        ]);
-      } else {
-        this.applySettings([
-          ["opacity", 0],
-        ]);
-      }
+      this.setResearchAppCatalogHipsVisibility({ catalog: this.catalog, visible: !this.visible });
     }
 
     handleColorChange(colorData: VueColorData) {
@@ -162,6 +141,19 @@ export default class CatalogItem extends Vue {
       }
     }
 
+    @Watch('visible')
+    onVisibilityChange(val: boolean) {
+      if (val) {
+        this.applySettings([
+          ["color", this.color],
+          ["opacity", this.color.a],
+        ]);
+      } else {
+        this.applySettings([
+          ["opacity", 0],
+        ]);
+      }
+    }
 }
 </script>
 
