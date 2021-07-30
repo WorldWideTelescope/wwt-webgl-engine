@@ -196,6 +196,8 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as moment from "moment";
 import * as screenfull from "screenfull";
 import "vue-select/dist/vue-select.css";
@@ -395,7 +397,7 @@ class ImageSetLayerMessageHandler {
   }
 
   handleModifyMessage(msg: classicPywwt.ModifyFitsLayerMessage) {
-    const setting: [string, any] = [msg.setting, msg.value]; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const setting: [string, any] = [msg.setting, msg.value];
 
     if (!isImageSetLayerSetting(setting)) {
       return;
@@ -527,7 +529,7 @@ class TableLayerMessageHandler {
     // settings - they are more transport-friendly versions, as expressed in the
     // PywwtSpreadSheetLayerSetting type.
 
-    const setting: [string, any] = [msg.setting, msg.value]; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const setting: [string, any] = [msg.setting, msg.value];
 
     if (!classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
       return;
@@ -649,7 +651,7 @@ class AnnotationMessageHandler {
   }
 
   handleModifyAnnotationMessage(msg: classicPywwt.ModifyAnnotationMessage) {
-    const setting: [string, any] = [msg.setting, msg.value]; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const setting: [string, any] = [msg.setting, msg.value];
 
     if (this.ann instanceof Circle && isCircleAnnotationSetting(setting)) {
       applyCircleAnnotationSetting(this.ann, setting);
@@ -1079,7 +1081,7 @@ export default class App extends WWTAwareComponent {
 
   // Incoming message handling
 
-  private messageHandlers: Map<string, (msg: any) => boolean> = new Map(); // eslint-disable-line @typescript-eslint/no-explicit-any
+  private messageHandlers: Map<string, (msg: any) => boolean> = new Map();
 
   private initializeHandlers() {
     // These handlers must take care to type-check that the input
@@ -1160,7 +1162,6 @@ export default class App extends WWTAwareComponent {
   }
 
   onMessage(msg: any) {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     const key = String(msg.type || msg.event);
     const handler = this.messageHandlers.get(key);
     let handled = false;
@@ -1180,7 +1181,6 @@ export default class App extends WWTAwareComponent {
   // Various message handlers that don't comfortably fit elsewhere:
 
   private handleLoadImageCollection(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isLoadImageCollectionMessage(msg)) return false;
 
     this.loadImageCollection({
@@ -1205,7 +1205,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleCenterOnCoordinates(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isCenterOnCoordinatesMessage(msg)) return false;
 
     const rollRad = msg.roll == undefined ? undefined : msg.roll * D2R;
@@ -1220,10 +1219,9 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleModifyEngineSetting(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isModifySettingMessage(msg)) return false;
 
-    const setting: [string, any] = [msg.setting, msg.value]; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const setting: [string, any] = [msg.setting, msg.value];
 
     if (!isEngineSetting(setting)) return false;
 
@@ -1232,7 +1230,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleSetDatetime(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isSetDatetimeMessage(msg)) return false;
 
     this.setTime(moment.utc(msg.isot).toDate());
@@ -1240,7 +1237,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handlePauseTime(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isPauseTimeMessage(msg)) return false;
 
     this.setClockSync(false);
@@ -1248,7 +1244,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleResumeTime(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isResumeTimeMessage(msg)) return false;
 
     this.setClockSync(true);
@@ -1257,7 +1252,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleTrackObject(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isTrackObjectMessage(msg)) return false;
 
     if (msg.code in SolarSystemObjects) {
@@ -1267,7 +1261,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleModifySettings(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     const appModified = settings.maybeAsModifiedAppSettings(msg);
 
     if (appModified !== null) {
@@ -1329,7 +1322,6 @@ export default class App extends WWTAwareComponent {
   })();
 
   nameForSource(source: any): string {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     for (const [key, [from, to]] of Object.entries(this.catalogNameMappings)) {
       if (from in source && source["catalogName"] === key) {
         return `${to}: ${source[from]}`;
@@ -1357,7 +1349,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleCreateImageSetLayer(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (classicPywwt.isCreateFitsLayerMessage(msg)) {
       const createImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
         event: msg.event,
@@ -1380,7 +1371,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleSetLayerOrder(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isSetLayerOrderMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
@@ -1388,7 +1378,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleStretchFitsLayer(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isStretchFitsLayerMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleStretchMessage(msg);
@@ -1396,7 +1385,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleSetFitsLayerColormap(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isSetFitsLayerColormapMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
@@ -1404,7 +1392,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleModifyFitsLayer(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isModifyFitsLayerMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleModifyMessage(msg);
@@ -1412,7 +1399,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleRemoveImageSetLayer(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isRemoveImageSetLayerMessage(msg)) return false;
 
     // NB we never remove the handler! It's tricky due to async issues.
@@ -1438,7 +1424,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleCreateTableLayer(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isCreateTableLayerMessage(msg)) return false;
 
     this.getTableLayerHandler(msg).handleCreateMessage(msg);
@@ -1446,7 +1431,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleUpdateTableLayer(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isUpdateTableLayerMessage(msg)) return false;
 
     this.getTableLayerHandler(msg).handleUpdateMessage(msg);
@@ -1454,7 +1438,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleModifyTableLayer(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isModifyTableLayerMessage(msg)) return false;
 
     this.getTableLayerHandler(msg).handleModifyMessage(msg);
@@ -1462,7 +1445,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleRemoveTableLayer(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isRemoveTableLayerMessage(msg)) return false;
 
     // NB we never remove the handler! It's tricky due to async issues.
@@ -1491,7 +1473,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleCreateAnnotation(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isCreateAnnotationMessage(msg)) return false;
 
     this.createAnnotationHandler(msg);
@@ -1499,7 +1480,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleModifyAnnotation(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isModifyAnnotationMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
@@ -1510,7 +1490,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleSetCircleCenter(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isSetCircleCenterMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
@@ -1521,7 +1500,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleAddLinePoint(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isAddLinePointMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
@@ -1532,7 +1510,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleAddPolygonPoint(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isAddPolygonPointMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
@@ -1543,7 +1520,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleRemoveAnnotation(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isRemoveAnnotationMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
@@ -1555,7 +1531,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleClearAnnotations(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isClearAnnotationsMessage(msg)) return false;
 
     this.clearAnnotations();
@@ -1565,7 +1540,6 @@ export default class App extends WWTAwareComponent {
   // Tours:
 
   private handleLoadTour(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isLoadTourMessage(msg)) return false;
 
     this.loadTour({
@@ -1576,7 +1550,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handlePauseTour(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isPauseTourMessage(msg)) return false;
 
     this.toggleTourPlayPauseState(); // note half-assed semantics here!
@@ -1584,7 +1557,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleResumeTour(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isResumeTourMessage(msg)) return false;
 
     this.toggleTourPlayPauseState(); // note half-assed semantics here!
@@ -1709,7 +1681,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleSetBackgroundByName(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isSetBackgroundByNameMessage(msg)) return false;
 
     this.setBackgroundImageByName(msg.name);
@@ -1717,7 +1688,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleSetForegroundByName(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isSetForegroundByNameMessage(msg)) return false;
 
     this.setForegroundImageByName(msg.name);
@@ -1725,7 +1695,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleSetForegroundOpacity(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isSetForegroundOpacityMessage(msg)) return false;
 
     this.setForegroundOpacity(msg.value);
@@ -1733,7 +1702,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleSetViewerMode(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!classicPywwt.isSetViewerModeMessage(msg)) return false;
 
     this.setBackgroundImageByName(msg.mode);
@@ -1791,7 +1759,6 @@ export default class App extends WWTAwareComponent {
   // reply to the client with the details of the catalog-as-spreadsheet-layer,
   // so that it can know what the catalog's characteristics are.
   private handleLoadHipsCatalog(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!layers.isLoadHipsCatalogMessage(msg)) return false;
 
     for (const cat of this.curAvailableCatalogs) {
@@ -1853,7 +1820,6 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleGetHipsCatalogDataInView(msg: any): boolean {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!layers.isGetHipsCatalogDataInViewMessage(msg)) return false;
 
     // Unlike most table-layer messages, here we don't bother to try to work
@@ -1995,7 +1961,7 @@ export default class App extends WWTAwareComponent {
       const latCol = layer.get_latColumn();
 
       const itemCreator = function (values: string[]): Source {
-        const obj: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+        const obj: any = {};
         for (let i = 0; i < values.length; i++) {
           obj[colNames[i]] = values[i];
         }
