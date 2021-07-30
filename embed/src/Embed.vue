@@ -235,7 +235,7 @@ export default class Embed extends WWTAwareComponent {
     if (this.embedSettings.tourUrl.length) {
       prom = prom.then(async () => {
         // TODO: figure out a good thing to do here
-        this.backgroundImagesets = [];
+        this.backgroundImagesets = [...skyBackgroundImagesets];
 
         await this.loadTour({
           url: this.embedSettings.tourUrl,
@@ -380,7 +380,7 @@ export default class Embed extends WWTAwareComponent {
 
   onFullscreenEvent() {
     // NB: we need the isEnabled check to make TypeScript happy even though it
-    // is not necesary in practice here.
+    // is not necessary in practice here.
     if (screenfull.isEnabled) {
       this.fullscreenModeActive = screenfull.isFullscreen;
     }
