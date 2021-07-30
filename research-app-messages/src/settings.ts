@@ -26,7 +26,7 @@ export type SettingsTarget = "app";
  * setting value. In some places, settings are strongly-typed, but it is
  * convenient to have a weakly-typed form as well.
  * */
- export type GenericSetting = [string, any];  // eslint-disable-line @typescript-eslint/no-explicit-any
+export type GenericSetting = [string, any];  // eslint-disable-line @typescript-eslint/no-explicit-any
 
 /** Type guard function for [[GenericSetting]]. */
 export function isGenericSetting(obj: any): obj is GenericSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -44,7 +44,7 @@ export function isGenericSetting(obj: any): obj is GenericSetting {  // eslint-d
 export type AppSetting =
   ["hideAllChrome", boolean];
 
-const appSettingTypeInfo: {[i: string]: boolean} = {
+const appSettingTypeInfo: { [i: string]: boolean } = {
   "hideAllChrome/boolean": true,
 };
 

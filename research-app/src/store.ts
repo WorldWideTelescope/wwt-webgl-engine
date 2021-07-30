@@ -39,7 +39,7 @@ function addToArrayWithoutDuplication<T>(array: T[], item: T, equivalent: Equiva
 function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> | null = null): number {
   const index = getIndex(array, item, equivalent);
   if (index >= 0) {
-      array.splice(index, 1);
+    array.splice(index, 1);
   }
   return index;
 }
@@ -53,23 +53,23 @@ function sourcesEqual(s1: Source, s2: Source) {
   stateFactory: true,
 })
 export class WWTResearchAppModule extends VuexModule {
-    
+
   hipsCatalogs: ImagesetInfo[] = [];
   hipsCatalogVisibilities: boolean[] = [];
   sources: Source[] = [];
 
   catalogNameMappings: { [catalogName: string]: [string, string] } = {
-    "2MASS All-Sky Catalog of Point Sources (Cutri+ 2003)" : [ "2MASS", "2MASS" ],
-    "The Guide Star Catalog, Version 2.3.2 (GSC2.3) (STScI, 2006)" : [ "GSC23", "GSC 2.3" ],
-    "The PPMXL Catalog (Roeser+ 2010)" : [ "PPMXL_ID", "PPMXL" ],
-    "UCAC5 Catalogue (Zacharias+ 2017) (ucac5)" : [ "SrcIDgaia", "GAIA ID" ],
-    "Gaia DR2 (Gaia Collaboration, 2018) (gaia2)" : [ "source_id", "GAIA ID" ],
-    "The SDSS Photometric Catalogue, Release 12 (Alam+, 2015) (sdss12)" : [ "SDSS12", "SDSS12" ],
-    "The Pan-STARRS release 1 (PS1) Survey - DR1 (Chambers+, 2016) (ps1)" : [ "f_objID", "PAN-Starrs ID" ],
+    "2MASS All-Sky Catalog of Point Sources (Cutri+ 2003)": ["2MASS", "2MASS"],
+    "The Guide Star Catalog, Version 2.3.2 (GSC2.3) (STScI, 2006)": ["GSC23", "GSC 2.3"],
+    "The PPMXL Catalog (Roeser+ 2010)": ["PPMXL_ID", "PPMXL"],
+    "UCAC5 Catalogue (Zacharias+ 2017) (ucac5)": ["SrcIDgaia", "GAIA ID"],
+    "Gaia DR2 (Gaia Collaboration, 2018) (gaia2)": ["source_id", "GAIA ID"],
+    "The SDSS Photometric Catalogue, Release 12 (Alam+, 2015) (sdss12)": ["SDSS12", "SDSS12"],
+    "The Pan-STARRS release 1 (PS1) Survey - DR1 (Chambers+, 2016) (ps1)": ["f_objID", "PAN-Starrs ID"],
   }
 
   get researchAppHipsCatalogVisibility() {
-    return (catalog: ImagesetInfo) =>  {
+    return (catalog: ImagesetInfo) => {
       const index = getIndex(this.hipsCatalogs, catalog);
       return (index >= 0) ? this.hipsCatalogVisibilities[index] : false;
     }

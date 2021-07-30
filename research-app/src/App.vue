@@ -2,13 +2,13 @@
   <div id="app">
     <WorldWideTelescope
       :wwt-namespace="wwtComponentNamespace"
-      :class="['wwt', { 'pointer' : this.lastClosePt !== null }]"
+      :class="['wwt', { pointer: this.lastClosePt !== null }]"
       @mousemove.native="wwtOnMouseMove"
       @mouseup.native="wwtOnMouseUp"
       @mousedown.native="wwtOnMouseDown"
     ></WorldWideTelescope>
 
-    <div id='display-panel' v-if="!hideAllChrome">
+    <div id="display-panel" v-if="!hideAllChrome">
       <transition name="catalog-transition">
         <div id="overlays">
           <p>{{ coordText }}</p>
@@ -19,10 +19,11 @@
           <label>Layers:</label>
         </div>
         <div v-if="showLayers">
-          <catalog-item v-for="catalog of hipsCatalogs"
-          v-bind:key="catalog.name"
-          v-bind:catalog="catalog"
-          v-bind:defaultColor="defaultColor"
+          <catalog-item
+            v-for="catalog of hipsCatalogs"
+            v-bind:key="catalog.name"
+            v-bind:catalog="catalog"
+            v-bind:defaultColor="defaultColor"
           />
         </div>
       </div>
@@ -31,10 +32,11 @@
           <label>Sources:</label>
         </div>
         <div v-if="showSources">
-          <source-item v-for="source of sources"
+          <source-item
+            v-for="source of sources"
             v-bind:key="source.name"
             v-bind:source="source"
-            />
+          />
         </div>
       </div>
     </div>
@@ -42,100 +44,164 @@
     <ul id="controls" v-if="!hideAllChrome">
       <li v-show="showToolMenu">
         <v-popover placement="left" trigger="manual" :open="showPopover">
-          <font-awesome-icon class="tooltip-target tooltip-icon" icon="sliders-h" size="lg" tabindex="0" @keyup.enter="showPopover = !showPopover" @click="showPopover = !showPopover" ></font-awesome-icon>
+          <font-awesome-icon
+            class="tooltip-target tooltip-icon"
+            icon="sliders-h"
+            size="lg"
+            tabindex="0"
+            @keyup.enter="showPopover = !showPopover"
+            @click="showPopover = !showPopover"
+          ></font-awesome-icon>
           <template slot="popover" tabindex="-1" show="showPopover">
             <ul class="tooltip-content tool-menu" tabindex="-1">
-              <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background'); showPopover=false" tabindex="0"><font-awesome-icon icon="mountain"/> Choose background</a></li>
-              <li v-show="showCatalogTool"><a href="#" v-close-popover @click="selectTool('choose-catalog'); showPopover=false" tabindex="0"><font-awesome-icon icon="map-marked-alt"/> Add HiPS catalogs</a></li>
+              <li v-show="showBackgroundChooser">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="
+                    selectTool('choose-background');
+                    showPopover = false;
+                  "
+                  tabindex="0"
+                  ><font-awesome-icon icon="mountain" /> Choose background</a
+                >
+              </li>
+              <li v-show="showCatalogTool">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="
+                    selectTool('choose-catalog');
+                    showPopover = false;
+                  "
+                  tabindex="0"
+                  ><font-awesome-icon icon="map-marked-alt" /> Add HiPS
+                  catalogs</a
+                >
+              </li>
             </ul>
           </template>
         </v-popover>
       </li>
       <li v-show="!wwtIsTourPlaying">
-        <font-awesome-icon icon="search-plus" size="lg" class="tooltip-icon" @keyup.enter="doZoom(true)" @click="doZoom(true)" tabindex="0"></font-awesome-icon>
+        <font-awesome-icon
+          icon="search-plus"
+          size="lg"
+          class="tooltip-icon"
+          @keyup.enter="doZoom(true)"
+          @click="doZoom(true)"
+          tabindex="0"
+        ></font-awesome-icon>
       </li>
       <li v-show="!wwtIsTourPlaying">
-        <font-awesome-icon icon="search-minus" size="lg" class="tooltip-icon" @keyup.enter="doZoom(false)" @click="doZoom(false)" tabindex="0"></font-awesome-icon>
+        <font-awesome-icon
+          icon="search-minus"
+          size="lg"
+          class="tooltip-icon"
+          @keyup.enter="doZoom(false)"
+          @click="doZoom(false)"
+          tabindex="0"
+        ></font-awesome-icon>
       </li>
       <li v-show="fullscreenAvailable">
-        <font-awesome-icon v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
-          size="lg" class="nudgeright1 tooltip-icon" @keyup.enter="toggleFullscreen()" @click="toggleFullscreen()" tabindex="0"></font-awesome-icon>
+        <font-awesome-icon
+          v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
+          size="lg"
+          class="nudgeright1 tooltip-icon"
+          @keyup.enter="toggleFullscreen()"
+          @click="toggleFullscreen()"
+          tabindex="0"
+        ></font-awesome-icon>
       </li>
     </ul>
 
     <div id="tools" v-if="!hideAllChrome">
       <div class="tool-container">
-      <template v-if="currentTool == 'crossfade'">
-        <span>Foreground opacity:</span> <input class="opacity-range" type="range" v-model="foregroundOpacity">
-      </template>
-      <template v-else-if="currentTool == 'choose-background'">
-        <div id="bg-select-container" class="item-select-container">
-          <span id="bg-select-title" class="item-select-title">Background imagery:</span>
-          <v-select v-model="curBackgroundImagesetName"
-                  id="bg-select" class="item-selector"
-                  :searchable="true"
-                  :clearable="false"
-                  :options="curAvailableImagesets"
-                  :filter="filterImagesets"
-                  :close-on-select="true"
-                  :reduce="bg => bg.name"
-                  label="name"
-                  placeholder="Background"
-                  >
-                  <template #option="option">
-                    <div class="item-option">
-                      <h4>{{option.name}}</h4>
-                      <em>{{option.description}}</em>
-                    </div>
-                  </template>
-                  <template #selected-option="option">
-                    <div>{{option.name}}</div>
-                  </template>
-          </v-select>
-        </div>
-      </template>
-      <template v-else-if="showCatalogChooser">
-        <div id="catalog-select-container-tool" class="item-select-container">
-          <span class="item-select-title">Add catalog:</span>
-          <v-select
-                  v-model="catalogToAdd"
-                  id="catalog-select-tool" class="item-selector"
-                  :searchable="true"
-                  :clearable="false"
-                  :options="curAvailableCatalogs"
-                  :filter="filterCatalogs"
-                  @change="cat => addHipsByName(cat.name)"
-                  label="name"
-                  placeholder="Catalog"
-                  >
-                  <template #option="option">
-                    <div class="item-option">
-                      <h4>{{option.name}}</h4>
-                      <em>{{option.description}}</em>
-                    </div>
-                  </template>
-                  <template #selected-option-container="">
-                    <div></div>
-                  </template>
-          </v-select>
-        </div>
-      </template>
+        <template v-if="currentTool == 'crossfade'">
+          <span>Foreground opacity:</span>
+          <input
+            class="opacity-range"
+            type="range"
+            v-model="foregroundOpacity"
+          />
+        </template>
+        <template v-else-if="currentTool == 'choose-background'">
+          <div id="bg-select-container" class="item-select-container">
+            <span id="bg-select-title" class="item-select-title"
+              >Background imagery:</span
+            >
+            <v-select
+              v-model="curBackgroundImagesetName"
+              id="bg-select"
+              class="item-selector"
+              :searchable="true"
+              :clearable="false"
+              :options="curAvailableImagesets"
+              :filter="filterImagesets"
+              :close-on-select="true"
+              :reduce="(bg) => bg.name"
+              label="name"
+              placeholder="Background"
+            >
+              <template #option="option">
+                <div class="item-option">
+                  <h4>{{ option.name }}</h4>
+                  <em>{{ option.description }}</em>
+                </div>
+              </template>
+              <template #selected-option="option">
+                <div>{{ option.name }}</div>
+              </template>
+            </v-select>
+          </div>
+        </template>
+        <template v-else-if="showCatalogChooser">
+          <div id="catalog-select-container-tool" class="item-select-container">
+            <span class="item-select-title">Add catalog:</span>
+            <v-select
+              v-model="catalogToAdd"
+              id="catalog-select-tool"
+              class="item-selector"
+              :searchable="true"
+              :clearable="false"
+              :options="curAvailableCatalogs"
+              :filter="filterCatalogs"
+              @change="(cat) => addHipsByName(cat.name)"
+              label="name"
+              placeholder="Catalog"
+            >
+              <template #option="option">
+                <div class="item-option">
+                  <h4>{{ option.name }}</h4>
+                  <em>{{ option.description }}</em>
+                </div>
+              </template>
+              <template #selected-option-container="">
+                <div></div>
+              </template>
+            </v-select>
+          </div>
+        </template>
       </div>
     </div>
 
     <div id="webgl2-popup" v-show="wwtShowWebGl2Warning" v-if="!hideAllChrome">
-      To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge.
-      In case you would like to use Safari, we recommend that you
-      <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a>.
+      To get the full AAS WWT experience, consider using the latest version of
+      Chrome, Firefox or Edge. In case you would like to use Safari, we
+      recommend that you
+      <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a
+      >.
     </div>
   </div>
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as moment from "moment";
 import * as screenfull from "screenfull";
-import 'vue-select/dist/vue-select.css';
-import { debounce } from 'debounce';
+import "vue-select/dist/vue-select.css";
+import { debounce } from "debounce";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { mapGetters, mapMutations, mapState } from "vuex";
 
@@ -144,10 +210,7 @@ import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { Source, WWTResearchAppModule } from "./store";
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
-import {
-  ImageSetType,
-  SolarSystemObjects,
-} from "@wwtelescope/engine-types";
+import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
 
 import {
   Annotation,
@@ -195,12 +258,12 @@ const R2D = 180.0 / Math.PI;
 type ToolType = "crossfade" | "choose-background" | "choose-catalog" | null;
 
 type AnyFitsLayerMessage =
-  classicPywwt.CreateImageSetLayerMessage |
-  classicPywwt.SetFitsLayerColormapMessage |
-  classicPywwt.SetLayerOrderMessage |
-  classicPywwt.StretchFitsLayerMessage |
-  classicPywwt.ModifyFitsLayerMessage |
-  classicPywwt.RemoveImageSetLayerMessage;
+  | classicPywwt.CreateImageSetLayerMessage
+  | classicPywwt.SetFitsLayerColormapMessage
+  | classicPywwt.SetLayerOrderMessage
+  | classicPywwt.StretchFitsLayerMessage
+  | classicPywwt.ModifyFitsLayerMessage
+  | classicPywwt.RemoveImageSetLayerMessage;
 
 /** Helper for handling messages that mutate FITS / ImageSet layers. Because
  * FITS loading is asynchronous, and messages might arrive out of order, we need
@@ -214,7 +277,8 @@ class ImageSetLayerMessageHandler {
   private stretchVersion = -1;
   private orderVersion = -1;
   private queuedStretch: classicPywwt.StretchFitsLayerMessage | null = null;
-  private queuedColormap: classicPywwt.SetFitsLayerColormapMessage | null = null;
+  private queuedColormap: classicPywwt.SetFitsLayerColormapMessage | null =
+    null;
   private queuedSettings: ImageSetLayerSetting[] = [];
   private queuedRemoval: classicPywwt.RemoveImageSetLayerMessage | null = null;
   private queuedOrder: classicPywwt.SetLayerOrderMessage | null = null;
@@ -233,12 +297,14 @@ class ImageSetLayerMessageHandler {
     // unspecified, we treat it as true.
     const gotoTarget = msg.goto == undefined ? true : msg.goto;
 
-    this.owner.addImageSetLayer({
-      url: msg.url,
-      mode: mode,
-      name: msg.id,
-      goto: gotoTarget,
-    }).then((layer) => this.layerInitialized(layer));
+    this.owner
+      .addImageSetLayer({
+        url: msg.url,
+        mode: mode,
+        name: msg.id,
+        goto: gotoTarget,
+      })
+      .then((layer) => this.layerInitialized(layer));
 
     this.created = true;
   }
@@ -279,7 +345,7 @@ class ImageSetLayerMessageHandler {
       if (msg.version > this.orderVersion) {
         this.owner.setImageSetLayerOrder({
           id: this.internalId,
-          order: msg.order
+          order: msg.order,
         });
         this.orderVersion = msg.version;
       }
@@ -290,7 +356,10 @@ class ImageSetLayerMessageHandler {
     if (this.internalId === null) {
       // Layer not yet created or fully initialized. Queue up message for processing
       // once it's ready.
-      if (this.queuedStretch === null || msg.version > this.queuedStretch.version) {
+      if (
+        this.queuedStretch === null ||
+        msg.version > this.queuedStretch.version
+      ) {
         this.queuedStretch = msg;
       }
     } else {
@@ -310,7 +379,10 @@ class ImageSetLayerMessageHandler {
     if (this.internalId === null) {
       // Layer not yet created or fully initialized. Queue up message for processing
       // once it's ready.
-      if (this.queuedColormap === null || msg.version > this.queuedColormap.version) {
+      if (
+        this.queuedColormap === null ||
+        msg.version > this.queuedColormap.version
+      ) {
         this.queuedColormap = msg;
       }
     } else {
@@ -325,7 +397,7 @@ class ImageSetLayerMessageHandler {
   }
 
   handleModifyMessage(msg: classicPywwt.ModifyFitsLayerMessage) {
-    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+    const setting: [string, any] = [msg.setting, msg.value];
 
     if (!isImageSetLayerSetting(setting)) {
       return;
@@ -359,10 +431,10 @@ class ImageSetLayerMessageHandler {
 }
 
 type AnyTableLayerMessage =
-  classicPywwt.CreateTableLayerMessage |
-  classicPywwt.UpdateTableLayerMessage |
-  classicPywwt.ModifyTableLayerMessage |
-  classicPywwt.RemoveTableLayerMessage;
+  | classicPywwt.CreateTableLayerMessage
+  | classicPywwt.UpdateTableLayerMessage
+  | classicPywwt.ModifyTableLayerMessage
+  | classicPywwt.RemoveTableLayerMessage;
 
 /** Helper for handling messages that mutate tabular / "spreadsheet" layers. */
 class TableLayerMessageHandler {
@@ -381,16 +453,17 @@ class TableLayerMessageHandler {
   }
 
   handleCreateMessage(msg: classicPywwt.CreateTableLayerMessage) {
-    if (this.created)
-      return;
+    if (this.created) return;
 
     const data = atob(msg.table);
 
-    this.owner.createTableLayer({
-      name: msg.id,
-      referenceFrame: msg.frame,
-      dataCsv: data,
-    }).then((layer) => this.layerInitialized(layer));
+    this.owner
+      .createTableLayer({
+        name: msg.id,
+        referenceFrame: msg.frame,
+        dataCsv: data,
+      })
+      .then((layer) => this.layerInitialized(layer));
 
     this.created = true;
   }
@@ -456,7 +529,7 @@ class TableLayerMessageHandler {
     // settings - they are more transport-friendly versions, as expressed in the
     // PywwtSpreadSheetLayerSetting type.
 
-    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+    const setting: [string, any] = [msg.setting, msg.value];
 
     if (!classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
       return;
@@ -478,24 +551,31 @@ class TableLayerMessageHandler {
     }
   }
 
-  async handleGetHipsDataInViewMessage(msg: layers.GetHipsCatalogDataInViewMessage): Promise<layers.GetHipsCatalogDataInViewReply | null> {
-    if (this.imageset === null || this.layer === null || this.internalId === null)
+  async handleGetHipsDataInViewMessage(
+    msg: layers.GetHipsCatalogDataInViewMessage
+  ): Promise<layers.GetHipsCatalogDataInViewReply | null> {
+    if (
+      this.imageset === null ||
+      this.layer === null ||
+      this.internalId === null
+    )
       return null; // Sorry!
 
-    if (!this.isHips)
-      return null;
+    if (!this.isHips) return null;
 
-    return this.owner.getCatalogHipsDataInView({
-      imageset: this.imageset,
-      limit: msg.limit,
-    }).then((info) => {
-      return {
-        event: "layer_hipscat_datainview_reply",
-        threadId: msg.threadId,
-        data: info.table,
-        aborted: info.aborted
-      };
-    });
+    return this.owner
+      .getCatalogHipsDataInView({
+        imageset: this.imageset,
+        limit: msg.limit,
+      })
+      .then((info) => {
+        return {
+          event: "layer_hipscat_datainview_reply",
+          threadId: msg.threadId,
+          data: info.table,
+          aborted: info.aborted,
+        };
+      });
   }
 
   handleRemoveMessage(msg: classicPywwt.RemoveTableLayerMessage) {
@@ -525,14 +605,13 @@ class TableLayerMessageHandler {
   }
 }
 
-
 type AnyAnnotationMessage =
-  classicPywwt.AddLinePointMessage |
-  classicPywwt.AddPolygonPointMessage |
-  classicPywwt.CreateAnnotationMessage |
-  classicPywwt.ModifyAnnotationMessage |
-  classicPywwt.RemoveAnnotationMessage |
-  classicPywwt.SetCircleCenterMessage;
+  | classicPywwt.AddLinePointMessage
+  | classicPywwt.AddPolygonPointMessage
+  | classicPywwt.CreateAnnotationMessage
+  | classicPywwt.ModifyAnnotationMessage
+  | classicPywwt.RemoveAnnotationMessage
+  | classicPywwt.SetCircleCenterMessage;
 
 /** Helper for handling messages that mutate annotations. These are actually
  * much simpler to deal with than image or data layers, but it doesn't hurt
@@ -542,19 +621,22 @@ class AnnotationMessageHandler {
   private owner: App;
   private ann: Annotation;
 
-  public static tryCreate(owner: App, msg: classicPywwt.CreateAnnotationMessage): AnnotationMessageHandler | null {
+  public static tryCreate(
+    owner: App,
+    msg: classicPywwt.CreateAnnotationMessage
+  ): AnnotationMessageHandler | null {
     // defaults here track pywwt's
-    if (msg.shape == 'circle') {
+    if (msg.shape == "circle") {
       const circ = new Circle();
       circ.set_fill(false);
       circ.set_skyRelative(true);
       circ.setCenter(owner.wwtRARad * R2D, owner.wwtDecRad * R2D);
       return new AnnotationMessageHandler(owner, circ, msg.id);
-    } else if (msg.shape == 'polygon') {
+    } else if (msg.shape == "polygon") {
       const poly = new Poly();
       poly.set_fill(false);
       return new AnnotationMessageHandler(owner, poly, msg.id);
-    } else if (msg.shape == 'line') {
+    } else if (msg.shape == "line") {
       return new AnnotationMessageHandler(owner, new PolyLine(), msg.id);
     }
 
@@ -569,13 +651,16 @@ class AnnotationMessageHandler {
   }
 
   handleModifyAnnotationMessage(msg: classicPywwt.ModifyAnnotationMessage) {
-    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+    const setting: [string, any] = [msg.setting, msg.value];
 
     if (this.ann instanceof Circle && isCircleAnnotationSetting(setting)) {
       applyCircleAnnotationSetting(this.ann, setting);
     } else if (this.ann instanceof Poly && isPolyAnnotationSetting(setting)) {
       applyPolyAnnotationSetting(this.ann, setting);
-    } else if (this.ann instanceof PolyLine && isPolyLineAnnotationSetting(setting)) {
+    } else if (
+      this.ann instanceof PolyLine &&
+      isPolyLineAnnotationSetting(setting)
+    ) {
       applyPolyLineAnnotationSetting(this.ann, setting);
     }
   }
@@ -610,7 +695,15 @@ class KeyPressInfo {
   shift: boolean;
   meta: boolean;
 
-  constructor(code: string, modifiers?: { ctrl?: boolean; alt?: boolean; shift?: boolean; meta?: boolean } ) {
+  constructor(
+    code: string,
+    modifiers?: {
+      ctrl?: boolean;
+      alt?: boolean;
+      shift?: boolean;
+      meta?: boolean;
+    }
+  ) {
     this.code = code;
     this.ctrl = modifiers?.ctrl ?? false;
     this.alt = modifiers?.alt ?? false;
@@ -619,11 +712,13 @@ class KeyPressInfo {
   }
 
   matches(event: KeyboardEvent): boolean {
-    return event.code === this.code
-        && event.ctrlKey === this.ctrl
-        && event.altKey === this.alt
-        && event.shiftKey === this.shift
-        && event.metaKey === this.meta;
+    return (
+      event.code === this.code &&
+      event.ctrlKey === this.ctrl &&
+      event.altKey === this.alt &&
+      event.shiftKey === this.shift &&
+      event.metaKey === this.meta
+    );
   }
 }
 
@@ -648,30 +743,12 @@ class KeyboardControlSettings {
   bigMoveFactor: number;
 
   constructor({
-    zoomIn = [
-      new KeyPressInfo("KeyZ"),
-      new KeyPressInfo("PageUp"),
-    ],
-    zoomOut = [
-      new KeyPressInfo("KeyX"),
-      new KeyPressInfo("PageDown"),
-    ],
-    moveUp = [
-      new KeyPressInfo("KeyI"),
-      new KeyPressInfo("ArrowUp"),
-    ],
-    moveDown = [
-      new KeyPressInfo("KeyK"),
-      new KeyPressInfo("ArrowDown"),
-    ],
-    moveLeft = [
-      new KeyPressInfo("KeyJ"),
-      new KeyPressInfo("ArrowLeft"),
-    ],
-    moveRight = [
-      new KeyPressInfo("KeyL"),
-      new KeyPressInfo("ArrowRight"),
-    ],
+    zoomIn = [new KeyPressInfo("KeyZ"), new KeyPressInfo("PageUp")],
+    zoomOut = [new KeyPressInfo("KeyX"), new KeyPressInfo("PageDown")],
+    moveUp = [new KeyPressInfo("KeyI"), new KeyPressInfo("ArrowUp")],
+    moveDown = [new KeyPressInfo("KeyK"), new KeyPressInfo("ArrowDown")],
+    moveLeft = [new KeyPressInfo("KeyJ"), new KeyPressInfo("ArrowLeft")],
+    moveRight = [new KeyPressInfo("KeyL"), new KeyPressInfo("ArrowRight")],
     tiltUp = [
       new KeyPressInfo("KeyI", { alt: true }),
       new KeyPressInfo("ArrowUp", { alt: true }),
@@ -745,14 +822,17 @@ class KeyboardControlSettings {
     "bigMoveRight",
   ] as const;
 
-  makeListener(actionName: KeyboardControlSettings["actionTypes"][number], action: () => void): (e: KeyboardEvent) => void {
+  makeListener(
+    actionName: KeyboardControlSettings["actionTypes"][number],
+    action: () => void
+  ): (e: KeyboardEvent) => void {
     return (e) => {
       for (const keyPress of this[actionName]) {
         if (keyPress.matches(e)) {
           action();
         }
       }
-    }
+    };
   }
 }
 
@@ -775,7 +855,11 @@ interface AngleCoordinates {
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof#instanceof_and_multiple_context_e.g._frames_or_windows
  */
 function eventSourceAsWindow(e: MessageEvent): Window | null {
-  if (!(e.source instanceof MessagePort) && (typeof ServiceWorker === 'undefined' || !(e.source instanceof ServiceWorker))) {
+  if (
+    !(e.source instanceof MessagePort) &&
+    (typeof ServiceWorker === "undefined" ||
+      !(e.source instanceof ServiceWorker))
+  ) {
     return e.source as Window;
   }
 
@@ -785,8 +869,9 @@ function eventSourceAsWindow(e: MessageEvent): Window | null {
 /** The main "research app" Vue component. */
 @Component
 export default class App extends WWTAwareComponent {
-  @Prop({default: null}) readonly allowedOrigin!: string | null;
-  @Prop({default: () => new KeyboardControlSettings({})}) private _kcs!: KeyboardControlSettings;
+  @Prop({ default: null }) readonly allowedOrigin!: string | null;
+  @Prop({ default: () => new KeyboardControlSettings({}) })
+  private _kcs!: KeyboardControlSettings;
 
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
@@ -811,25 +896,24 @@ export default class App extends WWTAwareComponent {
   beforeCreate(): void {
     this.$options.computed = {
       ...mapState(wwtResearchAppNamespace, {
-        catalogNameMappings: (state, _getters) => (state as WWTResearchAppModule).catalogNameMappings,
-        hipsCatalogs: (state, _getters) => (state as WWTResearchAppModule).hipsCatalogs,
+        catalogNameMappings: (state, _getters) =>
+          (state as WWTResearchAppModule).catalogNameMappings,
+        hipsCatalogs: (state, _getters) =>
+          (state as WWTResearchAppModule).hipsCatalogs,
         sources: (state, _getters) => (state as WWTResearchAppModule).sources,
       }),
-      ...mapGetters(wwtResearchAppNamespace, [
-        "visibleHipsCatalogs",
-      ]),
+      ...mapGetters(wwtResearchAppNamespace, ["visibleHipsCatalogs"]),
       ...this.$options.computed,
-    }
+    };
 
     this.$options.methods = {
       ...this.$options.methods,
       ...mapMutations(wwtResearchAppNamespace, [
-          "addResearchAppCatalogHips",
-          "addSource",
-          "removeResearchAppCatalogHips"
-      ])
-    }
-
+        "addResearchAppCatalogHips",
+        "addSource",
+        "removeResearchAppCatalogHips",
+      ]),
+    };
   }
 
   created() {
@@ -839,7 +923,7 @@ export default class App extends WWTAwareComponent {
 
   mounted() {
     if (screenfull.isEnabled) {
-      screenfull.on('change', this.onFullscreenEvent);
+      screenfull.on("change", this.onFullscreenEvent);
     }
 
     this.waitForReady().then(() => {
@@ -853,66 +937,140 @@ export default class App extends WWTAwareComponent {
       // state anyway.
       //
       // For now let's just not worry about removing this listener ...
-      window.addEventListener('message', (event) => {
-        // We have to be careful with event.source -- see this function's docs.
-        const sourceAsWindow = eventSourceAsWindow(event);
+      window.addEventListener(
+        "message",
+        (event) => {
+          // We have to be careful with event.source -- see this function's docs.
+          const sourceAsWindow = eventSourceAsWindow(event);
 
-        if (this.allowedOrigin !== null && event.origin == this.allowedOrigin) {
-          // You could imagine wanting to send status updates to multiple
-          // destinations, but let's start simple.
-          if (this.statusMessageDestination === null) {
-            if (sourceAsWindow !== null) {
-              this.statusMessageDestination = sourceAsWindow;
-              // Hardcode the status update rate to max out at 5 Hz.
-              this.updateIntervalId = window.setInterval(() => this.maybeUpdateStatus(), 200);
-            }
-          }
-
-          const message = event.data;
-
-          // Special handling for ping-pong to specifically reply to the pinger --
-          // one day we should get better about talking to multiple clients.
-          if (isPingPongMessage(message)) {
-            if (sourceAsWindow !== null) {
-              if (message.sessionId !== undefined) {
-                this.statusMessageSessionId = message.sessionId;
+          if (
+            this.allowedOrigin !== null &&
+            event.origin == this.allowedOrigin
+          ) {
+            // You could imagine wanting to send status updates to multiple
+            // destinations, but let's start simple.
+            if (this.statusMessageDestination === null) {
+              if (sourceAsWindow !== null) {
+                this.statusMessageDestination = sourceAsWindow;
+                // Hardcode the status update rate to max out at 5 Hz.
+                this.updateIntervalId = window.setInterval(
+                  () => this.maybeUpdateStatus(),
+                  200
+                );
               }
-
-              sourceAsWindow.postMessage(message, event.origin);
-            } else if (event.source instanceof Window) {
-              /* can't-happen, but needed to make TypeScript happy */
-            } else if (event.source !== null) {
-              event.source.postMessage(message);
             }
-          } else {
-            this.onMessage(message);
+
+            const message = event.data;
+
+            // Special handling for ping-pong to specifically reply to the pinger --
+            // one day we should get better about talking to multiple clients.
+            if (isPingPongMessage(message)) {
+              if (sourceAsWindow !== null) {
+                if (message.sessionId !== undefined) {
+                  this.statusMessageSessionId = message.sessionId;
+                }
+
+                sourceAsWindow.postMessage(message, event.origin);
+              } else if (event.source instanceof Window) {
+                /* can't-happen, but needed to make TypeScript happy */
+              } else if (event.source !== null) {
+                event.source.postMessage(message);
+              }
+            } else {
+              this.onMessage(message);
+            }
           }
-        }
-      }, false);
+        },
+        false
+      );
     });
 
     // Handling key presses
-    window.addEventListener('keydown', this._kcs.makeListener("zoomIn", () => this.doZoom(true)));
-    window.addEventListener('keydown', this._kcs.makeListener("zoomOut", () => this.doZoom(false)));
-    window.addEventListener('keydown', this._kcs.makeListener("moveUp", () => this.doMove(0, this._kcs.moveAmount)));
-    window.addEventListener('keydown', this._kcs.makeListener("moveDown", () => this.doMove(0, -this._kcs.moveAmount)));
-    window.addEventListener('keydown', this._kcs.makeListener("moveLeft", () => this.doMove(this._kcs.moveAmount, 0)));
-    window.addEventListener('keydown', this._kcs.makeListener("moveRight", () => this.doMove(-this._kcs.moveAmount, 0)));
-    window.addEventListener('keydown', this._kcs.makeListener("tiltLeft", () => this.doTilt(this._kcs.tiltAmount, 0)));
-    window.addEventListener('keydown', this._kcs.makeListener("tiltRight", () => this.doTilt(-this._kcs.tiltAmount, 0)));
-    window.addEventListener('keydown', this._kcs.makeListener("tiltUp", () => this.doTilt(0, this._kcs.tiltAmount)));
-    window.addEventListener('keydown', this._kcs.makeListener("tiltDown", () => this.doTilt(0, -this._kcs.tiltAmount)));
-    window.addEventListener('keydown', this._kcs.makeListener("bigMoveUp", () => this.doMove(0, this._kcs.bigMoveFactor * this._kcs.moveAmount)));
-    window.addEventListener('keydown', this._kcs.makeListener("bigMoveDown", () => this.doMove(0, this._kcs.bigMoveFactor * -this._kcs.moveAmount)));
-    window.addEventListener('keydown', this._kcs.makeListener("bigMoveLeft", () => this.doMove(this._kcs.bigMoveFactor * this._kcs.moveAmount, 0)));
-    window.addEventListener('keydown', this._kcs.makeListener("bigMoveRight", () => this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)));
-
-
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("zoomIn", () => this.doZoom(true))
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("zoomOut", () => this.doZoom(false))
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("moveUp", () =>
+        this.doMove(0, this._kcs.moveAmount)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("moveDown", () =>
+        this.doMove(0, -this._kcs.moveAmount)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("moveLeft", () =>
+        this.doMove(this._kcs.moveAmount, 0)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("moveRight", () =>
+        this.doMove(-this._kcs.moveAmount, 0)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("tiltLeft", () =>
+        this.doTilt(this._kcs.tiltAmount, 0)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("tiltRight", () =>
+        this.doTilt(-this._kcs.tiltAmount, 0)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("tiltUp", () =>
+        this.doTilt(0, this._kcs.tiltAmount)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("tiltDown", () =>
+        this.doTilt(0, -this._kcs.tiltAmount)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("bigMoveUp", () =>
+        this.doMove(0, this._kcs.bigMoveFactor * this._kcs.moveAmount)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("bigMoveDown", () =>
+        this.doMove(0, this._kcs.bigMoveFactor * -this._kcs.moveAmount)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("bigMoveLeft", () =>
+        this.doMove(this._kcs.bigMoveFactor * this._kcs.moveAmount, 0)
+      )
+    );
+    window.addEventListener(
+      "keydown",
+      this._kcs.makeListener("bigMoveRight", () =>
+        this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)
+      )
+    );
   }
 
   destroyed() {
     if (screenfull.isEnabled) {
-      screenfull.off('change', this.onFullscreenEvent);
+      screenfull.off("change", this.onFullscreenEvent);
     }
 
     if (this.updateIntervalId !== null) {
@@ -923,57 +1081,87 @@ export default class App extends WWTAwareComponent {
 
   // Incoming message handling
 
-  private messageHandlers: Map<string, (msg: any) => boolean> = new Map();  // eslint-disable-line @typescript-eslint/no-explicit-any
+  private messageHandlers: Map<string, (msg: any) => boolean> = new Map();
 
   private initializeHandlers() {
     // These handlers must take care to type-check that the input
     // message actually fully obeys the expected schema!
 
-    this.messageHandlers.set('load_image_collection', this.handleLoadImageCollection);
+    this.messageHandlers.set(
+      "load_image_collection",
+      this.handleLoadImageCollection
+    );
 
-    this.messageHandlers.set('set_background_by_name', this.handleSetBackgroundByName);
-    this.messageHandlers.set('set_foreground_by_name', this.handleSetForegroundByName);
-    this.messageHandlers.set('set_foreground_opacity', this.handleSetForegroundOpacity);
-    this.messageHandlers.set('set_viewer_mode', this.handleSetViewerMode);
+    this.messageHandlers.set(
+      "set_background_by_name",
+      this.handleSetBackgroundByName
+    );
+    this.messageHandlers.set(
+      "set_foreground_by_name",
+      this.handleSetForegroundByName
+    );
+    this.messageHandlers.set(
+      "set_foreground_opacity",
+      this.handleSetForegroundOpacity
+    );
+    this.messageHandlers.set("set_viewer_mode", this.handleSetViewerMode);
 
-    this.messageHandlers.set('center_on_coordinates', this.handleCenterOnCoordinates);
-    this.messageHandlers.set('track_object', this.handleTrackObject);
-    this.messageHandlers.set('set_datetime', this.handleSetDatetime);
-    this.messageHandlers.set('pause_time', this.handlePauseTime);
-    this.messageHandlers.set('resume_time', this.handleResumeTime);
+    this.messageHandlers.set(
+      "center_on_coordinates",
+      this.handleCenterOnCoordinates
+    );
+    this.messageHandlers.set("track_object", this.handleTrackObject);
+    this.messageHandlers.set("set_datetime", this.handleSetDatetime);
+    this.messageHandlers.set("pause_time", this.handlePauseTime);
+    this.messageHandlers.set("resume_time", this.handleResumeTime);
 
-    this.messageHandlers.set('modify_settings', this.handleModifySettings);
-    this.messageHandlers.set('setting_set', this.handleModifyEngineSetting);
+    this.messageHandlers.set("modify_settings", this.handleModifySettings);
+    this.messageHandlers.set("setting_set", this.handleModifyEngineSetting);
 
-    this.messageHandlers.set('image_layer_create', this.handleCreateImageSetLayer);
-    this.messageHandlers.set('image_layer_order', this.handleSetLayerOrder);
-    this.messageHandlers.set('image_layer_stretch', this.handleStretchFitsLayer);
-    this.messageHandlers.set('image_layer_cmap', this.handleSetFitsLayerColormap);
-    this.messageHandlers.set('image_layer_set', this.handleModifyFitsLayer);
-    this.messageHandlers.set('image_layer_remove', this.handleRemoveImageSetLayer);
+    this.messageHandlers.set(
+      "image_layer_create",
+      this.handleCreateImageSetLayer
+    );
+    this.messageHandlers.set("image_layer_order", this.handleSetLayerOrder);
+    this.messageHandlers.set(
+      "image_layer_stretch",
+      this.handleStretchFitsLayer
+    );
+    this.messageHandlers.set(
+      "image_layer_cmap",
+      this.handleSetFitsLayerColormap
+    );
+    this.messageHandlers.set("image_layer_set", this.handleModifyFitsLayer);
+    this.messageHandlers.set(
+      "image_layer_remove",
+      this.handleRemoveImageSetLayer
+    );
 
-    this.messageHandlers.set('table_layer_create', this.handleCreateTableLayer);
-    this.messageHandlers.set('table_layer_update', this.handleUpdateTableLayer);
-    this.messageHandlers.set('table_layer_set', this.handleModifyTableLayer);
-    this.messageHandlers.set('table_layer_remove', this.handleRemoveTableLayer);
+    this.messageHandlers.set("table_layer_create", this.handleCreateTableLayer);
+    this.messageHandlers.set("table_layer_update", this.handleUpdateTableLayer);
+    this.messageHandlers.set("table_layer_set", this.handleModifyTableLayer);
+    this.messageHandlers.set("table_layer_remove", this.handleRemoveTableLayer);
 
-    this.messageHandlers.set('layer_hipscat_load', this.handleLoadHipsCatalog);
-    this.messageHandlers.set('layer_hipscat_datainview', this.handleGetHipsCatalogDataInView);
+    this.messageHandlers.set("layer_hipscat_load", this.handleLoadHipsCatalog);
+    this.messageHandlers.set(
+      "layer_hipscat_datainview",
+      this.handleGetHipsCatalogDataInView
+    );
 
-    this.messageHandlers.set('annotation_create', this.handleCreateAnnotation);
-    this.messageHandlers.set('annotation_set', this.handleModifyAnnotation);
-    this.messageHandlers.set('circle_set_center', this.handleSetCircleCenter);
-    this.messageHandlers.set('line_add_point', this.handleAddLinePoint);
-    this.messageHandlers.set('polygon_add_point', this.handleAddPolygonPoint);
-    this.messageHandlers.set('remove_annotation', this.handleRemoveAnnotation);
-    this.messageHandlers.set('clear_annotations', this.handleClearAnnotations);
+    this.messageHandlers.set("annotation_create", this.handleCreateAnnotation);
+    this.messageHandlers.set("annotation_set", this.handleModifyAnnotation);
+    this.messageHandlers.set("circle_set_center", this.handleSetCircleCenter);
+    this.messageHandlers.set("line_add_point", this.handleAddLinePoint);
+    this.messageHandlers.set("polygon_add_point", this.handleAddPolygonPoint);
+    this.messageHandlers.set("remove_annotation", this.handleRemoveAnnotation);
+    this.messageHandlers.set("clear_annotations", this.handleClearAnnotations);
 
-    this.messageHandlers.set('load_tour', this.handleLoadTour);
-    this.messageHandlers.set('pause_tour', this.handlePauseTour);
-    this.messageHandlers.set('resume_tour', this.handleResumeTour);
+    this.messageHandlers.set("load_tour", this.handleLoadTour);
+    this.messageHandlers.set("pause_tour", this.handlePauseTour);
+    this.messageHandlers.set("resume_tour", this.handleResumeTour);
   }
 
-  onMessage(msg: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  onMessage(msg: any) {
     const key = String(msg.type || msg.event);
     const handler = this.messageHandlers.get(key);
     let handled = false;
@@ -983,33 +1171,41 @@ export default class App extends WWTAwareComponent {
     }
 
     if (!handled) {
-      console.warn("WWT research app received unhandled message, as follows:", msg);
+      console.warn(
+        "WWT research app received unhandled message, as follows:",
+        msg
+      );
     }
   }
 
   // Various message handlers that don't comfortably fit elsewhere:
 
-  private handleLoadImageCollection(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isLoadImageCollectionMessage(msg))
-      return false;
+  private handleLoadImageCollection(msg: any): boolean {
+    if (!classicPywwt.isLoadImageCollectionMessage(msg)) return false;
 
-    this.loadImageCollection({ url: msg.url, loadChildFolders: msg.loadChildFolders }).then(() => {
-      if (this.statusMessageDestination != null && this.allowedOrigin != null){
-        const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage = {
-          event: "load_image_collection_completed",
-          threadId: msg.threadId,
-          url: msg.url
-        };
+    this.loadImageCollection({
+      url: msg.url,
+      loadChildFolders: msg.loadChildFolders,
+    }).then(() => {
+      if (this.statusMessageDestination != null && this.allowedOrigin != null) {
+        const completedMessage: classicPywwt.LoadImageCollectionCompletedMessage =
+          {
+            event: "load_image_collection_completed",
+            threadId: msg.threadId,
+            url: msg.url,
+          };
 
-        this.statusMessageDestination.postMessage(completedMessage, this.allowedOrigin);
+        this.statusMessageDestination.postMessage(
+          completedMessage,
+          this.allowedOrigin
+        );
       }
     });
     return true;
   }
 
-  private handleCenterOnCoordinates(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isCenterOnCoordinatesMessage(msg))
-      return false;
+  private handleCenterOnCoordinates(msg: any): boolean {
+    if (!classicPywwt.isCenterOnCoordinatesMessage(msg)) return false;
 
     const rollRad = msg.roll == undefined ? undefined : msg.roll * D2R;
     this.gotoRADecZoom({
@@ -1022,47 +1218,41 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handleModifyEngineSetting(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isModifySettingMessage(msg))
-      return false;
+  private handleModifyEngineSetting(msg: any): boolean {
+    if (!classicPywwt.isModifySettingMessage(msg)) return false;
 
-    const setting: [string, any] = [msg.setting, msg.value];  // eslint-disable-line @typescript-eslint/no-explicit-any
+    const setting: [string, any] = [msg.setting, msg.value];
 
-    if (!isEngineSetting(setting))
-      return false;
+    if (!isEngineSetting(setting)) return false;
 
     this.applySetting(setting);
     return true;
   }
 
-  private handleSetDatetime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isSetDatetimeMessage(msg))
-      return false;
+  private handleSetDatetime(msg: any): boolean {
+    if (!classicPywwt.isSetDatetimeMessage(msg)) return false;
 
     this.setTime(moment.utc(msg.isot).toDate());
     return true;
   }
 
-  private handlePauseTime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isPauseTimeMessage(msg))
-      return false;
+  private handlePauseTime(msg: any): boolean {
+    if (!classicPywwt.isPauseTimeMessage(msg)) return false;
 
     this.setClockSync(false);
     return true;
   }
 
-  private handleResumeTime(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isResumeTimeMessage(msg))
-      return false;
+  private handleResumeTime(msg: any): boolean {
+    if (!classicPywwt.isResumeTimeMessage(msg)) return false;
 
     this.setClockSync(true);
     this.setClockRate(msg.rate);
     return true;
   }
 
-  private handleTrackObject(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isTrackObjectMessage(msg))
-      return false;
+  private handleTrackObject(msg: any): boolean {
+    if (!classicPywwt.isTrackObjectMessage(msg)) return false;
 
     if (msg.code in SolarSystemObjects) {
       this.setTrackedObject(msg.code as SolarSystemObjects);
@@ -1070,13 +1260,12 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handleModifySettings(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  private handleModifySettings(msg: any): boolean {
     const appModified = settings.maybeAsModifiedAppSettings(msg);
 
     if (appModified !== null) {
       for (const s of appModified) {
-        if (s[0] == "hideAllChrome")
-          this.hideAllChrome = s[1];
+        if (s[0] == "hideAllChrome") this.hideAllChrome = s[1];
       }
 
       return true;
@@ -1096,7 +1285,11 @@ export default class App extends WWTAwareComponent {
     if (closestPt == null && this.lastClosePt == null) {
       return;
     }
-    const needsUpdate = (closestPt == null || this.lastClosePt == null) || ((this.lastClosePt.ra != closestPt.ra) || (this.lastClosePt.dec != closestPt.dec));
+    const needsUpdate =
+      closestPt == null ||
+      this.lastClosePt == null ||
+      this.lastClosePt.ra != closestPt.ra ||
+      this.lastClosePt.dec != closestPt.dec;
     if (needsUpdate) {
       this.lastClosePt = closestPt;
     }
@@ -1109,7 +1302,10 @@ export default class App extends WWTAwareComponent {
 
   wwtOnMouseUp(_event: MouseEvent) {
     if (!this.isMouseMoving && this.lastClosePt !== null) {
-      const source: Source = { ...this.lastClosePt, name: this.nameForSource(this.lastClosePt) };
+      const source: Source = {
+        ...this.lastClosePt,
+        name: this.nameForSource(this.lastClosePt),
+      };
       this.addSource(source);
     }
     this.isMouseMoving = false;
@@ -1119,14 +1315,14 @@ export default class App extends WWTAwareComponent {
   newSourceName = (function () {
     let count = 0;
 
-    return function() {
+    return function () {
       count += 1;
       return `Source ${count}`;
-    }
+    };
   })();
 
-  nameForSource(source: any): string {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    for (const [ key, [from, to]] of Object.entries(this.catalogNameMappings)) {
+  nameForSource(source: any): string {
+    for (const [key, [from, to]] of Object.entries(this.catalogNameMappings)) {
       if (from in source && source["catalogName"] === key) {
         return `${to}: ${source[from]}`;
       }
@@ -1139,7 +1335,9 @@ export default class App extends WWTAwareComponent {
   // These maps are keyed by "external" layer IDs
   private fitsLayers: Map<string, ImageSetLayerMessageHandler> = new Map();
 
-  private getFitsLayerHandler(msg: AnyFitsLayerMessage): ImageSetLayerMessageHandler {
+  private getFitsLayerHandler(
+    msg: AnyFitsLayerMessage
+  ): ImageSetLayerMessageHandler {
     let handler = this.fitsLayers.get(msg.id);
 
     if (handler === undefined) {
@@ -1150,15 +1348,17 @@ export default class App extends WWTAwareComponent {
     return handler;
   }
 
-  private handleCreateImageSetLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  private handleCreateImageSetLayer(msg: any): boolean {
     if (classicPywwt.isCreateFitsLayerMessage(msg)) {
       const createImageSetMessage: classicPywwt.CreateImageSetLayerMessage = {
         event: msg.event,
         url: msg.url,
         id: msg.id,
         mode: "fits",
-      }
-      this.getFitsLayerHandler(createImageSetMessage).handleCreateMessage(createImageSetMessage);
+      };
+      this.getFitsLayerHandler(createImageSetMessage).handleCreateMessage(
+        createImageSetMessage
+      );
       return true;
     }
 
@@ -1170,41 +1370,36 @@ export default class App extends WWTAwareComponent {
     return false;
   }
 
-  private handleSetLayerOrder(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isSetLayerOrderMessage(msg))
-      return false;
+  private handleSetLayerOrder(msg: any): boolean {
+    if (!classicPywwt.isSetLayerOrderMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleSetLayerOrderMessage(msg);
     return true;
   }
 
-  private handleStretchFitsLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isStretchFitsLayerMessage(msg))
-      return false;
+  private handleStretchFitsLayer(msg: any): boolean {
+    if (!classicPywwt.isStretchFitsLayerMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleStretchMessage(msg);
     return true;
   }
 
-  private handleSetFitsLayerColormap(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isSetFitsLayerColormapMessage(msg))
-      return false;
+  private handleSetFitsLayerColormap(msg: any): boolean {
+    if (!classicPywwt.isSetFitsLayerColormapMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleSetColormapMessage(msg);
     return true;
   }
 
-  private handleModifyFitsLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isModifyFitsLayerMessage(msg))
-      return false;
+  private handleModifyFitsLayer(msg: any): boolean {
+    if (!classicPywwt.isModifyFitsLayerMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleModifyMessage(msg);
     return true;
   }
 
-  private handleRemoveImageSetLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isRemoveImageSetLayerMessage(msg))
-      return false;
+  private handleRemoveImageSetLayer(msg: any): boolean {
+    if (!classicPywwt.isRemoveImageSetLayerMessage(msg)) return false;
 
     // NB we never remove the handler! It's tricky due to async issues.
     this.getFitsLayerHandler(msg).handleRemoveMessage(msg);
@@ -1215,7 +1410,9 @@ export default class App extends WWTAwareComponent {
 
   private tableLayers: Map<string, TableLayerMessageHandler> = new Map();
 
-  private getTableLayerHandler(msg: AnyTableLayerMessage): TableLayerMessageHandler {
+  private getTableLayerHandler(
+    msg: AnyTableLayerMessage
+  ): TableLayerMessageHandler {
     let handler = this.tableLayers.get(msg.id);
 
     if (handler === undefined) {
@@ -1226,33 +1423,29 @@ export default class App extends WWTAwareComponent {
     return handler;
   }
 
-  private handleCreateTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isCreateTableLayerMessage(msg))
-      return false;
+  private handleCreateTableLayer(msg: any): boolean {
+    if (!classicPywwt.isCreateTableLayerMessage(msg)) return false;
 
     this.getTableLayerHandler(msg).handleCreateMessage(msg);
     return true;
   }
 
-  private handleUpdateTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isUpdateTableLayerMessage(msg))
-      return false;
+  private handleUpdateTableLayer(msg: any): boolean {
+    if (!classicPywwt.isUpdateTableLayerMessage(msg)) return false;
 
     this.getTableLayerHandler(msg).handleUpdateMessage(msg);
     return true;
   }
 
-  private handleModifyTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isModifyTableLayerMessage(msg))
-      return false;
+  private handleModifyTableLayer(msg: any): boolean {
+    if (!classicPywwt.isModifyTableLayerMessage(msg)) return false;
 
     this.getTableLayerHandler(msg).handleModifyMessage(msg);
     return true;
   }
 
-  private handleRemoveTableLayer(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isRemoveTableLayerMessage(msg))
-      return false;
+  private handleRemoveTableLayer(msg: any): boolean {
+    if (!classicPywwt.isRemoveTableLayerMessage(msg)) return false;
 
     // NB we never remove the handler! It's tricky due to async issues.
     this.getTableLayerHandler(msg).handleRemoveMessage(msg);
@@ -1263,7 +1456,9 @@ export default class App extends WWTAwareComponent {
 
   private annotations: Map<string, AnnotationMessageHandler> = new Map();
 
-  private createAnnotationHandler(msg: classicPywwt.CreateAnnotationMessage): void {
+  private createAnnotationHandler(
+    msg: classicPywwt.CreateAnnotationMessage
+  ): void {
     const handler = AnnotationMessageHandler.tryCreate(this, msg);
 
     if (handler !== null) {
@@ -1271,21 +1466,21 @@ export default class App extends WWTAwareComponent {
     }
   }
 
-  private lookupAnnotationHandler(msg: AnyAnnotationMessage): AnnotationMessageHandler | undefined {
+  private lookupAnnotationHandler(
+    msg: AnyAnnotationMessage
+  ): AnnotationMessageHandler | undefined {
     return this.annotations.get(msg.id);
   }
 
-  private handleCreateAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isCreateAnnotationMessage(msg))
-      return false;
+  private handleCreateAnnotation(msg: any): boolean {
+    if (!classicPywwt.isCreateAnnotationMessage(msg)) return false;
 
     this.createAnnotationHandler(msg);
     return true;
   }
 
-  private handleModifyAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isModifyAnnotationMessage(msg))
-      return false;
+  private handleModifyAnnotation(msg: any): boolean {
+    if (!classicPywwt.isModifyAnnotationMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
     if (handler !== undefined) {
@@ -1294,9 +1489,8 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handleSetCircleCenter(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isSetCircleCenterMessage(msg))
-      return false;
+  private handleSetCircleCenter(msg: any): boolean {
+    if (!classicPywwt.isSetCircleCenterMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
     if (handler !== undefined) {
@@ -1305,9 +1499,8 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handleAddLinePoint(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isAddLinePointMessage(msg))
-      return false;
+  private handleAddLinePoint(msg: any): boolean {
+    if (!classicPywwt.isAddLinePointMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
     if (handler !== undefined) {
@@ -1316,9 +1509,8 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handleAddPolygonPoint(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isAddPolygonPointMessage(msg))
-      return false;
+  private handleAddPolygonPoint(msg: any): boolean {
+    if (!classicPywwt.isAddPolygonPointMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
     if (handler !== undefined) {
@@ -1327,9 +1519,8 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handleRemoveAnnotation(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isRemoveAnnotationMessage(msg))
-      return false;
+  private handleRemoveAnnotation(msg: any): boolean {
+    if (!classicPywwt.isRemoveAnnotationMessage(msg)) return false;
 
     const handler = this.lookupAnnotationHandler(msg);
     if (handler !== undefined) {
@@ -1339,9 +1530,8 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handleClearAnnotations(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isClearAnnotationsMessage(msg))
-      return false;
+  private handleClearAnnotations(msg: any): boolean {
+    if (!classicPywwt.isClearAnnotationsMessage(msg)) return false;
 
     this.clearAnnotations();
     return true;
@@ -1349,9 +1539,8 @@ export default class App extends WWTAwareComponent {
 
   // Tours:
 
-  private handleLoadTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isLoadTourMessage(msg))
-      return false;
+  private handleLoadTour(msg: any): boolean {
+    if (!classicPywwt.isLoadTourMessage(msg)) return false;
 
     this.loadTour({
       url: msg.url,
@@ -1360,19 +1549,17 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handlePauseTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isPauseTourMessage(msg))
-      return false;
+  private handlePauseTour(msg: any): boolean {
+    if (!classicPywwt.isPauseTourMessage(msg)) return false;
 
-    this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    this.toggleTourPlayPauseState(); // note half-assed semantics here!
     return true;
   }
 
-  private handleResumeTour(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isResumeTourMessage(msg))
-      return false;
+  private handleResumeTour(msg: any): boolean {
+    if (!classicPywwt.isResumeTourMessage(msg)) return false;
 
-    this.toggleTourPlayPauseState();  // note half-assed semantics here!
+    this.toggleTourPlayPauseState(); // note half-assed semantics here!
     return true;
   }
 
@@ -1400,14 +1587,13 @@ export default class App extends WWTAwareComponent {
     const clockRate = this.wwtClockRate;
 
     const needUpdate =
-      (ra != this.lastUpdatedRA) ||
-      (dec != this.lastUpdatedDec) ||
-      (fov != this.lastUpdatedFov) ||
-      (clockRate != this.lastUpdatedClockRate) ||
-      (Date.now() - this.lastUpdatedTimestamp) > 60000;
+      ra != this.lastUpdatedRA ||
+      dec != this.lastUpdatedDec ||
+      fov != this.lastUpdatedFov ||
+      clockRate != this.lastUpdatedClockRate ||
+      Date.now() - this.lastUpdatedTimestamp > 60000;
 
-    if (!needUpdate)
-      return;
+    if (!needUpdate) return;
 
     const message: ViewStateMessage = {
       type: "wwt_view_state",
@@ -1431,7 +1617,7 @@ export default class App extends WWTAwareComponent {
     this.lastUpdatedTimestamp = Date.now();
   }
 
-  @Watch('wwtClockDiscontinuities')
+  @Watch("wwtClockDiscontinuities")
   onClockDiscontinuitiesChanged(_count: number) {
     // Force a clock update message.
     this.lastUpdatedTimestamp = 0;
@@ -1462,20 +1648,23 @@ export default class App extends WWTAwareComponent {
   // Background / foreground imagesets
 
   get curAvailableImagesets() {
-    if (this.wwtAvailableImagesets == null)
-      return [];
-    return this.wwtAvailableImagesets.filter(info => info.type == this.wwtRenderType && !info.extension.includes("tsv"));
+    if (this.wwtAvailableImagesets == null) return [];
+    return this.wwtAvailableImagesets.filter(
+      (info) =>
+        info.type == this.wwtRenderType && !info.extension.includes("tsv")
+    );
   }
 
   get curAvailableCatalogs() {
-    if (this.wwtAvailableImagesets == null)
-      return [];
-    return this.wwtAvailableImagesets.filter(info => info.type == this.wwtRenderType && info.extension.includes("tsv"));
+    if (this.wwtAvailableImagesets == null) return [];
+    return this.wwtAvailableImagesets.filter(
+      (info) =>
+        info.type == this.wwtRenderType && info.extension.includes("tsv")
+    );
   }
 
   get curBackgroundImagesetName() {
-    if (this.wwtBackgroundImageset == null)
-      return "";
+    if (this.wwtBackgroundImageset == null) return "";
     return this.wwtBackgroundImageset.get_name();
   }
 
@@ -1491,33 +1680,29 @@ export default class App extends WWTAwareComponent {
     this.setForegroundOpacity(o);
   }
 
-  private handleSetBackgroundByName(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isSetBackgroundByNameMessage(msg))
-      return false;
+  private handleSetBackgroundByName(msg: any): boolean {
+    if (!classicPywwt.isSetBackgroundByNameMessage(msg)) return false;
 
     this.setBackgroundImageByName(msg.name);
     return true;
   }
 
-  private handleSetForegroundByName(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isSetForegroundByNameMessage(msg))
-      return false;
+  private handleSetForegroundByName(msg: any): boolean {
+    if (!classicPywwt.isSetForegroundByNameMessage(msg)) return false;
 
     this.setForegroundImageByName(msg.name);
     return true;
   }
 
-  private handleSetForegroundOpacity(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isSetForegroundOpacityMessage(msg))
-      return false;
+  private handleSetForegroundOpacity(msg: any): boolean {
+    if (!classicPywwt.isSetForegroundOpacityMessage(msg)) return false;
 
     this.setForegroundOpacity(msg.value);
     return true;
   }
 
-  private handleSetViewerMode(msg: any): boolean {  // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!classicPywwt.isSetViewerModeMessage(msg))
-      return false;
+  private handleSetViewerMode(msg: any): boolean {
+    if (!classicPywwt.isSetViewerModeMessage(msg)) return false;
 
     this.setBackgroundImageByName(msg.mode);
     this.setForegroundImageByName(msg.mode);
@@ -1528,7 +1713,7 @@ export default class App extends WWTAwareComponent {
 
   addHips(catalog: ImagesetInfo): Promise<Imageset> {
     this.addResearchAppCatalogHips(catalog);
-    return this.addCatalogHipsByName({name: catalog.name}).then((imgset) => {
+    return this.addCatalogHipsByName({ name: catalog.name }).then((imgset) => {
       const hips = imgset.get_hipsProperties();
 
       if (hips !== null) {
@@ -1554,7 +1739,7 @@ export default class App extends WWTAwareComponent {
     this.addHips(catalog);
   }
 
-  @Watch('curAvailableCatalogs')
+  @Watch("curAvailableCatalogs")
   onAvailableCatalogsChanged(catalogs: ImagesetInfo[]) {
     // Notify clients about the new catalogs
 
@@ -1564,8 +1749,8 @@ export default class App extends WWTAwareComponent {
     const msg: ApplicationStateMessage = {
       type: "wwt_application_state",
       sessionId: this.statusMessageSessionId,
-      hipsCatalogNames: catalogs.map((img) => img.name)
-    }
+      hipsCatalogNames: catalogs.map((img) => img.name),
+    };
 
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
   }
@@ -1573,16 +1758,14 @@ export default class App extends WWTAwareComponent {
   // A client has requested that we load a HiPS catalog. Once it's loaded we
   // reply to the client with the details of the catalog-as-spreadsheet-layer,
   // so that it can know what the catalog's characteristics are.
-  private handleLoadHipsCatalog(msg: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!layers.isLoadHipsCatalogMessage(msg))
-      return false;
+  private handleLoadHipsCatalog(msg: any): boolean {
+    if (!layers.isLoadHipsCatalogMessage(msg)) return false;
 
     for (const cat of this.curAvailableCatalogs) {
       if (cat.name == msg.name) {
         this.addHips(cat).then((imgset) => {
           const hips = imgset.get_hipsProperties();
-          if (hips === null)
-            throw new Error('internal consistency failure');
+          if (hips === null) throw new Error("internal consistency failure");
 
           const layer = hips.get_catalogSpreadSheetLayer();
 
@@ -1599,10 +1782,12 @@ export default class App extends WWTAwareComponent {
 
           // Reply?
 
-          if (msg.threadId === undefined)
-            return;
+          if (msg.threadId === undefined) return;
 
-          if (this.statusMessageDestination === null || this.allowedOrigin === null)
+          if (
+            this.statusMessageDestination === null ||
+            this.allowedOrigin === null
+          )
             return;
 
           const settings = extractSpreadSheetLayerSettings(layer);
@@ -1610,8 +1795,7 @@ export default class App extends WWTAwareComponent {
 
           for (const s of settings) {
             const ps = convertSpreadSheetLayerSetting(s);
-            if (ps !== null)
-              pysettings.push(ps);
+            if (ps !== null) pysettings.push(ps);
           }
 
           const ssli: layers.SpreadSheetLayerInfo = {
@@ -1623,7 +1807,7 @@ export default class App extends WWTAwareComponent {
             event: "layer_hipscat_load_completed",
             threadId: msg.threadId,
             spreadsheetInfo: ssli,
-          }
+          };
 
           this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
         });
@@ -1635,9 +1819,8 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  private handleGetHipsCatalogDataInView(msg: any): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (!layers.isGetHipsCatalogDataInViewMessage(msg))
-      return false;
+  private handleGetHipsCatalogDataInView(msg: any): boolean {
+    if (!layers.isGetHipsCatalogDataInViewMessage(msg)) return false;
 
     // Unlike most table-layer messages, here we don't bother to try to work
     // well when messages are out-of-order or what have you.
@@ -1646,10 +1829,16 @@ export default class App extends WWTAwareComponent {
     if (handler !== undefined) {
       handler.handleGetHipsDataInViewMessage(msg).then((reply) => {
         if (reply !== null) {
-          if (this.statusMessageDestination !== null && this.allowedOrigin !== null)
-            this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+          if (
+            this.statusMessageDestination !== null &&
+            this.allowedOrigin !== null
+          )
+            this.statusMessageDestination.postMessage(
+              reply,
+              this.allowedOrigin
+            );
         }
-      })
+      });
     }
 
     return true;
@@ -1660,10 +1849,12 @@ export default class App extends WWTAwareComponent {
   currentTool: ToolType = null;
 
   get showCrossfader() {
-    if (this.wwtIsTourPlaying)
-      return false; // maybe show this if tour player is active but not playing?
+    if (this.wwtIsTourPlaying) return false; // maybe show this if tour player is active but not playing?
 
-    if (this.wwtForegroundImageset == null || this.wwtForegroundImageset === undefined)
+    if (
+      this.wwtForegroundImageset == null ||
+      this.wwtForegroundImageset === undefined
+    )
       return false;
 
     return this.wwtForegroundImageset != this.wwtBackgroundImageset;
@@ -1678,7 +1869,7 @@ export default class App extends WWTAwareComponent {
   }
 
   get showCatalogChooser() {
-    return this.currentTool == 'choose-catalog';
+    return this.currentTool == "choose-catalog";
   }
 
   get haveLayers() {
@@ -1714,27 +1905,35 @@ export default class App extends WWTAwareComponent {
 
   doZoom(zoomIn: boolean) {
     if (zoomIn) {
-      this.zoom(1/1.3);
+      this.zoom(1 / 1.3);
     } else {
       this.zoom(1.3);
     }
   }
 
   doMove(x: number, y: number) {
-    this.move({ x: x, y: y});
+    this.move({ x: x, y: y });
   }
 
   doTilt(x: number, y: number) {
-    this.tilt({ x: x, y: y});
+    this.tilt({ x: x, y: y });
   }
 
   // For filtering imagesets
   filterImagesets(imagesets: ImagesetInfo[], searchText: string) {
-    return imagesets.filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
+    return imagesets.filter(
+      (iset) =>
+        iset.name.toLowerCase().includes(searchText) ||
+        iset.description.toLowerCase().includes(searchText)
+    );
   }
 
   filterCatalogs(imagesets: ImagesetInfo[], searchText: string) {
-    return imagesets.filter(iset => iset.name.toLowerCase().includes(searchText) || iset.description.toLowerCase().includes(searchText));
+    return imagesets.filter(
+      (iset) =>
+        iset.name.toLowerCase().includes(searchText) ||
+        iset.description.toLowerCase().includes(searchText)
+    );
   }
 
   closestInView(target: AngleCoordinates, threshold?: number): Source | null {
@@ -1762,11 +1961,16 @@ export default class App extends WWTAwareComponent {
       const latCol = layer.get_latColumn();
 
       const itemCreator = function (values: string[]): Source {
-        const obj: any = {};  // eslint-disable-line @typescript-eslint/no-explicit-any
+        const obj: any = {};
         for (let i = 0; i < values.length; i++) {
           obj[colNames[i]] = values[i];
         }
-        return { ...obj, ra: D2R * Number(values[lngCol]), dec: D2R * Number(values[latCol]), catalogName: name };
+        return {
+          ...obj,
+          ra: D2R * Number(values[lngCol]),
+          dec: D2R * Number(values[latCol]),
+          catalogName: name,
+        };
       };
 
       for (const row of rows) {
@@ -1792,10 +1996,10 @@ export default class App extends WWTAwareComponent {
       showPopover: false,
       showLayers: true,
       showSources: true,
-    }
+    };
   }
 
-  /** The factor of 0.00002 converts between the WWT 
+  /** The factor of 0.00002 converts between the WWT
    * engine zoom and the distance between points.
    * This value doesn't come from anywhere in particular,
    * other than the cursor -> pointer change feeling natural
@@ -1804,7 +2008,7 @@ export default class App extends WWTAwareComponent {
     app.distanceThreshold = 0.00002 * newZoom;
   }, 20);
 
-  @Watch('wwtZoomDeg', { immediate: true })
+  @Watch("wwtZoomDeg", { immediate: true })
   onZoomChange(val: number) {
     this.updateDistanceThreshold(this, val);
   }
@@ -1855,7 +2059,7 @@ body {
   z-index: 10;
   top: 0.5rem;
   right: 0.5rem;
-  color: #FFF;
+  color: #fff;
 
   list-style-type: none;
   margin: 0;
@@ -1877,11 +2081,11 @@ body {
   z-index: 10;
   bottom: 3rem;
   left: 50%;
-  color: #FFF;
+  color: #fff;
   transform: translate(-50%, -50%);
 
   a {
-    color: #5588FF;
+    color: #5588ff;
   }
 }
 
@@ -1889,7 +2093,7 @@ body {
   position: absolute;
   top: 0.5rem;
   left: 50%;
-  color: #FFF;
+  color: #fff;
 
   .tool-container {
     position: relative;
@@ -1930,7 +2134,6 @@ body {
   & a .icon {
     padding: 0px 7px;
   }
-
 }
 
 .display-section-header {
@@ -2046,16 +2249,16 @@ body {
     }
   }
 
-  &[aria-hidden='true'] {
+  &[aria-hidden="true"] {
     visibility: hidden;
     opacity: 0;
-    transition: opacity .15s, visibility .15s;
+    transition: opacity 0.15s, visibility 0.15s;
   }
 
-  &[aria-hidden='false'] {
+  &[aria-hidden="false"] {
     visibility: visible;
     opacity: 1;
-    transition: opacity .15s;
+    transition: opacity 0.15s;
   }
 }
 
@@ -2082,7 +2285,7 @@ ul.tool-menu {
 
     &:hover {
       background-color: #000;
-      color: #FFF;
+      color: #fff;
     }
   }
 }
@@ -2144,5 +2347,4 @@ The alternative to this is to have Vue bind a class to the last element
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-
 </style>
