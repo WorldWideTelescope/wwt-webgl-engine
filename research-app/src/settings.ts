@@ -4,7 +4,7 @@
 /** Mapping JSON-serialized settings to runtime values.
  */
 
- import {
+import {
   AltTypes,
   AltUnits,
   CoordinatesType,
@@ -41,7 +41,7 @@ const typedMarkerScales: { [ix: string]: MarkerScales | undefined } = MarkerScal
 const typedPlotTypes: { [ix: string]: PlotTypes | undefined } = PlotTypes as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 const typedRAUnits: { [ix: string]: RAUnits | undefined } = RAUnits as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-function enumNameToValue<T, E>(name: T, typemap: { [ix: string]: E | undefined}, ix: string): [T, E] | null {
+function enumNameToValue<T, E>(name: T, typemap: { [ix: string]: E | undefined }, ix: string): [T, E] | null {
   const m = typemap[ix];
 
   if (m === undefined)
@@ -50,7 +50,7 @@ function enumNameToValue<T, E>(name: T, typemap: { [ix: string]: E | undefined},
   return [name, m];
 }
 
-function enumValueToName<T, E>(name: T, typemap: { [ix: string]: E | undefined}, val: E): [T, string] | null {
+function enumValueToName<T, E>(name: T, typemap: { [ix: string]: E | undefined }, val: E): [T, string] | null {
   for (const [vn, ival] of Object.entries(typemap)) {
     if (ival === val)
       return [name, vn];
