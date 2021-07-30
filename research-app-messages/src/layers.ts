@@ -90,7 +90,7 @@ export interface SpreadSheetLayerInfo {
  * This message will result in a [[GetHipsCatalogDataInViewReply]] if the
  * input parameters are all correct.
  */
- export interface GetHipsCatalogDataInViewMessage {
+export interface GetHipsCatalogDataInViewMessage {
   /** The tag identifying this message type. */
   event: 'layer_hipscat_datainview';
 
