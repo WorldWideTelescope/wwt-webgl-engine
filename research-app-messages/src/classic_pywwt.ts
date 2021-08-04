@@ -187,7 +187,11 @@ export function isCreateAnnotationMessage(o: any): o is CreateAnnotationMessage 
 }
 
 
-/** A command to create an image set layer. */
+/** A command to create an image set layer.
+ *
+ * This command is a more flexible evolution of [[CreateFitsLayerMessage]]. They
+ * have the same [[event]] tag, but this one has a [[mode]] parameter.
+ * */
 export interface CreateImageSetLayerMessage {
   /** The tag identifying this message type. */
   event: "image_layer_create";
@@ -205,24 +209,28 @@ export interface CreateImageSetLayerMessage {
    * imageset that has already been loaded into the engine. The default is
    * "autodetect", which will assume "fits" if the URL ends in a FITS-like
    * extension, otherwise "preloaded". */
-  mode?: "autodetect" | "fits" | "preloaded";
+  mode: "autodetect" | "fits" | "preloaded";
 
-  /** Go to centre of the data. Defaults to true.*/
+  /** Go to centre of the data. Defaults to true. */
   goto?: boolean;
 }
 
-/** Type guard function for CreateImageSetLayerMessage. */
+/** Type guard function for [[CreateImageSetLayerMessage]]. */
 export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "image_layer_create" &&
     typeof o.id === "string" &&
     typeof o.url === "string" &&
-    (o.mode === undefined || o.mode == "autodetect" || o.mode == "fits" || o.mode == "preloaded") &&
+    (o.mode == "autodetect" || o.mode == "fits" || o.mode == "preloaded") &&
     (o.goto === undefined || typeof o.goto === "boolean");
 }
 
-/** Deprecated, use CreateImageSetLayerMessage instead.
- *  A command to create a fits layer. */
+/** A command to create a FITS-backed images set layer.
+ *
+ * This command is deprecated. You should use [[CreateImageSetLayerMessage]]
+ * instead. The two commands have the same [[event]] tag, but this one lacks
+ * a `mode` parameter.
+ * */
 export interface CreateFitsLayerMessage {
   /** The tag identifying this message type. */
   event: "image_layer_create";
@@ -232,12 +240,17 @@ export interface CreateFitsLayerMessage {
   url: string;
 }
 
-/** Type guard function for CreateFitsLayerMessage. */
+/** Type guard function for [[CreateFitsLayerMessage]].
+ *
+ * These messages may not have a `mode` field, so that they can be distinguished
+ * from [[CreateImageSetLayerMessage]] instances.
+ * */
 export function isCreateFitsLayerMessage(o: any): o is CreateFitsLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "image_layer_create" &&
     typeof o.id === "string" &&
-    typeof o.url === "string";
+    typeof o.url === "string" &&
+    typeof o.mode === "undefined";
 }
 
 /** A command to set a layer's order in the draw cycle. */
@@ -840,6 +853,8 @@ export type PywwtMessage =
 */
 export function applyBaseUrlIfApplicable(o: any, baseurl: string): void {  // eslint-disable-line @typescript-eslint/no-explicit-any
   if (isCreateImageSetLayerMessage(o)) {
+    o.url = new URL(o.url, baseurl).toString();
+  } else if (isCreateFitsLayerMessage(o)) {
     o.url = new URL(o.url, baseurl).toString();
   } else if (isLoadImageCollectionMessage(o)) {
     o.url = new URL(o.url, baseurl).toString();
