@@ -13,12 +13,15 @@ import {
   Guid,
   Imageset,
   ImageSetLayer,
+  InViewReturnMessage,
   SpreadSheetLayer,
 } from "@wwtelescope/engine";
 
 import {
+  AddCatalogHipsByNameOptions,
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
+  GetCatalogHipsDataInViewOptions,
   GotoTargetOptions,
   AddImageSetLayerOptions,
   LoadFitsLayerOptions,
@@ -254,6 +257,8 @@ export class WWTAwareComponent extends Vue {
         wwtShowWebGl2Warning: (state, _getters) => (state as WWTEngineVuexState).showWebGl2Warning,
       }),
       ...mapGetters([
+        "findRADecForScreenPoint",
+        "layerForHipsCatalog",
         "lookupImageset",
       ]),
       ...this.$options.computed,
@@ -266,7 +271,9 @@ export class WWTAwareComponent extends Vue {
     this.$options.methods = {
       ...this.$options.methods,
       ...mapActions([
+        "addCatalogHipsByName",
         "createTableLayer",
+        "getCatalogHipsDataInView",
         "gotoRADecZoom",
         "gotoTarget",
         "loadImageCollection",
@@ -283,6 +290,7 @@ export class WWTAwareComponent extends Vue {
         "clearAnnotations",
         "deleteLayer",
         "removeAnnotation",
+        "removeCatalogHipsByName",
         "seekToTourTimecode",
         "setBackgroundImageByName",
         "setClockRate",
@@ -445,6 +453,14 @@ export class WWTAwareComponent extends Vue {
    */
   lookupImageset!: (_n: string) => Imageset | null;
 
+  /** Get the right ascension and declination, in degrees, for x, y coordinates on the screen */
+  findRADecForScreenPoint!: (pt: { x: number; y: number }) => { ra: number; dec: number };
+
+  /** Get the SpreadSheetLayer corresponding to the HiPS catalog with the given name
+   * Returns null if such a catalog has not been loaded into the engine
+   */
+  layerForHipsCatalog!: (name: string) => SpreadSheetLayer | null;
+
   // Mutations
 
   /** Add an [Annotation](../../engine/classes/annotation.html) to the view. */
@@ -474,6 +490,9 @@ export class WWTAwareComponent extends Vue {
 
   /** Remove the specified [Annotation](../../engine/classes/annotation.html) from the view. */
   removeAnnotation!: (_a: Annotation) => void;
+
+  /** Remove a "catalog HiPS" dataset to the current view, by name. */
+  removeCatalogHipsByName!: (name: string) => void;
 
   /** Seek tour playback to the specified timecode.
    *
@@ -535,7 +554,7 @@ export class WWTAwareComponent extends Vue {
    */
   setForegroundOpacity!: (o: number) => void;
 
-  /** Change the [ImageSetLayer](../../engine/classes/imagesetlayer.html) 
+  /** Change the [ImageSetLayer](../../engine/classes/imagesetlayer.html)
    * position in the draw cycle.
    */
   setImageSetLayerOrder!: (_o: SetLayerOrderOptions) => void;
@@ -605,18 +624,27 @@ export class WWTAwareComponent extends Vue {
   zoom!: (f: number) => void;
 
   /** Moves the position of the view */
-  move!: ({ x, y }: { x: number; y: number }) => void;
+  move!: (args: { x: number; y: number }) => void;
 
   /** Tilts the position of the view */
-  tilt!: ({ x, y }: { x: number; y: number }) => void;
+  tilt!: (args: { x: number; y: number }) => void;
 
   // Actions
+
+  /** Add a "catalog HiPS" dataset to the current view, by name.
+   *
+   * If the catalog name is not in the engine's registry, the promise rejects.
+   */
+  addCatalogHipsByName!: (_o: AddCatalogHipsByNameOptions) => Promise<Imageset>;
 
   /** Request the creation of a tabular data layer.
    *
    * The action resolves to a new [SpreadSheetLayer](../../engine/classes/spreadsheetlayer.html) instance.
    */
   createTableLayer!: (_o: CreateTableLayerParams) => Promise<SpreadSheetLayer>;
+
+  /** Request an export of the catalog HiPS data within the current viewport. */
+  getCatalogHipsDataInView!: (o: GetCatalogHipsDataInViewOptions) => Promise<InViewReturnMessage>;
 
   /** Command the view to steer to a specific configuration.
    *

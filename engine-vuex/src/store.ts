@@ -19,14 +19,17 @@ import {
   Guid,
   Imageset,
   ImageSetLayer,
+  InViewReturnMessage,
   SpreadSheetLayer,
   WWTControl,
 } from "@wwtelescope/engine";
 
 import {
-  ApplyFitsLayerSettingsOptions,
+  AddCatalogHipsByNameOptions,
   AddImageSetLayerOptions,
+  ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
+  GetCatalogHipsDataInViewOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
@@ -178,7 +181,7 @@ export interface WWTEngineVuexState {
   tourTimecode: number;
 
   showWebGl2Warning: boolean;
-  
+
   /** The current zoom level of the view, in degrees.
    *
    * The zoom level is the angular height of the viewport, times size.
@@ -273,6 +276,28 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       if (Vue.$wwt.inst === null)
         throw new Error('cannot lookupImageset without linking to WWTInstance');
       return Vue.$wwt.inst.ctl.getImagesetByName(imagesetName);
+    }
+  }
+
+  get findRADecForScreenPoint() {
+    return function (pt: { x: number; y: number }): { ra: number; dec: number } {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
+      const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
+      return { ra: (15 * coords.x + 720) % 360, dec: coords.y };
+    }
+  }
+
+  get layerForHipsCatalog() {
+    return function (name: string): SpreadSheetLayer | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
+      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
+      if (layer !== null && layer instanceof SpreadSheetLayer) {
+        return layer;
+      } else {
+        return null;
+      }
     }
   }
 
@@ -382,6 +407,27 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.$wwt.inst.setupForImageset(options);
   }
 
+  @Action({ rawError: true })
+  addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
+    return Vue.$wwt.inst.addCatalogHipsByName(options);
+  }
+
+  @Action({ rawError: true })
+  getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot getCatalogHipsDataInView without linking to WWTInstance');
+    return Vue.$wwt.inst.getCatalogHipsDataInView(options);
+  }
+
+  @Mutation
+  removeCatalogHipsByName(name: string): void {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
+    Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
+  }
+
   @Mutation
   zoom(factor: number): void {
     if (Vue.$wwt.inst === null)
@@ -390,17 +436,17 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Mutation
-  move(obj: { x: number; y: number }): void {
+  move(args: { x: number; y: number }): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot move without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.move(obj.x, obj.y);
+    Vue.$wwt.inst.ctl.move(args.x, args.y);
   }
 
   @Mutation
-  tilt(obj: { x: number; y: number}): void {
+  tilt(args: { x: number; y: number }): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot tilt without linking to WWTInstance');
-    Vue.$wwt.inst.ctl._tilt(obj.x, obj.y);
+    Vue.$wwt.inst.ctl._tilt(args.x, args.y);
   }
 
   @Mutation
@@ -530,7 +576,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @MutationAction
   async loadTour(
-    {url, play}: LoadTourParams
+    { url, play }: LoadTourParams
   ) {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadTour without linking to WWTInstance');
@@ -567,7 +613,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Action({ rawError: true })
   async loadImageCollection(
-    {url, loadChildFolders}: LoadImageCollectionParams
+    { url, loadChildFolders }: LoadImageCollectionParams
   ): Promise<Folder> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
@@ -593,12 +639,12 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadFitsLayer without linking to WWTInstance');
     const addImageSetLayerOptions: AddImageSetLayerOptions = {
-      url: options.url, 
+      url: options.url,
       mode: "fits",
       name: options.name,
       goto: options.gotoTarget
     };
-    
+
     return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
   }
 
@@ -718,4 +764,5 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('cannot clearAnnotations without linking to WWTInstance');
     Vue.$wwt.inst.si.clearAnnotations();
   }
+
 }

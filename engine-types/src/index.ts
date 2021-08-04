@@ -261,7 +261,11 @@ export interface Thumbnail {
 export type BaseEngineSetting =
   ["actualPlanetScale", boolean] |
   ["constellations", boolean] |
+  ["constellationBoundryColor", string] |
+  ["constellationFigureColor", string] |
   ["constellationsEnabled", string] |
+  ["constellationSelectionColor", string] |
+  ["crosshairsColor", string] |
   ["earthCutawayView", boolean] |
   ["fovCamera", number] |
   ["fovEyepiece", number] |
@@ -323,7 +327,11 @@ export type BaseEngineSetting =
 const baseEngineSettingTypeInfo = {
   "actualPlanetScale/boolean": true,
   "constellations/boolean": true,
+  "constellationBoundryColor/string": true,
+  "constellationFigureColor/string": true,
   "constellationsEnabled/string": true,
+  "constellationSelectionColor/string": true,
+  "crosshairsColor/string": true,
   "earthCutawayView/boolean": true,
   "fovCamera/number": true,
   "fovEyepiece/number": true,

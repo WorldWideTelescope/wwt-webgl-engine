@@ -4,7 +4,7 @@
 /** Mapping JSON-serialized settings to runtime values.
  */
 
- import {
+import {
   AltTypes,
   AltUnits,
   CoordinatesType,
@@ -41,7 +41,7 @@ const typedMarkerScales: { [ix: string]: MarkerScales | undefined } = MarkerScal
 const typedPlotTypes: { [ix: string]: PlotTypes | undefined } = PlotTypes as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 const typedRAUnits: { [ix: string]: RAUnits | undefined } = RAUnits as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-function mapEnumSetting<T, E>(name: T, typemap: { [ix: string]: E | undefined}, ix: string): [T, E] | null {
+function enumNameToValue<T, E>(name: T, typemap: { [ix: string]: E | undefined }, ix: string): [T, E] | null {
   const m = typemap[ix];
 
   if (m === undefined)
@@ -50,21 +50,30 @@ function mapEnumSetting<T, E>(name: T, typemap: { [ix: string]: E | undefined}, 
   return [name, m];
 }
 
+function enumValueToName<T, E>(name: T, typemap: { [ix: string]: E | undefined }, val: E): [T, string] | null {
+  for (const [vn, ival] of Object.entries(typemap)) {
+    if (ival === val)
+      return [name, vn];
+  }
+
+  return null;
+}
+
 export function convertPywwtSpreadSheetLayerSetting(setting: classicPywwt.PywwtSpreadSheetLayerSetting, layer: SpreadSheetLayer): SpreadSheetLayerSetting | null {
   if (setting[0] == "altColumn") {
     return [setting[0], colValToIndex(layer, setting[1])];
   } else if (setting[0] == "altType") {
-    return mapEnumSetting(setting[0], typedAltTypes, setting[1]);
+    return enumNameToValue(setting[0], typedAltTypes, setting[1]);
   } else if (setting[0] == "altUnit") {
-    return mapEnumSetting(setting[0], typedAltUnits, setting[1]);
+    return enumNameToValue(setting[0], typedAltUnits, setting[1]);
   } else if (setting[0] == "cartesianScale") {
-    return mapEnumSetting(setting[0], typedAltUnits, setting[1]);
+    return enumNameToValue(setting[0], typedAltUnits, setting[1]);
   } else if (setting[0] == "color") {
     return [setting[0], Color.fromHex(setting[1])];
   } else if (setting[0] == "colorMapColumn") {
     return [setting[0], colValToIndex(layer, setting[1])];
   } else if (setting[0] == "coordinatesType") {
-    return mapEnumSetting(setting[0], typedCoordinatesType, setting[1]);
+    return enumNameToValue(setting[0], typedCoordinatesType, setting[1]);
   } else if (setting[0] == "endDateColumn") {
     return [setting[0], colValToIndex(layer, setting[1])];
   } else if (setting[0] == "geometryColumn") {
@@ -78,11 +87,11 @@ export function convertPywwtSpreadSheetLayerSetting(setting: classicPywwt.PywwtS
   } else if (setting[0] == "markerColumn") {
     return [setting[0], colValToIndex(layer, setting[1])];
   } else if (setting[0] == "markerScale") {
-    return mapEnumSetting(setting[0], typedMarkerScales, setting[1]);
+    return enumNameToValue(setting[0], typedMarkerScales, setting[1]);
   } else if (setting[0] == "nameColumn") {
     return [setting[0], colValToIndex(layer, setting[1])];
   } else if (setting[0] == "plotType") {
-    return mapEnumSetting(setting[0], typedPlotTypes, setting[1]);
+    return enumNameToValue(setting[0], typedPlotTypes, setting[1]);
   } else if (setting[0] == "pointScaleType") {
     // Unusual: pywwt sends this one as a number not a string
     if (setting[1] in PointScaleTypes) {
@@ -91,7 +100,7 @@ export function convertPywwtSpreadSheetLayerSetting(setting: classicPywwt.PywwtS
       return null;
     }
   } else if (setting[0] == "raUnits") {
-    return mapEnumSetting(setting[0], typedRAUnits, setting[1]);
+    return enumNameToValue(setting[0], typedRAUnits, setting[1]);
   } else if (setting[0] == "sizeColumn") {
     return [setting[0], colValToIndex(layer, setting[1])];
   } else if (setting[0] == "startDateColumn") {
@@ -102,6 +111,28 @@ export function convertPywwtSpreadSheetLayerSetting(setting: classicPywwt.PywwtS
     return [setting[0], colValToIndex(layer, setting[1])];
   } else if (setting[0] == "zAxisColumn") {
     return [setting[0], colValToIndex(layer, setting[1])];
+  }
+
+  return setting;
+}
+
+export function convertSpreadSheetLayerSetting(setting: SpreadSheetLayerSetting): classicPywwt.PywwtSpreadSheetLayerSetting | null {
+  if (setting[0] == "altType") {
+    return enumValueToName(setting[0], typedAltTypes, setting[1]);
+  } else if (setting[0] == "altUnit") {
+    return enumValueToName(setting[0], typedAltUnits, setting[1]);
+  } else if (setting[0] == "cartesianScale") {
+    return enumValueToName(setting[0], typedAltUnits, setting[1]);
+  } else if (setting[0] == "color") {
+    return [setting[0], setting[1].toString()];
+  } else if (setting[0] == "coordinatesType") {
+    return enumValueToName(setting[0], typedCoordinatesType, setting[1]);
+  } else if (setting[0] == "markerScale") {
+    return enumValueToName(setting[0], typedMarkerScales, setting[1]);
+  } else if (setting[0] == "plotType") {
+    return enumValueToName(setting[0], typedPlotTypes, setting[1]);
+  } else if (setting[0] == "raUnits") {
+    return enumValueToName(setting[0], typedRAUnits, setting[1]);
   }
 
   return setting;
