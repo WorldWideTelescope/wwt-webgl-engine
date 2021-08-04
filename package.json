@@ -12,6 +12,7 @@
     "serve-research": "cd research-app && npm run serve"
   },
   "dependencies": {
+    "@types/debounce": "^1.2.0",
     "@types/vue-color": "^2.4.3",
     "@types/vue-select": "^3.11.1",
     "@wwtelescope/astro": "file:astro",
@@ -24,6 +25,7 @@
     "@wwtelescope/engine-vuex": "file:engine-vuex",
     "@wwtelescope/research-app": "file:research-app",
     "@wwtelescope/research-app-messages": "file:research-app-messages",
+    "debounce": "^1.2.1",
     "vue-color": "^2.8.1",
     "vue-select": "^3.11.2"
   },

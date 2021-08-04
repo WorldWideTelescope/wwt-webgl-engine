@@ -22,7 +22,7 @@ import { PywwtSpreadSheetLayerSetting } from './classic_pywwt';
  * HiPS catalogs are a bit funky because in some ways, they behave like
  * imagesets, while in other ways, they behave like data table layers.
  *
- * This message may result in a [[LoadsHipsCatalogCompletedMessage]] reply, if
+ * This message may result in a [[LoadHipsCatalogCompletedMessage]] reply, if
  * you specify the [[threadId]].
  */
 export interface LoadHipsCatalogMessage {
@@ -90,7 +90,7 @@ export interface SpreadSheetLayerInfo {
  * This message will result in a [[GetHipsCatalogDataInViewReply]] if the
  * input parameters are all correct.
  */
- export interface GetHipsCatalogDataInViewMessage {
+export interface GetHipsCatalogDataInViewMessage {
   /** The tag identifying this message type. */
   event: 'layer_hipscat_datainview';
 

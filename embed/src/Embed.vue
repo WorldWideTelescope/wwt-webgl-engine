@@ -2,7 +2,10 @@
   <div id="app">
     <WorldWideTelescope
       wwt-namespace="wwt-embed"
-      v-bind:style="{height: wwtComponentLayout.height, top: wwtComponentLayout.top}"
+      v-bind:style="{
+        height: wwtComponentLayout.height,
+        top: wwtComponentLayout.top,
+      }"
     ></WorldWideTelescope>
 
     <transition name="fade">
@@ -15,7 +18,12 @@
     </transition>
 
     <transition name="fade">
-      <div class="modal" id="modal-readytostart" v-show="isReadyToStartState" @click="startInteractive()">
+      <div
+        class="modal"
+        id="modal-readytostart"
+        v-show="isReadyToStartState"
+        @click="startInteractive()"
+      >
         <div>
           <font-awesome-icon class="icon" icon="play"></font-awesome-icon>
         </div>
@@ -31,68 +39,122 @@
     <ul id="controls">
       <li v-show="showToolMenu">
         <v-popover placement="left">
-          <font-awesome-icon class="tooltip-target" icon="sliders-h" size="lg"></font-awesome-icon>
+          <font-awesome-icon
+            class="tooltip-target"
+            icon="sliders-h"
+            size="lg"
+          ></font-awesome-icon>
           <template slot="popover">
             <ul class="tooltip-content tool-menu">
-              <li v-show="showCrossfader"><a href="#" v-close-popover @click="selectTool('crossfade')"><font-awesome-icon icon="adjust" /> Crossfade</a></li>
-              <li v-show="showBackgroundChooser"><a href="#" v-close-popover @click="selectTool('choose-background')"><font-awesome-icon icon="mountain" /> Choose background</a></li>
-              <li v-show="showPlaybackControls"><a href="#" v-close-popover @click="selectTool('playback-controls')"><font-awesome-icon icon="redo" /> Tour player controls</a></li>
+              <li v-show="showCrossfader">
+                <a href="#" v-close-popover @click="selectTool('crossfade')"
+                  ><font-awesome-icon icon="adjust" /> Crossfade</a
+                >
+              </li>
+              <li v-show="showBackgroundChooser">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="selectTool('choose-background')"
+                  ><font-awesome-icon icon="mountain" /> Choose background</a
+                >
+              </li>
+              <li v-show="showPlaybackControls">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="selectTool('playback-controls')"
+                  ><font-awesome-icon icon="redo" /> Tour player controls</a
+                >
+              </li>
             </ul>
           </template>
         </v-popover>
       </li>
       <li v-show="!wwtIsTourPlaying">
-        <font-awesome-icon icon="search-plus" size="lg" @click="doZoom(true)"></font-awesome-icon>
+        <font-awesome-icon
+          icon="search-plus"
+          size="lg"
+          @click="doZoom(true)"
+        ></font-awesome-icon>
       </li>
       <li v-show="!wwtIsTourPlaying">
-        <font-awesome-icon icon="search-minus" size="lg" @click="doZoom(false)"></font-awesome-icon>
+        <font-awesome-icon
+          icon="search-minus"
+          size="lg"
+          @click="doZoom(false)"
+        ></font-awesome-icon>
       </li>
       <li v-show="fullscreenAvailable">
-        <font-awesome-icon v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
-          size="lg" class="nudgeright1" @click="toggleFullscreen()"></font-awesome-icon>
+        <font-awesome-icon
+          v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
+          size="lg"
+          class="nudgeright1"
+          @click="toggleFullscreen()"
+        ></font-awesome-icon>
       </li>
     </ul>
 
     <div id="tools">
       <div class="tool-container">
-      <template v-if="currentTool == 'crossfade'">
-        <span>Foreground opacity:</span> <input class="opacity-range" type="range" v-model="foregroundOpacity">
-      </template>
-      <template v-else-if="currentTool == 'choose-background'">
-        <span>Background imagery:</span>
-        <select v-model="curBackgroundImagesetName">
-          <option v-for="bg in backgroundImagesets" v-bind:value="bg.imagesetName" v-bind:key="bg.imagesetName">
-            {{ bg.displayName }}
-          </option>
-        </select>
-      </template>
-      <template v-else-if="currentTool == 'playback-controls'">
-        <div class="playback-controls">
-          <font-awesome-icon v-bind:icon="tourPlaybackIcon"
-            size="lg" class="clickable" @click="tourPlaybackButtonClicked()"></font-awesome-icon>
-          <vue-slider
-            class="scrubber"
-            v-model="twoWayTourTimecode"
-            :max="wwtTourRunTime"
-            :marks="wwtTourStopStartTimes"
-            :tooltip-formatter="formatTimecode"
-            :adsorb="true"
-            :duration="0"
-            :interval="0.001"
-            :contained="true"
-            :hide-label="true"
-            :use-keyboard="false"
-          ></vue-slider>
-        </div>
-      </template>
+        <template v-if="currentTool == 'crossfade'">
+          <span>Foreground opacity:</span>
+          <input
+            class="opacity-range"
+            type="range"
+            v-model="foregroundOpacity"
+          />
+        </template>
+        <template v-else-if="currentTool == 'choose-background'">
+          <span>Background imagery:</span>
+          <select v-model="curBackgroundImagesetName">
+            <option
+              v-for="bg in backgroundImagesets"
+              v-bind:value="bg.imagesetName"
+              v-bind:key="bg.imagesetName"
+            >
+              {{ bg.displayName }}
+            </option>
+          </select>
+        </template>
+        <template v-else-if="currentTool == 'playback-controls'">
+          <div class="playback-controls">
+            <font-awesome-icon
+              v-bind:icon="tourPlaybackIcon"
+              size="lg"
+              class="clickable"
+              @click="tourPlaybackButtonClicked()"
+            ></font-awesome-icon>
+            <vue-slider
+              class="scrubber"
+              v-model="twoWayTourTimecode"
+              :max="wwtTourRunTime"
+              :marks="wwtTourStopStartTimes"
+              :tooltip-formatter="formatTimecode"
+              :adsorb="true"
+              :duration="0"
+              :interval="0.001"
+              :contained="true"
+              :hide-label="true"
+              :use-keyboard="false"
+            ></vue-slider>
+          </div>
+        </template>
       </div>
     </div>
 
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
-      <p>Powered by <a href="https://worldwidetelescope.org/home/">AAS WorldWide
-      Telescope</a>
-      <a href="https://worldwidetelescope.org/home/"><img alt="WWT Logo" src="./assets/logo_wwt.png" /></a>
-      <a href="https://aas.org/"><img alt="AAS Logo" src="./assets/logo_aas.png" /></a>
+      <p>
+        Powered by
+        <a href="https://worldwidetelescope.org/home/"
+          >AAS WorldWide Telescope</a
+        >
+        <a href="https://worldwidetelescope.org/home/"
+          ><img alt="WWT Logo" src="./assets/logo_wwt.png"
+        /></a>
+        <a href="https://aas.org/"
+          ><img alt="AAS Logo" src="./assets/logo_aas.png"
+        /></a>
       </p>
     </div>
   </div>
@@ -105,7 +167,10 @@ import * as screenfull from "screenfull";
 
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { ImageSetType } from "@wwtelescope/engine-types";
-import { SetupForImagesetOptions, WWTAwareComponent } from "@wwtelescope/engine-vuex";
+import {
+  SetupForImagesetOptions,
+  WWTAwareComponent,
+} from "@wwtelescope/engine-vuex";
 import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
 
 /** The overall state of the WWT embed component. */
@@ -133,25 +198,38 @@ class BackgroundImageset {
 }
 
 const skyBackgroundImagesets: BackgroundImageset[] = [
-  new BackgroundImageset("Optical (Terapixel DSS)", "Digitized Sky Survey (Color)"),
-  new BackgroundImageset("Low-frequency radio (VLSS)", "VLSS: VLA Low-frequency Sky Survey (Radio)"),
+  new BackgroundImageset(
+    "Optical (Terapixel DSS)",
+    "Digitized Sky Survey (Color)"
+  ),
+  new BackgroundImageset(
+    "Low-frequency radio (VLSS)",
+    "VLSS: VLA Low-frequency Sky Survey (Radio)"
+  ),
   new BackgroundImageset("Infrared (2MASS)", "2Mass: Imagery (Infrared)"),
   new BackgroundImageset("Infrared (SFD dust map)", "SFD Dust Map (Infrared)"),
   new BackgroundImageset("Ultraviolet (GALEX)", "GALEX (Ultraviolet)"),
-  new BackgroundImageset("X-Ray (ROSAT RASS)", "RASS: ROSAT All Sky Survey (X-ray)"),
-  new BackgroundImageset("Gamma Rays (FERMI LAT 8-year)", "Fermi LAT 8-year (gamma)"),
+  new BackgroundImageset(
+    "X-Ray (ROSAT RASS)",
+    "RASS: ROSAT All Sky Survey (X-ray)"
+  ),
+  new BackgroundImageset(
+    "Gamma Rays (FERMI LAT 8-year)",
+    "Fermi LAT 8-year (gamma)"
+  ),
 ];
 
 type Shape = { width: number; height: number };
-const defaultWindowShape: Shape = {width: 1200, height: 900};
+const defaultWindowShape: Shape = { width: 1200, height: 900 };
 
 type WwtComponentLayout = { top: string; height: string };
 
 @Component
 export default class Embed extends WWTAwareComponent {
-  CreditMode = CreditMode
+  CreditMode = CreditMode;
 
-  @Prop({ default: new EmbedSettings() }) readonly embedSettings!: EmbedSettings;
+  @Prop({ default: new EmbedSettings() })
+  readonly embedSettings!: EmbedSettings;
 
   componentState = ComponentState.LoadingResources;
   backgroundImagesets: BackgroundImageset[] = [];
@@ -177,8 +255,7 @@ export default class Embed extends WWTAwareComponent {
   }
 
   get curBackgroundImagesetName() {
-    if (this.wwtBackgroundImageset == null)
-      return "";
+    if (this.wwtBackgroundImageset == null) return "";
     return this.wwtBackgroundImageset.get_name();
   }
 
@@ -199,18 +276,19 @@ export default class Embed extends WWTAwareComponent {
   }
 
   get showBackgroundChooser() {
-    if (this.wwtIsTourPlaying)
-      return false;
+    if (this.wwtIsTourPlaying) return false;
 
     // TODO: we should wire in choices for other modes!
     return this.wwtRenderType == ImageSetType.sky;
   }
 
   get showCrossfader() {
-    if (this.wwtIsTourPlaying)
-      return false; // maybe show this if tour player is active but not playing?
+    if (this.wwtIsTourPlaying) return false; // maybe show this if tour player is active but not playing?
 
-    if (this.wwtForegroundImageset == null || this.wwtForegroundImageset === undefined)
+    if (
+      this.wwtForegroundImageset == null ||
+      this.wwtForegroundImageset === undefined
+    )
       return false;
 
     return this.wwtForegroundImageset != this.wwtBackgroundImageset;
@@ -222,7 +300,11 @@ export default class Embed extends WWTAwareComponent {
 
   get showToolMenu() {
     // This should return true if there are any tools to show.
-    return this.showBackgroundChooser || this.showCrossfader || this.showPlaybackControls;
+    return (
+      this.showBackgroundChooser ||
+      this.showCrossfader ||
+      this.showPlaybackControls
+    );
   }
 
   created() {
@@ -235,7 +317,7 @@ export default class Embed extends WWTAwareComponent {
     if (this.embedSettings.tourUrl.length) {
       prom = prom.then(async () => {
         // TODO: figure out a good thing to do here
-        this.backgroundImagesets = [];
+        this.backgroundImagesets = [...skyBackgroundImagesets];
 
         await this.loadTour({
           url: this.embedSettings.tourUrl,
@@ -252,7 +334,7 @@ export default class Embed extends WWTAwareComponent {
         prom = prom.then(async () => {
           const folder = await this.loadImageCollection({
             url: this.embedSettings.wtmlUrl,
-            loadChildFolders: false
+            loadChildFolders: false,
           });
 
           if (this.embedSettings.wtmlPlace) {
@@ -263,8 +345,8 @@ export default class Embed extends WWTAwareComponent {
                   place: pl,
                   noZoom: false,
                   instant: true,
-                  trackObject: true
-                })
+                  trackObject: true,
+                });
               }
             }
           }
@@ -279,7 +361,9 @@ export default class Embed extends WWTAwareComponent {
         let bgName = this.embedSettings.backgroundImagesetName;
 
         if (this.embedSettings.foregroundImagesetName.length) {
-          const img = this.lookupImageset(this.embedSettings.foregroundImagesetName);
+          const img = this.lookupImageset(
+            this.embedSettings.foregroundImagesetName
+          );
 
           if (img !== null) {
             // If the imageset is a panorama, we want to set it to be the background
@@ -327,7 +411,9 @@ export default class Embed extends WWTAwareComponent {
         }
 
         if (!foundBG) {
-          this.backgroundImagesets.unshift(new BackgroundImageset(bgName, bgName));
+          this.backgroundImagesets.unshift(
+            new BackgroundImageset(bgName, bgName)
+          );
         }
 
         this.componentState = ComponentState.Started;
@@ -337,10 +423,10 @@ export default class Embed extends WWTAwareComponent {
 
   mounted() {
     if (screenfull.isEnabled) {
-      screenfull.on('change', this.onFullscreenEvent);
+      screenfull.on("change", this.onFullscreenEvent);
     }
 
-    window.addEventListener('resize', this.onResizeEvent);
+    window.addEventListener("resize", this.onResizeEvent);
     // ResizeObserver not yet in TypeScript but we should start using it when
     // available. If we're in an iframe, our shape might change spontaneously.
     // const ro = new ResizeObserver(entries => this.onResizeEvent());
@@ -350,10 +436,10 @@ export default class Embed extends WWTAwareComponent {
 
   destroyed() {
     if (screenfull.isEnabled) {
-      screenfull.off('change', this.onFullscreenEvent);
+      screenfull.off("change", this.onFullscreenEvent);
     }
 
-    window.removeEventListener('resize', this.onResizeEvent);
+    window.removeEventListener("resize", this.onResizeEvent);
   }
 
   selectTool(name: ToolType) {
@@ -366,7 +452,7 @@ export default class Embed extends WWTAwareComponent {
 
   doZoom(zoomIn: boolean) {
     if (zoomIn) {
-      this.zoom(1/1.3);
+      this.zoom(1 / 1.3);
     } else {
       this.zoom(1.3);
     }
@@ -380,7 +466,7 @@ export default class Embed extends WWTAwareComponent {
 
   onFullscreenEvent() {
     // NB: we need the isEnabled check to make TypeScript happy even though it
-    // is not necesary in practice here.
+    // is not necessary in practice here.
     if (screenfull.isEnabled) {
       this.fullscreenModeActive = screenfull.isFullscreen;
     }
@@ -391,7 +477,7 @@ export default class Embed extends WWTAwareComponent {
     const height = this.$el.clientHeight;
 
     if (width > 0 && height > 0) {
-      this.windowShape = {width, height};
+      this.windowShape = { width, height };
     } else {
       this.windowShape = defaultWindowShape;
     }
@@ -433,12 +519,12 @@ export default class Embed extends WWTAwareComponent {
       // TODO: make sure this works in 3D mode.
       let newView = null;
 
-      if (this.wwtIsTourPlaying && this.wwtComponentLayout.top != '0') {
+      if (this.wwtIsTourPlaying && this.wwtComponentLayout.top != "0") {
         const curHeight = this.windowShape.width * 0.75;
         newView = {
           raRad: 1.0 * this.wwtRARad,
           decRad: 1.0 * this.wwtDecRad,
-          zoomDeg: this.wwtZoomDeg * this.windowShape.height / curHeight,
+          zoomDeg: (this.wwtZoomDeg * this.windowShape.height) / curHeight,
           instant: true,
         };
       }
@@ -458,8 +544,7 @@ export default class Embed extends WWTAwareComponent {
   }
 
   formatTimecode(seconds: number): string {
-    if (seconds < 0)
-      return "-:--"
+    if (seconds < 0) return "-:--";
 
     const minutes = Math.floor(seconds / 60);
     seconds = Math.round(seconds - 60 * minutes);
@@ -475,7 +560,7 @@ export default class Embed extends WWTAwareComponent {
     this.tourPlaybackJustEnded = false;
   }
 
-  @Watch('wwtTourCompletions')
+  @Watch("wwtTourCompletions")
   onTourCompletionsChanged(_count: number) {
     this.tourPlaybackJustEnded = true;
   }
@@ -486,17 +571,17 @@ export default class Embed extends WWTAwareComponent {
   // widescreen effect the content will get cut off.
   //
   // Keep this in sync with toggleTourPlayback.
-  get wwtComponentLayout(): WwtComponentLayout  {
+  get wwtComponentLayout(): WwtComponentLayout {
     if (this.wwtIsTourPlaying) {
       if (this.windowShape.height > this.windowShape.width) {
         const wwtHeight = this.windowShape.width * 0.75; // => 4:3 aspect ratio
-        const height = wwtHeight + 'px';
-        const top = 0.5 * (this.windowShape.height - wwtHeight) + 'px';
+        const height = wwtHeight + "px";
+        const top = 0.5 * (this.windowShape.height - wwtHeight) + "px";
         return { top, height };
       }
     }
 
-    return { top: '0', height: '100%' };
+    return { top: "0", height: "100%" };
   }
 }
 </script>
@@ -536,11 +621,13 @@ body {
   }
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .3s;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 
@@ -552,7 +639,7 @@ body {
   height: 100%;
   z-index: 100;
 
-  color: #FFF;
+  color: #fff;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
@@ -569,7 +656,7 @@ body {
     justify-content: center;
 
     .spinner {
-      background-image: url('assets/lunar_loader.gif');
+      background-image: url("assets/lunar_loader.gif");
       background-repeat: no-repeat;
       background-size: contain;
       width: 3rem;
@@ -595,7 +682,7 @@ body {
   div {
     margin: 0;
     padding: 0;
-    background-image: url('assets/wwt_globe_bg.png');
+    background-image: url("assets/wwt_globe_bg.png");
     background-repeat: no-repeat;
     background-size: contain;
     width: 20rem;
@@ -620,7 +707,7 @@ body {
   z-index: 10;
   top: 0.5rem;
   left: 0.5rem;
-  color: #FFF;
+  color: #fff;
 
   p {
     margin: 0;
@@ -634,7 +721,7 @@ body {
   z-index: 10;
   top: 0.5rem;
   right: 0.5rem;
-  color: #FFF;
+  color: #fff;
 
   list-style-type: none;
   margin: 0;
@@ -656,7 +743,7 @@ body {
   z-index: 10;
   bottom: 3rem;
   left: 50%;
-  color: #FFF;
+  color: #fff;
 
   .tool-container {
     position: relative;
@@ -671,7 +758,6 @@ body {
     cursor: pointer;
   }
 }
-
 
 .playback-controls {
   display: flex;
@@ -817,16 +903,16 @@ body {
     }
   }
 
-  &[aria-hidden='true'] {
+  &[aria-hidden="true"] {
     visibility: hidden;
     opacity: 0;
-    transition: opacity .15s, visibility .15s;
+    transition: opacity 0.15s, visibility 0.15s;
   }
 
-  &[aria-hidden='false'] {
+  &[aria-hidden="false"] {
     visibility: visible;
     opacity: 1;
-    transition: opacity .15s;
+    transition: opacity 0.15s;
   }
 }
 
@@ -853,9 +939,8 @@ ul.tool-menu {
 
     &:hover {
       background-color: #000;
-      color: #FFF;
+      color: #fff;
     }
   }
 }
-
 </style>

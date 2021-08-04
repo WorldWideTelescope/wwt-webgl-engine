@@ -8,32 +8,32 @@
     @after-enter="afterEnter"
     @leave="leave"
   >
-    <slot/>
+    <slot />
   </transition>
 </template>
 
 <script lang="ts">
-import { Component,  Emit,  Vue } from 'vue-property-decorator';
+import { Component, Emit, Vue } from "vue-property-decorator";
 
 @Component
 export default class TransitionExpand extends Vue {
-  name = 'TransitionExpand';
+  name = "TransitionExpand";
 
   @Emit()
   enter(element: HTMLElement) {
     const width = getComputedStyle(element).width;
 
     element.style.width = width;
-    element.style.position = 'absolute';
-    element.style.visibility = 'hidden';
-    element.style.height = 'auto';
+    element.style.position = "absolute";
+    element.style.visibility = "hidden";
+    element.style.height = "auto";
 
     const height = getComputedStyle(element).height;
 
-    element.style.width = '';
-    element.style.position = '';
-    element.style.visibility = 'visible';
-    element.style.height = '0px';
+    element.style.width = "";
+    element.style.position = "";
+    element.style.visibility = "visible";
+    element.style.height = "0px";
 
     // Force repaint to make sure the
     // animation is triggered correctly.
@@ -45,19 +45,19 @@ export default class TransitionExpand extends Vue {
     // painting after setting the `height`
     // to `0` in the line above.
     requestAnimationFrame(() => {
-    element.style.height = height;
+      element.style.height = height;
     });
   }
 
   @Emit()
   afterEnter(element: HTMLElement) {
-    element.style.height = 'auto';
+    element.style.height = "auto";
   }
 
   @Emit()
   leave(element: HTMLElement) {
     const height = getComputedStyle(element).height;
-    
+
     element.style.height = height;
 
     // Force repaint to make sure the
@@ -65,10 +65,9 @@ export default class TransitionExpand extends Vue {
     getComputedStyle(element).height;
 
     requestAnimationFrame(() => {
-      element.style.height = '0';
+      element.style.height = "0";
     });
   }
-
 }
 </script>
 

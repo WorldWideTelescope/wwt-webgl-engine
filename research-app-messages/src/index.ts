@@ -115,7 +115,7 @@ export function isViewStateMessage(o: any): o is ViewStateMessage {  // eslint-d
  * missing a particular field should be treated as conveying no information
  * about the state described by that field.
  */
- export interface ApplicationStateMessage {
+export interface ApplicationStateMessage {
   /** A message type identifier. */
   type: "wwt_application_state";
 
@@ -131,7 +131,7 @@ export function isViewStateMessage(o: any): o is ViewStateMessage {  // eslint-d
 
   /** The names of the available HiPS catalog datasets. */
   hipsCatalogNames?: string[];
- }
+}
 
 
 /** A "ping" or "pong" message.
