@@ -279,6 +279,28 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     }
   }
 
+  get findRADecForScreenPoint() {
+    return function (pt: { x: number; y: number }): { ra: number; dec: number } {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
+      const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
+      return { ra: (15 * coords.x + 720) % 360, dec: coords.y };
+    }
+  }
+
+  get layerForHipsCatalog() {
+    return function (name: string): SpreadSheetLayer | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
+      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
+      if (layer !== null && layer instanceof SpreadSheetLayer) {
+        return layer;
+      } else {
+        return null;
+      }
+    }
+  }
+
   @Mutation
   internalLinkToInstance(wwt: WWTInstance): void {
     Vue.$wwt.link(wwt);
@@ -554,7 +576,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @MutationAction
   async loadTour(
-    {url, play}: LoadTourParams
+    { url, play }: LoadTourParams
   ) {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadTour without linking to WWTInstance');
@@ -591,7 +613,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Action({ rawError: true })
   async loadImageCollection(
-    {url, loadChildFolders}: LoadImageCollectionParams
+    { url, loadChildFolders }: LoadImageCollectionParams
   ): Promise<Folder> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
@@ -742,4 +764,5 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('cannot clearAnnotations without linking to WWTInstance');
     Vue.$wwt.inst.si.clearAnnotations();
   }
+
 }

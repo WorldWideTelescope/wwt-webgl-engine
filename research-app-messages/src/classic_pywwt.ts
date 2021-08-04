@@ -209,7 +209,7 @@ export interface CreateImageSetLayerMessage {
 
   /** Go to centre of the data. Defaults to true.*/
   goto?: boolean;
-  }
+}
 
 /** Type guard function for CreateImageSetLayerMessage. */
 export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -906,7 +906,7 @@ export type PywwtSpreadSheetLayerSetting =
   ["zAxisColumn", string | number] | // pywwt customization
   ["zAxisReverse", boolean];
 
-const pywwtSpreadSheetLayerSettingTypeInfo: {[i: string]: boolean} = {
+const pywwtSpreadSheetLayerSettingTypeInfo: { [i: string]: boolean } = {
   "altColumn/string": true,
   "altColumn/number": true,
   "altType/string": true,

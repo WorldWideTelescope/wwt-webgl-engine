@@ -258,9 +258,15 @@ export namespace ColorMapContainer {
   export function fromNamedColormap(name: string): ColorMapContainer;
 }
 
-
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
+}
+
+export class Constellations {
+  
+  static containment: Constellations;
+
+  findConstellationForPoint(ra: number, dec: number): string;
 }
 
 /** The full EngineSetting type, which augments engine-types' BaseEngineSetting
@@ -2063,7 +2069,7 @@ export class WWTControl {
    *
    * See also [[addCatalogHipsByName]], [[addCatalogHipsByNameWithCallback]].
    * */
-   addCatalogHips(imageset: Imageset): void;
+  addCatalogHips(imageset: Imageset): void;
 
   /** Add a "catalog HiPS" dataset to the current view, by name.
    *
@@ -2088,6 +2094,9 @@ export class WWTControl {
 
   /** Remove a previously loaded "catalog HiPS" dataset from the view. */
   removeCatalogHipsByName(name: string): void;
+
+  /** Given x and y coordinates on the screen, returns the RA and Dec */
+  getCoordinatesForScreenPoint(x: number, y: number): { x: number; y: number };
 
   /** Start loading the tour stored at the specified URL.
    *

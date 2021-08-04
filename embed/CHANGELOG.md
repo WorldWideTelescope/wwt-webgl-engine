@@ -1,3 +1,13 @@
+# @wwtelescope/embed 1.5.1 (2021-08-04)
+
+- If a tour is being played back and the user pauses it, populate the background
+  chooser with our list of standard backgrounds for Sky mode. This could yield
+  incorrect results if the tour is currently in a different mode, but most of
+  the time it will be better than our current approach, which is to show an
+  empty list. Our support for non-Sky modes needs to be tidied up more
+  generally. (#127, @pkgw)
+
+
 # @wwtelescope/embed 1.5.0 (2021-06-17)
 
 - Add support for panorama images (#117, @Carifio24)
