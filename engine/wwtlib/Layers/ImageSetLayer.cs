@@ -17,10 +17,11 @@ namespace wwtlib
             get { return imageSet; }
             set { imageSet = value; }
         }
+
         string extension = ".txt";
+
         public ImageSetLayer()
         {
-
         }
 
         public static ImageSetLayer Create(Imageset set)
@@ -31,6 +32,7 @@ namespace wwtlib
         }
 
         bool overrideDefaultLayer = false;
+
         public bool OverrideDefaultLayer
         {
             get { return overrideDefaultLayer; }
@@ -40,6 +42,14 @@ namespace wwtlib
         public FitsImage GetFitsImage()
         {
             return imageSet.WcsImage as FitsImage;
+        }
+
+        // Test whether our underlying imagery is FITS based.
+        //
+        // This can come in two flavors: a single FITS image, or tiled FITS.
+        bool IsFitsImageset() {
+            bool fitsExt = imageSet.Extension.ToLowerCase().StartsWith(".fit");
+            return imageSet.WcsImage is FitsImage || (imageSet.WcsImage == null && fitsExt);
         }
 
         public override void InitializeFromXml(XmlNode node)
@@ -108,7 +118,7 @@ namespace wwtlib
         {
             if (imageSet.WcsImage != null)
             {
-                if (imageSet.WcsImage is FitsImage)
+                if (IsFitsImageset())
                 {
                     extension = ".fit";
                 }
@@ -116,21 +126,21 @@ namespace wwtlib
                 {
                     extension = ".png";
                 }
+
                 xmlWriter.WriteAttributeString("Extension", extension);
             }
 
-            if (imageSet.WcsImage is FitsImage)
+            if (IsFitsImageset())
             {
-                FitsImage fi = imageSet.WcsImage as FitsImage;
                 xmlWriter.WriteAttributeString("ScaleType", Enums.ToXml("ScaleTypes", (int)imageSet.FitsProperties.ScaleType));
                 xmlWriter.WriteAttributeString("MinValue", imageSet.FitsProperties.MinVal.ToString());
                 xmlWriter.WriteAttributeString("MaxValue", imageSet.FitsProperties.MaxVal.ToString());
                 xmlWriter.WriteAttributeString("LowerCut", imageSet.FitsProperties.LowerCut.ToString());
                 xmlWriter.WriteAttributeString("UpperCut", imageSet.FitsProperties.UpperCut.ToString());
+
                 if (imageSet.FitsProperties.ColorMapName != null) {
                     xmlWriter.WriteAttributeString("ColorMapperName", imageSet.FitsProperties.ColorMapName);
                 }
-
             }
 
             xmlWriter.WriteAttributeString("OverrideDefault", overrideDefaultLayer.ToString());
@@ -154,9 +164,7 @@ namespace wwtlib
             if (imageSet.WcsImage is FitsImage)
             {
                 string fName = ((WcsImage)imageSet.WcsImage).Filename;
-
                 string fileName = fc.TempDirectory + string.Format("{0}\\{1}{2}", fc.PackageID, this.ID.ToString(), extension);
-
                 fc.AddFile(fileName, ((FitsImage)imageSet.WcsImage).sourceBlob);
             }
         }
@@ -198,19 +206,19 @@ namespace wwtlib
         {
             double newMin = min;
             double newMax = max;
-            
-            if (imageSet.WcsImage is FitsImage)
+
+            if (IsFitsImageset())
             {
-                FitsImage img = imageSet.WcsImage as FitsImage;
                 newMin = (newMin - imageSet.FitsProperties.BZero) / imageSet.FitsProperties.BScale;
                 newMax = (newMax - imageSet.FitsProperties.BZero) / imageSet.FitsProperties.BScale;
             }
+
             SetImageScaleRaw(scaleType, newMin, newMax);
         }
 
         public void SetImageZ(double z)
         {
-            if (imageSet.WcsImage is FitsImage)
+            if (IsFitsImageset())
             {
                 Histogram.UpdateImage(this, z);
             }
@@ -224,8 +232,10 @@ namespace wwtlib
             {
                 if (ColorMapContainer.FromNamedColormap(value) == null)
                     throw new Exception("Invalid colormap name");
+
                 version++;
-                if(imageSet.WcsImage != null)
+
+                if (IsFitsImageset())
                 {
                     if (RenderContext.UseGlVersion2)
                     {
@@ -256,19 +266,18 @@ namespace wwtlib
             if (extension.ToLowerCase().StartsWith(".fit"))
             {
                 System.Html.Data.Files.Blob blob = tourDoc.GetFileBlob(filename.Replace(".txt", extension));
-
                 FitsImage fi;
+
                 if (RenderContext.UseGlVersion2)
                 {
                     fi = new FitsImage(imageSet, "image.fit", blob, DoneLoading);
-
                 }
                 else
                 {
                     fi = new FitsImageJs(imageSet, "image.fit", blob, DoneLoading);
                 }
-                imageSet.WcsImage = fi;
 
+                imageSet.WcsImage = fi;
             }
             else
             {
