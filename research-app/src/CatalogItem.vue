@@ -10,6 +10,7 @@
       <label
         focusable="false"
         id="name-label"
+        class="ellipsize"
         @click="isSelected = !isSelected"
         @keyup.enter="isSelected = !isSelected"
         >{{ catalog.name }}</label
@@ -33,7 +34,7 @@
       <div v-if="isSelected" class="detail-container">
         <div class="detail-row">
           <span class="prompt">URL:</span
-          ><span class="url-holder">{{ catalog.url }}</span>
+          ><span class="ellipsize">{{ catalog.url }}</span>
         </div>
         <div class="detail-row" v-if="catalog.description.length > 0">
           <span class="prompt">Description:</span
@@ -198,12 +199,15 @@ export default class CatalogItem extends Vue {
 
 <style scoped lang="less">
 #root-container {
-  background: #404040;
   color: white;
   font-weight: bold;
   font-size: 12pt;
   padding: 0px;
   overflow: hidden;
+
+  &:hover {
+    background: #999999;
+  }
 }
 
 #main-container {
@@ -211,13 +215,14 @@ export default class CatalogItem extends Vue {
   padding: 5px;
 }
 
-#main-container:hover {
-  background: #999999;
-}
-
 #name-label {
   display: inline-block;
   width: 75%;
+  vertical-align: middle;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 #buttons-container {
@@ -226,13 +231,16 @@ export default class CatalogItem extends Vue {
 
 .circle-popover {
   display: inline;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .detail-container {
   font-size: 9pt;
   margin: 0px 5px;
   padding-left: 15px;
-  background: #404040;
 }
 
 .icon {
@@ -246,11 +254,6 @@ export default class CatalogItem extends Vue {
   background: #404040;
 }
 
-.url-holder {
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-}
-
 .prompt {
   font-size: 11pt;
   font-weight: bold;
@@ -258,7 +261,13 @@ export default class CatalogItem extends Vue {
 }
 
 .detail-row {
-  padding: 5px 0px;
+  padding: 1px 0px;
+}
+
+.ellipsize {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 // For styling the nested vue-color component

@@ -16,7 +16,7 @@
       </transition>
       <div id="layers-container" v-if="haveLayers">
         <div class="display-section-header">
-          <label>Layers:</label>
+          <label>Layers</label>
         </div>
         <div v-if="showLayers">
           <catalog-item
@@ -29,7 +29,7 @@
       </div>
       <div id="sources-container" v-if="haveSources">
         <div class="display-section-header">
-          <label>Sources:</label>
+          <label>Sources</label>
         </div>
         <div v-if="showSources">
           <source-item
@@ -2051,7 +2051,7 @@ body {
 }
 
 #overlays {
-  margin: 10px;
+  margin: 5px;
 }
 
 #controls {
@@ -2112,10 +2112,13 @@ body {
   left: 0.5rem;
   width: 25vw;
   border-radius: 5px;
-  opacity: 0.6;
   color: white;
   font-weight: bold;
-  background: #404040;
+  background: rgba(65, 65, 65, 0.6);
+
+  p {
+    margin: 0;
+  }
 }
 
 #add-catalog {
@@ -2137,10 +2140,31 @@ body {
 }
 
 .display-section-header {
-  width: 100%;
-  font-size: 18pt;
-  text-align: center;
-  padding: 5px 0px;
+  font-size: 70%;
+  padding: 2px 5px;
+
+  /* Some tomfoolery to give a little strikethrough effect
+  * in the section header presentation */
+
+  display: flex;
+  align-items: center;
+
+  &::before,
+  &::after {
+    content: "";
+    height: 1px;
+    background-color: white;
+  }
+
+  &::before {
+    margin-right: 0.5rem;
+    width: 1rem;
+  }
+
+  &::after {
+    margin-left: 0.5rem;
+    flex-grow: 1;
+  }
 }
 
 .last-row {
