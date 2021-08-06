@@ -1816,8 +1816,11 @@ namespace wwtlib
                 uniform int scaleType;
                 uniform float opacity;
                 
-                bool isNaN(float value){
-                    return !(value < 0.0 || 0.0 < value || value == 0.0);
+                bool isNaN(float value) {
+                    // See https://stackoverflow.com/questions/9446888/best-way-to-detect-nans-in-opengl-shaders
+                    // PKGW also finds that we need `value != value` on his Dell laptop running
+                    // Chrome on Linux.
+                    return (value != value) || !(value < 0.0 || 0.0 < value || value == 0.0);
                 }
 
                 void main(void) {
@@ -1848,9 +1851,7 @@ namespace wwtlib
                         vec4 colorFromColorMapper = texture(colorSampler, vec2(physicalValue, 0.5));
                         fragmentColor = vec4(colorFromColorMapper.rgb, opacity);
                     }
-
                 }
-
                 ";
 
             String vertexShaderText =
