@@ -180,3 +180,52 @@ export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-dis
     typeof o.threadId === "string" &&
     (o.sessionId === undefined || typeof o.sessionId === "string");
 }
+
+/** Information about the current state of source and catalog selection
+ * inside the WWT application
+ * 
+ * This message is broadcasted by the application whenever one of the user's selection
+ * options inside of the application is adjusted. The Vue listeners for the selected 
+ * catalogs and sources are deep listeners, meaning that this message will be broadcasted
+ * whenever a property of one of their items changes.
+ * 
+ * Not all fields of this message will always be present, depending on the
+ * nature of the event triggering the emission of this message. A message
+ * missing a particular field should be treated as conveying no information
+ * about the state described by that field.
+ */
+
+export interface SelectionStateMessage {
+
+    /** The tag identifying this message type. */
+    type: "wwt_selection_state";
+
+    /** An app/client session identifier.
+   *
+   * If a single client is communicating with multiple apps, it needs to be able
+   * to tell which app is the source of any update messages. This session
+   * identifier allows clients to do so. The default value is "default". But if
+   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * that value will start appearing in these view state update messages.
+   */
+  sessionId: string;
+
+  /** The most recent source that was added to the selection list. */
+  mostRecentSource?: string;
+
+  /** The list of HiPS catalogs that are currently selected. */
+  selectedCatalogs?: string[];
+
+  /** The list of sources that are currently selected. */
+  selectedSources?: string[];
+}
+
+/** Type guard function for [[SelectionStateMessage]] */
+export function isSelectionStateMessage(o: any): o is SelectionStateMessage { // eslint-disable-line @typescript-eslint/no-explicit-any
+  return typeof o.type === "string" &&
+    o.type == "wwt_selection_state" &&
+    typeof o.threadId === "string" &&
+    (o.sessionId === undefined || typeof o.sessionId === "string") &&
+    (o.mostRecentSource === undefined || typeof o.mostRecentSource === "string") &&
+    (o.selectedSources === undefined || typeof o.selectedSources === "string");
+}
