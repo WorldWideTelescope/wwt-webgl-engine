@@ -2152,7 +2152,7 @@ body {
   &::before,
   &::after {
     content: "";
-    height: 1px;
+    height: 2px;
     background-color: white;
   }
 
