@@ -244,6 +244,7 @@ import {
   layers,
   settings,
   ApplicationStateMessage,
+  SelectionStateMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
 
@@ -876,6 +877,7 @@ export default class App extends WWTAwareComponent {
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
   lastClosePt: Source | null = null;
+  lastSelectedSource: Source | null = null;
   distanceThreshold = 0.01;
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
@@ -1307,6 +1309,7 @@ export default class App extends WWTAwareComponent {
         name: this.nameForSource(this.lastClosePt),
       };
       this.addSource(source);
+      this.lastSelectedSource = source;
     }
     this.isMouseMoving = false;
   }
@@ -1750,6 +1753,58 @@ export default class App extends WWTAwareComponent {
       type: "wwt_application_state",
       sessionId: this.statusMessageSessionId,
       hipsCatalogNames: catalogs.map((img) => img.name),
+    };
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
+  @Watch("lastSelectedSource")
+  onLastSelectedSourceChanged(source: Source) {
+    // Notify clients when a source is selected
+
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+      
+    const msg: SelectionStateMessage = {
+      type: "wwt_selection_state",
+      sessionId: this.statusMessageSessionId,
+      mostRecentSource: JSON.stringify(source),
+    };
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
+  @Watch("hipsCatalogs", {deep:true})
+  onSelectedCatalogsChanged(catalogs: ImagesetInfo[]) {
+    // Notify clients when the list of selected catalogs is changed
+    // By making this a deep watcher, it keeps of track of any change
+    // in the list - even events like a property of a list entry changing
+
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+
+    const msg: SelectionStateMessage = {
+      type: "wwt_selection_state",
+      sessionId: this.statusMessageSessionId,
+      selectedCatalogs: catalogs.map(catalog => JSON.stringify(catalog)),
+    };
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
+  @Watch("sources", {deep:true})
+  onSelectedSourcesChanged(sources: Source[]) {
+    // Notify clients when the list of selected sources is changed
+    // By making this a deep watcher, it keeps of track of any change
+    // in the list - even events like a property of a list entry changing
+    
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+
+    const msg: SelectionStateMessage = {
+      type: "wwt_selection_state",
+      sessionId: this.statusMessageSessionId,
+      selectedSources: sources.map(source => JSON.stringify(source)),
     };
 
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
