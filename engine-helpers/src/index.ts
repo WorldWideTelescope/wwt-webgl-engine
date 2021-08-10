@@ -6,9 +6,7 @@ import { D2H, R2D, R2H } from "@wwtelescope/astro";
 import {
   ImageSetType,
   isBaseEngineSetting,
-  isBaseLayerSetting,
   isBaseImageSetLayerSetting,
-  isBaseSpreadSheetLayerSetting,
   isBaseVoTableLayerSetting,
 } from "@wwtelescope/engine-types";
 
@@ -25,10 +23,8 @@ import {
   ImageSetLayer,
   ImageSetLayerSetting,
   InViewReturnMessage,
-  Layer,
   LayerManager,
   LayerManagerObject,
-  LayerSetting,
   Place,
   Poly,
   PolyAnnotationSetting,
@@ -46,6 +42,31 @@ import {
   VoTableLayerSetting,
 } from "@wwtelescope/engine";
 
+import {
+  isLayerSetting,
+} from "./layer";
+
+import {
+  applySpreadSheetLayerSetting,
+} from "./spreadsheetlayer";
+
+// Settings-related re-exports
+
+export {
+  applyLayerSetting,
+  copyLayerSettings,
+  extractLayerSettings,
+  isLayerSetting,
+  LayerState,
+} from "./layer";
+
+export {
+  applySpreadSheetLayerSetting,
+  copySpreadSheetLayerSettings,
+  extractSpreadSheetLayerSettings,
+  isSpreadSheetLayerSetting,
+  SpreadSheetLayerState,
+} from "./spreadsheetlayer";
 
 // Type guards for the augmented setting types
 
@@ -162,30 +183,6 @@ export function isEngineSetting(obj: [string, any]): obj is EngineSetting {  // 
 }
 
 
-const layerSettingTypeInfo = {
-  "color/Color": true,
-};
-
-/** Type guard function for LayerSetting. */
-export function isLayerSetting(obj: [string, any]): obj is LayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  let typekey: string = typeof obj[1];
-
-  if (obj[1] instanceof Color) {
-    typekey = "Color";
-  }
-
-  const key = obj[0] + "/" + typekey;
-  return (key in layerSettingTypeInfo) || isBaseLayerSetting(obj);
-}
-
-/** Apply a setting to a generic Layer. */
-export function applyLayerSetting(layer: Layer, setting: LayerSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-
 /** Type guard function for ImageSetLayerSetting. */
 export function isImageSetLayerSetting(obj: [string, any]): obj is ImageSetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
   // No special settings specific to non-base ImageSetLayerSetting.
@@ -200,86 +197,6 @@ export function applyImageSetLayerSetting(layer: ImageSetLayer, setting: ImageSe
 }
 
 
-/** Type guard function for SpreadSheetLayerSetting. */
-export function isSpreadSheetLayerSetting(obj: [string, any]): obj is SpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  // No special settings specific to non-base SpreadSheetLayerSetting.
-  return isLayerSetting(obj) || isBaseSpreadSheetLayerSetting(obj);
-}
-
-/** Apply a setting to a SpreadSheetLayer. */
-export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: SpreadSheetLayerSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-/** Extract all of the current settings of a SpreadSheetLayer. */
-export function extractSpreadSheetLayerSettings(layer: SpreadSheetLayer): SpreadSheetLayerSetting[] {
-  // Sigh, is there a smarter way to do this? I hate hardcording all of these
-  // lists over and over.
-  const s: SpreadSheetLayerSetting[] = [];
-
-  // BaseLayerSetting
-  s.push(["astronomical", layer.get_astronomical()]);
-  s.push(["fadeSpan", layer.get_fadeSpan()]);
-  s.push(["name", layer.get_name()]);
-  s.push(["opacity", layer.get_opacity()]);
-  s.push(["opened", layer.get_opened()]);
-  s.push(["referenceFrame", layer.get_referenceFrame()]);
-  s.push(["version", layer.get_version()]);
-
-  // LayerSetting
-  s.push(["color", layer.get_color()]);
-
-  // BaseSpreadSheetLayerSetting
-  s.push(["altColumn", layer.get_altColumn()]);
-  s.push(["altType", layer.get_altType()]);
-  s.push(["altUnit", layer.get_altUnit()]);
-  s.push(["barChartBitmask", layer.get_barChartBitmask()]);
-  s.push(["beginRange", layer.get_beginRange()]);
-  s.push(["cartesianCustomScale", layer.get_cartesianCustomScale()]);
-  s.push(["cartesianScale", layer.get_cartesianScale()]);
-  s.push(["colorMapColumn", layer.get_colorMapColumn()]);
-  s.push(["colorMapperName", layer.get_colorMapperName()]);
-  s.push(["coordinatesType", layer.get_coordinatesType()]);
-  s.push(["decay", layer.get_decay()]);
-  s.push(["dynamicColor", layer.get_dynamicColor()]);
-  s.push(["dynamicData", layer.get_dynamicData()]);
-  s.push(["endDateColumn", layer.get_endDateColumn()]);
-  s.push(["endRange", layer.get_endRange()]);
-  s.push(["geometryColumn", layer.get_geometryColumn()]);
-  s.push(["hyperlinkColumn", layer.get_hyperlinkColumn()]);
-  s.push(["hyperlinkFormat", layer.get_hyperlinkFormat()]);
-  s.push(["latColumn", layer.get_latColumn()]);
-  s.push(["lngColumn", layer.get_lngColumn()]);
-  s.push(["markerColumn", layer.get_markerColumn()]);
-  s.push(["markerIndex", layer.get_markerIndex()]);
-  s.push(["markerScale", layer.get_markerScale()]);
-  s.push(["nameColumn", layer.get_nameColumn()]);
-  s.push(["normalizeColorMap", layer.get_normalizeColorMap()]);
-  s.push(["normalizeColorMapMax", layer.get_normalizeColorMapMax()]);
-  s.push(["normalizeColorMapMin", layer.get_normalizeColorMapMin()]);
-  s.push(["normalizeSize", layer.get_normalizeSize()]);
-  s.push(["normalizeSizeClip", layer.get_normalizeSizeClip()]);
-  s.push(["normalizeSizeMax", layer.get_normalizeSizeMax()]);
-  s.push(["normalizeSizeMin", layer.get_normalizeSizeMin()]);
-  s.push(["plotType", layer.get_plotType()]);
-  s.push(["pointScaleType", layer.get_pointScaleType()]);
-  s.push(["raUnits", layer.get_raUnits()]);
-  s.push(["scaleFactor", layer.get_scaleFactor()]);
-  s.push(["showFarSide", layer.get_showFarSide()]);
-  s.push(["sizeColumn", layer.get_sizeColumn()]);
-  s.push(["startDateColumn", layer.get_startDateColumn()]);
-  s.push(["timeSeries", layer.get_timeSeries()]);
-  s.push(["xAxisColumn", layer.get_xAxisColumn()]);
-  s.push(["xAxisReverse", layer.get_xAxisReverse()]);
-  s.push(["yAxisColumn", layer.get_yAxisColumn()]);
-  s.push(["yAxisReverse", layer.get_yAxisReverse()]);
-  s.push(["zAxisColumn", layer.get_zAxisColumn()]);
-  s.push(["zAxisReverse", layer.get_zAxisReverse()]);
-
-  return s;
-}
 
 /** Type guard function for VoTableLayerSetting. */
 export function isVoTableLayerSetting(obj: [string, any]): obj is VoTableLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
