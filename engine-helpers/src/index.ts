@@ -49,7 +49,7 @@ import {
 
 // Type guards for the augmented setting types
 
-const annotationSettingTypeInfo: {[ix: string]: boolean} = {
+const annotationSettingTypeInfo: { [ix: string]: boolean } = {
   "id/string": true,
   "label/string": true,
   "opacity/number": true,
@@ -71,7 +71,7 @@ export function applyAnnotationSetting(ann: Annotation, setting: AnnotationSetti
 }
 
 
-const circleAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+const circleAnnotationSettingTypeInfo: { [ix: string]: boolean } = {
   "fill/boolean": true,
   "fillColor/string": true,
   "lineColor/string": true,
@@ -94,7 +94,7 @@ export function applyCircleAnnotationSetting(circle: Circle, setting: CircleAnno
 }
 
 
-const polyAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+const polyAnnotationSettingTypeInfo: { [ix: string]: boolean } = {
   "fill/boolean": true,
   "fillColor/string": true,
   "lineColor/string": true,
@@ -115,7 +115,7 @@ export function applyPolyAnnotationSetting(poly: Poly, setting: PolyAnnotationSe
 }
 
 
-const polyLineAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
+const polyLineAnnotationSettingTypeInfo: { [ix: string]: boolean } = {
   "fill/boolean": true,
   "fillColor/string": true,
   "lineColor/string": true,
@@ -859,13 +859,13 @@ export class WWTInstance {
    * the data-fetch operation can potentially attempt to download and return
    * gigabytes of data.
    * */
-   async getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+  async getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
     return new Promise((resolve, _reject) => {
       this.ctl.renderContext.getCatalogHipsDataInView(options.imageset, options.limit, (msg) => {
         resolve(msg);
       });
     });
-   }
+  }
 
   // "Mutator" type operations -- not async.
 
@@ -935,32 +935,32 @@ export class WWTInstance {
     let noZoom = false;
 
     switch (options.foreground.get_dataSetType()) {
-    case ImageSetType.sky:
-      if (imageHeightDeg == 180) {
-        // All-sky image -- special behavior
-        noZoom = true;
-      } else  {
-        place.set_RA(options.foreground.get_centerX() * D2H);
-        place.set_dec(options.foreground.get_centerY());
-        place.set_zoomLevel(imageHeightDeg * 6);
-      }
-      break;
+      case ImageSetType.sky:
+        if (imageHeightDeg == 180) {
+          // All-sky image -- special behavior
+          noZoom = true;
+        } else {
+          place.set_RA(options.foreground.get_centerX() * D2H);
+          place.set_dec(options.foreground.get_centerY());
+          place.set_zoomLevel(imageHeightDeg * 6);
+        }
+        break;
 
-    case ImageSetType.earth:
-    case ImageSetType.planet:
-      place.set_zoomLevel(120); // a pleasing default, according to me
+      case ImageSetType.earth:
+      case ImageSetType.planet:
+        place.set_zoomLevel(120); // a pleasing default, according to me
 
-      if (imageHeightDeg != 180) {
-        // need to verify that this is right
-        place.set_lng(options.foreground.get_centerX());
-        place.set_lat(options.foreground.get_centerY());
-      }
-      break;
+        if (imageHeightDeg != 180) {
+          // need to verify that this is right
+          place.set_lng(options.foreground.get_centerX());
+          place.set_lat(options.foreground.get_centerY());
+        }
+        break;
 
-    default:
-      // TODO: more cases ...
-      place.set_zoomLevel(360);
-      break;
+      default:
+        // TODO: more cases ...
+        place.set_zoomLevel(360);
+        break;
     }
 
     this.ctl.renderContext.set_backgroundImageset(bkg);
