@@ -58,6 +58,18 @@
             </template>
           </v-popover>
         </div>
+        <div class="detail-row">
+          <span class="prompt">Marker:</span
+          ><select v-model="plotType">
+            <option
+              v-for="pt in uiPlotTypes"
+              v-bind:value="pt.wwt"
+              v-bind:key="pt.desc"
+            >
+              {{ pt.desc }}
+            </option>
+          </select>
+        </div>
       </div>
     </transition-expand>
   </div>
@@ -68,10 +80,30 @@ import { mapGetters, mapMutations, mapState } from "vuex";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 import { ImagesetInfo } from "@wwtelescope/engine-vuex";
-import { Color, Imageset, SpreadSheetLayerSetting } from "@wwtelescope/engine";
+import {
+  Color,
+  SpreadSheetLayerSetting,
+  SpreadSheetLayerSettingsInterfaceRO,
+} from "@wwtelescope/engine";
 import { ApplyTableLayerSettingsOptions } from "@wwtelescope/engine-helpers";
+import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
+
+interface UiPlotTypes {
+  wwt: PlotTypes;
+  desc: string;
+}
+
+const uiPlotTypes: UiPlotTypes[] = [
+  { wwt: PlotTypes.gaussian, desc: "Gaussian" },
+  { wwt: PlotTypes.circle, desc: "Circle" },
+  { wwt: PlotTypes.pushPin, desc: "Push-pin" },
+  // The other types don't currently render well.
+  // "point": starts out OK but gets gnarly if the catalog is dense and you zoom in.
+  // "square": actually renders as a flag
+  // "custom": to be investigated
+];
 
 interface VueColorData {
   rgba: {
@@ -96,6 +128,8 @@ export default class CatalogItem extends Vue {
 
   tableId = "";
 
+  uiPlotTypes = uiPlotTypes;
+
   // Vuex integration
 
   beforeCreate(): void {
@@ -104,7 +138,7 @@ export default class CatalogItem extends Vue {
         visible: (_state, getters) =>
           getters["researchAppHipsCatalogVisibility"](this.catalog),
       }),
-      ...mapGetters(wwtEngineNamespace, ["lookupImageset"]),
+      ...mapGetters(wwtEngineNamespace, ["spreadsheetStateForHipsCatalog"]),
       ...this.$options.computed,
     };
 
@@ -122,13 +156,29 @@ export default class CatalogItem extends Vue {
   }
 
   applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
-  lookupImageset!: (_n: string) => Imageset | null;
+  spreadsheetStateForHipsCatalog!: (
+    _n: string
+  ) => SpreadSheetLayerSettingsInterfaceRO | null;
   removeCatalogHipsByName!: (name: string) => void;
   removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   setResearchAppCatalogHipsVisibility!: (args: {
     catalog: ImagesetInfo;
     visible: boolean;
   }) => void;
+
+  get plotType(): PlotTypes {
+    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+
+    if (state !== null) {
+      return state.get_plotType();
+    }
+
+    return PlotTypes.gaussian;
+  }
+
+  set plotType(value: PlotTypes) {
+    this.applySettings([["plotType", value]]);
+  }
 
   // Implementation
 
@@ -137,23 +187,11 @@ export default class CatalogItem extends Vue {
   }
 
   private applySettings(settings: SpreadSheetLayerSetting[]) {
-    if (!this.tableId) {
-      // This is potentially a bit racey -- the table ID isn't set up until
-      // the HiPS catalog has loaded its metadata, which is asynchronous and
-      // depends on a network request.
-      const imgset = this.lookupImageset(this.catalog.name);
-
-      if (imgset !== null) {
-        const hips = imgset.get_hipsProperties();
-
-        if (hips !== null) {
-          this.tableId = hips.get_catalogSpreadSheetLayer().id.toString();
-        }
-      }
-    }
-
+    // Building on the hack/simplification that the GUID of the catalog's
+    // spreadsheet layer is its `datasetName`, even though that is absolutely
+    // not a v4 GUID at all.
     this.applyTableLayerSettings({
-      id: this.tableId,
+      id: this.catalog.name,
       settings: settings,
     });
   }
