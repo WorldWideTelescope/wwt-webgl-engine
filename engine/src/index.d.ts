@@ -40,6 +40,158 @@ import {
   SettingsInterface,
 } from "@wwtelescope/engine-types";
 
+
+// First: interfaces for settings (state)
+//
+// These are implicitly defined by the engine. We extract their definitions from
+// main WWT classes because our Vuex implementation needs to mirror this state
+// within the Vuex data store pattern.
+//
+// Along with these interfaces, see SettingsInterface defined in engine-types.
+// We have to define these interfaces here because some of their methods depend
+// on types that are only defined in this package.
+
+/** Interface for querying generic Layer settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface LayerSettingsInterfaceRO {
+  get_astronomical(): boolean;
+  get_color(): Color;
+  get_endTime(): Date;
+  get_fadeSpan(): number;
+  get_fadeType(): FadeType;
+  get_name(): string;
+  get_opacity(): number;
+  get_opened(): boolean;
+  get_referenceFrame(): string;
+  get_startTime(): Date;
+  get_version(): number;
+}
+
+/** Interface for controlling generic Layer settings. */
+export interface LayerSettingsInterface extends LayerSettingsInterfaceRO {
+  set_astronomical(v: boolean): boolean;
+  set_color(v: Color): Color;
+  set_endTime(v: Date): Date;
+  set_fadeSpan(v: number): number;
+  set_fadeType(v: FadeType): FadeType;
+  set_name(v: string): string;
+  set_opacity(v: number): number;
+  set_opened(v: boolean): boolean;
+  set_referenceFrame(v: string): string;
+  set_startTime(v: Date): Date;
+  set_version(v: number): number;
+}
+
+/** Interface for querying [[SpreadSheetLayer]] settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface SpreadSheetLayerSettingsInterfaceRO extends LayerSettingsInterfaceRO {
+  get_altColumn(): number;
+  get_altType(): AltTypes;
+  get_altUnit(): AltUnits;
+  get_barChartBitmask(): number;
+  get_beginRange(): Date;
+  get_cartesianCustomScale(): number;
+  get_cartesianScale(): AltUnits;
+  // get_colorMap
+  get_colorMapColumn(): number;
+  get_colorMapperName(): string;
+  get_coordinatesType(): CoordinatesType;
+  get_decay(): number;
+  get_dynamicColor(): boolean;
+  get_dynamicData(): boolean;
+  get_endDateColumn(): number;
+  get_endRange(): Date;
+  get_geometryColumn(): number;
+  get_hyperlinkColumn(): number;
+  get_hyperlinkFormat(): string;
+  get_latColumn(): number;
+  get_lngColumn(): number;
+  get_markerColumn(): number;
+  get_markerIndex(): number;
+  // get_markerMix
+  get_markerScale(): MarkerScales;
+  get_nameColumn(): number;
+  get_normalizeColorMap(): boolean;
+  get_normalizeColorMapMax(): number;
+  get_normalizeColorMapMin(): number;
+  get_normalizeSize(): boolean;
+  get_normalizeSizeClip(): boolean;
+  get_normalizeSizeMax(): number;
+  get_normalizeSizeMin(): number;
+  get_plotType(): PlotTypes;
+  get_pointScaleType(): PointScaleTypes;
+  get_raUnits(): RAUnits;
+  get_scaleFactor(): number;
+  get_showFarSide(): boolean;
+  get_sizeColumn(): number;
+  get_startDateColumn(): number;
+  get_timeSeries(): boolean;
+  get_xAxisColumn(): number;
+  get_xAxisReverse(): boolean;
+  get_yAxisColumn(): number;
+  get_yAxisReverse(): boolean;
+  get_zAxisColumn(): number;
+  get_zAxisReverse(): boolean;
+}
+
+/** Interface for controlling [[SpreadSheetLayer]] settings. */
+export interface SpreadSheetLayerSettingsInterface extends LayerSettingsInterface, SpreadSheetLayerSettingsInterfaceRO {
+  set_altColumn(v: number): number;
+  set_altType(v: AltTypes): AltTypes;
+  set_altUnit(v: AltUnits): AltUnits;
+  set_barChartBitmask(v: number): number;
+  set_beginRange(v: Date): Date;
+  set_cartesianCustomScale(v: number): number;
+  set_cartesianScale(v: AltUnits): AltUnits;
+  // get_colorMap
+  set_colorMapColumn(v: number): number;
+  set_colorMapperName(v: string): string;
+  set_coordinatesType(v: CoordinatesType): CoordinatesType;
+  set_decay(v: number): number;
+  set_dynamicColor(v: boolean): boolean;
+  set_dynamicData(v: boolean): boolean;
+  set_endDateColumn(v: number): number;
+  set_endRange(v: Date): Date;
+  set_geometryColumn(v: number): number;
+  set_hyperlinkColumn(v: number): number;
+  set_hyperlinkFormat(v: string): string;
+  set_latColumn(v: number): number;
+  set_lngColumn(v: number): number;
+  set_markerColumn(v: number): number;
+  set_markerIndex(v: number): number;
+  // get_markerMix
+  set_markerScale(v: MarkerScales): MarkerScales;
+  set_nameColumn(v: number): number;
+  set_normalizeColorMap(v: boolean): boolean;
+  set_normalizeColorMapMax(v: number): number;
+  set_normalizeColorMapMin(v: number): number;
+  set_normalizeSize(v: boolean): boolean;
+  set_normalizeSizeClip(v: boolean): boolean;
+  set_normalizeSizeMax(v: number): number;
+  set_normalizeSizeMin(v: number): number;
+  set_plotType(v: PlotTypes): PlotTypes;
+  set_pointScaleType(v: PointScaleTypes): PointScaleTypes;
+  set_raUnits(v: RAUnits): RAUnits;
+  set_scaleFactor(v: number): number;
+  set_showFarSide(v: boolean): boolean;
+  set_sizeColumn(v: number): number;
+  set_startDateColumn(v: number): number;
+  set_timeSeries(v: boolean): boolean;
+  set_xAxisColumn(v: number): number;
+  set_xAxisReverse(v: boolean): boolean;
+  set_yAxisColumn(v: number): number;
+  set_yAxisReverse(v: boolean): boolean;
+  set_zAxisColumn(v: number): number;
+  set_zAxisReverse(v: boolean): boolean;
+}
+
+
+// Now the actual types implemented in WWT.
+
 /** A generic callback type. */
 export interface Action {
   (): void;
@@ -363,7 +515,12 @@ export class Folder implements Thumbnail {
   childLoadCallback(callback: Action): void;
 }
 
-/** An simple Version 4 GUID */
+/** An simple Version 4 GUID.
+ *
+ * Note that in WWT, GUID contents are not validated in any way upon creation.
+ * The stringification of a [[Guid]] may therefore not follow the UUID4 standard
+ * form.
+ */
 export class Guid {
   toString(): string;
 }
@@ -375,7 +532,12 @@ export namespace Guid {
   /** Create a new GUID with a random value. */
   export function newGuid(): Guid;
 
-  /** Create an instance of the GUID class from its string representation. */
+  /** Create an instance of the GUID class from its string representation.
+   *
+   * In WWT, the input does not need to actually have the standard UUID4 format.
+   * You can actually pass this function any string you want! It had really
+   * better be globally unique, though, or you're going to run into problems.
+   * */
   export function fromString(id: string): Guid;
 }
 
@@ -388,7 +550,7 @@ export class HipsProperties {
   set_catalogColumnInfo(vt: VoTable | null): VoTable | null;
 
   // Note: this is actually a CatalogSpreadSheetLayer subclass, but it doesn't
-  // add any new APIs that we care about. But let's not exposed the setter.
+  // add any new APIs that we care about. But let's not expose the setter.
   get_catalogSpreadSheetLayer(): SpreadSheetLayer;
 }
 
@@ -592,7 +754,7 @@ export interface InViewReturnMessageCallback {
 
 /** An abstract class for graphical layers that are incorporated into the WWT
  * rendering engine. */
-export class Layer {
+export class Layer implements LayerSettingsInterface {
   id: Guid;
   loadedFromTour: boolean;
   tourDocument: TourDocument | null;
@@ -634,7 +796,17 @@ export namespace LayerManager {
   export function get_tourLayers(): boolean;
   export function set_tourLayers(v: boolean): boolean;
   //export function get_layerMaps(): {[name: string]: LayerMap}
-  export function get_layerList(): {[guidtext: string]: Layer};
+
+  /** Get the collection of all layers registered with the engine.
+   *
+   * The layer "list" is really an unordered dictionary of all registered
+   * layers, keyed by each layer's stringified GUID. Given a [[Layer]] object,
+   * you can get its key with `layer.id.toString()`. This list includes layers
+   * that have been registered for all engine rendering modes, while only one
+   * rendering mode is currently active at a time. So there are inevitably
+   * layers in the collection that are not currently being rendered.
+   */
+  export function get_layerList(): { [guidtext: string]: Layer };
 
   export function add(layer: Layer, updateTree: boolean): void;
   export function addFitsImageSetLayer(imageset: ImageSetLayer, title: string): ImageSetLayer;
@@ -1287,7 +1459,7 @@ export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
 
 /** A tabular data layer. */
-export class SpreadSheetLayer extends Layer {
+export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsInterface {
   colorMapperName: string;
 
   get_altColumn(): number;
