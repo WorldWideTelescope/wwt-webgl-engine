@@ -263,7 +263,6 @@ export class ConstellationFilter implements ConstellationFilterInterface {
 }
 
 export class Constellations {
-  
   static containment: Constellations;
 
   findConstellationForPoint(ra: number, dec: number): string;
@@ -272,16 +271,16 @@ export class Constellations {
 /** The full EngineSetting type, which augments engine-types' BaseEngineSetting
  * with types that are only provided within the engine itself.
  */
+// NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
 export type EngineSetting = BaseEngineSetting |
-  // NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
-  ["constellationArtFilter", ConstellationFilter] |
-  ["constellationBoundariesFilter", ConstellationFilter] |
-  ["constellationBoundryColor", Color] |
-  ["constellationFigureColor", Color] |
-  ["constellationFiguresFilter", ConstellationFilter] |
-  ["constellationNamesFilter", ConstellationFilter] |
-  ["constellationSelectionColor", Color] |
-  ["crosshairsColor", Color];
+["constellationArtFilter", ConstellationFilter] |
+["constellationBoundariesFilter", ConstellationFilter] |
+["constellationBoundryColor", Color] |
+["constellationFigureColor", Color] |
+["constellationFiguresFilter", ConstellationFilter] |
+["constellationNamesFilter", ConstellationFilter] |
+["constellationSelectionColor", Color] |
+["crosshairsColor", Color];
 
 export class FitsImage extends WcsImage {
   histogramMaxCount: number;
@@ -383,7 +382,7 @@ export namespace Guid {
 /** Properties of HiPS imagesets */
 
 export class HipsProperties {
-  get_properties(): {[index: string]: string};
+  get_properties(): { [index: string]: string };
 
   get_catalogColumnInfo(): VoTable | null;
   set_catalogColumnInfo(vt: VoTable | null): VoTable | null;
@@ -672,9 +671,9 @@ export type LayerManagerObject = typeof LayerManager;
 /** The full LayerSetting type, which augments engine-types' BaseLayerSetting
  * with types that are only provided within the engine itself.
  */
+// NOTE: isLayerSetting in engine-helpers needs to be kept in sync.
 export type LayerSetting = BaseLayerSetting |
-  // NOTE: isLayerSetting in engine-helpers needs to be kept in sync.
-  ["color", Color];
+["color", Color];
 
 export class Place implements Thumbnail {
   annotation: string;
