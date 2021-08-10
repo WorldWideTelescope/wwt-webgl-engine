@@ -472,13 +472,19 @@ export interface SettingsInterface {
 }
 
 /** Settings for instances of the Layer type.  */
+// NOTE: this type not only skips `color`, which requires the `Color` type
+// defined in the `engine` package, but a few other fields which we could define
+// here.
 export type BaseLayerSetting =
   ["astronomical", boolean] |
+  // endTime: Date
   ["fadeSpan", number] |
+  // fadeType: FadeType
   ["name", string] |
   ["opacity", number] |
   ["opened", boolean] |
   ["referenceFrame", string] |
+  // startTime: Date
   ["version", number];
 
 const baseLayerSettingTypeInfo = {
@@ -565,7 +571,7 @@ export type BaseSpreadSheetLayerSetting =
 
 // See implementation below -- we need to handle enums specially
 // to make sure that inputs are in-range.
-const baseSpreadSheetLayerSettingTypeInfo: {[k: string]: string} = {
+const baseSpreadSheetLayerSettingTypeInfo: { [k: string]: string } = {
   "altColumn/number": "",
   "altType/number": "AltTypes",
   "altUnit/number": "AltUnits",
@@ -686,7 +692,7 @@ export type BaseVoTableLayerSetting =
 
 // See implementation below -- we need to handle enums specially
 // to make sure that inputs are in-range.
-const baseVoTableLayerSettingTypeInfo: {[k: string]: string} = {
+const baseVoTableLayerSettingTypeInfo: { [k: string]: string } = {
   "altColumn/number": "",
   "altType/number": "AltTypes",
   "altUnit/number": "AltUnits",
@@ -755,7 +761,7 @@ export function isBaseVoTableLayerSetting(obj: [string, any]): obj is BaseVoTabl
 
 // TypeScript magic to allow fallible reverse mapping of string-valued enums.
 // https://stackoverflow.com/q/57922745/3760486
-type StringEnum = {[key: string]: string};
+type StringEnum = { [key: string]: string };
 
 function keysOf<K extends {}>(o: K): (keyof K)[];
 function keysOf(o: any) { return Object.keys(o); }  // eslint-disable-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any
