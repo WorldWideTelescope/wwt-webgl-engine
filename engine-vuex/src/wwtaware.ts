@@ -15,6 +15,7 @@ import {
   ImageSetLayer,
   InViewReturnMessage,
   SpreadSheetLayer,
+  SpreadSheetLayerSettingsInterfaceRO,
 } from "@wwtelescope/engine";
 
 import {
@@ -260,6 +261,7 @@ export class WWTAwareComponent extends Vue {
         "findRADecForScreenPoint",
         "layerForHipsCatalog",
         "lookupImageset",
+        "spreadsheetStateForHipsCatalog",
       ]),
       ...this.$options.computed,
     };
@@ -591,6 +593,8 @@ export class WWTAwareComponent extends Vue {
    * want to show.
    */
   setupForImageset!: (o: SetupForImagesetOptions) => void;
+
+  spreadsheetStateForHipsCatalog!: (name: string) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   /** Start playback of the currently loaded tour.
    *
