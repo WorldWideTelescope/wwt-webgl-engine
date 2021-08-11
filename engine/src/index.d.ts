@@ -58,6 +58,7 @@ import {
 export interface LayerSettingsInterfaceRO {
   get_astronomical(): boolean;
   get_color(): Color;
+  get_enabled(): boolean;
   get_endTime(): Date;
   get_fadeSpan(): number;
   get_fadeType(): FadeType;
@@ -73,6 +74,7 @@ export interface LayerSettingsInterfaceRO {
 export interface LayerSettingsInterface extends LayerSettingsInterfaceRO {
   set_astronomical(v: boolean): boolean;
   set_color(v: Color): Color;
+  set_enabled(v: boolean): boolean;
   set_endTime(v: Date): Date;
   set_fadeSpan(v: number): number;
   set_fadeType(v: FadeType): FadeType;
@@ -772,6 +774,8 @@ export class Layer implements LayerSettingsInterface {
   set_astronomical(v: boolean): boolean;
   get_color(): Color;
   set_color(v: Color): Color;
+  get_enabled(): boolean;
+  set_enabled(v: boolean): boolean;
   get_endTime(): Date;
   set_endTime(v: Date): Date;
   get_fadeSpan(): number;

@@ -477,6 +477,7 @@ export interface SettingsInterface {
 // here.
 export type BaseLayerSetting =
   ["astronomical", boolean] |
+  ["enabled", boolean] |
   // endTime: Date
   ["fadeSpan", number] |
   // fadeType: FadeType
@@ -489,6 +490,7 @@ export type BaseLayerSetting =
 
 const baseLayerSettingTypeInfo = {
   "astronomical/boolean": true,
+  "enabled/boolean": true,
   "fadeSpan/number": true,
   "name/string": true,
   "opacity/number": true,

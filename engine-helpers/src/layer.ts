@@ -22,6 +22,7 @@ import {
 export const layerSettingNames = [
   "astronomical",
   "color",
+  "enabled",
   "fadeSpan",
   "name",
   "opacity",
@@ -101,6 +102,17 @@ export class LayerState implements LayerSettingsInterface {
 
   set_color(v: Color): Color {
     this.color = v;
+    return v;
+  }
+
+  enabled!: boolean;
+
+  get_enabled(): boolean {
+    return this.enabled;
+  }
+
+  set_enabled(v: boolean): boolean {
+    this.enabled = v;
     return v;
   }
 
