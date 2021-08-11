@@ -36,10 +36,12 @@
           <span class="prompt">URL:</span
           ><span class="ellipsize">{{ catalog.url }}</span>
         </div>
+
         <div class="detail-row" v-if="catalog.description.length > 0">
           <span class="prompt">Description:</span
           ><span>{{ catalog.description }}</span>
         </div>
+
         <div class="detail-row">
           <span class="prompt">Color:</span>
           <v-popover class="circle-popover">
@@ -58,6 +60,7 @@
             </template>
           </v-popover>
         </div>
+
         <div class="detail-row">
           <span class="prompt">Marker:</span
           ><select v-model="plotType">
@@ -69,6 +72,33 @@
               {{ pt.desc }}
             </option>
           </select>
+        </div>
+
+        <div class="detail-row">
+          <span class="prompt">Size adjust:</span>
+          <div class="flex-row">
+            <font-awesome-icon
+              class="icon icon-button"
+              size="lg"
+              icon="minus-circle"
+              @keyup.enter="doAdjustSize(false)"
+              @click="doAdjustSize(false)"
+              tabindex="0"
+            />
+            <input
+              type="text"
+              class="scale-factor-input"
+              v-model="scaleFactorDbText"
+            />
+            <font-awesome-icon
+              class="icon icon-button"
+              size="lg"
+              icon="plus-circle"
+              @keyup.enter="doAdjustSize(true)"
+              @click="doAdjustSize(true)"
+              tabindex="0"
+            />
+          </div>
         </div>
       </div>
     </transition-expand>
@@ -208,6 +238,41 @@ export default class CatalogItem extends Vue {
     this.applySettings([["plotType", value]]);
   }
 
+  get scaleFactorDb(): number {
+    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+
+    if (state !== null) {
+      return 10 * Math.log10(state.get_scaleFactor());
+    }
+
+    return 0.0;
+  }
+
+  set scaleFactorDb(value: number) {
+    this.applySettings([["scaleFactor", Math.pow(10, 0.1 * value)]]);
+  }
+
+  // I can't find a customizable Vue numeric input that has good TypeScript
+  // support, so we just hand-roll the processing to give nice textual
+  // presentation.
+  get scaleFactorDbText(): string {
+    if (this.scaleFactorDb == 0) {
+      return "0.00";
+    } else if (this.scaleFactorDb < 0) {
+      return this.scaleFactorDb.toFixed(2);
+    } else {
+      return "+" + this.scaleFactorDb.toFixed(2);
+    }
+  }
+
+  set scaleFactorDbText(value: string) {
+    const n = Number(value);
+
+    if (isFinite(n)) {
+      this.scaleFactorDb = n;
+    }
+  }
+
   // Implementation
 
   mounted() {
@@ -252,6 +317,14 @@ export default class CatalogItem extends Vue {
       catalog: this.catalog,
       visible: val,
     });
+  }
+
+  doAdjustSize(bigger: boolean) {
+    if (bigger) {
+      this.scaleFactorDb += 0.5;
+    } else {
+      this.scaleFactorDb -= 0.5;
+    }
   }
 }
 </script>
@@ -313,6 +386,11 @@ export default class CatalogItem extends Vue {
   background: #404040;
 }
 
+.icon-button {
+  cursor: pointer;
+  display: inline-block;
+}
+
 .prompt {
   font-size: 11pt;
   font-weight: bold;
@@ -321,12 +399,27 @@ export default class CatalogItem extends Vue {
 
 .detail-row {
   padding: 1px 0px;
+
+  // Get nice vertical alignment in individual rows
+  display: flex;
+  align-items: center;
 }
 
 .ellipsize {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.flex-row {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.scale-factor-input {
+  flex: 1;
+  text-align: center;
 }
 
 // For styling the nested vue-color component
