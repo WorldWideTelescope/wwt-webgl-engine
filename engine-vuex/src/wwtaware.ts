@@ -15,6 +15,7 @@ import {
   ImageSetLayer,
   InViewReturnMessage,
   SpreadSheetLayer,
+  SpreadSheetLayerSettingsInterfaceRO,
 } from "@wwtelescope/engine";
 
 import {
@@ -225,7 +226,7 @@ export class WWTAwareComponent extends Vue {
    * This prop should have the same value in all components in the app that
    * reference WWT.
    */
-  @Prop({default: "wwt"}) readonly wwtNamespace!: string;
+  @Prop({ default: "wwt" }) readonly wwtNamespace!: string;
 
   beforeCreate(): void {
     // Wire up this component to its backing WWT Vuex state module. We have to
@@ -260,6 +261,7 @@ export class WWTAwareComponent extends Vue {
         "findRADecForScreenPoint",
         "layerForHipsCatalog",
         "lookupImageset",
+        "spreadsheetStateForHipsCatalog",
       ]),
       ...this.$options.computed,
     };
@@ -592,6 +594,8 @@ export class WWTAwareComponent extends Vue {
    */
   setupForImageset!: (o: SetupForImagesetOptions) => void;
 
+  spreadsheetStateForHipsCatalog!: (name: string) => SpreadSheetLayerSettingsInterfaceRO | null;
+
   /** Start playback of the currently loaded tour.
    *
    * Nothing hppanes if no tour is loaded.
@@ -680,7 +684,7 @@ export class WWTAwareComponent extends Vue {
    * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
    * It’s asynchronous because the requested FITS file has to be downloaded.
    */
-   loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
+  loadFitsLayer!: (_o: LoadFitsLayerOptions) => Promise<ImageSetLayer>;
 
   /** Request the creation of a image layer. Either a single FITS or an image set.
    *

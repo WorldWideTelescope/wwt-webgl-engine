@@ -2153,12 +2153,8 @@ namespace wwtlib
         public static void AddSpreadsheetLayer(SpreadSheetLayer layer, string frame)
         {
             layer.Enabled = true;
-            LayerList[layer.ID] = layer;
             layer.ReferenceFrame = frame;
-            AllMaps[frame].Layers.Add(layer);
-            AllMaps[frame].Open = true;
-            version++;
-            LoadTree();
+            Add(layer, true);
         }
 
         static void showOrbitPlanet_Click(object sender, EventArgs e)

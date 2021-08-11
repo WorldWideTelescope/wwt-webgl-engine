@@ -882,6 +882,7 @@ export type PywwtSpreadSheetLayerSetting =
   ["decay", number] |
   ["dynamicColor", boolean] |
   ["dynamicData", boolean] |
+  ["enabled", boolean] |
   ["endDateColumn", string | number] | // pywwt customization
   ["endRange", Date] |
   ["fadeSpan", number] |
@@ -939,6 +940,7 @@ const pywwtSpreadSheetLayerSettingTypeInfo: { [i: string]: boolean } = {
   "decay/number": true,
   "dynamicColor/boolean": true,
   "dynamicData/boolean": true,
+  "enabled/boolean": true,
   "endDateColumn/string": true,
   "endDateColumn/number": true,
   "endRange/Date": true,

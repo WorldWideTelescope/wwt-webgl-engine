@@ -58,6 +58,18 @@
             </template>
           </v-popover>
         </div>
+        <div class="detail-row">
+          <span class="prompt">Marker:</span
+          ><select v-model="plotType">
+            <option
+              v-for="pt in uiPlotTypes"
+              v-bind:value="pt.wwt"
+              v-bind:key="pt.desc"
+            >
+              {{ pt.desc }}
+            </option>
+          </select>
+        </div>
       </div>
     </transition-expand>
   </div>
@@ -68,10 +80,30 @@ import { mapGetters, mapMutations, mapState } from "vuex";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 import { ImagesetInfo } from "@wwtelescope/engine-vuex";
-import { Color, Imageset, SpreadSheetLayerSetting } from "@wwtelescope/engine";
+import {
+  Color,
+  SpreadSheetLayerSetting,
+  SpreadSheetLayerSettingsInterfaceRO,
+} from "@wwtelescope/engine";
 import { ApplyTableLayerSettingsOptions } from "@wwtelescope/engine-helpers";
+import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
+
+interface UiPlotTypes {
+  wwt: PlotTypes;
+  desc: string;
+}
+
+const uiPlotTypes: UiPlotTypes[] = [
+  { wwt: PlotTypes.gaussian, desc: "Gaussian" },
+  { wwt: PlotTypes.circle, desc: "Circle" },
+  { wwt: PlotTypes.pushPin, desc: "Push-pin" },
+  // The other types don't currently render well.
+  // "point": starts out OK but gets gnarly if the catalog is dense and you zoom in.
+  // "square": actually renders as a flag
+  // "custom": handled same as push-pin in the engine
+];
 
 interface VueColorData {
   rgba: {
@@ -88,13 +120,7 @@ export default class CatalogItem extends Vue {
   @Prop({ required: false, default: Color.fromArgb(1, 255, 255, 255) })
   defaultColor!: Color;
 
-  hasFocus = false;
-  isSelected = false;
-  color = new Color();
-  // Tied to the store value
-  visible!: boolean;
-
-  tableId = "";
+  uiPlotTypes = uiPlotTypes;
 
   // Vuex integration
 
@@ -104,7 +130,7 @@ export default class CatalogItem extends Vue {
         visible: (_state, getters) =>
           getters["researchAppHipsCatalogVisibility"](this.catalog),
       }),
-      ...mapGetters(wwtEngineNamespace, ["lookupImageset"]),
+      ...mapGetters(wwtEngineNamespace, ["spreadsheetStateForHipsCatalog"]),
       ...this.$options.computed,
     };
 
@@ -121,14 +147,66 @@ export default class CatalogItem extends Vue {
     };
   }
 
+  // Tied to the store value
+  visible!: boolean;
+
+  spreadsheetStateForHipsCatalog!: (
+    _n: string
+  ) => SpreadSheetLayerSettingsInterfaceRO | null;
+
   applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
-  lookupImageset!: (_n: string) => Imageset | null;
   removeCatalogHipsByName!: (name: string) => void;
   removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   setResearchAppCatalogHipsVisibility!: (args: {
     catalog: ImagesetInfo;
     visible: boolean;
   }) => void;
+
+  // Local state
+
+  hasFocus = false;
+  isSelected = false;
+
+  get color(): Color {
+    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+
+    if (state !== null) {
+      return state.get_color();
+    } else {
+      return this.defaultColor;
+    }
+  }
+
+  set color(value: Color) {
+    this.applySettings([
+      ["color", value],
+      ["opacity", value.a],
+    ]);
+  }
+
+  get enabled(): boolean {
+    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+
+    if (state !== null) {
+      return state.get_enabled();
+    } else {
+      return true;
+    }
+  }
+
+  get plotType(): PlotTypes {
+    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+
+    if (state !== null) {
+      return state.get_plotType();
+    }
+
+    return PlotTypes.gaussian;
+  }
+
+  set plotType(value: PlotTypes) {
+    this.applySettings([["plotType", value]]);
+  }
 
   // Implementation
 
@@ -137,23 +215,11 @@ export default class CatalogItem extends Vue {
   }
 
   private applySettings(settings: SpreadSheetLayerSetting[]) {
-    if (!this.tableId) {
-      // This is potentially a bit racey -- the table ID isn't set up until
-      // the HiPS catalog has loaded its metadata, which is asynchronous and
-      // depends on a network request.
-      const imgset = this.lookupImageset(this.catalog.name);
-
-      if (imgset !== null) {
-        const hips = imgset.get_hipsProperties();
-
-        if (hips !== null) {
-          this.tableId = hips.get_catalogSpreadSheetLayer().id.toString();
-        }
-      }
-    }
-
+    // Building on the hack/simplification that the GUID of the catalog's
+    // spreadsheet layer is its `datasetName`, even though that is absolutely
+    // not a v4 GUID at all.
     this.applyTableLayerSettings({
-      id: this.tableId,
+      id: this.catalog.name,
       settings: settings,
     });
   }
@@ -172,27 +238,20 @@ export default class CatalogItem extends Vue {
 
   handleColorChange(colorData: VueColorData) {
     const rgba = colorData["rgba"];
-    const newColor = Color.fromArgb(rgba["a"], rgba["r"], rgba["g"], rgba["b"]);
-    this.color = newColor;
-
-    if (this.visible) {
-      this.applySettings([
-        ["color", this.color],
-        ["opacity", this.color.a],
-      ]);
-    }
+    this.color = Color.fromArgb(rgba["a"], rgba["r"], rgba["g"], rgba["b"]);
   }
 
   @Watch("visible")
   onVisibilityChange(val: boolean) {
-    if (val) {
-      this.applySettings([
-        ["color", this.color],
-        ["opacity", this.color.a],
-      ]);
-    } else {
-      this.applySettings([["opacity", 0]]);
-    }
+    this.applySettings([["enabled", val]]);
+  }
+
+  @Watch("enabled")
+  onEnabledChange(val: boolean) {
+    this.setResearchAppCatalogHipsVisibility({
+      catalog: this.catalog,
+      visible: val,
+    });
   }
 }
 </script>

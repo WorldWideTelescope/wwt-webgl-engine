@@ -21,6 +21,7 @@ import {
   ImageSetLayer,
   InViewReturnMessage,
   SpreadSheetLayer,
+  SpreadSheetLayerSettingsInterfaceRO,
   WWTControl,
 } from "@wwtelescope/engine";
 
@@ -29,12 +30,14 @@ import {
   AddImageSetLayerOptions,
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
+  applySpreadSheetLayerSetting,
   GetCatalogHipsDataInViewOptions,
   GotoTargetOptions,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
   SetLayerOrderOptions,
   SetupForImagesetOptions,
+  SpreadSheetLayerState,
   StretchFitsLayerOptions,
   UpdateTableLayerOptions,
   WWTInstance,
@@ -90,10 +93,31 @@ export class ImagesetInfo {
   }
 }
 
-/** This interface expresses the properties exposed by the WWT Engine’s
- * Vuex store module.
+/** This interface expresses the properties exposed by the WWT Engine’s Vuex
+ * store module.
+ *
+ * Much of this duplicates state that is already stored within the WWT engine
+ * itself (i.e., the `WWTInstance`). Due to the way that the Vue/Vuex reactivity
+ * framework works, we need to mirror the engine state into Vuex. The first
+ * reason to do this is that, as far as I can tell, there's no good way to
+ * integrate the "external" state of the WWT instance into the reactivity
+ * framework so that dependencies can be mapped correctly. And we can't just
+ * integrate the WWT instance into the reactivity framework -- well, I haven't
+ * tried, but I'm 99% sure that it won't work with all of the WebGL textures and
+ * whatnot. I.e., the WWT types that hold state are not "plain old data".
+ *
+ * The second reason is that it is recommended for app state to be flattened and
+ * normalized when expressed in Vuex, as in [this post]. The WWT engine
+ * certainly does *not* express its state in such a manner.
+ *
+ * [this post]: https://forum.vuejs.org/t/vuex-best-practices-for-complex-objects/10143/2
+ *
+ * The duplication of WWT's data structures is annoying, but the actual amount
+ * of mirrored data isn't very big.
  */
 export interface WWTEngineVuexState {
+  // NOTE: We were orginally alphabetizing these all, but now I think it will be
+  // better to group topically related fields.
 
   /** Info about the imagesets that are available in the engine to be used as backgrounds */
   availableImagesets: ImagesetInfo[];
@@ -189,6 +213,11 @@ export interface WWTEngineVuexState {
    * TODO: define this properly for 3D modes!
    */
   zoomDeg: number;
+
+  // Layers and layer management
+
+  /** Settings for all registered WWT spreadsheet layers. */
+  spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState };
 }
 
 /** The parameters for the [[WWTEngineVuexModule.createTableLayer]] action. */
@@ -250,6 +279,9 @@ export interface LoadImageCollectionParams {
   stateFactory: true,
 })
 export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexState {
+  // NOTE: We were orginally alphabetizing these all, but now I think it will be
+  // better to group topically related fields.
+
   availableImagesets: ImagesetInfo[] = [];
   backgroundImageset: Imageset | null = null;
   clockDiscontinuities = 0;
@@ -285,19 +317,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
         throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
       const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
       return { ra: (15 * coords.x + 720) % 360, dec: coords.y };
-    }
-  }
-
-  get layerForHipsCatalog() {
-    return function (name: string): SpreadSheetLayer | null {
-      if (Vue.$wwt.inst === null)
-        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
-      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
-      if (layer !== null && layer instanceof SpreadSheetLayer) {
-        return layer;
-      } else {
-        return null;
-      }
     }
   }
 
@@ -405,27 +424,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setupForImageset without linking to WWTInstance');
     Vue.$wwt.inst.setupForImageset(options);
-  }
-
-  @Action({ rawError: true })
-  addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
-    return Vue.$wwt.inst.addCatalogHipsByName(options);
-  }
-
-  @Action({ rawError: true })
-  getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot getCatalogHipsDataInView without linking to WWTInstance');
-    return Vue.$wwt.inst.getCatalogHipsDataInView(options);
-  }
-
-  @Mutation
-  removeCatalogHipsByName(name: string): void {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
   }
 
   @Mutation
@@ -677,6 +675,55 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.$wwt.inst.applyFitsLayerSettings(options);
   }
 
+  @Mutation
+  deleteLayer(id: string | Guid): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot deleteLayer without linking to WWTInstance');
+
+    let stringId = "";
+
+    if (typeof id === "string") {
+      stringId = id;
+      const guid = Guid.fromString(id);
+      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
+    } else {
+      stringId = id.toString();
+      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
+    }
+
+    // Mirror modification in the reactive system. Here we just
+    // delete willy-nilly and ignore any missing cases.
+
+    Vue.delete(this.spreadSheetLayers, stringId);
+  }
+
+  // Annotations
+
+  @Mutation
+  addAnnotation(ann: Annotation): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot addAnnotation without linking to WWTInstance');
+    Vue.$wwt.inst.si.addAnnotation(ann);
+  }
+
+  @Mutation
+  removeAnnotation(ann: Annotation): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot removeAnnotation without linking to WWTInstance');
+    Vue.$wwt.inst.si.removeAnnotation(ann);
+  }
+
+  @Mutation
+  clearAnnotations(): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot clearAnnotations without linking to WWTInstance');
+    Vue.$wwt.inst.si.clearAnnotations();
+  }
+
+  // Spreadsheet layers
+
+  spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState } = {};
+
   @Action({ rawError: true })
   async createTableLayer(
     options: CreateTableLayerParams
@@ -712,14 +759,31 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
     // Currently, table creation is synchronous, but treat it as async
     // in case our API needs to get more sophisticated later.
-    return new Promise((resolve, _reject) => resolve(layer));
+    const prom = new Promise<SpreadSheetLayer>((resolve, _reject) => resolve(layer));
+
+    // Mirror the layer state into the reactivity system.
+    const wwtLayer = await prom;
+    const guidText = wwtLayer.id.toString();
+    Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+
+    return wwtLayer;
   }
 
   @Mutation
   applyTableLayerSettings(options: ApplyTableLayerSettingsOptions): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot applyTableLayerSettings without linking to WWTInstance');
+
     Vue.$wwt.inst.applyTableLayerSettings(options);
+
+    // Mirror changes in the reactive framework.
+    const state = this.spreadSheetLayers[options.id];
+
+    if (state !== undefined) {
+      for (const s of options.settings) {
+        applySpreadSheetLayerSetting(state, s);
+      }
+    }
   }
 
   @Mutation
@@ -727,42 +791,101 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot updateTableLayer without linking to WWTInstance');
     Vue.$wwt.inst.updateTableLayer(options);
+
+    // Nothing to mirror in reactive-land -- this call affects the table data.
   }
 
-  @Mutation
-  deleteLayer(id: string | Guid): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot deleteLayer without linking to WWTInstance');
+  // Progressive HiPS catalogs.
+  //
+  // These have some characteristics of imagesets, and some characteristics
+  // of spreadsheet layers.
 
-    if (typeof id === "string") {
-      const guid = Guid.fromString(id);
-      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
-    } else {
-      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
+  /** Get the actual WWT `SpreadSheetLayer` for the named HiPS catalog.
+   *
+   * Do not use this function for UI purposes -- the WWT layer object is not
+   * integrated into the reactive state system, and so if you use it as a basis
+   * for UI elements, those elements will not be updated properly if/when the
+   * layer's settings change. Use [[spreadsheetStateForHipsCatalog]] instead.
+   *
+   * @param name The `datasetName` of the HiPS catalog
+   */
+  get layerForHipsCatalog() {
+    return function (name: string): SpreadSheetLayer | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
+
+      // NOTE! There is an intense hack in the HiPS catalog support where the
+      // GUID of each HiPS catalog's SpreadSheetLayer is the `datasetName` from
+      // the catalog metadata. This is possible because the WWT `Guid` class
+      // doesn't actually do any validation, and just accepts any string you
+      // give it.
+      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
+
+      if (layer !== null && layer instanceof SpreadSheetLayer) {
+        return layer;
+      } else {
+        return null;
+      }
     }
   }
 
-  // Annotations
+  /** Get reactive `SpreadSheetLayer` settings for the named HiPS catalog.
+   *
+   * The returned data structure is a component of the app's Vuex state. You can
+   * therefore use the settings to construct UI elements, and they will update
+   * reactively as the state evolves. The actual data structures used by WWT are
+   * separate, but the two mirror each other.
+   *
+   * @param name The `datasetName` of the HiPS catalog
+   */
+  get spreadsheetStateForHipsCatalog() {
+    return (name: string): SpreadSheetLayerSettingsInterfaceRO | null => {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get spreadsheetStateForHipsCatalog without linking to WWTInstance');
 
-  @Mutation
-  addAnnotation(ann: Annotation): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot addAnnotation without linking to WWTInstance');
-    Vue.$wwt.inst.si.addAnnotation(ann);
+      // NOTE: hack as described above -- the name is the GUID.
+      return this.spreadSheetLayers[name] || null;
+    }
+  }
+
+  @Action({ rawError: true })
+  async addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
+
+    const imgset = await Vue.$wwt.inst.addCatalogHipsByName(options);
+
+    // Mirror the spreadsheet layer aspect into the reactivity system.
+
+    const hips = imgset.get_hipsProperties();
+
+    if (hips !== null) {
+      const wwtLayer = hips.get_catalogSpreadSheetLayer();
+      const guidText = wwtLayer.id.toString();
+      Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+    }
+
+    return imgset;
+  }
+
+  @Action({ rawError: true })
+  getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot getCatalogHipsDataInView without linking to WWTInstance');
+    return Vue.$wwt.inst.getCatalogHipsDataInView(options);
   }
 
   @Mutation
-  removeAnnotation(ann: Annotation): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot removeAnnotation without linking to WWTInstance');
-    Vue.$wwt.inst.si.removeAnnotation(ann);
-  }
+  removeCatalogHipsByName(name: string): void {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
 
-  @Mutation
-  clearAnnotations(): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot clearAnnotations without linking to WWTInstance');
-    Vue.$wwt.inst.si.clearAnnotations();
-  }
+    Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
 
+    // Un-mirror the spreadsheet layer aspect from the reactivity system. Here
+    // we leverage the quasi-hack that the GUID of the spreadsheet layer is set
+    // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
+
+    Vue.delete(this.spreadSheetLayers, name);
+  }
 }
