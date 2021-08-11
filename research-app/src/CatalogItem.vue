@@ -102,7 +102,7 @@ const uiPlotTypes: UiPlotTypes[] = [
   // The other types don't currently render well.
   // "point": starts out OK but gets gnarly if the catalog is dense and you zoom in.
   // "square": actually renders as a flag
-  // "custom": to be investigated
+  // "custom": handled same as push-pin in the engine
 ];
 
 interface VueColorData {
@@ -119,14 +119,6 @@ export default class CatalogItem extends Vue {
   @Prop({ required: true }) catalog!: ImagesetInfo;
   @Prop({ required: false, default: Color.fromArgb(1, 255, 255, 255) })
   defaultColor!: Color;
-
-  hasFocus = false;
-  isSelected = false;
-  color = new Color();
-  // Tied to the store value
-  visible!: boolean;
-
-  tableId = "";
 
   uiPlotTypes = uiPlotTypes;
 
@@ -155,16 +147,52 @@ export default class CatalogItem extends Vue {
     };
   }
 
-  applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
+  // Tied to the store value
+  visible!: boolean;
+
   spreadsheetStateForHipsCatalog!: (
     _n: string
   ) => SpreadSheetLayerSettingsInterfaceRO | null;
+
+  applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
   removeCatalogHipsByName!: (name: string) => void;
   removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
   setResearchAppCatalogHipsVisibility!: (args: {
     catalog: ImagesetInfo;
     visible: boolean;
   }) => void;
+
+  // Local state
+
+  hasFocus = false;
+  isSelected = false;
+
+  get color(): Color {
+    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+
+    if (state !== null) {
+      return state.get_color();
+    } else {
+      return this.defaultColor;
+    }
+  }
+
+  set color(value: Color) {
+    this.applySettings([
+      ["color", value],
+      ["opacity", value.a],
+    ]);
+  }
+
+  get enabled(): boolean {
+    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+
+    if (state !== null) {
+      return state.get_enabled();
+    } else {
+      return true;
+    }
+  }
 
   get plotType(): PlotTypes {
     const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
@@ -210,27 +238,20 @@ export default class CatalogItem extends Vue {
 
   handleColorChange(colorData: VueColorData) {
     const rgba = colorData["rgba"];
-    const newColor = Color.fromArgb(rgba["a"], rgba["r"], rgba["g"], rgba["b"]);
-    this.color = newColor;
-
-    if (this.visible) {
-      this.applySettings([
-        ["color", this.color],
-        ["opacity", this.color.a],
-      ]);
-    }
+    this.color = Color.fromArgb(rgba["a"], rgba["r"], rgba["g"], rgba["b"]);
   }
 
   @Watch("visible")
   onVisibilityChange(val: boolean) {
-    if (val) {
-      this.applySettings([
-        ["color", this.color],
-        ["opacity", this.color.a],
-      ]);
-    } else {
-      this.applySettings([["opacity", 0]]);
-    }
+    this.applySettings([["enabled", val]]);
+  }
+
+  @Watch("enabled")
+  onEnabledChange(val: boolean) {
+    this.setResearchAppCatalogHipsVisibility({
+      catalog: this.catalog,
+      visible: val,
+    });
   }
 }
 </script>
