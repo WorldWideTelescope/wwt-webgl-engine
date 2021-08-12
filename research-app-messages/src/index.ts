@@ -197,10 +197,10 @@ export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-dis
 
 export interface SelectionStateMessage {
 
-    /** The tag identifying this message type. */
-    type: "wwt_selection_state";
+  /** The tag identifying this message type. */
+  type: "wwt_selection_state";
 
-    /** An app/client session identifier.
+  /** An app/client session identifier.
    *
    * If a single client is communicating with multiple apps, it needs to be able
    * to tell which app is the source of any update messages. This session
@@ -218,14 +218,4 @@ export interface SelectionStateMessage {
 
   /** The list of sources that are currently selected. */
   selectedSources?: string[];
-}
-
-/** Type guard function for [[SelectionStateMessage]] */
-export function isSelectionStateMessage(o: any): o is SelectionStateMessage { // eslint-disable-line @typescript-eslint/no-explicit-any
-  return typeof o.type === "string" &&
-    o.type == "wwt_selection_state" &&
-    typeof o.threadId === "string" &&
-    (o.sessionId === undefined || typeof o.sessionId === "string") &&
-    (o.mostRecentSource === undefined || typeof o.mostRecentSource === "string") &&
-    (o.selectedSources === undefined || typeof o.selectedSources === "string");
 }
