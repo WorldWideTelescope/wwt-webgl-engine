@@ -267,9 +267,9 @@ export type BaseEngineSetting =
   ["constellationSelectionColor", string] |
   ["crosshairsColor", string] |
   ["earthCutawayView", boolean] |
-  ["fovCamera", number] |
-  ["fovEyepiece", number] |
-  ["fovTelescope", number] |
+  //["fovCamera", number] |  // skipping because not settable
+  //["fovEyepiece", number] |  // skipping because not settable
+  //["fovTelescope", number] |  // skipping because not settable
   ["localHorizonMode", boolean] |
   ["galacticMode", boolean] |
   ["locationAltitude", number] |
@@ -278,7 +278,7 @@ export type BaseEngineSetting =
   ["milkyWayModel", boolean] |
   ["showAltAzGrid", boolean] |
   ["showAltAzGridText", boolean] |
-  ["showClouds", boolean] |
+  //["showClouds", boolean] |  // skipping because not settable
   ["showConstellations", boolean] |
   ["showConstellationBoundries", boolean] |
   ["showConstellationFigures", boolean] |
@@ -293,14 +293,14 @@ export type BaseEngineSetting =
   ["showEclipticOverviewText", boolean] |
   ["showElevationModel", boolean] |
   ["showEquatorialGridText", boolean] |
-  ["showFieldOfView", boolean] |
+  //["showFieldOfView", boolean] |  // skipping because not settable
   ["showGalacticGrid", boolean] |
   ["showGalacticGridText", boolean] |
   ["showGrid", boolean] |
   ["showHorizon", boolean] |
-  ["showHorizonPanorama", boolean] |
+  //["showHorizonPanorama", boolean] |  // skipping because not settable
   ["showISSModel", boolean] |
-  ["showMoonsAsPointSource", boolean] |
+  //["showMoonsAsPointSource", boolean] |  // skipping because not settable
   ["showPrecessionChart", boolean] |
   ["showSkyGrids", boolean] |
   ["showSkyNode", boolean] |
@@ -320,7 +320,7 @@ export type BaseEngineSetting =
   ["solarSystemPlanets", boolean] |
   ["solarSystemStars", boolean] |
   ["minorPlanetsFilter", number] |
-  ["plantOrbitsFilter", number] |
+  ["planetOrbitsFilter", number] |
   ["solarSystemScale", number];
 
 // I'm not aware of any smart TypeScripty way to automate the construction of this table :-(
@@ -333,9 +333,9 @@ const baseEngineSettingTypeInfo = {
   "constellationSelectionColor/string": true,
   "crosshairsColor/string": true,
   "earthCutawayView/boolean": true,
-  "fovCamera/number": true,
-  "fovEyepiece/number": true,
-  "fovTelescope/number": true,
+  //"fovCamera/number": true,  // skipping because not settable
+  //"fovEyepiece/number": true,  // skipping because not settable
+  //"fovTelescope/number": true,  // skipping because not settable
   "localHorizonMode/boolean": true,
   "galacticMode/boolean": true,
   "locationAltitude/number": true,
@@ -344,7 +344,7 @@ const baseEngineSettingTypeInfo = {
   "milkyWayModel/boolean": true,
   "showAltAzGrid/boolean": true,
   "showAltAzGridText/boolean": true,
-  "showClouds/boolean": true,
+  //"showClouds/boolean": true,  // skipping because not settable
   "showConstellations/boolean": true,
   "showConstellationBoundries/boolean": true,
   "showConstellationFigures/boolean": true,
@@ -359,14 +359,14 @@ const baseEngineSettingTypeInfo = {
   "showEclipticOverviewText/boolean": true,
   "showElevationModel/boolean": true,
   "showEquatorialGridText/boolean": true,
-  "showFieldOfView/boolean": true,
+  //"showFieldOfView/boolean": true,  // skipping because not settable
   "showGalacticGrid/boolean": true,
   "showGalacticGridText/boolean": true,
   "showGrid/boolean": true,
   "showHorizon/boolean": true,
-  "showHorizonPanorama/boolean": true,
+  //"showHorizonPanorama/boolean": true,  // skipping because not settable
   "showISSModel/boolean": true,
-  "showMoonsAsPointSource/boolean": true,
+  //"showMoonsAsPointSource/boolean": true,  // skipping because not settable
   "showPrecessionChart/boolean": true,
   "showSkyGrids/boolean": true,
   "showSkyNode/boolean": true,
@@ -386,7 +386,7 @@ const baseEngineSettingTypeInfo = {
   "solarSystemPlanets/boolean": true,
   "solarSystemStars/boolean": true,
   "minorPlanetsFilter/number": true,
-  "plantOrbitsFilter/number": true,
+  "planetOrbitsFilter/number": true,
   "solarSystemScale/number": true,
 }
 
@@ -403,8 +403,8 @@ export interface ConstellationFilterInterface {
 
 /** Core settings for the WWT rendering engine.
  *
- * This corresponds to the `ISettings` interface, which is implemented by the
- * `Settings` and `TourStop` classes.
+ * This (almost) corresponds to the `ISettings` interface, which is implemented
+ * by the `Settings` and `TourStop` classes.
 */
 export interface SettingsInterface {
   get_actualPlanetScale(): boolean;
@@ -414,9 +414,9 @@ export interface SettingsInterface {
   get_constellationNamesFilter(): ConstellationFilterInterface;
   get_constellationsEnabled(): string;
   get_earthCutawayView(): boolean;
-  get_fovCamera(): number;
-  get_fovEyepiece(): number;
-  get_fovTelescope(): number;
+  //get_fovCamera(): number;  // skipping because not settable
+  //get_fovEyepiece(): number;  // skipping because not settable
+  //get_fovTelescope(): number;  // skipping because not settable
   get_galacticMode(): boolean;
   get_localHorizonMode(): boolean;
   get_locationAltitude(): number;
@@ -427,7 +427,7 @@ export interface SettingsInterface {
   get_planetOrbitsFilter(): number;
   get_showAltAzGrid(): boolean;
   get_showAltAzGridText(): boolean;
-  get_showClouds(): boolean;
+  //get_showClouds(): boolean;  // skipping because not settable
   get_showConstellationBoundries(): boolean;
   get_showConstellationFigures(): boolean;
   get_showConstellationLabels(): boolean;
@@ -441,14 +441,14 @@ export interface SettingsInterface {
   get_showEclipticOverviewText(): boolean;
   get_showElevationModel(): boolean;
   get_showEquatorialGridText(): boolean;
-  get_showFieldOfView(): boolean;
+  //get_showFieldOfView(): boolean;  // skipping because not settable
   get_showGalacticGrid(): boolean;
   get_showGalacticGridText(): boolean;
   get_showGrid(): boolean;
   get_showHorizon(): boolean;
-  get_showHorizonPanorama(): boolean;
+  //get_showHorizonPanorama(): boolean;  // skipping because not settable
   get_showISSModel(): boolean;
-  get_showMoonsAsPointSource(): boolean;
+  //get_showMoonsAsPointSource(): boolean;  // skipping because not settable
   get_showPrecessionChart(): boolean;
   get_showSkyGrids(): boolean;
   get_showSkyNode(): boolean;
@@ -467,8 +467,6 @@ export interface SettingsInterface {
   get_solarSystemPlanets(): boolean;
   get_solarSystemScale(): number;
   get_solarSystemStars(): boolean;
-
-  // getSetting()
 }
 
 /** Settings for instances of the Layer type.  */
