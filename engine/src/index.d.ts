@@ -73,7 +73,7 @@ export interface AnnotationSettingsInterface extends AnnotationSettingsInterface
   set_tag(v: string): string;
 }
 
-export interface CircleAnnotationSettingsInterfaceRO {
+export interface CircleAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
   get_fill(): boolean;
   get_fillColor(): string;
   get_lineColor(): string;
@@ -82,7 +82,7 @@ export interface CircleAnnotationSettingsInterfaceRO {
   get_skyRelative(): boolean;
 }
 
-export interface CircleAnnotationSettingsInterface extends CircleAnnotationSettingsInterfaceRO {
+export interface CircleAnnotationSettingsInterface extends AnnotationSettingsInterface, CircleAnnotationSettingsInterfaceRO {
   set_fill(v: boolean): boolean;
   set_fillColor(v: string): string;
   set_lineColor(v: string): string;
@@ -156,6 +156,21 @@ export interface EngineSettingsInterface extends EngineSettingsInterfaceRO {
   set_solarSystemMinorOrbits(v: boolean): boolean;
 }
 
+/** Interface for querying [[ImageSetLayer]] settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface ImageSetLayerSettingsInterfaceRO extends LayerSettingsInterfaceRO {
+  get_colorMapperName(): string;
+  get_overrideDefaultLayer(): boolean;
+}
+
+/** Interface for controlling [[ImageSetLayer]] settings. */
+export interface ImageSetLayerSettingsInterface extends LayerSettingsInterface, ImageSetLayerSettingsInterfaceRO {
+  set_colorMapperName(v: string): string;
+  set_overrideDefaultLayer(v: boolean): boolean;
+}
+
 /** Interface for querying generic Layer settings.
  *
  * The `RO` is short for "read-only".
@@ -191,40 +206,26 @@ export interface LayerSettingsInterface extends LayerSettingsInterfaceRO {
   set_version(v: number): number;
 }
 
-export interface PolyAnnotationSettingsInterfaceRO {
+export interface PolyAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
   get_fill(): boolean;
   get_fillColor(): string;
   get_lineColor(): string;
   get_lineWidth(): number;
 }
 
-export interface PolyAnnotationSettingsInterface extends PolyAnnotationSettingsInterfaceRO {
+export interface PolyAnnotationSettingsInterface extends AnnotationSettingsInterface, PolyAnnotationSettingsInterfaceRO {
   set_fill(v: boolean): boolean;
   set_fillColor(v: string): string;
   set_lineColor(v: string): string;
   set_lineWidth(v: number): number;
 }
 
-export interface PolyAnnotationSettingsInterfaceRO {
-  get_fill(): boolean;
-  get_fillColor(): string;
+export interface PolyLineAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
   get_lineColor(): string;
   get_lineWidth(): number;
 }
 
-export interface PolyAnnotationSettingsInterface extends PolyAnnotationSettingsInterfaceRO {
-  set_fill(v: boolean): boolean;
-  set_fillColor(v: string): string;
-  set_lineColor(v: string): string;
-  set_lineWidth(v: number): number;
-}
-
-export interface PolyLineAnnotationSettingsInterfaceRO {
-  get_lineColor(): string;
-  get_lineWidth(): number;
-}
-
-export interface PolyLineAnnotationSettingsInterface extends PolyLineAnnotationSettingsInterfaceRO {
+export interface PolyLineAnnotationSettingsInterface extends AnnotationSettingsInterface, PolyLineAnnotationSettingsInterfaceRO {
   set_lineColor(v: string): string;
   set_lineWidth(v: number): number;
 }
@@ -334,6 +335,93 @@ export interface SpreadSheetLayerSettingsInterface extends LayerSettingsInterfac
   set_zAxisReverse(v: boolean): boolean;
 }
 
+/** Interface for querying [[VoTableLayer]] settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface VoTableLayerSettingsInterfaceRO extends LayerSettingsInterfaceRO {
+  get_altColumn(): number;
+  get_altType(): AltTypes;
+  get_altUnit(): AltUnits;
+  get_autoUpdate(): boolean;
+  get_beginRange(): Date;
+  get_cartesianCustomScale(): number;
+  get_cartesianScale(): AltUnits;
+  // get_colorMap
+  get_colorMapColumn(): number;
+  get_coordinatesType(): CoordinatesType;
+  get_dataSourceUrl(): string;
+  get_decay(): number;
+  get_dynamicData(): boolean;
+  get_endDateColumn(): number;
+  get_endRange(): Date;
+  get_hyperlinkColumn(): number;
+  get_hyperlinkFormat(): string;
+  get_latColumn(): number;
+  get_lngColumn(): number;
+  get_markerColumn(): number;
+  get_markerIndex(): number;
+  // get_markerMix
+  get_markerScale(): MarkerScales;
+  get_nameColumn(): number;
+  get_plotType(): PlotTypes;
+  get_pointScaleType(): PointScaleTypes;
+  get_raUnits(): RAUnits;
+  get_scaleFactor(): number;
+  get_showFarSide(): boolean;
+  get_sizeColumn(): number;
+  get_startDateColumn(): number;
+  // get_table()
+  get_timeSeries(): boolean;
+  get_xAxisColumn(): number;
+  get_xAxisReverse(): boolean;
+  get_yAxisColumn(): number;
+  get_yAxisReverse(): boolean;
+  get_zAxisColumn(): number;
+  get_zAxisReverse(): boolean;
+}
+
+/** Interface for controlling [[VoTableLayer]] settings. */
+export interface VoTableLayerSettingsInterface extends LayerSettingsInterface, VoTableLayerSettingsInterfaceRO {
+  set_altColumn(v: number): number;
+  set_altType(v: AltTypes): AltTypes;
+  set_altUnit(v: AltUnits): AltUnits;
+  set_autoUpdate(v: boolean): boolean;
+  set_beginRange(v: Date): Date;
+  set_cartesianCustomScale(v: number): number;
+  set_cartesianScale(v: AltUnits): AltUnits;
+  // get_colorMap
+  set_colorMapColumn(v: number): number;
+  set_coordinatesType(v: CoordinatesType): CoordinatesType;
+  set_dataSourceUrl(v: string): string;
+  set_decay(v: number): number;
+  set_dynamicData(v: boolean): boolean;
+  set_endDateColumn(v: number): number;
+  set_endRange(v: Date): Date;
+  set_hyperlinkColumn(v: number): number;
+  set_hyperlinkFormat(v: string): string;
+  set_latColumn(v: number): number;
+  set_lngColumn(v: number): number;
+  set_markerColumn(v: number): number;
+  set_markerIndex(v: number): number;
+  // get_markerMix
+  set_markerScale(v: MarkerScales): MarkerScales;
+  set_nameColumn(v: number): number;
+  set_plotType(v: PlotTypes): PlotTypes;
+  set_pointScaleType(v: PointScaleTypes): PointScaleTypes;
+  set_raUnits(v: RAUnits): RAUnits;
+  set_scaleFactor(v: number): number;
+  set_showFarSide(v: boolean): boolean;
+  set_sizeColumn(v: number): number;
+  set_startDateColumn(v: number): number;
+  set_timeSeries(v: boolean): boolean;
+  set_xAxisColumn(v: number): number;
+  set_xAxisReverse(v: boolean): boolean;
+  set_yAxisColumn(v: number): number;
+  set_yAxisReverse(v: boolean): boolean;
+  set_zAxisColumn(v: number): number;
+  set_zAxisReverse(v: boolean): boolean;
+}
 
 // Now the actual types implemented in WWT.
 
@@ -844,7 +932,7 @@ export namespace Imageset {
 }
 
 /** An imageset renderable as its own independent layer. */
-export class ImageSetLayer extends Layer {
+export class ImageSetLayer extends Layer implements ImageSetLayerSettingsInterface {
   colorMapperName: string;
 
   // get_colorMapper(): ColorMapContainer
@@ -2035,7 +2123,7 @@ export namespace VoTable {
  * This class is highly similar to [[SpreadSheetLayer]], and the latter class is
  * generally more featureful. It should be preferred when possible.
  */
-export class VoTableLayer extends Layer {
+export class VoTableLayer extends Layer implements VoTableLayerSettingsInterface {
   get_altColumn(): number;
   set_altColumn(v: number): number;
   get_altType(): AltTypes;
