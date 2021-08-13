@@ -14,11 +14,11 @@
           <p>{{ coordText }}</p>
         </div>
       </transition>
-      <div id="layers-container" v-if="haveLayers">
+      <div id="catalogs-container" v-if="haveCatalogs">
         <div class="display-section-header">
-          <label>Layers</label>
+          <label>Catalogs</label>
         </div>
-        <div v-if="showLayers">
+        <div v-if="showCatalogs">
           <catalog-item
             v-for="catalog of hipsCatalogs"
             v-bind:key="catalog.name"
@@ -1929,7 +1929,7 @@ export default class App extends WWTAwareComponent {
     return this.currentTool == "choose-catalog";
   }
 
-  get haveLayers() {
+  get haveCatalogs() {
     return this.hipsCatalogs.length > 0;
   }
 
@@ -2038,7 +2038,7 @@ export default class App extends WWTAwareComponent {
   data() {
     return {
       showPopover: false,
-      showLayers: true,
+      showCatalogs: true,
       showSources: true,
     };
   }
