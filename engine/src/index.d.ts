@@ -679,12 +679,15 @@ export class FitsImage extends WcsImage {
 export class FitsProperties {
   bZero: number;
   bScale: number;
+  containsBlanks: boolean;
   blankValue: number;
   maxVal: number;
   minVal: number;
   lowerCut: number;
   upperCut: number;
   transparentBlack: boolean;
+  colorMapName: string;
+  scaleType: ScaleTypes;
 }
 
 export class Folder implements Thumbnail {
