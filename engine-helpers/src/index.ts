@@ -240,7 +240,11 @@ export interface SetFitsLayerColormapOptions {
   /** The ID of the FITS layer. */
   id: string;
 
-  /** The name of the colormap. TODO: document! */
+  /** The name of the colormap.
+   *
+   * The available options are extracted from Matplotlib and defined
+   * [here](../../engine/modules/colormapcontainer.html#fromnamedcolormap).
+   */
   name: string;
 }
 
