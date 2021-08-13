@@ -13,6 +13,14 @@ export {
   settings,
 };
 
+export interface Source {
+  ra: number;
+  dec: number;
+  name: string;
+  catalogName: string;
+  zoomDeg?: number;
+}
+
 /** Information about the current position of the WWT view.
  *
  * Frontends (e.g., [embedded WWT apps][embed]) periodically send this
@@ -211,11 +219,8 @@ export interface SelectionStateMessage {
   sessionId: string;
 
   /** The most recent source that was added to the selection list. */
-  mostRecentSource?: string;
-
-  /** The list of HiPS catalogs that are currently selected. */
-  selectedCatalogs?: string[];
+  mostRecentSource?: Source;
 
   /** The list of sources that are currently selected. */
-  selectedSources?: string[];
+  selectedSources?: Source[];
 }
