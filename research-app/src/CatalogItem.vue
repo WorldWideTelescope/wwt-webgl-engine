@@ -88,7 +88,7 @@
             <input
               type="text"
               class="scale-factor-input"
-              v-model="scaleFactorDbText"
+              v-model.lazy="scaleFactorDbText"
             />
             <font-awesome-icon
               class="icon icon-button"
