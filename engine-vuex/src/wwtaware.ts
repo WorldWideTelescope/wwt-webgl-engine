@@ -1,3 +1,6 @@
+// Copyright 2020-2021 the .NET Foundation
+// Licensed under the MIT License
+
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
@@ -44,6 +47,11 @@ import {
 
 /** A class for Vue components that wish to interact with a [[WWTComponent]]
  * through the Vuex state management system.
+ * 
+ * Skip to [The WWT Vuex Interface](#the-wwt-vuex-interface) for a quick summary
+ * of how WWT's state is exposed and controlled in Vuex.
+ * 
+ * ## Introduction
  *
  * Vue applications are composed of multiple [components]. In a WWT-powered app,
  * one of those components will be a `<WorldWideTelescope>` component containing
@@ -73,8 +81,9 @@ import {
  *   import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
  *
  *   @Component
- *   export default class App extends WWTAwareComponent {get coordText() {return
- *     `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+ *   export default class App extends WWTAwareComponent {
+ *     get coordText() {
+ *       return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
  *     }
  *   }
  * </script>
@@ -84,7 +93,7 @@ import {
  * of the WWT view, and the coordinate readout will update automagically as the
  * user interacts with the view.
  *
- * ### Props
+ * ## Props
  *
  * Classes inheriting from [[WWTAwareComponent]] automatically define a prop
  * named [[wwtNamespace]]. This should be set to the namespace of the [Vuex
@@ -94,7 +103,7 @@ import {
  *
  * [Vuex module]: https://vuex.vuejs.org/guide/modules.html
  *
- * ### WWT State Interfaces
+ * ## The WWT Vuex Interface
  *
  * Your [[WWTAwareComponent]] can monitor or manipulate the state of the WWT
  * renderer using the following interfaces, grouped by category. As a reminder,
@@ -106,13 +115,17 @@ import {
  * [mutations]: https://vuex.vuejs.org/guide/mutations.html
  * [actions]: https://vuex.vuejs.org/guide/actions.html
  *
- * #### Initialization
+ * ### Initialization
+ * 
+ * Mutations:
+ * 
+ * - [[setupForImageset]]
  *
  * Actions:
  *
  * - [[waitForReady]]
  *
- * #### Basic View Information
+ * ### Basic View Information
  *
  * State:
  *
@@ -122,6 +135,10 @@ import {
  * - [[wwtDecRad]]
  * - [[wwtRARad]]
  * - [[wwtZoomDeg]]
+ * 
+ * Getters:
+ * 
+ * - [[findRADecForScreenPoint]]
  *
  * Mutations:
  *
@@ -136,10 +153,11 @@ import {
  * - [[gotoRADecZoom]]
  * - [[gotoTarget]]
  *
- * #### Image Sets
+ * ### Image Sets
  *
  * State:
  *
+ * - [[wwtAvailableImagesets]]
  * - [[wwtBackgroundImageset]]
  * - [[wwtForegroundImageset]]
  * - [[wwtForegroundOpacity]]
@@ -155,12 +173,13 @@ import {
  * - [[setForegroundImageByName]]
  * - [[setForegroundOpacity]]
  * - [[setupForImageset]]
+ * - [[updateAvailableImagesets]]
  *
  * Actions:
  *
  * - [[loadImageCollection]]
  *
- * #### FITS Image Layers
+ * ### Imageset Layers (including FITS imagery)
  *
  * Mutations:
  *
@@ -173,8 +192,13 @@ import {
  * Actions:
  *
  * - [[addImageSetLayer]]
+ * - [[loadFitsLayer]] (deprecated)
  *
- * #### Tabular Data Layers
+ * ### Tabular Data Layers
+ * 
+ * State:
+ * 
+ * - [[spreadSheetLayers]]
  *
  * Mutations:
  *
@@ -186,15 +210,35 @@ import {
  *
  * - [[createTableLayer]]
  *
- * #### Annotations
+ * ### Annotations
  *
  * Mutations:
  *
  * - [[addAnnotation]]
  * - [[clearAnnotations]]
  * - [[removeAnnotation]]
+ * 
+ * ### Progressive HiPS Catalogs
+ * 
+ * These have some characteristics of both imagesets and tabular ("spreadsheet") data 
+ * layers.
+ * 
+ * Getters:
+ * 
+ * - [[layerForHipsCatalog]]
+ * - [[spreadsheetStateForHipsCatalog]]
+ * 
+ * Mutations:
+ * 
+ * - [[applyTableLayerSettings]]
+ * - [[removeCatalogHipsByName]]
+ * 
+ * Actions:
+ * 
+ * - [[addCatalogHipsByName]]
+ * - [[getCatalogHipsDataInView]]
  *
- * #### Tours
+ * ### Tours
  *
  * State:
  *
@@ -216,7 +260,13 @@ import {
  *
  * - [[loadTour]]
  *
- * #### Miscellaneous
+ * ### Miscellaneous
+ * 
+ * State:
+ * 
+ * - [[showWebGl2Warning]]
+ * 
+ * Mutations:
  *
  * - [[applySetting]]
  **/

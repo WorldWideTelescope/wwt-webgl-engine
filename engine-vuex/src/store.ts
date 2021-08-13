@@ -1,6 +1,10 @@
 // Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
+// The high-level docs in `wwtaware.ts` contain the developer-friendly
+// descriptions of pretty much everything in this file. Update those docs when
+// adding new features here.
+
 import Vue from "vue";
 import { Module, VuexModule, Mutation, MutationAction, Action } from 'vuex-module-decorators';
 
@@ -96,10 +100,14 @@ export class ImagesetInfo {
 /** This interface expresses the properties exposed by the WWT Engine’s Vuex
  * store module.
  *
- * Much of this duplicates state that is already stored within the WWT engine
- * itself (i.e., the `WWTInstance`). Due to the way that the Vue/Vuex reactivity
- * framework works, we need to mirror the engine state into Vuex. The first
- * reason to do this is that, as far as I can tell, there's no good way to
+ * See [[WWTAwareComponent]] for an organized overview of the different aspects
+ * of WWT state that are exposed in the Vuex framework, along with associated
+ * getters, actions, and mutations.
+ *
+ * Much of this interface duplicates state that is already stored within the WWT
+ * engine itself (i.e., the `WWTInstance`). Due to the way that the Vue/Vuex
+ * reactivity framework works, we need to mirror the engine state into Vuex. The
+ * first reason to do this is that, as far as I can tell, there's no good way to
  * integrate the "external" state of the WWT instance into the reactivity
  * framework so that dependencies can be mapped correctly. And we can't just
  * integrate the WWT instance into the reactivity framework -- well, I haven't
@@ -110,7 +118,8 @@ export class ImagesetInfo {
  * normalized when expressed in Vuex, as in [this post]. The WWT engine
  * certainly does *not* express its state in such a manner.
  *
- * [this post]: https://forum.vuejs.org/t/vuex-best-practices-for-complex-objects/10143/2
+ * [this post]:
+ * https://forum.vuejs.org/t/vuex-best-practices-for-complex-objects/10143/2
  *
  * The duplication of WWT's data structures is annoying, but the actual amount
  * of mirrored data isn't very big.
@@ -274,6 +283,11 @@ export interface LoadImageCollectionParams {
   loadChildFolders?: boolean;
 }
 
+/** The store module class for the WWT Vuex implementation.
+ *
+ * See [[WWTAwareComponent]] for an organized overview of the state variables,
+ * getters, actions, and mutations exposed by this module.
+ */
 @Module({
   namespaced: true,
   stateFactory: true,

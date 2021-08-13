@@ -136,6 +136,10 @@ See [this GitHub
 comment](https://github.com/vuejs/vue-cli/issues/4271#issuecomment-585299391)
 for more information.
 
+Once you've gotten the basics set up, consult the documentation of the
+[WWTAwareComponent] for an organized overview of all of the ways that your app
+can interact with the WWT rendering engine.
+
 
 # Motivation
 
