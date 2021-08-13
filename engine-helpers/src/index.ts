@@ -5,6 +5,7 @@ import { D2H, R2D, R2H } from "@wwtelescope/astro";
 
 import {
   ImageSetType,
+  ScaleTypes,
 } from "@wwtelescope/engine-types";
 
 import {
@@ -225,8 +226,8 @@ export interface StretchFitsLayerOptions {
   /** The ID of the FITS layer. */
   id: string;
 
-  /** The kind of stretch type to use. TODO: enum-ify! 0..4 = lin/log/pow/sqrt/histeq */
-  stretch: number;
+  /** The kind of stretch type to use. */
+  stretch: ScaleTypes;
 
   /** The data value to use for the minimum stretch bound. */
   vmin: number;
