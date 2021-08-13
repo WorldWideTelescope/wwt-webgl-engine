@@ -662,7 +662,11 @@ export interface SetFitsLayerColormapMessage {
   /** A sequence number, in case messages arrive out-of-order. */
   version: number;
 
-  /** The name of the colormap to use. TODO: define these! */
+  /** The name of the colormap to use.
+   *
+   * The available options are extracted from Matplotlib and defined
+   * [here](../../engine/modules/colormapcontainer.html#fromnamedcolormap).
+   **/
   cmap: string;
 }
 
