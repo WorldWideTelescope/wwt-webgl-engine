@@ -10,23 +10,25 @@ import Chrome from 'vue-color/src/components/Chrome.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faAdjust,
+  faChevronDown,
+  faChevronUp,
+  faCircle,
   faCompress,
   faExpand,
+  faEye,
+  faEyeSlash,
+  faMapMarkedAlt,
+  faMapMarkerAlt,
+  faMinusCircle,
   faMountain,
+  faPencilAlt,
+  faPlus,
+  faPlusCircle,
   faSearchMinus,
   faSearchPlus,
   faSlidersH,
-  faEyeSlash,
-  faEye,
-  faChevronDown,
-  faChevronUp,
-  faPlus,
-  faWindowClose,
   faTimes,
-  faMapMarkedAlt,
-  faCircle,
-  faMapMarkerAlt,
-  faPencilAlt,
+  faWindowClose,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -53,23 +55,25 @@ Vue.use(createPlugin(), {
 });
 
 library.add(faAdjust);
+library.add(faChevronDown);
+library.add(faChevronUp);
+library.add(faCircle);
 library.add(faCompress);
 library.add(faExpand);
+library.add(faEye);
+library.add(faEyeSlash);
+library.add(faMapMarkedAlt);
+library.add(faMapMarkerAlt);
+library.add(faMinusCircle);
 library.add(faMountain);
+library.add(faPencilAlt);
+library.add(faPlus);
+library.add(faPlusCircle);
 library.add(faSearchMinus);
 library.add(faSearchPlus);
 library.add(faSlidersH);
-library.add(faEyeSlash);
-library.add(faEye);
-library.add(faChevronUp);
-library.add(faChevronDown);
-library.add(faPlus);
-library.add(faWindowClose);
 library.add(faTimes);
-library.add(faMapMarkedAlt);
-library.add(faCircle);
-library.add(faMapMarkerAlt);
-library.add(faPencilAlt);
+library.add(faWindowClose);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component("v-select", vSelect);
 Vue.component('catalog-item', CatalogItem);
