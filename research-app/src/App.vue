@@ -242,9 +242,9 @@ import {
   classicPywwt,
   isPingPongMessage,
   layers,
+  selections,
   settings,
   ApplicationStateMessage,
-  SelectionStateMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
 
@@ -1765,7 +1765,7 @@ export default class App extends WWTAwareComponent {
     if (this.statusMessageDestination === null || this.allowedOrigin === null)
       return;
       
-    const msg: SelectionStateMessage = {
+    const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
       mostRecentSource: source,
@@ -1783,7 +1783,7 @@ export default class App extends WWTAwareComponent {
     if (this.statusMessageDestination === null || this.allowedOrigin === null)
       return;
 
-    const msg: SelectionStateMessage = {
+    const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
       selectedSources: sources,

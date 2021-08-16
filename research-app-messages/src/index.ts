@@ -5,21 +5,15 @@
 
 import * as classicPywwt from './classic_pywwt';
 import * as layers from './layers';
+import * as selections from './selections';
 import * as settings from './settings';
 
 export {
   classicPywwt,
   layers,
+  selections,
   settings,
 };
-
-export interface Source {
-  ra: number;
-  dec: number;
-  name: string;
-  catalogName: string;
-  zoomDeg?: number;
-}
 
 /** Information about the current position of the WWT view.
  *
@@ -202,25 +196,3 @@ export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-dis
  * missing a particular field should be treated as conveying no information
  * about the state described by that field.
  */
-
-export interface SelectionStateMessage {
-
-  /** The tag identifying this message type. */
-  type: "wwt_selection_state";
-
-  /** An app/client session identifier.
-   *
-   * If a single client is communicating with multiple apps, it needs to be able
-   * to tell which app is the source of any update messages. This session
-   * identifier allows clients to do so. The default value is "default". But if
-   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
-   * that value will start appearing in these view state update messages.
-   */
-  sessionId: string;
-
-  /** The most recent source that was added to the selection list. */
-  mostRecentSource?: Source;
-
-  /** The list of sources that are currently selected. */
-  selectedSources?: Source[];
-}
