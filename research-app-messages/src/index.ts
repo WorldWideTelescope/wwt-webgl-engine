@@ -182,17 +182,3 @@ export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-dis
     typeof o.threadId === "string" &&
     (o.sessionId === undefined || typeof o.sessionId === "string");
 }
-
-/** Information about the current state of source and catalog selection
- * inside the WWT application
- * 
- * This message is broadcasted by the application whenever one of the user's selection
- * options inside of the application is adjusted. The Vue listeners for the selected 
- * catalogs and sources are deep listeners, meaning that this message will be broadcasted
- * whenever a property of one of their items changes.
- * 
- * Not all fields of this message will always be present, depending on the
- * nature of the event triggering the emission of this message. A message
- * missing a particular field should be treated as conveying no information
- * about the state described by that field.
- */
