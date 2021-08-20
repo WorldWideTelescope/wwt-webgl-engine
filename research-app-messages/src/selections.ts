@@ -9,6 +9,10 @@
     dec: number;
     name: string;
     catalogName: string;
+    zoomDeg?: number;
+    catalogData: {
+      [field: string]: string | undefined;
+    }
   }
 
   /** Information about the current state of source and catalog selection
