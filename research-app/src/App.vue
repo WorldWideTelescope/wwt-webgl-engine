@@ -1304,12 +1304,8 @@ export default class App extends WWTAwareComponent {
 
   wwtOnMouseUp(_event: MouseEvent) {
     if (!this.isMouseMoving && this.lastClosePt !== null) {
-      const source: Source = {
-        ...this.lastClosePt,
-        name: this.nameForSource(this.lastClosePt),
-      };
-      this.addSource(source);
-      this.lastSelectedSource = source;
+      this.addSource(this.lastClosePt);
+      this.lastSelectedSource = this.lastClosePt;
     }
     this.isMouseMoving = false;
   }
@@ -1975,14 +1971,31 @@ export default class App extends WWTAwareComponent {
 
   closestInView(target: AngleCoordinates, threshold?: number): Source | null {
     let minDist = Infinity;
-    let closestPt = null;
+    let closestPt: { ra: number; dec: number; catalogName: string, colNames: string[], values: string[] } | null = null;
 
     const rowSeparator = "\r\n";
     const colSeparator = "\t";
 
+    const sourceCreator = (info: typeof closestPt): Source | null => {
+      if (info === null) {
+        return null;
+      }
+      const obj: any = {};
+      for (let i = 0; i < info.values.length; i++) {
+        obj[info.colNames[i]] = info.values[i];
+      }
+      return {
+        ra: info.ra,
+        dec: info.dec,
+        catalogName: info.catalogName,
+        catalogData: obj,
+        name: "",
+      };
+    };
+
     for (const catalog of this.visibleHipsCatalogs()) {
-      const name = catalog.name;
-      const layer = this.layerForHipsCatalog(name);
+      const catalogName = catalog.name;
+      const layer = this.layerForHipsCatalog(catalogName);
       if (layer == null) {
         continue;
       }
@@ -1997,33 +2010,20 @@ export default class App extends WWTAwareComponent {
       const lngCol = layer.get_lngColumn();
       const latCol = layer.get_latColumn();
 
-      const itemCreator = function (values: string[]): Source {
-        const obj: any = {};
-        for (let i = 0; i < values.length; i++) {
-          obj[colNames[i]] = values[i];
-        }
-        return {
-          ...obj,
-          ra: D2R * Number(values[lngCol]),
-          dec: D2R * Number(values[latCol]),
-          catalogName: name,
-        };
-      };
-
       for (const row of rows) {
         const items = row.split(colSeparator);
-        const ra = Number(items[lngCol]);
-        const dec = Number(items[latCol]);
-        const pt = { ra: D2R * ra, dec: D2R * dec };
+        const ra = D2R * Number(items[lngCol]);
+        const dec = D2R * Number(items[latCol]);
+        const pt = { ra: ra, dec: dec };
         const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
         if (dist < minDist) {
-          closestPt = itemCreator(items);
+          closestPt = { ra: ra, dec: dec, colNames: colNames, values: items, catalogName: catalogName };
           minDist = dist;
         }
       }
     }
     if (!threshold || minDist < threshold) {
-      return closestPt;
+      return sourceCreator(closestPt);
     }
     return null;
   }
