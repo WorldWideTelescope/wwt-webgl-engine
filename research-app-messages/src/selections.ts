@@ -4,18 +4,18 @@
  * `catalogName` gives the name of the associated HiPS catalog,
  * while `name` gives a string name for the source.
  */
- export interface Source {
-    ra: number;
-    dec: number;
-    name: string;
-    catalogName: string;
-    zoomDeg?: number;
-    catalogData: {
-      [field: string]: string | undefined;
-    }
-  }
+export interface Source {
+  ra: number;
+  dec: number;
+  name: string;
+  catalogName: string;
+  zoomDeg?: number;
+  catalogData: {
+    [field: string]: string | undefined;
+  };
+}
 
-  /** Information about the current state of source and catalog selection
+/** Information about the current state of source and catalog selection
  * inside the WWT application
  * 
  * This message is broadcasted by the application whenever one of the user's selection
