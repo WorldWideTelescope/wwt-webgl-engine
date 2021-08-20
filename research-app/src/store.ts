@@ -9,7 +9,7 @@ export interface Source {
   zoomDeg?: number;
   catalogData: {
     [field: string]: string | undefined;
-  }
+  };
 }
 
 export interface HipsCatalogStatus {
@@ -49,25 +49,6 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
 
 function sourcesEqual(s1: Source, s2: Source) {
   return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (s1.catalogName === s2.catalogName);
-}
-
-// Increment the counter by 1 every time this is called
-const newSourceName = (function () {
-  let count = 0;
-
-  return function () {
-    count += 1;
-    return `Source ${count}`;
-  };
-})();
-
-function nameForSource(catalogData: any, catalogName: string, catalogNameMappings: { [catalogName: string]: [string, string] }): string {
-  for (const [key, [from, to]] of Object.entries(catalogNameMappings)) {
-    if (from in catalogData && catalogName === key) {
-      return `${to}: ${catalogData[from]}`;
-    }
-  }
-  return newSourceName();
 }
 
 @Module({
@@ -127,7 +108,6 @@ export class WWTResearchAppModule extends VuexModule {
 
   @Mutation
   addSource(source: Source) {
-    source.name = nameForSource(source.catalogData, source.catalogName, this.catalogNameMappings);
     addToArrayWithoutDuplication(this.sources, source, sourcesEqual);
   }
 

@@ -842,6 +842,14 @@ interface AngleCoordinates {
   dec: number;
 }
 
+interface RawSourceInfo {
+  ra: number;
+  dec: number;
+  catalogName: string;
+  colNames: string[];
+  values: string[];
+}
+
 /** Get the source of a MessageEvent as a Window, if it is one.
  *
  * The problem here is that on Chrome, if the event is a cross-origin message
@@ -876,7 +884,7 @@ export default class App extends WWTAwareComponent {
 
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
-  lastClosePt: Source | null = null;
+  lastClosePt: RawSourceInfo | null = null;
   lastSelectedSource: Source | null = null;
   distanceThreshold = 0.01;
   hideAllChrome = false;
@@ -1304,13 +1312,13 @@ export default class App extends WWTAwareComponent {
 
   wwtOnMouseUp(_event: MouseEvent) {
     if (!this.isMouseMoving && this.lastClosePt !== null) {
-      this.addSource(this.lastClosePt);
-      this.lastSelectedSource = this.lastClosePt;
+      const source = this.sourceCreator(this.lastClosePt);
+      this.addSource(source);
+      this.lastSelectedSource = source;
     }
     this.isMouseMoving = false;
   }
-
-  // Increment the counter by 1 every time this is called
+  
   newSourceName = (function () {
     let count = 0;
 
@@ -1320,13 +1328,27 @@ export default class App extends WWTAwareComponent {
     };
   })();
 
-  nameForSource(source: any): string {
+  nameForSource(catalogData: any, catalogName: string): string {
     for (const [key, [from, to]] of Object.entries(this.catalogNameMappings)) {
-      if (from in source && source["catalogName"] === key) {
-        return `${to}: ${source[from]}`;
+      if (from in catalogData && catalogName === key) {
+        return `${to}: ${catalogData[from]}`;
       }
     }
     return this.newSourceName();
+  }
+
+  sourceCreator(sourceInfo: RawSourceInfo): Source {
+    const obj: any = {};
+    for (let i = 0; i < sourceInfo.values.length; i++) {
+      obj[sourceInfo.colNames[i]] = sourceInfo.values[i];
+    }
+    return {
+      ra: sourceInfo.ra,
+      dec: sourceInfo.dec,
+      catalogName: sourceInfo.catalogName,
+      catalogData: obj,
+      name: this.nameForSource(obj, sourceInfo.catalogName),
+    };
   }
 
   // ImageSet layers, including FITS layers:
@@ -1969,29 +1991,12 @@ export default class App extends WWTAwareComponent {
     );
   }
 
-  closestInView(target: AngleCoordinates, threshold?: number): Source | null {
+  closestInView(target: AngleCoordinates, threshold?: number): RawSourceInfo | null {
     let minDist = Infinity;
-    let closestPt: { ra: number; dec: number; catalogName: string, colNames: string[], values: string[] } | null = null;
+    let closestPt = null;
 
     const rowSeparator = "\r\n";
     const colSeparator = "\t";
-
-    const sourceCreator = (info: typeof closestPt): Source | null => {
-      if (info === null) {
-        return null;
-      }
-      const obj: any = {};
-      for (let i = 0; i < info.values.length; i++) {
-        obj[info.colNames[i]] = info.values[i];
-      }
-      return {
-        ra: info.ra,
-        dec: info.dec,
-        catalogName: info.catalogName,
-        catalogData: obj,
-        name: "",
-      };
-    };
 
     for (const catalog of this.visibleHipsCatalogs()) {
       const catalogName = catalog.name;
@@ -2011,19 +2016,19 @@ export default class App extends WWTAwareComponent {
       const latCol = layer.get_latColumn();
 
       for (const row of rows) {
-        const items = row.split(colSeparator);
-        const ra = D2R * Number(items[lngCol]);
-        const dec = D2R * Number(items[latCol]);
+        const values = row.split(colSeparator);
+        const ra = D2R * Number(values[lngCol]);
+        const dec = D2R * Number(values[latCol]);
         const pt = { ra: ra, dec: dec };
         const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
         if (dist < minDist) {
-          closestPt = { ra: ra, dec: dec, colNames: colNames, values: items, catalogName: catalogName };
+          closestPt = { ra: ra, dec: dec, colNames: colNames, values: values, catalogName: catalogName };
           minDist = dist;
         }
       }
     }
     if (!threshold || minDist < threshold) {
-      return sourceCreator(closestPt);
+      return closestPt;
     }
     return null;
   }
