@@ -7,6 +7,9 @@ export interface Source {
   name: string;
   catalogName: string;
   zoomDeg?: number;
+  catalogData: {
+    [field: string]: string | undefined;
+  };
 }
 
 export interface HipsCatalogStatus {
@@ -45,7 +48,7 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
 }
 
 function sourcesEqual(s1: Source, s2: Source) {
-  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (s1.name === s2.name) && (s1.catalogName === s2.catalogName);
+  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (s1.catalogName === s2.catalogName);
 }
 
 @Module({

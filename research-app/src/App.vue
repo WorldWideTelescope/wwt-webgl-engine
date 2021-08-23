@@ -242,6 +242,7 @@ import {
   classicPywwt,
   isPingPongMessage,
   layers,
+  selections,
   settings,
   ApplicationStateMessage,
   ViewStateMessage,
@@ -841,6 +842,14 @@ interface AngleCoordinates {
   dec: number;
 }
 
+interface RawSourceInfo {
+  ra: number;
+  dec: number;
+  catalogName: string;
+  colNames: string[];
+  values: string[];
+}
+
 /** Get the source of a MessageEvent as a Window, if it is one.
  *
  * The problem here is that on Chrome, if the event is a cross-origin message
@@ -875,7 +884,8 @@ export default class App extends WWTAwareComponent {
 
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
-  lastClosePt: Source | null = null;
+  lastClosePt: RawSourceInfo | null = null;
+  lastSelectedSource: Source | null = null;
   distanceThreshold = 0.01;
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
@@ -1302,16 +1312,13 @@ export default class App extends WWTAwareComponent {
 
   wwtOnMouseUp(_event: MouseEvent) {
     if (!this.isMouseMoving && this.lastClosePt !== null) {
-      const source: Source = {
-        ...this.lastClosePt,
-        name: this.nameForSource(this.lastClosePt),
-      };
+      const source = this.sourceCreator(this.lastClosePt);
       this.addSource(source);
+      this.lastSelectedSource = source;
     }
     this.isMouseMoving = false;
   }
-
-  // Increment the counter by 1 every time this is called
+  
   newSourceName = (function () {
     let count = 0;
 
@@ -1321,13 +1328,27 @@ export default class App extends WWTAwareComponent {
     };
   })();
 
-  nameForSource(source: any): string {
+  nameForSource(catalogData: any, catalogName: string): string {
     for (const [key, [from, to]] of Object.entries(this.catalogNameMappings)) {
-      if (from in source && source["catalogName"] === key) {
-        return `${to}: ${source[from]}`;
+      if (from in catalogData && catalogName === key) {
+        return `${to}: ${catalogData[from]}`;
       }
     }
     return this.newSourceName();
+  }
+
+  sourceCreator(sourceInfo: RawSourceInfo): Source {
+    const obj: any = {};
+    for (let i = 0; i < sourceInfo.values.length; i++) {
+      obj[sourceInfo.colNames[i]] = sourceInfo.values[i];
+    }
+    return {
+      ra: sourceInfo.ra,
+      dec: sourceInfo.dec,
+      catalogName: sourceInfo.catalogName,
+      catalogData: obj,
+      name: this.nameForSource(obj, sourceInfo.catalogName),
+    };
   }
 
   // ImageSet layers, including FITS layers:
@@ -1755,6 +1776,40 @@ export default class App extends WWTAwareComponent {
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
   }
 
+  @Watch("lastSelectedSource")
+  onLastSelectedSourceChanged(source: Source) {
+    // Notify clients when a source is selected
+
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+      
+    const msg: selections.SelectionStateMessage = {
+      type: "wwt_selection_state",
+      sessionId: this.statusMessageSessionId,
+      mostRecentSource: source,
+    };
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
+  @Watch("sources", {deep:true})
+  onSelectedSourcesChanged(sources: Source[]) {
+    // Notify clients when the list of selected sources is changed
+    // By making this a deep watcher, it keeps of track of any change
+    // in the list - even events like a property of a list entry changing
+    
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+
+    const msg: selections.SelectionStateMessage = {
+      type: "wwt_selection_state",
+      sessionId: this.statusMessageSessionId,
+      selectedSources: sources,
+    };
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
   // A client has requested that we load a HiPS catalog. Once it's loaded we
   // reply to the client with the details of the catalog-as-spreadsheet-layer,
   // so that it can know what the catalog's characteristics are.
@@ -1936,7 +1991,7 @@ export default class App extends WWTAwareComponent {
     );
   }
 
-  closestInView(target: AngleCoordinates, threshold?: number): Source | null {
+  closestInView(target: AngleCoordinates, threshold?: number): RawSourceInfo | null {
     let minDist = Infinity;
     let closestPt = null;
 
@@ -1944,8 +1999,8 @@ export default class App extends WWTAwareComponent {
     const colSeparator = "\t";
 
     for (const catalog of this.visibleHipsCatalogs()) {
-      const name = catalog.name;
-      const layer = this.layerForHipsCatalog(name);
+      const catalogName = catalog.name;
+      const layer = this.layerForHipsCatalog(catalogName);
       if (layer == null) {
         continue;
       }
@@ -1960,27 +2015,14 @@ export default class App extends WWTAwareComponent {
       const lngCol = layer.get_lngColumn();
       const latCol = layer.get_latColumn();
 
-      const itemCreator = function (values: string[]): Source {
-        const obj: any = {};
-        for (let i = 0; i < values.length; i++) {
-          obj[colNames[i]] = values[i];
-        }
-        return {
-          ...obj,
-          ra: D2R * Number(values[lngCol]),
-          dec: D2R * Number(values[latCol]),
-          catalogName: name,
-        };
-      };
-
       for (const row of rows) {
-        const items = row.split(colSeparator);
-        const ra = Number(items[lngCol]);
-        const dec = Number(items[latCol]);
-        const pt = { ra: D2R * ra, dec: D2R * dec };
+        const values = row.split(colSeparator);
+        const ra = D2R * Number(values[lngCol]);
+        const dec = D2R * Number(values[latCol]);
+        const pt = { ra: ra, dec: dec };
         const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
         if (dist < minDist) {
-          closestPt = itemCreator(items);
+          closestPt = { ra: ra, dec: dec, colNames: colNames, values: values, catalogName: catalogName };
           minDist = dist;
         }
       }
