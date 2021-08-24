@@ -25,6 +25,7 @@ import {
   Imageset,
   ImageSetLayer,
   InViewReturnMessage,
+  LayerMap,
   SpreadSheetLayer,
   SpreadSheetLayerSettingsInterfaceRO,
   WWTControl,
@@ -145,7 +146,10 @@ export class ImageSetLayerState {
    * for the supported options. */
   colormapName: string;
 
+  private guidText: string;
+
   constructor(source: ImageSetLayer) {
+    this.guidText = source.id.toString();
     this.settings = new ImageSetLayerSettings(source);
 
     const fits = source.get_imageSet().get_fitsProperties();
@@ -153,6 +157,10 @@ export class ImageSetLayerState {
     this.vmin = fits.lowerCut;
     this.vmax = fits.upperCut;
     this.colormapName = fits.colorMapName;
+  }
+
+  getGuid(): string {
+    return this.guidText;
   }
 }
 
@@ -283,6 +291,9 @@ export interface WWTEngineVuexState {
   zoomDeg: number;
 
   // Layers and layer management
+
+  /** The GUIDs of all rendered layers, in their draw order. */
+  activeLayers: string[];
 
   /** Settings for all registered imageset layers. */
   imagesetLayers: { [guidtext: string]: ImageSetLayerState };
@@ -694,7 +705,60 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const result = await Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
     this.context.commit('updateAvailableImagesets');
     return result;
+  }
 
+  // General layers
+
+  activeLayers: string[] = [];
+
+  @Mutation
+  internalUpdateActiveLayers(): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot get internalUpdateActiveLayers without linking to WWTInstance');
+
+    const layers: string[] = [];
+
+    function accum(lm: LayerMap) {
+      for (const layer of lm.layers) {
+        layers.push(layer.id.toString());
+      }
+
+      for (const [_mapname, sublm] of Object.entries(lm.childMaps)) {
+        accum(sublm);
+      }
+    }
+
+    const rootlm = Vue.$wwt.inst.lm.get_allMaps()[Vue.$wwt.inst.ctl.getCurrentReferenceFrame()];
+    if (rootlm) {
+      accum(rootlm);
+    }
+
+    this.activeLayers = layers;
+  }
+
+  @Mutation
+  deleteLayer(id: string | Guid): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot deleteLayer without linking to WWTInstance');
+
+    let stringId = "";
+
+    if (typeof id === "string") {
+      stringId = id;
+      const guid = Guid.fromString(id);
+      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
+    } else {
+      stringId = id.toString();
+      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
+    }
+
+    // Mirror modification in the reactive system. Here we just
+    // delete willy-nilly and ignore any missing cases.
+
+    Vue.delete(this.imagesetLayers, stringId);
+    Vue.delete(this.spreadSheetLayers, stringId);
+
+    this.context.commit('internalUpdateActiveLayers');
   }
 
   // Imageset layers, including FITS layers
@@ -709,6 +773,19 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     }
   }
 
+  get activeImagesetLayerStates() {
+    const states: ImageSetLayerState[] = [];
+
+    for (const guid of this.activeLayers) {
+      const state = this.imagesetLayers[guid];
+      if (state) {
+        states.push(state);
+      }
+    }
+
+    return states;
+  }
+
   @Action({ rawError: true })
   async addImageSetLayer(
     options: AddImageSetLayerOptions
@@ -721,6 +798,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const guidText = wwtLayer.id.toString();
     Vue.set(this.imagesetLayers, guidText, new ImageSetLayerState(wwtLayer));
 
+    this.context.commit('internalUpdateActiveLayers');
     return wwtLayer;
   }
 
@@ -738,6 +816,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       name: options.name,
       goto: options.gotoTarget
     };
+
     return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
   }
 
@@ -746,7 +825,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
 
-    return Vue.$wwt.inst.setImageSetLayerOrder(options);
+    Vue.$wwt.inst.setImageSetLayerOrder(options);
+    this.context.commit('internalUpdateActiveLayers');
   }
 
 
@@ -796,29 +876,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     }
   }
 
-  @Mutation
-  deleteLayer(id: string | Guid): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot deleteLayer without linking to WWTInstance');
-
-    let stringId = "";
-
-    if (typeof id === "string") {
-      stringId = id;
-      const guid = Guid.fromString(id);
-      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
-    } else {
-      stringId = id.toString();
-      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
-    }
-
-    // Mirror modification in the reactive system. Here we just
-    // delete willy-nilly and ignore any missing cases.
-
-    Vue.delete(this.imagesetLayers, stringId);
-    Vue.delete(this.spreadSheetLayers, stringId);
-  }
-
   // Spreadsheet layers
 
   spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState } = {};
@@ -865,6 +922,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const guidText = wwtLayer.id.toString();
     Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
 
+    this.context.commit('internalUpdateActiveLayers');
     return wwtLayer;
   }
 
@@ -946,6 +1004,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
     }
 
+    this.context.commit('internalUpdateActiveLayers');
     return imgset;
   }
 
@@ -968,6 +1027,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
 
     Vue.delete(this.spreadSheetLayers, name);
+
+    this.context.commit('internalUpdateActiveLayers');
   }
 
   // Annotations

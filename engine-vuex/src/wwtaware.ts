@@ -185,10 +185,12 @@ import {
  *
  * State:
  *
+ * - [[wwtActiveLayers]]
  * - [[wwtImagesetLayers]]
  *
  * Getters:
  *
+ * - [[activeImagesetLayerStates]]
  * - [[imagesetStateForLayer]]
  *
  * Mutations:
@@ -208,6 +210,7 @@ import {
  *
  * State:
  *
+ * - [[wwtActiveLayers]]
  * - [[wwtSpreadSheetLayers]]
  *
  * Mutations:
@@ -298,6 +301,7 @@ export class WWTAwareComponent extends Vue {
 
     this.$options.computed = {
       ...mapState({
+        wwtActiveLayers: (state, _getters) => (state as WWTEngineVuexState).activeLayers,
         wwtAvailableImagesets: (state, _getters) => (state as WWTEngineVuexState).availableImagesets,
         wwtBackgroundImageset: (state, _getters) => (state as WWTEngineVuexState).backgroundImageset,
         wwtCurrentTime: (state, _getters) => (state as WWTEngineVuexState).currentTime,
@@ -320,6 +324,7 @@ export class WWTAwareComponent extends Vue {
         wwtSpreadSheetLayers: (state, _getters) => (state as WWTEngineVuexState).spreadSheetLayers,
       }),
       ...mapGetters([
+        "activeImagesetLayerStates",
         "findRADecForScreenPoint",
         "imagesetStateForLayer",
         "layerForHipsCatalog",
@@ -381,6 +386,16 @@ export class WWTAwareComponent extends Vue {
   }
 
   // Teach TypeScript about everything we wired up. State:
+
+  /** The GUIDs of all rendered layers, in their draw order.
+   *
+   * This list gives the GUIDs of the layers that are currently candidates for
+   * rendering. This list is determined by the hierarchy of "layer maps"
+   * registered with the engine and its current rendering mode. Layers in this
+   * list might not be actually rendered if their `enabled` flag is false, if
+   * they are fully transparent, and so on.
+   **/
+  wwtActiveLayers!: string[];
 
   /** Information about the imagesets that are available to be used as a background.
    *
@@ -518,6 +533,17 @@ export class WWTAwareComponent extends Vue {
   wwtShowWebGl2Warning!: boolean;
 
   // Getters
+
+  /** Get the reactive state for the active imageset layers
+   *
+   * These layers are created using the [[addImageSetLayer]] action. The state
+   * structures returned by this function is part of the reactive Vuex store, so
+   * you can wire them up to your UI and they will update correctly. The list is
+   * returned in the engine's render order.
+   *
+   * @returns The layer states
+   */
+  activeImagesetLayerStates!: ImageSetLayerState[];
 
   /** Look up the reactive state for an active imageset layer.
    *
