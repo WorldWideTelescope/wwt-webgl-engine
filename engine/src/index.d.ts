@@ -2403,6 +2403,20 @@ export class WWTControl {
    */
   renderType: ImageSetType;
 
+  /** Get the name of the reference frame associated with the current view.
+   *
+   * The current reference frame defines the physical coordinates of the view
+   * and the list of layers that are included in the current rendering process.
+   * The return value of this function can be indexed into
+   * [[LayerManager.get_allMaps]] to find the root [[LayerMap]] that is used to
+   * determine what gets rendered in the current view.
+   *
+   * In standard 2D sky mode, the return value will be `"Sky"`.
+   *
+   * @returns The name of the current reference frame.
+   */
+  getCurrentReferenceFrame(): string;
+
   /** Render the view.
    *
    * Note that there also exists a similar method named `render`, but it

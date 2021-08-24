@@ -660,7 +660,7 @@ namespace wwtlib
                 {
                     foreach (Imageset imageset in RenderContext.CatalogHipsImagesets)
                     {
-                        if (imageset.HipsProperties.CatalogSpreadSheetLayer.Enabled 
+                        if (imageset.HipsProperties.CatalogSpreadSheetLayer.Enabled
                             && imageset.HipsProperties.CatalogSpreadSheetLayer.lastVersion == imageset.HipsProperties.CatalogSpreadSheetLayer.Version)
                         {
                             RenderContext.DrawImageSet(imageset, 100);
@@ -786,7 +786,7 @@ namespace wwtlib
             }
         }
 
-        private string GetCurrentReferenceFrame()
+        public string GetCurrentReferenceFrame()
         {
             if (RenderContext.BackgroundImageset == null)
             {
@@ -1772,7 +1772,7 @@ namespace wwtlib
                 {
                     RenderContext.UseGlVersion2 = true;
                 }
-                else 
+                else
                 {
                     Script.Literal("console.warn('This browser does not support WebGL 2.0. Some features will work suboptimally. To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge. In case you would like to use Safari, we recommend that you enable WebGL 2.0')");
                     gl = (GL)(Object)canvas.GetContext((Rendering)(object)"webgl");
@@ -2671,7 +2671,7 @@ namespace wwtlib
                 Script.Literal("console.log({0} + ' not found')", imagesetName);
             }
         }
-        
+
 
         private SimpleLineList crossHairs = null;
 
