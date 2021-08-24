@@ -36,6 +36,7 @@ import { createPlugin } from "@wwtelescope/engine-vuex";
 
 import App from "./App.vue";
 import CatalogItem from "./CatalogItem.vue";
+import ImagesetItem from "./ImagesetItem.vue";
 import SourceItem from "./SourceItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import { WWTResearchAppModule } from "./store";
@@ -77,6 +78,7 @@ library.add(faWindowClose);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component("v-select", vSelect);
 Vue.component('catalog-item', CatalogItem);
+Vue.component('imageset-item', ImagesetItem);
 Vue.component('source-item', SourceItem);
 Vue.component('transition-expand', TransitionExpand);
 Vue.component('vue-color-chrome', Chrome);

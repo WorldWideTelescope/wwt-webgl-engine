@@ -14,6 +14,18 @@
           <p>{{ coordText }}</p>
         </div>
       </transition>
+      <div id="imagery-container" v-if="haveImagery">
+        <div class="display-section-header">
+          <label>Imagery</label>
+        </div>
+        <div>
+          <imageset-item
+            v-for="imageset of activeImagesetLayerStates"
+            v-bind:key="imageset.settings.name"
+            v-bind:imageset="imageset"
+          />
+        </div>
+      </div>
       <div id="catalogs-container" v-if="haveCatalogs">
         <div class="display-section-header">
           <label>Catalogs</label>
@@ -1320,7 +1332,7 @@ export default class App extends WWTAwareComponent {
     }
     this.isMouseMoving = false;
   }
-  
+
   newSourceName = (function () {
     let count = 0;
 
@@ -1784,7 +1796,7 @@ export default class App extends WWTAwareComponent {
 
     if (this.statusMessageDestination === null || this.allowedOrigin === null)
       return;
-      
+
     const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
@@ -1794,12 +1806,12 @@ export default class App extends WWTAwareComponent {
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
   }
 
-  @Watch("sources", {deep:true})
+  @Watch("sources", { deep: true })
   onSelectedSourcesChanged(sources: Source[]) {
     // Notify clients when the list of selected sources is changed
     // By making this a deep watcher, it keeps of track of any change
     // in the list - even events like a property of a list entry changing
-    
+
     if (this.statusMessageDestination === null || this.allowedOrigin === null)
       return;
 
@@ -1929,6 +1941,10 @@ export default class App extends WWTAwareComponent {
     return this.currentTool == "choose-catalog";
   }
 
+  get haveImagery() {
+    return this.activeImagesetLayerStates.length > 0;
+  }
+
   get haveCatalogs() {
     return this.hipsCatalogs.length > 0;
   }
@@ -1993,7 +2009,10 @@ export default class App extends WWTAwareComponent {
     );
   }
 
-  closestInView(target: AngleCoordinates, threshold?: number): RawSourceInfo | null {
+  closestInView(
+    target: AngleCoordinates,
+    threshold?: number
+  ): RawSourceInfo | null {
     let minDist = Infinity;
     let closestPt = null;
 
@@ -2024,7 +2043,13 @@ export default class App extends WWTAwareComponent {
         const pt = { ra: ra, dec: dec };
         const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
         if (dist < minDist) {
-          closestPt = { ra: ra, dec: dec, colNames: colNames, values: values, catalogName: catalogName };
+          closestPt = {
+            ra: ra,
+            dec: dec,
+            colNames: colNames,
+            values: values,
+            catalogName: catalogName,
+          };
           minDist = dist;
         }
       }
