@@ -46,11 +46,24 @@
           <span class="prompt">Colormap:</span
           ><select v-model="twoWayColorMapperName">
             <option
-              v-for="cm in uiColorMaps"
-              v-bind:value="cm.wwt"
-              v-bind:key="cm.desc"
+              v-for="x in uiColorMaps"
+              v-bind:value="x.wwt"
+              v-bind:key="x.desc"
             >
-              {{ cm.desc }}
+              {{ x.desc }}
+            </option>
+          </select>
+        </div>
+
+        <div class="detail-row">
+          <span class="prompt">Stretch:</span
+          ><select v-model="twoWayScaleType">
+            <option
+              v-for="x in uiScaleTypes"
+              v-bind:value="x.wwt"
+              v-bind:key="x.desc"
+            >
+              {{ x.desc }}
             </option>
           </select>
         </div>
@@ -63,8 +76,12 @@
 import { mapGetters, mapMutations, mapState } from "vuex";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
+import { ScaleTypes } from "@wwtelescope/engine-types";
 import { ImageSetLayerSetting } from "@wwtelescope/engine";
-import { ApplyFitsLayerSettingsOptions } from "@wwtelescope/engine-helpers";
+import {
+  ApplyFitsLayerSettingsOptions,
+  StretchFitsLayerOptions,
+} from "@wwtelescope/engine-helpers";
 import { ImageSetLayerState } from "@wwtelescope/engine-vuex";
 
 import { wwtEngineNamespace } from "./namespaces";
@@ -90,11 +107,27 @@ const uiColorMaps: UiColorMaps[] = [
   { wwt: "reds", desc: "White-to-Red" },
 ];
 
+interface UiScaleTypes {
+  wwt: ScaleTypes;
+  desc: string;
+}
+
+const uiScaleTypes: UiScaleTypes[] = [
+  { wwt: ScaleTypes.linear, desc: "Linear" },
+  { wwt: ScaleTypes.log, desc: "Logarithmic" },
+  { wwt: ScaleTypes.squareRoot, desc: "Square Root" },
+  { wwt: ScaleTypes.power, desc: "Exponential" },
+
+  // Not fully implemented ... I think ...?
+  //{ wwt: ScaleTypes.histogramEqualization, desc: "Hist-Eq" },
+];
+
 @Component
 export default class ImagesetItem extends Vue {
   @Prop({ required: true }) imageset!: ImageSetLayerState;
 
   uiColorMaps = uiColorMaps;
+  uiScaleTypes = uiScaleTypes;
 
   // Vuex integration
 
@@ -103,6 +136,7 @@ export default class ImagesetItem extends Vue {
       ...mapMutations(wwtEngineNamespace, [
         "applyFitsLayerSettings",
         "deleteLayer",
+        "stretchFitsLayer",
       ]),
       ...this.$options.methods,
     };
@@ -110,6 +144,7 @@ export default class ImagesetItem extends Vue {
 
   applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
   deleteLayer!: (id: string) => void;
+  stretchFitsLayer!: (o: StretchFitsLayerOptions) => void;
 
   // Local state
 
@@ -130,6 +165,21 @@ export default class ImagesetItem extends Vue {
 
   set twoWayColorMapperName(v: string) {
     this.applySettings([["colorMapperName", v]]);
+  }
+
+  get twoWayScaleType(): ScaleTypes {
+    return this.imageset.scaleType;
+  }
+
+  set twoWayScaleType(v: ScaleTypes) {
+    const o: StretchFitsLayerOptions = {
+      id: this.imageset.getGuid(),
+      vmin: this.imageset.vmin,
+      vmax: this.imageset.vmax,
+      stretch: v,
+    };
+
+    this.stretchFitsLayer(o);
   }
 
   // Implementation
