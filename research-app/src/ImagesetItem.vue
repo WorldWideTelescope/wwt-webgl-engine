@@ -15,25 +15,31 @@
         @keyup.enter="isSelected = !isSelected"
         >{{ imageset.settings.name }}</label
       >
-      <span id="buttons-container">
-        <a href="#" v-hide="!hasFocus" @click="handleDelete" class="icon-link"
+      <span id="buttons-container" v-hide="!hasFocus">
+        <a href="#" @click="handleDelete" class="icon-link"
           ><font-awesome-icon class="icon" icon="times"
         /></a>
-        <a href="#" v-hide="!hasFocus" @click="handleToggle" class="icon-link"
+        <a href="#" @click="handleVisibility" class="icon-link"
           ><font-awesome-icon
-            v-if="enabled"
             class="icon"
-            icon="eye" /><font-awesome-icon
-            v-if="!enabled"
-            class="icon"
-            icon="eye-slash"
+            :icon="imageset.settings.enabled ? 'eye' : 'eye-slash'"
         /></a>
       </span>
     </div>
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
         <div class="detail-row">
-          <span class="prompt">URL:</span><span class="ellipsize">nothing</span>
+          <span class="prompt">Opacity:</span>
+          <vue-slider
+            class="scrubber"
+            v-model="twoWayOpacity"
+            :max="1"
+            :duration="0"
+            :interval="0.01"
+            :contained="true"
+            :hide-label="true"
+            :use-keyboard="true"
+          ></vue-slider>
         </div>
       </div>
     </transition-expand>
@@ -74,26 +80,28 @@ export default class ImagesetItem extends Vue {
   hasFocus = false;
   isSelected = false;
 
-  get enabled(): boolean {
-    return this.imageset.settings.enabled;
+  get twoWayOpacity(): number {
+    return this.imageset.settings.opacity;
+  }
+
+  set twoWayOpacity(v: number) {
+    this.applySettings([["opacity", v]]);
   }
 
   // Implementation
 
   private applySettings(settings: ImageSetLayerSetting[]) {
     this.applyFitsLayerSettings({
-      //id: this.guid,
       id: this.imageset.getGuid(),
       settings: settings,
     });
   }
 
   handleDelete() {
-    //this.deleteLayer(this.guid);
     this.deleteLayer(this.imageset.getGuid());
   }
 
-  handleToggle() {
+  handleVisibility() {
     this.applySettings([["enabled", !this.imageset.settings.enabled]]);
   }
 }
@@ -185,5 +193,10 @@ export default class ImagesetItem extends Vue {
   display: inline-flex;
   flex-flow: row nowrap;
   align-items: center;
+}
+
+.scrubber {
+  flex: 1;
+  cursor: pointer;
 }
 </style>

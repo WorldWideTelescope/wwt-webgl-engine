@@ -32,6 +32,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+import VueSlider from 'vue-slider-component';
+import 'vue-slider-component/theme/default.css';
+
 import { createPlugin } from "@wwtelescope/engine-vuex";
 
 import App from "./App.vue";
@@ -75,13 +78,16 @@ library.add(faSearchPlus);
 library.add(faSlidersH);
 library.add(faTimes);
 library.add(faWindowClose);
+
 Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.component("v-select", vSelect);
+Vue.component('vue-color-chrome', Chrome);
+Vue.component('v-select', vSelect);
+Vue.component('vue-slider', VueSlider);
+
 Vue.component('catalog-item', CatalogItem);
 Vue.component('imageset-item', ImagesetItem);
 Vue.component('source-item', SourceItem);
 Vue.component('transition-expand', TransitionExpand);
-Vue.component('vue-color-chrome', Chrome);
 
 /** v-hide directive take from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
