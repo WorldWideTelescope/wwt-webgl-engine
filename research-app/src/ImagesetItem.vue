@@ -41,6 +41,19 @@
             :use-keyboard="true"
           ></vue-slider>
         </div>
+
+        <div class="detail-row">
+          <span class="prompt">Colormap:</span
+          ><select v-model="twoWayColorMapperName">
+            <option
+              v-for="cm in uiColorMaps"
+              v-bind:value="cm.wwt"
+              v-bind:key="cm.desc"
+            >
+              {{ cm.desc }}
+            </option>
+          </select>
+        </div>
       </div>
     </transition-expand>
   </div>
@@ -56,9 +69,32 @@ import { ImageSetLayerState } from "@wwtelescope/engine-vuex";
 
 import { wwtEngineNamespace } from "./namespaces";
 
+interface UiColorMaps {
+  wwt: string;
+  desc: string;
+}
+
+const uiColorMaps: UiColorMaps[] = [
+  { wwt: "viridis", desc: "Viridis" },
+  { wwt: "plasma", desc: "Plasma" },
+  { wwt: "inferno", desc: "Inferno" },
+  { wwt: "magma", desc: "Magma" },
+  { wwt: "cividis", desc: "Cividis" },
+  { wwt: "rdylbu", desc: "Thermal (Red-Yellow-Blue)" },
+  { wwt: "gray", desc: "Black-to-White" },
+  { wwt: "greys", desc: "White-to-Black" },
+  { wwt: "purples", desc: "White-to-Purple" },
+  { wwt: "blues", desc: "White-to-Blue" },
+  { wwt: "greens", desc: "White-to-Green" },
+  { wwt: "oranges", desc: "White-to-Orange" },
+  { wwt: "reds", desc: "White-to-Red" },
+];
+
 @Component
 export default class ImagesetItem extends Vue {
   @Prop({ required: true }) imageset!: ImageSetLayerState;
+
+  uiColorMaps = uiColorMaps;
 
   // Vuex integration
 
@@ -86,6 +122,14 @@ export default class ImagesetItem extends Vue {
 
   set twoWayOpacity(v: number) {
     this.applySettings([["opacity", v]]);
+  }
+
+  get twoWayColorMapperName(): string {
+    return this.imageset.settings.colorMapperName;
+  }
+
+  set twoWayColorMapperName(v: string) {
+    this.applySettings([["colorMapperName", v]]);
   }
 
   // Implementation
