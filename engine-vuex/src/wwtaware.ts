@@ -191,6 +191,7 @@ import {
  * Getters:
  *
  * - [[activeImagesetLayerStates]]
+ * - [[imagesetForLayer]]
  * - [[imagesetStateForLayer]]
  *
  * Mutations:
@@ -326,6 +327,7 @@ export class WWTAwareComponent extends Vue {
       ...mapGetters([
         "activeImagesetLayerStates",
         "findRADecForScreenPoint",
+        "imagesetForLayer",
         "imagesetStateForLayer",
         "layerForHipsCatalog",
         "lookupImageset",
@@ -545,11 +547,27 @@ export class WWTAwareComponent extends Vue {
    */
   activeImagesetLayerStates!: ImageSetLayerState[];
 
+  /** Look up the WWT engine object for an active imageset layer.
+   *
+   * This getter gets the WWT `Imageset` object associated with an imageset
+   * layer. The returned object is *not* part of the Vue(x) reactivity system,
+   * so you shouldn't use it to set up UI elements, but you can obtain more
+   * detailed information about the imageset than is stored in the state
+   * management system. For UI purposes, use [[imagesetStateForLayer]].
+   *
+   * @param guidtext The GUID of the layer to query, as a string
+   * @returns The layer's underlying imageset, or null if the GUID is
+   * unrecognized
+   */
+  imagesetForLayer!: (guidtext: string) => Imageset | null;
+
   /** Look up the reactive state for an active imageset layer.
    *
    * These layers are created using the [[addImageSetLayer]] action. The state
    * returned by this function is part of the reactive Vuex store, so you can
    * wire it up to your UI and it will update as the layer settings are changed.
+   * If you need "runtime" state not captured in the reactivity system, you may
+   * need to use [[imagesetForLayer]] instead.
    *
    * @param guidtext The GUID of the layer to query, as a string
    * @returns The layer state, or null if the GUID is unrecognized

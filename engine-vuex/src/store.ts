@@ -773,6 +773,21 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     }
   }
 
+  get imagesetForLayer() {
+    return function (guidtext: string): Imageset | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get imagesetForLayer without linking to WWTInstance');
+
+      const layer = Vue.$wwt.inst.lm.get_layerList()[guidtext];
+
+      if (layer !== null && layer instanceof ImageSetLayer) {
+        return layer.get_imageSet();
+      } else {
+        return null;
+      }
+    }
+  }
+
   get activeImagesetLayerStates() {
     const states: ImageSetLayerState[] = [];
 
