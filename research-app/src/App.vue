@@ -18,38 +18,32 @@
         <div class="display-section-header">
           <label>Imagery</label>
         </div>
-        <div>
-          <imageset-item
-            v-for="imageset of activeImagesetLayerStates"
-            v-bind:key="imageset.settings.name"
-            v-bind:imageset="imageset"
-          />
-        </div>
+        <imageset-item
+          v-for="imageset of activeImagesetLayerStates"
+          v-bind:key="imageset.settings.name"
+          v-bind:imageset="imageset"
+        />
       </div>
       <div id="catalogs-container" v-if="haveCatalogs">
         <div class="display-section-header">
           <label>Catalogs</label>
         </div>
-        <div v-if="showCatalogs">
-          <catalog-item
-            v-for="catalog of hipsCatalogs"
-            v-bind:key="catalog.name"
-            v-bind:catalog="catalog"
-            v-bind:defaultColor="defaultColor"
-          />
-        </div>
+        <catalog-item
+          v-for="catalog of hipsCatalogs"
+          v-bind:key="catalog.name"
+          v-bind:catalog="catalog"
+          v-bind:defaultColor="defaultColor"
+        />
       </div>
       <div id="sources-container" v-if="haveSources">
         <div class="display-section-header">
           <label>Sources</label>
         </div>
-        <div v-if="showSources">
-          <source-item
-            v-for="source of sources"
-            v-bind:key="source.name"
-            v-bind:source="source"
-          />
-        </div>
+        <source-item
+          v-for="source of sources"
+          v-bind:key="source.name"
+          v-bind:source="source"
+        />
       </div>
     </div>
 
@@ -2078,8 +2072,6 @@ export default class App extends WWTAwareComponent {
   data() {
     return {
       showPopover: false,
-      showCatalogs: true,
-      showSources: true,
     };
   }
 
