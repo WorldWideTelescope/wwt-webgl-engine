@@ -894,6 +894,9 @@ export class Imageset implements Thumbnail {
   get_url(): string;
   set_url(url: string): string;
 
+  get_wcsImage(): WcsImage | null;
+  set_wcsImage(w: WcsImage | null): WcsImage | null;
+
   get_widthFactor(): number;
   set_widthFactor(f: number): number;
 
@@ -946,7 +949,7 @@ export class ImageSetLayer extends Layer implements ImageSetLayerSettingsInterfa
   get_overrideDefaultLayer(): boolean;
   set_overrideDefaultLayer(v: boolean): boolean;
 
-  getFitsImage(): FitsImage | null;;
+  getFitsImage(): FitsImage | null;
   setImageScalePhysical(st: ScaleTypes, min: number, max: number): void;
   setImageScaleRaw(st: ScaleTypes, min: number, max: number): void;
   setImageZ(z: number): void;
