@@ -1183,6 +1183,16 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+
+    // Ignore incoming view_state messages. When testing the app, you might want
+    // to launch it as (e.g.)
+    // `http://localhost:8080/?origin=http://localhost:8080/` so that you can
+    // manually send it messages using postMesasge in the JS console. But in
+    // this setup, the app also receives every message that it sends! The
+    // resulting "unhandled message" report can actually be useful for examining
+    // outgoing messages, but it gets annoying for the view state messages that
+    // are sent so frequently. So ignore those.
+    this.messageHandlers.set("wwt_view_state", this.ignoreMessage);
   }
 
   onMessage(msg: any) {
@@ -1200,6 +1210,10 @@ export default class App extends WWTAwareComponent {
         msg
       );
     }
+  }
+
+  private ignoreMessage(msg: any): boolean {
+    return true;
   }
 
   // Various message handlers that don't comfortably fit elsewhere:
