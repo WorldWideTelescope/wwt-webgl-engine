@@ -539,7 +539,7 @@ export class WWTAwareComponent extends Vue {
   /** Get the reactive state for the active imageset layers
    *
    * These layers are created using the [[addImageSetLayer]] action. The state
-   * structures returned by this function is part of the reactive Vuex store, so
+   * structures returned by this function are part of the reactive Vuex store, so
    * you can wire them up to your UI and they will update correctly. The list is
    * returned in the engine's render order.
    *

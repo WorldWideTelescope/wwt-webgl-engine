@@ -1187,11 +1187,12 @@ export default class App extends WWTAwareComponent {
     // Ignore incoming view_state messages. When testing the app, you might want
     // to launch it as (e.g.)
     // `http://localhost:8080/?origin=http://localhost:8080/` so that you can
-    // manually send it messages using postMesasge in the JS console. But in
-    // this setup, the app also receives every message that it sends! The
-    // resulting "unhandled message" report can actually be useful for examining
-    // outgoing messages, but it gets annoying for the view state messages that
-    // are sent so frequently. So ignore those.
+    // manually send it messages using postMessage in the JS console. But in
+    // this setup, the app also receives every message that it sends, because
+    // its send and receive origins are the same! The resulting "unhandled
+    // message" report can actually be useful for examining outgoing messages,
+    // but it gets annoying for the view state messages that are sent so
+    // frequently. So, ignore those.
     this.messageHandlers.set("wwt_view_state", this.ignoreMessage);
   }
 

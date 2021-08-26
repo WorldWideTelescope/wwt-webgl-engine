@@ -352,6 +352,48 @@ export default class ImagesetItem extends Vue {
   }
 
   handleCutoffInteract(isMax: boolean) {
+    // This is a prototype interactive UX. It need iteration and a detailed
+    // explanation, but here's the capsule version:
+    //
+    // When this action is triggered, we turn the cursor into a crosshair (by
+    // adding the `pointer-tracking` class to the <html> DOM element) and start
+    // monitoring the user's mouse motions. As the mouse moves, we adjust the
+    // "vmin" or "vmax" cutoff value used to visualize the FITS data (depending
+    // on `isMax). When the mouse is to the left of the screen (lastrx => -1),
+    // the cutoff value is decreased. When it's to the right of the screen
+    // (lastrx => 1), it increases.
+    //
+    // The *scale* of the modification is a function of both the horizontal and
+    // vertical position of the pointer. The maximum possible delta is the
+    // magnitude of `|vmax - vmin|` when the mouse is at the top of the screen
+    // (lastry => -1), and 1% of it at the bottom of the screen (lastry => +1).
+    // This scale setting is determined relative to the initial value of the
+    // parameter that's being adjusted, which is stored in `lastCommittedValue`.
+    // This maximum scale is achieved when the mouse is on the left/right edges
+    // of the screen and scales linearly with the horizontal pointer position
+    // between the two. So if the pointer lies on the vertical line in the dead
+    // center of the window, the delta should be zero.
+    //
+    // When the user clicks the pointer, the change in the cutoff value is
+    // committed and the interaction ends.
+    //
+    // If the user hits spacebar during the interaction, the change in the
+    // cutoff value is committed but the interaction continues. So if you want
+    // to raise the cutoff value a lot, you move the mouse to the top-right of
+    // the screen and hit spacebar repeatedly. One awkward aspect of this
+    // interaction is that it's easy to hit spacebar to lock in your "final"
+    // setting, but then the interaction continues because you shold have
+    // clicked. The "solution" is to click in the bottom middle of the screen
+    // (which is as close to "don't change anything" as you can get) but that's
+    // not at all intuitive.
+    //
+    // Weaknesses that we're aware of:
+    //
+    // - The switch between keyboard and mouse is awkward.
+    // - We don't actually "grab" the pointer, so the click that ends the
+    //   interaction will also be processed by whatever it landed on.
+    // - This won't work well at all on mobile.
+
     let lastrx = 0;
     let lastry = 0;
     let lastCommittedValue = isMax ? this.imageset.vmax : this.imageset.vmin;
