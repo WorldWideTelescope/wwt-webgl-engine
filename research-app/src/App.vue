@@ -1212,7 +1212,7 @@ export default class App extends WWTAwareComponent {
     }
   }
 
-  private ignoreMessage(msg: any): boolean {
+  private ignoreMessage(_msg: any): boolean {
     return true;
   }
 

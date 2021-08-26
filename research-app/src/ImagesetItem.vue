@@ -15,16 +15,24 @@
         @keyup.enter="isSelected = !isSelected"
         >{{ imageset.settings.name }}</label
       >
-      <span id="buttons-container" v-hide="!hasFocus">
-        <a href="#" @click="handleDelete" class="icon-link"
-          ><font-awesome-icon class="icon" icon="times"
-        /></a>
-        <a href="#" @click="handleVisibility" class="icon-link"
-          ><font-awesome-icon
-            class="icon"
-            :icon="imageset.settings.enabled ? 'eye' : 'eye-slash'"
-        /></a>
-      </span>
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        icon="map-marker-alt"
+        @click="handleGoto"
+      />
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        :icon="imageset.settings.enabled ? 'eye' : 'eye-slash'"
+        @click="handleVisibility"
+      />
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        icon="times"
+        @click="handleDelete"
+      />
     </div>
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
@@ -105,16 +113,20 @@
 </template>
 
 <script lang="ts">
-import { mapActions, mapMutations } from "vuex";
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
-import { ScaleTypes } from "@wwtelescope/engine-types";
-import { ImageSetLayerSetting } from "@wwtelescope/engine";
+import { D2R } from "@wwtelescope/astro";
+import { ProjectionType, ScaleTypes } from "@wwtelescope/engine-types";
+import { Imageset, ImageSetLayerSetting } from "@wwtelescope/engine";
 import {
   ApplyFitsLayerSettingsOptions,
   StretchFitsLayerOptions,
 } from "@wwtelescope/engine-helpers";
-import { ImageSetLayerState } from "@wwtelescope/engine-vuex";
+import {
+  ImageSetLayerState,
+  WWTEngineVuexState,
+} from "@wwtelescope/engine-vuex";
 
 import { wwtEngineNamespace } from "./namespaces";
 
@@ -164,19 +176,37 @@ export default class ImagesetItem extends Vue {
   // Vuex integration
 
   beforeCreate(): void {
+    this.$options.computed = {
+      ...mapGetters(wwtEngineNamespace, ["imagesetForLayer"]),
+      ...mapState(wwtEngineNamespace, {
+        wwtZoomDeg: (state, _getters) => (state as WWTEngineVuexState).zoomDeg,
+      }),
+      ...this.$options.computed,
+    };
+
     this.$options.methods = {
       ...mapMutations(wwtEngineNamespace, [
         "applyFitsLayerSettings",
         "deleteLayer",
         "stretchFitsLayer",
       ]),
+      ...mapActions(wwtEngineNamespace, ["gotoRADecZoom"]),
       ...this.$options.methods,
     };
   }
 
   applyFitsLayerSettings!: (_o: ApplyFitsLayerSettingsOptions) => void;
   deleteLayer!: (id: string) => void;
+  gotoRADecZoom!: (args: {
+    raRad: number;
+    decRad: number;
+    zoomDeg: number;
+    instant: boolean;
+    rollRad?: number;
+  }) => Promise<void>;
+  imagesetForLayer!: (guidtext: string) => Imageset | null;
   stretchFitsLayer!: (o: StretchFitsLayerOptions) => void;
+  wwtZoomDeg!: number;
 
   // Local state
 
@@ -281,6 +311,42 @@ export default class ImagesetItem extends Vue {
     this.deleteLayer(this.imageset.getGuid());
   }
 
+  handleGoto() {
+    const imgset = this.imagesetForLayer(this.imageset.getGuid());
+
+    if (imgset !== null) {
+      // This is all a little shaky since we're not accounting for things like
+      // offsetX, rotation, etc. But it should be OK.
+
+      let zoomDeg = this.wwtZoomDeg;
+      const wcsimg = imgset.get_wcsImage();
+      const FOV_FACTOR = 1.7;
+
+      if (imgset.get_projection() == ProjectionType.skyImage) {
+        if (wcsimg !== null) {
+          // untiled SkyImage: baseTileDegrees is degrees per pixel
+          zoomDeg =
+            imgset.get_baseTileDegrees() * wcsimg.get_sizeY() * 6 * FOV_FACTOR;
+        }
+      } else {
+        // tiled image: baseTileDegrees is angular height of image after power-of-2 padding
+        zoomDeg = imgset.get_baseTileDegrees() * 6 * FOV_FACTOR;
+      }
+
+      // Only zoom in, not out.
+      if (this.wwtZoomDeg < zoomDeg) {
+        zoomDeg = this.wwtZoomDeg;
+      }
+
+      this.gotoRADecZoom({
+        zoomDeg: zoomDeg,
+        raRad: imgset.get_centerX() * D2R,
+        decRad: imgset.get_centerY() * D2R,
+        instant: false,
+      });
+    }
+  }
+
   handleVisibility() {
     this.applySettings([["enabled", !this.imageset.settings.enabled]]);
   }
@@ -325,7 +391,7 @@ export default class ImagesetItem extends Vue {
       }
     };
 
-    const cleanup = (event: PointerEvent) => {
+    const cleanup = (_event: Event) => {
       document.documentElement.classList.remove("pointer-tracking");
       document.removeEventListener("pointermove", onmove);
       document.removeEventListener("keydown", onkeydown);
@@ -356,20 +422,18 @@ export default class ImagesetItem extends Vue {
 #main-container {
   width: calc(100% - 10px);
   padding: 5px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 #name-label {
   display: inline-block;
-  width: 75%;
-  vertical-align: middle;
+  flex: 1;
 
   &:hover {
     cursor: pointer;
   }
-}
-
-#buttons-container {
-  width: 25%;
 }
 
 .detail-container {
@@ -378,20 +442,10 @@ export default class ImagesetItem extends Vue {
   padding-left: 15px;
 }
 
-.icon {
-  color: white;
-  margin: auto 1%;
-  float: right;
-}
-
-.icon-link {
-  height: 100%;
-  background: #404040;
-}
-
 .icon-button {
   cursor: pointer;
   margin: 2px;
+  width: 1em;
 }
 
 .prompt {
@@ -406,6 +460,7 @@ export default class ImagesetItem extends Vue {
   // Get nice vertical alignment in individual rows
   display: flex;
   align-items: center;
+  gap: 2px;
 }
 
 .ellipsize {
