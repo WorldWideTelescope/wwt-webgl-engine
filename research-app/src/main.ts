@@ -14,6 +14,7 @@ import {
   faChevronUp,
   faCircle,
   faCompress,
+  faCrosshairs,
   faExpand,
   faEye,
   faEyeSlash,
@@ -63,6 +64,7 @@ library.add(faChevronDown);
 library.add(faChevronUp);
 library.add(faCircle);
 library.add(faCompress);
+library.add(faCrosshairs);
 library.add(faExpand);
 library.add(faEye);
 library.add(faEyeSlash);

@@ -67,14 +67,46 @@
             </option>
           </select>
         </div>
+
+        <div class="detail-row">
+          <span class="prompt">Low cutoff:</span>
+          <input
+            type="text"
+            class="detail-input"
+            v-model.lazy="twoWayVMinText"
+          />
+          <font-awesome-icon
+            class="icon-button"
+            icon="crosshairs"
+            size="lg"
+            @click="handleCutoffInteract(false)"
+            @keyup.enter="handleCutoffInteract(false)"
+          ></font-awesome-icon>
+        </div>
+
+        <div class="detail-row">
+          <span class="prompt">High cutoff:</span>
+          <input
+            type="text"
+            class="detail-input"
+            v-model.lazy="twoWayVMaxText"
+          />
+          <font-awesome-icon
+            class="icon-button"
+            icon="crosshairs"
+            size="lg"
+            @click="handleCutoffInteract(true)"
+            @keyup.enter="handleCutoffInteract(true)"
+          ></font-awesome-icon>
+        </div>
       </div>
     </transition-expand>
   </div>
 </template>
 
 <script lang="ts">
-import { mapGetters, mapMutations, mapState } from "vuex";
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { mapActions, mapMutations } from "vuex";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 import { ScaleTypes } from "@wwtelescope/engine-types";
 import { ImageSetLayerSetting } from "@wwtelescope/engine";
@@ -182,6 +214,60 @@ export default class ImagesetItem extends Vue {
     this.stretchFitsLayer(o);
   }
 
+  get twoWayVMax(): number {
+    return this.imageset.vmax;
+  }
+
+  set twoWayVMax(v: number) {
+    const o: StretchFitsLayerOptions = {
+      id: this.imageset.getGuid(),
+      vmin: this.imageset.vmin,
+      vmax: v,
+      stretch: this.imageset.scaleType,
+    };
+
+    this.stretchFitsLayer(o);
+  }
+
+  get twoWayVMaxText(): string {
+    return "" + this.twoWayVMax;
+  }
+
+  set twoWayVMaxText(v: string) {
+    const n = Number(v);
+
+    if (isFinite(n)) {
+      this.twoWayVMax = n;
+    }
+  }
+
+  get twoWayVMin(): number {
+    return this.imageset.vmin;
+  }
+
+  set twoWayVMin(v: number) {
+    const o: StretchFitsLayerOptions = {
+      id: this.imageset.getGuid(),
+      vmin: v,
+      vmax: this.imageset.vmax,
+      stretch: this.imageset.scaleType,
+    };
+
+    this.stretchFitsLayer(o);
+  }
+
+  get twoWayVMinText(): string {
+    return "" + this.twoWayVMin;
+  }
+
+  set twoWayVMinText(v: string) {
+    const n = Number(v);
+
+    if (isFinite(n)) {
+      this.twoWayVMin = n;
+    }
+  }
+
   // Implementation
 
   private applySettings(settings: ImageSetLayerSetting[]) {
@@ -197,6 +283,59 @@ export default class ImagesetItem extends Vue {
 
   handleVisibility() {
     this.applySettings([["enabled", !this.imageset.settings.enabled]]);
+  }
+
+  handleCutoffInteract(isMax: boolean) {
+    let lastrx = 0;
+    let lastry = 0;
+    let lastCommittedValue = isMax ? this.imageset.vmax : this.imageset.vmin;
+
+    const update = () => {
+      const other = isMax ? this.twoWayVMin : this.twoWayVMax;
+      const scale = Math.abs(other - lastCommittedValue);
+      const delta = scale * Math.pow(10, -1 - lastry);
+      const newvalue = lastCommittedValue + delta * lastrx;
+
+      if (Number.isFinite(newvalue)) {
+        if (isMax) {
+          this.twoWayVMax = newvalue;
+        } else {
+          this.twoWayVMin = newvalue;
+        }
+      }
+    };
+
+    const onmove = (event: PointerEvent) => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      lastrx = (2 * event.clientX) / w - 1; // range: -1 (left edge) => +1 (right edge)
+      lastry = (2 * event.clientY) / h - 1; // range: -1 (top edge) => +1 (bottom edge)
+      update();
+    };
+
+    const onkeydown = (event: KeyboardEvent) => {
+      if (event.code == "Space") {
+        if (isMax) {
+          lastCommittedValue = this.twoWayVMax;
+        } else {
+          lastCommittedValue = this.twoWayVMin;
+        }
+
+        update();
+      }
+    };
+
+    const cleanup = (event: PointerEvent) => {
+      document.documentElement.classList.remove("pointer-tracking");
+      document.removeEventListener("pointermove", onmove);
+      document.removeEventListener("keydown", onkeydown);
+    };
+
+    document.addEventListener("pointermove", onmove);
+    document.addEventListener("pointerup", cleanup);
+    document.addEventListener("pointercancel", cleanup);
+    document.addEventListener("keydown", onkeydown);
+    document.documentElement.classList.add("pointer-tracking");
   }
 }
 </script>
@@ -233,14 +372,6 @@ export default class ImagesetItem extends Vue {
   width: 25%;
 }
 
-.circle-popover {
-  display: inline;
-
-  &:hover {
-    cursor: pointer;
-  }
-}
-
 .detail-container {
   font-size: 9pt;
   margin: 0px 5px;
@@ -260,7 +391,7 @@ export default class ImagesetItem extends Vue {
 
 .icon-button {
   cursor: pointer;
-  display: inline-block;
+  margin: 2px;
 }
 
 .prompt {
@@ -283,14 +414,13 @@ export default class ImagesetItem extends Vue {
   text-overflow: ellipsis;
 }
 
-.flex-row {
-  display: inline-flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
 .scrubber {
   flex: 1;
   cursor: pointer;
+}
+
+.detail-input {
+  flex: 1;
+  text-align: center;
 }
 </style>

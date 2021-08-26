@@ -2104,6 +2104,11 @@ html {
   margin: 0;
   padding: 0;
   background-color: #000;
+
+  // Activated in cases like interactive FITS stretch adjustment:
+  &.pointer-tracking {
+    cursor: crosshair;
+  }
 }
 
 body {
