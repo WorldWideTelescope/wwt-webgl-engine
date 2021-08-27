@@ -368,16 +368,18 @@ namespace wwtlib
             {
                 name = LayerManager.GetNextImageSetName();
             }
-            ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayer(imageset, name);
+
+            ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayerCallback(imageset, name, loaded);
 
             if (gotoTarget)
             {
-                WWTControl.Singleton.GotoRADecZoom(imageset.CenterX / 15, imageset.CenterY,
-                    WWTControl.Singleton.RenderContext.ViewCamera.Zoom, false, null);
-            }
-            if (loaded != null)
-            {
-                loaded(imagesetLayer);
+                WWTControl.Singleton.GotoRADecZoom(
+                    imageset.CenterX / 15,
+                    imageset.CenterY,
+                    WWTControl.Singleton.RenderContext.ViewCamera.Zoom,
+                    false,
+                    null
+                );
             }
 
             return imagesetLayer;
