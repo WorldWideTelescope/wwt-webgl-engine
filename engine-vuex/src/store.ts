@@ -150,8 +150,8 @@ export class ImageSetLayerState {
 
     const fits = source.get_imageSet().get_fitsProperties();
     this.scaleType = fits.scaleType;
-    this.vmin = fits.minVal;
-    this.vmax = fits.maxVal;
+    this.vmin = fits.lowerCut;
+    this.vmax = fits.upperCut;
     this.colormapName = fits.colorMapName;
   }
 }
