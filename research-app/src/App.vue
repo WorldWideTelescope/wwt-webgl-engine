@@ -85,6 +85,19 @@
                   catalogs</a
                 >
               </li>
+              <li v-show="showCollectionLoader">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="
+                    selectTool('load-collection');
+                    showPopover = false;
+                  "
+                  tabindex="0"
+                  ><font-awesome-icon icon="photo-video" />Load WTML
+                  collection</a
+                >
+              </li>
             </ul>
           </template>
         </v-popover>
@@ -131,6 +144,7 @@
             v-model="foregroundOpacity"
           />
         </template>
+
         <template v-else-if="currentTool == 'choose-background'">
           <div id="bg-select-container" class="item-select-container">
             <span id="bg-select-title" class="item-select-title"
@@ -161,6 +175,7 @@
             </v-select>
           </div>
         </template>
+
         <template v-else-if="showCatalogChooser">
           <div id="catalog-select-container-tool" class="item-select-container">
             <span class="item-select-title">Add catalog:</span>
@@ -186,6 +201,35 @@
                 <div></div>
               </template>
             </v-select>
+          </div>
+        </template>
+
+        <template v-else-if="currentTool == 'load-collection'">
+          <div class="load-collection-container">
+            <div class="load-collection-label">
+              Load
+              <a
+                href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/"
+                >WTML</a
+              >
+              data collection:
+            </div>
+            <div class="load-collection-row">
+              <label>URL:</label>
+              <input
+                type="url"
+                v-model.lazy="wtmlCollectionUrl"
+                @keyup.enter="submitWtmlCollectionUrl"
+              />
+              <font-awesome-icon
+                icon="arrow-circle-right"
+                size="lg"
+                class="load-collection-icon"
+                @keyup.enter="submitWtmlCollectionUrl"
+                @click="submitWtmlCollectionUrl"
+                tabindex="0"
+              ></font-awesome-icon>
+            </div>
           </div>
         </template>
       </div>
@@ -262,7 +306,12 @@ import {
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
 
-type ToolType = "crossfade" | "choose-background" | "choose-catalog" | null;
+type ToolType =
+  | "choose-background"
+  | "choose-catalog"
+  | "crossfade"
+  | "load-collection"
+  | null;
 
 type AnyFitsLayerMessage =
   | classicPywwt.CreateImageSetLayerMessage
@@ -1950,6 +1999,10 @@ export default class App extends WWTAwareComponent {
     return this.currentTool == "choose-catalog";
   }
 
+  get showCollectionLoader() {
+    return !this.wwtIsTourPlaying;
+  }
+
   get haveImagery() {
     return this.activeImagesetLayerStates.length > 0;
   }
@@ -1972,6 +2025,20 @@ export default class App extends WWTAwareComponent {
       this.currentTool = null;
     } else {
       this.currentTool = name;
+    }
+  }
+
+  // Load WTML Collection tool
+
+  wtmlCollectionUrl = "";
+
+  submitWtmlCollectionUrl() {
+    if (this.wtmlCollectionUrl) {
+      this.loadImageCollection({
+        url: this.wtmlCollectionUrl,
+        loadChildFolders: true,
+      });
+      this.wtmlCollectionUrl = "";
     }
   }
 
@@ -2185,6 +2252,15 @@ body {
   .opacity-range {
     width: 50vw;
   }
+
+  a {
+    text-decoration: none;
+    color: #bff;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 #display-panel {
@@ -2199,24 +2275,6 @@ body {
 
   p {
     margin: 0;
-  }
-}
-
-#add-catalog {
-  position: relative;
-  width: max-content;
-  max-width: 100%;
-  margin: auto;
-  font-size: 12pt;
-
-  & a {
-    text-align: center;
-    color: white;
-    text-decoration: none;
-  }
-
-  & a .icon {
-    padding: 0px 7px;
   }
 }
 
@@ -2256,6 +2314,42 @@ body {
 .icon {
   padding: 0px 5px;
   color: white;
+}
+
+.load-collection-container {
+  width: 35vw;
+
+  .load-collection-label {
+    width: 100%;
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .load-collection-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    width: 100%;
+    margin-top: 0.2rem;
+
+    label {
+      margin-right: 0.5rem;
+    }
+
+    input {
+      flex: 1;
+    }
+  }
+
+  .load-collection-icon {
+    cursor: pointer;
+    color: #9bf;
+
+    &:hover {
+      color: #88f;
+    }
+  }
 }
 
 /* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */

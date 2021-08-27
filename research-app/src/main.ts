@@ -10,6 +10,7 @@ import Chrome from 'vue-color/src/components/Chrome.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faAdjust,
+  faArrowCircleRight,
   faChevronDown,
   faChevronUp,
   faCircle,
@@ -23,6 +24,7 @@ import {
   faMinusCircle,
   faMountain,
   faPencilAlt,
+  faPhotoVideo,
   faPlus,
   faPlusCircle,
   faSearchMinus,
@@ -60,6 +62,7 @@ Vue.use(createPlugin(), {
 });
 
 library.add(faAdjust);
+library.add(faArrowCircleRight);
 library.add(faChevronDown);
 library.add(faChevronUp);
 library.add(faCircle);
@@ -73,6 +76,7 @@ library.add(faMapMarkerAlt);
 library.add(faMinusCircle);
 library.add(faMountain);
 library.add(faPencilAlt);
+library.add(faPhotoVideo);
 library.add(faPlus);
 library.add(faPlusCircle);
 library.add(faSearchMinus);
