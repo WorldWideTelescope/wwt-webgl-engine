@@ -72,6 +72,18 @@
                   ><font-awesome-icon icon="mountain" /> Choose background</a
                 >
               </li>
+              <li v-show="showAddImageryTool">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="
+                    selectTool('add-imagery-layer');
+                    showPopover = false;
+                  "
+                  tabindex="0"
+                  ><font-awesome-icon icon="image" /> Add imagery as layer</a
+                >
+              </li>
               <li v-show="showCatalogTool">
                 <a
                   href="#"
@@ -94,7 +106,7 @@
                     showPopover = false;
                   "
                   tabindex="0"
-                  ><font-awesome-icon icon="photo-video" />Load WTML
+                  ><font-awesome-icon icon="photo-video" /> Load WTML
                   collection</a
                 >
               </li>
@@ -171,6 +183,39 @@
               </template>
               <template #selected-option="option">
                 <div>{{ option.name }}</div>
+              </template>
+            </v-select>
+          </div>
+        </template>
+
+        <template v-else-if="currentTool == 'add-imagery-layer'">
+          <div class="item-select-container">
+            <span class="item-select-title">Add imagery layer:</span>
+            <v-select
+              v-model="imageryToAdd"
+              class="item-selector"
+              :searchable="true"
+              :clearable="false"
+              :options="curAvailableImageryData"
+              :filter="filterImagesets"
+              label="name"
+              placeholder="Dataset"
+            >
+              <template #option="option">
+                <div class="item-option">
+                  <h4>{{ option.name }}</h4>
+                  <em>{{ option.description }}</em>
+                </div>
+              </template>
+              <template #selected-option="option">
+                <div>{{ option.name }}</div>
+              </template>
+              <template #no-options="{ search, searching }">
+                <template v-if="searching">
+                  No datasets matching <em>{{ search }}</em
+                  >.
+                </template>
+                <em v-else>No datasets available. Load a WTML collection?</em>
               </template>
             </v-select>
           </div>
@@ -307,6 +352,7 @@ const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
 
 type ToolType =
+  | "add-imagery-layer"
   | "choose-background"
   | "choose-catalog"
   | "crossfade"
@@ -1987,6 +2033,10 @@ export default class App extends WWTAwareComponent {
     return this.wwtForegroundImageset != this.wwtBackgroundImageset;
   }
 
+  get showAddImageryTool() {
+    return !this.wwtIsTourPlaying;
+  }
+
   get showBackgroundChooser() {
     return !this.wwtIsTourPlaying;
   }
@@ -2026,6 +2076,39 @@ export default class App extends WWTAwareComponent {
     } else {
       this.currentTool = name;
     }
+  }
+
+  // Add Imagery As Layer tool
+
+  get imageryToAdd() {
+    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
+  }
+
+  set imageryToAdd(iinfo: ImagesetInfo) {
+    const msg: classicPywwt.CreateImageSetLayerMessage = {
+      event: "image_layer_create",
+      url: iinfo.url,
+      id: iinfo.name,
+      mode: "preloaded",
+    };
+
+    this.getFitsLayerHandler(msg).handleCreateMessage(msg);
+  }
+
+  get curAvailableImageryData() {
+    if (this.wwtAvailableImagesets == null) return [];
+
+    // Currently (2021 August) the engine code requires that the
+    // filetype/extension field of an imageset be exactly ".fits" if it will be
+    // rendered with the FITS machinery. There are some datasets out there that
+    // include multiple space-separated extensions in this attribute, and of
+    // course there are different FITS-like extensions in use, so this might get
+    // more sophisticated in the future. If so, this logic will need to be
+    // updated.
+
+    return this.wwtAvailableImagesets.filter(
+      (info) => info.type == this.wwtRenderType && info.extension == ".fits"
+    );
   }
 
   // Load WTML Collection tool

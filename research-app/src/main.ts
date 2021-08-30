@@ -19,6 +19,7 @@ import {
   faExpand,
   faEye,
   faEyeSlash,
+  faImage,
   faMapMarkedAlt,
   faMapMarkerAlt,
   faMinusCircle,
@@ -71,6 +72,7 @@ library.add(faCrosshairs);
 library.add(faExpand);
 library.add(faEye);
 library.add(faEyeSlash);
+library.add(faImage);
 library.add(faMapMarkedAlt);
 library.add(faMapMarkerAlt);
 library.add(faMinusCircle);
