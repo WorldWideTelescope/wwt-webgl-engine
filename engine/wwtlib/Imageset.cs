@@ -8,6 +8,7 @@ namespace wwtlib
 {
     public class Imageset :  IThumbnail
     {
+        // This is probably an `object` and not `WcsImage` for historical reasons?
         private object wcsImage;
 
         public object WcsImage
@@ -88,7 +89,7 @@ namespace wwtlib
             get { return projection; }
             set { projection = value; }
         }
-    
+
         private string referenceFrame;
 
         public string ReferenceFrame
@@ -139,7 +140,7 @@ namespace wwtlib
 
         public int GetHashCode()
         {
-            
+
             return Util.GetHashCode(Url);
         }
 
@@ -304,8 +305,8 @@ namespace wwtlib
                              node.Attributes.GetNamedItem("").Value,
                             Convert.ToDouble(node.Attributes.GetNamedItem("").Value),
                             Convert.ToInt32(node.Attributes.GetNamedItem("").Value),
- 
- 
+
+
          * */
         string altUrl = "";
 
@@ -354,7 +355,7 @@ namespace wwtlib
                 BandPass bandPass = BandPass.Visible;
 
                 bandPass = (BandPass)Enums.Parse("BandPass",node.Attributes.GetNamedItem("BandPass").Value);
-                
+
                 int wf = 1;
                 if (node.Attributes.GetNamedItem("WidthFactor") != null)
                 {
@@ -364,7 +365,7 @@ namespace wwtlib
                 if (node.Attributes.GetNamedItem("Generic") == null || !bool.Parse(node.Attributes.GetNamedItem("Generic").Value.ToString()))
                 {
                     projection = (ProjectionType)Enums.Parse("ProjectionType", node.Attributes.GetNamedItem("Projection").Value);
-                    
+
                     string fileType = node.Attributes.GetNamedItem("FileType").Value.ToString();
                     if (!fileType.StartsWith("."))
                     {
@@ -642,8 +643,8 @@ namespace wwtlib
         //    if (left == null ^ right == null)
         //    {
         //        return false;
-        //    }      
-        //    return (left.Url.GetHashCode() == right.Url.GetHashCode());   
+        //    }
+        //    return (left.Url.GetHashCode() == right.Url.GetHashCode());
         //}
 
         //public static bool operator !=(ImageSet left, ImageSet right)
@@ -651,7 +652,7 @@ namespace wwtlib
         //    if (left == right )
         //    {
         //        return false;
-        //    }       
+        //    }
         //    if ( left == null ^ right == null)
         //    {
         //        return true;
@@ -684,7 +685,7 @@ namespace wwtlib
             Imageset b = (Imageset)obj;
 
             return (Util.GetHashCode(b.Url) == Util.GetHashCode(this.Url) && b.DataSetType == this.DataSetType && b.BandPass == this.BandPass && b.Generic == this.Generic);
-            
+
         }
 
         private Matrix3d matrix;
@@ -767,7 +768,7 @@ namespace wwtlib
             temp.rotation = 0;
             //todo add scale
             temp.thumbnailUrl = "";
-      
+
             temp.matrix = Matrix3d.Identity;
             temp.matrix.Multiply(Matrix3d.RotationX((((temp.Rotation)) / 180f * Math.PI)));
             temp.matrix.Multiply(Matrix3d.RotationZ(((temp.CenterY) / 180f * Math.PI)));
@@ -831,8 +832,6 @@ namespace wwtlib
             }
         }
 
-
-
         public static Imageset Create(string name, string url, ImageSetType dataSetType, BandPass bandPass, ProjectionType projection, int imageSetID, int baseLevel, int levels, int tileSize, double baseTileDegrees, string extension, bool bottomsUp, string quadTreeMap, double centerX, double centerY, double rotation, bool sparse, string thumbnailUrl, bool defaultSet, bool elevationModel, int wf, double offsetX, double offsetY, string credits, string creditsUrl, string demUrlIn, string alturl, double meanRadius, string referenceFrame)
         {
             Imageset temp = new Imageset();
@@ -876,28 +875,61 @@ namespace wwtlib
             this.ComputeMatrix();
         }
 
+        // Ideally, imagesets will be associated with Places that specify
+        // exactly how the view should be set up when "going to" them, but
+        // sometimes (especially research datasets) we're interested in deriving
+        // a reasonable zoom setting without that extra information. The returned value
+        // isn't going to be perfect but it should hopefully be OK.
 
+        private const double FOV_FACTOR = 1.7;
+
+        internal double GuessZoomSetting(double currentZoom)
+        {
+            double zoom = currentZoom;
+
+            // ScriptSharp has an issue here. Maybe because we have a field name
+            // matching a class name? Right now the only implementation of
+            // WcsImage is FitsImage so we can get away with this:
+            WcsImage aswcs = this.wcsImage as FitsImage;
+
+            if (Projection == ProjectionType.SkyImage) {
+                // Untiled SkyImage: basetiledegrees is degrees per pixel
+                if (aswcs != null) {
+                    zoom = BaseTileDegrees * aswcs.SizeY * 6 * FOV_FACTOR;
+                }
+            } else if (aswcs != null) {
+                zoom = aswcs.ScaleY * aswcs.SizeY * 6 * FOV_FACTOR;
+            } else {
+                // Tiled. basetiledegrees is angular height of whole image after
+                // power-of-2 padding.
+                zoom = BaseTileDegrees * 6 * FOV_FACTOR;
+            }
+
+            // Only zoom in, not out. Usability-wise this tends to make the most
+            // sense.
+
+            if (zoom > currentZoom) {
+                zoom = currentZoom;
+            }
+
+            return zoom;
+        }
 
         // URL parameters
-            //{0} ImageSetID
-            //{1} level
-            //{2} x tile id
-            //{3} y tile id
-            //{4} quadtree address (VE style)
-            //{5} quadtree address (Google maps style)
-            //{6} top left corner RA
-            //{7} top left corner Dec
-            //{8} bottom right corner RA
-            //{9} bottom right corner dec
-            //{10} bottom left corner RA
-            //{11} bottom left corner dec
-            //{12} top right corner RA
-            //{13} top right corner dec
-
-
-
-
-
+        //{0} ImageSetID
+        //{1} level
+        //{2} x tile id
+        //{3} y tile id
+        //{4} quadtree address (VE style)
+        //{5} quadtree address (Google maps style)
+        //{6} top left corner RA
+        //{7} top left corner Dec
+        //{8} bottom right corner RA
+        //{9} bottom right corner dec
+        //{10} bottom left corner RA
+        //{11} bottom left corner dec
+        //{12} top right corner RA
+        //{13} top right corner dec
 
         #region IThumbnail Members
 
