@@ -704,7 +704,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   get imagesetStateForLayer() {
     return (guidtext: string): ImageSetLayerState | null => {
       if (Vue.$wwt.inst === null)
-        throw new Error('cannot get imagesetStateForLAyer without linking to WWTInstance');
+        throw new Error('cannot get imagesetStateForLayer without linking to WWTInstance');
       return this.imagesetLayers[guidtext] || null;
     }
   }
