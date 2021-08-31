@@ -758,8 +758,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.$wwt.inst.stretchFitsLayer(options);
 
     // Update the reactive mirror.
-    const state = this.imagesetStateForLayer(options.id);
-    if (state !== null) {
+    const state = this.imagesetLayers[options.id];
+    if (state) {
       state.scaleType = options.stretch;
       state.vmin = options.vmin;
       state.vmax = options.vmax;
@@ -774,8 +774,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.$wwt.inst.setFitsLayerColormap(options);
 
     // Update the reactive mirror.
-    const state = this.imagesetStateForLayer(options.id);
-    if (state !== null) {
+    const state = this.imagesetLayers[options.id];
+    if (state) {
       state.colormapName = options.name;
     }
   }
@@ -788,8 +788,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.$wwt.inst.applyFitsLayerSettings(options);
 
     // Update the reactive mirror.
-    const state = this.imagesetStateForLayer(options.id);
-    if (state !== null) {
+    const state = this.imagesetLayers[options.id];
+    if (state) {
       for (const s of options.settings) {
         applyImageSetLayerSetting(state.settings, s);
       }
