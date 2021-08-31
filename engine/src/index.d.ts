@@ -21,7 +21,7 @@ import {
   Classification,
   ConstellationFilterInterface,
   CoordinatesType,
-  DataTypes,
+  // DataTypes,
   FadeType,
   FolderGroup,
   FolderRefreshType,
@@ -50,6 +50,126 @@ import {
 // Along with these interfaces, see SettingsInterface defined in engine-types.
 // We have to define these interfaces here because some of their methods depend
 // on types that are only defined in this package.
+
+/** Interface for querying generic Annotation settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface AnnotationSettingsInterfaceRO {
+  //get_center
+  get_id(): string;
+  get_label(): string;
+  get_opacity(): number;
+  get_showHoverLabel(): boolean;
+  get_tag(): string;
+}
+
+/** Interface for controlling generic Annotation settings. */
+export interface AnnotationSettingsInterface extends AnnotationSettingsInterfaceRO {
+  set_id(v: string): string;
+  set_label(v: string): string;
+  set_opacity(v: number): number;
+  set_showHoverLabel(v: boolean): boolean;
+  set_tag(v: string): string;
+}
+
+export interface CircleAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
+  get_fill(): boolean;
+  get_fillColor(): string;
+  get_lineColor(): string;
+  get_lineWidth(): number;
+  get_radius(): number;
+  get_skyRelative(): boolean;
+}
+
+export interface CircleAnnotationSettingsInterface extends AnnotationSettingsInterface, CircleAnnotationSettingsInterfaceRO {
+  set_fill(v: boolean): boolean;
+  set_fillColor(v: string): string;
+  set_lineColor(v: string): string;
+  set_lineWidth(v: number): number;
+  set_radius(v: number): number;
+  set_skyRelative(v: boolean): boolean;
+}
+
+export type EngineSettingsInterfaceRO = SettingsInterface;
+
+export interface EngineSettingsInterface extends EngineSettingsInterfaceRO {
+  set_actualPlanetScale(v: boolean): boolean;
+  set_constellationArtFilter(v: ConstellationFilter): ConstellationFilter;
+  set_constellationBoundariesFilter(v: ConstellationFilter): ConstellationFilter;
+  set_constellationFigureColor(v: string): string;
+  set_constellationFiguresFilter(v: ConstellationFilter): ConstellationFilter;
+  set_constellationBoundryColor(v: string): string;
+  set_constellationNamesFilter(v: ConstellationFilter): ConstellationFilter;
+  set_constellations(v: boolean): boolean;
+  set_constellationSelectionColor(v: string): string;
+  set_constellationsEnabled(v: string): string;
+  set_crosshairsColor(v: string): string;
+  set_earthCutawayView(v: boolean): boolean;
+  set_galacticMode(v: boolean): boolean;
+  set_localHorizonMode(v: boolean): boolean;
+  set_locationAltitude(v: number): number;
+  set_locationLat(v: number): number;
+  set_locationLng(v: number): number;
+  set_milkyWayModel(v: boolean): boolean;
+  set_minorPlanetsFilter(v: number): number;
+  set_planetOrbitsFilter(v: number): number;
+  set_showAltAzGrid(v: boolean): boolean;
+  set_showAltAzGridText(v: boolean): boolean;
+  set_showConstellationBoundries(v: boolean): boolean;
+  set_showConstellationFigures(v: boolean): boolean;
+  set_showConstellationLabels(v: boolean): boolean;
+  set_showConstellationPictures(v: boolean): boolean;
+  set_showConstellations(v: boolean): boolean;
+  set_showConstellationSelection(v: boolean): boolean;
+  set_showCrosshairs(v: boolean): boolean;
+  set_showEarthSky(v: boolean): boolean;
+  set_showEcliptic(v: boolean): boolean;
+  set_showEclipticGrid(v: boolean): boolean;
+  set_showEclipticGridText(v: boolean): boolean;
+  set_showEclipticOverviewText(v: boolean): boolean;
+  set_showElevationModel(v: boolean): boolean;
+  set_showEquatorialGridText(v: boolean): boolean;
+  set_showGalacticGrid(v: boolean): boolean;
+  set_showGalacticGridText(v: boolean): boolean;
+  set_showGrid(v: boolean): boolean;
+  set_showHorizon(v: boolean): boolean;
+  set_showISSModel(v: boolean): boolean;
+  set_showPrecessionChart(v: boolean): boolean;
+  set_showSkyGrids(v: boolean): boolean;
+  set_showSkyOverlays(v: boolean): boolean;
+  set_showSkyOverlaysIn3d(v: boolean): boolean;
+  set_showSkyNode(v: boolean): boolean;
+  set_showSolarSystem(v: boolean): boolean;
+  set_smoothPan(v: boolean): boolean;
+  set_solarSystemCMB(v: boolean): boolean;
+  set_solarSystemCosmos(v: boolean): boolean;
+  set_solarSystemLighting(v: boolean): boolean;
+  set_solarSystemMilkyWay(v: boolean): boolean;
+  set_solarSystemMinorPlanets(v: boolean): boolean;
+  set_solarSystemMultiRes(v: boolean): boolean;
+  set_solarSystemOrbits(v: boolean): boolean;
+  set_solarSystemOverlays(v: boolean): boolean;
+  set_solarSystemPlanets(v: boolean): boolean;
+  set_solarSystemScale(v: number): number;
+  set_solarSystemStars(v: boolean): boolean;
+  set_solarSystemMinorOrbits(v: boolean): boolean;
+}
+
+/** Interface for querying [[ImageSetLayer]] settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface ImageSetLayerSettingsInterfaceRO extends LayerSettingsInterfaceRO {
+  get_colorMapperName(): string;
+  get_overrideDefaultLayer(): boolean;
+}
+
+/** Interface for controlling [[ImageSetLayer]] settings. */
+export interface ImageSetLayerSettingsInterface extends LayerSettingsInterface, ImageSetLayerSettingsInterfaceRO {
+  set_colorMapperName(v: string): string;
+  set_overrideDefaultLayer(v: boolean): boolean;
+}
 
 /** Interface for querying generic Layer settings.
  *
@@ -84,6 +204,30 @@ export interface LayerSettingsInterface extends LayerSettingsInterfaceRO {
   set_referenceFrame(v: string): string;
   set_startTime(v: Date): Date;
   set_version(v: number): number;
+}
+
+export interface PolyAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
+  get_fill(): boolean;
+  get_fillColor(): string;
+  get_lineColor(): string;
+  get_lineWidth(): number;
+}
+
+export interface PolyAnnotationSettingsInterface extends AnnotationSettingsInterface, PolyAnnotationSettingsInterfaceRO {
+  set_fill(v: boolean): boolean;
+  set_fillColor(v: string): string;
+  set_lineColor(v: string): string;
+  set_lineWidth(v: number): number;
+}
+
+export interface PolyLineAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
+  get_lineColor(): string;
+  get_lineWidth(): number;
+}
+
+export interface PolyLineAnnotationSettingsInterface extends AnnotationSettingsInterface, PolyLineAnnotationSettingsInterfaceRO {
+  set_lineColor(v: string): string;
+  set_lineWidth(v: number): number;
 }
 
 /** Interface for querying [[SpreadSheetLayer]] settings.
@@ -191,6 +335,93 @@ export interface SpreadSheetLayerSettingsInterface extends LayerSettingsInterfac
   set_zAxisReverse(v: boolean): boolean;
 }
 
+/** Interface for querying [[VoTableLayer]] settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface VoTableLayerSettingsInterfaceRO extends LayerSettingsInterfaceRO {
+  get_altColumn(): number;
+  get_altType(): AltTypes;
+  get_altUnit(): AltUnits;
+  get_autoUpdate(): boolean;
+  get_beginRange(): Date;
+  get_cartesianCustomScale(): number;
+  get_cartesianScale(): AltUnits;
+  // get_colorMap
+  get_colorMapColumn(): number;
+  get_coordinatesType(): CoordinatesType;
+  get_dataSourceUrl(): string;
+  get_decay(): number;
+  get_dynamicData(): boolean;
+  get_endDateColumn(): number;
+  get_endRange(): Date;
+  get_hyperlinkColumn(): number;
+  get_hyperlinkFormat(): string;
+  get_latColumn(): number;
+  get_lngColumn(): number;
+  get_markerColumn(): number;
+  get_markerIndex(): number;
+  // get_markerMix
+  get_markerScale(): MarkerScales;
+  get_nameColumn(): number;
+  get_plotType(): PlotTypes;
+  get_pointScaleType(): PointScaleTypes;
+  get_raUnits(): RAUnits;
+  get_scaleFactor(): number;
+  get_showFarSide(): boolean;
+  get_sizeColumn(): number;
+  get_startDateColumn(): number;
+  // get_table()
+  get_timeSeries(): boolean;
+  get_xAxisColumn(): number;
+  get_xAxisReverse(): boolean;
+  get_yAxisColumn(): number;
+  get_yAxisReverse(): boolean;
+  get_zAxisColumn(): number;
+  get_zAxisReverse(): boolean;
+}
+
+/** Interface for controlling [[VoTableLayer]] settings. */
+export interface VoTableLayerSettingsInterface extends LayerSettingsInterface, VoTableLayerSettingsInterfaceRO {
+  set_altColumn(v: number): number;
+  set_altType(v: AltTypes): AltTypes;
+  set_altUnit(v: AltUnits): AltUnits;
+  set_autoUpdate(v: boolean): boolean;
+  set_beginRange(v: Date): Date;
+  set_cartesianCustomScale(v: number): number;
+  set_cartesianScale(v: AltUnits): AltUnits;
+  // get_colorMap
+  set_colorMapColumn(v: number): number;
+  set_coordinatesType(v: CoordinatesType): CoordinatesType;
+  set_dataSourceUrl(v: string): string;
+  set_decay(v: number): number;
+  set_dynamicData(v: boolean): boolean;
+  set_endDateColumn(v: number): number;
+  set_endRange(v: Date): Date;
+  set_hyperlinkColumn(v: number): number;
+  set_hyperlinkFormat(v: string): string;
+  set_latColumn(v: number): number;
+  set_lngColumn(v: number): number;
+  set_markerColumn(v: number): number;
+  set_markerIndex(v: number): number;
+  // get_markerMix
+  set_markerScale(v: MarkerScales): MarkerScales;
+  set_nameColumn(v: number): number;
+  set_plotType(v: PlotTypes): PlotTypes;
+  set_pointScaleType(v: PointScaleTypes): PointScaleTypes;
+  set_raUnits(v: RAUnits): RAUnits;
+  set_scaleFactor(v: number): number;
+  set_showFarSide(v: boolean): boolean;
+  set_sizeColumn(v: number): number;
+  set_startDateColumn(v: number): number;
+  set_timeSeries(v: boolean): boolean;
+  set_xAxisColumn(v: number): number;
+  set_xAxisReverse(v: boolean): boolean;
+  set_yAxisColumn(v: number): number;
+  set_yAxisReverse(v: boolean): boolean;
+  set_zAxisColumn(v: number): number;
+  set_zAxisReverse(v: boolean): boolean;
+}
 
 // Now the actual types implemented in WWT.
 
@@ -200,7 +431,7 @@ export interface Action {
 }
 
 /** A visual annotation in the WWT view. */
-export class Annotation {
+export class Annotation implements AnnotationSettingsInterface {
   //get_center
   get_id(): string;
   set_id(v: string): string;
@@ -265,7 +496,7 @@ export class CameraParameters {
 }
 
 /** A simple circular annotation. */
-export class Circle extends Annotation {
+export class Circle extends Annotation implements CircleAnnotationSettingsInterface {
   get_fill(): boolean;
   set_fill(v: boolean): boolean;
   get_fillColor(): string;
@@ -433,8 +664,7 @@ export type EngineSetting = BaseEngineSetting |
 ["constellationFigureColor", Color] |
 ["constellationFiguresFilter", ConstellationFilter] |
 ["constellationNamesFilter", ConstellationFilter] |
-["constellationSelectionColor", Color] |
-["crosshairsColor", Color];
+["constellationSelectionColor", Color];
 
 export class FitsImage extends WcsImage {
   histogramMaxCount: number;
@@ -449,12 +679,15 @@ export class FitsImage extends WcsImage {
 export class FitsProperties {
   bZero: number;
   bScale: number;
+  containsBlanks: boolean;
   blankValue: number;
   maxVal: number;
   minVal: number;
   lowerCut: number;
   upperCut: number;
   transparentBlack: boolean;
+  colorMapName: string;
+  scaleType: ScaleTypes;
 }
 
 export class Folder implements Thumbnail {
@@ -702,7 +935,7 @@ export namespace Imageset {
 }
 
 /** An imageset renderable as its own independent layer. */
-export class ImageSetLayer extends Layer {
+export class ImageSetLayer extends Layer implements ImageSetLayerSettingsInterface {
   colorMapperName: string;
 
   // get_colorMapper(): ColorMapContainer
@@ -911,7 +1144,7 @@ export class Place implements Thumbnail {
 
 
 /** A polygonal annotation. */
-export class Poly extends Annotation {
+export class Poly extends Annotation implements PolyAnnotationSettingsInterface {
   get_fill(): boolean;
   set_fill(v: boolean): boolean;
   get_fillColor(): string;
@@ -939,7 +1172,7 @@ export type PolyAnnotationSetting =
   ["lineWidth", number];
 
 /** An annotation composed of a sequence of lines. */
-export class PolyLine extends Annotation {
+export class PolyLine extends Annotation implements PolyLineAnnotationSettingsInterface {
   get_lineColor(): string;
   /** The color is parsed using [[Color.load]]. */
   set_lineColor(v: string): string;
@@ -1229,9 +1462,8 @@ export interface ScriptInterfaceCallback {
   (si: ScriptInterface): void;
 }
 
-
 /** A variety of settings for the WWT rendering engine. */
-export class Settings implements SettingsInterface {
+export class Settings implements EngineSettingsInterface {
   get_constellationFigureColor(): string;
   set_constellationFigureColor(v: string): string;
   get_constellationBoundryColor(): string;
@@ -1894,7 +2126,7 @@ export namespace VoTable {
  * This class is highly similar to [[SpreadSheetLayer]], and the latter class is
  * generally more featureful. It should be preferred when possible.
  */
-export class VoTableLayer extends Layer {
+export class VoTableLayer extends Layer implements VoTableLayerSettingsInterface {
   get_altColumn(): number;
   set_altColumn(v: number): number;
   get_altType(): AltTypes;

@@ -662,7 +662,11 @@ export interface SetFitsLayerColormapMessage {
   /** A sequence number, in case messages arrive out-of-order. */
   version: number;
 
-  /** The name of the colormap to use. TODO: define these! */
+  /** The name of the colormap to use.
+   *
+   * The available options are extracted from Matplotlib and defined
+   * [here](../../engine/modules/colormapcontainer.html#fromnamedcolormap).
+   **/
   cmap: string;
 }
 
@@ -745,7 +749,12 @@ export interface StretchFitsLayerMessage {
   /** A sequence number, in case messages arrive out-of-order. */
   version: number;
 
-  /** The kind of stretch type to use. TODO: enum-ify! 0..4 = lin/log/pow/sqrt/histeq */
+  /** The kind of "stretch" type to use.
+   *
+   * This value should be an integer from the
+   * [ScaleTypes](../../engine-types/enums/scaletypes.html) enumeration. For
+   * historical reasons, it is expressed as an untyped number in this API.
+   */
   stretch: number;
 
   /** The data value to use for the minimum stretch bound. */

@@ -1,3 +1,6 @@
+// Copyright 2020-2021 the .NET Foundation
+// Licensed under the MIT License
+
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { createNamespacedHelpers } from "vuex";
 
@@ -29,6 +32,7 @@ import {
   SetLayerOrderOptions,
   SetFitsLayerColormapOptions,
   SetupForImagesetOptions,
+  SpreadSheetLayerState,
   StretchFitsLayerOptions,
   UpdateTableLayerOptions,
 } from "@wwtelescope/engine-helpers";
@@ -37,6 +41,7 @@ import {
   CreateTableLayerParams,
   GotoRADecZoomParams,
   ImagesetInfo,
+  ImageSetLayerState,
   LoadTourParams,
   LoadImageCollectionParams,
   WWTEngineVuexState,
@@ -44,6 +49,11 @@ import {
 
 /** A class for Vue components that wish to interact with a [[WWTComponent]]
  * through the Vuex state management system.
+ *
+ * Skip to [The WWT Vuex Interface](#the-wwt-vuex-interface) for a quick summary
+ * of how WWT's state is exposed and controlled in Vuex.
+ *
+ * ## Introduction
  *
  * Vue applications are composed of multiple [components]. In a WWT-powered app,
  * one of those components will be a `<WorldWideTelescope>` component containing
@@ -73,8 +83,9 @@ import {
  *   import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
  *
  *   @Component
- *   export default class App extends WWTAwareComponent {get coordText() {return
- *     `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+ *   export default class App extends WWTAwareComponent {
+ *     get coordText() {
+ *       return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
  *     }
  *   }
  * </script>
@@ -84,7 +95,7 @@ import {
  * of the WWT view, and the coordinate readout will update automagically as the
  * user interacts with the view.
  *
- * ### Props
+ * ## Props
  *
  * Classes inheriting from [[WWTAwareComponent]] automatically define a prop
  * named [[wwtNamespace]]. This should be set to the namespace of the [Vuex
@@ -94,7 +105,7 @@ import {
  *
  * [Vuex module]: https://vuex.vuejs.org/guide/modules.html
  *
- * ### WWT State Interfaces
+ * ## The WWT Vuex Interface
  *
  * Your [[WWTAwareComponent]] can monitor or manipulate the state of the WWT
  * renderer using the following interfaces, grouped by category. As a reminder,
@@ -106,13 +117,17 @@ import {
  * [mutations]: https://vuex.vuejs.org/guide/mutations.html
  * [actions]: https://vuex.vuejs.org/guide/actions.html
  *
- * #### Initialization
+ * ### Initialization
+ *
+ * Mutations:
+ *
+ * - [[setupForImageset]]
  *
  * Actions:
  *
  * - [[waitForReady]]
  *
- * #### Basic View Information
+ * ### Basic View Information
  *
  * State:
  *
@@ -122,6 +137,10 @@ import {
  * - [[wwtDecRad]]
  * - [[wwtRARad]]
  * - [[wwtZoomDeg]]
+ *
+ * Getters:
+ *
+ * - [[findRADecForScreenPoint]]
  *
  * Mutations:
  *
@@ -136,10 +155,11 @@ import {
  * - [[gotoRADecZoom]]
  * - [[gotoTarget]]
  *
- * #### Image Sets
+ * ### Image Sets
  *
  * State:
  *
+ * - [[wwtAvailableImagesets]]
  * - [[wwtBackgroundImageset]]
  * - [[wwtForegroundImageset]]
  * - [[wwtForegroundOpacity]]
@@ -155,12 +175,21 @@ import {
  * - [[setForegroundImageByName]]
  * - [[setForegroundOpacity]]
  * - [[setupForImageset]]
+ * - [[updateAvailableImagesets]]
  *
  * Actions:
  *
  * - [[loadImageCollection]]
  *
- * #### FITS Image Layers
+ * ### Imageset Layers (including FITS imagery)
+ *
+ * State:
+ *
+ * - [[wwtImagesetLayers]]
+ *
+ * Getters:
+ *
+ * - [[imagesetStateForLayer]]
  *
  * Mutations:
  *
@@ -173,8 +202,13 @@ import {
  * Actions:
  *
  * - [[addImageSetLayer]]
+ * - [[loadFitsLayer]] (deprecated)
  *
- * #### Tabular Data Layers
+ * ### Tabular Data Layers
+ *
+ * State:
+ *
+ * - [[wwtSpreadSheetLayers]]
  *
  * Mutations:
  *
@@ -186,7 +220,7 @@ import {
  *
  * - [[createTableLayer]]
  *
- * #### Annotations
+ * ### Annotations
  *
  * Mutations:
  *
@@ -194,7 +228,27 @@ import {
  * - [[clearAnnotations]]
  * - [[removeAnnotation]]
  *
- * #### Tours
+ * ### Progressive HiPS Catalogs
+ *
+ * These have some characteristics of both imagesets and tabular ("spreadsheet") data
+ * layers.
+ *
+ * Getters:
+ *
+ * - [[layerForHipsCatalog]]
+ * - [[spreadsheetStateForHipsCatalog]]
+ *
+ * Mutations:
+ *
+ * - [[applyTableLayerSettings]]
+ * - [[removeCatalogHipsByName]]
+ *
+ * Actions:
+ *
+ * - [[addCatalogHipsByName]]
+ * - [[getCatalogHipsDataInView]]
+ *
+ * ### Tours
  *
  * State:
  *
@@ -216,7 +270,13 @@ import {
  *
  * - [[loadTour]]
  *
- * #### Miscellaneous
+ * ### Miscellaneous
+ *
+ * State:
+ *
+ * - [[showWebGl2Warning]]
+ *
+ * Mutations:
  *
  * - [[applySetting]]
  **/
@@ -246,6 +306,7 @@ export class WWTAwareComponent extends Vue {
         wwtDecRad: (state, _getters) => (state as WWTEngineVuexState).decRad,
         wwtForegroundImageset: (state, _getters) => (state as WWTEngineVuexState).foregroundImageset,
         wwtForegroundOpacity: (state, _getters) => (state as WWTEngineVuexState).foregroundOpacity,
+        wwtImagesetLayers: (state, _getters) => (state as WWTEngineVuexState).imagesetLayers,
         wwtIsTourPlayerActive: (state, _getters) => (state as WWTEngineVuexState).isTourPlayerActive,
         wwtIsTourPlaying: (state, _getters) => (state as WWTEngineVuexState).isTourPlaying,
         wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
@@ -256,9 +317,11 @@ export class WWTAwareComponent extends Vue {
         wwtTourTimecode: (state, _getters) => (state as WWTEngineVuexState).tourTimecode,
         wwtZoomDeg: (state, _getters) => (state as WWTEngineVuexState).zoomDeg,
         wwtShowWebGl2Warning: (state, _getters) => (state as WWTEngineVuexState).showWebGl2Warning,
+        wwtSpreadSheetLayers: (state, _getters) => (state as WWTEngineVuexState).spreadSheetLayers,
       }),
       ...mapGetters([
         "findRADecForScreenPoint",
+        "imagesetStateForLayer",
         "layerForHipsCatalog",
         "lookupImageset",
         "spreadsheetStateForHipsCatalog",
@@ -319,7 +382,8 @@ export class WWTAwareComponent extends Vue {
 
   // Teach TypeScript about everything we wired up. State:
 
-  /** Information about the imagesets that are available to be used as a background
+  /** Information about the imagesets that are available to be used as a background.
+   *
    * The info includes the name, which can then be used to set the background image
    * via the [[setBackgroundImageByName]] mutation.
    */
@@ -369,6 +433,13 @@ export class WWTAwareComponent extends Vue {
    * and 100 (fully opaque). */
   wwtForegroundOpacity!: number;
 
+  /** A table of activated imageset layers.
+   *
+   * Use [[imagesetStateForLayer]] to access information about a particular
+   * layer.
+   */
+  wwtImagesetLayers!: { [guidtext: string]: ImageSetLayerState };
+
   /** Whether a tour has been loaded up and is available for playback. */
   wwtIsTourPlayerActive!: boolean;
 
@@ -389,6 +460,13 @@ export class WWTAwareComponent extends Vue {
    * [[setBackgroundImageByName]].
    */
   wwtRenderType!: ImageSetType;
+
+  /** A table of activated imageset layers.
+   *
+   * Use [[imagesetStateForLayer]] to access information about a particular
+   * layer.
+   */
+  wwtSpreadSheetLayers!: { [guidtext: string]: SpreadSheetLayerState };
 
   /** The number of times that a WWT tour has completed playing.
    *
@@ -441,6 +519,17 @@ export class WWTAwareComponent extends Vue {
 
   // Getters
 
+  /** Look up the reactive state for an active imageset layer.
+   *
+   * These layers are created using the [[addImageSetLayer]] action. The state
+   * returned by this function is part of the reactive Vuex store, so you can
+   * wire it up to your UI and it will update as the layer settings are changed.
+   *
+   * @param guidtext The GUID of the layer to query, as a string
+   * @returns The layer state, or null if the GUID is unrecognized
+   */
+  imagesetStateForLayer!: (guidtext: string) => ImageSetLayerState | null;
+
   /** Look up an [Imageset](../../engine/classes/imageset.html) in the engine’s
    * table of ones with registered names.
    *
@@ -458,8 +547,14 @@ export class WWTAwareComponent extends Vue {
   /** Get the right ascension and declination, in degrees, for x, y coordinates on the screen */
   findRADecForScreenPoint!: (pt: { x: number; y: number }) => { ra: number; dec: number };
 
-  /** Get the SpreadSheetLayer corresponding to the HiPS catalog with the given name
-   * Returns null if such a catalog has not been loaded into the engine
+  /** Get the actual WWT `SpreadSheetLayer` for the named HiPS catalog.
+   *
+   * Do not use this function for UI purposes -- the WWT layer object is not
+   * integrated into the reactive state system, and so if you use it as a basis
+   * for UI elements, those elements will not be updated properly if/when the
+   * layer's settings change. Use [[spreadsheetStateForHipsCatalog]] instead.
+   *
+   * @param name The `datasetName` of the HiPS catalog
    */
   layerForHipsCatalog!: (name: string) => SpreadSheetLayer | null;
 
@@ -594,6 +689,15 @@ export class WWTAwareComponent extends Vue {
    */
   setupForImageset!: (o: SetupForImagesetOptions) => void;
 
+  /** Get reactive `SpreadSheetLayer` settings for the named HiPS catalog.
+   *
+   * The returned data structure is a component of the app's Vuex state. You can
+   * therefore use the settings to construct UI elements, and they will update
+   * reactively as the state evolves. The actual data structures used by WWT are
+   * separate, but the two mirror each other.
+   *
+   * @param name The `datasetName` of the HiPS catalog
+   */
   spreadsheetStateForHipsCatalog!: (name: string) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   /** Start playback of the currently loaded tour.

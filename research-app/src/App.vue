@@ -364,6 +364,8 @@ class ImageSetLayerMessageHandler {
         this.queuedStretch = msg;
       }
     } else {
+      // TODO: `msg.stretch` is just a number while `stretch` is a typed
+      // ScaleTypes enum; TypeScript seems happy but we should validate!
       if (msg.version > this.stretchVersion) {
         this.owner.stretchFitsLayer({
           id: this.internalId,
