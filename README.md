@@ -177,6 +177,44 @@ essential to the smooth and reproducible deployment of the WWT web services.
 
 [Cranko]: https://pkgw.github.io/cranko/
 
+## Testing
+
+Testing for the research app is done using [BrowerStack]. For the main branch, this
+is triggered automatically with each commit/pull request. However, the test suite
+can also be run using a version of the app on your local machine, either locally (using
+the Nightwatch binary) or using BrowserStack (provided that you have a BrowserStack account).
+In either case, modify the `url` in `tests/page_objects/researchApp.js` to point to the 
+localhost port that you will be using (e.g. `http://localhost:8080`).
+
+[BrowerStack]: https://www.browserstack.com/
+
+To run the test suite locally:
+```
+cd tests
+npm install # If necessary
+./node_modules/.bin/nightwatch -c conf/local.conf.js
+```
+
+To run tests on a local version of the app via BrowserStack, do the following:
+
+* Set the variables `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` to your BrowserStack 
+username and access key, respectively. You can find these values in your BrowserStack 
+[Account Settings].
+
+[Account Settings]: https://www.browserstack.com/accounts/settings
+
+* Run the test suite:
+```
+cd tests
+npm install # If necessary
+node scripts/bslocal.runner.js -c conf/bslocal.conf.js
+``` 
+
+By default, both of these local options will run the tests in multiple browsers. Use the `-e` flag 
+to restrict the testing environments, e.g.
+```
+node scripts/local.runner.js -c conf/local.conf.js -e firefox,safari
+```
 
 ## Getting involved
 
