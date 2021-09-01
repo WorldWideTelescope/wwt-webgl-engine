@@ -191,7 +191,7 @@ localhost port that you will be using (e.g. `http://localhost:8080`).
 To run the test suite locally:
 ```
 cd tests
-npm install # If necessary
+npm install
 npm run build
 ./node_modules/.bin/nightwatch -c conf/local.conf.js
 ```
@@ -207,7 +207,7 @@ username and access key, respectively. You can find these values in your Browser
 * Run the test suite:
 ```
 cd tests
-npm install # If necessary
+npm install
 npm run build
 node scripts/bslocal.runner.js -c conf/bslocal.conf.js
 ``` 
