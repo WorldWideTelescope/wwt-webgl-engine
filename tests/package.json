@@ -12,6 +12,7 @@
   "description": "Tests for the AAS WorldwideTelescope engine.",
   "devDependencies": {
     "chromedriver": "^92.0.2",
+    "edgedriver": "^4.17134.1",
     "geckodriver": "^2.0.3"
   },
   "homepage": "https://worldwidetelescope.org/home/",
@@ -26,8 +27,8 @@
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
-    "local": "./node_modules/.bin/nightwatch -c conf/local.conf.js -e default",
-    "bs-local": "node scripts/bslocal.runner.js -c conf/bslocal.conf.js -e default"
+    "local": "./node_modules/.bin/nightwatch -c local.conf.js -e default",
+    "bs-local": "node scripts/bslocal.runner.js -c bslocal.conf.js -e default"
   },
   "version": "0.0.0-dev.0"
 }

@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "rootDir": "..",
     "target": "es5",
     "module": "commonjs",
+    "composite": true,
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
@@ -13,7 +15,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "outDir": "dist",
-    "declaration": false,
+    "declaration": true,
     "paths": {
       "@/*": [
         "src/*"

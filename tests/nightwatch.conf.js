@@ -2,13 +2,14 @@
 // Refer to the online docs for more details: https://nightwatchjs.org/gettingstarted/configuration/
 const Services = {}; loadServices();
 
+const directory = __dirname;
 const nightwatch_config = {
   // An array of folders (excluding subfolders) where your tests are located;
   // if this is not specified, the test source must be passed as the second argument to the test runner.
-  src_folders: ["research_app"],
+  src_folders: [directory + "/dist/tests/research_app"],
 
   // See https://nightwatchjs.org/guide/working-with-page-objects/
-  page_objects_path: 'page_objects',
+  page_objects_path: directory + "/page_objects",
 
   // See https://nightwatchjs.org/guide/extending-nightwatch/#writing-custom-commands
   custom_commands_path:  '',
@@ -18,6 +19,8 @@ const nightwatch_config = {
 
   // See https://nightwatchjs.org/guide/#external-globals
   globals_path: '',
+
+  disable_typescript: true,
 
   selenium : {
     "start_process" : false,

@@ -15,9 +15,10 @@ function capabilitiesForBrowser(browserName) {
 const directory = __dirname;
 
 const nightwatch_config = {
-  src_folders: [directory + "/../dist/research_app"],
-  page_objects_path: [directory + "/../page_objects"],
+  src_folders: [directory + "/dist/tests/research_app"],
+  page_objects_path: [directory + "/page_objects"],
   custom_assertions_path: [],
+  disable_typescript: true,
   
   selenium : {
     "start_process" : false,
@@ -39,12 +40,12 @@ const nightwatch_config = {
     edge: {
       desiredCapabilities: capabilitiesForBrowser('edge')
     },
-    safari: {
-      desiredCapabilities: capabilitiesForBrowser('safari')
-    },
-    opera: {
-      desiredCapabilities: capabilitiesForBrowser('opera')
-    }
+    // safari: {
+    //   desiredCapabilities: capabilitiesForBrowser('safari')
+    // },
+    // opera: {
+    //   desiredCapabilities: capabilitiesForBrowser('opera')
+    // }
   }
 };
   
