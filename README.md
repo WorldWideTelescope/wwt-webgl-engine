@@ -192,6 +192,7 @@ To run the test suite locally:
 ```
 cd tests
 npm install # If necessary
+npm run build
 ./node_modules/.bin/nightwatch -c conf/local.conf.js
 ```
 
@@ -207,13 +208,21 @@ username and access key, respectively. You can find these values in your Browser
 ```
 cd tests
 npm install # If necessary
+npm run build
 node scripts/bslocal.runner.js -c conf/bslocal.conf.js
 ``` 
 
 By default, both of these local options will run the tests in multiple browsers. Use the `-e` flag 
 to restrict the testing environments, e.g.
 ```
-node scripts/local.runner.js -c conf/local.conf.js -e firefox,safari
+node scripts/bslocal.runner.js -c conf/bslocal.conf.js -e firefox,safari
+```
+
+For convenience, the following commands run the test suite in the default environment (which uses ChromeDriver):
+
+```
+npm run local  # Local app
+npm run bs-local  # Local app, on BrowserStack
 ```
 
 ## Getting involved

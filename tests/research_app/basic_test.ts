@@ -1,16 +1,23 @@
-const { expectAllPresent } = require("../utils");
-var utils = require("../utils");
+const utils = require('../utils');
 
-module.exports = {
+import {
+    NightwatchBrowser,
+} from "nightwatch";
 
-    before: function(browser) {
+const researchApp: any = null;
+
+const tests = {
+
+    researchApp: researchApp, // eslint-disable @typescript-eslint/no-explicit-any
+
+    before: function(browser: NightwatchBrowser): void {
         browser.globals.waitForConditionTimeout = 7500;
         this.researchApp = browser.page.researchApp();
     },
 
     // Navigate to the page
     // and wait for the app and WWT component to be visible
-    'Navigation and loading': function(_browser) {
+    'Navigation and loading': function() {
         this.researchApp
             .navigate()
             .waitForReady();
@@ -19,7 +26,7 @@ module.exports = {
     // Test the initial configuration of the research app
     // This consists of verifying that the appropriate elements
     // are displayed, and that any initial values are correct
-    'Initial configuration': function(_browser) {
+    'Initial configuration': function() {
         const app = this.researchApp;
         const displayPanel = app.section.displayPanel;
         const controls = app.section.controls;
@@ -89,7 +96,7 @@ module.exports = {
 
     },
 
-    'HiPS catalog selection': function(_browser) {
+    'HiPS catalog selection': function() {
         const app = this.researchApp;
         const controls = app.section.controls;
         const tools = app.section.tools;
@@ -133,7 +140,7 @@ module.exports = {
         // Check that the catalog layer displays in the panel
         // with the correct name
         const firstLayerTitle = utils.nthOfTypeSelector("@layerTitle", 1);
-        const firstLayerButtons = ["@layerVisibilityButton", "@layerDeleteButton"]
+        const firstLayerButtons: string[] = ["@layerVisibilityButton", "@layerDeleteButton"]
             .map(selector => utils.nthOfTypeSelector(selector, 1));
         displayPanel.expect.elements("@layerItem").count.to.equal(1);
         utils.expectAllPresent(displayPanel, firstLayerButtons);
@@ -144,8 +151,8 @@ module.exports = {
 
         // If we click on layer title, check that the UI container becomes visible
         // The buttons should appear as well
-        const firstLayer = utils.nthOfTypeSelector("@layerItem", 1);
-        const toClick = firstLayerTitle;
+        const firstLayer: string = utils.nthOfTypeSelector("@layerItem", 1);
+        const toClick: string = firstLayerTitle;
         const firstLayerDetail= `${firstLayer} ${displayPanel.props.detailClass}`;
         displayPanel.click(toClick);
         utils.expectAllVisible(displayPanel, firstLayerButtons.concat([firstLayerDetail]));
@@ -160,7 +167,9 @@ module.exports = {
 
     },
 
-    after: function(browser) {
+    after: function(browser: NightwatchBrowser) {
         browser.end();
     }
 }
+
+module.exports = tests;

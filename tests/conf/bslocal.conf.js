@@ -12,9 +12,11 @@ function capabilitiesForBrowser(browserName) {
   }
 }
 
+const directory = __dirname;
+
 const nightwatch_config = {
-  src_folders: [ "research_app" ],
-  page_objects_path: ["page_objects"],
+  src_folders: [directory + "/../dist/research_app"],
+  page_objects_path: [directory + "/../page_objects"],
   custom_assertions_path: [],
   
   selenium : {
