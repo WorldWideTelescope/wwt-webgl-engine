@@ -5,9 +5,7 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@types/nightwatch": "^1.3.4",
-    "browserstack-local": "^1.4.8",
-    "nightwatch": "^1.7.8"
+    "browserstack-local": "^1.4.8"
   },
   "description": "Tests for the AAS WorldwideTelescope engine.",
   "devDependencies": {
