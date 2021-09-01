@@ -381,6 +381,7 @@ namespace wwtlib
         {
             return LayerManager.AddVoTableLayerWithPlotType(table, title, PlotTypes.Circle);
         }
+
         public static VoTableLayer AddVoTableLayerWithPlotType(VoTable table, string title, PlotTypes plotType)
         {
             VoTableLayer layer = VoTableLayer.Create(table, plotType);
@@ -400,20 +401,63 @@ namespace wwtlib
         public static ImageSetLayer AddImageSetLayer(Imageset imageset, string title)
         {
             ImageSetLayer layer = ImageSetLayer.Create(imageset);
-            layer.DoneLoading(null);
-            layer.Name = title;
-            layer.Astronomical = true;
-            layer.ReferenceFrame = "Sky";
-            LayerList[layer.ID] = layer;
-            AllMaps["Sky"].Layers.Add(layer);
-            AllMaps["Sky"].Open = true;
-            layer.Enabled = true;
-            version++;
-            LoadTree();
+            return AddFitsImageSetLayer(layer, title);
+        }
+
+        public static ImageSetLayer AddImageSetLayerCallback(Imageset imageset, string title, ImagesetLoaded callback)
+        {
+            ImageSetLayer layer = ImageSetLayer.Create(imageset);
+
+            // The tile rendering codepaths require that "Extension" is exactly
+            // .fits -- multiple extensions are not currently supported.
+
+            bool isNonhipsTiledFits =
+                imageset.Extension == ".fits" &&
+                layer.GetFitsImage() == null &&
+                imageset.Projection != ProjectionType.Healpix;
+
+            // The goal here is to fire the callback once the initial imageset
+            // data have loaded. In particular, for FITS-type imagesets, we
+            // inevitably need to download some data in order to figure out
+            // parameters like FitsProperties.LowerCut.
+            //
+            // At the moment, this is only wired up correctly for non-HiPS tiled
+            // FITS. In a pretty egregious hack, the OnMainImageLoaded callback
+            // below will be fired once the level-0 FITS tile is loaded. We
+            // basically needed to add this new callback hook because there
+            // wasn't any other way to get something to fire when the level-0
+            // tile data actually arrive.
+            //
+            // HiPS FITS datasets will *eventually* get the right FitsProperties
+            // because the fetch of the HipsProperties data sets this up. (This
+            // is triggered by the HipsProperties constructor, used in
+            // Imageset.GetNewTile.) But the timing of the callback here is
+            // uncorrelated with that process. The same is broadly true for
+            // untiled FITS. This function should be improved to make sure that
+            // the callback argument gets fired at the right time for such
+            // datasets.
+
+            if (isNonhipsTiledFits) {
+                imageset.FitsProperties.OnMainImageLoaded = delegate (FitsImage image) {
+                    image.ApplyDisplaySettings();
+                    if (callback != null) {
+                        callback(layer);
+                    }
+                };
+            }
+
+            AddFitsImageSetLayer(layer, title);
+
+            // For everything not yet handled, just trigger the callback now, if
+            // needed.
+            if (callback != null && !isNonhipsTiledFits) {
+                callback(layer);
+            }
 
             return layer;
         }
 
+        // This method is somewhat misnamed - there's nothing FITS-specific about it.
         public static ImageSetLayer AddFitsImageSetLayer(ImageSetLayer layer, string title)
         {
             layer.DoneLoading(null);
@@ -428,8 +472,6 @@ namespace wwtlib
             LoadTree();
             return layer;
         }
-
-
 
         public static string GetNextFitsName()
         {

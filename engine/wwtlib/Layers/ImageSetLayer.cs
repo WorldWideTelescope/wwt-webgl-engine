@@ -47,9 +47,12 @@ namespace wwtlib
         // Test whether our underlying imagery is FITS based.
         //
         // This can come in two flavors: a single FITS image, or tiled FITS.
+        // Note that even though the FileType/Extension field can currently
+        // specify multiple file formats, the rendering code requires that the
+        // extension is exactly ".fits" for FITS rendering to kick in.
         bool IsFitsImageset() {
-            bool fitsExt = imageSet.Extension.ToLowerCase().StartsWith(".fit");
-            return imageSet.WcsImage is FitsImage || (imageSet.WcsImage == null && fitsExt);
+            bool hasFitsExt = imageSet.Extension == ".fits";
+            return imageSet.WcsImage is FitsImage || (imageSet.WcsImage == null && hasFitsExt);
         }
 
         public override void InitializeFromXml(XmlNode node)

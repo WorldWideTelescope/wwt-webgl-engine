@@ -894,6 +894,9 @@ export class Imageset implements Thumbnail {
   get_url(): string;
   set_url(url: string): string;
 
+  get_wcsImage(): WcsImage | null;
+  set_wcsImage(w: WcsImage | null): WcsImage | null;
+
   get_widthFactor(): number;
   set_widthFactor(f: number): number;
 
@@ -946,7 +949,7 @@ export class ImageSetLayer extends Layer implements ImageSetLayerSettingsInterfa
   get_overrideDefaultLayer(): boolean;
   set_overrideDefaultLayer(v: boolean): boolean;
 
-  getFitsImage(): FitsImage | null;;
+  getFitsImage(): FitsImage | null;
   setImageScalePhysical(st: ScaleTypes, min: number, max: number): void;
   setImageScaleRaw(st: ScaleTypes, min: number, max: number): void;
   setImageZ(z: number): void;
@@ -1032,7 +1035,33 @@ export class Layer implements LayerSettingsInterface {
 export namespace LayerManager {
   export function get_tourLayers(): boolean;
   export function set_tourLayers(v: boolean): boolean;
-  //export function get_layerMaps(): {[name: string]: LayerMap}
+
+  /** Get the hierarchy of layers registered with the engine.
+   *
+   * This function returns a dictionary of [[LayerMap]] instances that define
+   * the engine’s rendering hierarchy. This top-level dictionary contains only
+   * the root reference frames used by the engine — typically, it has only two
+   * entries, named `"Sun"` and `"Sky"`. Below the `"Sun"` map (in its
+   * [[LayerMap.childMaps]] field) are found maps for the planets, and below
+   * those are maps for their moons.
+   *
+   * See also [[get_allMaps]], which returns the same collection of layer maps
+   * but in a flattened hierarchy.
+   */
+  export function get_layerMaps(): { [name: string]: LayerMap }
+
+  /** Get the flattened hierarchy of layers registered with the engine.
+   *
+   * This function returns a dictionary of [[LayerMap]] instances that define
+   * the engine’s rendering hierarchy. The dictionary contains an entry for
+   * every [[LayerMap]] registered with the engine. This is unlike the
+   * `get_layerMaps()` interface, which only returns the “root” layer maps.
+   * Because there is a layer map for every solar system planet and every known
+   * moon thereof, this dictionary is quite large.
+   *
+   * The keying is done such that `allMaps[map.get_name()] = map`.
+   */
+  export function get_allMaps(): { [name: string]: LayerMap }
 
   /** Get the collection of all layers registered with the engine.
    *
@@ -1076,6 +1105,28 @@ export namespace LayerManager {
 /** An alias for the type implicitly defined by the static
  * [[LayerManager]] namespace. */
 export type LayerManagerObject = typeof LayerManager;
+
+/** A collection of layers in a hierarchical tree.
+ *
+ * Each map includes a collection of zero or more [[Layer]]s rooted in its
+ * reference frame (the [[layers]] list) as well as a collection of zero or more
+ * child [[LayerMap]]s, which have reference frames that are defined relative to
+ * this layer's reference frame (the [[childMaps]] dictionary).
+ **/
+export class LayerMap {
+  childMaps: { [childName: string]: LayerMap };
+  parent: LayerMap | null;
+  layers: Layer[];
+  open: boolean;
+  enabled: boolean;
+  loadedFromTour: boolean;
+  //frame: ReferenceFrame;
+
+  addChild(child: LayerMap): void;
+
+  get_name(): string;
+  set_name(v: string): string;
+}
 
 /** The full LayerSetting type, which augments engine-types' BaseLayerSetting
  * with types that are only provided within the engine itself.
@@ -2354,6 +2405,20 @@ export class WWTControl {
    * background image set.
    */
   renderType: ImageSetType;
+
+  /** Get the name of the reference frame associated with the current view.
+   *
+   * The current reference frame defines the physical coordinates of the view
+   * and the list of layers that are included in the current rendering process.
+   * The return value of this function can be indexed into
+   * [[LayerManager.get_allMaps]] to find the root [[LayerMap]] that is used to
+   * determine what gets rendered in the current view.
+   *
+   * In standard 2D sky mode, the return value will be `"Sky"`.
+   *
+   * @returns The name of the current reference frame.
+   */
+  getCurrentReferenceFrame(): string;
 
   /** Render the view.
    *
