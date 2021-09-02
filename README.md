@@ -98,11 +98,11 @@ To build the engine library starting from C#:
 1. Open the `engine/WebGLEngine.sln` solution and build the project it contains.
    This should create the file `engine/wwtlib/bin/wwtlib.js`.
 
-Otherwise, check out the latest continuous integration build of this repository, 
+Otherwise, check out the latest continuous integration build of this repository,
 download the `scriptsharp` artifact, and copy the `wwtlib.js` file to the location
-given above. (To find the artifact, go to the appropriate build in this project's 
-[pipeline] on [Azure DevOps]). Under 'Related', select '9 published', and download 
-artifacts for `scriptsharp`). If you want to change the C# code, you can file a pull 
+given above. (To find the artifact, go to the appropriate build in this project's
+[pipeline] on [Azure DevOps]). Under 'Related', select '9 published', and download
+artifacts for `scriptsharp`). If you want to change the C# code, you can file a pull
 request and access the artifacts associated with your pull request builds.
 
 [Azure DevOps]: https://azure.microsoft.com/en-us/services/devops/?nav=min
@@ -177,53 +177,51 @@ essential to the smooth and reproducible deployment of the WWT web services.
 
 [Cranko]: https://pkgw.github.io/cranko/
 
-## Testing
 
-Testing for the research app is done using [BrowerStack]. For the main branch, this
-is triggered automatically with each commit/pull request. However, the test suite
-can also be run using a version of the app on your local machine, either locally (using
-the Nightwatch binary) or using BrowserStack (provided that you have a BrowserStack account).
-In either case, modify the `url` in `tests/page_objects/researchApp.js` to point to the 
-localhost port that you will be using (e.g. `http://localhost:8080`).
+## Integration Testing
 
-[BrowerStack]: https://www.browserstack.com/
+Integration testing of the apps is done using [Selenium], [Nightwatch], and
+[BrowserStack]. For the main branch, this is triggered automatically with each
+commit/pull request. However, the test suite can also be run using a version of
+the app on your local machine, either locally (using the Nightwatch binary) or
+using BrowserStack (provided that you have a BrowserStack account). In either
+case, you may need to modify the `url` in `tests/page_objects/researchApp.js` to
+point to the localhost port that you will be using (the default is
+`http://localhost:8080`).
 
-To run the test suite locally:
+[Selenium]: https://www.selenium.dev/
+[Nightwatch]: https://nightwatchjs.org/
+[BrowserStack]: https://www.browserstack.com/
+
+To run the test suite on a local version of the app with ChromeDriver:
+
 ```
+npm run serve-research &  # or equivalent
 cd tests
 npm install
 npm run build
-./node_modules/.bin/nightwatch -c conf/local.conf.js
+npm run local
 ```
 
-To run tests on a local version of the app via BrowserStack, do the following:
+To run tests on a local version of the app via BrowserStack's multi-browser,
+multi-platform infrastructure, do the following:
 
-* Set the variables `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` to your BrowserStack 
-username and access key, respectively. You can find these values in your BrowserStack 
+* Set the variables `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` to your BrowserStack
+username and access key, respectively. You can find these values in your BrowserStack
 [Account Settings].
 
 [Account Settings]: https://www.browserstack.com/accounts/settings
 
-* Run the test suite:
-```
-cd tests
-npm install
-npm run build
-node scripts/bslocal.runner.js -c conf/bslocal.conf.js
-``` 
+* Run the test suite as above but with the final command: `npm run bs-local`
 
-By default, both of these local options will run the tests in multiple browsers. Use the `-e` flag 
-to restrict the testing environments, e.g.
-```
-node scripts/bslocal.runner.js -c conf/bslocal.conf.js -e firefox,safari
-```
-
-For convenience, the following commands run the test suite in the default environment (which uses ChromeDriver):
+By default, both of these local options will run the tests in Chrome. You can
+adjust the testing environments adding the `-e` option, which can be
+accomplished with syntax such as
 
 ```
-npm run local  # Local app
-npm run bs-local  # Local app, on BrowserStack
+npm run bs-local -- -e firefox,edge
 ```
+
 
 ## Getting involved
 
