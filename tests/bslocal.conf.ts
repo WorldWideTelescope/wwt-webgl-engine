@@ -53,7 +53,7 @@ addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', WINDOWS_VERSIONS, WIN
 
 // OS X
 const OSX_VERSIONS = ["Big Sur", "Catalina", "Mojave"];
-const OSX_BROWSERS = ["Safari", "Chrome", "Edge", "Firefox"];
+const OSX_BROWSERS = ["Chrome", "Edge", "Firefox"];
 const osxKeyMaker = function(version: string, browser: string): string {
   return `${browser}_${version}`.replace(" ", "");
 };
@@ -62,9 +62,9 @@ addBrowsers(environments, BSLOCAL_CAPABILITIES, 'OS X', OSX_VERSIONS, OSX_BROWSE
 // For convenience, add the latest versions of browsers on Windows
 // to an environment named `<lowercasebrowsername>`
 const simpleKeyMaker = function(_version: string, browser: string): string {
-  return browser;
+  return browser.toLowerCase();
 };
-addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', ['10'], ['chrome', 'firefox', 'edge'], simpleKeyMaker);
+addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', ['10'], ['Chrome', 'Firefox', 'Edge'], simpleKeyMaker);
 
 // Code to copy seleniumhost/port into test settings
 for (const i in nightwatch_config.test_settings) {
