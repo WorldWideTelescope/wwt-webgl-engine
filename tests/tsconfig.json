@@ -29,6 +29,7 @@
   },
   "include": [
     "research_app/*.ts",
-    "utils.ts"
+    "page_objects/*.ts",
+    "*.ts"
   ],
 }

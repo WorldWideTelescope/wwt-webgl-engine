@@ -1,3 +1,7 @@
+// @ts-nocheck
+// TODO: Add proper TypeScript for this page object
+// For now, we just want a compiled .js file to appear in `dist`
+
 module.exports = {
   url: "http://localhost:8080",
   commands: [{
