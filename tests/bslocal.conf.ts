@@ -45,26 +45,31 @@ const environments = nightwatch_config.test_settings;
 
 // Windows
 const WINDOWS_VERSIONS = ["10", "8.1", "7"];
-const WINDOWS_BROWSERS = ["Chrome","Edge",  "Firefox", "IE"];
+const WINDOWS_BROWSERS = ["Chrome", "MicrosoftEdge",  "Firefox", "IE"];
 const winKeyMaker = function(version: string, browser: string): string {
-  return `${browser}_Win${version}`.replace(" ", "");
+  const browserName = (browser === 'MicrosoftEdge' ? 'Edge' : browser);
+  return `${browserName}_Win${version}`.replace(" ", "");
 };
 addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', WINDOWS_VERSIONS, WINDOWS_BROWSERS, winKeyMaker);
 
 // OS X
 const OSX_VERSIONS = ["Big Sur", "Catalina", "Mojave"];
-const OSX_BROWSERS = ["Chrome", "Edge", "Firefox"];
+const OSX_BROWSERS = ["Chrome", "MicrosoftEdge", "Firefox"];
 const osxKeyMaker = function(version: string, browser: string): string {
-  return `${browser}_${version}`.replace(" ", "");
+  const browserName = (browser === 'MicrosoftEdge' ? 'Edge' : browser);
+  return `${browserName}_${version}`.replace(" ", "");
 };
 addBrowsers(environments, BSLOCAL_CAPABILITIES, 'OS X', OSX_VERSIONS, OSX_BROWSERS, osxKeyMaker);
 
 // For convenience, add the latest versions of browsers on Windows
 // to an environment named `<lowercasebrowsername>`
 const simpleKeyMaker = function(_version: string, browser: string): string {
+  if (browser === 'MicrosoftEdge') {
+    return 'edge';
+  }
   return browser.toLowerCase();
 };
-addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', ['10'], ['Chrome', 'Firefox', 'Edge'], simpleKeyMaker);
+addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', ['10'], ['Chrome', 'Firefox', 'MicrosoftEdge'], simpleKeyMaker);
 
 // Code to copy seleniumhost/port into test settings
 for (const i in nightwatch_config.test_settings) {
@@ -75,5 +80,6 @@ for (const i in nightwatch_config.test_settings) {
   config['selenium_host'] = nightwatch_config.selenium.host;
   config['selenium_port'] = nightwatch_config.selenium.port;
 }
+
 module.exports = nightwatch_config;
   
