@@ -435,14 +435,16 @@ export default class ImagesetItem extends Vue {
 
     const cleanup = (_event: Event) => {
       document.documentElement.classList.remove("pointer-tracking");
-      document.removeEventListener("pointermove", onmove);
-      document.removeEventListener("keydown", onkeydown);
+      document.removeEventListener("pointermove", onmove, { capture: true });
+      document.removeEventListener("pointerup", cleanup, { capture: true });
+      document.removeEventListener("pointercancel", cleanup, { capture: true });
+      document.removeEventListener("keydown", onkeydown, { capture: true });
     };
 
-    document.addEventListener("pointermove", onmove);
-    document.addEventListener("pointerup", cleanup);
-    document.addEventListener("pointercancel", cleanup);
-    document.addEventListener("keydown", onkeydown);
+    document.addEventListener("pointermove", onmove, { capture: true });
+    document.addEventListener("pointerup", cleanup, { capture: true });
+    document.addEventListener("pointercancel", cleanup), { capture: true };
+    document.addEventListener("keydown", onkeydown, { capture: true });
     document.documentElement.classList.add("pointer-tracking");
   }
 }
