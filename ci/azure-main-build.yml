@@ -170,7 +170,7 @@ jobs:
       cd tests
       npm install
 
-      npm run bs-local -- -e default,firefox,edge -o reports
+      npm run bs-local -- -e default,firefox,edge,safari -o reports
 
       pkill -f vue-cli-service  # stop the servers
     displayName: BrowserStack test local research app
