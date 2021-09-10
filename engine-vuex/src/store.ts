@@ -355,6 +355,30 @@ export interface LoadImageCollectionParams {
   loadChildFolders?: boolean;
 }
 
+function activeLayersList(): string[] {
+  if (Vue.$wwt.inst === null)
+    throw new Error('cannot get activeLayersList without linking to WWTInstance');
+
+  const layers: string[] = [];
+
+  function accum(lm: LayerMap) {
+    for (const layer of lm.layers) {
+      layers.push(layer.id.toString());
+    }
+
+    for (const [_mapname, sublm] of Object.entries(lm.childMaps)) {
+      accum(sublm);
+    }
+  }
+
+  const rootlm = Vue.$wwt.inst.lm.get_allMaps()[Vue.$wwt.inst.ctl.getCurrentReferenceFrame()];
+  if (rootlm) {
+    accum(rootlm);
+  }
+
+  return layers;
+}
+
 /** The store module class for the WWT Vuex implementation.
  *
  * See [[WWTAwareComponent]] for an organized overview of the state variables,
@@ -715,24 +739,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot get internalUpdateActiveLayers without linking to WWTInstance');
 
-    const layers: string[] = [];
-
-    function accum(lm: LayerMap) {
-      for (const layer of lm.layers) {
-        layers.push(layer.id.toString());
-      }
-
-      for (const [_mapname, sublm] of Object.entries(lm.childMaps)) {
-        accum(sublm);
-      }
-    }
-
-    const rootlm = Vue.$wwt.inst.lm.get_allMaps()[Vue.$wwt.inst.ctl.getCurrentReferenceFrame()];
-    if (rootlm) {
-      accum(rootlm);
-    }
-
-    this.activeLayers = layers;
+    this.activeLayers = activeLayersList();
   }
 
   @Mutation
@@ -757,7 +764,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.delete(this.imagesetLayers, stringId);
     Vue.delete(this.spreadSheetLayers, stringId);
 
-    this.context.commit('internalUpdateActiveLayers');
+    this.activeLayers = activeLayersList();
   }
 
   // Imageset layers, including FITS layers
@@ -840,7 +847,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
 
     Vue.$wwt.inst.setImageSetLayerOrder(options);
-    this.context.commit('internalUpdateActiveLayers');
+    this.activeLayers = activeLayersList();
   }
 
 
@@ -1042,7 +1049,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
     Vue.delete(this.spreadSheetLayers, name);
 
-    this.context.commit('internalUpdateActiveLayers');
+    this.activeLayers = activeLayersList();
   }
 
   // Annotations
