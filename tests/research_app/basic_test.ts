@@ -149,9 +149,14 @@ const tests = {
         // To start, the visibility and delete button should not be visible
         utils.expectAllNotVisible(displayPanel, firstCatalogButtons);
 
-        // If we click on catalog title, check that the UI container becomes visible
-        // The buttons should appear as well
-        const firstCatalog: string = utils.nthOfTypeSelector("@catalogItem", 1);
+        // If we click on catalog title, check that the UI container becomes
+        // visible. The buttons should appear as well.
+        //
+        // The nth-of-type finds the element of the same type as the
+        // @catalogItem, which is a <div>, and is 1-based. The first sibling
+        // <div> is the section header, so the 2nd <div> is the first catalog
+        // item.
+        const firstCatalog: string = utils.nthOfTypeSelector("@catalogItem", 2);
         const toClick: string = firstCatalogTitle;
         const firstCatalogDetail = `${firstCatalog} ${displayPanel.props.detailClass}`;
         displayPanel.click(toClick);
@@ -164,7 +169,6 @@ const tests = {
         // Check that the catalog goes away if we click the delete button
         displayPanel.click(firstCatalogButtons[1]);
         displayPanel.expect.elements("@catalogItem").count.to.equal(0);
-
     },
 
     after: function (browser: NightwatchBrowser) {
