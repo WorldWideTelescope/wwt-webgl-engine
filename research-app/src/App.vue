@@ -280,6 +280,8 @@
       </div>
     </div>
 
+    <notifications group="load-collection" position="top right" />
+
     <div id="webgl2-popup" v-show="wwtShowWebGl2Warning" v-if="!hideAllChrome">
       To get the full AAS WWT experience, consider using the latest version of
       Chrome, Firefox or Edge. In case you would like to use Safari, we
@@ -2120,7 +2122,14 @@ export default class App extends WWTAwareComponent {
       this.loadImageCollection({
         url: this.wtmlCollectionUrl,
         loadChildFolders: true,
+      }).then((_folder) => {
+        this.$notify({
+          group: "load-collection",
+          type: "success",
+          text: "WTML collection successfully loaded",
+        });
       });
+
       this.wtmlCollectionUrl = "";
     }
   }
@@ -2433,6 +2442,11 @@ body {
       color: #88f;
     }
   }
+}
+
+.vue-notification-group {
+  padding-right: 2.5rem;
+  padding-top: 0.75rem;
 }
 
 /* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */

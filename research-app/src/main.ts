@@ -36,6 +36,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+import Notifications from 'vue-notification';
+
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
 
@@ -51,6 +53,7 @@ import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 Vue.config.productionTip = false;
 
+Vue.use(Notifications);
 Vue.use(VTooltip);
 Vue.use(Vuex);
 
