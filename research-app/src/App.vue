@@ -8,7 +8,9 @@
       @mousedown.native="wwtOnMouseDown"
     ></WorldWideTelescope>
 
-    <div id="display-panel" v-if="!hideAllChrome">
+    <!-- keydown.stops here and below prevent any keynav presses from reaching
+      the toplevel UI handlers -->
+    <div id="display-panel" v-if="!hideAllChrome" @keydown.stop>
       <transition name="catalog-transition">
         <div id="overlays">
           <p>{{ coordText }}</p>
@@ -47,7 +49,7 @@
       </div>
     </div>
 
-    <ul id="controls" v-if="!hideAllChrome">
+    <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
       <li v-show="showToolMenu">
         <v-popover placement="left" trigger="manual" :open="showPopover">
           <font-awesome-icon
@@ -146,7 +148,7 @@
       </li>
     </ul>
 
-    <div id="tools" v-if="!hideAllChrome">
+    <div id="tools" v-if="!hideAllChrome" @keydown.stop>
       <div class="tool-container">
         <template v-if="currentTool == 'crossfade'">
           <span>Foreground opacity:</span>
@@ -263,7 +265,7 @@
               <label>URL:</label>
               <input
                 type="url"
-                v-model.lazy="wtmlCollectionUrl"
+                v-model="wtmlCollectionUrl"
                 @keyup.enter="submitWtmlCollectionUrl"
               />
               <font-awesome-icon
@@ -282,7 +284,12 @@
 
     <notifications group="load-collection" position="top right" />
 
-    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning" v-if="!hideAllChrome">
+    <div
+      id="webgl2-popup"
+      v-show="wwtShowWebGl2Warning"
+      v-if="!hideAllChrome"
+      @keydown.stop
+    >
       To get the full AAS WWT experience, consider using the latest version of
       Chrome, Firefox or Edge. In case you would like to use Safari, we
       recommend that you
