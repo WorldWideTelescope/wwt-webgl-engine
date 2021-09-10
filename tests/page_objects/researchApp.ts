@@ -48,11 +48,11 @@ module.exports = {
         coordinateDisplay: {
           selector: "#overlays > p"
         },
-        layersContainer: {
-          selector: "#layers-container"
+        catalogsContainer: {
+          selector: "#  "
         },
-        layersHeader: {
-          selector: "#layers-container .display-section-header"
+        catalogsHeader: {
+          selector: "#catalogs-container .display-section-header"
         },
         sourcesContainer: {
           selector: "#sources-container"
@@ -60,27 +60,27 @@ module.exports = {
         sourcesHeader: {
           selector: "#sources-container .display-section-header"
         },
-        // We need to specify the layer container id
+        // We need to specify the catalog container id
         // in case other Vue components use the inner selectors
         // i.e., the source components have a similar structure
         // with some of the same IDs
-        layerItem: {
-          selector: "#layers-container #root-container"
+        catalogItem: {
+          selector: "#catalogs-container #root-container"
         },
-        layerMainContainer: {
-          selector: "#layers-container #main-container"
+        catalogMainContainer: {
+          selector: "#catalogs-container #main-container"
         },
-        layerTitle: {
-          selector: "#layers-container #name-label"
+        catalogTitle: {
+          selector: "#catalogs-container #name-label"
         },
-        layerButtonContainer: {
-          selector: "#layers-container #buttons-container"
+        catalogButtonContainer: {
+          selector: "#catalogs-container #buttons-container"
         },
-        layerVisibilityButton: {
-          selector: "#layers-container #buttons-container .fa-eye, #layers-container #buttons-container .fa-eye-slash"
+        catalogVisibilityButton: {
+          selector: "#catalogs-container #buttons-container .fa-eye, #catalogs-container #buttons-container .fa-eye-slash"
         },
-        layerDeleteButton: {
-          selector: "#layers-container #buttons-container .fa-times"
+        catalogDeleteButton: {
+          selector: "#catalogs-container #buttons-container .fa-times"
         },
       },
       props: {
@@ -136,7 +136,7 @@ module.exports = {
           selector: ".vs__dropdown-option > div > h4"
         },
         backgroundDropdownOptionDescription: {
-        selector: ".vs__dropdown-option > div > em"
+          selector: ".vs__dropdown-option > div > em"
         },
         catalogSelectionContainer: {
           selector: "#catalog-select-container-tool"
@@ -157,7 +157,7 @@ module.exports = {
           selector: ".vs__dropdown-option > div > h4"
         },
         catalogDropdownOptionDescription: {
-        selector: ".vs__dropdown-option > div > em"
+          selector: ".vs__dropdown-option > div > em"
         },
       },
       props: {

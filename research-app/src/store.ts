@@ -1,6 +1,10 @@
+// Copyright 2020-2021 the .NET Foundation
+// Licensed under the MIT License
+
 import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
 import { ImagesetInfo } from '@wwtelescope/engine-vuex';
 import Vue from 'vue';
+
 export interface Source {
   ra: number;
   dec: number;
@@ -56,7 +60,6 @@ function sourcesEqual(s1: Source, s2: Source) {
   stateFactory: true,
 })
 export class WWTResearchAppModule extends VuexModule {
-
   hipsCatalogs: ImagesetInfo[] = [];
   hipsCatalogVisibilities: boolean[] = [];
   sources: Source[] = [];
@@ -115,5 +118,4 @@ export class WWTResearchAppModule extends VuexModule {
   removeSource(source: Source) {
     removeFromArray(this.sources, source);
   }
-
 }

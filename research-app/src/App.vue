@@ -8,40 +8,48 @@
       @mousedown.native="wwtOnMouseDown"
     ></WorldWideTelescope>
 
-    <div id="display-panel" v-if="!hideAllChrome">
+    <!-- keydown.stops here and below prevent any keynav presses from reaching
+      the toplevel UI handlers -->
+    <div id="display-panel" v-if="!hideAllChrome" @keydown.stop>
       <transition name="catalog-transition">
         <div id="overlays">
           <p>{{ coordText }}</p>
         </div>
       </transition>
-      <div id="layers-container" v-if="haveLayers">
+      <div id="imagery-container" v-if="haveImagery">
         <div class="display-section-header">
-          <label>Layers</label>
+          <label>Imagery</label>
         </div>
-        <div v-if="showLayers">
-          <catalog-item
-            v-for="catalog of hipsCatalogs"
-            v-bind:key="catalog.name"
-            v-bind:catalog="catalog"
-            v-bind:defaultColor="defaultColor"
-          />
+        <imageset-item
+          v-for="imageset of activeImagesetLayerStates"
+          v-bind:key="imageset.settings.name"
+          v-bind:imageset="imageset"
+        />
+      </div>
+      <div id="catalogs-container" v-if="haveCatalogs">
+        <div class="display-section-header">
+          <label>Catalogs</label>
         </div>
+        <catalog-item
+          v-for="catalog of hipsCatalogs"
+          v-bind:key="catalog.name"
+          v-bind:catalog="catalog"
+          v-bind:defaultColor="defaultColor"
+        />
       </div>
       <div id="sources-container" v-if="haveSources">
         <div class="display-section-header">
           <label>Sources</label>
         </div>
-        <div v-if="showSources">
-          <source-item
-            v-for="source of sources"
-            v-bind:key="source.name"
-            v-bind:source="source"
-          />
-        </div>
+        <source-item
+          v-for="source of sources"
+          v-bind:key="source.name"
+          v-bind:source="source"
+        />
       </div>
     </div>
 
-    <ul id="controls" v-if="!hideAllChrome">
+    <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
       <li v-show="showToolMenu">
         <v-popover placement="left" trigger="manual" :open="showPopover">
           <font-awesome-icon
@@ -66,6 +74,18 @@
                   ><font-awesome-icon icon="mountain" /> Choose background</a
                 >
               </li>
+              <li v-show="showAddImageryTool">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="
+                    selectTool('add-imagery-layer');
+                    showPopover = false;
+                  "
+                  tabindex="0"
+                  ><font-awesome-icon icon="image" /> Add imagery as layer</a
+                >
+              </li>
               <li v-show="showCatalogTool">
                 <a
                   href="#"
@@ -77,6 +97,19 @@
                   tabindex="0"
                   ><font-awesome-icon icon="map-marked-alt" /> Add HiPS
                   catalogs</a
+                >
+              </li>
+              <li v-show="showCollectionLoader">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="
+                    selectTool('load-collection');
+                    showPopover = false;
+                  "
+                  tabindex="0"
+                  ><font-awesome-icon icon="photo-video" /> Load WTML
+                  collection</a
                 >
               </li>
             </ul>
@@ -115,7 +148,7 @@
       </li>
     </ul>
 
-    <div id="tools" v-if="!hideAllChrome">
+    <div id="tools" v-if="!hideAllChrome" @keydown.stop>
       <div class="tool-container">
         <template v-if="currentTool == 'crossfade'">
           <span>Foreground opacity:</span>
@@ -125,6 +158,7 @@
             v-model="foregroundOpacity"
           />
         </template>
+
         <template v-else-if="currentTool == 'choose-background'">
           <div id="bg-select-container" class="item-select-container">
             <span id="bg-select-title" class="item-select-title"
@@ -155,6 +189,40 @@
             </v-select>
           </div>
         </template>
+
+        <template v-else-if="currentTool == 'add-imagery-layer'">
+          <div class="item-select-container">
+            <span class="item-select-title">Add imagery layer:</span>
+            <v-select
+              v-model="imageryToAdd"
+              class="item-selector"
+              :searchable="true"
+              :clearable="false"
+              :options="curAvailableImageryData"
+              :filter="filterImagesets"
+              label="name"
+              placeholder="Dataset"
+            >
+              <template #option="option">
+                <div class="item-option">
+                  <h4>{{ option.name }}</h4>
+                  <em>{{ option.description }}</em>
+                </div>
+              </template>
+              <template #selected-option="option">
+                <div>{{ option.name }}</div>
+              </template>
+              <template #no-options="{ search, searching }">
+                <template v-if="searching">
+                  No datasets matching <em>{{ search }}</em
+                  >.
+                </template>
+                <em v-else>No datasets available. Load a WTML collection?</em>
+              </template>
+            </v-select>
+          </div>
+        </template>
+
         <template v-else-if="showCatalogChooser">
           <div id="catalog-select-container-tool" class="item-select-container">
             <span class="item-select-title">Add catalog:</span>
@@ -182,10 +250,46 @@
             </v-select>
           </div>
         </template>
+
+        <template v-else-if="currentTool == 'load-collection'">
+          <div class="load-collection-container">
+            <div class="load-collection-label">
+              Load
+              <a
+                href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/"
+                >WTML</a
+              >
+              data collection:
+            </div>
+            <div class="load-collection-row">
+              <label>URL:</label>
+              <input
+                type="url"
+                v-model="wtmlCollectionUrl"
+                @keyup.enter="submitWtmlCollectionUrl"
+              />
+              <font-awesome-icon
+                icon="arrow-circle-right"
+                size="lg"
+                class="load-collection-icon"
+                @keyup.enter="submitWtmlCollectionUrl"
+                @click="submitWtmlCollectionUrl"
+                tabindex="0"
+              ></font-awesome-icon>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
 
-    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning" v-if="!hideAllChrome">
+    <notifications group="load-collection" position="top right" />
+
+    <div
+      id="webgl2-popup"
+      v-show="wwtShowWebGl2Warning"
+      v-if="!hideAllChrome"
+      @keydown.stop
+    >
       To get the full AAS WWT experience, consider using the latest version of
       Chrome, Firefox or Edge. In case you would like to use Safari, we
       recommend that you
@@ -256,7 +360,13 @@ import {
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
 
-type ToolType = "crossfade" | "choose-background" | "choose-catalog" | null;
+type ToolType =
+  | "add-imagery-layer"
+  | "choose-background"
+  | "choose-catalog"
+  | "crossfade"
+  | "load-collection"
+  | null;
 
 type AnyFitsLayerMessage =
   | classicPywwt.CreateImageSetLayerMessage
@@ -1171,6 +1281,17 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+
+    // Ignore incoming view_state messages. When testing the app, you might want
+    // to launch it as (e.g.)
+    // `http://localhost:8080/?origin=http://localhost:8080/` so that you can
+    // manually send it messages using postMessage in the JS console. But in
+    // this setup, the app also receives every message that it sends, because
+    // its send and receive origins are the same! The resulting "unhandled
+    // message" report can actually be useful for examining outgoing messages,
+    // but it gets annoying for the view state messages that are sent so
+    // frequently. So, ignore those.
+    this.messageHandlers.set("wwt_view_state", this.ignoreMessage);
   }
 
   onMessage(msg: any) {
@@ -1188,6 +1309,10 @@ export default class App extends WWTAwareComponent {
         msg
       );
     }
+  }
+
+  private ignoreMessage(_msg: any): boolean {
+    return true;
   }
 
   // Various message handlers that don't comfortably fit elsewhere:
@@ -1320,7 +1445,7 @@ export default class App extends WWTAwareComponent {
     }
     this.isMouseMoving = false;
   }
-  
+
   newSourceName = (function () {
     let count = 0;
 
@@ -1784,7 +1909,7 @@ export default class App extends WWTAwareComponent {
 
     if (this.statusMessageDestination === null || this.allowedOrigin === null)
       return;
-      
+
     const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
@@ -1794,12 +1919,12 @@ export default class App extends WWTAwareComponent {
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
   }
 
-  @Watch("sources", {deep:true})
+  @Watch("sources", { deep: true })
   onSelectedSourcesChanged(sources: Source[]) {
     // Notify clients when the list of selected sources is changed
     // By making this a deep watcher, it keeps of track of any change
     // in the list - even events like a property of a list entry changing
-    
+
     if (this.statusMessageDestination === null || this.allowedOrigin === null)
       return;
 
@@ -1917,6 +2042,10 @@ export default class App extends WWTAwareComponent {
     return this.wwtForegroundImageset != this.wwtBackgroundImageset;
   }
 
+  get showAddImageryTool() {
+    return !this.wwtIsTourPlaying;
+  }
+
   get showBackgroundChooser() {
     return !this.wwtIsTourPlaying;
   }
@@ -1929,7 +2058,15 @@ export default class App extends WWTAwareComponent {
     return this.currentTool == "choose-catalog";
   }
 
-  get haveLayers() {
+  get showCollectionLoader() {
+    return !this.wwtIsTourPlaying;
+  }
+
+  get haveImagery() {
+    return this.activeImagesetLayerStates.length > 0;
+  }
+
+  get haveCatalogs() {
     return this.hipsCatalogs.length > 0;
   }
 
@@ -1947,6 +2084,60 @@ export default class App extends WWTAwareComponent {
       this.currentTool = null;
     } else {
       this.currentTool = name;
+    }
+  }
+
+  // Add Imagery As Layer tool
+
+  get imageryToAdd() {
+    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
+  }
+
+  set imageryToAdd(iinfo: ImagesetInfo) {
+    const msg: classicPywwt.CreateImageSetLayerMessage = {
+      event: "image_layer_create",
+      url: iinfo.url,
+      id: iinfo.name,
+      mode: "preloaded",
+    };
+
+    this.getFitsLayerHandler(msg).handleCreateMessage(msg);
+  }
+
+  get curAvailableImageryData() {
+    if (this.wwtAvailableImagesets == null) return [];
+
+    // Currently (2021 August) the engine code requires that the
+    // filetype/extension field of an imageset be exactly ".fits" if it will be
+    // rendered with the FITS machinery. There are some datasets out there that
+    // include multiple space-separated extensions in this attribute, and of
+    // course there are different FITS-like extensions in use, so this might get
+    // more sophisticated in the future. If so, this logic will need to be
+    // updated.
+
+    return this.wwtAvailableImagesets.filter(
+      (info) => info.type == this.wwtRenderType && info.extension == ".fits"
+    );
+  }
+
+  // Load WTML Collection tool
+
+  wtmlCollectionUrl = "";
+
+  submitWtmlCollectionUrl() {
+    if (this.wtmlCollectionUrl) {
+      this.loadImageCollection({
+        url: this.wtmlCollectionUrl,
+        loadChildFolders: true,
+      }).then((_folder) => {
+        this.$notify({
+          group: "load-collection",
+          type: "success",
+          text: "WTML collection successfully loaded",
+        });
+      });
+
+      this.wtmlCollectionUrl = "";
     }
   }
 
@@ -1993,7 +2184,10 @@ export default class App extends WWTAwareComponent {
     );
   }
 
-  closestInView(target: AngleCoordinates, threshold?: number): RawSourceInfo | null {
+  closestInView(
+    target: AngleCoordinates,
+    threshold?: number
+  ): RawSourceInfo | null {
     let minDist = Infinity;
     let closestPt = null;
 
@@ -2024,7 +2218,13 @@ export default class App extends WWTAwareComponent {
         const pt = { ra: ra, dec: dec };
         const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
         if (dist < minDist) {
-          closestPt = { ra: ra, dec: dec, colNames: colNames, values: values, catalogName: catalogName };
+          closestPt = {
+            ra: ra,
+            dec: dec,
+            colNames: colNames,
+            values: values,
+            catalogName: catalogName,
+          };
           minDist = dist;
         }
       }
@@ -2038,8 +2238,6 @@ export default class App extends WWTAwareComponent {
   data() {
     return {
       showPopover: false,
-      showLayers: true,
-      showSources: true,
     };
   }
 
@@ -2065,6 +2263,11 @@ html {
   margin: 0;
   padding: 0;
   background-color: #000;
+
+  // Activated in cases like interactive FITS stretch adjustment:
+  &.pointer-tracking {
+    cursor: crosshair;
+  }
 }
 
 body {
@@ -2148,6 +2351,15 @@ body {
   .opacity-range {
     width: 50vw;
   }
+
+  a {
+    text-decoration: none;
+    color: #9bf;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 #display-panel {
@@ -2162,24 +2374,6 @@ body {
 
   p {
     margin: 0;
-  }
-}
-
-#add-catalog {
-  position: relative;
-  width: max-content;
-  max-width: 100%;
-  margin: auto;
-  font-size: 12pt;
-
-  & a {
-    text-align: center;
-    color: white;
-    text-decoration: none;
-  }
-
-  & a .icon {
-    padding: 0px 7px;
   }
 }
 
@@ -2219,6 +2413,47 @@ body {
 .icon {
   padding: 0px 5px;
   color: white;
+}
+
+.load-collection-container {
+  width: 35vw;
+
+  .load-collection-label {
+    width: 100%;
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .load-collection-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    width: 100%;
+    margin-top: 0.2rem;
+
+    label {
+      margin-right: 0.5rem;
+    }
+
+    input {
+      flex: 1;
+    }
+  }
+
+  .load-collection-icon {
+    cursor: pointer;
+    color: #9bf;
+
+    &:hover {
+      color: #88f;
+    }
+  }
+}
+
+.vue-notification-group {
+  padding-right: 2.5rem;
+  padding-top: 0.75rem;
 }
 
 /* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */

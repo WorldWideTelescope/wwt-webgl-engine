@@ -10,18 +10,22 @@ import Chrome from 'vue-color/src/components/Chrome.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faAdjust,
+  faArrowCircleRight,
   faChevronDown,
   faChevronUp,
   faCircle,
   faCompress,
+  faCrosshairs,
   faExpand,
   faEye,
   faEyeSlash,
+  faImage,
   faMapMarkedAlt,
   faMapMarkerAlt,
   faMinusCircle,
   faMountain,
   faPencilAlt,
+  faPhotoVideo,
   faPlus,
   faPlusCircle,
   faSearchMinus,
@@ -32,10 +36,16 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+import Notifications from 'vue-notification';
+
+import VueSlider from 'vue-slider-component';
+import 'vue-slider-component/theme/default.css';
+
 import { createPlugin } from "@wwtelescope/engine-vuex";
 
 import App from "./App.vue";
 import CatalogItem from "./CatalogItem.vue";
+import ImagesetItem from "./ImagesetItem.vue";
 import SourceItem from "./SourceItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import { WWTResearchAppModule } from "./store";
@@ -43,6 +53,7 @@ import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 Vue.config.productionTip = false;
 
+Vue.use(Notifications);
 Vue.use(VTooltip);
 Vue.use(Vuex);
 
@@ -55,18 +66,22 @@ Vue.use(createPlugin(), {
 });
 
 library.add(faAdjust);
+library.add(faArrowCircleRight);
 library.add(faChevronDown);
 library.add(faChevronUp);
 library.add(faCircle);
 library.add(faCompress);
+library.add(faCrosshairs);
 library.add(faExpand);
 library.add(faEye);
 library.add(faEyeSlash);
+library.add(faImage);
 library.add(faMapMarkedAlt);
 library.add(faMapMarkerAlt);
 library.add(faMinusCircle);
 library.add(faMountain);
 library.add(faPencilAlt);
+library.add(faPhotoVideo);
 library.add(faPlus);
 library.add(faPlusCircle);
 library.add(faSearchMinus);
@@ -74,12 +89,16 @@ library.add(faSearchPlus);
 library.add(faSlidersH);
 library.add(faTimes);
 library.add(faWindowClose);
+
 Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.component("v-select", vSelect);
+Vue.component('vue-color-chrome', Chrome);
+Vue.component('v-select', vSelect);
+Vue.component('vue-slider', VueSlider);
+
 Vue.component('catalog-item', CatalogItem);
+Vue.component('imageset-item', ImagesetItem);
 Vue.component('source-item', SourceItem);
 Vue.component('transition-expand', TransitionExpand);
-Vue.component('vue-color-chrome', Chrome);
 
 /** v-hide directive take from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice

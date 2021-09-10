@@ -185,8 +185,7 @@ export class ImageSetLayerState {
  * normalized when expressed in Vuex, as in [this post]. The WWT engine
  * certainly does *not* express its state in such a manner.
  *
- * [this post]:
- * https://forum.vuejs.org/t/vuex-best-practices-for-complex-objects/10143/2
+ * [this post]: https://forum.vuejs.org/t/vuex-best-practices-for-complex-objects/10143/2
  *
  * The duplication of WWT's data structures is annoying, but the actual amount
  * of mirrored data isn't very big.
