@@ -2452,8 +2452,8 @@ body {
 }
 
 .vue-notification-group {
-  padding-right: 2.5rem;
-  padding-top: 0.75rem;
+  margin-right: 2.5rem;
+  margin-top: 0.75rem;
 }
 
 /* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */
