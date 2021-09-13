@@ -2654,7 +2654,7 @@ This makes the last element of the last list item in the
 display panel have the rounded bottom edge
 The alternative to this is to have Vue bind a class to the last element
 */
-#display-panel > *:last-child > *:last-child > *:last-child {
+#display-panel > *:last-child > *:last-child {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
