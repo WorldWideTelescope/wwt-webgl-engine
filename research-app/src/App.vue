@@ -179,8 +179,8 @@
             >
               <template #option="option">
                 <div class="item-option">
-                  <h4>{{ option.name }}</h4>
-                  <em>{{ option.description }}</em>
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
                 </div>
               </template>
               <template #selected-option="option">
@@ -205,8 +205,8 @@
             >
               <template #option="option">
                 <div class="item-option">
-                  <h4>{{ option.name }}</h4>
-                  <em>{{ option.description }}</em>
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
                 </div>
               </template>
               <template #selected-option="option">
@@ -2565,6 +2565,12 @@ body {
   }
 }
 
+.ellipsize {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Specialized styling for popups */
 
 ul.tool-menu {
@@ -2629,11 +2635,13 @@ ul.tool-menu {
 .item-option {
   & h4 {
     margin: 0;
+    width: 100%;
   }
 
-  & em {
+  & p {
     margin: 0;
     font-size: small;
+    widtH: 100%;
   }
 }
 
