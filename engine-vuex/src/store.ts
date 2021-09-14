@@ -735,14 +735,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   activeLayers: string[] = [];
 
   @Mutation
-  internalUpdateActiveLayers(): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot get internalUpdateActiveLayers without linking to WWTInstance');
-
-    this.activeLayers = activeLayersList();
-  }
-
-  @Mutation
   deleteLayer(id: string | Guid): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot deleteLayer without linking to WWTInstance');
@@ -819,7 +811,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const guidText = wwtLayer.id.toString();
     Vue.set(this.imagesetLayers, guidText, new ImageSetLayerState(wwtLayer));
 
-    this.context.commit('internalUpdateActiveLayers');
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
     return wwtLayer;
   }
 
@@ -943,7 +935,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const guidText = wwtLayer.id.toString();
     Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
 
-    this.context.commit('internalUpdateActiveLayers');
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
     return wwtLayer;
   }
 
@@ -1025,7 +1017,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
     }
 
-    this.context.commit('internalUpdateActiveLayers');
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
     return imgset;
   }
 
