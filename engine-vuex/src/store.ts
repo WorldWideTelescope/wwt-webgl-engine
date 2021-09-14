@@ -355,6 +355,10 @@ export interface LoadImageCollectionParams {
   loadChildFolders?: boolean;
 }
 
+/** This function creates the list of currently active layers.
+ * Keeping this functionality outside of the store allows us to use it from
+ * inside either an action or a mutation.
+ */
 function activeLayersList(): string[] {
   if (Vue.$wwt.inst === null)
     throw new Error('cannot get activeLayersList without linking to WWTInstance');
