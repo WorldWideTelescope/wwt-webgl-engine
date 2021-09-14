@@ -383,6 +383,16 @@ function activeLayersList(): string[] {
   return layers;
 }
 
+
+/** This function creates the list of currently available imagesets.
+ * Keeping this functionality outside of the store allows us to use it from
+ * inside either an action or a mutation.
+ */
+function availableImagesets(): ImagesetInfo[] {
+  return WWTControl.getImageSets()
+      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
+} 
+
 /** The store module class for the WWT Vuex implementation.
  *
  * See [[WWTAwareComponent]] for an organized overview of the state variables,
@@ -730,7 +740,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
     const result = await Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
-    this.context.commit('updateAvailableImagesets');
+    (this.context.state as WWTEngineVuexState).availableImagesets = availableImagesets();
     return result;
   }
 
