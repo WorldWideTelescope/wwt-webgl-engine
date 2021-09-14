@@ -2367,7 +2367,7 @@ body {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
-  width: 25vw;
+  max-width: 25vw;
   border-radius: 5px;
   color: white;
   font-weight: bold;
