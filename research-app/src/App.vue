@@ -257,6 +257,7 @@
               Load
               <a
                 href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/"
+                target="_blank"
                 >WTML</a
               >
               data collection:
