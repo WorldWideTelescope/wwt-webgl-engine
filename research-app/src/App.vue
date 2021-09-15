@@ -184,7 +184,7 @@
                 </div>
               </template>
               <template #selected-option="option">
-                <div>{{ option.name }}</div>
+                <div class="ellipsize">{{ option.name }}</div>
               </template>
             </v-select>
           </div>
@@ -210,7 +210,7 @@
                 </div>
               </template>
               <template #selected-option="option">
-                <div>{{ option.name }}</div>
+                <div class="ellipsize">{{ option.name }}</div>
               </template>
               <template #no-options="{ search, searching }">
                 <template v-if="searching">
@@ -240,8 +240,8 @@
             >
               <template #option="option">
                 <div class="item-option">
-                  <h4>{{ option.name }}</h4>
-                  <em>{{ option.description }}</em>
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
                 </div>
               </template>
               <template #selected-option-container="">
@@ -2630,6 +2630,18 @@ ul.tool-menu {
   .vs__dropdown-option--highlight {
     color: red;
   }
+
+  .vs__selected-options {
+    margin: 0;
+    flex-wrap: nowrap;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  .vs__selected {
+    overflow: hidden;
+  }
+
 }
 
 .item-option {
@@ -2641,7 +2653,7 @@ ul.tool-menu {
   & p {
     margin: 0;
     font-size: small;
-    widtH: 100%;
+    width: 100%;
   }
 }
 
