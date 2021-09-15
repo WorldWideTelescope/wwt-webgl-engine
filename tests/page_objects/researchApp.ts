@@ -136,7 +136,7 @@ module.exports = {
           selector: ".vs__dropdown-option > div > h4"
         },
         backgroundDropdownOptionDescription: {
-          selector: ".vs__dropdown-option > div > em"
+          selector: ".vs__dropdown-option > div > p"
         },
         catalogSelectionContainer: {
           selector: "#catalog-select-container-tool"
@@ -157,7 +157,7 @@ module.exports = {
           selector: ".vs__dropdown-option > div > h4"
         },
         catalogDropdownOptionDescription: {
-          selector: ".vs__dropdown-option > div > em"
+          selector: ".vs__dropdown-option > div > p"
         },
       },
       props: {
