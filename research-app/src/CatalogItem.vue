@@ -346,7 +346,7 @@ export default class CatalogItem extends Vue {
   width: calc(100% - 10px);
   padding: 5px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
 }
 
 #name-label {
@@ -386,8 +386,8 @@ export default class CatalogItem extends Vue {
 .icon-link {
   height: 100%;
   background: inherit;
-  margin-left: 5px;
-  margin-right: 5px;
+  margin-left: 3px;
+  margin-right: 3px;
 }
 
 .icon-button {
