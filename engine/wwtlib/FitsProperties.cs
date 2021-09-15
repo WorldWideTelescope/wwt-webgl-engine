@@ -21,7 +21,7 @@ namespace wwtlib
         public double MinVal = double.MaxValue;
         public double UpperCut = double.MinValue;
         public double LowerCut = double.MaxValue;
-        public bool TransparentBlack = true;
+        public bool TransparentBlack = false;
         public string ColorMapName = "gray";
         public ScaleTypes ScaleType = ScaleTypes.Linear;
 

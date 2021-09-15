@@ -257,6 +257,7 @@
               Load
               <a
                 href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/"
+                target="_blank"
                 >WTML</a
               >
               data collection:
@@ -2366,7 +2367,7 @@ body {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
-  width: 25vw;
+  max-width: 25vw;
   border-radius: 5px;
   color: white;
   font-weight: bold;
