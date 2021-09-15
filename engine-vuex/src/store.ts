@@ -355,6 +355,44 @@ export interface LoadImageCollectionParams {
   loadChildFolders?: boolean;
 }
 
+/** This function creates the list of currently active layers.
+ * Keeping this functionality outside of the store allows us to use it from
+ * inside either an action or a mutation.
+ */
+function activeLayersList(): string[] {
+  if (Vue.$wwt.inst === null)
+    throw new Error('cannot get activeLayersList without linking to WWTInstance');
+
+  const layers: string[] = [];
+
+  function accum(lm: LayerMap) {
+    for (const layer of lm.layers) {
+      layers.push(layer.id.toString());
+    }
+
+    for (const [_mapname, sublm] of Object.entries(lm.childMaps)) {
+      accum(sublm);
+    }
+  }
+
+  const rootlm = Vue.$wwt.inst.lm.get_allMaps()[Vue.$wwt.inst.ctl.getCurrentReferenceFrame()];
+  if (rootlm) {
+    accum(rootlm);
+  }
+
+  return layers;
+}
+
+
+/** This function creates the list of currently available imagesets.
+ * Keeping this functionality outside of the store allows us to use it from
+ * inside either an action or a mutation.
+ */
+function availableImagesets(): ImagesetInfo[] {
+  return WWTControl.getImageSets()
+      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
+} 
+
 /** The store module class for the WWT Vuex implementation.
  *
  * See [[WWTAwareComponent]] for an organized overview of the state variables,
@@ -702,38 +740,13 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
     const result = await Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
-    this.context.commit('updateAvailableImagesets');
+    (this.context.state as WWTEngineVuexState).availableImagesets = availableImagesets();
     return result;
   }
 
   // General layers
 
   activeLayers: string[] = [];
-
-  @Mutation
-  internalUpdateActiveLayers(): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot get internalUpdateActiveLayers without linking to WWTInstance');
-
-    const layers: string[] = [];
-
-    function accum(lm: LayerMap) {
-      for (const layer of lm.layers) {
-        layers.push(layer.id.toString());
-      }
-
-      for (const [_mapname, sublm] of Object.entries(lm.childMaps)) {
-        accum(sublm);
-      }
-    }
-
-    const rootlm = Vue.$wwt.inst.lm.get_allMaps()[Vue.$wwt.inst.ctl.getCurrentReferenceFrame()];
-    if (rootlm) {
-      accum(rootlm);
-    }
-
-    this.activeLayers = layers;
-  }
 
   @Mutation
   deleteLayer(id: string | Guid): void {
@@ -757,7 +770,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     Vue.delete(this.imagesetLayers, stringId);
     Vue.delete(this.spreadSheetLayers, stringId);
 
-    this.context.commit('internalUpdateActiveLayers');
+    this.activeLayers = activeLayersList();
   }
 
   // Imageset layers, including FITS layers
@@ -812,7 +825,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const guidText = wwtLayer.id.toString();
     Vue.set(this.imagesetLayers, guidText, new ImageSetLayerState(wwtLayer));
 
-    this.context.commit('internalUpdateActiveLayers');
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
     return wwtLayer;
   }
 
@@ -840,7 +853,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
 
     Vue.$wwt.inst.setImageSetLayerOrder(options);
-    this.context.commit('internalUpdateActiveLayers');
+    this.activeLayers = activeLayersList();
   }
 
 
@@ -936,7 +949,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const guidText = wwtLayer.id.toString();
     Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
 
-    this.context.commit('internalUpdateActiveLayers');
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
     return wwtLayer;
   }
 
@@ -1018,7 +1031,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
     }
 
-    this.context.commit('internalUpdateActiveLayers');
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
     return imgset;
   }
 
@@ -1042,7 +1055,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
     Vue.delete(this.spreadSheetLayers, name);
 
-    this.context.commit('internalUpdateActiveLayers');
+    this.activeLayers = activeLayersList();
   }
 
   // Annotations
