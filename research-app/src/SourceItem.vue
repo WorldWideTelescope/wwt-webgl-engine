@@ -254,12 +254,6 @@ a:visited {
   color: lightcoral;
 }
 
-.ellipsize {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .detail-container {
   font-size: 9pt;
   margin: 0px 5px;

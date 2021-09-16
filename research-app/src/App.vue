@@ -179,12 +179,12 @@
             >
               <template #option="option">
                 <div class="item-option">
-                  <h4>{{ option.name }}</h4>
-                  <em>{{ option.description }}</em>
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
                 </div>
               </template>
               <template #selected-option="option">
-                <div>{{ option.name }}</div>
+                <div class="ellipsize">{{ option.name }}</div>
               </template>
             </v-select>
           </div>
@@ -205,12 +205,12 @@
             >
               <template #option="option">
                 <div class="item-option">
-                  <h4>{{ option.name }}</h4>
-                  <em>{{ option.description }}</em>
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
                 </div>
               </template>
               <template #selected-option="option">
-                <div>{{ option.name }}</div>
+                <div class="ellipsize">{{ option.name }}</div>
               </template>
               <template #no-options="{ search, searching }">
                 <template v-if="searching">
@@ -240,8 +240,8 @@
             >
               <template #option="option">
                 <div class="item-option">
-                  <h4>{{ option.name }}</h4>
-                  <em>{{ option.description }}</em>
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
                 </div>
               </template>
               <template #selected-option-container="">
@@ -2566,6 +2566,12 @@ body {
   }
 }
 
+.ellipsize {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Specialized styling for popups */
 
 ul.tool-menu {
@@ -2625,16 +2631,30 @@ ul.tool-menu {
   .vs__dropdown-option--highlight {
     color: red;
   }
+
+  .vs__selected-options {
+    margin: 0;
+    flex-wrap: nowrap;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  .vs__selected {
+    overflow: hidden;
+  }
+
 }
 
 .item-option {
   & h4 {
     margin: 0;
+    width: 100%;
   }
 
-  & em {
+  & p {
     margin: 0;
     font-size: small;
+    width: 100%;
   }
 }
 
@@ -2647,7 +2667,7 @@ This makes the last element of the last list item in the
 display panel have the rounded bottom edge
 The alternative to this is to have Vue bind a class to the last element
 */
-#display-panel > *:last-child > *:last-child > *:last-child {
+#display-panel > *:last-child > *:last-child {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }

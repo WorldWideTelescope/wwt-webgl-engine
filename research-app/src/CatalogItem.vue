@@ -16,9 +16,6 @@
         >{{ catalog.name }}</label
       >
       <span id="buttons-container">
-        <a href="#" v-hide="!hasFocus" @click="handleDelete" class="icon-link"
-          ><font-awesome-icon class="icon" icon="times"
-        /></a>
         <a href="#" v-hide="!hasFocus" @click="handleToggle" class="icon-link"
           ><font-awesome-icon
             v-if="visible"
@@ -27,6 +24,9 @@
             v-if="!visible"
             class="icon"
             icon="eye-slash"
+        /></a>
+        <a href="#" v-hide="!hasFocus" @click="handleDelete" class="icon-link"
+          ><font-awesome-icon class="icon" icon="times"
         /></a>
       </span>
     </div>
@@ -345,11 +345,12 @@ export default class CatalogItem extends Vue {
 #main-container {
   width: calc(100% - 10px);
   padding: 5px;
+  display: flex;
+  justify-content: space-between;
 }
 
 #name-label {
   display: inline-block;
-  width: 75%;
   vertical-align: middle;
 
   &:hover {
@@ -358,7 +359,9 @@ export default class CatalogItem extends Vue {
 }
 
 #buttons-container {
-  width: 25%;
+  align-self: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .circle-popover {
@@ -378,17 +381,19 @@ export default class CatalogItem extends Vue {
 .icon {
   color: white;
   margin: auto 1%;
-  float: right;
 }
 
 .icon-link {
   height: 100%;
-  background: #404040;
+  background: inherit;
+  margin-left: 3px;
+  margin-right: 3px;
 }
 
 .icon-button {
   cursor: pointer;
   display: inline-block;
+  background: inherit;
 }
 
 .prompt {
@@ -403,6 +408,7 @@ export default class CatalogItem extends Vue {
   // Get nice vertical alignment in individual rows
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .ellipsize {
@@ -415,10 +421,11 @@ export default class CatalogItem extends Vue {
   display: inline-flex;
   flex-flow: row nowrap;
   align-items: center;
+  flex: 50%;
 }
 
 .scale-factor-input {
-  flex: 1;
+  width: 50%;
   text-align: center;
 }
 
