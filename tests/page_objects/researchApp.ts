@@ -161,7 +161,7 @@ module.exports = {
         },
       },
       props: {
-        backgroundOptionCount: 832,
+        backgroundOptionCount: 834,
         catalogOptionCount: 49,
         firstBackgroundName: "Digitized Sky Survey (Color)",
         firstBackgroundDescription: "Copyright DSS Consortium",
