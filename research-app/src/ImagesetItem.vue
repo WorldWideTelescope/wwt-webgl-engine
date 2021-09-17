@@ -510,12 +510,6 @@ export default class ImagesetItem extends Vue {
   gap: 2px;
 }
 
-.ellipsize {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .scrubber {
   flex: 1;
   cursor: pointer;
