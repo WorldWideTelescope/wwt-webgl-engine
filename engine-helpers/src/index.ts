@@ -5,35 +5,19 @@ import { D2H, R2D, R2H } from "@wwtelescope/astro";
 
 import {
   ImageSetType,
-  isBaseEngineSetting,
-  isBaseLayerSetting,
-  isBaseImageSetLayerSetting,
-  isBaseSpreadSheetLayerSetting,
-  isBaseVoTableLayerSetting,
+  ScaleTypes,
 } from "@wwtelescope/engine-types";
 
 import {
-  Annotation,
-  AnnotationSetting,
-  Circle,
-  CircleAnnotationSetting,
-  Color,
-  ConstellationFilter,
   EngineSetting,
   Folder,
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   InViewReturnMessage,
-  Layer,
   LayerManager,
   LayerManagerObject,
-  LayerSetting,
   Place,
-  Poly,
-  PolyAnnotationSetting,
-  PolyLine,
-  PolyLineAnnotationSetting,
   ScriptInterface,
   SpaceTimeControllerObject,
   TourPlayer,
@@ -42,257 +26,90 @@ import {
   SpaceTimeController,
   SpreadSheetLayer,
   SpreadSheetLayerSetting,
-  VoTableLayer,
-  VoTableLayerSetting,
 } from "@wwtelescope/engine";
 
+import {
+  applyImageSetLayerSetting,
+} from "./imagesetlayer";
 
-// Type guards for the augmented setting types
-
-const annotationSettingTypeInfo: {[ix: string]: boolean} = {
-  "id/string": true,
-  "label/string": true,
-  "opacity/number": true,
-  "showHoverLabel/boolean": true,
-  "tag/string": true,
-}
-
-/** Type guard function for AnnotationSetting. */
-export function isAnnotationSetting(obj: [string, any]): obj is AnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  const key = obj[0] + "/" + typeof obj[1];
-  return key in annotationSettingTypeInfo;
-}
-
-/** Apply a setting to a generic Annotation. */
-export function applyAnnotationSetting(ann: Annotation, setting: AnnotationSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (ann as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
+import {
+  applySpreadSheetLayerSetting,
+} from "./spreadsheetlayer";
 
 
-const circleAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
-  "fill/boolean": true,
-  "fillColor/string": true,
-  "lineColor/string": true,
-  "lineWidth/number": true,
-  "radius/number": true,
-  "skyRelative/boolean": true,
-}
+// Settings-related re-exports
 
-/** Type guard function for CircleAnnotationSetting. */
-export function isCircleAnnotationSetting(obj: [string, any]): obj is CircleAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  const key = obj[0] + "/" + typeof obj[1];
-  return (key in circleAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
-}
+export {
+  applyAnnotationSetting,
+  copyAnnotationSettings,
+  extractAnnotationSettings,
+  isAnnotationSetting,
+  AnnotationState,
+} from "./annotation";
 
-/** Apply a setting to a generic CircleAnnotation. */
-export function applyCircleAnnotationSetting(circle: Circle, setting: CircleAnnotationSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (circle as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
+export {
+  applyCircleAnnotationSetting,
+  copyCircleAnnotationSettings,
+  extractCircleAnnotationSettings,
+  isCircleAnnotationSetting,
+  CircleAnnotationState,
+} from "./circleannotation";
 
+export {
+  applyEngineSetting,
+  copyEngineSettings,
+  extractEngineSettings,
+  isEngineSetting,
+  EngineState,
+} from "./engine";
 
-const polyAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
-  "fill/boolean": true,
-  "fillColor/string": true,
-  "lineColor/string": true,
-  "lineWidth/number": true,
-}
+export {
+  applyImageSetLayerSetting,
+  copyImageSetLayerSettings,
+  extractImageSetLayerSettings,
+  isImageSetLayerSetting,
+  ImageSetLayerState,
+} from "./imagesetlayer";
 
-/** Type guard function for PolyAnnotationSetting. */
-export function isPolyAnnotationSetting(obj: [string, any]): obj is PolyAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  const key = obj[0] + "/" + typeof obj[1];
-  return (key in polyAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
-}
+export {
+  applyLayerSetting,
+  copyLayerSettings,
+  extractLayerSettings,
+  isLayerSetting,
+  LayerState,
+} from "./layer";
 
-/** Apply a setting to a generic PolyAnnotation. */
-export function applyPolyAnnotationSetting(poly: Poly, setting: PolyAnnotationSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (poly as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
+export {
+  applyPolyAnnotationSetting,
+  copyPolyAnnotationSettings,
+  extractPolyAnnotationSettings,
+  isPolyAnnotationSetting,
+  PolyAnnotationState,
+} from "./polyannotation";
 
+export {
+  applyPolyLineAnnotationSetting,
+  copyPolyLineAnnotationSettings,
+  extractPolyLineAnnotationSettings,
+  isPolyLineAnnotationSetting,
+  PolyLineAnnotationState,
+} from "./polylineannotation";
 
-const polyLineAnnotationSettingTypeInfo: {[ix: string]: boolean} = {
-  "fill/boolean": true,
-  "fillColor/string": true,
-  "lineColor/string": true,
-  "lineWidth/number": true,
-}
+export {
+  applySpreadSheetLayerSetting,
+  copySpreadSheetLayerSettings,
+  extractSpreadSheetLayerSettings,
+  isSpreadSheetLayerSetting,
+  SpreadSheetLayerState,
+} from "./spreadsheetlayer";
 
-/** Type guard function for PolyLineAnnotationSetting. */
-export function isPolyLineAnnotationSetting(obj: [string, any]): obj is PolyLineAnnotationSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  const key = obj[0] + "/" + typeof obj[1];
-  return (key in polyLineAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
-}
-
-/** Apply a setting to a generic PolyLineAnnotation. */
-export function applyPolyLineAnnotationSetting(polyLine: PolyLine, setting: PolyLineAnnotationSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (polyLine as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-
-const engineSettingTypeInfo = {
-  "constellationArtFilter/ConstellationFilter": true,
-  "constellationBoundariesFilter/ConstellationFilter": true,
-  "constellationBoundryColor/Color": true,
-  "constellationFigureColor/Color": true,
-  "constellationFiguresFilter/ConstellationFilter": true,
-  "constellationNamesFilter/ConstellationFilter": true,
-  "constellationSelectionColor/Color": true,
-  "crosshairsColor/Color": true,
-};
-
-/** Type guard function for EngineSetting. */
-export function isEngineSetting(obj: [string, any]): obj is EngineSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  let typekey: string = typeof obj[1];
-
-  if (obj[1] instanceof Color) {
-    typekey = "Color";
-  } else if (obj[1] instanceof ConstellationFilter) {
-    typekey = "ConstellationFilter";
-  }
-
-  const key = obj[0] + "/" + typekey;
-  return (key in engineSettingTypeInfo) || isBaseEngineSetting(obj);
-}
-
-
-const layerSettingTypeInfo = {
-  "color/Color": true,
-};
-
-/** Type guard function for LayerSetting. */
-export function isLayerSetting(obj: [string, any]): obj is LayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  let typekey: string = typeof obj[1];
-
-  if (obj[1] instanceof Color) {
-    typekey = "Color";
-  }
-
-  const key = obj[0] + "/" + typekey;
-  return (key in layerSettingTypeInfo) || isBaseLayerSetting(obj);
-}
-
-/** Apply a setting to a generic Layer. */
-export function applyLayerSetting(layer: Layer, setting: LayerSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-
-/** Type guard function for ImageSetLayerSetting. */
-export function isImageSetLayerSetting(obj: [string, any]): obj is ImageSetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  // No special settings specific to non-base ImageSetLayerSetting.
-  return isLayerSetting(obj) || isBaseImageSetLayerSetting(obj);
-}
-
-/** Apply a setting to an ImageSetLayer. */
-export function applyImageSetLayerSetting(layer: ImageSetLayer, setting: ImageSetLayerSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-
-/** Type guard function for SpreadSheetLayerSetting. */
-export function isSpreadSheetLayerSetting(obj: [string, any]): obj is SpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  // No special settings specific to non-base SpreadSheetLayerSetting.
-  return isLayerSetting(obj) || isBaseSpreadSheetLayerSetting(obj);
-}
-
-/** Apply a setting to a SpreadSheetLayer. */
-export function applySpreadSheetLayerSetting(layer: SpreadSheetLayer, setting: SpreadSheetLayerSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-/** Extract all of the current settings of a SpreadSheetLayer. */
-export function extractSpreadSheetLayerSettings(layer: SpreadSheetLayer): SpreadSheetLayerSetting[] {
-  // Sigh, is there a smarter way to do this? I hate hardcording all of these
-  // lists over and over.
-  const s: SpreadSheetLayerSetting[] = [];
-
-  // BaseLayerSetting
-  s.push(["astronomical", layer.get_astronomical()]);
-  s.push(["fadeSpan", layer.get_fadeSpan()]);
-  s.push(["name", layer.get_name()]);
-  s.push(["opacity", layer.get_opacity()]);
-  s.push(["opened", layer.get_opened()]);
-  s.push(["referenceFrame", layer.get_referenceFrame()]);
-  s.push(["version", layer.get_version()]);
-
-  // LayerSetting
-  s.push(["color", layer.get_color()]);
-
-  // BaseSpreadSheetLayerSetting
-  s.push(["altColumn", layer.get_altColumn()]);
-  s.push(["altType", layer.get_altType()]);
-  s.push(["altUnit", layer.get_altUnit()]);
-  s.push(["barChartBitmask", layer.get_barChartBitmask()]);
-  s.push(["beginRange", layer.get_beginRange()]);
-  s.push(["cartesianCustomScale", layer.get_cartesianCustomScale()]);
-  s.push(["cartesianScale", layer.get_cartesianScale()]);
-  s.push(["colorMapColumn", layer.get_colorMapColumn()]);
-  s.push(["colorMapperName", layer.get_colorMapperName()]);
-  s.push(["coordinatesType", layer.get_coordinatesType()]);
-  s.push(["decay", layer.get_decay()]);
-  s.push(["dynamicColor", layer.get_dynamicColor()]);
-  s.push(["dynamicData", layer.get_dynamicData()]);
-  s.push(["endDateColumn", layer.get_endDateColumn()]);
-  s.push(["endRange", layer.get_endRange()]);
-  s.push(["geometryColumn", layer.get_geometryColumn()]);
-  s.push(["hyperlinkColumn", layer.get_hyperlinkColumn()]);
-  s.push(["hyperlinkFormat", layer.get_hyperlinkFormat()]);
-  s.push(["latColumn", layer.get_latColumn()]);
-  s.push(["lngColumn", layer.get_lngColumn()]);
-  s.push(["markerColumn", layer.get_markerColumn()]);
-  s.push(["markerIndex", layer.get_markerIndex()]);
-  s.push(["markerScale", layer.get_markerScale()]);
-  s.push(["nameColumn", layer.get_nameColumn()]);
-  s.push(["normalizeColorMap", layer.get_normalizeColorMap()]);
-  s.push(["normalizeColorMapMax", layer.get_normalizeColorMapMax()]);
-  s.push(["normalizeColorMapMin", layer.get_normalizeColorMapMin()]);
-  s.push(["normalizeSize", layer.get_normalizeSize()]);
-  s.push(["normalizeSizeClip", layer.get_normalizeSizeClip()]);
-  s.push(["normalizeSizeMax", layer.get_normalizeSizeMax()]);
-  s.push(["normalizeSizeMin", layer.get_normalizeSizeMin()]);
-  s.push(["plotType", layer.get_plotType()]);
-  s.push(["pointScaleType", layer.get_pointScaleType()]);
-  s.push(["raUnits", layer.get_raUnits()]);
-  s.push(["scaleFactor", layer.get_scaleFactor()]);
-  s.push(["showFarSide", layer.get_showFarSide()]);
-  s.push(["sizeColumn", layer.get_sizeColumn()]);
-  s.push(["startDateColumn", layer.get_startDateColumn()]);
-  s.push(["timeSeries", layer.get_timeSeries()]);
-  s.push(["xAxisColumn", layer.get_xAxisColumn()]);
-  s.push(["xAxisReverse", layer.get_xAxisReverse()]);
-  s.push(["yAxisColumn", layer.get_yAxisColumn()]);
-  s.push(["yAxisReverse", layer.get_yAxisReverse()]);
-  s.push(["zAxisColumn", layer.get_zAxisColumn()]);
-  s.push(["zAxisReverse", layer.get_zAxisReverse()]);
-
-  return s;
-}
-
-/** Type guard function for VoTableLayerSetting. */
-export function isVoTableLayerSetting(obj: [string, any]): obj is VoTableLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
-  // No special settings specific to non-base VoTableLayerSetting.
-  return isLayerSetting(obj) || isBaseVoTableLayerSetting(obj);
-}
-
-/** Apply a setting to a VoTableLayer. */
-export function applyVoTableLayerSetting(layer: VoTableLayer, setting: VoTableLayerSetting): void {
-  const funcName = "set_" + setting[0];
-  const value: any = setting[1];  // eslint-disable-line @typescript-eslint/no-explicit-any
-  (layer as any)[funcName](value);  // eslint-disable-line @typescript-eslint/no-explicit-any
-}
+export {
+  applyVoTableLayerSetting,
+  copyVoTableLayerSettings,
+  extractVoTableLayerSettings,
+  isVoTableLayerSetting,
+  VoTableLayerState,
+} from "./votablelayer";
 
 
 // The WWTInstance wrapper class and friends.
@@ -409,8 +226,8 @@ export interface StretchFitsLayerOptions {
   /** The ID of the FITS layer. */
   id: string;
 
-  /** The kind of stretch type to use. TODO: enum-ify! 0..4 = lin/log/pow/sqrt/histeq */
-  stretch: number;
+  /** The kind of stretch type to use. */
+  stretch: ScaleTypes;
 
   /** The data value to use for the minimum stretch bound. */
   vmin: number;
@@ -424,7 +241,11 @@ export interface SetFitsLayerColormapOptions {
   /** The ID of the FITS layer. */
   id: string;
 
-  /** The name of the colormap. TODO: document! */
+  /** The name of the colormap.
+   *
+   * The available options are extracted from Matplotlib and defined
+   * [here](../../engine/modules/colormapcontainer.html#fromnamedcolormap).
+   */
   name: string;
 }
 
@@ -859,13 +680,13 @@ export class WWTInstance {
    * the data-fetch operation can potentially attempt to download and return
    * gigabytes of data.
    * */
-   async getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+  async getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
     return new Promise((resolve, _reject) => {
       this.ctl.renderContext.getCatalogHipsDataInView(options.imageset, options.limit, (msg) => {
         resolve(msg);
       });
     });
-   }
+  }
 
   // "Mutator" type operations -- not async.
 
@@ -935,32 +756,32 @@ export class WWTInstance {
     let noZoom = false;
 
     switch (options.foreground.get_dataSetType()) {
-    case ImageSetType.sky:
-      if (imageHeightDeg == 180) {
-        // All-sky image -- special behavior
-        noZoom = true;
-      } else  {
-        place.set_RA(options.foreground.get_centerX() * D2H);
-        place.set_dec(options.foreground.get_centerY());
-        place.set_zoomLevel(imageHeightDeg * 6);
-      }
-      break;
+      case ImageSetType.sky:
+        if (imageHeightDeg == 180) {
+          // All-sky image -- special behavior
+          noZoom = true;
+        } else {
+          place.set_RA(options.foreground.get_centerX() * D2H);
+          place.set_dec(options.foreground.get_centerY());
+          place.set_zoomLevel(imageHeightDeg * 6);
+        }
+        break;
 
-    case ImageSetType.earth:
-    case ImageSetType.planet:
-      place.set_zoomLevel(120); // a pleasing default, according to me
+      case ImageSetType.earth:
+      case ImageSetType.planet:
+        place.set_zoomLevel(120); // a pleasing default, according to me
 
-      if (imageHeightDeg != 180) {
-        // need to verify that this is right
-        place.set_lng(options.foreground.get_centerX());
-        place.set_lat(options.foreground.get_centerY());
-      }
-      break;
+        if (imageHeightDeg != 180) {
+          // need to verify that this is right
+          place.set_lng(options.foreground.get_centerX());
+          place.set_lat(options.foreground.get_centerY());
+        }
+        break;
 
-    default:
-      // TODO: more cases ...
-      place.set_zoomLevel(360);
-      break;
+      default:
+        // TODO: more cases ...
+        place.set_zoomLevel(360);
+        break;
     }
 
     this.ctl.renderContext.set_backgroundImageset(bkg);

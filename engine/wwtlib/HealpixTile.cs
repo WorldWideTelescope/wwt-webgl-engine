@@ -23,7 +23,6 @@ namespace wwtlib
         private bool subDivided = false;
         private readonly List<List<string>> catalogRows = new List<List<string>>();
         private WebFile catalogData;
-        private FitsImageTile fitsImage;
         private static readonly Matrix3d galacticMatrix = Matrix3d.Create(
                     -0.0548755604024359, -0.4838350155267381, -0.873437090247923, 0,
                     -0.8676661489811610, 0.4559837762325372, -0.1980763734646737, 0,
@@ -196,7 +195,7 @@ namespace wwtlib
 
         private string GetUrl(Imageset dataset, int level, int x, int y)
         {
-            string extention = GetHipsFileExtention();
+            string extension = GetHipsFileExtension();
 
             int tileTextureIndex = -1;
             if (level == 0)
@@ -211,14 +210,18 @@ namespace wwtlib
 
             int subDirIndex = Math.Floor(tileTextureIndex / 10000) * 10000;
 
-            return String.Format(dataset.Url, level.ToString(), subDirIndex.ToString(), tileTextureIndex.ToString() + extention);
+            return String.Format(dataset.Url, level.ToString(), subDirIndex.ToString(), tileTextureIndex.ToString() + extension);
         }
 
-        private string GetHipsFileExtention()
+        private string GetHipsFileExtension()
         {
-            // The extension will contain either a list of type or a single type
-            // The imageset can be set to the perfrered file type if desired IE: FITS will never be chosen if others are avaialbe,
-            // unless the FITS only is selected and saved into the extension field of the imageset.
+            // The extension will contain either a space-separated list of types
+            // or a single type. We currently match preferred filetypes
+            // greedily. The extension must be exactly ".fits" in order to
+            // render correctly -- not only because of the greedy matching here,
+            // but because there are other parts of the code that check for an
+            // exact match.
+
             //prioritize transparent Png over other image formats
             if (dataset.Extension.ToLowerCase().IndexOf("png") > -1)
             {
@@ -335,7 +338,7 @@ namespace wwtlib
                 {
                     if (Level < dataset.Levels)
                     {
-                        // make children 
+                        // make children
                         if (children[childIndex] == null)
                         {
                             children[childIndex] = TileCache.GetTile(Level + 1, x1, y1, dataset, this);
@@ -417,28 +420,6 @@ namespace wwtlib
             }
 
             return true;
-        }
-
-        public override void RenderPart(RenderContext renderContext, int part, double opacity, bool combine)
-        {
-            if (fitsImage == null)
-            {
-                TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
-            }
-            else
-            {
-                ColorMapContainer.BindColorMapTexture(PrepDevice, dataset.FitsProperties.ColorMapName);
-                FitsShader.Min = (float)dataset.FitsProperties.LowerCut;
-                FitsShader.Max = (float)dataset.FitsProperties.UpperCut;
-                FitsShader.ContainsBlanks = dataset.FitsProperties.ContainsBlanks;
-                FitsShader.BlankValue = (float)dataset.FitsProperties.BlankValue;
-                FitsShader.BZero = (float)dataset.FitsProperties.BZero;
-                FitsShader.BScale = (float)dataset.FitsProperties.BScale;
-                FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
-                FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
-                FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
-            }
-            renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
         }
 
         public void DrawCatalogTile(RenderContext renderContext, double opacity)
@@ -634,7 +615,7 @@ namespace wwtlib
                     PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
                     PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
-                    if (GetHipsFileExtention() == ".fits" && RenderContext.UseGlVersion2)
+                    if (GetHipsFileExtension() == ".fits" && RenderContext.UseGlVersion2)
                     {
                         PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
@@ -671,7 +652,7 @@ namespace wwtlib
                     catalogData.Send();
                 }
             }
-            else if (GetHipsFileExtention() == ".fits")
+            else if (GetHipsFileExtension() == ".fits")
             {
                 if (!Downloading && !ReadyToRender)
                 {
@@ -693,7 +674,7 @@ namespace wwtlib
                         });
                     } else
                     {
-                        FitsImageJs image = FitsImageJs.CreateHipsTile(dataset, URL, delegate (WcsImage wcsImage)
+                        FitsImageJs image = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
                         {
                             texReady = true;
                             Downloading = false;
@@ -893,7 +874,7 @@ namespace wwtlib
          *        2   6   10
          *          1   5
          *            0
-         * 
+         *
          */
         private void PopulateVertexList(PositionTexture[] vertexList, int step)
         {

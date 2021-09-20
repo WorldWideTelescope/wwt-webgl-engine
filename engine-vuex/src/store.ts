@@ -1,6 +1,10 @@
 // Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
+// The high-level docs in `wwtaware.ts` contain the developer-friendly
+// descriptions of pretty much everything in this file. Update those docs when
+// adding new features here.
+
 import Vue from "vue";
 import { Module, VuexModule, Mutation, MutationAction, Action } from 'vuex-module-decorators';
 
@@ -9,6 +13,7 @@ import { D2R, H2R } from "@wwtelescope/astro";
 import {
   AltUnits,
   ImageSetType,
+  ScaleTypes,
   SolarSystemObjects,
 } from "@wwtelescope/engine-types";
 
@@ -20,7 +25,9 @@ import {
   Imageset,
   ImageSetLayer,
   InViewReturnMessage,
+  LayerMap,
   SpreadSheetLayer,
+  SpreadSheetLayerSettingsInterfaceRO,
   WWTControl,
 } from "@wwtelescope/engine";
 
@@ -29,12 +36,16 @@ import {
   AddImageSetLayerOptions,
   ApplyFitsLayerSettingsOptions,
   ApplyTableLayerSettingsOptions,
+  applyImageSetLayerSetting,
+  applySpreadSheetLayerSetting,
   GetCatalogHipsDataInViewOptions,
   GotoTargetOptions,
+  ImageSetLayerState as ImageSetLayerSettings,
   LoadFitsLayerOptions,
   SetFitsLayerColormapOptions,
   SetLayerOrderOptions,
   SetupForImagesetOptions,
+  SpreadSheetLayerState,
   StretchFitsLayerOptions,
   UpdateTableLayerOptions,
   WWTInstance,
@@ -66,19 +77,35 @@ export class WWTGlobalState {
   }
 }
 
-/** This class holds basic information about an image set
- * Member values include
- * @member url: URL of the image data
- * @member name: Name of the image set
- * @member type: The type of the image set (panorama, sky, ...)
- * @member description: An (application-specific) string giving some additional info about the image set
- * @member extension: The extension(s) of the image files
-*/
+/** This class holds basic information about an imageset.
+ *
+ * Discover imagesets through the [[WWTAwareComponent.wwtAvailableImagesets]]
+ * state variable. In standard practice there will be hundreds of available
+ * imagesets of many different kinds.
+ *
+ * Imagesets may be uniquely identified by their associated image data [[url]].
+ * (If you really need to have multiple imagesets associated with the same URL,
+ * add a `#fragment` to the end.)
+ */
 export class ImagesetInfo {
+  /** The URL of the image data. */
   url: string;
+
+  /** The user-facing name of the imageset. */
   name: string;
+
+  /** The type of the imageset: panorama, sky, ... */
   type: ImageSetType;
+
+  /** An (application-specific) string giving some additional information about
+   * the imageset. */
   description: string;
+
+  /** The image filename extension(s) associated with this imageset.
+   *
+   * May include multiple extensions separated by spaces. May also start with a
+   * leading period.
+   */
   extension: string;
 
   constructor(url: string, name: string, type: ImageSetType, description: string, extension: string) {
@@ -86,14 +113,86 @@ export class ImagesetInfo {
     this.name = name;
     this.type = type;
     this.description = description;
-    this.extension = extension
+    this.extension = extension;
   }
 }
 
-/** This interface expresses the properties exposed by the WWT Engine’s
- * Vuex store module.
+/** Information about an active imageset layer. */
+export class ImageSetLayerState {
+  /** Layer parameters exposed in WWT's generic "settings" system.
+   *
+   * This field is an instance of the [@wwtelescope/engine-helpers]
+   * [ImageSetLayerState] class (which has the same name as this class, but is
+   * different).
+   *
+   * [@wwtelescope/engine-helpers]: ../../engine-helpers/
+   * [ImageSetLayerState]: ../../engine-helpers/classes/imagesetlayerstate.html
+  */
+  settings: ImageSetLayerSettings;
+
+  /** For FITS-like images, the "stretch" used for color-mapping the image data. */
+  scaleType: ScaleTypes;
+
+  /** For FITS-like images, the lower cutoff used for color-mapping the image data. */
+  vmin: number;
+
+  /** For FITS-like images, the upper cutoff used for color-mapping the image data. */
+  vmax: number;
+
+  /** For FITS-like images, the name of the color map used to render the image
+   * data.
+   *
+   * See [here](../../engine/modules/colormapcontainer.html#fromnamedcolormap)
+   * for the supported options. */
+  colormapName: string;
+
+  private guidText: string;
+
+  constructor(source: ImageSetLayer) {
+    this.guidText = source.id.toString();
+    this.settings = new ImageSetLayerSettings(source);
+
+    const fits = source.get_imageSet().get_fitsProperties();
+    this.scaleType = fits.scaleType;
+    this.vmin = fits.lowerCut;
+    this.vmax = fits.upperCut;
+    this.colormapName = fits.colorMapName;
+  }
+
+  getGuid(): string {
+    return this.guidText;
+  }
+}
+
+/** This interface expresses the properties exposed by the WWT Engine’s Vuex
+ * store module.
+ *
+ * See [[WWTAwareComponent]] for an organized overview of the different aspects
+ * of WWT state that are exposed in the Vuex framework, along with associated
+ * getters, actions, and mutations.
+ *
+ * Much of this interface duplicates state that is already stored within the WWT
+ * engine itself (i.e., the `WWTInstance`). Due to the way that the Vue/Vuex
+ * reactivity framework works, we need to mirror the engine state into Vuex. The
+ * first reason to do this is that, as far as I can tell, there's no good way to
+ * integrate the "external" state of the WWT instance into the reactivity
+ * framework so that dependencies can be mapped correctly. And we can't just
+ * integrate the WWT instance into the reactivity framework -- well, I haven't
+ * tried, but I'm 99% sure that it won't work with all of the WebGL textures and
+ * whatnot. I.e., the WWT types that hold state are not "plain old data".
+ *
+ * The second reason is that it is recommended for app state to be flattened and
+ * normalized when expressed in Vuex, as in [this post]. The WWT engine
+ * certainly does *not* express its state in such a manner.
+ *
+ * [this post]: https://forum.vuejs.org/t/vuex-best-practices-for-complex-objects/10143/2
+ *
+ * The duplication of WWT's data structures is annoying, but the actual amount
+ * of mirrored data isn't very big.
  */
 export interface WWTEngineVuexState {
+  // NOTE: We were orginally alphabetizing these all, but now I think it will be
+  // better to group topically related fields.
 
   /** Info about the imagesets that are available in the engine to be used as backgrounds */
   availableImagesets: ImagesetInfo[];
@@ -189,6 +288,17 @@ export interface WWTEngineVuexState {
    * TODO: define this properly for 3D modes!
    */
   zoomDeg: number;
+
+  // Layers and layer management
+
+  /** The GUIDs of all rendered layers, in their draw order. */
+  activeLayers: string[];
+
+  /** Settings for all registered imageset layers. */
+  imagesetLayers: { [guidtext: string]: ImageSetLayerState };
+
+  /** Settings for all registered WWT spreadsheet layers. */
+  spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState };
 }
 
 /** The parameters for the [[WWTEngineVuexModule.createTableLayer]] action. */
@@ -245,11 +355,57 @@ export interface LoadImageCollectionParams {
   loadChildFolders?: boolean;
 }
 
+/** This function creates the list of currently active layers.
+ * Keeping this functionality outside of the store allows us to use it from
+ * inside either an action or a mutation.
+ */
+function activeLayersList(): string[] {
+  if (Vue.$wwt.inst === null)
+    throw new Error('cannot get activeLayersList without linking to WWTInstance');
+
+  const layers: string[] = [];
+
+  function accum(lm: LayerMap) {
+    for (const layer of lm.layers) {
+      layers.push(layer.id.toString());
+    }
+
+    for (const [_mapname, sublm] of Object.entries(lm.childMaps)) {
+      accum(sublm);
+    }
+  }
+
+  const rootlm = Vue.$wwt.inst.lm.get_allMaps()[Vue.$wwt.inst.ctl.getCurrentReferenceFrame()];
+  if (rootlm) {
+    accum(rootlm);
+  }
+
+  return layers;
+}
+
+
+/** This function creates the list of currently available imagesets.
+ * Keeping this functionality outside of the store allows us to use it from
+ * inside either an action or a mutation.
+ */
+function availableImagesets(): ImagesetInfo[] {
+  return WWTControl.getImageSets()
+      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
+} 
+
+/** The store module class for the WWT Vuex implementation.
+ *
+ * See [[WWTAwareComponent]] for an organized overview of the state variables,
+ * getters, actions, and mutations exposed by this module.
+ */
 @Module({
   namespaced: true,
   stateFactory: true,
 })
 export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexState {
+  // NOTE: We were orginally alphabetizing these all, but now I think it will be
+  // better to group topically related fields.
+
   availableImagesets: ImagesetInfo[] = [];
   backgroundImageset: Imageset | null = null;
   clockDiscontinuities = 0;
@@ -285,19 +441,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
         throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
       const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
       return { ra: (15 * coords.x + 720) % 360, dec: coords.y };
-    }
-  }
-
-  get layerForHipsCatalog() {
-    return function (name: string): SpreadSheetLayer | null {
-      if (Vue.$wwt.inst === null)
-        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
-      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
-      if (layer !== null && layer instanceof SpreadSheetLayer) {
-        return layer;
-      } else {
-        return null;
-      }
     }
   }
 
@@ -405,27 +548,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setupForImageset without linking to WWTInstance');
     Vue.$wwt.inst.setupForImageset(options);
-  }
-
-  @Action({ rawError: true })
-  addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
-    return Vue.$wwt.inst.addCatalogHipsByName(options);
-  }
-
-  @Action({ rawError: true })
-  getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot getCatalogHipsDataInView without linking to WWTInstance');
-    return Vue.$wwt.inst.getCatalogHipsDataInView(options);
-  }
-
-  @Mutation
-  removeCatalogHipsByName(name: string): void {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
   }
 
   @Mutation
@@ -618,9 +740,77 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadImageCollection without linking to WWTInstance');
     const result = await Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
-    this.context.commit('updateAvailableImagesets');
+    (this.context.state as WWTEngineVuexState).availableImagesets = availableImagesets();
     return result;
+  }
 
+  // General layers
+
+  activeLayers: string[] = [];
+
+  @Mutation
+  deleteLayer(id: string | Guid): void {
+    if (Vue.$wwt.inst === null)
+      throw new Error('cannot deleteLayer without linking to WWTInstance');
+
+    let stringId = "";
+
+    if (typeof id === "string") {
+      stringId = id;
+      const guid = Guid.fromString(id);
+      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
+    } else {
+      stringId = id.toString();
+      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
+    }
+
+    // Mirror modification in the reactive system. Here we just
+    // delete willy-nilly and ignore any missing cases.
+
+    Vue.delete(this.imagesetLayers, stringId);
+    Vue.delete(this.spreadSheetLayers, stringId);
+
+    this.activeLayers = activeLayersList();
+  }
+
+  // Imageset layers, including FITS layers
+
+  imagesetLayers: { [guidtext: string]: ImageSetLayerState } = {};
+
+  get imagesetStateForLayer() {
+    return (guidtext: string): ImageSetLayerState | null => {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get imagesetStateForLayer without linking to WWTInstance');
+      return this.imagesetLayers[guidtext] || null;
+    }
+  }
+
+  get imagesetForLayer() {
+    return function (guidtext: string): Imageset | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get imagesetForLayer without linking to WWTInstance');
+
+      const layer = Vue.$wwt.inst.lm.get_layerList()[guidtext];
+
+      if (layer !== null && layer instanceof ImageSetLayer) {
+        return layer.get_imageSet();
+      } else {
+        return null;
+      }
+    }
+  }
+
+  get activeImagesetLayerStates() {
+    const states: ImageSetLayerState[] = [];
+
+    for (const guid of this.activeLayers) {
+      const state = this.imagesetLayers[guid];
+      if (state) {
+        states.push(state);
+      }
+    }
+
+    return states;
   }
 
   @Action({ rawError: true })
@@ -629,15 +819,24 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   ): Promise<ImageSetLayer> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot addImageSetLayer without linking to WWTInstance');
-    return Vue.$wwt.inst.addImageSetLayer(options);
+
+    // Mirror the layer state into the reactivity system.
+    const wwtLayer = await Vue.$wwt.inst.addImageSetLayer(options);
+    const guidText = wwtLayer.id.toString();
+    Vue.set(this.imagesetLayers, guidText, new ImageSetLayerState(wwtLayer));
+
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
+    return wwtLayer;
   }
 
+  // deprecated, but maintained for compatibility:
   @Action({ rawError: true })
   async loadFitsLayer(
     options: LoadFitsLayerOptions
   ): Promise<ImageSetLayer> {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot loadFitsLayer without linking to WWTInstance');
+
     const addImageSetLayerOptions: AddImageSetLayerOptions = {
       url: options.url,
       mode: "fits",
@@ -652,7 +851,9 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   setImageSetLayerOrder(options: SetLayerOrderOptions): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
-    return Vue.$wwt.inst.setImageSetLayerOrder(options);
+
+    Vue.$wwt.inst.setImageSetLayerOrder(options);
+    this.activeLayers = activeLayersList();
   }
 
 
@@ -660,22 +861,51 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   stretchFitsLayer(options: StretchFitsLayerOptions): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot stretchFitsLayer without linking to WWTInstance');
+
     Vue.$wwt.inst.stretchFitsLayer(options);
+
+    // Update the reactive mirror.
+    const state = this.imagesetLayers[options.id];
+    if (state) {
+      state.scaleType = options.stretch;
+      state.vmin = options.vmin;
+      state.vmax = options.vmax;
+    }
   }
 
   @Mutation
   setFitsLayerColormap(options: SetFitsLayerColormapOptions): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot setFitsLayerColormap without linking to WWTInstance');
+
     Vue.$wwt.inst.setFitsLayerColormap(options);
+
+    // Update the reactive mirror.
+    const state = this.imagesetLayers[options.id];
+    if (state) {
+      state.colormapName = options.name;
+    }
   }
 
   @Mutation
   applyFitsLayerSettings(options: ApplyFitsLayerSettingsOptions): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot applyFitsLayerSettings without linking to WWTInstance');
+
     Vue.$wwt.inst.applyFitsLayerSettings(options);
+
+    // Update the reactive mirror.
+    const state = this.imagesetLayers[options.id];
+    if (state) {
+      for (const s of options.settings) {
+        applyImageSetLayerSetting(state.settings, s);
+      }
+    }
   }
+
+  // Spreadsheet layers
+
+  spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState } = {};
 
   @Action({ rawError: true })
   async createTableLayer(
@@ -712,14 +942,32 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
     // Currently, table creation is synchronous, but treat it as async
     // in case our API needs to get more sophisticated later.
-    return new Promise((resolve, _reject) => resolve(layer));
+    const prom = new Promise<SpreadSheetLayer>((resolve, _reject) => resolve(layer));
+
+    // Mirror the layer state into the reactivity system.
+    const wwtLayer = await prom;
+    const guidText = wwtLayer.id.toString();
+    Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
+    return wwtLayer;
   }
 
   @Mutation
   applyTableLayerSettings(options: ApplyTableLayerSettingsOptions): void {
     if (Vue.$wwt.inst === null)
       throw new Error('cannot applyTableLayerSettings without linking to WWTInstance');
+
     Vue.$wwt.inst.applyTableLayerSettings(options);
+
+    // Mirror changes in the reactive framework.
+    const state = this.spreadSheetLayers[options.id];
+
+    if (state !== undefined) {
+      for (const s of options.settings) {
+        applySpreadSheetLayerSetting(state, s);
+      }
+    }
   }
 
   @Mutation
@@ -727,19 +975,87 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst === null)
       throw new Error('cannot updateTableLayer without linking to WWTInstance');
     Vue.$wwt.inst.updateTableLayer(options);
+
+    // Nothing to mirror in reactive-land -- this call affects the table data.
+  }
+
+  // Progressive HiPS catalogs.
+  //
+  // These have some characteristics of imagesets, and some characteristics
+  // of spreadsheet layers.
+
+  get layerForHipsCatalog() {
+    return function (name: string): SpreadSheetLayer | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
+
+      // NOTE! There is an intense hack in the HiPS catalog support where the
+      // GUID of each HiPS catalog's SpreadSheetLayer is the `datasetName` from
+      // the catalog metadata. This is possible because the WWT `Guid` class
+      // doesn't actually do any validation, and just accepts any string you
+      // give it.
+      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
+
+      if (layer !== null && layer instanceof SpreadSheetLayer) {
+        return layer;
+      } else {
+        return null;
+      }
+    }
+  }
+
+  get spreadsheetStateForHipsCatalog() {
+    return (name: string): SpreadSheetLayerSettingsInterfaceRO | null => {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get spreadsheetStateForHipsCatalog without linking to WWTInstance');
+
+      // NOTE: hack as described above -- the name is the GUID.
+      return this.spreadSheetLayers[name] || null;
+    }
+  }
+
+  @Action({ rawError: true })
+  async addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
+
+    const imgset = await Vue.$wwt.inst.addCatalogHipsByName(options);
+
+    // Mirror the spreadsheet layer aspect into the reactivity system.
+
+    const hips = imgset.get_hipsProperties();
+
+    if (hips !== null) {
+      const wwtLayer = hips.get_catalogSpreadSheetLayer();
+      const guidText = wwtLayer.id.toString();
+      Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+    }
+
+    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
+    return imgset;
+  }
+
+  @Action({ rawError: true })
+  getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot getCatalogHipsDataInView without linking to WWTInstance');
+    return Vue.$wwt.inst.getCatalogHipsDataInView(options);
   }
 
   @Mutation
-  deleteLayer(id: string | Guid): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot deleteLayer without linking to WWTInstance');
+  removeCatalogHipsByName(name: string): void {
+    if (Vue.$wwt.inst == null)
+      throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
 
-    if (typeof id === "string") {
-      const guid = Guid.fromString(id);
-      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
-    } else {
-      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
-    }
+    Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
+
+    // Un-mirror the spreadsheet layer aspect from the reactivity system. Here
+    // we leverage the quasi-hack that the GUID of the spreadsheet layer is set
+    // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
+
+    Vue.delete(this.spreadSheetLayers, name);
+
+    this.activeLayers = activeLayersList();
   }
 
   // Annotations
@@ -764,5 +1080,4 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       throw new Error('cannot clearAnnotations without linking to WWTInstance');
     Vue.$wwt.inst.si.clearAnnotations();
   }
-
 }

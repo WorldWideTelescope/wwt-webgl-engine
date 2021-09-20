@@ -1,3 +1,8 @@
+# @wwtelescope/astro 0.2.0 (2021-09-20)
+
+- Add a function for calculating great-circle distance (@Carifio24).
+
+
 # @wwtelescope/astro 0.1.4 (2021-06-03)
 
 - No code changes, just syncing up Cranko with changes in the repository.

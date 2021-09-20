@@ -21,7 +21,7 @@ import {
   Classification,
   ConstellationFilterInterface,
   CoordinatesType,
-  DataTypes,
+  // DataTypes,
   FadeType,
   FolderGroup,
   FolderRefreshType,
@@ -40,13 +40,398 @@ import {
   SettingsInterface,
 } from "@wwtelescope/engine-types";
 
+
+// First: interfaces for settings (state)
+//
+// These are implicitly defined by the engine. We extract their definitions from
+// main WWT classes because our Vuex implementation needs to mirror this state
+// within the Vuex data store pattern.
+//
+// Along with these interfaces, see SettingsInterface defined in engine-types.
+// We have to define these interfaces here because some of their methods depend
+// on types that are only defined in this package.
+
+/** Interface for querying generic Annotation settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface AnnotationSettingsInterfaceRO {
+  //get_center
+  get_id(): string;
+  get_label(): string;
+  get_opacity(): number;
+  get_showHoverLabel(): boolean;
+  get_tag(): string;
+}
+
+/** Interface for controlling generic Annotation settings. */
+export interface AnnotationSettingsInterface extends AnnotationSettingsInterfaceRO {
+  set_id(v: string): string;
+  set_label(v: string): string;
+  set_opacity(v: number): number;
+  set_showHoverLabel(v: boolean): boolean;
+  set_tag(v: string): string;
+}
+
+export interface CircleAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
+  get_fill(): boolean;
+  get_fillColor(): string;
+  get_lineColor(): string;
+  get_lineWidth(): number;
+  get_radius(): number;
+  get_skyRelative(): boolean;
+}
+
+export interface CircleAnnotationSettingsInterface extends AnnotationSettingsInterface, CircleAnnotationSettingsInterfaceRO {
+  set_fill(v: boolean): boolean;
+  set_fillColor(v: string): string;
+  set_lineColor(v: string): string;
+  set_lineWidth(v: number): number;
+  set_radius(v: number): number;
+  set_skyRelative(v: boolean): boolean;
+}
+
+export type EngineSettingsInterfaceRO = SettingsInterface;
+
+export interface EngineSettingsInterface extends EngineSettingsInterfaceRO {
+  set_actualPlanetScale(v: boolean): boolean;
+  set_constellationArtFilter(v: ConstellationFilter): ConstellationFilter;
+  set_constellationBoundariesFilter(v: ConstellationFilter): ConstellationFilter;
+  set_constellationFigureColor(v: string): string;
+  set_constellationFiguresFilter(v: ConstellationFilter): ConstellationFilter;
+  set_constellationBoundryColor(v: string): string;
+  set_constellationNamesFilter(v: ConstellationFilter): ConstellationFilter;
+  set_constellations(v: boolean): boolean;
+  set_constellationSelectionColor(v: string): string;
+  set_constellationsEnabled(v: string): string;
+  set_crosshairsColor(v: string): string;
+  set_earthCutawayView(v: boolean): boolean;
+  set_galacticMode(v: boolean): boolean;
+  set_localHorizonMode(v: boolean): boolean;
+  set_locationAltitude(v: number): number;
+  set_locationLat(v: number): number;
+  set_locationLng(v: number): number;
+  set_milkyWayModel(v: boolean): boolean;
+  set_minorPlanetsFilter(v: number): number;
+  set_planetOrbitsFilter(v: number): number;
+  set_showAltAzGrid(v: boolean): boolean;
+  set_showAltAzGridText(v: boolean): boolean;
+  set_showConstellationBoundries(v: boolean): boolean;
+  set_showConstellationFigures(v: boolean): boolean;
+  set_showConstellationLabels(v: boolean): boolean;
+  set_showConstellationPictures(v: boolean): boolean;
+  set_showConstellations(v: boolean): boolean;
+  set_showConstellationSelection(v: boolean): boolean;
+  set_showCrosshairs(v: boolean): boolean;
+  set_showEarthSky(v: boolean): boolean;
+  set_showEcliptic(v: boolean): boolean;
+  set_showEclipticGrid(v: boolean): boolean;
+  set_showEclipticGridText(v: boolean): boolean;
+  set_showEclipticOverviewText(v: boolean): boolean;
+  set_showElevationModel(v: boolean): boolean;
+  set_showEquatorialGridText(v: boolean): boolean;
+  set_showGalacticGrid(v: boolean): boolean;
+  set_showGalacticGridText(v: boolean): boolean;
+  set_showGrid(v: boolean): boolean;
+  set_showHorizon(v: boolean): boolean;
+  set_showISSModel(v: boolean): boolean;
+  set_showPrecessionChart(v: boolean): boolean;
+  set_showSkyGrids(v: boolean): boolean;
+  set_showSkyOverlays(v: boolean): boolean;
+  set_showSkyOverlaysIn3d(v: boolean): boolean;
+  set_showSkyNode(v: boolean): boolean;
+  set_showSolarSystem(v: boolean): boolean;
+  set_smoothPan(v: boolean): boolean;
+  set_solarSystemCMB(v: boolean): boolean;
+  set_solarSystemCosmos(v: boolean): boolean;
+  set_solarSystemLighting(v: boolean): boolean;
+  set_solarSystemMilkyWay(v: boolean): boolean;
+  set_solarSystemMinorPlanets(v: boolean): boolean;
+  set_solarSystemMultiRes(v: boolean): boolean;
+  set_solarSystemOrbits(v: boolean): boolean;
+  set_solarSystemOverlays(v: boolean): boolean;
+  set_solarSystemPlanets(v: boolean): boolean;
+  set_solarSystemScale(v: number): number;
+  set_solarSystemStars(v: boolean): boolean;
+  set_solarSystemMinorOrbits(v: boolean): boolean;
+}
+
+/** Interface for querying [[ImageSetLayer]] settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface ImageSetLayerSettingsInterfaceRO extends LayerSettingsInterfaceRO {
+  get_colorMapperName(): string;
+  get_overrideDefaultLayer(): boolean;
+}
+
+/** Interface for controlling [[ImageSetLayer]] settings. */
+export interface ImageSetLayerSettingsInterface extends LayerSettingsInterface, ImageSetLayerSettingsInterfaceRO {
+  set_colorMapperName(v: string): string;
+  set_overrideDefaultLayer(v: boolean): boolean;
+}
+
+/** Interface for querying generic Layer settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface LayerSettingsInterfaceRO {
+  get_astronomical(): boolean;
+  get_color(): Color;
+  get_enabled(): boolean;
+  get_endTime(): Date;
+  get_fadeSpan(): number;
+  get_fadeType(): FadeType;
+  get_name(): string;
+  get_opacity(): number;
+  get_opened(): boolean;
+  get_referenceFrame(): string;
+  get_startTime(): Date;
+  get_version(): number;
+}
+
+/** Interface for controlling generic Layer settings. */
+export interface LayerSettingsInterface extends LayerSettingsInterfaceRO {
+  set_astronomical(v: boolean): boolean;
+  set_color(v: Color): Color;
+  set_enabled(v: boolean): boolean;
+  set_endTime(v: Date): Date;
+  set_fadeSpan(v: number): number;
+  set_fadeType(v: FadeType): FadeType;
+  set_name(v: string): string;
+  set_opacity(v: number): number;
+  set_opened(v: boolean): boolean;
+  set_referenceFrame(v: string): string;
+  set_startTime(v: Date): Date;
+  set_version(v: number): number;
+}
+
+export interface PolyAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
+  get_fill(): boolean;
+  get_fillColor(): string;
+  get_lineColor(): string;
+  get_lineWidth(): number;
+}
+
+export interface PolyAnnotationSettingsInterface extends AnnotationSettingsInterface, PolyAnnotationSettingsInterfaceRO {
+  set_fill(v: boolean): boolean;
+  set_fillColor(v: string): string;
+  set_lineColor(v: string): string;
+  set_lineWidth(v: number): number;
+}
+
+export interface PolyLineAnnotationSettingsInterfaceRO extends AnnotationSettingsInterfaceRO {
+  get_lineColor(): string;
+  get_lineWidth(): number;
+}
+
+export interface PolyLineAnnotationSettingsInterface extends AnnotationSettingsInterface, PolyLineAnnotationSettingsInterfaceRO {
+  set_lineColor(v: string): string;
+  set_lineWidth(v: number): number;
+}
+
+/** Interface for querying [[SpreadSheetLayer]] settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface SpreadSheetLayerSettingsInterfaceRO extends LayerSettingsInterfaceRO {
+  get_altColumn(): number;
+  get_altType(): AltTypes;
+  get_altUnit(): AltUnits;
+  get_barChartBitmask(): number;
+  get_beginRange(): Date;
+  get_cartesianCustomScale(): number;
+  get_cartesianScale(): AltUnits;
+  // get_colorMap
+  get_colorMapColumn(): number;
+  get_colorMapperName(): string;
+  get_coordinatesType(): CoordinatesType;
+  get_decay(): number;
+  get_dynamicColor(): boolean;
+  get_dynamicData(): boolean;
+  get_endDateColumn(): number;
+  get_endRange(): Date;
+  get_geometryColumn(): number;
+  get_hyperlinkColumn(): number;
+  get_hyperlinkFormat(): string;
+  get_latColumn(): number;
+  get_lngColumn(): number;
+  get_markerColumn(): number;
+  get_markerIndex(): number;
+  // get_markerMix
+  get_markerScale(): MarkerScales;
+  get_nameColumn(): number;
+  get_normalizeColorMap(): boolean;
+  get_normalizeColorMapMax(): number;
+  get_normalizeColorMapMin(): number;
+  get_normalizeSize(): boolean;
+  get_normalizeSizeClip(): boolean;
+  get_normalizeSizeMax(): number;
+  get_normalizeSizeMin(): number;
+  get_plotType(): PlotTypes;
+  get_pointScaleType(): PointScaleTypes;
+  get_raUnits(): RAUnits;
+  get_scaleFactor(): number;
+  get_showFarSide(): boolean;
+  get_sizeColumn(): number;
+  get_startDateColumn(): number;
+  get_timeSeries(): boolean;
+  get_xAxisColumn(): number;
+  get_xAxisReverse(): boolean;
+  get_yAxisColumn(): number;
+  get_yAxisReverse(): boolean;
+  get_zAxisColumn(): number;
+  get_zAxisReverse(): boolean;
+}
+
+/** Interface for controlling [[SpreadSheetLayer]] settings. */
+export interface SpreadSheetLayerSettingsInterface extends LayerSettingsInterface, SpreadSheetLayerSettingsInterfaceRO {
+  set_altColumn(v: number): number;
+  set_altType(v: AltTypes): AltTypes;
+  set_altUnit(v: AltUnits): AltUnits;
+  set_barChartBitmask(v: number): number;
+  set_beginRange(v: Date): Date;
+  set_cartesianCustomScale(v: number): number;
+  set_cartesianScale(v: AltUnits): AltUnits;
+  // get_colorMap
+  set_colorMapColumn(v: number): number;
+  set_colorMapperName(v: string): string;
+  set_coordinatesType(v: CoordinatesType): CoordinatesType;
+  set_decay(v: number): number;
+  set_dynamicColor(v: boolean): boolean;
+  set_dynamicData(v: boolean): boolean;
+  set_endDateColumn(v: number): number;
+  set_endRange(v: Date): Date;
+  set_geometryColumn(v: number): number;
+  set_hyperlinkColumn(v: number): number;
+  set_hyperlinkFormat(v: string): string;
+  set_latColumn(v: number): number;
+  set_lngColumn(v: number): number;
+  set_markerColumn(v: number): number;
+  set_markerIndex(v: number): number;
+  // get_markerMix
+  set_markerScale(v: MarkerScales): MarkerScales;
+  set_nameColumn(v: number): number;
+  set_normalizeColorMap(v: boolean): boolean;
+  set_normalizeColorMapMax(v: number): number;
+  set_normalizeColorMapMin(v: number): number;
+  set_normalizeSize(v: boolean): boolean;
+  set_normalizeSizeClip(v: boolean): boolean;
+  set_normalizeSizeMax(v: number): number;
+  set_normalizeSizeMin(v: number): number;
+  set_plotType(v: PlotTypes): PlotTypes;
+  set_pointScaleType(v: PointScaleTypes): PointScaleTypes;
+  set_raUnits(v: RAUnits): RAUnits;
+  set_scaleFactor(v: number): number;
+  set_showFarSide(v: boolean): boolean;
+  set_sizeColumn(v: number): number;
+  set_startDateColumn(v: number): number;
+  set_timeSeries(v: boolean): boolean;
+  set_xAxisColumn(v: number): number;
+  set_xAxisReverse(v: boolean): boolean;
+  set_yAxisColumn(v: number): number;
+  set_yAxisReverse(v: boolean): boolean;
+  set_zAxisColumn(v: number): number;
+  set_zAxisReverse(v: boolean): boolean;
+}
+
+/** Interface for querying [[VoTableLayer]] settings.
+ *
+ * The `RO` is short for "read-only".
+ * */
+export interface VoTableLayerSettingsInterfaceRO extends LayerSettingsInterfaceRO {
+  get_altColumn(): number;
+  get_altType(): AltTypes;
+  get_altUnit(): AltUnits;
+  get_autoUpdate(): boolean;
+  get_beginRange(): Date;
+  get_cartesianCustomScale(): number;
+  get_cartesianScale(): AltUnits;
+  // get_colorMap
+  get_colorMapColumn(): number;
+  get_coordinatesType(): CoordinatesType;
+  get_dataSourceUrl(): string;
+  get_decay(): number;
+  get_dynamicData(): boolean;
+  get_endDateColumn(): number;
+  get_endRange(): Date;
+  get_hyperlinkColumn(): number;
+  get_hyperlinkFormat(): string;
+  get_latColumn(): number;
+  get_lngColumn(): number;
+  get_markerColumn(): number;
+  get_markerIndex(): number;
+  // get_markerMix
+  get_markerScale(): MarkerScales;
+  get_nameColumn(): number;
+  get_plotType(): PlotTypes;
+  get_pointScaleType(): PointScaleTypes;
+  get_raUnits(): RAUnits;
+  get_scaleFactor(): number;
+  get_showFarSide(): boolean;
+  get_sizeColumn(): number;
+  get_startDateColumn(): number;
+  // get_table()
+  get_timeSeries(): boolean;
+  get_xAxisColumn(): number;
+  get_xAxisReverse(): boolean;
+  get_yAxisColumn(): number;
+  get_yAxisReverse(): boolean;
+  get_zAxisColumn(): number;
+  get_zAxisReverse(): boolean;
+}
+
+/** Interface for controlling [[VoTableLayer]] settings. */
+export interface VoTableLayerSettingsInterface extends LayerSettingsInterface, VoTableLayerSettingsInterfaceRO {
+  set_altColumn(v: number): number;
+  set_altType(v: AltTypes): AltTypes;
+  set_altUnit(v: AltUnits): AltUnits;
+  set_autoUpdate(v: boolean): boolean;
+  set_beginRange(v: Date): Date;
+  set_cartesianCustomScale(v: number): number;
+  set_cartesianScale(v: AltUnits): AltUnits;
+  // get_colorMap
+  set_colorMapColumn(v: number): number;
+  set_coordinatesType(v: CoordinatesType): CoordinatesType;
+  set_dataSourceUrl(v: string): string;
+  set_decay(v: number): number;
+  set_dynamicData(v: boolean): boolean;
+  set_endDateColumn(v: number): number;
+  set_endRange(v: Date): Date;
+  set_hyperlinkColumn(v: number): number;
+  set_hyperlinkFormat(v: string): string;
+  set_latColumn(v: number): number;
+  set_lngColumn(v: number): number;
+  set_markerColumn(v: number): number;
+  set_markerIndex(v: number): number;
+  // get_markerMix
+  set_markerScale(v: MarkerScales): MarkerScales;
+  set_nameColumn(v: number): number;
+  set_plotType(v: PlotTypes): PlotTypes;
+  set_pointScaleType(v: PointScaleTypes): PointScaleTypes;
+  set_raUnits(v: RAUnits): RAUnits;
+  set_scaleFactor(v: number): number;
+  set_showFarSide(v: boolean): boolean;
+  set_sizeColumn(v: number): number;
+  set_startDateColumn(v: number): number;
+  set_timeSeries(v: boolean): boolean;
+  set_xAxisColumn(v: number): number;
+  set_xAxisReverse(v: boolean): boolean;
+  set_yAxisColumn(v: number): number;
+  set_yAxisReverse(v: boolean): boolean;
+  set_zAxisColumn(v: number): number;
+  set_zAxisReverse(v: boolean): boolean;
+}
+
+// Now the actual types implemented in WWT.
+
 /** A generic callback type. */
 export interface Action {
   (): void;
 }
 
 /** A visual annotation in the WWT view. */
-export class Annotation {
+export class Annotation implements AnnotationSettingsInterface {
   //get_center
   get_id(): string;
   set_id(v: string): string;
@@ -111,7 +496,7 @@ export class CameraParameters {
 }
 
 /** A simple circular annotation. */
-export class Circle extends Annotation {
+export class Circle extends Annotation implements CircleAnnotationSettingsInterface {
   get_fill(): boolean;
   set_fill(v: boolean): boolean;
   get_fillColor(): string;
@@ -263,7 +648,6 @@ export class ConstellationFilter implements ConstellationFilterInterface {
 }
 
 export class Constellations {
-  
   static containment: Constellations;
 
   findConstellationForPoint(ra: number, dec: number): string;
@@ -272,16 +656,15 @@ export class Constellations {
 /** The full EngineSetting type, which augments engine-types' BaseEngineSetting
  * with types that are only provided within the engine itself.
  */
+// NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
 export type EngineSetting = BaseEngineSetting |
-  // NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
-  ["constellationArtFilter", ConstellationFilter] |
-  ["constellationBoundariesFilter", ConstellationFilter] |
-  ["constellationBoundryColor", Color] |
-  ["constellationFigureColor", Color] |
-  ["constellationFiguresFilter", ConstellationFilter] |
-  ["constellationNamesFilter", ConstellationFilter] |
-  ["constellationSelectionColor", Color] |
-  ["crosshairsColor", Color];
+["constellationArtFilter", ConstellationFilter] |
+["constellationBoundariesFilter", ConstellationFilter] |
+["constellationBoundryColor", Color] |
+["constellationFigureColor", Color] |
+["constellationFiguresFilter", ConstellationFilter] |
+["constellationNamesFilter", ConstellationFilter] |
+["constellationSelectionColor", Color];
 
 export class FitsImage extends WcsImage {
   histogramMaxCount: number;
@@ -296,12 +679,15 @@ export class FitsImage extends WcsImage {
 export class FitsProperties {
   bZero: number;
   bScale: number;
+  containsBlanks: boolean;
   blankValue: number;
   maxVal: number;
   minVal: number;
   lowerCut: number;
   upperCut: number;
   transparentBlack: boolean;
+  colorMapName: string;
+  scaleType: ScaleTypes;
 }
 
 export class Folder implements Thumbnail {
@@ -364,7 +750,12 @@ export class Folder implements Thumbnail {
   childLoadCallback(callback: Action): void;
 }
 
-/** An simple Version 4 GUID */
+/** An simple Version 4 GUID.
+ *
+ * Note that in WWT, GUID contents are not validated in any way upon creation.
+ * The stringification of a [[Guid]] may therefore not follow the UUID4 standard
+ * form.
+ */
 export class Guid {
   toString(): string;
 }
@@ -376,20 +767,25 @@ export namespace Guid {
   /** Create a new GUID with a random value. */
   export function newGuid(): Guid;
 
-  /** Create an instance of the GUID class from its string representation. */
+  /** Create an instance of the GUID class from its string representation.
+   *
+   * In WWT, the input does not need to actually have the standard UUID4 format.
+   * You can actually pass this function any string you want! It had really
+   * better be globally unique, though, or you're going to run into problems.
+   * */
   export function fromString(id: string): Guid;
 }
 
 /** Properties of HiPS imagesets */
 
 export class HipsProperties {
-  get_properties(): {[index: string]: string};
+  get_properties(): { [index: string]: string };
 
   get_catalogColumnInfo(): VoTable | null;
   set_catalogColumnInfo(vt: VoTable | null): VoTable | null;
 
   // Note: this is actually a CatalogSpreadSheetLayer subclass, but it doesn't
-  // add any new APIs that we care about. But let's not exposed the setter.
+  // add any new APIs that we care about. But let's not expose the setter.
   get_catalogSpreadSheetLayer(): SpreadSheetLayer;
 }
 
@@ -498,6 +894,9 @@ export class Imageset implements Thumbnail {
   get_url(): string;
   set_url(url: string): string;
 
+  get_wcsImage(): WcsImage | null;
+  set_wcsImage(w: WcsImage | null): WcsImage | null;
+
   get_widthFactor(): number;
   set_widthFactor(f: number): number;
 
@@ -539,7 +938,7 @@ export namespace Imageset {
 }
 
 /** An imageset renderable as its own independent layer. */
-export class ImageSetLayer extends Layer {
+export class ImageSetLayer extends Layer implements ImageSetLayerSettingsInterface {
   colorMapperName: string;
 
   // get_colorMapper(): ColorMapContainer
@@ -550,7 +949,7 @@ export class ImageSetLayer extends Layer {
   get_overrideDefaultLayer(): boolean;
   set_overrideDefaultLayer(v: boolean): boolean;
 
-  getFitsImage(): FitsImage | null;;
+  getFitsImage(): FitsImage | null;
   setImageScalePhysical(st: ScaleTypes, min: number, max: number): void;
   setImageScaleRaw(st: ScaleTypes, min: number, max: number): void;
   setImageZ(z: number): void;
@@ -593,7 +992,7 @@ export interface InViewReturnMessageCallback {
 
 /** An abstract class for graphical layers that are incorporated into the WWT
  * rendering engine. */
-export class Layer {
+export class Layer implements LayerSettingsInterface {
   id: Guid;
   loadedFromTour: boolean;
   tourDocument: TourDocument | null;
@@ -611,6 +1010,8 @@ export class Layer {
   set_astronomical(v: boolean): boolean;
   get_color(): Color;
   set_color(v: Color): Color;
+  get_enabled(): boolean;
+  set_enabled(v: boolean): boolean;
   get_endTime(): Date;
   set_endTime(v: Date): Date;
   get_fadeSpan(): number;
@@ -634,8 +1035,44 @@ export class Layer {
 export namespace LayerManager {
   export function get_tourLayers(): boolean;
   export function set_tourLayers(v: boolean): boolean;
-  //export function get_layerMaps(): {[name: string]: LayerMap}
-  export function get_layerList(): {[guidtext: string]: Layer};
+
+  /** Get the hierarchy of layers registered with the engine.
+   *
+   * This function returns a dictionary of [[LayerMap]] instances that define
+   * the engine’s rendering hierarchy. This top-level dictionary contains only
+   * the root reference frames used by the engine — typically, it has only two
+   * entries, named `"Sun"` and `"Sky"`. Below the `"Sun"` map (in its
+   * [[LayerMap.childMaps]] field) are found maps for the planets, and below
+   * those are maps for their moons.
+   *
+   * See also [[get_allMaps]], which returns the same collection of layer maps
+   * but in a flattened hierarchy.
+   */
+  export function get_layerMaps(): { [name: string]: LayerMap }
+
+  /** Get the flattened hierarchy of layers registered with the engine.
+   *
+   * This function returns a dictionary of [[LayerMap]] instances that define
+   * the engine’s rendering hierarchy. The dictionary contains an entry for
+   * every [[LayerMap]] registered with the engine. This is unlike the
+   * `get_layerMaps()` interface, which only returns the “root” layer maps.
+   * Because there is a layer map for every solar system planet and every known
+   * moon thereof, this dictionary is quite large.
+   *
+   * The keying is done such that `allMaps[map.get_name()] = map`.
+   */
+  export function get_allMaps(): { [name: string]: LayerMap }
+
+  /** Get the collection of all layers registered with the engine.
+   *
+   * The layer "list" is really an unordered dictionary of all registered
+   * layers, keyed by each layer's stringified GUID. Given a [[Layer]] object,
+   * you can get its key with `layer.id.toString()`. This list includes layers
+   * that have been registered for all engine rendering modes, while only one
+   * rendering mode is currently active at a time. So there are inevitably
+   * layers in the collection that are not currently being rendered.
+   */
+  export function get_layerList(): { [guidtext: string]: Layer };
 
   export function add(layer: Layer, updateTree: boolean): void;
   export function addFitsImageSetLayer(imageset: ImageSetLayer, title: string): ImageSetLayer;
@@ -669,12 +1106,34 @@ export namespace LayerManager {
  * [[LayerManager]] namespace. */
 export type LayerManagerObject = typeof LayerManager;
 
+/** A collection of layers in a hierarchical tree.
+ *
+ * Each map includes a collection of zero or more [[Layer]]s rooted in its
+ * reference frame (the [[layers]] list) as well as a collection of zero or more
+ * child [[LayerMap]]s, which have reference frames that are defined relative to
+ * this layer's reference frame (the [[childMaps]] dictionary).
+ **/
+export class LayerMap {
+  childMaps: { [childName: string]: LayerMap };
+  parent: LayerMap | null;
+  layers: Layer[];
+  open: boolean;
+  enabled: boolean;
+  loadedFromTour: boolean;
+  //frame: ReferenceFrame;
+
+  addChild(child: LayerMap): void;
+
+  get_name(): string;
+  set_name(v: string): string;
+}
+
 /** The full LayerSetting type, which augments engine-types' BaseLayerSetting
  * with types that are only provided within the engine itself.
  */
+// NOTE: isLayerSetting in engine-helpers needs to be kept in sync.
 export type LayerSetting = BaseLayerSetting |
-  // NOTE: isLayerSetting in engine-helpers needs to be kept in sync.
-  ["color", Color];
+["color", Color];
 
 export class Place implements Thumbnail {
   annotation: string;
@@ -736,7 +1195,7 @@ export class Place implements Thumbnail {
 
 
 /** A polygonal annotation. */
-export class Poly extends Annotation {
+export class Poly extends Annotation implements PolyAnnotationSettingsInterface {
   get_fill(): boolean;
   set_fill(v: boolean): boolean;
   get_fillColor(): string;
@@ -764,7 +1223,7 @@ export type PolyAnnotationSetting =
   ["lineWidth", number];
 
 /** An annotation composed of a sequence of lines. */
-export class PolyLine extends Annotation {
+export class PolyLine extends Annotation implements PolyLineAnnotationSettingsInterface {
   get_lineColor(): string;
   /** The color is parsed using [[Color.load]]. */
   set_lineColor(v: string): string;
@@ -1054,9 +1513,8 @@ export interface ScriptInterfaceCallback {
   (si: ScriptInterface): void;
 }
 
-
 /** A variety of settings for the WWT rendering engine. */
-export class Settings implements SettingsInterface {
+export class Settings implements EngineSettingsInterface {
   get_constellationFigureColor(): string;
   set_constellationFigureColor(v: string): string;
   get_constellationBoundryColor(): string;
@@ -1288,7 +1746,7 @@ export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
 
 /** A tabular data layer. */
-export class SpreadSheetLayer extends Layer {
+export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsInterface {
   colorMapperName: string;
 
   get_altColumn(): number;
@@ -1719,7 +2177,7 @@ export namespace VoTable {
  * This class is highly similar to [[SpreadSheetLayer]], and the latter class is
  * generally more featureful. It should be preferred when possible.
  */
-export class VoTableLayer extends Layer {
+export class VoTableLayer extends Layer implements VoTableLayerSettingsInterface {
   get_altColumn(): number;
   set_altColumn(v: number): number;
   get_altType(): AltTypes;
@@ -1947,6 +2405,20 @@ export class WWTControl {
    * background image set.
    */
   renderType: ImageSetType;
+
+  /** Get the name of the reference frame associated with the current view.
+   *
+   * The current reference frame defines the physical coordinates of the view
+   * and the list of layers that are included in the current rendering process.
+   * The return value of this function can be indexed into
+   * [[LayerManager.get_allMaps]] to find the root [[LayerMap]] that is used to
+   * determine what gets rendered in the current view.
+   *
+   * In standard 2D sky mode, the return value will be `"Sky"`.
+   *
+   * @returns The name of the current reference frame.
+   */
+  getCurrentReferenceFrame(): string;
 
   /** Render the view.
    *

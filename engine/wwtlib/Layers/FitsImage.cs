@@ -467,6 +467,39 @@ namespace wwtlib
             ValidWcs = hasScale && hasRotation && hasPixel && hasLocation;
         }
 
+        // Modify the FitsProperties object to apply any settings stored in this
+        // FITS image's header keywords. This mechanism gives us a way to set up
+        // the rendering of a tiled FITS image through keywords set on its
+        // level-0 tile file.
+        //
+        // I'm not aware of any standard, or even standard-ish, headers to
+        // define these settings, so we'll roll our own here.
+        public void ApplyDisplaySettings()
+        {
+            // TODO for tiled FITS: distinguish between datamin in this one tile,
+            // and datamin across the full, un-downsampled original imagery.
+
+            if (header.ContainsKey("DATAMIN")) {
+                fitsProperties.LowerCut = double.Parse(header["DATAMIN"].Trim());
+                fitsProperties.MinVal = fitsProperties.LowerCut;
+            }
+
+            if (header.ContainsKey("DATAMAX")) {
+                fitsProperties.UpperCut = double.Parse(header["DATAMAX"].Trim());
+                fitsProperties.MaxVal = fitsProperties.UpperCut;
+            }
+
+            if (header.ContainsKey("PXCUTMIN")) {
+                // Override DATAMIN
+                fitsProperties.LowerCut = double.Parse(header["PXCUTMIN"].Trim());
+            }
+
+            if (header.ContainsKey("PXCUTMAX")) {
+                // Override DATAMAX
+                fitsProperties.UpperCut = double.Parse(header["PXCUTMAX"].Trim());
+            }
+        }
+
         public int[] ComputeHistogram(int count)
         {
             int[] histogram = new int[count + 1];
@@ -492,7 +525,7 @@ namespace wwtlib
         protected virtual void PopulateHistogram(int[] histogram)
         {
             int buckets = histogram.Length;
-            
+
             double factor = (fitsProperties.MaxVal - fitsProperties.MinVal) / buckets;
 
             for (int i = 0; i < dataUnit.length; i++)

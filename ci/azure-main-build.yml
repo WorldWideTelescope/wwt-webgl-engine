@@ -96,7 +96,7 @@ jobs:
       artifactName: research-app
       targetPath: $(Build.ArtifactStagingDirectory)/research-app
 
-  # Test
+  # NPM Test
   #
   # In principle we could/should reapply the Lerna workaround here, but correct
   # ordering shouldn't matter for the tests. Likewise for the other NPM commands
@@ -111,6 +111,7 @@ jobs:
     inputs:
       testResultsFormat: 'JUnit'
       testResultsFiles: 'engine/tests/results.xml'
+
 
 - job: build_macos
   pool:
@@ -132,6 +133,54 @@ jobs:
     inputs:
       testResultsFormat: 'JUnit'
       testResultsFiles: 'engine/tests/results.xml'
+
+
+- job: browserstack
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - template: azure-job-setup.yml
+    parameters:
+      setupBuild: true
+
+  - bash: npm run build
+    displayName: NPM build
+
+  - bash: |
+      set -xeuo pipefail
+      cd tests
+      npm run build
+    displayName: Build test code
+
+  # We can't use the BrowserStackConfig@0 task because it relies on an Azure
+  # Pipelines "service connection" for BrowserStack, and as far as I can tell it
+  # is not possible to make those available to pull requests from repo forks.
+  # Which is something we want. So instead this pipeline has been configured in
+  # the AzP UI with *non-secured* environment variables configuring the
+  # BrowserStack-local client. A malicious pull request could easily expose
+  # those variables, so we have to be careful. To mitigate things, the
+  # vulnerable username and access key correspond to a BrowserStack "service
+  # account" named `ci-testing` that's owned by the impersonal WWT BrowserStack
+  # account.
+
+  - bash: |
+      set -xeuo pipefail
+      npm run serve-research &
+      sleep 10 # give the local service time to start up
+      cd tests
+      npm install
+
+      npm run bs-local -- -e default,firefox,edge,safari -o reports
+
+      pkill -f vue-cli-service  # stop the servers
+    displayName: BrowserStack test local research app
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'tests/reports/*.xml'
 
 
 - job: lint
