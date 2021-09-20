@@ -1,3 +1,15 @@
+# @wwtelescope/research-app-messages 0.10.0 (2021-09-20)
+
+More new interfaces and fixes supporting neat new features in the research app
+(@Carifio24, @pkgw)!
+
+- Fix a function signature bug which was preventing catalogs from being made
+  visible after being hidden.
+- Add the `SelectionStateMessage` for broadcasting messages about source and
+  catalog selections, and related types.
+- Wire in the `Layer.enabled` setting
+
+
 # @wwtelescope/research-app-messages 0.9.0 (2021-07-23)
 
 - Add new messages for interacting with HiPS catalogs (#126, @pkgw). These are a

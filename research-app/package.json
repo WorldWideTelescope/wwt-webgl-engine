@@ -8,12 +8,12 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
-    "@wwtelescope/astro": "^0.1.0",
-    "@wwtelescope/engine": "^7.12.0",
+    "@wwtelescope/astro": "^0.2.0",
+    "@wwtelescope/engine": "^7.13.0",
     "@wwtelescope/engine-helpers": "^0.7.0",
-    "@wwtelescope/engine-types": "^0.5.0",
+    "@wwtelescope/engine-types": "^0.6.0",
     "@wwtelescope/engine-vuex": "^0.10.0",
-    "@wwtelescope/research-app-messages": "^0.9.0",
+    "@wwtelescope/research-app-messages": "^0.10.0",
     "moment": "^2.29.1",
     "screenfull": "^5",
     "v-tooltip": "^2.1",
@@ -30,12 +30,12 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/astro": "manual:^0.1.0",
-    "@wwtelescope/engine": "f477fa5422b1548741ffca37e533b80799d0eede",
-    "@wwtelescope/engine-helpers": "thiscommit:2021-07-23:yLz00RP",
-    "@wwtelescope/engine-types": "thiscommit:2021-07-20:dSWTwuL",
-    "@wwtelescope/engine-vuex": "thiscommit:2021-07-23:787GD3c",
-    "@wwtelescope/research-app-messages": "thiscommit:2021-07-23:cXkPKXq"
+    "@wwtelescope/astro": "7cb232125428a91bd8fd10be24fec904e3589cce",
+    "@wwtelescope/engine": "1dded843ee47f132873d8b264bdba50badfea25f",
+    "@wwtelescope/engine-helpers": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2",
+    "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2",
+    "@wwtelescope/engine-vuex": "98d79e2c009c0fbabe676730787e8582dd1b8adb",
+    "@wwtelescope/research-app-messages": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2"
   },
   "keywords": [
     "AAS WorldWide Telescope"

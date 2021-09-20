@@ -6,7 +6,7 @@
     "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/engine": "^7.12.0",
+    "@wwtelescope/engine": "^7.13.0",
     "@wwtelescope/engine-helpers": "^0.7.0",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
@@ -19,8 +19,8 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine": "f477fa5422b1548741ffca37e533b80799d0eede",
-    "@wwtelescope/engine-helpers": "thiscommit:2021-07-23:QBr3OFS"
+    "@wwtelescope/engine": "1dded843ee47f132873d8b264bdba50badfea25f",
+    "@wwtelescope/engine-helpers": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2"
   },
   "keywords": [
     "AAS WorldWide Telescope"

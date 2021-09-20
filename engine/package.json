@@ -6,7 +6,7 @@
     "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/engine-types": "^0.4.0"
+    "@wwtelescope/engine-types": "^0.6.0"
   },
   "description": "The AAS WorldWide Telescope WebGL engine",
   "files": [
@@ -21,7 +21,7 @@
   ],
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine-types": "thiscommit:20210318:eehie0Et"
+    "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2"
   },
   "keywords": [
     "AAS WorldWide Telescope"

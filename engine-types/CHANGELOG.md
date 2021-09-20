@@ -1,3 +1,10 @@
+# @wwtelescope/engine-types 0.6.0 (2021-09-20)
+
+- Wire in the "Layer.enabled" setting
+- Delist "settings" that can't be modified. This is nominally a breaking change,
+  although such settings would have been of extremely limited use anyway.
+
+
 # @wwtelescope/engine-types 0.5.0 (2021-07-20)
 
 - Expose some engine color settings (#125, @pkgw). Unlike certain other
