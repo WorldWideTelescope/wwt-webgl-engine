@@ -10,7 +10,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/embed-common": "^0.2.0",
     "@wwtelescope/engine": "^7.14.0",
-    "@wwtelescope/engine-vuex": "^0.10.0",
+    "@wwtelescope/engine-vuex": "^0.11.0",
     "screenfull": "^5",
     "v-tooltip": "^2.1",
     "vue": "^2.6.11",

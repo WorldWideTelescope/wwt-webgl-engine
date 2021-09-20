@@ -1,3 +1,21 @@
+# @wwtelescope/engine-vuex 0.11.0 (2021-09-20)
+
+Lots of new features to (better) support HiPS catalogs, source selections, and
+tiled FITS datasets!
+
+- Add functionality for finding RA and Dec of a given point in the WWT viewport,
+  as well as for finding the nearest HiPS catalog object.
+- Add an `imagesetForLayer` getter
+- Expose "active" imageset layers in the store
+- Wire up and expose reactive `ImageSetLayer` state, building on the improved
+  settings interfaces (#131, #134, #137, @pkgw)
+- Likewise, expose `SpreadSheetLayer` state (@Carifio24, @pkgw). Some preliminary
+  APIs were consolidated into the more uniform settings interface.
+- Fix a function signature bug which was preventing catalogs from being made
+  visible after being hidden.
+- Tidying, documentation fixes, and bugfixes
+
+
 # @wwtelescope/engine-vuex 0.10.0 (2021-07-23)
 
 BREAKING: rework the catalog HiPS APIs (#126, @pkgw). The first approach used
