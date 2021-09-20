@@ -10,7 +10,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/astro": "^0.2.0",
     "@wwtelescope/engine": "^7.14.0",
-    "@wwtelescope/engine-helpers": "^0.7.0",
+    "@wwtelescope/engine-helpers": "^0.8.0",
     "@wwtelescope/engine-types": "^0.6.0",
     "@wwtelescope/engine-vuex": "^0.10.0",
     "@wwtelescope/research-app-messages": "^0.10.0",

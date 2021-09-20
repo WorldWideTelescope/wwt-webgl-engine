@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@wwtelescope/engine": "^7.14.0",
-    "@wwtelescope/engine-helpers": "^0.7.0",
+    "@wwtelescope/engine-helpers": "^0.8.0",
     "vue": "^2.6.11",
     "vuex": "^3.1.3"
   },

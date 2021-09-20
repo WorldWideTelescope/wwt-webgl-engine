@@ -31,5 +31,5 @@
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "version": "0.7.0"
+  "version": "0.8.0"
 }

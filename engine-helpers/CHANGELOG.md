@@ -1,3 +1,15 @@
+# @wwtelescope/engine-helpers 0.8.0 (2021-09-20)
+
+- Provide a homogeneous set of settings interfaces, building on the new
+  interfaces provided by some of the lower-level packages (@pkgw, #131, #134).
+  There is a new suite of functions for extracting, copying, and storing
+  settings, which make it easier to bridge WWT settings into systems external to
+  WWT itself, such as Vue and Vuex.
+- Properly type `StretchFitsLayerOptions.stretch` as a `ScaleTypes`. This
+  is technically a breaking change although the TypeScript compiler doesn't
+  always seem to mind if you still initialize the field with a number.
+
+
 # @wwtelescope/engine-helpers 0.7.0 (2021-07-23)
 
 - Add various wrappers for catalog HiPS functionality: an async-ified wrapper
