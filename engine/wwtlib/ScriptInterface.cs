@@ -368,16 +368,20 @@ namespace wwtlib
             {
                 name = LayerManager.GetNextImageSetName();
             }
-            ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayer(imageset, name);
+
+            ImageSetLayer imagesetLayer = LayerManager.AddImageSetLayerCallback(imageset, name, loaded);
 
             if (gotoTarget)
             {
-                WWTControl.Singleton.GotoRADecZoom(imageset.CenterX / 15, imageset.CenterY,
-                    WWTControl.Singleton.RenderContext.ViewCamera.Zoom, false, null);
-            }
-            if (loaded != null)
-            {
-                loaded(imagesetLayer);
+                double zoom = imageset.GuessZoomSetting(WWTControl.Singleton.RenderContext.ViewCamera.Zoom);
+
+                WWTControl.Singleton.GotoRADecZoom(
+                    imageset.CenterX / 15,
+                    imageset.CenterY,
+                    zoom,
+                    false,
+                    null
+                );
             }
 
             return imagesetLayer;
@@ -437,15 +441,26 @@ namespace wwtlib
                 imageset.WcsImage = wcsImage;
                 imagesetLayer.ImageSet = imageset;
                 LayerManager.AddFitsImageSetLayer(imagesetLayer, name);
+
                 if (gotoTarget)
                 {
-                    WWTControl.Singleton.GotoRADecZoom(wcsImage.CenterX / 15, wcsImage.CenterY, 10 * wcsImage.ScaleY * height, false, null);
+                    double zoom = imageset.GuessZoomSetting(WWTControl.Singleton.RenderContext.ViewCamera.Zoom);
+
+                    WWTControl.Singleton.GotoRADecZoom(
+                        wcsImage.CenterX / 15,
+                        wcsImage.CenterY,
+                        zoom,
+                        false,
+                        null
+                    );
                 }
+
                 if (loaded != null)
                 {
                     loaded(imagesetLayer);
                 }
             };
+
             if (string.IsNullOrWhiteSpace(name))
             {
                 name = LayerManager.GetNextFitsName();

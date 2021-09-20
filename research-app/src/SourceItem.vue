@@ -10,7 +10,7 @@
       <label
         v-show="!editing"
         focusable="false"
-        class="name-label"
+        class="name-label ellipsize"
         @click="isSelected = !isSelected"
         @keyup.enter="isSelected = !isSelected"
         >{{ source.name }}</label
@@ -209,14 +209,17 @@ export default class SourceItem extends Vue {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 #root-container {
-  background: #404040;
   color: white;
   font-weight: bold;
   font-size: 12pt;
   padding: 0px;
   overflow: hidden;
+
+  &:hover {
+    background: #999999;
+  }
 }
 
 #main-container {
@@ -224,13 +227,14 @@ export default class SourceItem extends Vue {
   padding: 5px;
 }
 
-#main-container:hover {
-  background: #999999;
-}
-
 .name-label {
   display: inline-block;
   width: 62%;
+  vertical-align: middle;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .name-input {
@@ -254,7 +258,6 @@ a:visited {
   font-size: 9pt;
   margin: 0px 5px;
   padding-left: 15px;
-  background: #404040;
 }
 
 .icon {
@@ -269,7 +272,6 @@ a:visited {
 
 .icon-link {
   height: 100%;
-  background: #404040;
 }
 
 .prompt {
@@ -279,6 +281,6 @@ a:visited {
 }
 
 .detail-row {
-  padding: 5px 0px;
+  padding: 1px 0px;
 }
 </style>

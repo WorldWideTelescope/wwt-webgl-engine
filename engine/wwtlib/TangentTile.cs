@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Html;
 
 
@@ -9,6 +8,10 @@ namespace wwtlib
     public class TangentTile : Tile
     {
         bool topDown = true;
+
+        //Cached bitmap for performance reasons
+        //Only used in legacy rendering of FITS (WebGL 1.0) inside SkyImageTile
+        protected Bitmap bmp;
         protected void ComputeBoundingSphere()
         {
             //insideOut = this.Dataset.DataSetType == ImageSetType.Sky || this.Dataset.DataSetType == ImageSetType.Panorama;
@@ -35,7 +38,6 @@ namespace wwtlib
             BottomLeft = GeoTo3dTan(latMax, lngMin);
 
             Vector3d distVect = GeoTo3dTan(latMin, lngMin);
-            tileDegrees = lngMax - lngMin;
             distVect.Subtract(sphereCenter);
             this.sphereRadius = distVect.Length();
         }
@@ -50,7 +52,87 @@ namespace wwtlib
 
         }
 
+        public override void RequestImage()
+        {
+            fitsImage = dataset.WcsImage as FitsImage;
+            if (fitsImage != null)
+            {
+                texReady = true;
+                Downloading = false;
+                errored = fitsImage.errored;
+                RequestPending = false;
+                TileCache.RemoveFromQueue(this.Key, true);
+                if (RenderContext.UseGlVersion2)
+                {
+                    MakeTexture();
+                    ReadyToRender = true;
+                }
+                else
+                {
+                    bmp = fitsImage.GetBitmap();
+                    texture2d = bmp.GetTexture();
+                    ReadyToRender = true;
+                }
+            }
+            else if (dataset.Extension == ".fits" && dataset.WcsImage == null)
+            {
+                if (!Downloading && !ReadyToRender)
+                {
 
+                    Downloading = true;
+                    if (RenderContext.UseGlVersion2)
+                    {
+                        fitsImage = new FitsImageTile(dataset, URL, delegate (WcsImage wcsImage)
+                        {
+                            Downloading = false;
+                            errored = fitsImage.errored;
+                            TileCache.RemoveFromQueue(this.Key, true);
+                            if (!fitsImage.errored)
+                            {
+                                // For a non-HiPS tiled FITS, this is our
+                                // mechanism for notifying the layer creator
+                                // that the initial FITS data have loaded and
+                                // the FitsProperties can be trusted.
+                                if (Level == 0) {
+                                    dataset.FitsProperties.FireMainImageLoaded(fitsImage);
+                                }
+
+                                texReady = true;
+                                ReadyToRender = texReady && (DemReady || !demTile);
+                                RequestPending = false;
+                                MakeTexture();
+                                ReadyToRender = true;
+                            }
+                        });
+                    }
+                    else
+                    {
+                        FitsImageJs image = null;
+
+                        image = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
+                        {
+                            if (Level == 0) {
+                                dataset.FitsProperties.FireMainImageLoaded(fitsImage);
+                            }
+
+                            texReady = true;
+                            Downloading = false;
+                            errored = false;
+                            ReadyToRender = texReady && (DemReady || !demTile);
+                            RequestPending = false;
+                            TileCache.RemoveFromQueue(this.Key, true);
+                            bmp = wcsImage.GetBitmap();
+                            texture2d = bmp.GetTexture();
+                            ReadyToRender = true;
+                        });
+                    }
+                }
+            }
+            else
+            {
+                base.RequestImage();
+            }
+        }
 
         protected void ComputeBoundingSphereBottomsUp()
         {
@@ -65,19 +147,14 @@ namespace wwtlib
             double latCenter = (latMin + latMax) / 2.0;
             double lngCenter = (lngMin + lngMax) / 2.0;
 
-
             TopLeft = GeoTo3dTan(latMin, lngMin);
             BottomRight = GeoTo3dTan(latMax, lngMax);
             TopRight = GeoTo3dTan(latMin, lngMax);
             BottomLeft = GeoTo3dTan(latMax, lngMin);
-            Vector3d distVect = TopLeft;
-            tileDegrees = lngMax - lngMin;
         }
 
         public override bool CreateGeometry(RenderContext renderContext)
         {
-            base.CreateGeometry(renderContext);
-
             if (GeometryCreated)
             {
                 return true;
@@ -89,25 +166,12 @@ namespace wwtlib
                 RenderTriangleLists[i] = new List<RenderTriangle>();
             }
 
+            LatLngEdges edges = GetLatLngEdges();
 
-            double tileDegrees = this.dataset.BaseTileDegrees / (Math.Pow(2, this.Level));
-
-            double latMin = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)this.tileY) * tileDegrees)) + this.dataset.OffsetY);
-            double latMax = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)(this.tileY + 1)) * tileDegrees)) + this.dataset.OffsetY);
-            double lngMin = ((((double)this.tileX * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX);
-            double lngMax = (((((double)(this.tileX + 1)) * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX);
-            double tileDegreesX = lngMax - lngMin;
-            double tileDegreesY = latMax - latMin;
-
-
-
-            TopLeft = GeoTo3dTan(latMin, lngMin);
-            BottomRight = GeoTo3dTan(latMax, lngMax);
-            TopRight = GeoTo3dTan(latMin, lngMax);
-            BottomLeft = GeoTo3dTan(latMax, lngMin);
-
-            double latCenter = (latMin + latMax) / 2.0;
-            double lngCenter = (lngMin + lngMax) / 2.0;
+            TopLeft = GeoTo3dTan(edges.latMin, edges.lngMin);
+            BottomRight = GeoTo3dTan(edges.latMax, edges.lngMax);
+            TopRight = GeoTo3dTan(edges.latMin, edges.lngMax);
+            BottomLeft = GeoTo3dTan(edges.latMax, edges.lngMin);
 
             Vector3d center = Vector3d.MidPoint(TopLeft, BottomRight);
             Vector3d leftCenter = Vector3d.MidPoint(TopLeft, BottomLeft);
@@ -125,6 +189,7 @@ namespace wwtlib
                 RenderTriangleLists[2].Add(RenderTriangle.Create(PositionTexture.CreatePos(leftCenter, 0, .5), PositionTexture.CreatePos(BottomLeft, 0, 1), PositionTexture.CreatePos(bottomCenter, .5, 1), texture, Level));
                 RenderTriangleLists[3].Add(RenderTriangle.Create(PositionTexture.CreatePos(center, .5, .5), PositionTexture.CreatePos(BottomRight, 1, 1), PositionTexture.CreatePos(rightCenter, 1, .5), texture, Level));
                 RenderTriangleLists[3].Add(RenderTriangle.Create(PositionTexture.CreatePos(center, .5, .5), PositionTexture.CreatePos(bottomCenter, .5, 1), PositionTexture.CreatePos(BottomRight, 1, 1), texture, Level));
+                ReadyToRender = true;
             }
             else
             {
@@ -172,7 +237,7 @@ namespace wwtlib
                             indexArray[index++] = 8;
                             indexArray[index++] = 6;
                             indexArray[index++] = 3;
-                            indexArray[index++] = 5;            
+                            indexArray[index++] = 5;
                             break;
                         case 2:
                             indexArray[index++] = 4;
@@ -193,37 +258,42 @@ namespace wwtlib
                     }
                     IndexBuffers[i] = PrepDevice.createBuffer();
                     PrepDevice.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, IndexBuffers[i]);
-                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, ui16array, GL.STATIC_DRAW);   
+                    PrepDevice.bufferData(GL.ELEMENT_ARRAY_BUFFER, ui16array, GL.STATIC_DRAW);
 
                 }
             }
             return true;
         }
 
-        //public override bool IsTileBigEnough(RenderContext renderContext)
-        //{   
-        //    //to check this
-        //    double arcPixels = ((dataset.BaseTileDegrees / 256) / Math.Pow(2, Level)) * 3600;
-        //    return (renderContext.FovScale < arcPixels);
-        //}
-
-        public TangentTile()
+        public TangentTile(int level, int x, int y, Imageset dataset, Tile parent)
         {
-        }
-
-        public static TangentTile Create(int level, int x, int y, Imageset dataset, Tile parent)
-        {
-            TangentTile temp = new TangentTile();
-            temp.Parent = parent;
-            temp.Level = level;
-            temp.tileX = x;
-            temp.tileY = y;
-            temp.dataset = dataset;
-            temp.topDown = !dataset.BottomsUp;
-            temp.ComputeBoundingSphere();
-            return temp;
+            this.Parent = parent;
+            this.Level = level;
+            this.tileX = x;
+            this.tileY = y;
+            this.dataset = dataset;
+            this.topDown = !dataset.BottomsUp;
+            this.ComputeBoundingSphere();
         }
 
 
+        protected virtual LatLngEdges GetLatLngEdges()
+        {
+            double tileDegrees = this.dataset.BaseTileDegrees / (Math.Pow(2, this.Level));
+            LatLngEdges edges = new LatLngEdges();
+            edges.latMin = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)this.tileY) * tileDegrees)) + this.dataset.OffsetY);
+            edges.latMax = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)(this.tileY + 1)) * tileDegrees)) + this.dataset.OffsetY);
+            edges.lngMin = ((((double)this.tileX * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX);
+            edges.lngMax = (((((double)(this.tileX + 1)) * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX);
+            return edges;
+        }
+
+    }
+    public class LatLngEdges
+    {
+        public double latMin;
+        public double latMax;
+        public double lngMin;
+        public double lngMax;
     }
 }

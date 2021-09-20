@@ -8,40 +8,48 @@
       @mousedown.native="wwtOnMouseDown"
     ></WorldWideTelescope>
 
-    <div id="display-panel" v-if="!hideAllChrome">
+    <!-- keydown.stops here and below prevent any keynav presses from reaching
+      the toplevel UI handlers -->
+    <div id="display-panel" v-if="!hideAllChrome" @keydown.stop>
       <transition name="catalog-transition">
         <div id="overlays">
           <p>{{ coordText }}</p>
         </div>
       </transition>
-      <div id="layers-container" v-if="haveLayers">
+      <div id="imagery-container" v-if="haveImagery">
         <div class="display-section-header">
-          <label>Layers:</label>
+          <label>Imagery</label>
         </div>
-        <div v-if="showLayers">
-          <catalog-item
-            v-for="catalog of hipsCatalogs"
-            v-bind:key="catalog.name"
-            v-bind:catalog="catalog"
-            v-bind:defaultColor="defaultColor"
-          />
+        <imageset-item
+          v-for="imageset of activeImagesetLayerStates"
+          v-bind:key="imageset.settings.name"
+          v-bind:imageset="imageset"
+        />
+      </div>
+      <div id="catalogs-container" v-if="haveCatalogs">
+        <div class="display-section-header">
+          <label>Catalogs</label>
         </div>
+        <catalog-item
+          v-for="catalog of hipsCatalogs"
+          v-bind:key="catalog.name"
+          v-bind:catalog="catalog"
+          v-bind:defaultColor="defaultColor"
+        />
       </div>
       <div id="sources-container" v-if="haveSources">
         <div class="display-section-header">
-          <label>Sources:</label>
+          <label>Sources</label>
         </div>
-        <div v-if="showSources">
-          <source-item
-            v-for="source of sources"
-            v-bind:key="source.name"
-            v-bind:source="source"
-          />
-        </div>
+        <source-item
+          v-for="source of sources"
+          v-bind:key="source.name"
+          v-bind:source="source"
+        />
       </div>
     </div>
 
-    <ul id="controls" v-if="!hideAllChrome">
+    <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
       <li v-show="showToolMenu">
         <v-popover placement="left" trigger="manual" :open="showPopover">
           <font-awesome-icon
@@ -66,6 +74,18 @@
                   ><font-awesome-icon icon="mountain" /> Choose background</a
                 >
               </li>
+              <li v-show="showAddImageryTool">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="
+                    selectTool('add-imagery-layer');
+                    showPopover = false;
+                  "
+                  tabindex="0"
+                  ><font-awesome-icon icon="image" /> Add imagery as layer</a
+                >
+              </li>
               <li v-show="showCatalogTool">
                 <a
                   href="#"
@@ -77,6 +97,19 @@
                   tabindex="0"
                   ><font-awesome-icon icon="map-marked-alt" /> Add HiPS
                   catalogs</a
+                >
+              </li>
+              <li v-show="showCollectionLoader">
+                <a
+                  href="#"
+                  v-close-popover
+                  @click="
+                    selectTool('load-collection');
+                    showPopover = false;
+                  "
+                  tabindex="0"
+                  ><font-awesome-icon icon="photo-video" /> Load WTML
+                  collection</a
                 >
               </li>
             </ul>
@@ -115,7 +148,7 @@
       </li>
     </ul>
 
-    <div id="tools" v-if="!hideAllChrome">
+    <div id="tools" v-if="!hideAllChrome" @keydown.stop>
       <div class="tool-container">
         <template v-if="currentTool == 'crossfade'">
           <span>Foreground opacity:</span>
@@ -125,6 +158,7 @@
             v-model="foregroundOpacity"
           />
         </template>
+
         <template v-else-if="currentTool == 'choose-background'">
           <div id="bg-select-container" class="item-select-container">
             <span id="bg-select-title" class="item-select-title"
@@ -145,16 +179,50 @@
             >
               <template #option="option">
                 <div class="item-option">
-                  <h4>{{ option.name }}</h4>
-                  <em>{{ option.description }}</em>
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
                 </div>
               </template>
               <template #selected-option="option">
-                <div>{{ option.name }}</div>
+                <div class="ellipsize">{{ option.name }}</div>
               </template>
             </v-select>
           </div>
         </template>
+
+        <template v-else-if="currentTool == 'add-imagery-layer'">
+          <div class="item-select-container">
+            <span class="item-select-title">Add imagery layer:</span>
+            <v-select
+              v-model="imageryToAdd"
+              class="item-selector"
+              :searchable="true"
+              :clearable="false"
+              :options="curAvailableImageryData"
+              :filter="filterImagesets"
+              label="name"
+              placeholder="Dataset"
+            >
+              <template #option="option">
+                <div class="item-option">
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
+                </div>
+              </template>
+              <template #selected-option="option">
+                <div class="ellipsize">{{ option.name }}</div>
+              </template>
+              <template #no-options="{ search, searching }">
+                <template v-if="searching">
+                  No datasets matching <em>{{ search }}</em
+                  >.
+                </template>
+                <em v-else>No datasets available. Load a WTML collection?</em>
+              </template>
+            </v-select>
+          </div>
+        </template>
+
         <template v-else-if="showCatalogChooser">
           <div id="catalog-select-container-tool" class="item-select-container">
             <span class="item-select-title">Add catalog:</span>
@@ -172,8 +240,8 @@
             >
               <template #option="option">
                 <div class="item-option">
-                  <h4>{{ option.name }}</h4>
-                  <em>{{ option.description }}</em>
+                  <h4 class="ellipsize">{{ option.name }}</h4>
+                  <p class="ellipsize"><em>{{ option.description }}</em></p>
                 </div>
               </template>
               <template #selected-option-container="">
@@ -182,10 +250,47 @@
             </v-select>
           </div>
         </template>
+
+        <template v-else-if="currentTool == 'load-collection'">
+          <div class="load-collection-container">
+            <div class="load-collection-label">
+              Load
+              <a
+                href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/"
+                target="_blank"
+                >WTML</a
+              >
+              data collection:
+            </div>
+            <div class="load-collection-row">
+              <label>URL:</label>
+              <input
+                type="url"
+                v-model="wtmlCollectionUrl"
+                @keyup.enter="submitWtmlCollectionUrl"
+              />
+              <font-awesome-icon
+                icon="arrow-circle-right"
+                size="lg"
+                class="load-collection-icon"
+                @keyup.enter="submitWtmlCollectionUrl"
+                @click="submitWtmlCollectionUrl"
+                tabindex="0"
+              ></font-awesome-icon>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
 
-    <div id="webgl2-popup" v-show="wwtShowWebGl2Warning" v-if="!hideAllChrome">
+    <notifications group="load-collection" position="top right" />
+
+    <div
+      id="webgl2-popup"
+      v-show="wwtShowWebGl2Warning"
+      v-if="!hideAllChrome"
+      @keydown.stop
+    >
       To get the full AAS WWT experience, consider using the latest version of
       Chrome, Firefox or Edge. In case you would like to use Safari, we
       recommend that you
@@ -242,6 +347,7 @@ import {
   classicPywwt,
   isPingPongMessage,
   layers,
+  selections,
   settings,
   ApplicationStateMessage,
   ViewStateMessage,
@@ -255,7 +361,13 @@ import {
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
 
-type ToolType = "crossfade" | "choose-background" | "choose-catalog" | null;
+type ToolType =
+  | "add-imagery-layer"
+  | "choose-background"
+  | "choose-catalog"
+  | "crossfade"
+  | "load-collection"
+  | null;
 
 type AnyFitsLayerMessage =
   | classicPywwt.CreateImageSetLayerMessage
@@ -363,6 +475,8 @@ class ImageSetLayerMessageHandler {
         this.queuedStretch = msg;
       }
     } else {
+      // TODO: `msg.stretch` is just a number while `stretch` is a typed
+      // ScaleTypes enum; TypeScript seems happy but we should validate!
       if (msg.version > this.stretchVersion) {
         this.owner.stretchFitsLayer({
           id: this.internalId,
@@ -841,6 +955,14 @@ interface AngleCoordinates {
   dec: number;
 }
 
+interface RawSourceInfo {
+  ra: number;
+  dec: number;
+  catalogName: string;
+  colNames: string[];
+  values: string[];
+}
+
 /** Get the source of a MessageEvent as a Window, if it is one.
  *
  * The problem here is that on Chrome, if the event is a cross-origin message
@@ -875,7 +997,8 @@ export default class App extends WWTAwareComponent {
 
   defaultColor = Color.fromArgb(1, 255, 255, 255);
   wwtComponentNamespace = wwtEngineNamespace;
-  lastClosePt: Source | null = null;
+  lastClosePt: RawSourceInfo | null = null;
+  lastSelectedSource: Source | null = null;
   distanceThreshold = 0.01;
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
@@ -1159,6 +1282,17 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+
+    // Ignore incoming view_state messages. When testing the app, you might want
+    // to launch it as (e.g.)
+    // `http://localhost:8080/?origin=http://localhost:8080/` so that you can
+    // manually send it messages using postMessage in the JS console. But in
+    // this setup, the app also receives every message that it sends, because
+    // its send and receive origins are the same! The resulting "unhandled
+    // message" report can actually be useful for examining outgoing messages,
+    // but it gets annoying for the view state messages that are sent so
+    // frequently. So, ignore those.
+    this.messageHandlers.set("wwt_view_state", this.ignoreMessage);
   }
 
   onMessage(msg: any) {
@@ -1176,6 +1310,10 @@ export default class App extends WWTAwareComponent {
         msg
       );
     }
+  }
+
+  private ignoreMessage(_msg: any): boolean {
+    return true;
   }
 
   // Various message handlers that don't comfortably fit elsewhere:
@@ -1302,16 +1440,13 @@ export default class App extends WWTAwareComponent {
 
   wwtOnMouseUp(_event: MouseEvent) {
     if (!this.isMouseMoving && this.lastClosePt !== null) {
-      const source: Source = {
-        ...this.lastClosePt,
-        name: this.nameForSource(this.lastClosePt),
-      };
+      const source = this.sourceCreator(this.lastClosePt);
       this.addSource(source);
+      this.lastSelectedSource = source;
     }
     this.isMouseMoving = false;
   }
 
-  // Increment the counter by 1 every time this is called
   newSourceName = (function () {
     let count = 0;
 
@@ -1321,13 +1456,27 @@ export default class App extends WWTAwareComponent {
     };
   })();
 
-  nameForSource(source: any): string {
+  nameForSource(catalogData: any, catalogName: string): string {
     for (const [key, [from, to]] of Object.entries(this.catalogNameMappings)) {
-      if (from in source && source["catalogName"] === key) {
-        return `${to}: ${source[from]}`;
+      if (from in catalogData && catalogName === key) {
+        return `${to}: ${catalogData[from]}`;
       }
     }
     return this.newSourceName();
+  }
+
+  sourceCreator(sourceInfo: RawSourceInfo): Source {
+    const obj: any = {};
+    for (let i = 0; i < sourceInfo.values.length; i++) {
+      obj[sourceInfo.colNames[i]] = sourceInfo.values[i];
+    }
+    return {
+      ra: sourceInfo.ra,
+      dec: sourceInfo.dec,
+      catalogName: sourceInfo.catalogName,
+      catalogData: obj,
+      name: this.nameForSource(obj, sourceInfo.catalogName),
+    };
   }
 
   // ImageSet layers, including FITS layers:
@@ -1755,6 +1904,40 @@ export default class App extends WWTAwareComponent {
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
   }
 
+  @Watch("lastSelectedSource")
+  onLastSelectedSourceChanged(source: Source) {
+    // Notify clients when a source is selected
+
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+
+    const msg: selections.SelectionStateMessage = {
+      type: "wwt_selection_state",
+      sessionId: this.statusMessageSessionId,
+      mostRecentSource: source,
+    };
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
+  @Watch("sources", { deep: true })
+  onSelectedSourcesChanged(sources: Source[]) {
+    // Notify clients when the list of selected sources is changed
+    // By making this a deep watcher, it keeps of track of any change
+    // in the list - even events like a property of a list entry changing
+
+    if (this.statusMessageDestination === null || this.allowedOrigin === null)
+      return;
+
+    const msg: selections.SelectionStateMessage = {
+      type: "wwt_selection_state",
+      sessionId: this.statusMessageSessionId,
+      selectedSources: sources,
+    };
+
+    this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+  }
+
   // A client has requested that we load a HiPS catalog. Once it's loaded we
   // reply to the client with the details of the catalog-as-spreadsheet-layer,
   // so that it can know what the catalog's characteristics are.
@@ -1860,6 +2043,10 @@ export default class App extends WWTAwareComponent {
     return this.wwtForegroundImageset != this.wwtBackgroundImageset;
   }
 
+  get showAddImageryTool() {
+    return !this.wwtIsTourPlaying;
+  }
+
   get showBackgroundChooser() {
     return !this.wwtIsTourPlaying;
   }
@@ -1872,7 +2059,15 @@ export default class App extends WWTAwareComponent {
     return this.currentTool == "choose-catalog";
   }
 
-  get haveLayers() {
+  get showCollectionLoader() {
+    return !this.wwtIsTourPlaying;
+  }
+
+  get haveImagery() {
+    return this.activeImagesetLayerStates.length > 0;
+  }
+
+  get haveCatalogs() {
     return this.hipsCatalogs.length > 0;
   }
 
@@ -1890,6 +2085,60 @@ export default class App extends WWTAwareComponent {
       this.currentTool = null;
     } else {
       this.currentTool = name;
+    }
+  }
+
+  // Add Imagery As Layer tool
+
+  get imageryToAdd() {
+    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
+  }
+
+  set imageryToAdd(iinfo: ImagesetInfo) {
+    const msg: classicPywwt.CreateImageSetLayerMessage = {
+      event: "image_layer_create",
+      url: iinfo.url,
+      id: iinfo.name,
+      mode: "preloaded",
+    };
+
+    this.getFitsLayerHandler(msg).handleCreateMessage(msg);
+  }
+
+  get curAvailableImageryData() {
+    if (this.wwtAvailableImagesets == null) return [];
+
+    // Currently (2021 August) the engine code requires that the
+    // filetype/extension field of an imageset be exactly ".fits" if it will be
+    // rendered with the FITS machinery. There are some datasets out there that
+    // include multiple space-separated extensions in this attribute, and of
+    // course there are different FITS-like extensions in use, so this might get
+    // more sophisticated in the future. If so, this logic will need to be
+    // updated.
+
+    return this.wwtAvailableImagesets.filter(
+      (info) => info.type == this.wwtRenderType && info.extension == ".fits"
+    );
+  }
+
+  // Load WTML Collection tool
+
+  wtmlCollectionUrl = "";
+
+  submitWtmlCollectionUrl() {
+    if (this.wtmlCollectionUrl) {
+      this.loadImageCollection({
+        url: this.wtmlCollectionUrl,
+        loadChildFolders: true,
+      }).then((_folder) => {
+        this.$notify({
+          group: "load-collection",
+          type: "success",
+          text: "WTML collection successfully loaded",
+        });
+      });
+
+      this.wtmlCollectionUrl = "";
     }
   }
 
@@ -1936,7 +2185,10 @@ export default class App extends WWTAwareComponent {
     );
   }
 
-  closestInView(target: AngleCoordinates, threshold?: number): Source | null {
+  closestInView(
+    target: AngleCoordinates,
+    threshold?: number
+  ): RawSourceInfo | null {
     let minDist = Infinity;
     let closestPt = null;
 
@@ -1944,8 +2196,8 @@ export default class App extends WWTAwareComponent {
     const colSeparator = "\t";
 
     for (const catalog of this.visibleHipsCatalogs()) {
-      const name = catalog.name;
-      const layer = this.layerForHipsCatalog(name);
+      const catalogName = catalog.name;
+      const layer = this.layerForHipsCatalog(catalogName);
       if (layer == null) {
         continue;
       }
@@ -1960,27 +2212,20 @@ export default class App extends WWTAwareComponent {
       const lngCol = layer.get_lngColumn();
       const latCol = layer.get_latColumn();
 
-      const itemCreator = function (values: string[]): Source {
-        const obj: any = {};
-        for (let i = 0; i < values.length; i++) {
-          obj[colNames[i]] = values[i];
-        }
-        return {
-          ...obj,
-          ra: D2R * Number(values[lngCol]),
-          dec: D2R * Number(values[latCol]),
-          catalogName: name,
-        };
-      };
-
       for (const row of rows) {
-        const items = row.split(colSeparator);
-        const ra = Number(items[lngCol]);
-        const dec = Number(items[latCol]);
-        const pt = { ra: D2R * ra, dec: D2R * dec };
+        const values = row.split(colSeparator);
+        const ra = D2R * Number(values[lngCol]);
+        const dec = D2R * Number(values[latCol]);
+        const pt = { ra: ra, dec: dec };
         const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
         if (dist < minDist) {
-          closestPt = itemCreator(items);
+          closestPt = {
+            ra: ra,
+            dec: dec,
+            colNames: colNames,
+            values: values,
+            catalogName: catalogName,
+          };
           minDist = dist;
         }
       }
@@ -1994,8 +2239,6 @@ export default class App extends WWTAwareComponent {
   data() {
     return {
       showPopover: false,
-      showLayers: true,
-      showSources: true,
     };
   }
 
@@ -2021,6 +2264,11 @@ html {
   margin: 0;
   padding: 0;
   background-color: #000;
+
+  // Activated in cases like interactive FITS stretch adjustment:
+  &.pointer-tracking {
+    cursor: crosshair;
+  }
 }
 
 body {
@@ -2051,7 +2299,7 @@ body {
 }
 
 #overlays {
-  margin: 10px;
+  margin: 5px;
 }
 
 #controls {
@@ -2104,43 +2352,58 @@ body {
   .opacity-range {
     width: 50vw;
   }
+
+  a {
+    text-decoration: none;
+    color: #9bf;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 #display-panel {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
-  width: 25vw;
+  max-width: 25vw;
   border-radius: 5px;
-  opacity: 0.6;
   color: white;
   font-weight: bold;
-  background: #404040;
-}
+  background: rgba(65, 65, 65, 0.6);
 
-#add-catalog {
-  position: relative;
-  width: max-content;
-  max-width: 100%;
-  margin: auto;
-  font-size: 12pt;
-
-  & a {
-    text-align: center;
-    color: white;
-    text-decoration: none;
-  }
-
-  & a .icon {
-    padding: 0px 7px;
+  p {
+    margin: 0;
   }
 }
 
 .display-section-header {
-  width: 100%;
-  font-size: 18pt;
-  text-align: center;
-  padding: 5px 0px;
+  font-size: 70%;
+  padding: 2px 5px;
+
+  /* Some tomfoolery to give a little strikethrough effect
+  * in the section header presentation */
+
+  display: flex;
+  align-items: center;
+
+  &::before,
+  &::after {
+    content: "";
+    height: 2px;
+    background-color: white;
+  }
+
+  &::before {
+    margin-right: 0.5rem;
+    width: 1rem;
+  }
+
+  &::after {
+    margin-left: 0.5rem;
+    flex-grow: 1;
+  }
 }
 
 .last-row {
@@ -2151,6 +2414,47 @@ body {
 .icon {
   padding: 0px 5px;
   color: white;
+}
+
+.load-collection-container {
+  width: 35vw;
+
+  .load-collection-label {
+    width: 100%;
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .load-collection-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    width: 100%;
+    margin-top: 0.2rem;
+
+    label {
+      margin-right: 0.5rem;
+    }
+
+    input {
+      flex: 1;
+    }
+  }
+
+  .load-collection-icon {
+    cursor: pointer;
+    color: #9bf;
+
+    &:hover {
+      color: #88f;
+    }
+  }
+}
+
+.vue-notification-group {
+  margin-right: 2.5rem;
+  margin-top: 0.75rem;
 }
 
 /* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */
@@ -2262,6 +2566,12 @@ body {
   }
 }
 
+.ellipsize {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Specialized styling for popups */
 
 ul.tool-menu {
@@ -2321,16 +2631,30 @@ ul.tool-menu {
   .vs__dropdown-option--highlight {
     color: red;
   }
+
+  .vs__selected-options {
+    margin: 0;
+    flex-wrap: nowrap;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  .vs__selected {
+    overflow: hidden;
+  }
+
 }
 
 .item-option {
   & h4 {
     margin: 0;
+    width: 100%;
   }
 
-  & em {
+  & p {
     margin: 0;
     font-size: small;
+    width: 100%;
   }
 }
 
@@ -2343,7 +2667,7 @@ This makes the last element of the last list item in the
 display panel have the rounded bottom edge
 The alternative to this is to have Vue bind a class to the last element
 */
-#display-panel > *:last-child > *:last-child > *:last-child {
+#display-panel > *:last-child > *:last-child {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }

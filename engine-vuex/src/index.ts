@@ -10,6 +10,7 @@ export {
   CreateTableLayerParams,
   GotoRADecZoomParams,
   ImagesetInfo,
+  ImageSetLayerState,
   LoadImageCollectionParams,
   LoadTourParams,
   WWTEngineVuexModule,

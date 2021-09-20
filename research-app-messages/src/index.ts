@@ -5,11 +5,13 @@
 
 import * as classicPywwt from './classic_pywwt';
 import * as layers from './layers';
+import * as selections from './selections';
 import * as settings from './settings';
 
 export {
   classicPywwt,
   layers,
+  selections,
   settings,
 };
 

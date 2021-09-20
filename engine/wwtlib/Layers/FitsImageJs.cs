@@ -24,11 +24,11 @@ namespace wwtlib
         public FitsImageJs(Imageset dataset, string file, Blob blob, WcsLoaded callMeBack) : base (dataset, file, blob, callMeBack)
         {
         }
-        public bool isHipsTile = false;
-        public static FitsImageJs CreateHipsTile(Imageset dataset, string file, WcsLoaded callMeBack)
+        public bool isTiledFits = false;
+        public static FitsImageJs CreateTiledFits(Imageset dataset, string file, WcsLoaded callMeBack)
         {
             FitsImageJs fits = new FitsImageJs(dataset, file, null, callMeBack);
-            fits.isHipsTile = true;
+            fits.isTiledFits = true;
             return fits;
         }
 
@@ -514,7 +514,7 @@ namespace wwtlib
 
         protected override void ComputeWcs()
         {
-            if (!isHipsTile)
+            if (!isTiledFits)
             {
                 base.ComputeWcs();
             }

@@ -1,12 +1,19 @@
+// Copyright 2020-2021 the .NET Foundation
+// Licensed under the MIT License
+
 import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
 import { ImagesetInfo } from '@wwtelescope/engine-vuex';
 import Vue from 'vue';
+
 export interface Source {
   ra: number;
   dec: number;
   name: string;
   catalogName: string;
   zoomDeg?: number;
+  catalogData: {
+    [field: string]: string | undefined;
+  };
 }
 
 export interface HipsCatalogStatus {
@@ -45,7 +52,7 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
 }
 
 function sourcesEqual(s1: Source, s2: Source) {
-  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (s1.name === s2.name) && (s1.catalogName === s2.catalogName);
+  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (s1.catalogName === s2.catalogName);
 }
 
 @Module({
@@ -53,7 +60,6 @@ function sourcesEqual(s1: Source, s2: Source) {
   stateFactory: true,
 })
 export class WWTResearchAppModule extends VuexModule {
-
   hipsCatalogs: ImagesetInfo[] = [];
   hipsCatalogVisibilities: boolean[] = [];
   sources: Source[] = [];
@@ -112,5 +118,4 @@ export class WWTResearchAppModule extends VuexModule {
   removeSource(source: Source) {
     removeFromArray(this.sources, source);
   }
-
 }

@@ -24,7 +24,7 @@ namespace wwtlib
     public enum AltUnits { Meters=1, Feet=2, Inches=3, Miles=4, Kilometers=5, AstronomicalUnits=6, LightYears=7, Parsecs=8, MegaParsecs=9, Custom=10 };
 
     public enum FadeType { FadeIn=1, FadeOut=2, Both=3, None=4 };
-    public abstract class Layer 
+    public abstract class Layer
     {
         public virtual LayerUI GetPrimaryUI()
         {
@@ -452,8 +452,20 @@ namespace wwtlib
         //    }
         //}
 
-        protected bool astronomical = false;
+        // Add named accessor functions so that we can support `enabled` as a
+        // "setting" in our TypeScript framework, without breaking anything that
+        // might rely on Enabled being a true bool.
 
+        public bool get_enabled() {
+            return Enabled;
+        }
+
+        public bool set_enabled(bool value) {
+            Enabled = value;
+            return value;
+        }
+
+        protected bool astronomical = false;
 
         public bool Astronomical
         {

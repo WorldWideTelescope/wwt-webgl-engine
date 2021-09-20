@@ -9,7 +9,8 @@
     "embed",
     "embed-creator",
     "research-app-messages",
-    "research-app"
+    "research-app",
+    "tests"
   ],
   "version": "independent",
   "npmClient": "npm",
