@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@wwtelescope/astro": "^0.1.0",
-    "@wwtelescope/engine": "^7.13.0",
+    "@wwtelescope/engine": "^7.14.0",
     "@wwtelescope/engine-types": "^0.6.0"
   },
   "description": "Helpful extensions to the AAS WorldWide Telescope engine.",

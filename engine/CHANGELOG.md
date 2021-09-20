@@ -1,3 +1,30 @@
+# @wwtelescope/engine 7.14.0 (2021-09-20)
+
+- Add support for tiled FITS studies!!! (@imbasimba, @pkgw, #115, #129, #135)
+  The WWT engine can now display FITS imagery of arbitrary size, if the data are
+  preprocessed into WWT's tiled "study" format. This can be done using the
+  [toasty] Python package.
+- Add functionality for finding RA and Dec of a given point in the WWT viewport,
+  as well as for finding the nearest HiPS catalog object (@Carifio24, #123)
+- Internal refactorings to help ensure that users of FITS imagesets can get
+  proper FITS properties (max and min values, etc.) once the data have loaded
+  (@pkgw).
+- Turn off the "transparent-black" FITS image setting by default (#140, @imbasimba).
+  This mimics the default behavior of pywwt.
+- When loading an imageset with the "goto" behavior turned on, guess an appropriate
+  zoom level (@pkgw).
+- Define and implement a bunch of TypeScript interfaces for the "settings"
+  associated with various WWT objects (@pkgw, #131). These are needed to help
+  build up reactive user interfaces for settings in the web UIs.
+- Expose various APIs to TypeScript (@pkgw, #131)
+  - The `Layer.enabled` setting
+  - The `LayerMap` API to TypeScript
+  - `WWTControl.getCurrentReferenceFrame()`
+  - `Imageset.{get,set}_wcsImage()`
+
+[toasty]: https://toasty.readthedocs.io/
+
+
 # @wwtelescope/engine 7.13.0 (2021-07-23)
 
 - Expose Imageset HiPS properties in the TypeScript API, for use by
