@@ -52,7 +52,7 @@ module.exports = {
           selector: "#  "
         },
         catalogsHeader: {
-          selector: "#catalogs-container .display-section-header"
+          selector: "#spreadsheets-container .display-section-header"
         },
         sourcesContainer: {
           selector: "#sources-container"
@@ -65,22 +65,22 @@ module.exports = {
         // i.e., the source components have a similar structure
         // with some of the same IDs
         catalogItem: {
-          selector: "#catalogs-container #root-container"
+          selector: "#spreadsheets-container #root-container"
         },
         catalogMainContainer: {
-          selector: "#catalogs-container #main-container"
+          selector: "#spreadsheets-container #main-container"
         },
         catalogTitle: {
-          selector: "#catalogs-container #name-label"
+          selector: "#spreadsheets-container #name-label"
         },
         catalogButtonContainer: {
-          selector: "#catalogs-container #buttons-container"
+          selector: "#spreadsheets-container #buttons-container"
         },
         catalogVisibilityButton: {
-          selector: "#catalogs-container #buttons-container .fa-eye, #catalogs-container #buttons-container .fa-eye-slash"
+          selector: "#spreadsheets-container #buttons-container .fa-eye, #spreadsheets-container #buttons-container .fa-eye-slash"
         },
         catalogDeleteButton: {
-          selector: "#catalogs-container #buttons-container .fa-times"
+          selector: "#spreadsheets-container #buttons-container .fa-times"
         },
       },
       props: {
@@ -161,7 +161,7 @@ module.exports = {
         },
       },
       props: {
-        backgroundOptionCount: 832,
+        backgroundOptionCount: 834,
         catalogOptionCount: 49,
         firstBackgroundName: "Digitized Sky Survey (Color)",
         firstBackgroundDescription: "Copyright DSS Consortium",

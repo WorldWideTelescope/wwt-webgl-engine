@@ -1,3 +1,57 @@
+export enum ImageSetType {
+  earth = 0,
+  planet = 1,
+  sky = 2,
+  panorama = 3,
+  solarSystem = 4,
+  sandbox = 5
+}
+
+/** This class holds basic information about an imageset.
+ *
+ * Discover imagesets through the [[WWTAwareComponent.wwtAvailableImagesets]]
+ * state variable. In standard practice there will be hundreds of available
+ * imagesets of many different kinds.
+ *
+ * Imagesets may be uniquely identified by their associated image data [[url]].
+ * (If you really need to have multiple imagesets associated with the same URL,
+ * add a `#fragment` to the end.)
+ */
+ export interface ImagesetInfo {
+  /** The URL of the image data. */
+  url: string;
+
+  /** The user-facing name of the imageset. */
+  name: string;
+
+  /** The type of the imageset: panorama, sky, ... */
+  type: ImageSetType;
+
+  /** An (application-specific) string giving some additional information about
+   * the imageset. */
+  description: string;
+
+  /** The image filename extension(s) associated with this imageset.
+   *
+   * May include multiple extensions separated by spaces. May also start with a
+   * leading period.
+   */
+  extension: string;
+}
+
+export interface SpreadSheetLayerInfo {
+  /* The user-facing name of the layer */
+  name: string;
+
+  /* The internal GUID of the layer */
+  id: string;
+
+  /* The reference frame in which the data are defined. */
+  referenceFrame: string;
+}
+
+export type LayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
+
 /**
  * Information about a selected source in the engine.
  * The values for right ascension and declination are given in radians.
@@ -8,9 +62,9 @@ export interface Source {
   ra: number;
   dec: number;
   name: string;
-  catalogName: string;
+  layer: LayerInfo;
   zoomDeg?: number;
-  catalogData: {
+  layerData: {
     [field: string]: string | undefined;
   };
 }

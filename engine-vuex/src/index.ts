@@ -11,8 +11,10 @@ export {
   GotoRADecZoomParams,
   ImagesetInfo,
   ImageSetLayerState,
+  isImageSetInfo,
   LoadImageCollectionParams,
   LoadTourParams,
+  SpreadSheetLayerInfo,
   WWTEngineVuexModule,
   WWTEngineVuexState,
 } from "./store";

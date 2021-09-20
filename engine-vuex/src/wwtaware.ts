@@ -331,6 +331,8 @@ export class WWTAwareComponent extends Vue {
         "imagesetStateForLayer",
         "layerForHipsCatalog",
         "lookupImageset",
+        "spreadSheetLayerById",
+        "spreadsheetState",
         "spreadsheetStateForHipsCatalog",
       ]),
       ...this.$options.computed,
@@ -591,6 +593,17 @@ export class WWTAwareComponent extends Vue {
   /** Get the right ascension and declination, in degrees, for x, y coordinates on the screen */
   findRADecForScreenPoint!: (pt: { x: number; y: number }) => { ra: number; dec: number };
 
+  /** Get the actual WWT `SpreadSheetLayer` for the table layer with the given ID.
+   *
+   * Do not use this function for UI purposes -- the WWT layer object is not
+   * integrated into the reactive state system, and so if you use it as a basis
+   * for UI elements, those elements will not be updated properly if/when the
+   * layer's settings change. Use [[spreadsheetState]] instead.
+   *
+   * @param id The table layer's identifier.
+   */
+  spreadSheetLayerById!: (id: string) => SpreadSheetLayer | null;
+
   /** Get the actual WWT `SpreadSheetLayer` for the named HiPS catalog.
    *
    * Do not use this function for UI purposes -- the WWT layer object is not
@@ -732,6 +745,17 @@ export class WWTAwareComponent extends Vue {
    * want to show.
    */
   setupForImageset!: (o: SetupForImagesetOptions) => void;
+
+    /** Get reactive `SpreadSheetLayer` settings for the table layer with the given ID.
+   *
+   * The returned data structure is a component of the app's Vuex state. You can
+   * therefore use the settings to construct UI elements, and they will update
+   * reactively as the state evolves. The actual data structures used by WWT are
+   * separate, but the two mirror each other.
+   *
+   * @param id The identifier of the table layer.
+   */
+  spreadsheetState!: (id: string) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   /** Get reactive `SpreadSheetLayer` settings for the named HiPS catalog.
    *

@@ -47,8 +47,8 @@
           <span class="prompt">Dec:</span><span>{{ this.decStr }}</span>
         </div>
         <div class="detail-row">
-          <span class="prompt">Catalog:</span
-          ><span>{{ this.source.catalogName }}</span>
+          <span class="prompt">Layer:</span
+          ><span>{{ this.source.layer.name }}</span>
         </div>
         <div class="detail-row">
           <span class="prompt">Query Coordinates:</span

@@ -117,6 +117,35 @@ export class ImagesetInfo {
   }
 }
 
+export function isImageSetInfo(o: any): o is ImagesetInfo { // eslint-disable-line @typescript-eslint/no-explicit-any
+  return typeof o.url === 'string'
+      && typeof o.name === 'string'
+      && typeof o.type === 'number'
+      && typeof o.description === 'string'
+      && typeof o.extension === 'string';
+}
+
+export class SpreadSheetLayerInfo {
+  /* The user-facing name of the layer */
+  name: string;
+
+  /* The internal GUID of the layer */
+  id: string;
+
+  /* The reference frame in which the data are defined. */
+  referenceFrame: string;
+
+  setName(name: string) {
+    this.name = name;
+  }
+
+  constructor(id: string, referenceFrame: string, name?: string) {
+    this.id = id;
+    this.referenceFrame = referenceFrame;
+    this.name = name ?? id;
+  }
+}
+
 /** Information about an active imageset layer. */
 export class ImageSetLayerState {
   /** Layer parameters exposed in WWT's generic "settings" system.
@@ -1004,6 +1033,21 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     }
   }
 
+  get spreadSheetLayerById() {
+    return function(id: string): SpreadSheetLayer | null {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get spreadSheetLayerById without linking to WWTInstance');
+
+      const layer = Vue.$wwt.inst.lm.get_layerList()[id];
+
+      if (layer !== null && layer instanceof SpreadSheetLayer) {
+        return layer;
+      } else {
+        return null;
+      }
+    }
+  }
+
   get spreadsheetStateForHipsCatalog() {
     return (name: string): SpreadSheetLayerSettingsInterfaceRO | null => {
       if (Vue.$wwt.inst === null)
@@ -1011,6 +1055,15 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
       // NOTE: hack as described above -- the name is the GUID.
       return this.spreadSheetLayers[name] || null;
+    }
+  }
+
+  get spreadsheetState() {
+    return (id: string): SpreadSheetLayerSettingsInterfaceRO | null => {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get spreadsheetState without linking to WWTInstance');
+
+      return this.spreadSheetLayers[id] || null;
     }
   }
 

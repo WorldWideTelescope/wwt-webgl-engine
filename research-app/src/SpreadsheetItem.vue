@@ -8,23 +8,31 @@
       @blur="hasFocus = false"
     >
       <label
+        v-show="!editing"
         focusable="false"
         id="name-label"
         class="ellipsize"
         @click="isSelected = !isSelected"
         @keyup.enter="isSelected = !isSelected"
-        >{{ catalog.name }}</label
+        >{{ layer.name }}</label
       >
+      <input v-show="editing" class="name-input" @blur="editing = false" />
       <span id="buttons-container">
+        <a
+          href="#"
+          v-if="!isLayerHips"
+          v-hide="!hasFocus"
+          @click="handleEditClick"
+          class="icon-link"
+          ><font-awesome-icon
+            :class="['icon', { 'icon-active': editing }]"
+            icon="pencil-alt"
+        /></a>
         <a href="#" v-hide="!hasFocus" @click="handleToggle" class="icon-link"
           ><font-awesome-icon
-            v-if="visible"
             class="icon"
-            icon="eye" /><font-awesome-icon
-            v-if="!visible"
-            class="icon"
-            icon="eye-slash"
-        /></a>
+            :icon="visible ? 'eye' : 'eye-slash'" />
+          </a>
         <a href="#" v-hide="!hasFocus" @click="handleDelete" class="icon-link"
           ><font-awesome-icon class="icon" icon="times"
         /></a>
@@ -32,14 +40,14 @@
     </div>
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
-        <div class="detail-row">
+        <div class="detail-row" v-if="isLayerHips">
           <span class="prompt">URL:</span
-          ><span class="ellipsize">{{ catalog.url }}</span>
+          ><span class="ellipsize">{{ layer.url }}</span>
         </div>
 
-        <div class="detail-row" v-if="catalog.description.length > 0">
+        <div class="detail-row" v-if="isLayerHips && layer.description.length > 0">
           <span class="prompt">Description:</span
-          ><span>{{ catalog.description }}</span>
+          ><span>{{ layer.description }}</span>
         </div>
 
         <div class="detail-row">
@@ -109,9 +117,10 @@
 import { mapGetters, mapMutations, mapState } from "vuex";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
-import { ImagesetInfo } from "@wwtelescope/engine-vuex";
+import { isImageSetInfo } from "@wwtelescope/engine-vuex";
 import {
   Color,
+  Guid,
   SpreadSheetLayerSetting,
   SpreadSheetLayerSettingsInterfaceRO,
 } from "@wwtelescope/engine";
@@ -119,6 +128,7 @@ import { ApplyTableLayerSettingsOptions } from "@wwtelescope/engine-helpers";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
+import { LayerInfo } from "./store";
 
 interface UiPlotTypes {
   wwt: PlotTypes;
@@ -146,8 +156,9 @@ interface VueColorData {
 
 @Component
 export default class CatalogItem extends Vue {
-  @Prop({ required: true }) catalog!: ImagesetInfo;
+  @Prop({ required: true }) layer!: LayerInfo;
   @Prop({ required: false, default: Color.fromArgb(1, 255, 255, 255) })
+
   defaultColor!: Color;
 
   uiPlotTypes = uiPlotTypes;
@@ -158,9 +169,12 @@ export default class CatalogItem extends Vue {
     this.$options.computed = {
       ...mapState(wwtResearchAppNamespace, {
         visible: (_state, getters) =>
-          getters["researchAppHipsCatalogVisibility"](this.catalog),
+          getters["researchAppTableLayerVisibility"](this.layer),
       }),
-      ...mapGetters(wwtEngineNamespace, ["spreadsheetStateForHipsCatalog"]),
+      ...mapGetters(wwtEngineNamespace, [
+        "spreadsheetState",
+        "spreadsheetStateForHipsCatalog"
+      ]),
       ...this.$options.computed,
     };
 
@@ -168,11 +182,12 @@ export default class CatalogItem extends Vue {
       ...this.$options.methods,
       ...mapMutations(wwtEngineNamespace, [
         "applyTableLayerSettings",
+        "deleteLayer",
         "removeCatalogHipsByName",
       ]),
       ...mapMutations(wwtResearchAppNamespace, [
-        "removeResearchAppCatalogHips",
-        "setResearchAppCatalogHipsVisibility",
+        "removeResearchAppTableLayer",
+        "setResearchAppTableLayerVisibility",
       ]),
     };
   }
@@ -180,25 +195,38 @@ export default class CatalogItem extends Vue {
   // Tied to the store value
   visible!: boolean;
 
+  spreadsheetState!: (id: string) => SpreadSheetLayerSettingsInterfaceRO | null;
   spreadsheetStateForHipsCatalog!: (
     _n: string
   ) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
+  deleteLayer!: (id: string | Guid) => void;
   removeCatalogHipsByName!: (name: string) => void;
-  removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
-  setResearchAppCatalogHipsVisibility!: (args: {
-    catalog: ImagesetInfo;
+  removeResearchAppTableLayer!: (layer: LayerInfo) => void;
+  setResearchAppTableLayerVisibility!: (args: {
+    layer: LayerInfo;
     visible: boolean;
   }) => void;
 
   // Local state
 
+  editing = false;
   hasFocus = false;
   isSelected = false;
+  isLayerHips = false;
+
+  layerId(): string {
+    return isImageSetInfo(this.layer) ? this.layer.name : this.layer.id;
+  }
+
+  layerState(): SpreadSheetLayerSettingsInterfaceRO | null {
+    const id = this.layerId();
+    return isImageSetInfo(this.layer) ? this.spreadsheetStateForHipsCatalog(id) : this.spreadsheetState(id);
+  }
 
   get color(): Color {
-    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+    const state = this.layerState();
 
     if (state !== null) {
       return state.get_color();
@@ -215,7 +243,7 @@ export default class CatalogItem extends Vue {
   }
 
   get enabled(): boolean {
-    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+    const state = this.layerState();
 
     if (state !== null) {
       return state.get_enabled();
@@ -225,7 +253,7 @@ export default class CatalogItem extends Vue {
   }
 
   get plotType(): PlotTypes {
-    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+    const state = this.layerState();
 
     if (state !== null) {
       return state.get_plotType();
@@ -239,7 +267,7 @@ export default class CatalogItem extends Vue {
   }
 
   get scaleFactorDb(): number {
-    const state = this.spreadsheetStateForHipsCatalog(this.catalog.name);
+    const state = this.layerState();
 
     if (state !== null) {
       return 10 * Math.log10(state.get_scaleFactor());
@@ -277,26 +305,31 @@ export default class CatalogItem extends Vue {
 
   mounted() {
     this.color = this.defaultColor;
+    this.isLayerHips = isImageSetInfo(this.layer);
   }
 
   private applySettings(settings: SpreadSheetLayerSetting[]) {
-    // Building on the hack/simplification that the GUID of the catalog's
-    // spreadsheet layer is its `datasetName`, even though that is absolutely
-    // not a v4 GUID at all.
+    // For HiPS layers, this builds on the hack/simplification that the GUID of
+    // the catalog's spreadsheet layer is its `datasetName`, even though that 
+    // is absolutely not a v4 GUID at all.
     this.applyTableLayerSettings({
-      id: this.catalog.name,
+      id: this.layerId(),
       settings: settings,
     });
   }
 
   handleDelete() {
-    this.removeResearchAppCatalogHips(this.catalog);
-    this.removeCatalogHipsByName(this.catalog.name);
+    this.removeResearchAppTableLayer(this.layer);
+    if (isImageSetInfo(this.layer)) {
+      this.removeCatalogHipsByName(this.layer.name);
+    } else {
+      this.deleteLayer(this.layer.id);
+    }
   }
 
   handleToggle() {
-    this.setResearchAppCatalogHipsVisibility({
-      catalog: this.catalog,
+    this.setResearchAppTableLayerVisibility({
+      layer: this.layer,
       visible: !this.visible,
     });
   }
@@ -306,6 +339,10 @@ export default class CatalogItem extends Vue {
     this.color = Color.fromArgb(rgba["a"], rgba["r"], rgba["g"], rgba["b"]);
   }
 
+  handleEditClick() {
+    this.editing = !this.editing;
+  }
+
   @Watch("visible")
   onVisibilityChange(val: boolean) {
     this.applySettings([["enabled", val]]);
@@ -313,10 +350,22 @@ export default class CatalogItem extends Vue {
 
   @Watch("enabled")
   onEnabledChange(val: boolean) {
-    this.setResearchAppCatalogHipsVisibility({
-      catalog: this.catalog,
+    this.setResearchAppTableLayerVisibility({
+      layer: this.layer,
       visible: val,
     });
+  }
+
+  @Watch("editing")
+  editingChanged(val: boolean, _oldVal: boolean) {
+    const input: HTMLInputElement = this.$el.getElementsByClassName(
+      "name-input"
+    )[0] as HTMLInputElement;
+    if (val) {
+      input.value = this.layer.name;
+    } else {
+      this.layer.name = input.value;
+    }
   }
 
   doAdjustSize(bigger: boolean) {
@@ -383,6 +432,10 @@ export default class CatalogItem extends Vue {
   margin: auto 1%;
 }
 
+.icon-active {
+  color: darkred;
+}
+
 .icon-link {
   height: 100%;
   background: inherit;
@@ -394,6 +447,11 @@ export default class CatalogItem extends Vue {
   cursor: pointer;
   display: inline-block;
   background: inherit;
+}
+
+.name-input {
+  display: inline-block;
+  background: #999999;
 }
 
 .prompt {

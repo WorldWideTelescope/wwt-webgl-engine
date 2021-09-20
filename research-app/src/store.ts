@@ -2,22 +2,26 @@
 // Licensed under the MIT License
 
 import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
-import { ImagesetInfo } from '@wwtelescope/engine-vuex';
+import { ImagesetInfo, SpreadSheetLayerInfo, isImageSetInfo } from '@wwtelescope/engine-vuex';
 import Vue from 'vue';
 
 export interface Source {
   ra: number;
   dec: number;
   name: string;
-  catalogName: string;
+  layer: LayerInfo;
   zoomDeg?: number;
-  catalogData: {
+  layerData: {
     [field: string]: string | undefined;
   };
 }
 
-export interface HipsCatalogStatus {
+export type LayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
+
+export interface TableLayerStatus {
   visible: boolean;
+  type: 'hips' | 'table';
+  layer: LayerInfo;
 }
 
 type EquivalenceTest<T> = (t1: T, t2: T) => boolean;
@@ -52,7 +56,23 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
 }
 
 function sourcesEqual(s1: Source, s2: Source) {
-  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (s1.catalogName === s2.catalogName);
+  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (infoKey(s1.layer) === infoKey(s2.layer));
+}
+
+function infoKey(info: LayerInfo) {
+  return isImageSetInfo(info) ? info.name : info.id;
+}
+
+function getFilteredLayers(statusMap: { [id: string]: TableLayerStatus | undefined },
+                           filter: (status: TableLayerStatus) => boolean): LayerInfo[] {
+  const statuses = Object.values(statusMap);
+  const filtered: LayerInfo[] = [];
+  for (const status of statuses) {
+    if (status !== undefined && filter(status)) {
+      filtered.push(status.layer);
+    }
+  }
+  return filtered;
 }
 
 @Module({
@@ -60,8 +80,8 @@ function sourcesEqual(s1: Source, s2: Source) {
   stateFactory: true,
 })
 export class WWTResearchAppModule extends VuexModule {
-  hipsCatalogs: ImagesetInfo[] = [];
-  hipsCatalogVisibilities: boolean[] = [];
+  
+  _tableLayers: { [id: string]: TableLayerStatus | undefined } = {};
   sources: Source[] = [];
 
   catalogNameMappings: { [catalogName: string]: [string, string] } = {
@@ -74,38 +94,52 @@ export class WWTResearchAppModule extends VuexModule {
     "The Pan-STARRS release 1 (PS1) Survey - DR1 (Chambers+, 2016) (ps1)": ["f_objID", "PAN-Starrs ID"],
   }
 
-  get researchAppHipsCatalogVisibility() {
-    return (catalog: ImagesetInfo) => {
-      const index = getIndex(this.hipsCatalogs, catalog);
-      return (index >= 0) ? this.hipsCatalogVisibilities[index] : false;
-    }
+  get hipsCatalogs() {
+    return () => getFilteredLayers(this._tableLayers, status => status.type == 'hips');
   }
 
   get visibleHipsCatalogs() {
-    return () => this.hipsCatalogs.filter((_catalog, index) => this.hipsCatalogVisibilities[index]);
+    return () => getFilteredLayers(this._tableLayers, status => status.type == 'hips' && status.visible);
   }
 
-  @Mutation
-  addResearchAppCatalogHips(catalog: ImagesetInfo) {
-    const added = addToArrayWithoutDuplication(this.hipsCatalogs, catalog);
-    if (added) {
-      this.hipsCatalogVisibilities.push(true);
+  get tableLayers() {
+    return () => getFilteredLayers(this._tableLayers, _status => true);
+  }
+
+  get visibleTableLayers() {
+    return () => getFilteredLayers(this._tableLayers, status => status.visible);
+  }
+
+  get researchAppTableLayerVisibility() {
+    return (info: LayerInfo) => {
+      const status = this._tableLayers[infoKey(info)];
+      if (status == undefined) {
+        return false;
+      }
+      return status.visible;
     }
   }
 
   @Mutation
-  removeResearchAppCatalogHips(catalog: ImagesetInfo) {
-    const index = removeFromArray(this.hipsCatalogs, catalog);
-    if (index >= 0) {
-      this.hipsCatalogVisibilities.splice(index, 1);
-    }
+  addResearchAppTableLayer(info: LayerInfo) {
+    const status: TableLayerStatus = {
+      type: isImageSetInfo(info) ? 'hips' : 'table',
+      visible: true,
+      layer: info,
+    };
+    Vue.set(this._tableLayers, infoKey(info), status);
   }
 
   @Mutation
-  setResearchAppCatalogHipsVisibility(args: { catalog: ImagesetInfo; visible: boolean }) {
-    const index = getIndex(this.hipsCatalogs, args.catalog);
-    if (index >= 0) {
-      Vue.set(this.hipsCatalogVisibilities, index, args.visible);
+  removeResearchAppTableLayer(layer: LayerInfo) {
+    Vue.delete(this._tableLayers, infoKey(layer));
+  }
+
+  @Mutation
+  setResearchAppTableLayerVisibility(args: { layer: LayerInfo; visible: boolean }) {
+    const status = this._tableLayers[infoKey(args.layer)];
+    if (status !== undefined) {
+      Vue.set(status, 'visible', args.visible);
     }
   }
 
