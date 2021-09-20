@@ -146,7 +146,7 @@ const tests = {
         ];
         displayPanel.expect.elements("@catalogItem").count.to.equal(1);
         utils.expectAllPresent(displayPanel, firstCatalogButtons);
-        displayPanel.expect.element(firstCatalogTitle).text.to.equal(tools.props.firstCatalogName);
+        displayPanel.expect.element(firstCatalogTitle).text.to.match(tools.props.firstCatalogRegex);
 
         // To start, the visibility and delete button should not be visible
         utils.expectAllNotVisible(displayPanel, firstCatalogButtons);

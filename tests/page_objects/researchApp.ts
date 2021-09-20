@@ -163,7 +163,8 @@ module.exports = {
         firstBackgroundName: "Digitized Sky Survey (Color)",
         firstBackgroundDescription: "Copyright DSS Consortium",
         firstCatalogName: "The DENIS database (DENIS Consortium, 2005) (denis)",
+        firstCatalogRegex: /^The DENIS database \(DENIS Consortium, 2005\) \(denis\)(\s+)?/
       },
-    }
+    },
   }
 }
