@@ -1,42 +1,45 @@
 <template>
-  <div id="root-container">
+  <div
+    id="root-container"
+    @mouseenter="hasFocus = true"
+    @mouseleave="hasFocus = false"
+    @focus="hasFocus = true"
+    @blur="hasFocus = false"
+  >
     <div
       id="main-container"
-      @mouseenter="hasFocus = true"
-      @mouseleave="hasFocus = false"
-      @focus="hasFocus = true"
-      @blur="hasFocus = false"
     >
       <label
         v-show="!editing"
         focusable="false"
-        class="name-label ellipsize"
+        id="name-label"
+        class="ellipsize"
         @click="isSelected = !isSelected"
         @keyup.enter="isSelected = !isSelected"
-        >{{ source.name }}</label
-      >
-      <input v-show="editing" class="name-input" @blur="editing = false" />
-      <span id="buttons-container">
-        <a href="#" v-hide="!hasFocus" @click="handleDelete" class="icon-link"
-          ><font-awesome-icon class="icon" icon="times"
-        /></a>
-        <a
-          href="#"
-          v-hide="!hasFocus"
-          @click="handleMarkerClick"
-          class="icon-link"
-          ><font-awesome-icon class="icon" icon="map-marker-alt"
-        /></a>
-        <a
-          href="#"
-          v-hide="!hasFocus"
-          @click="handleEditClick"
-          class="icon-link"
-          ><font-awesome-icon
-            :class="['icon', { 'icon-active': editing }]"
-            icon="pencil-alt"
-        /></a>
-      </span>
+        >{{ source.name }}
+      </label>
+      <input
+        v-show="editing"
+        class="name-input"
+        @blur="editing = false" />
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        :class="['icon-button', { 'icon-active': editing }]"
+        icon="pencil-alt"
+        @click="handleEditClick"
+      />
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        icon="map-marker-alt"
+        @click='handleMarkerClick'
+      />
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        icon="times"
+        @click="handleDelete"
+      />
     </div>
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
@@ -225,12 +228,15 @@ export default class SourceItem extends Vue {
 #main-container {
   width: calc(100% - 10px);
   padding: 5px;
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
 }
 
-.name-label {
+#name-label {
   display: inline-block;
-  width: 62%;
-  vertical-align: middle;
+  flex: 1;
+  padding-right: 10px;
 
   &:hover {
     cursor: pointer;
@@ -240,10 +246,7 @@ export default class SourceItem extends Vue {
 .name-input {
   display: inline-block;
   background: #999999;
-}
-
-#buttons-container {
-  width: 38%;
+  flex: 1;
 }
 
 a {
@@ -260,18 +263,14 @@ a:visited {
   padding-left: 15px;
 }
 
-.icon {
-  color: white;
-  margin: auto 1%;
-  float: right;
+.icon-button {
+  cursor: pointer;
+  margin: 2px;
+  width: 1em;
 }
 
 .icon-active {
   color: darkred;
-}
-
-.icon-link {
-  height: 100%;
 }
 
 .prompt {

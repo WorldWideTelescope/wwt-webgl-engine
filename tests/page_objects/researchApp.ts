@@ -73,14 +73,11 @@ module.exports = {
         catalogTitle: {
           selector: "#catalogs-container #name-label"
         },
-        catalogButtonContainer: {
-          selector: "#catalogs-container #buttons-container"
-        },
         catalogVisibilityButton: {
-          selector: "#catalogs-container #buttons-container .fa-eye, #catalogs-container #buttons-container .fa-eye-slash"
+          selector: "#catalogs-container .fa-eye"
         },
         catalogDeleteButton: {
-          selector: "#catalogs-container #buttons-container .fa-times"
+          selector: "#catalogs-container .fa-times"
         },
       },
       props: {
@@ -166,7 +163,8 @@ module.exports = {
         firstBackgroundName: "Digitized Sky Survey (Color)",
         firstBackgroundDescription: "Copyright DSS Consortium",
         firstCatalogName: "The DENIS database (DENIS Consortium, 2005) (denis)",
+        firstCatalogRegex: /^The DENIS database \(DENIS Consortium, 2005\) \(denis\)(\s+)?/
       },
-    }
+    },
   }
 }
