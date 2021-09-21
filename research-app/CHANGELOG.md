@@ -1,3 +1,21 @@
+# @wwtelescope/research-app 0.7.0 (2021-09-21)
+
+So many new features!
+
+- Add the ability to select sources by clicking, and give user links to query
+  the coordinates on SIMBAD and NED (@Carifio24, #123, #133). Sources have (very
+  basic) automatic name generation.
+- Add an "Add Imagery As Layer" tool (@pkgw, #138)
+- Add a "Load WTML Collection" tool (@pkgw, #138)
+- Add a UI for "imagery" (layers) of FITS data (@pkgw, #138). This includes
+  interactive stretch controls.
+- Rename "layers" to more specific "catalogs" (@pkgw, #138)
+- Add some new UI controls for HiPS catalogs:
+  - A scale factor control
+  - PlotType control
+- Lots of UI/UX polish all around
+
+
 # @wwtelescope/research-app 0.6.0 (2021-07-23)
 
 - Add support for HiPS catalog control messages (#126, @pkgw). These enable

@@ -1,3 +1,10 @@
+# @wwtelescope/embed 1.5.2 (2021-09-21)
+
+- An internal improvement to our folder loading code broke the way that the
+  embed processed WTML files, making it so that it wouldn't probably home in on
+  specified places. Update the WTML processing to fix this (@Carifio24, #143).
+
+
 # @wwtelescope/embed 1.5.1 (2021-08-04)
 
 - If a tour is being played back and the user pauses it, populate the background
