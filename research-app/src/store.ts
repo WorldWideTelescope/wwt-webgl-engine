@@ -55,12 +55,12 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
   return index;
 }
 
-function sourcesEqual(s1: Source, s2: Source) {
-  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (infoKey(s1.layer) === infoKey(s2.layer));
-}
-
 function infoKey(info: LayerInfo) {
   return isImageSetInfo(info) ? info.name : info.id;
+}
+
+function sourcesEqual(s1: Source, s2: Source) {
+  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (infoKey(s1.layer) === infoKey(s2.layer));
 }
 
 function getFilteredLayers(statusMap: { [id: string]: TableLayerStatus | undefined },
