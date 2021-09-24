@@ -10,276 +10,278 @@
 
     <!-- keydown.stops here and below prevent any keynav presses from reaching
       the toplevel UI handlers -->
-    <div id="display-panel" v-if="!hideAllChrome" @keydown.stop>
-      <transition name="catalog-transition">
-        <div id="overlays">
-          <p>{{ coordText }}</p>
-        </div>
-      </transition>
-      <div id="imagery-container" v-if="haveImagery">
-        <div class="display-section-header">
-          <label>Imagery</label>
-        </div>
-        <imageset-item
-          v-for="imageset of activeImagesetLayerStates"
-          v-bind:key="imageset.settings.name"
-          v-bind:imageset="imageset"
-        />
-      </div>
-      <div id="catalogs-container" v-if="haveCatalogs">
-        <div class="display-section-header">
-          <label>Catalogs</label>
-        </div>
-        <catalog-item
-          v-for="catalog of hipsCatalogs"
-          v-bind:key="catalog.name"
-          v-bind:catalog="catalog"
-          v-bind:defaultColor="defaultColor"
-        />
-      </div>
-      <div id="sources-container" v-if="haveSources">
-        <div class="display-section-header">
-          <label>Sources</label>
-        </div>
-        <source-item
-          v-for="source of sources"
-          v-bind:key="source.name"
-          v-bind:source="source"
-        />
-      </div>
-    </div>
-
-    <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
-      <li v-show="showToolMenu">
-        <v-popover placement="left" trigger="manual" :open="showPopover">
-          <font-awesome-icon
-            class="tooltip-target tooltip-icon"
-            icon="sliders-h"
-            size="lg"
-            tabindex="0"
-            @keyup.enter="showPopover = !showPopover"
-            @click="showPopover = !showPopover"
-          ></font-awesome-icon>
-          <template slot="popover" tabindex="-1" show="showPopover">
-            <ul class="tooltip-content tool-menu" tabindex="-1">
-              <li v-show="showBackgroundChooser">
-                <a
-                  href="#"
-                  v-close-popover
-                  @click="
-                    selectTool('choose-background');
-                    showPopover = false;
-                  "
-                  tabindex="0"
-                  ><font-awesome-icon icon="mountain" /> Choose background</a
-                >
-              </li>
-              <li v-show="showAddImageryTool">
-                <a
-                  href="#"
-                  v-close-popover
-                  @click="
-                    selectTool('add-imagery-layer');
-                    showPopover = false;
-                  "
-                  tabindex="0"
-                  ><font-awesome-icon icon="image" /> Add imagery as layer</a
-                >
-              </li>
-              <li v-show="showCatalogTool">
-                <a
-                  href="#"
-                  v-close-popover
-                  @click="
-                    selectTool('choose-catalog');
-                    showPopover = false;
-                  "
-                  tabindex="0"
-                  ><font-awesome-icon icon="map-marked-alt" /> Add HiPS
-                  catalogs</a
-                >
-              </li>
-              <li v-show="showCollectionLoader">
-                <a
-                  href="#"
-                  v-close-popover
-                  @click="
-                    selectTool('load-collection');
-                    showPopover = false;
-                  "
-                  tabindex="0"
-                  ><font-awesome-icon icon="photo-video" /> Load WTML
-                  collection</a
-                >
-              </li>
-            </ul>
-          </template>
-        </v-popover>
-      </li>
-      <li v-show="!wwtIsTourPlaying">
-        <font-awesome-icon
-          icon="search-plus"
-          size="lg"
-          class="tooltip-icon"
-          @keyup.enter="doZoom(true)"
-          @click="doZoom(true)"
-          tabindex="0"
-        ></font-awesome-icon>
-      </li>
-      <li v-show="!wwtIsTourPlaying">
-        <font-awesome-icon
-          icon="search-minus"
-          size="lg"
-          class="tooltip-icon"
-          @keyup.enter="doZoom(false)"
-          @click="doZoom(false)"
-          tabindex="0"
-        ></font-awesome-icon>
-      </li>
-      <li v-show="fullscreenAvailable">
-        <font-awesome-icon
-          v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
-          size="lg"
-          class="nudgeright1 tooltip-icon"
-          @keyup.enter="toggleFullscreen()"
-          @click="toggleFullscreen()"
-          tabindex="0"
-        ></font-awesome-icon>
-      </li>
-    </ul>
-
-    <div id="tools" v-if="!hideAllChrome" @keydown.stop>
-      <div class="tool-container">
-        <template v-if="currentTool == 'crossfade'">
-          <span>Foreground opacity:</span>
-          <input
-            class="opacity-range"
-            type="range"
-            v-model="foregroundOpacity"
+    <div id="ui-elements">
+      <div id="display-panel" v-if="!hideAllChrome" @keydown.stop>
+        <transition name="catalog-transition">
+          <div id="overlays">
+            <p>{{ coordText }}</p>
+          </div>
+        </transition>
+        <div id="imagery-container" v-if="haveImagery">
+          <div class="display-section-header">
+            <label>Imagery</label>
+          </div>
+          <imageset-item
+            v-for="imageset of activeImagesetLayerStates"
+            v-bind:key="imageset.settings.name"
+            v-bind:imageset="imageset"
           />
-        </template>
-
-        <template v-else-if="currentTool == 'choose-background'">
-          <div id="bg-select-container" class="item-select-container">
-            <span id="bg-select-title" class="item-select-title"
-              >Background imagery:</span
-            >
-            <v-select
-              v-model="curBackgroundImagesetName"
-              id="bg-select"
-              class="item-selector"
-              :searchable="true"
-              :clearable="false"
-              :options="curAvailableImagesets"
-              :filter="filterImagesets"
-              :close-on-select="true"
-              :reduce="(bg) => bg.name"
-              label="name"
-              placeholder="Background"
-            >
-              <template #option="option">
-                <div class="item-option">
-                  <h4 class="ellipsize">{{ option.name }}</h4>
-                  <p class="ellipsize"><em>{{ option.description }}</em></p>
-                </div>
-              </template>
-              <template #selected-option="option">
-                <div class="ellipsize">{{ option.name }}</div>
-              </template>
-            </v-select>
+        </div>
+        <div id="catalogs-container" v-if="haveCatalogs">
+          <div class="display-section-header">
+            <label>Catalogs</label>
           </div>
-        </template>
-
-        <template v-else-if="currentTool == 'add-imagery-layer'">
-          <div class="item-select-container">
-            <span class="item-select-title">Add imagery layer:</span>
-            <v-select
-              v-model="imageryToAdd"
-              class="item-selector"
-              :searchable="true"
-              :clearable="false"
-              :options="curAvailableImageryData"
-              :filter="filterImagesets"
-              label="name"
-              placeholder="Dataset"
-            >
-              <template #option="option">
-                <div class="item-option">
-                  <h4 class="ellipsize">{{ option.name }}</h4>
-                  <p class="ellipsize"><em>{{ option.description }}</em></p>
-                </div>
-              </template>
-              <template #selected-option="option">
-                <div class="ellipsize">{{ option.name }}</div>
-              </template>
-              <template #no-options="{ search, searching }">
-                <template v-if="searching">
-                  No datasets matching <em>{{ search }}</em
-                  >.
-                </template>
-                <em v-else>No datasets available. Load a WTML collection?</em>
-              </template>
-            </v-select>
+          <catalog-item
+            v-for="catalog of hipsCatalogs"
+            v-bind:key="catalog.name"
+            v-bind:catalog="catalog"
+            v-bind:defaultColor="defaultColor"
+          />
+        </div>
+        <div id="sources-container" v-if="haveSources">
+          <div class="display-section-header">
+            <label>Sources</label>
           </div>
-        </template>
+          <source-item
+            v-for="source of sources"
+            v-bind:key="source.name"
+            v-bind:source="source"
+          />
+        </div>
+      </div>
 
-        <template v-else-if="showCatalogChooser">
-          <div id="catalog-select-container-tool" class="item-select-container">
-            <span class="item-select-title">Add catalog:</span>
-            <v-select
-              v-model="catalogToAdd"
-              id="catalog-select-tool"
-              class="item-selector"
-              :searchable="true"
-              :clearable="false"
-              :options="curAvailableCatalogs"
-              :filter="filterCatalogs"
-              @change="(cat) => addHipsByName(cat.name)"
-              label="name"
-              placeholder="Catalog"
-            >
-              <template #option="option">
-                <div class="item-option">
-                  <h4 class="ellipsize">{{ option.name }}</h4>
-                  <p class="ellipsize"><em>{{ option.description }}</em></p>
-                </div>
-              </template>
-              <template #selected-option-container="">
-                <div></div>
-              </template>
-            </v-select>
-          </div>
-        </template>
+      <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
+        <li v-show="showToolMenu">
+          <v-popover placement="left" trigger="manual" :open="showPopover">
+            <font-awesome-icon
+              class="tooltip-target tooltip-icon"
+              icon="sliders-h"
+              size="lg"
+              tabindex="0"
+              @keyup.enter="showPopover = !showPopover"
+              @click="showPopover = !showPopover"
+            ></font-awesome-icon>
+            <template slot="popover" tabindex="-1" show="showPopover">
+              <ul class="tooltip-content tool-menu" tabindex="-1">
+                <li v-show="showBackgroundChooser">
+                  <a
+                    href="#"
+                    v-close-popover
+                    @click="
+                      selectTool('choose-background');
+                      showPopover = false;
+                    "
+                    tabindex="0"
+                    ><font-awesome-icon icon="mountain" /> Choose background</a
+                  >
+                </li>
+                <li v-show="showAddImageryTool">
+                  <a
+                    href="#"
+                    v-close-popover
+                    @click="
+                      selectTool('add-imagery-layer');
+                      showPopover = false;
+                    "
+                    tabindex="0"
+                    ><font-awesome-icon icon="image" /> Add imagery as layer</a
+                  >
+                </li>
+                <li v-show="showCatalogTool">
+                  <a
+                    href="#"
+                    v-close-popover
+                    @click="
+                      selectTool('choose-catalog');
+                      showPopover = false;
+                    "
+                    tabindex="0"
+                    ><font-awesome-icon icon="map-marked-alt" /> Add HiPS
+                    catalogs</a
+                  >
+                </li>
+                <li v-show="showCollectionLoader">
+                  <a
+                    href="#"
+                    v-close-popover
+                    @click="
+                      selectTool('load-collection');
+                      showPopover = false;
+                    "
+                    tabindex="0"
+                    ><font-awesome-icon icon="photo-video" /> Load WTML
+                    collection</a
+                  >
+                </li>
+              </ul>
+            </template>
+          </v-popover>
+        </li>
+        <li v-show="!wwtIsTourPlaying">
+          <font-awesome-icon
+            icon="search-plus"
+            size="lg"
+            class="tooltip-icon"
+            @keyup.enter="doZoom(true)"
+            @click="doZoom(true)"
+            tabindex="0"
+          ></font-awesome-icon>
+        </li>
+        <li v-show="!wwtIsTourPlaying">
+          <font-awesome-icon
+            icon="search-minus"
+            size="lg"
+            class="tooltip-icon"
+            @keyup.enter="doZoom(false)"
+            @click="doZoom(false)"
+            tabindex="0"
+          ></font-awesome-icon>
+        </li>
+        <li v-show="fullscreenAvailable">
+          <font-awesome-icon
+            v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
+            size="lg"
+            class="nudgeright1 tooltip-icon"
+            @keyup.enter="toggleFullscreen()"
+            @click="toggleFullscreen()"
+            tabindex="0"
+          ></font-awesome-icon>
+        </li>
+      </ul>
 
-        <template v-else-if="currentTool == 'load-collection'">
-          <div class="load-collection-container">
-            <div class="load-collection-label">
-              Load
-              <a
-                href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/"
-                target="_blank"
-                >WTML</a
+      <div id="tools" v-if="!hideAllChrome" @keydown.stop>
+        <div class="tool-container">
+          <template v-if="currentTool == 'crossfade'">
+            <span>Foreground opacity:</span>
+            <input
+              class="opacity-range"
+              type="range"
+              v-model="foregroundOpacity"
+            />
+          </template>
+
+          <template v-else-if="currentTool == 'choose-background'">
+            <div id="bg-select-container" class="item-select-container">
+              <span id="bg-select-title" class="item-select-title"
+                >Background imagery:</span
               >
-              data collection:
+              <v-select
+                v-model="curBackgroundImagesetName"
+                id="bg-select"
+                class="item-selector"
+                :searchable="true"
+                :clearable="false"
+                :options="curAvailableImagesets"
+                :filter="filterImagesets"
+                :close-on-select="true"
+                :reduce="(bg) => bg.name"
+                label="name"
+                placeholder="Background"
+              >
+                <template #option="option">
+                  <div class="item-option">
+                    <h4 class="ellipsize">{{ option.name }}</h4>
+                    <p class="ellipsize"><em>{{ option.description }}</em></p>
+                  </div>
+                </template>
+                <template #selected-option="option">
+                  <div class="ellipsize">{{ option.name }}</div>
+                </template>
+              </v-select>
             </div>
-            <div class="load-collection-row">
-              <label>URL:</label>
-              <input
-                type="url"
-                v-model="wtmlCollectionUrl"
-                @keyup.enter="submitWtmlCollectionUrl"
-              />
-              <font-awesome-icon
-                icon="arrow-circle-right"
-                size="lg"
-                class="load-collection-icon"
-                @keyup.enter="submitWtmlCollectionUrl"
-                @click="submitWtmlCollectionUrl"
-                tabindex="0"
-              ></font-awesome-icon>
+          </template>
+
+          <template v-else-if="currentTool == 'add-imagery-layer'">
+            <div class="item-select-container">
+              <span class="item-select-title">Add imagery layer:</span>
+              <v-select
+                v-model="imageryToAdd"
+                class="item-selector"
+                :searchable="true"
+                :clearable="false"
+                :options="curAvailableImageryData"
+                :filter="filterImagesets"
+                label="name"
+                placeholder="Dataset"
+              >
+                <template #option="option">
+                  <div class="item-option">
+                    <h4 class="ellipsize">{{ option.name }}</h4>
+                    <p class="ellipsize"><em>{{ option.description }}</em></p>
+                  </div>
+                </template>
+                <template #selected-option="option">
+                  <div class="ellipsize">{{ option.name }}</div>
+                </template>
+                <template #no-options="{ search, searching }">
+                  <template v-if="searching">
+                    No datasets matching <em>{{ search }}</em
+                    >.
+                  </template>
+                  <em v-else>No datasets available. Load a WTML collection?</em>
+                </template>
+              </v-select>
             </div>
-          </div>
-        </template>
+          </template>
+
+          <template v-else-if="showCatalogChooser">
+            <div id="catalog-select-container-tool" class="item-select-container">
+              <span class="item-select-title">Add catalog:</span>
+              <v-select
+                v-model="catalogToAdd"
+                id="catalog-select-tool"
+                class="item-selector"
+                :searchable="true"
+                :clearable="false"
+                :options="curAvailableCatalogs"
+                :filter="filterCatalogs"
+                @change="(cat) => addHipsByName(cat.name)"
+                label="name"
+                placeholder="Catalog"
+              >
+                <template #option="option">
+                  <div class="item-option">
+                    <h4 class="ellipsize">{{ option.name }}</h4>
+                    <p class="ellipsize"><em>{{ option.description }}</em></p>
+                  </div>
+                </template>
+                <template #selected-option-container="">
+                  <div></div>
+                </template>
+              </v-select>
+            </div>
+          </template>
+
+          <template v-else-if="currentTool == 'load-collection'">
+            <div class="load-collection-container">
+              <div class="load-collection-label">
+                Load
+                <a
+                  href="https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/"
+                  target="_blank"
+                  >WTML</a
+                >
+                data collection:
+              </div>
+              <div class="load-collection-row">
+                <label>URL:</label>
+                <input
+                  type="url"
+                  v-model="wtmlCollectionUrl"
+                  @keyup.enter="submitWtmlCollectionUrl"
+                />
+                <font-awesome-icon
+                  icon="arrow-circle-right"
+                  size="lg"
+                  class="load-collection-icon"
+                  @keyup.enter="submitWtmlCollectionUrl"
+                  @click="submitWtmlCollectionUrl"
+                  tabindex="0"
+                ></font-awesome-icon>
+              </div>
+            </div>
+          </template>
+        </div>
       </div>
     </div>
 
@@ -2302,11 +2304,19 @@ body {
   margin: 5px;
 }
 
-#controls {
+#ui-elements {
   position: absolute;
-  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   top: 0.5rem;
-  right: 0.5rem;
+  left: 0.5rem;
+  width: calc(100% - 1rem);
+}
+
+#controls {
+  order: 3;
+  z-index: 10;
   color: #fff;
 
   list-style-type: none;
@@ -2338,14 +2348,13 @@ body {
 }
 
 #tools {
-  position: absolute;
-  top: 0.5rem;
-  left: 50%;
+  order: 2;
   color: #fff;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 
   .tool-container {
-    position: relative;
-    left: -50%;
     z-index: 10;
   }
 
@@ -2364,9 +2373,8 @@ body {
 }
 
 #display-panel {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  order: 1;
+  min-width: 175px;
   max-width: 25vw;
   border-radius: 5px;
   color: white;
@@ -2602,6 +2610,7 @@ ul.tool-menu {
 
 .item-selector {
   width: 25vw;
+  min-width: 200px;
   vertical-align: middle;
   padding: 5px;
   white-space: nowrap;
@@ -2611,6 +2620,8 @@ ul.tool-menu {
 
 .item-select-container {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .item-select-title {
@@ -2660,6 +2671,26 @@ ul.tool-menu {
 
 .pointer {
   cursor: pointer;
+}
+
+@media all and (max-width: 400px) {
+  #ui-elements {
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  #controls {
+    order: 2;
+  }
+
+  #tools {
+    order: 3;
+    flex-grow: 1;
+  }
+
+  .item-select-container {
+    flex-direction: column;
+  }
 }
 
 /**
