@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.7.1 (2021-09-24)
+
+- Bump minimum required engine version to get the WebGL1 position fix (#147, @imbasimba)
+- Tidy up the control panel some more (#144, @Carifio24)
+
+
 # @wwtelescope/research-app 0.7.0 (2021-09-21)
 
 So many new features!
