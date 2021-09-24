@@ -42,7 +42,7 @@ namespace wwtlib
                 {
                     Height = bmp.Height;
                     Width = bmp.Width;
-                    if (wcsImage.SizeX != wcsImage.SizeY)
+                    if (bmp.Height != wcsImage.SizeY)
                     {
                         PixelCenterY += bmp.Height - wcsImage.SizeY;
                     }
