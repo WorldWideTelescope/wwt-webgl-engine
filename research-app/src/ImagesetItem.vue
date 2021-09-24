@@ -1,11 +1,13 @@
 <template>
-  <div id="root-container">
+  <div
+    id="root-container"
+    @mouseenter="hasFocus = true"
+    @mouseleave="hasFocus = false"
+    @focus="hasFocus = true"
+    @blur="hasFocus = false"
+  >
     <div
       id="main-container"
-      @mouseenter="hasFocus = true"
-      @mouseleave="hasFocus = false"
-      @focus="hasFocus = true"
-      @blur="hasFocus = false"
     >
       <label
         focusable="false"
@@ -13,8 +15,8 @@
         class="ellipsize"
         @click="isSelected = !isSelected"
         @keyup.enter="isSelected = !isSelected"
-        >{{ imageset.settings.name }}</label
-      >
+        >{{ imageset.settings.name }}
+      </label>
       <font-awesome-icon
         v-hide="!hasFocus"
         class="icon-button"
@@ -474,6 +476,7 @@ export default class ImagesetItem extends Vue {
 #name-label {
   display: inline-block;
   flex: 1;
+  padding-right: 10px;
 
   &:hover {
     cursor: pointer;
@@ -505,12 +508,6 @@ export default class ImagesetItem extends Vue {
   display: flex;
   align-items: center;
   gap: 2px;
-}
-
-.ellipsize {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .scrubber {

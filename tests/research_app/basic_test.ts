@@ -140,11 +140,13 @@ const tests = {
         // Check that the catalog displays in the panel
         // with the correct name
         const firstCatalogTitle = utils.nthOfTypeSelector("@catalogTitle", 1);
-        const firstCatalogButtons: string[] = ["@catalogVisibilityButton", "@catalogDeleteButton"]
-            .map(selector => utils.nthOfTypeSelector(selector, 1));
+        const firstCatalogButtons: string[] = [
+            utils.nthOfTypeSelector("@catalogVisibilityButton", 1),
+            utils.nthOfTypeSelector("@catalogDeleteButton", 2),
+        ];
         displayPanel.expect.elements("@catalogItem").count.to.equal(1);
         utils.expectAllPresent(displayPanel, firstCatalogButtons);
-        displayPanel.expect.element(firstCatalogTitle).text.to.equal(tools.props.firstCatalogName);
+        displayPanel.expect.element(firstCatalogTitle).text.to.match(tools.props.firstCatalogRegex);
 
         // To start, the visibility and delete button should not be visible
         utils.expectAllNotVisible(displayPanel, firstCatalogButtons);
