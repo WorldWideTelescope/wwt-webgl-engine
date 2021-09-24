@@ -2312,6 +2312,7 @@ body {
   top: 0.5rem;
   left: 0.5rem;
   width: calc(100% - 1rem);
+  gap: 5px;
 }
 
 #controls {
@@ -2350,9 +2351,6 @@ body {
 #tools {
   order: 2;
   color: #fff;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
 
   .tool-container {
     z-index: 10;
@@ -2374,7 +2372,7 @@ body {
 
 #display-panel {
   order: 1;
-  min-width: 175px;
+  min-width: 200px;
   max-width: 25vw;
   border-radius: 5px;
   color: white;
@@ -2610,7 +2608,7 @@ ul.tool-menu {
 
 .item-selector {
   width: 25vw;
-  min-width: 200px;
+  min-width: 175px;
   vertical-align: middle;
   padding: 5px;
   white-space: nowrap;
@@ -2622,6 +2620,7 @@ ul.tool-menu {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  flex-direction: row;
 }
 
 .item-select-title {
@@ -2673,10 +2672,10 @@ ul.tool-menu {
   cursor: pointer;
 }
 
-@media all and (max-width: 400px) {
+@media all and (max-width: 425px) {
   #ui-elements {
     flex-wrap: wrap;
-    align-items: center;
+    gap: 15px 1px;
   }
 
   #controls {
@@ -2689,7 +2688,18 @@ ul.tool-menu {
   }
 
   .item-select-container {
-    flex-direction: column;
+    align-items: center;
+  }
+
+  .item-selector {
+    width: 75vw;
+    min-width: 75vw;
+  }
+}
+
+@media all and (max-width: 250px) {
+  #display-panel {
+    min-width: calc(100% - 30px);
   }
 }
 
