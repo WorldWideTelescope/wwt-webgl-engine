@@ -9,7 +9,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/astro": "^0.2.0",
-    "@wwtelescope/engine": "^7.14.0",
+    "@wwtelescope/engine": "^7.14.1",
     "@wwtelescope/engine-helpers": "^0.8.0",
     "@wwtelescope/engine-types": "^0.6.0",
     "@wwtelescope/engine-vuex": "^0.11.0",
@@ -31,7 +31,7 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "7cb232125428a91bd8fd10be24fec904e3589cce",
-    "@wwtelescope/engine": "1dded843ee47f132873d8b264bdba50badfea25f",
+    "@wwtelescope/engine": "thiscommit:2021-09-24:AozaW18",
     "@wwtelescope/engine-helpers": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2",
     "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2",
     "@wwtelescope/engine-vuex": "98d79e2c009c0fbabe676730787e8582dd1b8adb",

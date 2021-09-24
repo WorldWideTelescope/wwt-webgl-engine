@@ -1,3 +1,8 @@
+# @wwtelescope/engine 7.14.1 (2021-09-24)
+
+- Fix positioning of FITS SkyImages when using WebGL 1 (#147, @imbasimba).
+
+
 # @wwtelescope/engine 7.14.0 (2021-09-20)
 
 - Add support for tiled FITS studies!!! (@imbasimba, @pkgw, #115, #129, #135)

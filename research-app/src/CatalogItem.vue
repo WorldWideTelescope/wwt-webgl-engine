@@ -1,11 +1,13 @@
 <template>
-  <div id="root-container">
+  <div
+    id="root-container"
+    @mouseenter="hasFocus = true"
+    @mouseleave="hasFocus = false"
+    @focus="hasFocus = true"
+    @blur="hasFocus = false"
+  >
     <div
       id="main-container"
-      @mouseenter="hasFocus = true"
-      @mouseleave="hasFocus = false"
-      @focus="hasFocus = true"
-      @blur="hasFocus = false"
     >
       <label
         focusable="false"
@@ -13,22 +15,20 @@
         class="ellipsize"
         @click="isSelected = !isSelected"
         @keyup.enter="isSelected = !isSelected"
-        >{{ catalog.name }}</label
-      >
-      <span id="buttons-container">
-        <a href="#" v-hide="!hasFocus" @click="handleToggle" class="icon-link"
-          ><font-awesome-icon
-            v-if="visible"
-            class="icon"
-            icon="eye" /><font-awesome-icon
-            v-if="!visible"
-            class="icon"
-            icon="eye-slash"
-        /></a>
-        <a href="#" v-hide="!hasFocus" @click="handleDelete" class="icon-link"
-          ><font-awesome-icon class="icon" icon="times"
-        /></a>
-      </span>
+        >{{ catalog.name }}
+      </label>
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        :icon="visible ? 'eye' : 'eye-slash'"
+        @click="handleToggle"
+      />
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        icon="times"
+        @click="handleDelete"
+      />
     </div>
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
@@ -78,7 +78,7 @@
           <span class="prompt">Size adjust:</span>
           <div class="flex-row">
             <font-awesome-icon
-              class="icon icon-button"
+              class="icon-button"
               size="lg"
               icon="minus-circle"
               @keyup.enter="doAdjustSize(false)"
@@ -91,7 +91,7 @@
               v-model.lazy="scaleFactorDbText"
             />
             <font-awesome-icon
-              class="icon icon-button"
+              class="icon-button"
               size="lg"
               icon="plus-circle"
               @keyup.enter="doAdjustSize(true)"
@@ -347,21 +347,17 @@ export default class CatalogItem extends Vue {
   padding: 5px;
   display: flex;
   justify-content: space-between;
+  gap: 2px;
 }
 
 #name-label {
   display: inline-block;
-  vertical-align: middle;
+  flex: 1;
+  padding-right: 10px;
 
   &:hover {
     cursor: pointer;
   }
-}
-
-#buttons-container {
-  align-self: flex-end;
-  display: flex;
-  justify-content: flex-end;
 }
 
 .circle-popover {
@@ -378,22 +374,10 @@ export default class CatalogItem extends Vue {
   padding-left: 15px;
 }
 
-.icon {
-  color: white;
-  margin: auto 1%;
-}
-
-.icon-link {
-  height: 100%;
-  background: inherit;
-  margin-left: 3px;
-  margin-right: 3px;
-}
-
 .icon-button {
   cursor: pointer;
-  display: inline-block;
-  background: inherit;
+  margin: 2px;
+  width: 1em;
 }
 
 .prompt {
@@ -409,12 +393,6 @@ export default class CatalogItem extends Vue {
   display: flex;
   align-items: center;
   width: 100%;
-}
-
-.ellipsize {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .flex-row {
