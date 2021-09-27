@@ -153,7 +153,7 @@
         </ul>
       </div>
 
-      <div class="element-box" id="tools-box">
+      <div class="element-box" id="tools-box" v-if="!hideAllChrome">
         <div id="tools" v-if="!hideAllChrome" @keydown.stop>
           <div class="tool-container">
             <template v-if="currentTool == 'crossfade'">
@@ -2724,7 +2724,7 @@ ul.tool-menu {
 
   #tools-box {
     order: 3;
-    flex-grow: 1;
+    flex-grow: 0;
   }
 
   .item-select-container {
@@ -2734,6 +2734,10 @@ ul.tool-menu {
   .item-selector {
     width: 75vw;
     min-width: 75vw;
+  }
+
+  .element-box:last-child {
+    margin-right: auto;
   }
 }
 
