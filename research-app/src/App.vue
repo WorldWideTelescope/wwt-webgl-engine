@@ -2463,13 +2463,14 @@ body {
 }
 
 .load-collection-container {
-  width: 35vw;
+  width: 100%;
 
   .load-collection-label {
     width: 100%;
     font-size: 120%;
     font-weight: bold;
     margin-bottom: 0.5rem;
+    text-align: center;
   }
 
   .load-collection-row {
@@ -2478,13 +2479,15 @@ body {
     gap: 0.3rem;
     width: 100%;
     margin-top: 0.2rem;
+    justify-content: center;
 
     label {
       margin-right: 0.5rem;
     }
 
     input {
-      flex: 1;
+      width: 80%;
+      min-width: 100px;
     }
   }
 
