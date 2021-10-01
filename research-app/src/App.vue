@@ -962,7 +962,7 @@ interface AngleCoordinates {
 interface RawSourceInfo {
   ra: number;
   dec: number;
-  layer: CatalogLayerInfo;
+  catalogLayer: CatalogLayerInfo;
   colNames: string[];
   values: string[];
 }
@@ -1476,9 +1476,9 @@ export default class App extends WWTAwareComponent {
     return {
       ra: sourceInfo.ra,
       dec: sourceInfo.dec,
-      layer: sourceInfo.layer,
+      catalogLayer: sourceInfo.catalogLayer,
       layerData: obj,
-      name: this.nameForSource(obj, sourceInfo.layer.name),
+      name: this.nameForSource(obj, sourceInfo.catalogLayer.name),
     };
   }
 
@@ -1893,18 +1893,19 @@ export default class App extends WWTAwareComponent {
 
   prepareForMessaging(source: Source): selections.Source {
     let layer: selections.CatalogLayerInfo;
-    if (source.layer instanceof ImagesetInfo) {
+    const sourceLayer = source.catalogLayer;
+    if (sourceLayer instanceof ImagesetInfo) {
       layer = {
-        ...source.layer,
-        type: selections.ImageSetTypes[source.layer.type]
+        ...sourceLayer,
+        type: selections.ImageSetTypes[sourceLayer.type]
       };
     } else {
-      layer = source.layer;
+      layer = sourceLayer;
     }
 
     return {
       ...source,
-      layer: layer,
+      catalogLayer: layer,
     };
   }
 
@@ -2250,7 +2251,7 @@ export default class App extends WWTAwareComponent {
             dec: dec,
             colNames: colNames,
             values: values,
-            layer: layerInfo,
+            catalogLayer: layerInfo,
           };
           minDist = dist;
         }

@@ -49,14 +49,21 @@ export type CatalogLayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
 /**
  * Information about a selected source in the engine.
  * The values for right ascension and declination are given in radians.
- * `catalogName` gives the name of the associated HiPS catalog,
- * while `name` gives a string name for the source.
+ * `name` gives a string name for the source.
+ * `catalogLayer` contains information about the layer, which varies
+ * based on the layer type.
+ * For a standard spreadsheet layer, see [[SpreadSheetLayerInfo]]
+ * For a HiPS catalog, see [[ImagesetInfo]].
+ * `layerData` contains all of the associated data for the source, 
+ * which will depends on the contents of the particular catalog.
+ * `zoomDeg`, if present, defines the FOV, in degrees, that WWT will
+ * use when moving to the source.
  */
 export interface Source {
   ra: number;
   dec: number;
   name: string;
-  layer: CatalogLayerInfo;
+  catalogLayer: CatalogLayerInfo;
   zoomDeg?: number;
   layerData: {
     [field: string]: string | undefined;

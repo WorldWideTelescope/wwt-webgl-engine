@@ -9,7 +9,7 @@ export interface Source {
   ra: number;
   dec: number;
   name: string;
-  layer: CatalogLayerInfo;
+  catalogLayer: CatalogLayerInfo;
   zoomDeg?: number;
   layerData: {
     [field: string]: string | undefined;
@@ -62,7 +62,7 @@ function infoKey(info: CatalogLayerInfo) {
 }
 
 function sourcesEqual(s1: Source, s2: Source) {
-  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (infoKey(s1.layer) === infoKey(s2.layer));
+  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (infoKey(s1.catalogLayer) === infoKey(s2.catalogLayer));
 }
 
 function getFilteredLayers(statusMap: { [id: string]: TableLayerStatus | undefined },
