@@ -341,7 +341,7 @@ import {
   isPolyLineAnnotationSetting,
 } from "@wwtelescope/engine-helpers";
 
-import { WWTAwareComponent, ImagesetInfo, SpreadSheetCatalogLayerInfo } from "@wwtelescope/engine-vuex";
+import { WWTAwareComponent, ImagesetInfo, SpreadSheetLayerInfo } from "@wwtelescope/engine-vuex";
 
 import {
   classicPywwt,
@@ -579,7 +579,7 @@ class TableLayerMessageHandler {
       })
       .then((layer) => {
         this.layerInitialized(layer);
-        this.owner.addResearchAppTableLayer(new SpreadSheetCatalogLayerInfo(layer.id.toString(), layer.get_referenceFrame(), layer.get_name()));
+        this.owner.addResearchAppTableLayer(new SpreadSheetLayerInfo(layer.id.toString(), layer.get_referenceFrame(), layer.get_name()));
         
       });
 
@@ -2001,7 +2001,7 @@ export default class App extends WWTAwareComponent {
             if (ps !== null) pysettings.push(ps);
           }
 
-          const ssli: layers.SpreadSheetCatalogLayerInfo = {
+          const ssli: layers.SpreadSheetLayerInfo = {
             header: layer.get_header(),
             settings: pysettings,
           };
@@ -2225,8 +2225,8 @@ export default class App extends WWTAwareComponent {
       }
 
       if (layer == null) {
-          continue;
-        }
+        continue;
+      }
       const hipsStr = layer.getTableDataInView();
       const rows = hipsStr.split(rowSeparator);
       const header = rows.shift();

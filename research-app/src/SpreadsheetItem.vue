@@ -127,7 +127,7 @@ import { ApplyTableLayerSettingsOptions } from "@wwtelescope/engine-helpers";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
-import { LayerInfo } from "./store";
+import { CatalogLayerInfo } from "./store";
 import { ImagesetInfo } from "@wwtelescope/engine-vuex";
 
 interface UiPlotTypes {
@@ -156,7 +156,7 @@ interface VueColorData {
 
 @Component
 export default class CatalogItem extends Vue {
-  @Prop({ required: true }) layer!: LayerInfo;
+  @Prop({ required: true }) layer!: CatalogLayerInfo;
   @Prop({ required: false, default: Color.fromArgb(1, 255, 255, 255) })
 
   defaultColor!: Color;
@@ -203,9 +203,9 @@ export default class CatalogItem extends Vue {
   applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
   deleteLayer!: (id: string | Guid) => void;
   removeCatalogHipsByName!: (name: string) => void;
-  removeResearchAppTableLayer!: (layer: LayerInfo) => void;
+  removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   setResearchAppTableLayerVisibility!: (args: {
-    layer: LayerInfo;
+    layer: CatalogLayerInfo;
     visible: boolean;
   }) => void;
 

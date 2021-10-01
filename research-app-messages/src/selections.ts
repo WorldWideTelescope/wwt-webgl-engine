@@ -44,7 +44,7 @@ export interface SpreadSheetLayerInfo {
   referenceFrame: string;
 }
 
-export type LayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
+export type CatalogLayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
 
 /**
  * Information about a selected source in the engine.
@@ -56,7 +56,7 @@ export interface Source {
   ra: number;
   dec: number;
   name: string;
-  layer: LayerInfo;
+  layer: CatalogLayerInfo;
   zoomDeg?: number;
   layerData: {
     [field: string]: string | undefined;
