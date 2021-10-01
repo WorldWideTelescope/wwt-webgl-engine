@@ -1,11 +1,5 @@
-export enum ImageSetType {
-  earth = 0,
-  planet = 1,
-  sky = 2,
-  panorama = 3,
-  solarSystem = 4,
-  sandbox = 5
-}
+export const ImageSetTypes = ["earth", "planet", "sky", "panorama", "solarSystem", "sandbox"] as const;
+export type ImageSetType = (typeof ImageSetTypes)[number];
 
 /** This class holds basic information about an imageset.
  *

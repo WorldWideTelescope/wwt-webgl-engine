@@ -1891,6 +1891,23 @@ export default class App extends WWTAwareComponent {
     this.addHips(catalog);
   }
 
+  prepareForMessaging(source: Source): selections.Source {
+    let layer: selections.LayerInfo;
+    if (source.layer instanceof ImagesetInfo) {
+      layer = {
+        ...source.layer,
+        type: selections.ImageSetTypes[source.layer.type]
+      };
+    } else {
+      layer = source.layer;
+    }
+
+    return {
+      ...source,
+      layer: layer,
+    };
+  }
+
   @Watch("curAvailableCatalogs")
   onAvailableCatalogsChanged(catalogs: ImagesetInfo[]) {
     // Notify clients about the new catalogs
@@ -1917,7 +1934,7 @@ export default class App extends WWTAwareComponent {
     const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
-      mostRecentSource: source,
+      mostRecentSource: this.prepareForMessaging(source),
     };
 
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
@@ -1935,7 +1952,7 @@ export default class App extends WWTAwareComponent {
     const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
-      selectedSources: sources,
+      selectedSources: sources.map(source => this.prepareForMessaging(source)),
     };
 
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
