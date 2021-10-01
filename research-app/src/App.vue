@@ -341,7 +341,7 @@ import {
   isPolyLineAnnotationSetting,
 } from "@wwtelescope/engine-helpers";
 
-import { WWTAwareComponent, ImagesetInfo, isImageSetInfo, SpreadSheetLayerInfo } from "@wwtelescope/engine-vuex";
+import { WWTAwareComponent, ImagesetInfo, SpreadSheetLayerInfo } from "@wwtelescope/engine-vuex";
 
 import {
   classicPywwt,
@@ -2201,7 +2201,7 @@ export default class App extends WWTAwareComponent {
     for (const layerInfo of this.visibleTableLayers()) {
 
       let layer: SpreadSheetLayer | null = null;
-      if (isImageSetInfo(layerInfo)) {
+      if (layerInfo instanceof ImagesetInfo) {
         layer = this.layerForHipsCatalog(layerInfo.name);
       } else {
         layer = this.spreadSheetLayerById(layerInfo.id);

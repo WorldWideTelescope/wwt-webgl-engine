@@ -117,14 +117,6 @@ export class ImagesetInfo {
   }
 }
 
-export function isImageSetInfo(o: any): o is ImagesetInfo { // eslint-disable-line @typescript-eslint/no-explicit-any
-  return typeof o.url === 'string'
-      && typeof o.name === 'string'
-      && typeof o.type === 'number'
-      && typeof o.description === 'string'
-      && typeof o.extension === 'string';
-}
-
 export class SpreadSheetLayerInfo {
   /* The user-facing name of the layer */
   name: string;

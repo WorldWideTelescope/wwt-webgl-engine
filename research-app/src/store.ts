@@ -2,7 +2,7 @@
 // Licensed under the MIT License
 
 import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
-import { ImagesetInfo, SpreadSheetLayerInfo, isImageSetInfo } from '@wwtelescope/engine-vuex';
+import { ImagesetInfo, SpreadSheetLayerInfo } from '@wwtelescope/engine-vuex';
 import Vue from 'vue';
 
 export interface Source {
@@ -56,7 +56,7 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
 }
 
 function infoKey(info: LayerInfo) {
-  return isImageSetInfo(info) ? info.name : info.id;
+  return info instanceof ImagesetInfo ? info.name : info.id;
 }
 
 function sourcesEqual(s1: Source, s2: Source) {
@@ -123,7 +123,7 @@ export class WWTResearchAppModule extends VuexModule {
   @Mutation
   addResearchAppTableLayer(info: LayerInfo) {
     const status: TableLayerStatus = {
-      type: isImageSetInfo(info) ? 'hips' : 'table',
+      type: info instanceof ImagesetInfo ? 'hips' : 'table',
       visible: true,
       layer: info,
     };

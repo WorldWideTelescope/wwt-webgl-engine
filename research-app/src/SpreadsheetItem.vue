@@ -117,7 +117,6 @@
 import { mapGetters, mapMutations, mapState } from "vuex";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
-import { isImageSetInfo } from "@wwtelescope/engine-vuex";
 import {
   Color,
   Guid,
@@ -129,6 +128,7 @@ import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 import { LayerInfo } from "./store";
+import { ImagesetInfo } from "@wwtelescope/engine-vuex";
 
 interface UiPlotTypes {
   wwt: PlotTypes;
@@ -217,12 +217,12 @@ export default class CatalogItem extends Vue {
   isLayerHips = false;
 
   layerId(): string {
-    return isImageSetInfo(this.layer) ? this.layer.name : this.layer.id;
+    return this.layer instanceof ImagesetInfo ? this.layer.name : this.layer.id;
   }
 
   layerState(): SpreadSheetLayerSettingsInterfaceRO | null {
     const id = this.layerId();
-    return isImageSetInfo(this.layer) ? this.spreadsheetStateForHipsCatalog(id) : this.spreadsheetState(id);
+    return this.layer instanceof ImagesetInfo ? this.spreadsheetStateForHipsCatalog(id) : this.spreadsheetState(id);
   }
 
   get color(): Color {
@@ -305,7 +305,7 @@ export default class CatalogItem extends Vue {
 
   mounted() {
     this.color = this.defaultColor;
-    this.isLayerHips = isImageSetInfo(this.layer);
+    this.isLayerHips = this.layer instanceof ImagesetInfo;
   }
 
   private applySettings(settings: SpreadSheetLayerSetting[]) {
@@ -320,7 +320,7 @@ export default class CatalogItem extends Vue {
 
   handleDelete() {
     this.removeResearchAppTableLayer(this.layer);
-    if (isImageSetInfo(this.layer)) {
+    if (this.layer instanceof ImagesetInfo) {
       this.removeCatalogHipsByName(this.layer.name);
     } else {
       this.deleteLayer(this.layer.id);
