@@ -9,19 +9,21 @@ export interface Source {
   ra: number;
   dec: number;
   name: string;
-  layer: LayerInfo;
+  layer: CatalogLayerInfo;
   zoomDeg?: number;
   layerData: {
     [field: string]: string | undefined;
   };
 }
 
-export type LayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
+// This union type includes ImagesetInfo as an option to include HiPS catalogs
+// which combine elements of both Imageset and Spreadsheet layers
+export type CatalogLayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
 
 export interface TableLayerStatus {
   visible: boolean;
   type: 'hips' | 'table';
-  layer: LayerInfo;
+  layer: CatalogLayerInfo;
 }
 
 type EquivalenceTest<T> = (t1: T, t2: T) => boolean;
@@ -55,7 +57,7 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
   return index;
 }
 
-function infoKey(info: LayerInfo) {
+function infoKey(info: CatalogLayerInfo) {
   return info instanceof ImagesetInfo ? info.name : info.id;
 }
 
@@ -64,9 +66,9 @@ function sourcesEqual(s1: Source, s2: Source) {
 }
 
 function getFilteredLayers(statusMap: { [id: string]: TableLayerStatus | undefined },
-                           filter: (status: TableLayerStatus) => boolean): LayerInfo[] {
+                           filter: (status: TableLayerStatus) => boolean): CatalogLayerInfo[] {
   const statuses = Object.values(statusMap);
-  const filtered: LayerInfo[] = [];
+  const filtered: CatalogLayerInfo[] = [];
   for (const status of statuses) {
     if (status !== undefined && filter(status)) {
       filtered.push(status.layer);
@@ -111,7 +113,7 @@ export class WWTResearchAppModule extends VuexModule {
   }
 
   get researchAppTableLayerVisibility() {
-    return (info: LayerInfo) => {
+    return (info: CatalogLayerInfo) => {
       const status = this._tableLayers[infoKey(info)];
       if (status == undefined) {
         return false;
@@ -121,7 +123,7 @@ export class WWTResearchAppModule extends VuexModule {
   }
 
   @Mutation
-  addResearchAppTableLayer(info: LayerInfo) {
+  addResearchAppTableLayer(info: CatalogLayerInfo) {
     const status: TableLayerStatus = {
       type: info instanceof ImagesetInfo ? 'hips' : 'table',
       visible: true,
@@ -131,12 +133,12 @@ export class WWTResearchAppModule extends VuexModule {
   }
 
   @Mutation
-  removeResearchAppTableLayer(layer: LayerInfo) {
+  removeResearchAppTableLayer(layer: CatalogLayerInfo) {
     Vue.delete(this._tableLayers, infoKey(layer));
   }
 
   @Mutation
-  setResearchAppTableLayerVisibility(args: { layer: LayerInfo; visible: boolean }) {
+  setResearchAppTableLayerVisibility(args: { layer: CatalogLayerInfo; visible: boolean }) {
     const status = this._tableLayers[infoKey(args.layer)];
     if (status !== undefined) {
       Vue.set(status, 'visible', args.visible);

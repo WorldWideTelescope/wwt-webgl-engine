@@ -312,7 +312,7 @@ import { mapGetters, mapMutations, mapState } from "vuex";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
-import { LayerInfo, Source, WWTResearchAppModule } from "./store";
+import { CatalogLayerInfo, Source, WWTResearchAppModule } from "./store";
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
@@ -341,7 +341,7 @@ import {
   isPolyLineAnnotationSetting,
 } from "@wwtelescope/engine-helpers";
 
-import { WWTAwareComponent, ImagesetInfo, SpreadSheetLayerInfo } from "@wwtelescope/engine-vuex";
+import { WWTAwareComponent, ImagesetInfo, SpreadSheetCatalogLayerInfo } from "@wwtelescope/engine-vuex";
 
 import {
   classicPywwt,
@@ -579,7 +579,7 @@ class TableLayerMessageHandler {
       })
       .then((layer) => {
         this.layerInitialized(layer);
-        this.owner.addResearchAppTableLayer(new SpreadSheetLayerInfo(layer.id.toString(), layer.get_referenceFrame(), layer.get_name()));
+        this.owner.addResearchAppTableLayer(new SpreadSheetCatalogLayerInfo(layer.id.toString(), layer.get_referenceFrame(), layer.get_name()));
         
       });
 
@@ -962,7 +962,7 @@ interface AngleCoordinates {
 interface RawSourceInfo {
   ra: number;
   dec: number;
-  layer: LayerInfo;
+  layer: CatalogLayerInfo;
   colNames: string[];
   values: string[];
 }
@@ -1010,13 +1010,13 @@ export default class App extends WWTAwareComponent {
 
   // From the store
   catalogNameMappings!: { [catalogName: string]: [string, string] };
-  layers!: LayerInfo[];
+  layers!: CatalogLayerInfo[];
   sources!: Source[];
 
-  addResearchAppTableLayer!: (layer: LayerInfo) => void;
+  addResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   addSource!: (source: Source) => void;
-  removeResearchAppTableLayer!: (layer: LayerInfo) => void;
-  visibleTableLayers!: () => LayerInfo[];
+  removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
+  visibleTableLayers!: () => CatalogLayerInfo[];
 
   // Lifecycle management
 
@@ -1892,7 +1892,7 @@ export default class App extends WWTAwareComponent {
   }
 
   prepareForMessaging(source: Source): selections.Source {
-    let layer: selections.LayerInfo;
+    let layer: selections.CatalogLayerInfo;
     if (source.layer instanceof ImagesetInfo) {
       layer = {
         ...source.layer,
@@ -2001,7 +2001,7 @@ export default class App extends WWTAwareComponent {
             if (ps !== null) pysettings.push(ps);
           }
 
-          const ssli: layers.SpreadSheetLayerInfo = {
+          const ssli: layers.SpreadSheetCatalogLayerInfo = {
             header: layer.get_header(),
             settings: pysettings,
           };
