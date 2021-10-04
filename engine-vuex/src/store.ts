@@ -138,6 +138,14 @@ export class SpreadSheetLayerInfo {
   }
 }
 
+/** This type defines the union of the various spreadsheet layers.
+ *
+ * Currently this includes standard spreadsheet layers, and HiPS catalog
+ * layers, which are a sort of hybrid between spreadsheet and imageset
+ * layers.
+ */
+export type CatalogLayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
+
 /** Information about an active imageset layer. */
 export class ImageSetLayerState {
   /** Layer parameters exposed in WWT's generic "settings" system.
@@ -412,7 +420,33 @@ function activeLayersList(): string[] {
 function availableImagesets(): ImagesetInfo[] {
   return WWTControl.getImageSets()
       .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
-} 
+}
+
+/** This function get a SpreadSheetLayer by the key used to store it in the engine.
+ * For regular table layers this is the layer ID; for HiPS catalogs it is the layer name.
+ * Keeping this functionality outside of the store allows us to use it from
+ * inside either an action or a mutation.
+ */
+function spreadSheetLayerByKey(key: string): SpreadSheetLayer | null {
+  if (Vue.$wwt.inst === null)
+    throw new Error('cannot get spreadSheetLayerById without linking to WWTInstance');
+
+  const layer = Vue.$wwt.inst.lm.get_layerList()[key];
+
+  if (layer !== null && layer instanceof SpreadSheetLayer) {
+    return layer;
+  } else {
+    return null;
+  }
+}
+
+function catalogLayerKey(catalog: CatalogLayerInfo): string {
+  if (catalog instanceof ImagesetInfo) {
+    return catalog.name;
+  } else {
+    return catalog.id;
+  }
+}
 
 /** The store module class for the WWT Vuex implementation.
  *
@@ -1015,28 +1049,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       // the catalog metadata. This is possible because the WWT `Guid` class
       // doesn't actually do any validation, and just accepts any string you
       // give it.
-      const layer = Vue.$wwt.inst.lm.get_layerList()[name];
-
-      if (layer !== null && layer instanceof SpreadSheetLayer) {
-        return layer;
-      } else {
-        return null;
-      }
-    }
-  }
-
-  get spreadSheetLayerById() {
-    return function(id: string): SpreadSheetLayer | null {
-      if (Vue.$wwt.inst === null)
-        throw new Error('cannot get spreadSheetLayerById without linking to WWTInstance');
-
-      const layer = Vue.$wwt.inst.lm.get_layerList()[id];
-
-      if (layer !== null && layer instanceof SpreadSheetLayer) {
-        return layer;
-      } else {
-        return null;
-      }
+      return spreadSheetLayerByKey(name);
     }
   }
 
@@ -1050,12 +1063,38 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     }
   }
 
-  get spreadsheetState() {
+  get spreadSheetLayerById() {
+    return function(id: string): SpreadSheetLayer | null {
+      return spreadSheetLayerByKey(id);
+    }
+  }
+
+  get spreadsheetStateById() {
     return (id: string): SpreadSheetLayerSettingsInterfaceRO | null => {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get spreadsheetStateById without linking to WWTInstance');
+
+      return this.spreadSheetLayers[id] || null;
+    }
+  }
+
+  get spreadSheetLayer() {
+    return (catalog: CatalogLayerInfo): SpreadSheetLayer | null => {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot get spreadSheetLayer without linking to WWTInstance');
+
+      const key = catalogLayerKey(catalog);
+      return spreadSheetLayerByKey(key);
+    }
+  }
+
+  get spreadsheetState() {
+    return (catalog: CatalogLayerInfo): SpreadSheetLayerSettingsInterfaceRO | null => {
       if (Vue.$wwt.inst === null)
         throw new Error('cannot get spreadsheetState without linking to WWTInstance');
 
-      return this.spreadSheetLayers[id] || null;
+      const key = catalogLayerKey(catalog);
+      return this.spreadSheetLayers[key] || null;
     }
   }
 

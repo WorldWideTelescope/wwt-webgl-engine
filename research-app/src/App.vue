@@ -312,7 +312,7 @@ import { mapGetters, mapMutations, mapState } from "vuex";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
-import { CatalogLayerInfo, Source, WWTResearchAppModule } from "./store";
+import { Source, WWTResearchAppModule } from "./store";
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
@@ -341,7 +341,7 @@ import {
   isPolyLineAnnotationSetting,
 } from "@wwtelescope/engine-helpers";
 
-import { WWTAwareComponent, ImagesetInfo, SpreadSheetLayerInfo } from "@wwtelescope/engine-vuex";
+import { WWTAwareComponent, CatalogLayerInfo, ImagesetInfo, SpreadSheetLayerInfo } from "@wwtelescope/engine-vuex";
 
 import {
   classicPywwt,
@@ -2218,13 +2218,7 @@ export default class App extends WWTAwareComponent {
 
     for (const layerInfo of this.visibleTableLayers()) {
 
-      let layer: SpreadSheetLayer | null = null;
-      if (layerInfo instanceof ImagesetInfo) {
-        layer = this.layerForHipsCatalog(layerInfo.name);
-      } else {
-        layer = this.spreadSheetLayerById(layerInfo.id);
-      }
-
+      let layer = this.spreadSheetLayer(layerInfo);
       if (layer == null) {
         continue;
       }

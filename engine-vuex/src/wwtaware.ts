@@ -38,6 +38,7 @@ import {
 } from "@wwtelescope/engine-helpers";
 
 import {
+  CatalogLayerInfo,
   CreateTableLayerParams,
   GotoRADecZoomParams,
   ImagesetInfo,
@@ -332,7 +333,9 @@ export class WWTAwareComponent extends Vue {
         "layerForHipsCatalog",
         "lookupImageset",
         "spreadSheetLayerById",
+        "spreadSheetLayer",
         "spreadsheetState",
+        "spreadsheetStateById",
         "spreadsheetStateForHipsCatalog",
       ]),
       ...this.$options.computed,
@@ -615,6 +618,18 @@ export class WWTAwareComponent extends Vue {
    */
   layerForHipsCatalog!: (name: string) => SpreadSheetLayer | null;
 
+  /** Get the actual WWT `SpreadSheetLayer` for the table layer corresponding
+   * to the given CatalogLayerInfo.
+   *
+   * Do not use this function for UI purposes -- the WWT layer object is not
+   * integrated into the reactive state system, and so if you use it as a basis
+   * for UI elements, those elements will not be updated properly if/when the
+   * layer's settings change. Use [[spreadsheetState]] instead.
+   *
+   * @param id The table layer's identifier.
+   */
+  spreadSheetLayer!: (catalog: CatalogLayerInfo) => SpreadSheetLayer | null;
+
   // Mutations
 
   /** Add an [Annotation](../../engine/classes/annotation.html) to the view. */
@@ -755,7 +770,7 @@ export class WWTAwareComponent extends Vue {
    *
    * @param id The identifier of the table layer.
    */
-  spreadsheetState!: (id: string) => SpreadSheetLayerSettingsInterfaceRO | null;
+  spreadsheetStateById!: (id: string) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   /** Get reactive `SpreadSheetLayer` settings for the named HiPS catalog.
    *
@@ -767,6 +782,18 @@ export class WWTAwareComponent extends Vue {
    * @param name The `datasetName` of the HiPS catalog
    */
   spreadsheetStateForHipsCatalog!: (name: string) => SpreadSheetLayerSettingsInterfaceRO | null;
+
+  /** Get reactive `SpreadSheetLayer` settings for the table layer corresponding to 
+   * the given CatalogLayerInfo.
+   *
+   * The returned data structure is a component of the app's Vuex state. You can
+   * therefore use the settings to construct UI elements, and they will update
+   * reactively as the state evolves. The actual data structures used by WWT are
+   * separate, but the two mirror each other.
+   *
+   * @param catalog A CatalogLayerInfo object corresponding to the layer.
+   */
+    spreadsheetState!: (catalog: CatalogLayerInfo) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   /** Start playback of the currently loaded tour.
    *

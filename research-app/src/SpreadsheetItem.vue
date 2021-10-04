@@ -127,8 +127,7 @@ import { ApplyTableLayerSettingsOptions } from "@wwtelescope/engine-helpers";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
-import { CatalogLayerInfo } from "./store";
-import { ImagesetInfo } from "@wwtelescope/engine-vuex";
+import { CatalogLayerInfo, ImagesetInfo } from "@wwtelescope/engine-vuex";
 
 interface UiPlotTypes {
   wwt: PlotTypes;
@@ -173,7 +172,6 @@ export default class CatalogItem extends Vue {
       }),
       ...mapGetters(wwtEngineNamespace, [
         "spreadsheetState",
-        "spreadsheetStateForHipsCatalog"
       ]),
       ...this.$options.computed,
     };
@@ -195,10 +193,7 @@ export default class CatalogItem extends Vue {
   // Tied to the store value
   visible!: boolean;
 
-  spreadsheetState!: (id: string) => SpreadSheetLayerSettingsInterfaceRO | null;
-  spreadsheetStateForHipsCatalog!: (
-    _n: string
-  ) => SpreadSheetLayerSettingsInterfaceRO | null;
+  spreadsheetState!: (layer: CatalogLayerInfo) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
   deleteLayer!: (id: string | Guid) => void;
@@ -221,8 +216,7 @@ export default class CatalogItem extends Vue {
   }
 
   layerState(): SpreadSheetLayerSettingsInterfaceRO | null {
-    const id = this.layerId();
-    return this.layer instanceof ImagesetInfo ? this.spreadsheetStateForHipsCatalog(id) : this.spreadsheetState(id);
+    return this.spreadsheetState(this.layer);
   }
 
   get color(): Color {

@@ -7,6 +7,7 @@ import { Store } from "vuex/types";
 export { SetupForImagesetOptions } from "@wwtelescope/engine-helpers";
 
 export {
+  CatalogLayerInfo,
   CreateTableLayerParams,
   GotoRADecZoomParams,
   ImagesetInfo,
