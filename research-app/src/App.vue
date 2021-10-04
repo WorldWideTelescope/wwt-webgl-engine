@@ -31,7 +31,7 @@
           <label>Data Tables</label>
         </div>
         <spreadsheet-item
-          v-for="layer of layers"
+          v-for="layer of appTableLayers"
           v-bind:key="layer.name"
           v-bind:layer="layer"
           v-bind:defaultColor="defaultColor"

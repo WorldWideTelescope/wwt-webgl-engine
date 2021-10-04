@@ -48,7 +48,7 @@
         </div>
         <div class="detail-row">
           <span class="prompt">Table:</span
-          ><span>{{ this.source.layer.name }}</span>
+          ><span>{{ this.source.catalogLayer.name }}</span>
         </div>
         <div class="detail-row">
           <span class="prompt">Query Coordinates:</span
