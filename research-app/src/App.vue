@@ -31,7 +31,7 @@
           <label>Data Tables</label>
         </div>
         <spreadsheet-item
-          v-for="layer of appTableLayers"
+          v-for="layer of spreadsheetLayers"
           v-bind:key="layer.name"
           v-bind:layer="layer"
           v-bind:defaultColor="defaultColor"
@@ -1010,7 +1010,7 @@ export default class App extends WWTAwareComponent {
 
   // From the store
   catalogNameMappings!: { [catalogName: string]: [string, string] };
-  appTableLayers!: CatalogLayerInfo[];
+  spreadsheetLayers!: CatalogLayerInfo[];
   sources!: Source[];
 
   addResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
@@ -1025,7 +1025,7 @@ export default class App extends WWTAwareComponent {
       ...mapState(wwtResearchAppNamespace, {
         catalogNameMappings: (state, _getters) =>
           (state as WWTResearchAppModule).catalogNameMappings,
-        appTableLayers: (_state, getters) => getters["tableLayers"](),
+        spreadsheetLayers: (_state, getters) => getters["tableLayers"](),
         sources: (state, _getters) => (state as WWTResearchAppModule).sources,
       }),
       ...mapGetters(wwtResearchAppNamespace, ["visibleTableLayers"]),
@@ -1416,7 +1416,7 @@ export default class App extends WWTAwareComponent {
   }
 
   wwtOnMouseMove(event: MouseEvent) {
-    if (this.appTableLayers.length == 0) {
+    if (this.spreadsheetLayers.length == 0) {
       return;
     }
     const pt = { x: event.offsetX, y: event.offsetY };
@@ -2089,7 +2089,7 @@ export default class App extends WWTAwareComponent {
   }
 
   get haveTableLayers() {
-    return this.appTableLayers.length > 0;
+    return this.spreadsheetLayers.length > 0;
   }
 
   get haveSources() {
