@@ -28,7 +28,7 @@
       </div>
       <div id="spreadsheets-container" v-if="haveTableLayers">
         <div class="display-section-header">
-          <label>Catalogs and Spreadsheets</label>
+          <label>Data Tables</label>
         </div>
         <spreadsheet-item
           v-for="layer of layers"

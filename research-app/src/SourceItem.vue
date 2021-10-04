@@ -47,7 +47,7 @@
           <span class="prompt">Dec:</span><span>{{ this.decStr }}</span>
         </div>
         <div class="detail-row">
-          <span class="prompt">Layer:</span
+          <span class="prompt">Table:</span
           ><span>{{ this.source.layer.name }}</span>
         </div>
         <div class="detail-row">
