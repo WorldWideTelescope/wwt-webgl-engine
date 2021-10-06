@@ -74,7 +74,7 @@ module.exports = {
           selector: "#spreadsheets-container #name-label"
         },
         catalogVisibilityButton: {
-          selector: "#spreadsheets-container .fa-eye,"
+          selector: "#spreadsheets-container .fa-eye"
         },
         catalogDeleteButton: {
           selector: "#spreadsheets-container .fa-times"
