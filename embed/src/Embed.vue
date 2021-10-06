@@ -166,6 +166,7 @@ import { Component, Prop, Watch } from "vue-property-decorator";
 import * as screenfull from "screenfull";
 
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { Place } from "@wwtelescope/engine";
 import { ImageSetType } from "@wwtelescope/engine-types";
 import {
   SetupForImagesetOptions,
@@ -338,7 +339,13 @@ export default class Embed extends WWTAwareComponent {
           });
 
           if (this.embedSettings.wtmlPlace) {
-            for (const pl of folder.get_places()) {
+
+            // Currently, there is an issue with the `places` field of a `Folder`
+            // object populating correctly. Thus, we iterate over `children` instead
+            for (const pl of folder.get_children() ?? []) {
+              if (!(pl instanceof Place)) {
+                continue;
+              }
               if (pl.get_name() == this.embedSettings.wtmlPlace) {
                 /* This is nominally an async Action, but with `instant: true` it's ... instant */
                 this.gotoTarget({

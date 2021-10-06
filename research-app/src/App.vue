@@ -2288,6 +2288,12 @@ export default class App extends WWTAwareComponent {
 </script>
 
 <style lang="less">
+
+/** Note: the CSS is designed to keep the tools element (which contains the various dropdown selectors) 
+  * centered at all times. This is done by using nested flexbox containers, based on the first answer
+  * from https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths
+*/
+
 html {
   height: 100%;
   margin: 0;
@@ -2331,11 +2337,44 @@ body {
   margin: 5px;
 }
 
-#controls {
+#ui-elements {
   position: absolute;
-  z-index: 10;
+  display: flex;
+  align-items: flex-start;
   top: 0.5rem;
-  right: 0.5rem;
+  left: 0.5rem;
+  width: calc(100% - 1rem);
+}
+
+.element-box {
+  display: flex;
+}
+
+.element-box:first-child {
+  margin-right: auto;
+}
+.element-box:last-child {
+  margin-left: auto; 
+}
+
+#display-panel-box {
+  flex: 2;
+  order: 1;
+}
+
+#tools-box {
+  flex: 3;
+  order: 2;
+}
+
+#controls-box {
+  flex: 2;
+  order: 3;
+  justify-content: flex-end;
+}
+
+#controls {
+  z-index: 10;
   color: #fff;
 
   list-style-type: none;
@@ -2367,14 +2406,14 @@ body {
 }
 
 #tools {
-  position: absolute;
-  top: 0.5rem;
-  left: 50%;
+  order: 2;
   color: #fff;
+  left: -calc(12.5vw - 15px);
+  width: 100%;
+  display: flex;
+  justify-content: center;
 
   .tool-container {
-    position: relative;
-    left: -50%;
     z-index: 10;
   }
 
@@ -2393,9 +2432,8 @@ body {
 }
 
 #display-panel {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  order: 1;
+  min-width: 200px;
   max-width: 25vw;
   border-radius: 5px;
   color: white;
@@ -2446,13 +2484,14 @@ body {
 }
 
 .load-collection-container {
-  width: 35vw;
+  width: 100%;
 
   .load-collection-label {
     width: 100%;
     font-size: 120%;
     font-weight: bold;
     margin-bottom: 0.5rem;
+    text-align: center;
   }
 
   .load-collection-row {
@@ -2461,13 +2500,15 @@ body {
     gap: 0.3rem;
     width: 100%;
     margin-top: 0.2rem;
+    justify-content: center;
 
     label {
       margin-right: 0.5rem;
     }
 
     input {
-      flex: 1;
+      width: 80%;
+      min-width: 100px;
     }
   }
 
@@ -2631,6 +2672,7 @@ ul.tool-menu {
 
 .item-selector {
   width: 25vw;
+  min-width: 175px;
   vertical-align: middle;
   padding: 5px;
   white-space: nowrap;
@@ -2640,6 +2682,9 @@ ul.tool-menu {
 
 .item-select-container {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-direction: row;
 }
 
 .item-select-title {
@@ -2689,6 +2734,46 @@ ul.tool-menu {
 
 .pointer {
   cursor: pointer;
+}
+
+@media all and (max-width: 425px) {
+  #ui-elements {
+    flex-wrap: wrap;
+    gap: 15px 1px;
+  }
+
+  #controls-box {
+    order: 2;
+  }
+
+  #tools-box {
+    order: 3;
+    flex-grow: 0;
+  }
+
+  .item-select-container {
+    align-items: center;
+  }
+
+  .item-selector {
+    width: 75vw;
+    min-width: 75vw;
+  }
+
+  .element-box:last-child {
+    margin-right: auto;
+  }
+}
+
+@media all and (max-width: 250px) {
+  #display-panel {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  #controls-box {
+    flex: 0;
+  }
 }
 
 /**

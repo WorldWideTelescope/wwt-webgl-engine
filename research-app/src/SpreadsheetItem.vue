@@ -1,11 +1,13 @@
 <template>
-  <div id="root-container">
+  <div
+    id="root-container"
+    @mouseenter="hasFocus = true"
+    @mouseleave="hasFocus = false"
+    @focus="hasFocus = true"
+    @blur="hasFocus = false"
+  >
     <div
       id="main-container"
-      @mouseenter="hasFocus = true"
-      @mouseleave="hasFocus = false"
-      @focus="hasFocus = true"
-      @blur="hasFocus = false"
     >
       <label
         v-show="!editing"
@@ -85,7 +87,7 @@
           <span class="prompt">Size adjust:</span>
           <div class="flex-row">
             <font-awesome-icon
-              class="icon icon-button"
+              class="icon-button"
               size="lg"
               icon="minus-circle"
               @keyup.enter="doAdjustSize(false)"
@@ -98,7 +100,7 @@
               v-model.lazy="scaleFactorDbText"
             />
             <font-awesome-icon
-              class="icon icon-button"
+              class="icon-button"
               size="lg"
               icon="plus-circle"
               @keyup.enter="doAdjustSize(true)"
@@ -389,21 +391,17 @@ export default class CatalogItem extends Vue {
   padding: 5px;
   display: flex;
   justify-content: space-between;
+  gap: 2px;
 }
 
 #name-label {
   display: inline-block;
-  vertical-align: middle;
+  flex: 1;
+  padding-right: 10px;
 
   &:hover {
     cursor: pointer;
   }
-}
-
-#buttons-container {
-  align-self: flex-end;
-  display: flex;
-  justify-content: flex-end;
 }
 
 .circle-popover {
@@ -426,8 +424,8 @@ export default class CatalogItem extends Vue {
 
 .icon-button {
   cursor: pointer;
-  display: inline-block;
-  background: inherit;
+  margin: 2px;
+  width: 1em;
 }
 
 .name-input {
@@ -448,12 +446,6 @@ export default class CatalogItem extends Vue {
   display: flex;
   align-items: center;
   width: 100%;
-}
-
-.ellipsize {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .flex-row {
