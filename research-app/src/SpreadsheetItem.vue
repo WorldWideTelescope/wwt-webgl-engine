@@ -17,26 +17,25 @@
         >{{ layer.name }}</label
       >
       <input v-show="editing" class="name-input" @blur="editing = false" />
-      <span id="buttons-container">
-        <a
-          href="#"
-          v-if="!isLayerHips"
-          v-hide="!hasFocus"
-          @click="handleEditClick"
-          class="icon-link"
-          ><font-awesome-icon
-            :class="['icon', { 'icon-active': editing }]"
-            icon="pencil-alt"
-        /></a>
-        <a href="#" v-hide="!hasFocus" @click="handleToggle" class="icon-link"
-          ><font-awesome-icon
-            class="icon"
-            :icon="visible ? 'eye' : 'eye-slash'" />
-          </a>
-        <a href="#" v-hide="!hasFocus" @click="handleDelete" class="icon-link"
-          ><font-awesome-icon class="icon" icon="times"
-        /></a>
-      </span>
+      <font-awesome-icon
+        v-if="!isLayerHips"
+        v-hide="!hasFocus"
+        @click="handleEditClick"
+        :class="['icon-button', { 'icon-active': editing }]"
+        icon="pencil-alt"
+      />
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        :icon="visible ? 'eye' : 'eye-slash'"
+        @click="handleToggle"
+      />
+      <font-awesome-icon
+        v-hide="!hasFocus"
+        class="icon-button"
+        icon="times"
+        @click="handleDelete"
+      />
     </div>
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
@@ -421,20 +420,8 @@ export default class CatalogItem extends Vue {
   padding-left: 15px;
 }
 
-.icon {
-  color: white;
-  margin: auto 1%;
-}
-
 .icon-active {
   color: darkred;
-}
-
-.icon-link {
-  height: 100%;
-  background: inherit;
-  margin-left: 3px;
-  margin-right: 3px;
 }
 
 .icon-button {

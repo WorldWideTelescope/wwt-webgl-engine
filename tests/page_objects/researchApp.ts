@@ -73,14 +73,11 @@ module.exports = {
         catalogTitle: {
           selector: "#spreadsheets-container #name-label"
         },
-        catalogButtonContainer: {
-          selector: "#spreadsheets-container #buttons-container"
-        },
         catalogVisibilityButton: {
-          selector: "#spreadsheets-container #buttons-container .fa-eye, #spreadsheets-container #buttons-container .fa-eye-slash"
+          selector: "#spreadsheets-container .fa-eye,"
         },
         catalogDeleteButton: {
-          selector: "#spreadsheets-container #buttons-container .fa-times"
+          selector: "#spreadsheets-container .fa-times"
         },
       },
       props: {
