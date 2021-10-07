@@ -89,9 +89,9 @@ const tests = {
             "@backgroundDropdownOption",
             "@backgroundDropdownOptionName",
             "@backgroundDropdownOptionDescription"
-        ].map(selector => utils.nthOfTypeSelector(selector, 1));
+        ];
         utils.expectAllPresent(tools, [firstBackgroundOption, firstBackgroundName, firstBackgroundDescription]);
-        tools.expect.element(firstBackgroundName).text.to.equal(tools.props.firstBackgroundName);
+        tools.expect.element(firstBackgroundName, {index : 1}).text.to.equal(tools.props.firstBackgroundName);
         tools.expect.element(firstBackgroundDescription).text.to.equal(tools.props.firstBackgroundDescription);
 
     },
@@ -108,7 +108,9 @@ const tests = {
         utils.expectAllPresent(app, [
             "@toolMenu",
             "@backgroundButton",
+            "@imageryButton",
             "@catalogButton",
+            "@loadWtmlButton",
         ]);
 
         // Select the catalog chooser
@@ -171,6 +173,61 @@ const tests = {
         // Check that the catalog goes away if we click the delete button
         displayPanel.click(firstCatalogButtons[1]);
         displayPanel.expect.elements("@catalogItem").count.to.equal(0);
+    },
+
+    'PHAT FITS': function(browser: NightwatchBrowser) {
+        const app = this.researchApp;
+        const controls = app.section.controls;
+        const tools = app.section.tools;
+        const displayPanel = app.section.displayPanel;
+
+        // Load the PHAT WTML file
+        controls.click("@toolChooser");
+        app.click("@loadWtmlButton");
+        tools.updateValue("@wtmlUrlInput", tools.props.phatWtmlUrl);
+        tools.sendKeys("@wtmlUrlInput", browser.Keys.ENTER);
+
+        // Check that the appropriate imagery layers now exist
+        controls.click("@toolChooser");
+        app.click("@imageryButton");
+        tools.click("@imagerySelectionToggle");
+        tools.expect.elements("@imageryDropdownOption").count.to.equal(tools.props.phatImageryCount);
+        for (let i = 0; i < tools.props.phatImageryCount; i++) {
+            tools.expect.element({selector: "@imageryDropdownOptionName", index: i}).text.to.equal(tools.props.phatLayerNames[i]);
+        }
+
+        // Select the first PHAT imagery layer
+        tools.click({selector: "@imageryDropdownOption", index: 0});
+
+        // Check that the layer displays in the panel with the correct name
+        displayPanel.expect.elements("@imageryItem").count.to.equal(1);
+        displayPanel.expect.element({selector: "@imageryTitle", index: 0}).text.to.equal(tools.props.phatLayerNames[0]);
+
+        // Initially, none of the icon buttons should be visible
+        const buttons = [
+            "@imageryGotoButton",
+            "@imageryVisibilityButton",
+            "@imageryDeleteButton"
+        ].map((sel) => { return {selector: sel, index: 0}; });
+        utils.expectAllNotVisible(displayPanel, buttons);
+
+        // We should have already moved to the correct position
+        displayPanel.expect.element("@coordinateDisplay").text.to.equal(displayPanel.props.phatLayerCoordinates);
+
+        // If we click on the name, the detail container should open
+        // Also, the buttons should be visible
+        displayPanel.click("@imageryTitle");
+        utils.expectAllVisible(displayPanel, buttons);
+        displayPanel.expect.element({selector: "@imageryDetailContainer", index: 0}).to.be.visible;
+
+        // If we click the title again, the detail container should go away
+        displayPanel.click("@imageryTitle");
+        displayPanel.expect.element({selector: "@imageryDetailContainer", index: 0}).to.not.be.present;
+
+        // If we click the delete button, the layer should be removed from the display panel
+        displayPanel.click(buttons[2]);
+        displayPanel.expect.elements("@imageryItem").count.to.equal(0);
+
     },
 
     after: function (browser: NightwatchBrowser) {
