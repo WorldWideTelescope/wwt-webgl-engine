@@ -28,14 +28,14 @@
               v-bind:imageset="imageset"
             />
           </div>
-          <div id="catalogs-container" v-if="haveCatalogs">
+          <div id="spreadsheets-container" v-if="haveTableLayers">
             <div class="display-section-header">
-              <label>Catalogs</label>
+              <label>Data Tables</label>
             </div>
-            <catalog-item
-              v-for="catalog of hipsCatalogs"
-              v-bind:key="catalog.name"
-              v-bind:catalog="catalog"
+            <spreadsheet-item
+              v-for="layer of spreadsheetLayers"
+              v-bind:key="layer.name"
+              v-bind:layer="layer"
               v-bind:defaultColor="defaultColor"
             />
           </div>
@@ -349,7 +349,7 @@ import {
   isPolyLineAnnotationSetting,
 } from "@wwtelescope/engine-helpers";
 
-import { WWTAwareComponent, ImagesetInfo } from "@wwtelescope/engine-vuex";
+import { WWTAwareComponent, CatalogLayerInfo, ImagesetInfo, SpreadSheetLayerInfo } from "@wwtelescope/engine-vuex";
 
 import {
   classicPywwt,
@@ -585,7 +585,11 @@ class TableLayerMessageHandler {
         referenceFrame: msg.frame,
         dataCsv: data,
       })
-      .then((layer) => this.layerInitialized(layer));
+      .then((layer) => {
+        this.layerInitialized(layer);
+        this.owner.addResearchAppTableLayer(new SpreadSheetLayerInfo(layer.id.toString(), layer.get_referenceFrame(), layer.get_name()));
+        
+      });
 
     this.created = true;
   }
@@ -714,7 +718,7 @@ class TableLayerMessageHandler {
 
         for (const cat of this.owner.curAvailableCatalogs) {
           if (cat.name == name) {
-            this.owner.removeResearchAppCatalogHips(cat);
+            this.owner.removeResearchAppTableLayer(cat);
             this.owner.removeCatalogHipsByName(name);
           }
         }
@@ -966,7 +970,7 @@ interface AngleCoordinates {
 interface RawSourceInfo {
   ra: number;
   dec: number;
-  catalogName: string;
+  catalogLayer: CatalogLayerInfo;
   colNames: string[];
   values: string[];
 }
@@ -1014,13 +1018,13 @@ export default class App extends WWTAwareComponent {
 
   // From the store
   catalogNameMappings!: { [catalogName: string]: [string, string] };
-  hipsCatalogs!: ImagesetInfo[];
+  spreadsheetLayers!: CatalogLayerInfo[];
   sources!: Source[];
 
-  addResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
+  addResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   addSource!: (source: Source) => void;
-  removeResearchAppCatalogHips!: (catalog: ImagesetInfo) => void;
-  visibleHipsCatalogs!: () => ImagesetInfo[];
+  removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
+  visibleTableLayers!: () => CatalogLayerInfo[];
 
   // Lifecycle management
 
@@ -1029,20 +1033,19 @@ export default class App extends WWTAwareComponent {
       ...mapState(wwtResearchAppNamespace, {
         catalogNameMappings: (state, _getters) =>
           (state as WWTResearchAppModule).catalogNameMappings,
-        hipsCatalogs: (state, _getters) =>
-          (state as WWTResearchAppModule).hipsCatalogs,
+        spreadsheetLayers: (_state, getters) => getters["tableLayers"](),
         sources: (state, _getters) => (state as WWTResearchAppModule).sources,
       }),
-      ...mapGetters(wwtResearchAppNamespace, ["visibleHipsCatalogs"]),
+      ...mapGetters(wwtResearchAppNamespace, ["visibleTableLayers"]),
       ...this.$options.computed,
     };
 
     this.$options.methods = {
       ...this.$options.methods,
       ...mapMutations(wwtResearchAppNamespace, [
-        "addResearchAppCatalogHips",
+        "addResearchAppTableLayer",
         "addSource",
-        "removeResearchAppCatalogHips",
+        "removeResearchAppTableLayer",
       ]),
     };
   }
@@ -1421,7 +1424,7 @@ export default class App extends WWTAwareComponent {
   }
 
   wwtOnMouseMove(event: MouseEvent) {
-    if (this.hipsCatalogs.length == 0) {
+    if (this.spreadsheetLayers.length == 0) {
       return;
     }
     const pt = { x: event.offsetX, y: event.offsetY };
@@ -1464,10 +1467,10 @@ export default class App extends WWTAwareComponent {
     };
   })();
 
-  nameForSource(catalogData: any, catalogName: string): string {
+  nameForSource(layerData: any, layerName: string): string {
     for (const [key, [from, to]] of Object.entries(this.catalogNameMappings)) {
-      if (from in catalogData && catalogName === key) {
-        return `${to}: ${catalogData[from]}`;
+      if (from in layerData && layerName === key) {
+        return `${to}: ${layerData[from]}`;
       }
     }
     return this.newSourceName();
@@ -1481,9 +1484,9 @@ export default class App extends WWTAwareComponent {
     return {
       ra: sourceInfo.ra,
       dec: sourceInfo.dec,
-      catalogName: sourceInfo.catalogName,
-      catalogData: obj,
-      name: this.nameForSource(obj, sourceInfo.catalogName),
+      catalogLayer: sourceInfo.catalogLayer,
+      layerData: obj,
+      name: this.nameForSource(obj, sourceInfo.catalogLayer.name),
     };
   }
 
@@ -1869,7 +1872,7 @@ export default class App extends WWTAwareComponent {
   // HiPS catalogs (see also the table layer support)
 
   addHips(catalog: ImagesetInfo): Promise<Imageset> {
-    this.addResearchAppCatalogHips(catalog);
+    this.addResearchAppTableLayer(catalog);
     return this.addCatalogHipsByName({ name: catalog.name }).then((imgset) => {
       const hips = imgset.get_hipsProperties();
 
@@ -1894,6 +1897,24 @@ export default class App extends WWTAwareComponent {
 
   set catalogToAdd(catalog: ImagesetInfo) {
     this.addHips(catalog);
+  }
+
+  prepareForMessaging(source: Source): selections.Source {
+    let layer: selections.CatalogLayerInfo;
+    const sourceLayer = source.catalogLayer;
+    if (sourceLayer instanceof ImagesetInfo) {
+      layer = {
+        ...sourceLayer,
+        type: selections.ImageSetTypes[sourceLayer.type]
+      };
+    } else {
+      layer = sourceLayer;
+    }
+
+    return {
+      ...source,
+      catalogLayer: layer,
+    };
   }
 
   @Watch("curAvailableCatalogs")
@@ -1922,7 +1943,7 @@ export default class App extends WWTAwareComponent {
     const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
-      mostRecentSource: source,
+      mostRecentSource: this.prepareForMessaging(source),
     };
 
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
@@ -1940,7 +1961,7 @@ export default class App extends WWTAwareComponent {
     const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
-      selectedSources: sources,
+      selectedSources: sources.map(source => this.prepareForMessaging(source)),
     };
 
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
@@ -2075,8 +2096,8 @@ export default class App extends WWTAwareComponent {
     return this.activeImagesetLayerStates.length > 0;
   }
 
-  get haveCatalogs() {
-    return this.hipsCatalogs.length > 0;
+  get haveTableLayers() {
+    return this.spreadsheetLayers.length > 0;
   }
 
   get haveSources() {
@@ -2203,9 +2224,9 @@ export default class App extends WWTAwareComponent {
     const rowSeparator = "\r\n";
     const colSeparator = "\t";
 
-    for (const catalog of this.visibleHipsCatalogs()) {
-      const catalogName = catalog.name;
-      const layer = this.layerForHipsCatalog(catalogName);
+    for (const layerInfo of this.visibleTableLayers()) {
+
+      let layer = this.spreadSheetLayer(layerInfo);
       if (layer == null) {
         continue;
       }
@@ -2232,7 +2253,7 @@ export default class App extends WWTAwareComponent {
             dec: dec,
             colNames: colNames,
             values: values,
-            catalogName: catalogName,
+            catalogLayer: layerInfo,
           };
           minDist = dist;
         }

@@ -44,9 +44,9 @@ import 'vue-slider-component/theme/default.css';
 import { createPlugin } from "@wwtelescope/engine-vuex";
 
 import App from "./App.vue";
-import CatalogItem from "./CatalogItem.vue";
 import ImagesetItem from "./ImagesetItem.vue";
 import SourceItem from "./SourceItem.vue";
+import SpreadsheetItem from "./SpreadsheetItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import { WWTResearchAppModule } from "./store";
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
@@ -95,7 +95,7 @@ Vue.component('vue-color-chrome', Chrome);
 Vue.component('v-select', vSelect);
 Vue.component('vue-slider', VueSlider);
 
-Vue.component('catalog-item', CatalogItem);
+Vue.component('spreadsheet-item', SpreadsheetItem);
 Vue.component('imageset-item', ImagesetItem);
 Vue.component('source-item', SourceItem);
 Vue.component('transition-expand', TransitionExpand);
