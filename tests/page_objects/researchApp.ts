@@ -3,8 +3,6 @@
 // For now, we just want a compiled .js file to appear in `dist`
 
 const utils = require("../utils");
-const BUILTIN_URL = "https://web.wwtassets.org/engine/assets/builtin-image-sets.wtml";
-const HIPS_URL = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips";
 
 module.exports = {
   url: "http://localhost:8080",
@@ -18,13 +16,13 @@ module.exports = {
     backgroundCount: async function() {
       const docHandler = (doc) => {
         const items = [...doc.querySelectorAll("ImageSet")];
-          return items
-            .map(item => item.attributes)
-            .filter(attr => attr.FileType.nodeValue != 'tsv' && attr.DataSetType.nodeValue == 'Sky')
-            .length;
+        return items
+          .map(item => item.attributes)
+          .filter(attr => attr.FileType.nodeValue != 'tsv' && attr.DataSetType.nodeValue == 'Sky')
+          .length;
       };
-      const hipsProm = utils.parseXMLFromUrl(BUILTIN_URL).then(docHandler);
-      const builtinProm = utils.parseXMLFromUrl(HIPS_URL).then(docHandler);
+      const hipsProm = utils.parseXMLFromUrl(this.props.builtinUrl).then(docHandler);
+      const builtinProm = utils.parseXMLFromUrl(this.props.hipsUrl).then(docHandler);
       return Promise.all([hipsProm, builtinProm]).then(values => {
         const reducer = (prev, curr) => prev + curr;
         return values.reduce(reducer);
@@ -32,7 +30,7 @@ module.exports = {
     },
 
     hipsCount: function() {
-      return utils.parseXMLFromUrl(HIPS_URL)
+      return utils.parseXMLFromUrl(this.props.hipsUrl)
         .then(doc => {
           const items = [...doc.querySelectorAll("ImageSet")];
           return items.filter(item => item.attributes.FileType.nodeValue == 'tsv').length;
@@ -40,7 +38,9 @@ module.exports = {
     }
   }],
   props: {
-    title: "AAS WorldWide Telescope"
+    title: "AAS WorldWide Telescope",
+    builtinUrl: "https://web.wwtassets.org/engine/assets/builtin-image-sets.wtml",
+    hipsUrl: "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips",
   },
   elements: {
     app: {
@@ -234,14 +234,17 @@ module.exports = {
           selector: ".vs__dropdown-option > div > h4"
         },
       },
-      props: {
-        firstBackgroundName: "Digitized Sky Survey (Color)",
-        firstBackgroundDescription: "Copyright DSS Consortium",
-        firstCatalogName: "The DENIS database (DENIS Consortium, 2005) (denis)",
-        firstCatalogRegex: /^The DENIS database \(DENIS Consortium, 2005\) \(denis\)(\s+)?/,
-        phatWtmlUrl: "http://data1.wwtassets.org/packages/2021/09_phat_fits/index.wtml",
-        phatImageryCount: 2,
-        phatLayerNames: ["PHAT-f475w", "PHAT-f814w"],
+      props: function() {
+        const firstCatalogName = "The DENIS database (DENIS Consortium, 2005) (denis)";
+        return {
+          firstBackgroundName: "Digitized Sky Survey (Color)",
+          firstBackgroundDescription: "Copyright DSS Consortium",
+          firstCatalogName: firstCatalogName,
+          firstCatalogRegex: new RegExp(`${utils.escapeRegExp(firstCatalogName)}(\s+)?`),
+          phatWtmlUrl: "http://data1.wwtassets.org/packages/2021/09_phat_fits/index.wtml",
+          phatImageryCount: 2,
+          phatLayerNames: ["PHAT-f475w", "PHAT-f814w"],
+        }
       }
     },
   }
