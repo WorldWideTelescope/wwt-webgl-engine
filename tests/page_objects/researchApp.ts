@@ -76,6 +76,9 @@ module.exports = {
         catalogMainContainer: {
           selector: "#spreadsheets-container #main-container"
         },
+        catalogDetailContainer: {
+          selector: "#catalogs-container .detail-container"
+        },
         catalogTitle: {
           selector: "#spreadsheets-container #name-label"
         },
@@ -110,7 +113,6 @@ module.exports = {
       },
       props: {
         initialCoordinateText: "17:45:35 -28:53:59",
-        detailClass: ".detail-container",
         phatLayerCoordinates: "00:45:05 +41:42:31", // Both are at the same position
       },
     },

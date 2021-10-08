@@ -134,18 +134,18 @@ const tests = {
         const [firstCatalogOption, firstCatalogName] = [
             "@catalogDropdownOption",
             "@catalogDropdownOptionName"
-        ].map(selector => utils.nthOfTypeSelector(selector, 1));
+        ].map(selector => ({selector: selector, index: 0}));
         utils.expectAllPresent(tools, [firstCatalogOption, firstCatalogName]);
         tools.expect.element(firstCatalogName).text.to.equal(tools.props.firstCatalogName);
         tools.click(firstCatalogOption);
 
         // Check that the catalog displays in the panel
         // with the correct name
-        const firstCatalogTitle = utils.nthOfTypeSelector("@catalogTitle", 1);
-        const firstCatalogButtons: string[] = [
-            utils.nthOfTypeSelector("@catalogVisibilityButton", 1),
-            utils.nthOfTypeSelector("@catalogDeleteButton", 2),
-        ];
+        const firstCatalogTitle = {selector: "@catalogTitle", index: 0};
+        const firstCatalogButtons = [
+            "@catalogVisibilityButton",
+            "@catalogDeleteButton",
+        ].map(selector =>({selector: selector, index: 0}));
         displayPanel.expect.elements("@catalogItem").count.to.equal(1);
         utils.expectAllPresent(displayPanel, firstCatalogButtons);
         displayPanel.expect.element(firstCatalogTitle).text.to.match(tools.props.firstCatalogRegex);
@@ -155,14 +155,8 @@ const tests = {
 
         // If we click on catalog title, check that the UI container becomes
         // visible. The buttons should appear as well.
-        //
-        // The nth-of-type finds the element of the same type as the
-        // @catalogItem, which is a <div>, and is 1-based. The first sibling
-        // <div> is the section header, so the 2nd <div> is the first catalog
-        // item.
-        const firstCatalog: string = utils.nthOfTypeSelector("@catalogItem", 2);
-        const toClick: string = firstCatalogTitle;
-        const firstCatalogDetail = `${firstCatalog} ${displayPanel.props.detailClass}`;
+        const toClick = firstCatalogTitle;
+        const firstCatalogDetail = {selector: "@catalogDetailContainer", index: 0};
         displayPanel.click(toClick);
         utils.expectAllVisible(displayPanel, firstCatalogButtons.concat([firstCatalogDetail]));
 
@@ -208,7 +202,7 @@ const tests = {
             "@imageryGotoButton",
             "@imageryVisibilityButton",
             "@imageryDeleteButton"
-        ].map((sel) => { return {selector: sel, index: 0}; });
+        ].map((selector) => ({selector: selector, index: 0}));
         utils.expectAllNotVisible(displayPanel, buttons);
 
         // We should have already moved to the correct position
