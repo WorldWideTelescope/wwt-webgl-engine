@@ -91,9 +91,9 @@ const tests = {
             "@backgroundDropdownOption",
             "@backgroundDropdownOptionName",
             "@backgroundDropdownOptionDescription"
-        ];
+        ].map(selector =>({selector: selector, index: 0}));
         utils.expectAllPresent(tools, [firstBackgroundOption, firstBackgroundName, firstBackgroundDescription]);
-        tools.expect.element(firstBackgroundName, {index : 1}).text.to.equal(tools.props.firstBackgroundName);
+        tools.expect.element(firstBackgroundName).text.to.equal(tools.props.firstBackgroundName);
         tools.expect.element(firstBackgroundDescription).text.to.equal(tools.props.firstBackgroundDescription);
 
     },
