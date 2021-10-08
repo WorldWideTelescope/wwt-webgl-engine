@@ -52,7 +52,7 @@ const tests = {
     },
 
     // Test the functionality of the background chooser
-    'Background selection': function () {
+    'Background selection': async function (browser: NightwatchBrowser) {
         const app = this.researchApp;
         const controls = app.section.controls;
         const tools = app.section.tools;
@@ -82,7 +82,9 @@ const tests = {
         tools.click("@backgroundSelectionToggle");
         app.expect.element("@toolMenu").to.not.be.present;
         tools.expect.element("@backgroundDropdown").to.be.present;
-        tools.expect.elements("@backgroundDropdownOption").count.to.equal(tools.props.backgroundOptionCount);
+        browser.perform(async() => {
+            tools.expect.elements("@backgroundDropdownOption").count.to.equal(await app.backgroundCount());
+        });
 
         // Verify that the first catalog in the list has the correct name and description
         const [firstBackgroundOption, firstBackgroundName, firstBackgroundDescription] = [
@@ -96,7 +98,7 @@ const tests = {
 
     },
 
-    'HiPS catalog selection': function () {
+    'HiPS catalog selection': function (browser: NightwatchBrowser) {
         const app = this.researchApp;
         const controls = app.section.controls;
         const tools = app.section.tools;
@@ -126,7 +128,9 @@ const tests = {
         tools.click("@catalogSelectionToggle");
         app.expect.element("@toolMenu").to.not.be.present;
         tools.expect.element("@catalogDropdown").to.be.present;
-        tools.expect.elements("@catalogDropdownOption").count.to.equal(tools.props.catalogOptionCount);
+        browser.perform(async() => {
+            tools.expect.elements("@catalogDropdownOption").count.to.equal(await app.hipsCount());
+        });
 
         // Open the catalog list
         // Verify that the first option has the correct name

@@ -2,6 +2,10 @@
 // TODO: Add proper TypeScript for this page object
 // For now, we just want a compiled .js file to appear in `dist`
 
+const utils = require("../utils");
+const BUILTIN_URL = "https://web.wwtassets.org/engine/assets/builtin-image-sets.wtml";
+const HIPS_URL = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips";
+
 module.exports = {
   url: "http://localhost:8080",
   commands: [{
@@ -10,6 +14,30 @@ module.exports = {
         .waitForElementVisible("@app")
         .waitForElementVisible("@wwtComponent");
     },
+    
+    backgroundCount: async function() {
+      const docHandler = (doc) => {
+        const items = [...doc.querySelectorAll("ImageSet")];
+          return items
+            .map(item => item.attributes)
+            .filter(attr => attr.FileType.nodeValue != 'tsv' && attr.DataSetType.nodeValue == 'Sky')
+            .length;
+      };
+      const hipsProm = utils.parseXMLFromUrl(BUILTIN_URL).then(docHandler);
+      const builtinProm = utils.parseXMLFromUrl(HIPS_URL).then(docHandler);
+      return Promise.all([hipsProm, builtinProm]).then(values => {
+        const reducer = (prev, curr) => prev + curr;
+        return values.reduce(reducer);
+      });
+    },
+
+    hipsCount: function() {
+      return utils.parseXMLFromUrl(HIPS_URL)
+        .then(doc => {
+          const items = [...doc.querySelectorAll("ImageSet")];
+          return items.filter(item => item.attributes.FileType.nodeValue == 'tsv').length;
+        });
+    }
   }],
   props: {
     title: "AAS WorldWide Telescope"
@@ -207,8 +235,6 @@ module.exports = {
         },
       },
       props: {
-        backgroundOptionCount: 834,
-        catalogOptionCount: 49,
         firstBackgroundName: "Digitized Sky Survey (Color)",
         firstBackgroundDescription: "Copyright DSS Consortium",
         firstCatalogName: "The DENIS database (DENIS Consortium, 2005) (denis)",
@@ -216,7 +242,7 @@ module.exports = {
         phatWtmlUrl: "http://data1.wwtassets.org/packages/2021/09_phat_fits/index.wtml",
         phatImageryCount: 2,
         phatLayerNames: ["PHAT-f475w", "PHAT-f814w"],
-      },
+      }
     },
   }
 }
