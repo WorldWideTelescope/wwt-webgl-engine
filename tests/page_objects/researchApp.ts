@@ -29,7 +29,7 @@ module.exports = {
       });
     },
 
-    hipsCount: function() {
+    hipsCount: async function() {
       return utils.parseXMLFromUrl(this.props.hipsUrl)
         .then(doc => {
           const items = [...doc.querySelectorAll("ImageSet")];
