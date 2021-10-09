@@ -5,13 +5,13 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
+    "@types/jsdom": "^16.2.13",
+    "axios": "^0.21.4",
     "browserstack-local": "^1.4.8",
     "jsdom": "^18.0.0"
   },
   "description": "Tests for the AAS WorldWide Telescope engine and apps.",
   "devDependencies": {
-    "@types/jsdom": "^16.2.13",
-    "axios": "^0.21.4",
     "chromedriver": "^92.0.2",
     "edgedriver": "^4.17134.1",
     "geckodriver": "^2.0.3",
