@@ -11,7 +11,7 @@ const tests = {
     researchApp: researchApp, // eslint-disable @typescript-eslint/no-explicit-any
 
     before: function (browser: NightwatchBrowser): void {
-        browser.globals.waitForConditionTimeout = 15000;
+        browser.globals.waitForConditionTimeout = 30000;
         this.researchApp = browser.page.researchApp();
     },
 
