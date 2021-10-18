@@ -186,12 +186,13 @@ const tests = {
         tools.sendKeys("@wtmlUrlInput", browser.Keys.ENTER);
 
         // Check that the appropriate imagery layers now exist
+        const phatLayerRegExps = tools.props.phatLayerNames.map((name: string) => new RegExp(`${utils.escapeRegExp(name)}(\s+)?`));
         controls.click("@toolChooser");
         app.click("@imageryButton");
         tools.click("@imagerySelectionToggle");
         tools.expect.elements("@imageryDropdownOption").count.to.equal(tools.props.phatImageryCount);
         for (let i = 0; i < tools.props.phatImageryCount; i++) {
-            tools.expect.element({selector: "@imageryDropdownOptionName", index: i}).text.to.equal(tools.props.phatLayerNames[i]);
+            tools.expect.element({selector: "@imageryDropdownOptionName", index: i}).text.to.match(phatLayerRegExps[i]);
         }
 
         // Select the first PHAT imagery layer
@@ -199,7 +200,7 @@ const tests = {
 
         // Check that the layer displays in the panel with the correct name
         displayPanel.expect.elements("@imageryItem").count.to.equal(1);
-        displayPanel.expect.element({selector: "@imageryTitle", index: 0}).text.to.equal(tools.props.phatLayerNames[0]);
+        displayPanel.expect.element({selector: "@imageryTitle", index: 0}).text.to.match(phatLayerRegExps[0]);
 
         // Initially, none of the icon buttons should be visible
         const buttons = [
