@@ -317,6 +317,7 @@ import "vue-select/dist/vue-select.css";
 import { debounce } from "debounce";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { mapGetters, mapMutations, mapState } from "vuex";
+import { Route } from 'vue-router';
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
@@ -335,6 +336,7 @@ import {
   Poly,
   PolyLine,
   SpreadSheetLayer,
+  WWTControl,
 } from "@wwtelescope/engine";
 
 import {
@@ -1063,7 +1065,13 @@ export default class App extends WWTAwareComponent {
     this.waitForReady().then(() => {
       // This returns a promise but I don't think that we need to wait for that
       // to resolve before going ahead and starting to listen for messages.
-      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
+      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true })
+        .then(() => {
+          // Get and handle the query parameters
+          // We (potentially) need the catalogs to have finished loading for this
+          const route = this.$route as Route;
+          this.handleQueryParameters(route);
+        });
 
       // Don't start listening for messages until the engine is ready to go.
       // There's no point in returning a "not ready yet" error or anything since
@@ -1211,6 +1219,76 @@ export default class App extends WWTAwareComponent {
       window.clearInterval(this.updateIntervalId);
       this.updateIntervalId = null;
     }
+  }
+
+  parseFloatParam(param: string | (string | null)[], fallback: number): number {
+    if (typeof param === 'string') {
+      let value = parseFloat(param);
+      return value || fallback;
+    }
+    return fallback;
+  }
+
+  handleQueryParameters(route: Route): void {
+    if (!route) {
+      return;
+    }
+    const query = route.query;
+
+    // Go to RA/Dec/Zoom
+    if (query.ra || query.dec || query.zoom) {
+      this.gotoRADecZoom({
+        raRad: this.parseFloatParam(query.ra, this.wwtRARad),
+        decRad: this.parseFloatParam(query.dec, this.wwtDecRad),
+        zoomDeg: this.parseFloatParam(query.zoom, this.wwtZoomDeg),
+        instant: true,
+      });
+    }
+
+    // Set the background image
+    if (typeof query.background === 'string') {
+      console.log(`Setting background to ${query.background}`);
+      this.setBackgroundImageByName(query.background);
+    }
+
+    // Add HiPS catalogs
+    let hipsCatalogs = query.catalogs;
+    if (hipsCatalogs) {
+      if (typeof hipsCatalogs === 'string') {
+        hipsCatalogs = [hipsCatalogs];
+      }
+      console.log(`The catalogs are ${hipsCatalogs}`);
+
+      const catalogsInfo = this.curAvailableCatalogs.filter(info => hipsCatalogs.indexOf(info.name) >= 0);
+      catalogsInfo.forEach(info => {
+        this.addHips(info);
+      });
+    }
+
+    // Load any WTML urls
+    let wtmlUrls = query.wtml;
+    if (wtmlUrls) {
+      if (typeof wtmlUrls === 'string') {
+        wtmlUrls = [wtmlUrls];
+      }
+      for (const url of wtmlUrls) {
+        if (url) {
+          this.loadWtml(url);
+        }
+      }
+    }
+
+    // Add imagery layers
+    // let imageryLayers = query.imagery;
+    // if (imageryLayers) {
+    //   if (typeof imageryLayers === 'string') {
+    //     imageryLayers = [imageryLayers];
+    //   }
+    //   for (const layer of imageryLayers) {
+    //     this.addImageSetLayer(layer);
+    //   }
+    // }
+
   }
 
   // Incoming message handling
@@ -2153,11 +2231,11 @@ export default class App extends WWTAwareComponent {
   // Load WTML Collection tool
 
   wtmlCollectionUrl = "";
+  loadedWtmlUrls: string[] = [];
 
-  submitWtmlCollectionUrl() {
-    if (this.wtmlCollectionUrl) {
-      this.loadImageCollection({
-        url: this.wtmlCollectionUrl,
+  loadWtml(url: string) {
+    this.loadImageCollection({
+        url: url,
         loadChildFolders: true,
       }).then((_folder) => {
         this.$notify({
@@ -2165,8 +2243,13 @@ export default class App extends WWTAwareComponent {
           type: "success",
           text: "WTML collection successfully loaded",
         });
+        this.loadedWtmlUrls.push(this.wtmlCollectionUrl);
       });
+  }
 
+  submitWtmlCollectionUrl() {
+    if (this.wtmlCollectionUrl) {
+      this.loadWtml(this.wtmlCollectionUrl);
       this.wtmlCollectionUrl = "";
     }
   }
