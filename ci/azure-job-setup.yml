@@ -68,7 +68,7 @@ steps:
   - task: NodeTool@0
     displayName: Set up node.js
     inputs:
-      versionSpec: '>=15'
+      versionSpec: '16'
 
   - bash: |
       set -xeuo pipefail
