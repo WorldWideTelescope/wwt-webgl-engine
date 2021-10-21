@@ -1,3 +1,8 @@
+# @wwtelescope/engine 7.14.2 (2021-10-21)
+
+- Fix display of tiled FITS images when using WebGL 1 (#150, @imbasimba).
+
+
 # @wwtelescope/engine 7.14.1 (2021-09-24)
 
 - Fix positioning of FITS SkyImages when using WebGL 1 (#147, @imbasimba).

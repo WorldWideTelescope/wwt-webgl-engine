@@ -107,9 +107,7 @@ namespace wwtlib
                     }
                     else
                     {
-                        FitsImageJs image = null;
-
-                        image = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
+                        fitsImage = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
                         {
                             if (Level == 0) {
                                 dataset.FitsProperties.FireMainImageLoaded(fitsImage);

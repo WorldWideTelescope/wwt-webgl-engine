@@ -1,3 +1,9 @@
+# @wwtelescope/embed 1.5.3 (2021-10-21)
+
+- Fix the centering of the background WWT logo in the "ready to start" tour
+  playback mode (#150, @pkgw).
+
+
 # @wwtelescope/embed 1.5.2 (2021-09-21)
 
 - An internal improvement to our folder loading code broke the way that the
