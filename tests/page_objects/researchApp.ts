@@ -52,7 +52,7 @@ module.exports = {
           selector: "#  "
         },
         catalogsHeader: {
-          selector: "#catalogs-container .display-section-header"
+          selector: "#spreadsheets-container .display-section-header"
         },
         sourcesContainer: {
           selector: "#sources-container"
@@ -65,19 +65,19 @@ module.exports = {
         // i.e., the source components have a similar structure
         // with some of the same IDs
         catalogItem: {
-          selector: "#catalogs-container #root-container"
+          selector: "#spreadsheets-container #root-container"
         },
         catalogMainContainer: {
-          selector: "#catalogs-container #main-container"
+          selector: "#spreadsheets-container #main-container"
         },
         catalogTitle: {
-          selector: "#catalogs-container #name-label"
+          selector: "#spreadsheets-container #name-label"
         },
         catalogVisibilityButton: {
-          selector: "#catalogs-container .fa-eye"
+          selector: "#spreadsheets-container .fa-eye"
         },
         catalogDeleteButton: {
-          selector: "#catalogs-container .fa-times"
+          selector: "#spreadsheets-container .fa-times"
         },
       },
       props: {
