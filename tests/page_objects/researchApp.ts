@@ -105,7 +105,7 @@ module.exports = {
           selector: "#spreadsheets-container #main-container"
         },
         catalogDetailContainer: {
-          selector: "#catalogs-container .detail-container"
+          selector: "#spreadsheets-container .detail-container"
         },
         catalogTitle: {
           selector: "#spreadsheets-container #name-label"
