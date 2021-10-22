@@ -330,6 +330,7 @@ import {
   Annotation,
   Circle,
   Color,
+  Guid,
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
@@ -367,6 +368,8 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
+import { CenterOnCoordinatesMessage, isSetBackgroundByNameMessage, LoadImageCollectionMessage, ModifyTableLayerMessage, SetBackgroundByNameMessage, SetForegroundByNameMessage } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
+import { LoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1025,6 +1028,7 @@ export default class App extends WWTAwareComponent {
 
   addResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   addSource!: (source: Source) => void;
+  hipsCatalogs!: () => CatalogLayerInfo[];
   removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   visibleTableLayers!: () => CatalogLayerInfo[];
 
@@ -1038,7 +1042,10 @@ export default class App extends WWTAwareComponent {
         spreadsheetLayers: (_state, getters) => getters["tableLayers"](),
         sources: (state, _getters) => (state as WWTResearchAppModule).sources,
       }),
-      ...mapGetters(wwtResearchAppNamespace, ["visibleTableLayers"]),
+      ...mapGetters(wwtResearchAppNamespace, [
+        "hipsCatalogs",
+        "visibleTableLayers"
+        ]),
       ...this.$options.computed,
     };
 
@@ -1069,8 +1076,7 @@ export default class App extends WWTAwareComponent {
         .then(() => {
           // Get and handle the query parameters
           // We (potentially) need the catalogs to have finished loading for this
-          const route = this.$route as Route;
-          this.handleQueryParameters(route);
+          this.handleQueryParameters(this.$route);
         });
 
       // Don't start listening for messages until the engine is ready to go.
@@ -1208,6 +1214,8 @@ export default class App extends WWTAwareComponent {
         this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)
       )
     );
+
+    window.addEventListener("keydown", (_event) => console.log(this.stateAsUrl()));
   }
 
   destroyed() {
@@ -1229,66 +1237,116 @@ export default class App extends WWTAwareComponent {
     return fallback;
   }
 
+  encodeObjectBase64(obj: object): string {
+    return Buffer.from(JSON.stringify(obj)).toString('base64');
+  }
+
+  decodeObjectBase64(data: string): object {
+    return JSON.parse(Buffer.from(data, 'base64').toString());
+  }
+
   handleQueryParameters(route: Route): void {
     if (!route) {
       return;
     }
     const query = route.query;
 
-    // Go to RA/Dec/Zoom
-    if (query.ra || query.dec || query.zoom) {
-      this.gotoRADecZoom({
-        raRad: this.parseFloatParam(query.ra, this.wwtRARad),
-        decRad: this.parseFloatParam(query.dec, this.wwtDecRad),
-        zoomDeg: this.parseFloatParam(query.zoom, this.wwtZoomDeg),
-        instant: true,
-      });
-    }
-
-    // Set the background image
-    if (typeof query.background === 'string') {
-      console.log(`Setting background to ${query.background}`);
-      this.setBackgroundImageByName(query.background);
-    }
-
-    // Add HiPS catalogs
-    let hipsCatalogs = query.catalogs;
-    if (hipsCatalogs) {
-      if (typeof hipsCatalogs === 'string') {
-        hipsCatalogs = [hipsCatalogs];
-      }
-      console.log(`The catalogs are ${hipsCatalogs}`);
-
-      const catalogsInfo = this.curAvailableCatalogs.filter(info => hipsCatalogs.indexOf(info.name) >= 0);
-      catalogsInfo.forEach(info => {
-        this.addHips(info);
-      });
-    }
-
-    // Load any WTML urls
-    let wtmlUrls = query.wtml;
-    if (wtmlUrls) {
-      if (typeof wtmlUrls === 'string') {
-        wtmlUrls = [wtmlUrls];
-      }
-      for (const url of wtmlUrls) {
-        if (url) {
-          this.loadWtml(url);
-        }
-      }
-    }
-
-    // Add imagery layers
-    // let imageryLayers = query.imagery;
-    // if (imageryLayers) {
-    //   if (typeof imageryLayers === 'string') {
-    //     imageryLayers = [imageryLayers];
-    //   }
-    //   for (const layer of imageryLayers) {
-    //     this.addImageSetLayer(layer);
-    //   }
+    // Go to RA/Dec/Zoom, if at least one is provided
+    // if (query.ra || query.dec || query.zoom) {
+    //   this.gotoRADecZoom({
+    //     raRad: this.parseFloatParam(query.ra, this.wwtRARad),
+    //     decRad: this.parseFloatParam(query.dec, this.wwtDecRad),
+    //     zoomDeg: this.parseFloatParam(query.zoom, this.wwtZoomDeg),
+    //     instant: true,
+    //   });
     // }
 
+    console.log(route);
+    console.log(query);
+    let msgs = query.messages;
+    console.log(msgs);
+    if (msgs) {
+      let messageStrings: string[];
+      if (typeof msgs === 'string') {
+        messageStrings = msgs.split(",");
+      } else {
+        messageStrings = msgs.flatMap(s => s ? [s] : []);
+      }
+      const messages = messageStrings.map(str => this.decodeObjectBase64(str));
+
+      messages.forEach(console.log);
+
+      // TODO: We need to handle messages in the correct order
+      // Namely, anything that depends on resources being loaded
+      // has to wait until those resources are actually loaded
+      // Currently, this should only mean fetching user-loaded
+      // WTML collections before adding imagery layers
+      // We don't need to worry about HiPS catalogs because
+      // this function runs after they have been loaded
+
+      messages.forEach(this.onMessage);
+
+    }
+  }
+
+  stateAsUrl(): string {
+
+    const coordinatesMessage: CenterOnCoordinatesMessage = {
+      event: "center_on_coordinates",
+      ra: this.wwtRARad * R2D,
+      dec: this.wwtDecRad * R2D,
+      fov: this.wwtZoomDeg,
+      instant: true,
+    };
+
+    let backgroundMessage: SetBackgroundByNameMessage | null = null;
+    if (this.wwtBackgroundImageset !== null) {
+      backgroundMessage = {
+        event: "set_background_by_name",
+        name: this.wwtBackgroundImageset.get_name(),
+      };
+    }
+    
+
+    let foregroundMessage: SetForegroundByNameMessage | null = null;
+    if (this.wwtForegroundImageset !== null) {
+      foregroundMessage = {
+        event: "set_foreground_by_name",
+        name: this.wwtForegroundImageset.get_name(),
+      };
+    }
+
+    const loadCatalogsMessages: LoadHipsCatalogMessage[] =
+      this.hipsCatalogs().map(catalog => {
+        return {
+          event: "layer_hipscat_load",
+          tableId: Guid.create(), // Does the tableId have any external meaning?
+          name: catalog.name
+        };
+      });
+
+    const loadWtmlMessages: LoadImageCollectionMessage[] = 
+      this.loadedWtmlUrls.map(url => {
+        return {
+          event: "load_image_collection",
+          url: url,
+          loadChildFolders: true
+        }
+      });
+
+    const messageStrings = [
+      coordinatesMessage,
+      backgroundMessage,
+      foregroundMessage,
+      ...loadCatalogsMessages,
+      ...loadWtmlMessages,
+    ].flatMap(s => s ? [s] : []).map(this.encodeObjectBase64);
+
+    const params = {
+      messages: messageStrings.join(","),
+    };
+
+    return window.location.origin + '#/?' + (new URLSearchParams(params)).toString();
   }
 
   // Incoming message handling
@@ -1385,6 +1443,7 @@ export default class App extends WWTAwareComponent {
   }
 
   onMessage(msg: any) {
+    console.log(msg);
     const key = String(msg.type || msg.event);
     const handler = this.messageHandlers.get(key);
     let handled = false;
@@ -2243,7 +2302,7 @@ export default class App extends WWTAwareComponent {
           type: "success",
           text: "WTML collection successfully loaded",
         });
-        this.loadedWtmlUrls.push(this.wtmlCollectionUrl);
+        this.loadedWtmlUrls.push(url);
       });
   }
 
