@@ -429,7 +429,7 @@ function availableImagesets(): ImagesetInfo[] {
  */
 function spreadSheetLayerByKey(key: string): SpreadSheetLayer | null {
   if (Vue.$wwt.inst === null)
-    throw new Error('cannot get spreadSheetLayerById without linking to WWTInstance');
+    throw new Error('cannot get spreadSheetLayerByKey without linking to WWTInstance');
 
   const layer = Vue.$wwt.inst.lm.get_layerList()[key];
 

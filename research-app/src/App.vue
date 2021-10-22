@@ -368,8 +368,6 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
-import { CenterOnCoordinatesMessage, isSetBackgroundByNameMessage, LoadImageCollectionMessage, ModifyTableLayerMessage, SetBackgroundByNameMessage, SetForegroundByNameMessage } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
-import { LoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1045,7 +1043,7 @@ export default class App extends WWTAwareComponent {
       ...mapGetters(wwtResearchAppNamespace, [
         "hipsCatalogs",
         "visibleTableLayers"
-        ]),
+      ]),
       ...this.$options.computed,
     };
 
@@ -1076,7 +1074,7 @@ export default class App extends WWTAwareComponent {
         .then(() => {
           // Get and handle the query parameters
           // We (potentially) need the catalogs to have finished loading for this
-          this.handleQueryParameters(this.$route);
+          this.handleQueryParameters(window.location);
         });
 
       // Don't start listening for messages until the engine is ready to go.
@@ -1245,38 +1243,18 @@ export default class App extends WWTAwareComponent {
     return JSON.parse(Buffer.from(data, 'base64').toString());
   }
 
-  handleQueryParameters(route: Route): void {
-    if (!route) {
+  handleQueryParameters(location: Location): void {
+    if (!location) {
       return;
     }
-    const query = route.query;
+    const query = new URLSearchParams(location.search);
 
-    // Go to RA/Dec/Zoom, if at least one is provided
-    // if (query.ra || query.dec || query.zoom) {
-    //   this.gotoRADecZoom({
-    //     raRad: this.parseFloatParam(query.ra, this.wwtRARad),
-    //     decRad: this.parseFloatParam(query.dec, this.wwtDecRad),
-    //     zoomDeg: this.parseFloatParam(query.zoom, this.wwtZoomDeg),
-    //     instant: true,
-    //   });
-    // }
-
-    console.log(route);
-    console.log(query);
-    let msgs = query.messages;
-    console.log(msgs);
+    let msgs = query.get('messages');
     if (msgs) {
-      let messageStrings: string[];
-      if (typeof msgs === 'string') {
-        messageStrings = msgs.split(",");
-      } else {
-        messageStrings = msgs.flatMap(s => s ? [s] : []);
-      }
+      const messageStrings = msgs.split(",");
       const messages = messageStrings.map(str => this.decodeObjectBase64(str));
 
-      messages.forEach(console.log);
-
-      // TODO: We need to handle messages in the correct order
+      // We need to handle messages in the correct order
       // Namely, anything that depends on resources being loaded
       // has to wait until those resources are actually loaded
       // Currently, this should only mean fetching user-loaded
@@ -1284,14 +1262,47 @@ export default class App extends WWTAwareComponent {
       // We don't need to worry about HiPS catalogs because
       // this function runs after they have been loaded
 
-      messages.forEach(this.onMessage);
+      // The approach is as follows:
+      // We don't know which loaded WTML file is responsible for each imagery layer
+      // so we wait for all of our WTML files to finish loading
+      // A message handler keeps track of which ones have completed
+      // Once they're all done, we can load our imagery files
+      // and remove this message handler
+
+      const imagesetLoadMessages = messages.filter(classicPywwt.isLoadImageCollectionMessage);
+      const imageryLayerMessages = messages.filter(classicPywwt.isCreateImageSetLayerMessage);
+
+      const handleWtmlLoaded: (msg: any) => boolean = (msg) => {
+        if (!classicPywwt.isLoadImageCollectionCompletedMessage(msg)) return false;
+        this.loadedWtmlUrls.push(msg.url);
+
+        const matchingMessages = imagesetLoadMessages.filter(x => x.url === msg.url);
+        for (const loadMsg of matchingMessages) {
+          this.onMessage(loadMsg);
+          const index = imagesetLoadMessages.indexOf(loadMsg);
+          if (index >= 0) {
+            imagesetLoadMessages.splice(index, 1);
+          }
+        }
+        if (imagesetLoadMessages.length === 0) {
+          for (const message of imageryLayerMessages) {
+            this.onMessage(message);
+          }
+          this.messageHandlers.delete("load_image_collection_completed");
+        }
+        return true;
+      }
+      this.messageHandlers.set("load_image_collection_completed", handleWtmlLoaded);
+      
+      const otherMessages = messages.filter(msg => !classicPywwt.isCreateImageSetLayerMessage(msg));
+      otherMessages.forEach(this.onMessage);
 
     }
   }
 
   stateAsUrl(): string {
 
-    const coordinatesMessage: CenterOnCoordinatesMessage = {
+    const coordinatesMessage: classicPywwt.CenterOnCoordinatesMessage = {
       event: "center_on_coordinates",
       ra: this.wwtRARad * R2D,
       dec: this.wwtDecRad * R2D,
@@ -1299,16 +1310,20 @@ export default class App extends WWTAwareComponent {
       instant: true,
     };
 
-    let backgroundMessage: SetBackgroundByNameMessage | null = null;
+    let backgroundMessage: classicPywwt.SetBackgroundByNameMessage | null = null;
     if (this.wwtBackgroundImageset !== null) {
+      let name = this.wwtBackgroundImageset.get_name();
+      if (name === 'DSS') {
+        name = 'Digitized Sky Survey (Color)'
+      };
       backgroundMessage = {
         event: "set_background_by_name",
-        name: this.wwtBackgroundImageset.get_name(),
+        name: name,
       };
     }
     
 
-    let foregroundMessage: SetForegroundByNameMessage | null = null;
+    let foregroundMessage: classicPywwt.SetForegroundByNameMessage | null = null;
     if (this.wwtForegroundImageset !== null) {
       foregroundMessage = {
         event: "set_foreground_by_name",
@@ -1316,7 +1331,7 @@ export default class App extends WWTAwareComponent {
       };
     }
 
-    const loadCatalogsMessages: LoadHipsCatalogMessage[] =
+    const loadCatalogsMessages: layers.LoadHipsCatalogMessage[] =
       this.hipsCatalogs().map(catalog => {
         return {
           event: "layer_hipscat_load",
@@ -1325,7 +1340,7 @@ export default class App extends WWTAwareComponent {
         };
       });
 
-    const loadWtmlMessages: LoadImageCollectionMessage[] = 
+    const loadWtmlMessages: classicPywwt.LoadImageCollectionMessage[] = 
       this.loadedWtmlUrls.map(url => {
         return {
           event: "load_image_collection",
@@ -1334,19 +1349,39 @@ export default class App extends WWTAwareComponent {
         }
       });
 
+    const imgMsgs: (classicPywwt.CreateImageSetLayerMessage | null)[] = 
+      this.activeImagesetLayerStates.map(info => {
+
+        const id = info.getGuid();
+        const imageset = this.imagesetForLayer(id);
+        if (imageset !== null) {
+          return {
+            event: "image_layer_create",
+            id: imageset.get_name(),
+            url: imageset.get_url(),
+            mode: "preloaded",
+            goto: false,
+          };
+        }
+        return null;
+      });
+    const imageryLayerMessages: classicPywwt.CreateImageSetLayerMessage[] = imgMsgs.filter(classicPywwt.isCreateImageSetLayerMessage);
+
     const messageStrings = [
       coordinatesMessage,
       backgroundMessage,
       foregroundMessage,
       ...loadCatalogsMessages,
       ...loadWtmlMessages,
-    ].flatMap(s => s ? [s] : []).map(this.encodeObjectBase64);
+      ...imageryLayerMessages,
+    ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
 
     const params = {
+      origin: window.location.origin,
       messages: messageStrings.join(","),
     };
 
-    return window.location.origin + '#/?' + (new URLSearchParams(params)).toString();
+    return window.location.origin + '/?' + (new URLSearchParams(params)).toString();
   }
 
   // Incoming message handling
@@ -1443,7 +1478,6 @@ export default class App extends WWTAwareComponent {
   }
 
   onMessage(msg: any) {
-    console.log(msg);
     const key = String(msg.type || msg.event);
     const handler = this.messageHandlers.get(key);
     let handled = false;

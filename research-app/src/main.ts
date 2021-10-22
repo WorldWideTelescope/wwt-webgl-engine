@@ -41,8 +41,6 @@ import Notifications from 'vue-notification';
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
 
-import VueRouter from "vue-router";
-
 import { createPlugin } from "@wwtelescope/engine-vuex";
 
 import App from "./App.vue";
@@ -58,12 +56,9 @@ Vue.config.productionTip = false;
 Vue.use(Notifications);
 Vue.use(VTooltip);
 Vue.use(Vuex);
-Vue.use(VueRouter);
 
 const store = new Vuex.Store({});
 store.registerModule(wwtResearchAppNamespace, WWTResearchAppModule);
-
-const router = new VueRouter();
 
 Vue.use(createPlugin(), {
   store,
@@ -134,7 +129,6 @@ if (allowedOrigin === null) {
 }
 
 new Vue({
-  router,
   store,
   el: "#app",
   render: createElement => {
