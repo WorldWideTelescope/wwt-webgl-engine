@@ -71,6 +71,12 @@ export interface LoadHipsCatalogCompletedMessage {
   spreadsheetInfo: SpreadSheetLayerInfo;
 }
 
+export function isLoadHipsCatalogCompletedMessage(o: any): o is LoadHipsCatalogCompletedMessage {
+  return o.event == 'layer_hipscat_load_completed' &&
+    typeof o.threadId == 'string' &&
+    typeof o.spreadsheetInfo == 'object';
+}
+
 /** Information about a "spreadsheet" layer in the engine.
  *
  * This interface is used when a client needs to learn about a spreadsheet layer

@@ -317,7 +317,6 @@ import "vue-select/dist/vue-select.css";
 import { debounce } from "debounce";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { mapGetters, mapMutations, mapState } from "vuex";
-import { Route } from 'vue-router';
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
@@ -368,6 +367,8 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
+import { spreadSheetLayerSettingNames } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
+import { imageSetLayerSettingNames } from "@wwtelescope/engine-helpers/src/imagesetlayer";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1255,46 +1256,91 @@ export default class App extends WWTAwareComponent {
       const messages = messageStrings.map(str => this.decodeObjectBase64(str));
 
       // We need to handle messages in the correct order
-      // Namely, anything that depends on resources being loaded
-      // has to wait until those resources are actually loaded
-      // Currently, this should only mean fetching user-loaded
-      // WTML collections before adding imagery layers
-      // We don't need to worry about HiPS catalogs because
-      // this function runs after they have been loaded
 
+      // First, imagery layers
+      // These depend on the loading of WTML files
       // The approach is as follows:
       // We don't know which loaded WTML file is responsible for each imagery layer
       // so we wait for all of our WTML files to finish loading
       // A message handler keeps track of which ones have completed
       // Once they're all done, we can load our imagery files
-      // and remove this message handler
+      // and apply any settings
+      // and then remove this message handler
 
       const imagesetLoadMessages = messages.filter(classicPywwt.isLoadImageCollectionMessage);
       const imageryLayerMessages = messages.filter(classicPywwt.isCreateImageSetLayerMessage);
+      const imagerySettingMessages = messages.filter(classicPywwt.isModifyFitsLayerMessage);
 
       const handleWtmlLoaded: (msg: any) => boolean = (msg) => {
         if (!classicPywwt.isLoadImageCollectionCompletedMessage(msg)) return false;
         this.loadedWtmlUrls.push(msg.url);
 
         const matchingMessages = imagesetLoadMessages.filter(x => x.url === msg.url);
-        for (const loadMsg of matchingMessages) {
-          this.onMessage(loadMsg);
+        matchingMessages.forEach(loadMsg => {
           const index = imagesetLoadMessages.indexOf(loadMsg);
           if (index >= 0) {
             imagesetLoadMessages.splice(index, 1);
           }
-        }
+        });
         if (imagesetLoadMessages.length === 0) {
-          for (const message of imageryLayerMessages) {
-            this.onMessage(message);
-          }
+          [imageryLayerMessages, imagerySettingMessages].forEach(
+            messages => messages.forEach(this.onMessage));
           this.messageHandlers.delete("load_image_collection_completed");
         }
         return true;
-      }
+      };
       this.messageHandlers.set("load_image_collection_completed", handleWtmlLoaded);
+
+      // We also want to wait to apply any table layer settings
+      // after the corresponding layers have been created
+      // Some of the settings messages correspond to HiPS catalog layers,
+      // and we don't have a good way to tell which are which
+      // So we defer all of these messages until all HiPS catalogs are loaded
+      const loadCatalogsMessages = messages.filter(layers.isLoadHipsCatalogMessage);
+      const createTableMessages = messages.filter(classicPywwt.isCreateTableLayerMessage);
+      const tableSettingMessages = messages.filter(classicPywwt.isModifyTableLayerMessage);
+
+      const nameFromSpreadsheetInfo = function(info: layers.SpreadSheetLayerInfo): string {
+        const settings = info.settings;
+        for (const items of settings) {
+          if (items[0] == 'name') {
+            return items[1];
+          }
+        }
+        return "";
+      }
       
-      const otherMessages = messages.filter(msg => !classicPywwt.isCreateImageSetLayerMessage(msg));
+      const handleHipsLoaded: (msg: any) => boolean = (msg) => {
+        if (!layers.isLoadHipsCatalogCompletedMessage(msg)) return false;
+
+        const name = nameFromSpreadsheetInfo(msg.spreadsheetInfo);
+        const matchingMessages = loadCatalogsMessages.filter(x => x.name == name);
+        matchingMessages.forEach(loadMsg => {
+          const index = loadCatalogsMessages.indexOf(loadMsg);
+          if (index >= 0) {
+            loadCatalogsMessages.splice(index, 1);
+          }
+        });
+        if (loadCatalogsMessages.length === 0) {
+          [createTableMessages, tableSettingMessages].forEach(
+            messages => messages.forEach(this.onMessage));
+          this.messageHandlers.delete("layer_hipscat_load_completed");
+        }
+        return true;
+      };
+      this.messageHandlers.set("layer_hipscat_load_completed", handleHipsLoaded);
+      
+      
+      // Any other messages that aren't order-dependent
+      // Note that this includes the loading messages
+      // since it's only their replies that we need to
+      // worry about
+      const otherMessages = messages.filter(msg => 
+        !(   classicPywwt.isCreateTableLayerMessage(msg)
+          || classicPywwt.isCreateImageSetLayerMessage(msg)
+          || classicPywwt.isModifyTableLayerMessage(msg)
+          || classicPywwt.isModifyFitsLayerMessage(msg)
+      ));
       otherMessages.forEach(this.onMessage);
 
     }
@@ -1331,14 +1377,31 @@ export default class App extends WWTAwareComponent {
       };
     }
 
+    const threadId = Guid.create();
+    const catalogs = this.hipsCatalogs();
     const loadCatalogsMessages: layers.LoadHipsCatalogMessage[] =
-      this.hipsCatalogs().map(catalog => {
+      catalogs.map(catalog => {
         return {
           event: "layer_hipscat_load",
+          threadId: threadId, // We need this to get a response
           tableId: Guid.create(), // Does the tableId have any external meaning?
           name: catalog.name
         };
       });
+
+    
+    const tableSettingMessages: classicPywwt.ModifyTableLayerMessage[] = [];
+    this.spreadsheetLayers.forEach(layer => {
+      const state = this.spreadsheetState(layer);
+      for (const setting of spreadSheetLayerSettingNames) {
+        tableSettingMessages.push({
+          event: "table_layer_set",
+          id: layer instanceof SpreadSheetLayerInfo ? layer.id : layer.name,
+          setting: setting,
+          value: (state as any)["get_" + setting](),
+        });
+      }
+    });
 
     const loadWtmlMessages: classicPywwt.LoadImageCollectionMessage[] = 
       this.loadedWtmlUrls.map(url => {
@@ -1349,23 +1412,32 @@ export default class App extends WWTAwareComponent {
         }
       });
 
-    const imgMsgs: (classicPywwt.CreateImageSetLayerMessage | null)[] = 
-      this.activeImagesetLayerStates.map(info => {
-
-        const id = info.getGuid();
-        const imageset = this.imagesetForLayer(id);
-        if (imageset !== null) {
-          return {
+    const imageryLayerMessages: classicPywwt.CreateImageSetLayerMessage[] = [];
+    const imagerySettingMessages: classicPywwt.ModifyFitsLayerMessage[] = [];
+    this.activeImagesetLayerStates.forEach(info => {
+      const id = info.getGuid();
+      const imageset = this.imagesetForLayer(id);
+      if (imageset !== null) {
+          imageryLayerMessages.push({
             event: "image_layer_create",
             id: imageset.get_name(),
             url: imageset.get_url(),
             mode: "preloaded",
             goto: false,
-          };
+          });
+
+        const state = this.wwtImagesetLayers[id];
+        const settings = state.settings;
+        for (const setting of imageSetLayerSettingNames) {
+          imagerySettingMessages.push({
+            event: "image_layer_set",
+            id: imageset.get_name(),
+            setting: setting,
+            value: (settings as any)["get_" + setting](),
+          });
         }
-        return null;
-      });
-    const imageryLayerMessages: classicPywwt.CreateImageSetLayerMessage[] = imgMsgs.filter(classicPywwt.isCreateImageSetLayerMessage);
+      }
+    });
 
     const messageStrings = [
       coordinatesMessage,
@@ -1374,6 +1446,8 @@ export default class App extends WWTAwareComponent {
       ...loadCatalogsMessages,
       ...loadWtmlMessages,
       ...imageryLayerMessages,
+      ...tableSettingMessages,
+      ...imagerySettingMessages,
     ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
 
     const params = {
