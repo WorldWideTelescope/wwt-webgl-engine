@@ -34,8 +34,8 @@
     "@wwtelescope/engine": "thiscommit:2021-09-24:AozaW18",
     "@wwtelescope/engine-helpers": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2",
     "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2",
-    "@wwtelescope/engine-vuex": "98d79e2c009c0fbabe676730787e8582dd1b8adb",
-    "@wwtelescope/research-app-messages": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2"
+    "@wwtelescope/engine-vuex": "0ca3ceb17cfb110d27465c6997d9469f4e728ae9",
+    "@wwtelescope/research-app-messages": "a35405348fc96b130391fb17c1de22fb9f5df362"
   },
   "keywords": [
     "AAS WorldWide Telescope"
