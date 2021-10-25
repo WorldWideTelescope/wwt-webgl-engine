@@ -2344,6 +2344,7 @@ body {
   top: 0.5rem;
   left: 0.5rem;
   width: calc(100% - 1rem);
+  pointer-events: none;
 }
 
 .element-box {
@@ -2374,6 +2375,7 @@ body {
 }
 
 #controls {
+  pointer-events: auto;
   z-index: 10;
   color: #fff;
 
@@ -2406,6 +2408,7 @@ body {
 }
 
 #tools {
+  pointer-events: auto;
   order: 2;
   color: #fff;
   left: -calc(12.5vw - 15px);
@@ -2432,6 +2435,7 @@ body {
 }
 
 #display-panel {
+  pointer-events: auto;
   order: 1;
   min-width: 200px;
   max-width: 25vw;
