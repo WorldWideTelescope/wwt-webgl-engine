@@ -325,6 +325,8 @@ import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
 
+interface Message { event: string; }
+
 import {
   Annotation,
   Circle,
@@ -1251,98 +1253,125 @@ export default class App extends WWTAwareComponent {
     const query = new URLSearchParams(location.search);
 
     let msgs = query.get('messages');
-    if (msgs) {
-      const messageStrings = msgs.split(",");
-      const messages = messageStrings.map(str => this.decodeObjectBase64(str));
+    if (!msgs) {
+      return;
+    }
 
-      // We need to handle messages in the correct order
+    console.log("Here");
 
-      // First, imagery layers
-      // These depend on the loading of WTML files
-      // The approach is as follows:
-      // We don't know which loaded WTML file is responsible for each imagery layer
-      // so we wait for all of our WTML files to finish loading
-      // A message handler keeps track of which ones have completed
-      // Once they're all done, we can load our imagery files
-      // and apply any settings
-      // and then remove this message handler
+    //const decoded = decompress(msgs) as string;
+    const decoded = msgs;
+    const messageStrings = decoded.split(",");
+    const messages: Message[] = messageStrings.map(str => this.decodeObjectBase64(str))
+                                    .filter((obj): obj is Message => "event" in obj);
+    messages.forEach(console.log);
+    
 
-      const imagesetLoadMessages = messages.filter(classicPywwt.isLoadImageCollectionMessage);
-      const imageryLayerMessages = messages.filter(classicPywwt.isCreateImageSetLayerMessage);
-      const imagerySettingMessages = messages.filter(classicPywwt.isModifyFitsLayerMessage);
+    // We need to handle messages in the correct order
+    // Generally, let's assume that our message can be any
+    // research app message
+    // Even though some (i.e. removal messages) are unlikely
+    // to come in a query string
+    const messagesAdjList: { [event: string]: string[] | undefined } = {
+      "table_layer_create": [ "table_layer_set", "table_layer_remove", "table_layer_update" ],
+      "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create" ],
+      "set_foreground_by_name": [ "set_foreground_opacity" ],
+      "layer_hipscat_load": [ "layer_hipscat_datainview" ],
+    };
+    const completedMessageType: { [event: string]: string | undefined } = {
+      "load_image_collection": "load_image_collection_completed",
+      "layer_hipscat_load": "layer_hipscat_load_completed",
+    };
+    const messageTypes: string[] = messages.map(msg => msg.event);
 
-      const handleWtmlLoaded: (msg: any) => boolean = (msg) => {
-        if (!classicPywwt.isLoadImageCollectionCompletedMessage(msg)) return false;
-        this.loadedWtmlUrls.push(msg.url);
+    // Messages types that don't depend on another message type
+    const rootTypes = messageTypes.filter(type => Object.values(messagesAdjList).map(types => (types || []).indexOf(type)).every(x => x < 0));
+    console.log(`Root types: ${rootTypes}`);
 
-        const matchingMessages = imagesetLoadMessages.filter(x => x.url === msg.url);
-        matchingMessages.forEach(loadMsg => {
-          const index = imagesetLoadMessages.indexOf(loadMsg);
-          if (index >= 0) {
-            imagesetLoadMessages.splice(index, 1);
+    const bfs = (rootNodes: string[], adjList: typeof messagesAdjList) => {
+      const queue: string[] = [...rootNodes];
+      const result: string[] = [];
+      const visited: { [node: string]: boolean | undefined } = {};
+      rootNodes.forEach(node => visited[node] = true);
+      let currentVertex: string;
+      while (queue.length > 0) {
+
+          // Assigning the result of queue.shift() to currentVertex
+          // made TypeScript complain
+          const nextItem = queue.shift();
+          if (nextItem === undefined) {
+            break;
           }
-        });
-        if (imagesetLoadMessages.length === 0) {
-          [imageryLayerMessages, imagerySettingMessages].forEach(
-            messages => messages.forEach(this.onMessage));
-          this.messageHandlers.delete("load_image_collection_completed");
-        }
-        return true;
-      };
-      this.messageHandlers.set("load_image_collection_completed", handleWtmlLoaded);
+          currentVertex = nextItem;
 
-      // We also want to wait to apply any table layer settings
-      // after the corresponding layers have been created
-      // Some of the settings messages correspond to HiPS catalog layers,
-      // and we don't have a good way to tell which are which
-      // So we defer all of these messages until all HiPS catalogs are loaded
-      const loadCatalogsMessages = messages.filter(layers.isLoadHipsCatalogMessage);
-      const createTableMessages = messages.filter(classicPywwt.isCreateTableLayerMessage);
-      const tableSettingMessages = messages.filter(classicPywwt.isModifyTableLayerMessage);
-
-      const nameFromSpreadsheetInfo = function(info: layers.SpreadSheetLayerInfo): string {
-        const settings = info.settings;
-        for (const items of settings) {
-          if (items[0] == 'name') {
-            return items[1];
-          }
-        }
-        return "";
+          result.push(currentVertex);
+          (adjList[currentVertex] || []).forEach(neighbor => {
+              if (!visited[neighbor]) {
+                  visited[neighbor] = true;
+                  queue.push(neighbor);
+              }
+          });
       }
-      
-      const handleHipsLoaded: (msg: any) => boolean = (msg) => {
-        if (!layers.isLoadHipsCatalogCompletedMessage(msg)) return false;
+      return result;
+    };
 
-        const name = nameFromSpreadsheetInfo(msg.spreadsheetInfo);
-        const matchingMessages = loadCatalogsMessages.filter(x => x.name == name);
-        matchingMessages.forEach(loadMsg => {
-          const index = loadCatalogsMessages.indexOf(loadMsg);
-          if (index >= 0) {
-            loadCatalogsMessages.splice(index, 1);
+    const sortedTypes = bfs(rootTypes, messagesAdjList);
+    console.log(`Root types after bfs: ${rootTypes}`);
+    console.log(`Sorted types: ${sortedTypes}`);
+    const sortedMessages = messages.sort((msg1, msg2) => sortedTypes.indexOf(msg1.event) - sortedTypes.indexOf(msg2.event));
+    
+    const addMessagesOfType: (type: string) => void = (type) => {
+      console.log(`Adding messages of type ${type}`);
+      const messagesOfType = sortedMessages.filter(msg => msg.event === type);
+      this.messageQueue = this.messageQueue.concat(messagesOfType);
+
+      const nextTypes = messagesAdjList[type];
+      const completedType = completedMessageType[type];
+      if (!nextTypes) {
+        return;
+      }
+
+      const nextTypesPresent = nextTypes.filter(t => messageTypes.indexOf(t) >= 0);
+
+      if (completedType) {
+        console.log(`Completed type: ${completedType}`);
+        const handler: (msg: any) => boolean = (msg) => {
+          console.log(`Inside dynamic handler for type ${msg.event}`);
+          console.log(`The msg is ${JSON.stringify(msg)}`);
+          //@ts-ignore
+          const matchingMessages = messagesOfType.filter(x => x.threadId === msg.threadId);
+          matchingMessages.forEach(m => {
+            messagesOfType.splice(messagesOfType.indexOf(m), 1);
+          });
+          if (messagesOfType.length === 0) {
+            this.messageHandlers.delete(type);
+            nextTypesPresent.forEach(t => addMessagesOfType(t));
           }
-        });
-        if (loadCatalogsMessages.length === 0) {
-          [createTableMessages, tableSettingMessages].forEach(
-            messages => messages.forEach(this.onMessage));
-          this.messageHandlers.delete("layer_hipscat_load_completed");
-        }
-        return true;
-      };
-      this.messageHandlers.set("layer_hipscat_load_completed", handleHipsLoaded);
-      
-      
-      // Any other messages that aren't order-dependent
-      // Note that this includes the loading messages
-      // since it's only their replies that we need to
-      // worry about
-      const otherMessages = messages.filter(msg => 
-        !(   classicPywwt.isCreateTableLayerMessage(msg)
-          || classicPywwt.isCreateImageSetLayerMessage(msg)
-          || classicPywwt.isModifyTableLayerMessage(msg)
-          || classicPywwt.isModifyFitsLayerMessage(msg)
-      ));
-      otherMessages.forEach(this.onMessage);
+          return true;
+        };
+        this.messageHandlers.set(completedType, handler);
+        console.log(`Set handler for ${type}`);
+      } else {
+        nextTypes.forEach(t => addMessagesOfType(t));
+      }
+    }
 
+    console.log(`Root types:`);
+    console.log(rootTypes);
+    const rootTypesPresent = rootTypes.filter(t => messageTypes.indexOf(t) >= 0);
+    console.log("Root types present");
+    console.log(rootTypesPresent);
+    rootTypesPresent.forEach(type => addMessagesOfType(type));
+  }
+
+  messageQueue: Message[] = [];
+
+  @Watch("messageQueue")
+  handleMessageQueueUpdate(queue: Message[]): void {
+    console.log(`Message queue got updated. Current length is ${queue.length}`);
+    while (queue.length > 0) {
+      const message = queue.shift();
+      this.onMessage(message);
     }
   }
 
@@ -1385,23 +1414,33 @@ export default class App extends WWTAwareComponent {
           event: "layer_hipscat_load",
           threadId: threadId, // We need this to get a response
           tableId: Guid.create(), // Does the tableId have any external meaning?
-          name: catalog.name
+          name: catalog.name,
         };
       });
 
-    
-    const tableSettingMessages: classicPywwt.ModifyTableLayerMessage[] = [];
-    this.spreadsheetLayers.forEach(layer => {
-      const state = this.spreadsheetState(layer);
-      for (const setting of spreadSheetLayerSettingNames) {
-        tableSettingMessages.push({
-          event: "table_layer_set",
-          id: layer instanceof SpreadSheetLayerInfo ? layer.id : layer.name,
-          setting: setting,
-          value: (state as any)["get_" + setting](),
-        });
-      }
-    });
+    const otherTables = this.spreadsheetLayers.filter((x): x is SpreadSheetLayerInfo => x instanceof SpreadSheetLayerInfo);
+    // const createTableMessages: classicPywwt.CreateTableLayerMessage[] = 
+    //   otherTables.map(table => {
+    //     const layer = this.spreadSheetLayerById(table.id);
+    //     return {
+    //       event: "table_layer_create",
+    //       id: table.id,
+    //       table: layer.
+    //     }
+    //   })
+
+    // const tableSettingMessages: classicPywwt.ModifyTableLayerMessage[] = [];
+    // this.spreadsheetLayers.forEach(layer => {
+    //   const state = this.spreadsheetState(layer);
+    //   for (const setting of spreadSheetLayerSettingNames) {
+    //     tableSettingMessages.push({
+    //       event: "table_layer_set",
+    //       id: layer instanceof SpreadSheetLayerInfo ? layer.id : layer.name,
+    //       setting: setting,
+    //       value: (state as any)["get_" + setting](),
+    //     });
+    //   }
+    // });
 
     const loadWtmlMessages: classicPywwt.LoadImageCollectionMessage[] = 
       this.loadedWtmlUrls.map(url => {
@@ -1426,16 +1465,16 @@ export default class App extends WWTAwareComponent {
             goto: false,
           });
 
-        const state = this.wwtImagesetLayers[id];
-        const settings = state.settings;
-        for (const setting of imageSetLayerSettingNames) {
-          imagerySettingMessages.push({
-            event: "image_layer_set",
-            id: imageset.get_name(),
-            setting: setting,
-            value: (settings as any)["get_" + setting](),
-          });
-        }
+        // const state = this.wwtImagesetLayers[id];
+        // const settings = state.settings;
+        // for (const setting of imageSetLayerSettingNames) {
+        //   imagerySettingMessages.push({
+        //     event: "image_layer_set",
+        //     id: imageset.get_name(),
+        //     setting: setting,
+        //     value: (settings as any)["get_" + setting](),
+        //   });
+        // }
       }
     });
 
@@ -1446,13 +1485,17 @@ export default class App extends WWTAwareComponent {
       ...loadCatalogsMessages,
       ...loadWtmlMessages,
       ...imageryLayerMessages,
-      ...tableSettingMessages,
+      //...tableSettingMessages,
       ...imagerySettingMessages,
     ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
 
+    const messageString = messageStrings.join(",");
+    //const outString = compress(messageString);
+    const outString = messageString;
+
     const params = {
       origin: window.location.origin,
-      messages: messageStrings.join(","),
+      messages: outString,
     };
 
     return window.location.origin + '/?' + (new URLSearchParams(params)).toString();
@@ -1463,6 +1506,7 @@ export default class App extends WWTAwareComponent {
   private messageHandlers: Map<string, (msg: any) => boolean> = new Map();
 
   private initializeHandlers() {
+    console.log("Initializing handlers");
     // These handlers must take care to type-check that the input
     // message actually fully obeys the expected schema!
 
@@ -1552,6 +1596,7 @@ export default class App extends WWTAwareComponent {
   }
 
   onMessage(msg: any) {
+    console.log(`onMessage: ${JSON.stringify(msg)}`);
     const key = String(msg.type || msg.event);
     const handler = this.messageHandlers.get(key);
     let handled = false;
@@ -1594,6 +1639,7 @@ export default class App extends WWTAwareComponent {
           this.allowedOrigin
         );
       }
+      this.loadedWtmlUrls.push(msg.url);
     });
     return true;
   }
