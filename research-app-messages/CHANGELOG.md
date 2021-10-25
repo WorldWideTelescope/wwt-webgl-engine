@@ -1,3 +1,12 @@
+# @wwtelescope/research-app-messages 0.11.0 (2021-10-25)
+
+- Update the selection interface to support selected sources that originate in
+  either HiPS progressive catalogs (as before) or also regular "spreadsheet"
+  layers (#146, @Carifio24). This change involves some field name changes that
+  would break existing client code that interacted with source selection
+  messages, if there was any in the wild.
+
+
 # @wwtelescope/research-app-messages 0.10.0 (2021-09-20)
 
 More new interfaces and fixes supporting neat new features in the research app

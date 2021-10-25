@@ -1,3 +1,12 @@
+# @wwtelescope/engine-vuex 0.12.0 (2021-10-25)
+
+- Add new interfaces that help unify code that deals with both HiPS
+  progressive catalog layers and regular "spreadsheet" layers (#146,
+  @Carifio24). These include the `CatalogLayerInfo` and `SpreadSheetLayerInfo`
+  classes and `WWTEngineVuexModule` getters `spreadSheetLayerById`,
+  `spreadsheetStateById`, `spreadSheetLayer`, and `spreadsheetState`; 
+
+
 # @wwtelescope/engine-vuex 0.11.0 (2021-09-20)
 
 Lots of new features to (better) support HiPS catalogs, source selections, and
