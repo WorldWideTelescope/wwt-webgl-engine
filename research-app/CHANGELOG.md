@@ -1,3 +1,11 @@
+# @wwtelescope/research-app 0.8.0 (2021-10-25)
+
+- Allow users to use the UI to configure how not just HiPS progressive catalog
+  data, but also generic "spreadsheet" layers, are displayed (#146, @Carifio24).
+- Update the CSS and layout to be more responsive and work better in narrow
+  windows (#148, @Carifio24).
+
+
 # @wwtelescope/research-app 0.7.1 (2021-09-24)
 
 - Bump minimum required engine version to get the WebGL1 position fix (#147, @imbasimba)
