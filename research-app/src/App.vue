@@ -2366,6 +2366,7 @@ body {
 #tools-box {
   flex: 3;
   order: 2;
+  justify-content: center;
 }
 
 #controls-box {
@@ -2411,8 +2412,6 @@ body {
   pointer-events: auto;
   order: 2;
   color: #fff;
-  left: -calc(12.5vw - 15px);
-  width: 100%;
   display: flex;
   justify-content: center;
 
