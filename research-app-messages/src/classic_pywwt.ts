@@ -861,14 +861,24 @@ export type PywwtMessage =
  * function enables. The input is modified in-place.
 */
 export function applyBaseUrlIfApplicable(o: any, baseurl: string): void {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  // Creating a URL object can cause extra escaping to be applied, which can
+  // break some WWT engine APIs that expect to match URLs with exact string
+  // comparisons. In particular, braces will get percent-escaped, which causes
+  // problems for tiled imagery. I'm not aware of a better solution than to
+  // blind undo the escaping that *probably* don't want.
+  function rewrite(url: string): string {
+    const u = new URL(url, baseurl);
+    return u.toString().replace(/%7B/, '{').replace(/%7D/, '}');
+  }
+
   if (isCreateImageSetLayerMessage(o)) {
-    o.url = new URL(o.url, baseurl).toString();
+    o.url = rewrite(o.url);
   } else if (isCreateFitsLayerMessage(o)) {
-    o.url = new URL(o.url, baseurl).toString();
+    o.url = rewrite(o.url);
   } else if (isLoadImageCollectionMessage(o)) {
-    o.url = new URL(o.url, baseurl).toString();
+    o.url = rewrite(o.url);
   } else if (isLoadTourMessage(o)) {
-    o.url = new URL(o.url, baseurl).toString();
+    o.url = rewrite(o.url);
   }
 }
 
