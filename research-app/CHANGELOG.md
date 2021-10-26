@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.8.1 (2021-10-26)
+
+- Fix some cases where invisible HTML elements prevent clicks from reaching the
+  WWT application (#152, @Carifio24).
+
+
 # @wwtelescope/research-app 0.8.0 (2021-10-25)
 
 - Allow users to use the UI to configure how not just HiPS progressive catalog
