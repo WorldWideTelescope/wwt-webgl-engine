@@ -1,3 +1,12 @@
+# @wwtelescope/research-app-messages 0.11.1 (2021-10-26)
+
+- Work around undesirable URL escaping that could be added when applying a
+  base-URL in `classic_pywwt.applyBaseUrlIfApplicable()` (#153, @pkgw). This
+  escaping irrevocably altered URLs with WWT templates, which in turn made it
+  impossible to use certain engine APIs that look up URLs using string
+  comparions.
+
+
 # @wwtelescope/research-app-messages 0.11.0 (2021-10-25)
 
 - Update the selection interface to support selected sources that originate in
