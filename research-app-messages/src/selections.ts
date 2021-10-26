@@ -85,17 +85,32 @@ export interface Source {
  */
 export interface SelectionStateMessage {
 
-    /** The tag identifying this message type. */
-    type: "wwt_selection_state";
+  /** The tag identifying this message type. */
+  type: "wwt_selection_state";
+
+  /** An app/client session identifier. See the description for [[ViewStateMessage.sessionId]].
+   */
+  sessionId: string;
+
+  /** The most recent source that was added to the selection list. */
+  mostRecentSource?: Source;
+
+  /** The list of sources that are currently selected. */
+  selectedSources?: Source[];
+}
   
-    /** An app/client session identifier. See the description for [[ViewStateMessage.sessionId]].
-     */
-    sessionId: string;
-  
-    /** The most recent source that was added to the selection list. */
-    mostRecentSource?: Source;
-  
-    /** The list of sources that are currently selected. */
-    selectedSources?: Source[];
-  }
-  
+export interface AddSourceMessage {
+
+  /** The tag identifying this message type */
+  type: "add_source";
+
+  /** The source to be added */
+  source: Source;
+}
+
+export function isAddSourceMessage(o: any): o is AddSourceMessage {
+  return typeof o.type === 'string' &&
+      o.type == 'add_source' &&
+      typeof o.source === 'object';
+
+}

@@ -369,8 +369,6 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
-import { spreadSheetLayerSettingNames } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
-import { imageSetLayerSettingNames } from "@wwtelescope/engine-helpers/src/imagesetlayer";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1031,6 +1029,7 @@ export default class App extends WWTAwareComponent {
   addSource!: (source: Source) => void;
   hipsCatalogs!: () => CatalogLayerInfo[];
   removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
+  appTableLayers!: () => CatalogLayerInfo[];
   visibleTableLayers!: () => CatalogLayerInfo[];
 
   // Lifecycle management
@@ -1047,6 +1046,9 @@ export default class App extends WWTAwareComponent {
         "hipsCatalogs",
         "visibleTableLayers"
       ]),
+      ...mapGetters(wwtResearchAppNamespace, {
+        appTableLayers: "tableLayers",
+      }),
       ...this.$options.computed,
     };
 
@@ -1263,7 +1265,7 @@ export default class App extends WWTAwareComponent {
     const decoded = msgs;
     const messageStrings = decoded.split(",");
     const messages: Message[] = messageStrings.map(str => this.decodeObjectBase64(str))
-                                    .filter((obj): obj is Message => "event" in obj);
+                                    .filter((obj): obj is Message => "event" in obj || "type" in obj);
     messages.forEach(console.log);
     
 
@@ -1273,16 +1275,17 @@ export default class App extends WWTAwareComponent {
     // Even though some (i.e. removal messages) are unlikely
     // to come in a query string
     const messagesAdjList: { [event: string]: string[] | undefined } = {
-      "table_layer_create": [ "table_layer_set", "table_layer_remove", "table_layer_update" ],
+      "table_layer_create": [ "table_layer_set", "table_layer_remove", "table_layer_update", "add_source" ],
       "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create" ],
       "set_foreground_by_name": [ "set_foreground_opacity" ],
-      "layer_hipscat_load": [ "layer_hipscat_datainview" ],
+      "layer_hipscat_load": [ "layer_hipscat_datainview", "add_source" ],
     };
     const completedMessageType: { [event: string]: string | undefined } = {
       "load_image_collection": "load_image_collection_completed",
       "layer_hipscat_load": "layer_hipscat_load_completed",
     };
     const messageTypes: string[] = messages.map(msg => msg.event);
+    messageTypes.forEach(console.log);
 
     // Messages types that don't depend on another message type
     const rootTypes = messageTypes.filter(type => Object.values(messagesAdjList).map(types => (types || []).indexOf(type)).every(x => x < 0));
@@ -1345,14 +1348,14 @@ export default class App extends WWTAwareComponent {
           });
           if (messagesOfType.length === 0) {
             this.messageHandlers.delete(type);
-            nextTypesPresent.forEach(t => addMessagesOfType(t));
+            nextTypesPresent.forEach(addMessagesOfType);
           }
           return true;
         };
         this.messageHandlers.set(completedType, handler);
         console.log(`Set handler for ${type}`);
       } else {
-        nextTypes.forEach(t => addMessagesOfType(t));
+        nextTypes.forEach(addMessagesOfType);
       }
     }
 
@@ -1361,7 +1364,7 @@ export default class App extends WWTAwareComponent {
     const rootTypesPresent = rootTypes.filter(t => messageTypes.indexOf(t) >= 0);
     console.log("Root types present");
     console.log(rootTypesPresent);
-    rootTypesPresent.forEach(type => addMessagesOfType(type));
+    rootTypesPresent.forEach(addMessagesOfType);
   }
 
   messageQueue: Message[] = [];
@@ -1478,6 +1481,14 @@ export default class App extends WWTAwareComponent {
       }
     });
 
+    const sourceMessages: selections.AddSourceMessage[] = this.sources.map(source => {
+      return {
+        type: "add_source",
+        source: this.prepareForMessaging(source),
+      };
+    });
+    sourceMessages.forEach(console.log);
+
     const messageStrings = [
       coordinatesMessage,
       backgroundMessage,
@@ -1487,6 +1498,7 @@ export default class App extends WWTAwareComponent {
       ...imageryLayerMessages,
       //...tableSettingMessages,
       ...imagerySettingMessages,
+      ...sourceMessages,
     ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
 
     const messageString = messageStrings.join(",");
@@ -1582,6 +1594,7 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+    this.messageHandlers.set("add_source", this.handleAddSource);
 
     // Ignore incoming view_state messages. When testing the app, you might want
     // to launch it as (e.g.)
@@ -2344,6 +2357,41 @@ export default class App extends WWTAwareComponent {
       });
     }
 
+    return true;
+  }
+
+  isMessageSpreadsheetLayer(layer: selections.CatalogLayerInfo): layer is selections.SpreadSheetLayerInfo {
+      return "referenceFrame" in layer;
+    }
+
+  isMessageImagesetInfo(layer: selections.CatalogLayerInfo): layer is selections.ImagesetInfo {
+    return 'url' in layer;
+  }
+
+  deserializeSource(src: selections.Source): Source {
+    const msgLayer = src.catalogLayer;
+    let layer: CatalogLayerInfo = this.appTableLayers().find(x => x.name === msgLayer.name);
+
+    // If the layer corresponding to the source doesn't exist
+    // we create a new CatalogLayerInfo object for the source to use
+    if (layer === undefined) {
+      if (this.isMessageSpreadsheetLayer(msgLayer)) {
+        layer = new SpreadSheetLayerInfo(msgLayer.id, msgLayer.referenceFrame, msgLayer.name);
+      } else {
+        layer = new ImagesetInfo(msgLayer.url, msgLayer.name, ImageSetType[msgLayer.type], msgLayer.description, msgLayer.extension)
+      }
+    }
+    return {
+      ...src,
+      catalogLayer: layer,
+    }
+  }
+
+  handleAddSource(msg: selections.AddSourceMessage): boolean {
+    if (!selections.isAddSourceMessage(msg)) return false;
+
+    const source = this.deserializeSource(msg.source);
+    this.addSource(source);
     return true;
   }
 
