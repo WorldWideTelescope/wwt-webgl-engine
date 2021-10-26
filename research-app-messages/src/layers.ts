@@ -142,3 +142,46 @@ export interface GetHipsCatalogDataInViewReply {
    * */
   aborted: boolean;
 }
+
+/** A command to modify multiple table layer settings in a generic way.
+ * 
+ * This interface does not validate the setting names or their values.
+ */
+export interface MultiModifyTableLayerMessage {
+  /** The tag identifying this message type */
+  event: "table_layer_set_multi";
+
+  /** The identifier of the layer to modify */
+  id: string;
+
+  /** The names of the settings to modify */
+  settings: string[];
+
+  /** The values for these settings, in the same order as the setting names */
+  values: any[];
+}
+
+/** A command to modify multiple FITS layer settings in a generic way.
+ * 
+ * This interface does not validate the setting names or their values.
+ */
+export interface MultiModifyFitsLayerMessage {
+  /** The tag identifying this message type */
+  event: "image_layer_set_multi";
+
+  /** The identifier of the IFTS layer to modify */
+  id: string;
+
+  /** The names of the settings to modify */
+  settings: string[];
+
+  /** The values for these settings, in the same order as the setting names */
+  values: any[];
+}
+
+export function isMultiModifyFitsLayerMessage(o: any): o is MultiModifyFitsLayerMessage {
+  return o.event === 'image_layer_set_multi' &&
+    typeof o.id === 'string' &&
+    typeof o.settings === 'object' &&
+    typeof o.values === 'object';
+}

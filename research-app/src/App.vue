@@ -369,6 +369,7 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
+import { imageSetLayerSettingNames, ImageSetLayerState } from "@wwtelescope/engine-helpers/src/imagesetlayer";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -387,7 +388,8 @@ type AnyFitsLayerMessage =
   | classicPywwt.SetLayerOrderMessage
   | classicPywwt.StretchFitsLayerMessage
   | classicPywwt.ModifyFitsLayerMessage
-  | classicPywwt.RemoveImageSetLayerMessage;
+  | classicPywwt.RemoveImageSetLayerMessage
+  | layers.MultiModifyFitsLayerMessage;
 
 /** Helper for handling messages that mutate FITS / ImageSet layers. Because
  * FITS loading is asynchronous, and messages might arrive out of order, we need
@@ -434,6 +436,7 @@ class ImageSetLayerMessageHandler {
   }
 
   private layerInitialized(layer: ImageSetLayer) {
+    console.log("Imageset layerInitialized");
     this.internalId = layer.id.toString();
 
     if (this.queuedStretch !== null) {
@@ -537,6 +540,29 @@ class ImageSetLayerMessageHandler {
       this.owner.applyFitsLayerSettings({
         id: this.internalId,
         settings: [setting],
+      });
+    }
+  }
+
+  handleMultiModifyFitsLayerMessage(msg: layers.MultiModifyFitsLayerMessage) {
+
+    if (!layers.isMultiModifyFitsLayerMessage(msg)) return;
+    if (msg.settings.length !== msg.values.length) return;
+
+    const settings: ImageSetLayerSetting[] = [];
+    for (const [index, option] of msg.settings.entries()) {
+      const setting: [string, any] = [option, msg.values[index]];
+      if (isImageSetLayerSetting(setting)) {
+        settings.push(setting);
+      }
+    }
+
+    if (this.internalId === null) {
+      settings.forEach(setting => this.queuedSettings.push(setting));
+    } else {
+      this.owner.applyFitsLayerSettings({
+        id: this.internalId,
+        settings: settings,
       });
     }
   }
@@ -1277,6 +1303,7 @@ export default class App extends WWTAwareComponent {
     const messagesAdjList: { [event: string]: string[] | undefined } = {
       "table_layer_create": [ "table_layer_set", "table_layer_remove", "table_layer_update", "add_source" ],
       "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create" ],
+      "image_layer_create": [ "image_layer_set", "image_layer_set_multi", "image_layer_stretch" ],
       "set_foreground_by_name": [ "set_foreground_opacity" ],
       "layer_hipscat_load": [ "layer_hipscat_datainview", "add_source" ],
     };
@@ -1289,7 +1316,6 @@ export default class App extends WWTAwareComponent {
 
     // Messages types that don't depend on another message type
     const rootTypes = messageTypes.filter(type => Object.values(messagesAdjList).map(types => (types || []).indexOf(type)).every(x => x < 0));
-    console.log(`Root types: ${rootTypes}`);
 
     const bfs = (rootNodes: string[], adjList: typeof messagesAdjList) => {
       const queue: string[] = [...rootNodes];
@@ -1319,8 +1345,6 @@ export default class App extends WWTAwareComponent {
     };
 
     const sortedTypes = bfs(rootTypes, messagesAdjList);
-    console.log(`Root types after bfs: ${rootTypes}`);
-    console.log(`Sorted types: ${sortedTypes}`);
     const sortedMessages = messages.sort((msg1, msg2) => sortedTypes.indexOf(msg1.event) - sortedTypes.indexOf(msg2.event));
     
     const addMessagesOfType: (type: string) => void = (type) => {
@@ -1359,11 +1383,7 @@ export default class App extends WWTAwareComponent {
       }
     }
 
-    console.log(`Root types:`);
-    console.log(rootTypes);
     const rootTypesPresent = rootTypes.filter(t => messageTypes.indexOf(t) >= 0);
-    console.log("Root types present");
-    console.log(rootTypesPresent);
     rootTypesPresent.forEach(addMessagesOfType);
   }
 
@@ -1455,29 +1475,38 @@ export default class App extends WWTAwareComponent {
       });
 
     const imageryLayerMessages: classicPywwt.CreateImageSetLayerMessage[] = [];
-    const imagerySettingMessages: classicPywwt.ModifyFitsLayerMessage[] = [];
+    const imagerySettingMessages: layers.MultiModifyFitsLayerMessage[] = [];
+    const imageryStretchMessages: classicPywwt.StretchFitsLayerMessage[] = [];
     this.activeImagesetLayerStates.forEach(info => {
       const id = info.getGuid();
       const imageset = this.imagesetForLayer(id);
       if (imageset !== null) {
-          imageryLayerMessages.push({
-            event: "image_layer_create",
-            id: imageset.get_name(),
-            url: imageset.get_url(),
-            mode: "preloaded",
-            goto: false,
-          });
+        imageryLayerMessages.push({
+          event: "image_layer_create",
+          id: imageset.get_name(),
+          url: imageset.get_url(),
+          mode: "preloaded",
+          goto: false,
+        });
 
-        // const state = this.wwtImagesetLayers[id];
-        // const settings = state.settings;
-        // for (const setting of imageSetLayerSettingNames) {
-        //   imagerySettingMessages.push({
-        //     event: "image_layer_set",
-        //     id: imageset.get_name(),
-        //     setting: setting,
-        //     value: (settings as any)["get_" + setting](),
-        //   });
-        // }
+        const state = this.wwtImagesetLayers[id];
+        const settings = state.settings;
+        const values: any[] = imageSetLayerSettingNames.map(setting => (settings as any)["get_" + setting]());
+        imagerySettingMessages.push({
+          event: "image_layer_set_multi",
+          id: imageset.get_name(),
+          settings: imageSetLayerSettingNames,
+          values: values,
+        });
+
+        imageryStretchMessages.push({
+          event: "image_layer_stretch",
+          id: imageset.get_name(),
+          version: 1, // TODO: What does this mean?
+          stretch: state.scaleType,
+          vmin: state.vmin,
+          vmax: state.vmax,
+        });
       }
     });
 
@@ -1498,6 +1527,7 @@ export default class App extends WWTAwareComponent {
       ...imageryLayerMessages,
       //...tableSettingMessages,
       ...imagerySettingMessages,
+      ...imageryStretchMessages,
       ...sourceMessages,
     ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
 
@@ -1567,6 +1597,7 @@ export default class App extends WWTAwareComponent {
       this.handleSetFitsLayerColormap
     );
     this.messageHandlers.set("image_layer_set", this.handleModifyFitsLayer);
+    this.messageHandlers.set("image_layer_set_multi", this.handleMultiModifyFitsLayer);
     this.messageHandlers.set(
       "image_layer_remove",
       this.handleRemoveImageSetLayer
@@ -1594,6 +1625,7 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+
     this.messageHandlers.set("add_source", this.handleAddSource);
 
     // Ignore incoming view_state messages. When testing the app, you might want
@@ -1859,6 +1891,15 @@ export default class App extends WWTAwareComponent {
     if (!classicPywwt.isModifyFitsLayerMessage(msg)) return false;
 
     this.getFitsLayerHandler(msg).handleModifyMessage(msg);
+    return true;
+  }
+
+  private handleMultiModifyFitsLayer(msg: any): boolean {
+    console.log(`In app handleMultiModifyFitsLayerMessage`);
+    if (!layers.isMultiModifyFitsLayerMessage(msg)) return false;
+
+    console.log("Message is good");
+    this.getFitsLayerHandler(msg).handleMultiModifyFitsLayerMessage(msg);
     return true;
   }
 
@@ -2361,8 +2402,8 @@ export default class App extends WWTAwareComponent {
   }
 
   isMessageSpreadsheetLayer(layer: selections.CatalogLayerInfo): layer is selections.SpreadSheetLayerInfo {
-      return "referenceFrame" in layer;
-    }
+    return "referenceFrame" in layer;
+  }
 
   isMessageImagesetInfo(layer: selections.CatalogLayerInfo): layer is selections.ImagesetInfo {
     return 'url' in layer;
@@ -2370,7 +2411,7 @@ export default class App extends WWTAwareComponent {
 
   deserializeSource(src: selections.Source): Source {
     const msgLayer = src.catalogLayer;
-    let layer: CatalogLayerInfo = this.appTableLayers().find(x => x.name === msgLayer.name);
+    let layer: CatalogLayerInfo | undefined = this.appTableLayers().find(x => x.name === msgLayer.name);
 
     // If the layer corresponding to the source doesn't exist
     // we create a new CatalogLayerInfo object for the source to use
