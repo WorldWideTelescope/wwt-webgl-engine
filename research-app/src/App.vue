@@ -325,7 +325,10 @@ import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
 
-interface Message { event: string; }
+interface Message {
+  event?: string;
+  type?: string;
+}
 
 import {
   Annotation,
@@ -373,6 +376,7 @@ import {
 import { imageSetLayerSettingNames, ImageSetLayerState } from "@wwtelescope/engine-helpers/src/imagesetlayer";
 import { isSpreadSheetLayerSetting, spreadSheetLayerSettingNames, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
 import { PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
+import { type } from "os";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -727,6 +731,7 @@ class TableLayerMessageHandler {
       for (const [index, option] of msg.settings.entries()) {
         
         const setting: [string, any] = [option, msg.values[index]];
+        console.log(setting, classicPywwt.isPywwtSpreadSheetLayerSetting(setting), isSpreadSheetLayerSetting(setting));
         if (classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
           const converted = convertPywwtSpreadSheetLayerSetting(setting, layer);
           if (converted !== null) {
@@ -1322,6 +1327,22 @@ export default class App extends WWTAwareComponent {
     return JSON.parse(Buffer.from(data, 'base64').toString());
   }
 
+  adjustSettingsForImport(names: string[], values: any[]): void {
+    for (let i = 0; i < names.length; i++) {
+      const name = names[i];
+      const value = values[i];
+      if (name === 'color') {
+        if (typeof value === 'string') {
+          values[i] = Color.load(value);
+        } else if (typeof value === 'object') {
+          values[i] = Color.fromArgb(value.a, value.r, value.g, value.b);
+        }
+      } else if ((name === 'beginRange' || name === 'endRange') && typeof value === 'string') {
+        values[i] = new Date(value);
+      }
+    }
+  }
+
   handleQueryParameters(location: Location): void {
     if (!location) {
       return;
@@ -1341,6 +1362,16 @@ export default class App extends WWTAwareComponent {
     const messages: Message[] = messageStrings.map(str => this.decodeObjectBase64(str))
                                     .filter((obj): obj is Message => "event" in obj || "type" in obj);
     messages.forEach(console.log);
+
+    messages.forEach(msg => {
+      if (classicPywwt.isModifyTableLayerMessage(msg)) {
+        this.adjustSettingsForImport([msg.setting], [msg.value]);
+      } else if (layers.isMultiModifyTableLayerMessage(msg)) {
+        this.adjustSettingsForImport(msg.settings, msg.values);
+      }
+      console.log("After adjustment");
+      console.log(msg);
+    });
     
 
     // We need to handle messages in the correct order
@@ -1359,11 +1390,12 @@ export default class App extends WWTAwareComponent {
       "load_image_collection": "load_image_collection_completed",
       "layer_hipscat_load": "layer_hipscat_load_completed",
     };
-    const messageTypes: string[] = messages.map(msg => msg.event);
-    messageTypes.forEach(console.log);
+
+    const getType: (msg: Message) => string = msg => msg.event || msg.type || "";
+    const messageTypes: string[] = messages.map(getType);
 
     // Messages types that don't depend on another message type
-    const rootTypes = messageTypes.filter(type => Object.values(messagesAdjList).map(types => (types || []).indexOf(type)).every(x => x < 0));
+    const rootTypes = messageTypes.filter(msgType => Object.values(messagesAdjList).map(types => (types || []).indexOf(msgType)).every(x => x < 0));
 
     const bfs = (rootNodes: string[], adjList: typeof messagesAdjList) => {
       const queue: string[] = [...rootNodes];
@@ -1393,28 +1425,28 @@ export default class App extends WWTAwareComponent {
     };
 
     const sortedTypes = bfs(rootTypes, messagesAdjList);
-    const sortedMessages = messages.sort((msg1, msg2) => sortedTypes.indexOf(msg1.event) - sortedTypes.indexOf(msg2.event));
+    const sortedMessages = messages.sort((msg1, msg2) => sortedTypes.indexOf(getType(msg1)) - sortedTypes.indexOf(getType(msg2)));
     const finishedMessageTypes: string[] = [];
 
     // The prerequesite to add messages of a type is
     // all of the types that it depends on have been finished
     // (this is trivially true are there aren't any of that type)
-    const prerequisitesMet: (type: string) => boolean = (type) => {
+    const prerequisitesMet: (msgType: string) => boolean = (msgType) => {
       for (const t in messagesAdjList) {
-        if (messageTypes.indexOf(t) >= 0 && (messagesAdjList[t] || []).indexOf(type) >= 0 && finishedMessageTypes.indexOf(t) < 0) {
+        if (messageTypes.indexOf(t) >= 0 && (messagesAdjList[t] || []).indexOf(msgType) >= 0 && finishedMessageTypes.indexOf(t) < 0) {
           return false;
         }
       }
       return true;
     }
     
-    const addMessagesOfType: (type: string) => void = (type) => {
-      console.log(`Adding messages of type ${type}`);
-      const messagesOfType = sortedMessages.filter(msg => msg.event === type);
+    const addMessagesOfType: (msgType: string) => void = (msgType) => {
+      console.log(`Adding messages of type ${msgType}`);
+      const messagesOfType = sortedMessages.filter(msg => msg.event === msgType);
       this.messageQueue = this.messageQueue.concat(messagesOfType);
 
-      const nextTypes = messagesAdjList[type];
-      const completedType = completedMessageType[type];
+      const nextTypes = messagesAdjList[msgType];
+      const completedType = completedMessageType[msgType];
       if (!nextTypes) {
         return;
       }
@@ -1426,14 +1458,16 @@ export default class App extends WWTAwareComponent {
         const handler: (msg: any) => boolean = (msg) => {
           console.log(`Inside dynamic handler for type ${msg.event}`);
           console.log(`The msg is ${JSON.stringify(msg)}`);
+
+          // TODO: A better way to do this?
           //@ts-ignore
           const matchingMessages = messagesOfType.filter(x => x.threadId === msg.threadId);
           matchingMessages.forEach(m => {
             messagesOfType.splice(messagesOfType.indexOf(m), 1);
           });
           if (messagesOfType.length === 0) {
-            this.messageHandlers.delete(type);
-            finishedMessageTypes.push(type);
+            this.messageHandlers.delete(msgType);
+            finishedMessageTypes.push(msgType);
             console.log("Finished:")
             console.log(finishedMessageTypes);
             nextTypes.forEach(t => {
@@ -1445,9 +1479,9 @@ export default class App extends WWTAwareComponent {
           return true;
         };
         this.messageHandlers.set(completedType, handler);
-        console.log(`Set handler for ${type}`);
+        console.log(`Set handler for ${completedType}`);
       } else {
-        finishedMessageTypes.push(type);
+        finishedMessageTypes.push(msgType);
         console.log("Finished:")
         console.log(finishedMessageTypes);
         nextTypes.forEach(t => {
