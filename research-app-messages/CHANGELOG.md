@@ -1,3 +1,9 @@
+# @wwtelescope/research-app-messages 0.11.2 (2021-10-27)
+
+- Not quite "fix the fix", but ... improve it (#154, @pkgw). We only replaced
+  the first instance of braces.
+
+
 # @wwtelescope/research-app-messages 0.11.1 (2021-10-26)
 
 - Work around undesirable URL escaping that could be added when applying a
