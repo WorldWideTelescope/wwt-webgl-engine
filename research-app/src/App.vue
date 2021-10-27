@@ -338,6 +338,7 @@ import {
   Poly,
   PolyLine,
   SpreadSheetLayer,
+  SpreadSheetLayerSetting,
   WWTControl,
 } from "@wwtelescope/engine";
 
@@ -370,6 +371,8 @@ import {
   convertSpreadSheetLayerSetting,
 } from "./settings";
 import { imageSetLayerSettingNames, ImageSetLayerState } from "@wwtelescope/engine-helpers/src/imagesetlayer";
+import { isSpreadSheetLayerSetting, spreadSheetLayerSettingNames, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
+import { PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -544,25 +547,25 @@ class ImageSetLayerMessageHandler {
     }
   }
 
-  handleMultiModifyFitsLayerMessage(msg: layers.MultiModifyFitsLayerMessage) {
+  handleMultiModifyMessage(msg: layers.MultiModifyFitsLayerMessage) {
 
     if (!layers.isMultiModifyFitsLayerMessage(msg)) return;
     if (msg.settings.length !== msg.values.length) return;
 
-    const settings: ImageSetLayerSetting[] = [];
+    const layerSettings: ImageSetLayerSetting[] = [];
     for (const [index, option] of msg.settings.entries()) {
       const setting: [string, any] = [option, msg.values[index]];
       if (isImageSetLayerSetting(setting)) {
-        settings.push(setting);
+        layerSettings.push(setting);
       }
     }
 
     if (this.internalId === null) {
-      settings.forEach(setting => this.queuedSettings.push(setting));
+      layerSettings.forEach(setting => this.queuedSettings.push(setting));
     } else {
       this.owner.applyFitsLayerSettings({
         id: this.internalId,
-        settings: settings,
+        settings: layerSettings,
       });
     }
   }
@@ -586,7 +589,8 @@ type AnyTableLayerMessage =
   | classicPywwt.CreateTableLayerMessage
   | classicPywwt.UpdateTableLayerMessage
   | classicPywwt.ModifyTableLayerMessage
-  | classicPywwt.RemoveTableLayerMessage;
+  | classicPywwt.RemoveTableLayerMessage
+  | layers.MultiModifyTableLayerMessage;
 
 /** Helper for handling messages that mutate tabular / "spreadsheet" layers. */
 class TableLayerMessageHandler {
@@ -702,6 +706,50 @@ class TableLayerMessageHandler {
         this.owner.applyTableLayerSettings({
           id: this.internalId,
           settings: [es],
+        });
+      }
+    }
+  }
+
+  handleMultiModifyMessage(msg: layers.MultiModifyTableLayerMessage) {
+
+    if (!layers.isMultiModifyTableLayerMessage(msg)) return;
+    if (msg.settings.length !== msg.values.length) return;
+
+    console.log(`Multi modify message is good`);
+
+    const layer = this.owner.spreadSheetLayerById(msg.id);
+    if (layer) {
+      
+      console.log("Layer exists!");
+      const settings: SpreadSheetLayerSetting[] = [];
+      const pywwtSettings: PywwtSpreadSheetLayerSetting[] = [];
+      for (const [index, option] of msg.settings.entries()) {
+        
+        const setting: [string, any] = [option, msg.values[index]];
+        if (classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
+          const converted = convertPywwtSpreadSheetLayerSetting(setting, layer);
+          if (converted !== null) {
+            settings.push(converted);
+          }
+          pywwtSettings.push(setting);
+        } else if (isSpreadSheetLayerSetting(setting)) {
+          const converted = convertSpreadSheetLayerSetting(setting);
+          if (converted !== null) {
+            pywwtSettings.push(converted);
+          }
+          settings.push(setting);
+        } else {
+          console.log(`Rejected setting: ${JSON.stringify(setting)}`);
+        }
+      }
+
+      if (this.internalId === null) {
+        pywwtSettings.forEach(setting => this.queuedSettings.push(setting));
+      } else {
+        this.owner.applyTableLayerSettings({
+          id: this.internalId,
+          settings: settings,
         });
       }
     }
@@ -1301,11 +1349,11 @@ export default class App extends WWTAwareComponent {
     // Even though some (i.e. removal messages) are unlikely
     // to come in a query string
     const messagesAdjList: { [event: string]: string[] | undefined } = {
-      "table_layer_create": [ "table_layer_set", "table_layer_remove", "table_layer_update", "add_source" ],
+      "table_layer_create": [ "table_layer_set", "table_layer_set_multi", "table_layer_remove", "table_layer_update", "add_source" ],
       "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create" ],
       "image_layer_create": [ "image_layer_set", "image_layer_set_multi", "image_layer_stretch" ],
       "set_foreground_by_name": [ "set_foreground_opacity" ],
-      "layer_hipscat_load": [ "layer_hipscat_datainview", "add_source" ],
+      "layer_hipscat_load": [ "layer_hipscat_datainview", "add_source", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
     };
     const completedMessageType: { [event: string]: string | undefined } = {
       "load_image_collection": "load_image_collection_completed",
@@ -1346,6 +1394,19 @@ export default class App extends WWTAwareComponent {
 
     const sortedTypes = bfs(rootTypes, messagesAdjList);
     const sortedMessages = messages.sort((msg1, msg2) => sortedTypes.indexOf(msg1.event) - sortedTypes.indexOf(msg2.event));
+    const finishedMessageTypes: string[] = [];
+
+    // The prerequesite to add messages of a type is
+    // all of the types that it depends on have been finished
+    // (this is trivially true are there aren't any of that type)
+    const prerequisitesMet: (type: string) => boolean = (type) => {
+      for (const t in messagesAdjList) {
+        if (messageTypes.indexOf(t) >= 0 && (messagesAdjList[t] || []).indexOf(type) >= 0 && finishedMessageTypes.indexOf(t) < 0) {
+          return false;
+        }
+      }
+      return true;
+    }
     
     const addMessagesOfType: (type: string) => void = (type) => {
       console.log(`Adding messages of type ${type}`);
@@ -1372,14 +1433,28 @@ export default class App extends WWTAwareComponent {
           });
           if (messagesOfType.length === 0) {
             this.messageHandlers.delete(type);
-            nextTypesPresent.forEach(addMessagesOfType);
+            finishedMessageTypes.push(type);
+            console.log("Finished:")
+            console.log(finishedMessageTypes);
+            nextTypes.forEach(t => {
+              console.log("Next type and ready:")
+              console.log(t, prerequisitesMet(t));
+            });
+            nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
           }
           return true;
         };
         this.messageHandlers.set(completedType, handler);
         console.log(`Set handler for ${type}`);
       } else {
-        nextTypes.forEach(addMessagesOfType);
+        finishedMessageTypes.push(type);
+        console.log("Finished:")
+        console.log(finishedMessageTypes);
+        nextTypes.forEach(t => {
+          console.log("Next type and ready:")
+          console.log(t, prerequisitesMet(t));
+        });
+        nextTypes.filter(prerequisitesMet).forEach(addMessagesOfType);
       }
     }
 
@@ -1431,15 +1506,31 @@ export default class App extends WWTAwareComponent {
 
     const threadId = Guid.create();
     const catalogs = this.hipsCatalogs();
-    const loadCatalogsMessages: layers.LoadHipsCatalogMessage[] =
-      catalogs.map(catalog => {
-        return {
+    const loadCatalogsMessages: layers.LoadHipsCatalogMessage[] = [];
+    const catalogSettingsMessages: layers.MultiModifyTableLayerMessage[] = [];
+    catalogs.forEach(catalog => {
+      const layer = this.layerForHipsCatalog(catalog.name);
+      if (layer !== null) {
+        const id = layer.id.toString();
+        loadCatalogsMessages.push({
           event: "layer_hipscat_load",
           threadId: threadId, // We need this to get a response
-          tableId: Guid.create(), // Does the tableId have any external meaning?
+          tableId: id,
           name: catalog.name,
-        };
-      });
+        });
+
+
+        const state: SpreadSheetLayerState = this.wwtSpreadSheetLayers[id];
+        const values: any[] = spreadSheetLayerSettingNames.map(setting => (state as any)["get_" + setting]());
+        catalogSettingsMessages.push({
+          event: "table_layer_set_multi",
+          id: catalog.name,
+          settings: spreadSheetLayerSettingNames,
+          values: values,
+        });
+      }
+
+    });
 
     const otherTables = this.spreadsheetLayers.filter((x): x is SpreadSheetLayerInfo => x instanceof SpreadSheetLayerInfo);
     // const createTableMessages: classicPywwt.CreateTableLayerMessage[] = 
@@ -1523,6 +1614,7 @@ export default class App extends WWTAwareComponent {
       backgroundMessage,
       foregroundMessage,
       ...loadCatalogsMessages,
+      ...catalogSettingsMessages,
       ...loadWtmlMessages,
       ...imageryLayerMessages,
       //...tableSettingMessages,
@@ -1607,6 +1699,7 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("table_layer_update", this.handleUpdateTableLayer);
     this.messageHandlers.set("table_layer_set", this.handleModifyTableLayer);
     this.messageHandlers.set("table_layer_remove", this.handleRemoveTableLayer);
+    this.messageHandlers.set("table_layer_set_multi", this.handleMultiModifyTableLayer);
 
     this.messageHandlers.set("layer_hipscat_load", this.handleLoadHipsCatalog);
     this.messageHandlers.set(
@@ -1899,7 +1992,14 @@ export default class App extends WWTAwareComponent {
     if (!layers.isMultiModifyFitsLayerMessage(msg)) return false;
 
     console.log("Message is good");
-    this.getFitsLayerHandler(msg).handleMultiModifyFitsLayerMessage(msg);
+    this.getFitsLayerHandler(msg).handleMultiModifyMessage(msg);
+    return true;
+  }
+
+  private handleMultiModifyTableLayer(msg: any): boolean {
+    if (!layers.isMultiModifyTableLayerMessage(msg)) return false;
+
+    this.getTableLayerHandler(msg).handleMultiModifyMessage(msg);
     return true;
   }
 

@@ -161,6 +161,13 @@ export interface MultiModifyTableLayerMessage {
   values: any[];
 }
 
+export function isMultiModifyTableLayerMessage(o: any): o is MultiModifyTableLayerMessage {
+  return o.event === 'table_layer_set_multi' &&
+    typeof o.id === 'string' &&
+    typeof o.settings === 'object' &&
+    typeof o.values === 'object';
+}
+
 /** A command to modify multiple FITS layer settings in a generic way.
  * 
  * This interface does not validate the setting names or their values.
