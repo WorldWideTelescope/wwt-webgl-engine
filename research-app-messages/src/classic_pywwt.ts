@@ -865,10 +865,10 @@ export function applyBaseUrlIfApplicable(o: any, baseurl: string): void {  // es
   // break some WWT engine APIs that expect to match URLs with exact string
   // comparisons. In particular, braces will get percent-escaped, which causes
   // problems for tiled imagery. I'm not aware of a better solution than to
-  // blind undo the escaping that *probably* don't want.
+  // blindly undo the escaping that we *probably* don't want.
   function rewrite(url: string): string {
     const u = new URL(url, baseurl);
-    return u.toString().replace(/%7B/, '{').replace(/%7D/, '}');
+    return u.toString().replace(/%7B/g, '{').replace(/%7D/g, '}');
   }
 
   if (isCreateImageSetLayerMessage(o)) {
