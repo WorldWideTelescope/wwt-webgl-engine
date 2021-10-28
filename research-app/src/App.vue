@@ -1354,14 +1354,11 @@ export default class App extends WWTAwareComponent {
       return;
     }
 
-    console.log("Here");
-
     //const decoded = decompress(msgs) as string;
     const decoded = msgs;
     const messageStrings = decoded.split(",");
     const messages: Message[] = messageStrings.map(str => this.decodeObjectBase64(str))
                                     .filter((obj): obj is Message => "event" in obj || "type" in obj);
-    messages.forEach(console.log);
 
     messages.forEach(msg => {
       if (classicPywwt.isModifyTableLayerMessage(msg)) {
@@ -1369,8 +1366,6 @@ export default class App extends WWTAwareComponent {
       } else if (layers.isMultiModifyTableLayerMessage(msg)) {
         this.adjustSettingsForImport(msg.settings, msg.values);
       }
-      console.log("After adjustment");
-      console.log(msg);
     });
     
 
@@ -1393,56 +1388,39 @@ export default class App extends WWTAwareComponent {
 
     const getType: (msg: Message) => string = msg => msg.event || msg.type || "";
     const messageTypes: string[] = messages.map(getType);
+    messageTypes.forEach(console.log);
+
+    const prerequisites: { [type: string]: string[] | undefined } = {};
+    messageTypes.forEach(t => {
+      const prereqs = [];
+      for (const [typ, deps] of Object.entries(messagesAdjList)) {
+        if (deps && deps.indexOf(t) >= 0) {
+          prereqs.push(typ);
+        }
+      }
+      prerequisites[t] = prereqs;
+    });
+    console.log(prerequisites);
+
 
     // Messages types that don't depend on another message type
     const rootTypes = messageTypes.filter(msgType => Object.values(messagesAdjList).map(types => (types || []).indexOf(msgType)).every(x => x < 0));
-
-    const bfs = (rootNodes: string[], adjList: typeof messagesAdjList) => {
-      const queue: string[] = [...rootNodes];
-      const result: string[] = [];
-      const visited: { [node: string]: boolean | undefined } = {};
-      rootNodes.forEach(node => visited[node] = true);
-      let currentVertex: string;
-      while (queue.length > 0) {
-
-          // Assigning the result of queue.shift() to currentVertex
-          // made TypeScript complain
-          const nextItem = queue.shift();
-          if (nextItem === undefined) {
-            break;
-          }
-          currentVertex = nextItem;
-
-          result.push(currentVertex);
-          (adjList[currentVertex] || []).forEach(neighbor => {
-              if (!visited[neighbor]) {
-                  visited[neighbor] = true;
-                  queue.push(neighbor);
-              }
-          });
-      }
-      return result;
-    };
-
-    const sortedTypes = bfs(rootTypes, messagesAdjList);
-    const sortedMessages = messages.sort((msg1, msg2) => sortedTypes.indexOf(getType(msg1)) - sortedTypes.indexOf(getType(msg2)));
     const finishedMessageTypes: string[] = [];
 
-    // The prerequesite to add messages of a type is
+    // The prerequisite to add messages of a type is
     // all of the types that it depends on have been finished
     // (this is trivially true are there aren't any of that type)
     const prerequisitesMet: (msgType: string) => boolean = (msgType) => {
-      for (const t in messagesAdjList) {
-        if (messageTypes.indexOf(t) >= 0 && (messagesAdjList[t] || []).indexOf(msgType) >= 0 && finishedMessageTypes.indexOf(t) < 0) {
-          return false;
-        }
+      const prereqs = prerequisites[msgType];
+      if (prereqs === undefined) {
+        return true;
       }
-      return true;
+      return prereqs.every(t => messageTypes.indexOf(t) < 0 || finishedMessageTypes.indexOf(t) >= 0);
     }
     
     const addMessagesOfType: (msgType: string) => void = (msgType) => {
       console.log(`Adding messages of type ${msgType}`);
-      const messagesOfType = sortedMessages.filter(msg => msg.event === msgType);
+      const messagesOfType = messages.filter(msg => getType(msg) === msgType);
       this.messageQueue = this.messageQueue.concat(messagesOfType);
 
       const nextTypes = messagesAdjList[msgType];
@@ -1454,10 +1432,7 @@ export default class App extends WWTAwareComponent {
       const nextTypesPresent = nextTypes.filter(t => messageTypes.indexOf(t) >= 0);
 
       if (completedType) {
-        console.log(`Completed type: ${completedType}`);
         const handler: (msg: any) => boolean = (msg) => {
-          console.log(`Inside dynamic handler for type ${msg.event}`);
-          console.log(`The msg is ${JSON.stringify(msg)}`);
 
           // TODO: A better way to do this?
           //@ts-ignore
@@ -1468,13 +1443,7 @@ export default class App extends WWTAwareComponent {
           if (messagesOfType.length === 0) {
             this.messageHandlers.delete(msgType);
             finishedMessageTypes.push(msgType);
-            console.log("Finished:")
-            console.log(finishedMessageTypes);
-            nextTypes.forEach(t => {
-              console.log("Next type and ready:")
-              console.log(t, prerequisitesMet(t));
-            });
-            nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
+            nextTypesPresent.filter(prerequisitesMet).filter(t => finishedMessageTypes.indexOf(t) < 0).forEach(addMessagesOfType);
           }
           return true;
         };
@@ -1482,13 +1451,8 @@ export default class App extends WWTAwareComponent {
         console.log(`Set handler for ${completedType}`);
       } else {
         finishedMessageTypes.push(msgType);
-        console.log("Finished:")
-        console.log(finishedMessageTypes);
-        nextTypes.forEach(t => {
-          console.log("Next type and ready:")
-          console.log(t, prerequisitesMet(t));
-        });
-        nextTypes.filter(prerequisitesMet).forEach(addMessagesOfType);
+        nextTypesPresent.filter(prerequisitesMet).filter(t => finishedMessageTypes.indexOf(t) < 0).forEach(addMessagesOfType);
+        console.log(`Added messages of type ${msgType} to queue`);
       }
     }
 
@@ -1566,29 +1530,18 @@ export default class App extends WWTAwareComponent {
 
     });
 
-    const otherTables = this.spreadsheetLayers.filter((x): x is SpreadSheetLayerInfo => x instanceof SpreadSheetLayerInfo);
-    // const createTableMessages: classicPywwt.CreateTableLayerMessage[] = 
-    //   otherTables.map(table => {
-    //     const layer = this.spreadSheetLayerById(table.id);
-    //     return {
-    //       event: "table_layer_create",
-    //       id: table.id,
-    //       table: layer.
-    //     }
-    //   })
-
-    // const tableSettingMessages: classicPywwt.ModifyTableLayerMessage[] = [];
-    // this.spreadsheetLayers.forEach(layer => {
-    //   const state = this.spreadsheetState(layer);
-    //   for (const setting of spreadSheetLayerSettingNames) {
-    //     tableSettingMessages.push({
-    //       event: "table_layer_set",
-    //       id: layer instanceof SpreadSheetLayerInfo ? layer.id : layer.name,
-    //       setting: setting,
-    //       value: (state as any)["get_" + setting](),
-    //     });
-    //   }
-    // });
+    const tableSettingMessages: classicPywwt.ModifyTableLayerMessage[] = [];
+    this.spreadsheetLayers.forEach(layer => {
+      const state = this.spreadsheetState(layer);
+      for (const setting of spreadSheetLayerSettingNames) {
+        tableSettingMessages.push({
+          event: "table_layer_set",
+          id: layer instanceof SpreadSheetLayerInfo ? layer.id : layer.name,
+          setting: setting,
+          value: (state as any)["get_" + setting](),
+        });
+      }
+    });
 
     const loadWtmlMessages: classicPywwt.LoadImageCollectionMessage[] = 
       this.loadedWtmlUrls.map(url => {
@@ -1768,8 +1721,8 @@ export default class App extends WWTAwareComponent {
   }
 
   onMessage(msg: any) {
-    console.log(`onMessage: ${JSON.stringify(msg)}`);
     const key = String(msg.type || msg.event);
+    console.log(`onMessage: key is ${key}`);
     const handler = this.messageHandlers.get(key);
     let handled = false;
 
@@ -2563,9 +2516,11 @@ export default class App extends WWTAwareComponent {
   }
 
   handleAddSource(msg: selections.AddSourceMessage): boolean {
+    console.log(`Got an add source message: ${JSON.stringify(msg)}`);
     if (!selections.isAddSourceMessage(msg)) return false;
 
     const source = this.deserializeSource(msg.source);
+    console.log(`Adding source ${JSON.stringify(source)}`);
     this.addSource(source);
     return true;
   }
