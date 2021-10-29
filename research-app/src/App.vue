@@ -308,7 +308,7 @@
                   <font-awesome-icon
                     icon="copy"
                     size="lg"
-                    class="save-state-icon"
+                    class="pointer"
                     @click="copyStateURL"
                     @keyup.enter="copyStateURL"
                     tabindex="0"
@@ -3271,10 +3271,6 @@ ul.tool-menu {
     display: none;
   }
 
-}
-
-.save-state-icon {
-  cursor: pointer;
 }
 
 .pointer {
