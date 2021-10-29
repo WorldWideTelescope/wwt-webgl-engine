@@ -14,7 +14,6 @@
   "dependencies": {
     "@types/debounce": "^1.2.0",
     "@types/vue-color": "^2.4.3",
-    "@types/vue-router": "^2.0.0",
     "@types/vue-select": "^3.11.1",
     "@wwtelescope/astro": "file:astro",
     "@wwtelescope/embed": "file:embed",
