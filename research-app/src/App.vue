@@ -1403,7 +1403,7 @@ export default class App extends WWTAwareComponent {
       "set_foreground_by_name": [ "set_foreground_opacity" ],
       "layer_hipscat_load": [ "layer_hipscat_datainview", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
     };
-    const completedMessageType: { [event: string]: [string, (sent: Message, reply: Message) => boolean] | undefined } = {
+    const completion: { [event: string]: [string, (sent: Message, reply: Message) => boolean] | undefined } = {
       "load_image_collection": ["load_image_collection_completed", (sent, reply) => {
         if (!(isLoadImageCollectionMessage(sent) && isLoadImageCollectionCompletedMessage(reply))) return false;
         return sent.url === reply.url;
@@ -1464,7 +1464,7 @@ export default class App extends WWTAwareComponent {
       this.messageQueue = this.messageQueue.concat(messagesOfType);
 
       const nextTypes = messagesAdjList[msgType];
-      const completionInfo = completedMessageType[msgType];
+      const completionInfo = completion[msgType];
       if (!nextTypes) {
         return;
       }
