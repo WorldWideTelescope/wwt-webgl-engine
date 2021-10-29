@@ -1400,7 +1400,7 @@ export default class App extends WWTAwareComponent {
       "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create" ],
       "image_layer_create": [ "image_layer_set", "image_layer_set_multi", "image_layer_stretch" ],
       "set_foreground_by_name": [ "set_foreground_opacity" ],
-      "layer_hipscat_load": [ "layer_hipscat_datainview", "add_source", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
+      "layer_hipscat_load": [ "layer_hipscat_datainview", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
     };
     const completedMessageType: { [event: string]: string | undefined } = {
       "load_image_collection": "load_image_collection_completed",
@@ -1409,22 +1409,18 @@ export default class App extends WWTAwareComponent {
 
     const getType: (msg: Message) => string = msg => msg.event || msg.type || "";
     const messageTypes: string[] = messages.map(getType);
+    const finishedMessageTypes: string[] = [];
 
     const prerequisites: { [type: string]: string[] | undefined } = {};
     messageTypes.forEach(t => {
       const prereqs = [];
       for (const [typ, deps] of Object.entries(messagesAdjList)) {
-        if (deps && deps.indexOf(t) >= 0) {
+        if (deps && deps.includes(t)) {
           prereqs.push(typ);
         }
       }
       prerequisites[t] = prereqs;
     });
-
-
-    // Messages types that don't depend on another message type
-    const rootTypes = messageTypes.filter(msgType => Object.values(messagesAdjList).map(types => (types || []).indexOf(msgType)).every(x => x < 0));
-    const finishedMessageTypes: string[] = [];
 
     // The prerequisite to add messages of a type is
     // all of the types that it depends on have been finished
@@ -1434,9 +1430,23 @@ export default class App extends WWTAwareComponent {
       if (prereqs === undefined) {
         return true;
       }
-      return prereqs.every(t => messageTypes.indexOf(t) < 0 || finishedMessageTypes.indexOf(t) >= 0);
+      return prereqs.every(t => !messageTypes.includes(t) || finishedMessageTypes.includes(t));
     }
+
+    // We define "root" messages as messages that either
+    // - Don't depend on another message type
+    // - Might depend on another message type, but there aren't
+    //    any of that type present.
+    //    For instance, if a user has loaded an imageset via WTML and has 
+    //    that as a background image, we need to wait until the WTML has loaded.
+    //    But they may also just have a built-in image as the background
+    const isRoot = (t: string) => {
+      const prereqs = prerequisites[t];
+      return (prereqs === undefined) || prereqs.length === 0 || prereqs.every(x => !messageTypes.includes(x));
+    }
+    const rootTypes = messageTypes.filter(isRoot);
     
+
     const addMessagesOfType: (msgType: string) => void = (msgType) => {
       const messagesOfType = messages.filter(msg => getType(msg) === msgType);
       this.messageQueue = this.messageQueue.concat(messagesOfType);
@@ -1452,7 +1462,7 @@ export default class App extends WWTAwareComponent {
       if (completedType) {
         const handler: (msg: any) => boolean = (msg) => {
 
-          // TODO: A better way to do this?
+          // TODO: What's the best way to match up these messages?
           //@ts-ignore
           const matchingMessages = messagesOfType.filter(x => x.threadId === msg.threadId);
           matchingMessages.forEach(m => {
@@ -1461,19 +1471,18 @@ export default class App extends WWTAwareComponent {
           if (messagesOfType.length === 0) {
             this.messageHandlers.delete(msgType);
             finishedMessageTypes.push(msgType);
-            nextTypesPresent.filter(prerequisitesMet).filter(t => finishedMessageTypes.indexOf(t) < 0).forEach(addMessagesOfType);
+            nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
           }
           return true;
         };
         this.messageHandlers.set(completedType, handler);
       } else {
         finishedMessageTypes.push(msgType);
-        nextTypesPresent.filter(prerequisitesMet).filter(t => finishedMessageTypes.indexOf(t) < 0).forEach(addMessagesOfType);
+        nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
       }
     }
 
-    const rootTypesPresent = rootTypes.filter(t => messageTypes.indexOf(t) >= 0);
-    rootTypesPresent.forEach(addMessagesOfType);
+    rootTypes.forEach(addMessagesOfType);
   }
 
   messageQueue: Message[] = [];
@@ -1622,15 +1631,12 @@ export default class App extends WWTAwareComponent {
   }
 
   copyStateURL(): void {
-    console.log("Here");
     navigator.clipboard.writeText(this.stateAsUrl())
-      .then(() => {
-        this.$notify({
+      .then(() => this.$notify({
         group: "copy-url",
         type: "success",
-        text: "URL copied",
-      });
-      console.log("Success")})
+        text: "URL successfully copied",
+      }))
       .catch(_err => this.$notify({
         group: "copy-url",
         type: "error",
@@ -3227,6 +3233,7 @@ ul.tool-menu {
 
 .save-state-title {
   font-size: 16pt;
+  text-align: center;
 }
 
 .save-state-content {
@@ -3239,6 +3246,7 @@ ul.tool-menu {
   white-space: nowrap;
   overflow: scroll;
   max-width: 25vw;
+  min-width: 150px;
   font-family: monospace;
   padding: 4px;
   border: 1px solid white;
