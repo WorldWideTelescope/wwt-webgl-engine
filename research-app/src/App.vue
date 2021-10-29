@@ -1367,7 +1367,6 @@ export default class App extends WWTAwareComponent {
         this.adjustSettingsForImport(msg.settings, msg.values);
       }
     });
-    
 
     // We need to handle messages in the correct order
     // Generally, let's assume that our message can be any
@@ -1477,7 +1476,7 @@ export default class App extends WWTAwareComponent {
       event: "center_on_coordinates",
       ra: this.wwtRARad * R2D,
       dec: this.wwtDecRad * R2D,
-      fov: this.wwtZoomDeg,
+      fov: this.wwtZoomDeg / 6,
       instant: true,
     };
 
