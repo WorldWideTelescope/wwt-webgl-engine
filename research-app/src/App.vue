@@ -405,8 +405,9 @@ import {
 } from "./settings";
 import { imageSetLayerSettingNames, ImageSetLayerState } from "@wwtelescope/engine-helpers/src/imagesetlayer";
 import { isSpreadSheetLayerSetting, spreadSheetLayerSettingNames, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
-import { PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
+import { isLoadImageCollectionCompletedMessage, isLoadImageCollectionMessage, PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
 import { type } from "os";
+import { isLoadHipsCatalogCompletedMessage, isLoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1402,9 +1403,20 @@ export default class App extends WWTAwareComponent {
       "set_foreground_by_name": [ "set_foreground_opacity" ],
       "layer_hipscat_load": [ "layer_hipscat_datainview", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
     };
-    const completedMessageType: { [event: string]: string | undefined } = {
-      "load_image_collection": "load_image_collection_completed",
-      "layer_hipscat_load": "layer_hipscat_load_completed",
+    const completedMessageType: { [event: string]: [string, (sent: Message, reply: Message) => boolean] | undefined } = {
+      "load_image_collection": ["load_image_collection_completed", (sent, reply) => {
+        if (!(isLoadImageCollectionMessage(sent) && isLoadImageCollectionCompletedMessage(reply))) return false;
+        return sent.url === reply.url;
+        }],
+      "layer_hipscat_load": ["layer_hipscat_load_completed", (sent, reply) => {
+        if (!(isLoadHipsCatalogMessage(sent) && isLoadHipsCatalogCompletedMessage(reply))) return false;
+        for (const [option, value] of reply.spreadsheetInfo.settings) {
+          if (option === 'name') {
+            return sent.name === value;
+          }
+        }
+        return false;
+      }],
     };
 
     const getType: (msg: Message) => string = msg => msg.event || msg.type || "";
@@ -1452,19 +1464,19 @@ export default class App extends WWTAwareComponent {
       this.messageQueue = this.messageQueue.concat(messagesOfType);
 
       const nextTypes = messagesAdjList[msgType];
-      const completedType = completedMessageType[msgType];
+      const completionInfo = completedMessageType[msgType];
       if (!nextTypes) {
         return;
       }
 
       const nextTypesPresent = nextTypes.filter(t => messageTypes.indexOf(t) >= 0);
 
-      if (completedType) {
+      if (completionInfo) {
+        const [completedType, completedMatcher] = completionInfo;
         const handler: (msg: any) => boolean = (msg) => {
 
-          // TODO: What's the best way to match up these messages?
           //@ts-ignore
-          const matchingMessages = messagesOfType.filter(x => x.threadId === msg.threadId);
+          const matchingMessages = messagesOfType.filter(x => completedMatcher(x, msg));
           matchingMessages.forEach(m => {
             messagesOfType.splice(messagesOfType.indexOf(m), 1);
           });
