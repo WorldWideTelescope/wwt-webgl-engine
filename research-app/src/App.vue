@@ -1603,7 +1603,7 @@ export default class App extends WWTAwareComponent {
         imageryStretchMessages.push({
           event: "image_layer_stretch",
           id: imageset.get_name(),
-          version: 1, // TODO: What does this mean?
+          version: 1, // Don't think that this should matter - we're only sending one per layer
           stretch: state.scaleType,
           vmin: state.vmin,
           vmax: state.vmax,
