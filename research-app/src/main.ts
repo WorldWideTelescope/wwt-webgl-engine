@@ -15,6 +15,7 @@ import {
   faChevronUp,
   faCircle,
   faCompress,
+  faCopy,
   faCrosshairs,
   faExpand,
   faEye,
@@ -28,6 +29,7 @@ import {
   faPhotoVideo,
   faPlus,
   faPlusCircle,
+  faSave,
   faSearchMinus,
   faSearchPlus,
   faSlidersH,
@@ -89,6 +91,8 @@ library.add(faSearchPlus);
 library.add(faSlidersH);
 library.add(faTimes);
 library.add(faWindowClose);
+library.add(faSave);
+library.add(faCopy);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('vue-color-chrome', Chrome);

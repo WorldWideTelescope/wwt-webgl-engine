@@ -116,6 +116,17 @@
                       collection</a
                     >
                   </li>
+                  <li>
+                    <a
+                      href="#"
+                      v-close-popover
+                      @click="
+                        selectTool('save-state');
+                        showPopover = false;
+                      "
+                      tabindex="0"
+                    ><font-awesome-icon icon="save" /> Save current state</a>
+                  </li>
                 </ul>
               </template>
             </v-popover>
@@ -286,12 +297,32 @@
                 </div>
               </div>
             </template>
+            
+            <template v-else-if="currentTool == 'save-state'">
+              <div class="save-state-container">
+                <label class="save-state-title">The current app state can be restored using:</label>
+                <div class="save-state-content">
+                  <span class="save-state-url">
+                  {{ this.stateAsUrl() }}
+                  </span>
+                  <font-awesome-icon
+                    icon="copy"
+                    size="lg"
+                    class="save-state-icon"
+                    @click="copyStateURL"
+                    @keyup.enter="copyStateURL"
+                    tabindex="0"
+                  ></font-awesome-icon>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
       </div>
     </div>
 
     <notifications group="load-collection" position="top right" />
+    <notifications group="copy-url" position="top right" />
 
     <div
       id="webgl2-popup"
@@ -342,7 +373,6 @@ import {
   PolyLine,
   SpreadSheetLayer,
   SpreadSheetLayerSetting,
-  WWTControl,
 } from "@wwtelescope/engine";
 
 import {
@@ -443,7 +473,6 @@ class ImageSetLayerMessageHandler {
   }
 
   private layerInitialized(layer: ImageSetLayer) {
-    console.log("Imageset layerInitialized");
     this.internalId = layer.id.toString();
 
     if (this.queuedStretch !== null) {
@@ -720,18 +749,14 @@ class TableLayerMessageHandler {
     if (!layers.isMultiModifyTableLayerMessage(msg)) return;
     if (msg.settings.length !== msg.values.length) return;
 
-    console.log(`Multi modify message is good`);
-
     const layer = this.owner.spreadSheetLayerById(msg.id);
     if (layer) {
       
-      console.log("Layer exists!");
       const settings: SpreadSheetLayerSetting[] = [];
       const pywwtSettings: PywwtSpreadSheetLayerSetting[] = [];
       for (const [index, option] of msg.settings.entries()) {
         
         const setting: [string, any] = [option, msg.values[index]];
-        console.log(setting, classicPywwt.isPywwtSpreadSheetLayerSetting(setting), isSpreadSheetLayerSetting(setting));
         if (classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
           const converted = convertPywwtSpreadSheetLayerSetting(setting, layer);
           if (converted !== null) {
@@ -744,8 +769,6 @@ class TableLayerMessageHandler {
             pywwtSettings.push(converted);
           }
           settings.push(setting);
-        } else {
-          console.log(`Rejected setting: ${JSON.stringify(setting)}`);
         }
       }
 
@@ -1297,7 +1320,6 @@ export default class App extends WWTAwareComponent {
       )
     );
 
-    window.addEventListener("keydown", (_event) => console.log(this.stateAsUrl()));
   }
 
   destroyed() {
@@ -1387,7 +1409,6 @@ export default class App extends WWTAwareComponent {
 
     const getType: (msg: Message) => string = msg => msg.event || msg.type || "";
     const messageTypes: string[] = messages.map(getType);
-    messageTypes.forEach(console.log);
 
     const prerequisites: { [type: string]: string[] | undefined } = {};
     messageTypes.forEach(t => {
@@ -1399,7 +1420,6 @@ export default class App extends WWTAwareComponent {
       }
       prerequisites[t] = prereqs;
     });
-    console.log(prerequisites);
 
 
     // Messages types that don't depend on another message type
@@ -1418,7 +1438,6 @@ export default class App extends WWTAwareComponent {
     }
     
     const addMessagesOfType: (msgType: string) => void = (msgType) => {
-      console.log(`Adding messages of type ${msgType}`);
       const messagesOfType = messages.filter(msg => getType(msg) === msgType);
       this.messageQueue = this.messageQueue.concat(messagesOfType);
 
@@ -1447,11 +1466,9 @@ export default class App extends WWTAwareComponent {
           return true;
         };
         this.messageHandlers.set(completedType, handler);
-        console.log(`Set handler for ${completedType}`);
       } else {
         finishedMessageTypes.push(msgType);
         nextTypesPresent.filter(prerequisitesMet).filter(t => finishedMessageTypes.indexOf(t) < 0).forEach(addMessagesOfType);
-        console.log(`Added messages of type ${msgType} to queue`);
       }
     }
 
@@ -1463,7 +1480,6 @@ export default class App extends WWTAwareComponent {
 
   @Watch("messageQueue")
   handleMessageQueueUpdate(queue: Message[]): void {
-    console.log(`Message queue got updated. Current length is ${queue.length}`);
     while (queue.length > 0) {
       const message = queue.shift();
       this.onMessage(message);
@@ -1529,19 +1545,6 @@ export default class App extends WWTAwareComponent {
 
     });
 
-    const tableSettingMessages: classicPywwt.ModifyTableLayerMessage[] = [];
-    this.spreadsheetLayers.forEach(layer => {
-      const state = this.spreadsheetState(layer);
-      for (const setting of spreadSheetLayerSettingNames) {
-        tableSettingMessages.push({
-          event: "table_layer_set",
-          id: layer instanceof SpreadSheetLayerInfo ? layer.id : layer.name,
-          setting: setting,
-          value: (state as any)["get_" + setting](),
-        });
-      }
-    });
-
     const loadWtmlMessages: classicPywwt.LoadImageCollectionMessage[] = 
       this.loadedWtmlUrls.map(url => {
         return {
@@ -1593,7 +1596,6 @@ export default class App extends WWTAwareComponent {
         source: this.prepareForMessaging(source),
       };
     });
-    sourceMessages.forEach(console.log);
 
     const messageStrings = [
       coordinatesMessage,
@@ -1603,14 +1605,12 @@ export default class App extends WWTAwareComponent {
       ...catalogSettingsMessages,
       ...loadWtmlMessages,
       ...imageryLayerMessages,
-      //...tableSettingMessages,
       ...imagerySettingMessages,
       ...imageryStretchMessages,
       ...sourceMessages,
     ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
 
     const messageString = messageStrings.join(",");
-    //const outString = compress(messageString);
     const outString = messageString;
 
     const params = {
@@ -1621,12 +1621,28 @@ export default class App extends WWTAwareComponent {
     return window.location.origin + '/?' + (new URLSearchParams(params)).toString();
   }
 
+  copyStateURL(): void {
+    console.log("Here");
+    navigator.clipboard.writeText(this.stateAsUrl())
+      .then(() => {
+        this.$notify({
+        group: "copy-url",
+        type: "success",
+        text: "URL copied",
+      });
+      console.log("Success")})
+      .catch(_err => this.$notify({
+        group: "copy-url",
+        type: "error",
+        text: "Failed to copy URL"
+      }));
+  }
+
   // Incoming message handling
 
   private messageHandlers: Map<string, (msg: any) => boolean> = new Map();
 
   private initializeHandlers() {
-    console.log("Initializing handlers");
     // These handlers must take care to type-check that the input
     // message actually fully obeys the expected schema!
 
@@ -1721,7 +1737,6 @@ export default class App extends WWTAwareComponent {
 
   onMessage(msg: any) {
     const key = String(msg.type || msg.event);
-    console.log(`onMessage: key is ${key}`);
     const handler = this.messageHandlers.get(key);
     let handled = false;
 
@@ -1974,10 +1989,8 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleMultiModifyFitsLayer(msg: any): boolean {
-    console.log(`In app handleMultiModifyFitsLayerMessage`);
     if (!layers.isMultiModifyFitsLayerMessage(msg)) return false;
 
-    console.log("Message is good");
     this.getFitsLayerHandler(msg).handleMultiModifyMessage(msg);
     return true;
   }
@@ -2515,11 +2528,9 @@ export default class App extends WWTAwareComponent {
   }
 
   handleAddSource(msg: selections.AddSourceMessage): boolean {
-    console.log(`Got an add source message: ${JSON.stringify(msg)}`);
     if (!selections.isAddSourceMessage(msg)) return false;
 
     const source = this.deserializeSource(msg.source);
-    console.log(`Adding source ${JSON.stringify(source)}`);
     this.addSource(source);
     return true;
   }
@@ -3203,6 +3214,47 @@ ul.tool-menu {
     font-size: small;
     width: 100%;
   }
+}
+
+.save-state-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+}
+
+.save-state-title {
+  font-size: 16pt;
+}
+
+.save-state-content {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.save-state-url {
+  white-space: nowrap;
+  overflow: scroll;
+  max-width: 25vw;
+  font-family: monospace;
+  padding: 4px;
+  border: 1px solid white;
+  border-radius: 7px;
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // Edge, IE
+
+  // Chrome, Safari, Opera
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+}
+
+.save-state-icon {
+  cursor: pointer;
 }
 
 .pointer {
