@@ -192,3 +192,28 @@ export function isMultiModifyFitsLayerMessage(o: any): o is MultiModifyFitsLayer
     typeof o.settings === 'object' &&
     typeof o.values === 'object';
 }
+
+/** A command to modify multiple annotation settings in a generic way
+ * 
+ * This interface does not validate the setting names or their values.
+ */
+export interface MultiModifyAnnotationMessage {
+  /** The tag identifying this message type */
+  event: "annotation_set_multi",
+
+  /** The identifier of the annotation to modify */
+  id: string;
+
+  /** The names of the settings to modify */
+  settings: string[];
+
+  /** The values for these settings, in the same order as the setting names */
+  values: any[];
+}
+
+export function isMultiModifyAnnotationMessage(o: any): o is MultiModifyAnnotationMessage {
+  return o.event === 'annotation_set_multi' &&
+    typeof o.id === 'string' &&
+    typeof o.settings === 'object' &&
+    typeof o.values === 'object';
+}

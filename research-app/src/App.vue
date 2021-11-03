@@ -363,6 +363,7 @@ interface Message {
 
 import {
   Annotation,
+  AnnotationSetting,
   Circle,
   Color,
   Guid,
@@ -380,6 +381,7 @@ import {
   applyPolyAnnotationSetting,
   applyPolyLineAnnotationSetting,
   extractSpreadSheetLayerSettings,
+  isAnnotationSetting,
   isCircleAnnotationSetting,
   isEngineSetting,
   isImageSetLayerSetting,
@@ -408,6 +410,10 @@ import { isSpreadSheetLayerSetting, spreadSheetLayerSettingNames, SpreadSheetLay
 import { isLoadImageCollectionCompletedMessage, isLoadImageCollectionMessage, PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
 import { type } from "os";
 import { isLoadHipsCatalogCompletedMessage, isLoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
+import { annotationSettingNames } from "@wwtelescope/engine-helpers/src/annotation";
+import { circleAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/circleannotation";
+import { polyAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/polyannotation";
+import { polyLineAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/polylineannotation";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -844,7 +850,8 @@ type AnyAnnotationMessage =
   | classicPywwt.CreateAnnotationMessage
   | classicPywwt.ModifyAnnotationMessage
   | classicPywwt.RemoveAnnotationMessage
-  | classicPywwt.SetCircleCenterMessage;
+  | classicPywwt.SetCircleCenterMessage
+  | layers.MultiModifyAnnotationMessage;
 
 /** Helper for handling messages that mutate annotations. These are actually
  * much simpler to deal with than image or data layers, but it doesn't hurt
@@ -898,6 +905,22 @@ class AnnotationMessageHandler {
     }
   }
 
+  handleMultiModifyAnnotationMessage(msg: layers.MultiModifyAnnotationMessage) {
+    for (const [index, option] of msg.settings.entries()) {
+        const setting: [string, any] = [option, msg.values[index]];
+        if (this.ann instanceof Circle && isCircleAnnotationSetting(setting)) {
+        applyCircleAnnotationSetting(this.ann, setting);
+      } else if (this.ann instanceof Poly && isPolyAnnotationSetting(setting)) {
+        applyPolyAnnotationSetting(this.ann, setting);
+      } else if (
+        this.ann instanceof PolyLine &&
+        isPolyLineAnnotationSetting(setting)
+      ) {
+        applyPolyLineAnnotationSetting(this.ann, setting);
+      }
+    }
+  }
+
   handleRemoveAnnotationMessage(_msg: classicPywwt.RemoveAnnotationMessage) {
     this.owner.removeAnnotation(this.ann);
   }
@@ -918,6 +941,10 @@ class AnnotationMessageHandler {
     if (this.ann instanceof Poly) {
       this.ann.addPoint(msg.ra, msg.dec);
     }
+  }
+
+  annotation(): Annotation {
+    return this.ann;
   }
 }
 
@@ -1402,6 +1429,7 @@ export default class App extends WWTAwareComponent {
       "image_layer_create": [ "image_layer_set", "image_layer_set_multi", "image_layer_stretch" ],
       "set_foreground_by_name": [ "set_foreground_opacity" ],
       "layer_hipscat_load": [ "layer_hipscat_datainview", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
+      "annotation_create": [ "annotation_set", "annotation_set_multi" ],
     };
     const completion: { [event: string]: [string, (sent: Message, reply: Message) => boolean] | undefined } = {
       "load_image_collection": ["load_image_collection_completed", (sent, reply) => {
@@ -1618,6 +1646,44 @@ export default class App extends WWTAwareComponent {
       };
     });
 
+    const createAnnotationMessages: classicPywwt.CreateAnnotationMessage[] = [];
+    const annotationSettingsMessages: layers.MultiModifyAnnotationMessage[] = [];
+    for (const [id, handler] of this.annotations) {
+      const annotation = handler.annotation();
+      let shape: "circle" | "line" | "polygon" | undefined = undefined;
+      if (annotation instanceof Circle) {
+        shape = "circle";
+      } else if (annotation instanceof Poly) {
+        shape = "polygon";
+      } else if (annotation instanceof PolyLine) {
+        shape = "line"
+      }
+      if (shape == undefined) {
+        continue;
+      }
+      createAnnotationMessages.push({
+        event: "annotation_create",
+        shape: shape,
+        id: id,
+      });
+
+      let settingNames: string[] = [];
+      if (shape === "circle") {
+        settingNames = circleAnnotationSettingNames;
+      } else if (shape === "polygon") {
+        settingNames = polyAnnotationSettingNames;
+      } else {
+        settingNames = polyLineAnnotationSettingNames;
+      }
+      const values = settingNames.map(setting => (annotation as any)["get_" + setting]());
+      annotationSettingsMessages.push({
+        event: "annotation_set_multi",
+        id: id,
+        settings: settingNames,
+        values: values,
+      });
+    }
+
     const messageStrings = [
       coordinatesMessage,
       backgroundMessage,
@@ -1629,6 +1695,8 @@ export default class App extends WWTAwareComponent {
       ...imagerySettingMessages,
       ...imageryStretchMessages,
       ...sourceMessages,
+      ...createAnnotationMessages,
+      ...annotationSettingsMessages,
     ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
 
     const messageString = messageStrings.join(",");
@@ -1729,6 +1797,7 @@ export default class App extends WWTAwareComponent {
 
     this.messageHandlers.set("annotation_create", this.handleCreateAnnotation);
     this.messageHandlers.set("annotation_set", this.handleModifyAnnotation);
+    this.messageHandlers.set("annotation_set_multi", this.handleMultiModifyAnnotation);
     this.messageHandlers.set("circle_set_center", this.handleSetCircleCenter);
     this.messageHandlers.set("line_add_point", this.handleAddLinePoint);
     this.messageHandlers.set("polygon_add_point", this.handleAddPolygonPoint);
@@ -2107,6 +2176,16 @@ export default class App extends WWTAwareComponent {
     const handler = this.lookupAnnotationHandler(msg);
     if (handler !== undefined) {
       handler.handleModifyAnnotationMessage(msg);
+    }
+    return true;
+  }
+
+  private handleMultiModifyAnnotation(msg: any): boolean {
+    if (!layers.isMultiModifyAnnotationMessage(msg)) return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleMultiModifyAnnotationMessage(msg);
     }
     return true;
   }
