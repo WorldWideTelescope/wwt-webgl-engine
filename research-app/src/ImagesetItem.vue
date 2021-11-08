@@ -77,9 +77,9 @@
             </option>
           </select>
         </div>
-
+      
         <div class="detail-row">
-          <span class="prompt">Low cutoff:</span>
+          <span class="prompt cutoff">Low cutoff:</span>
           <input
             type="text"
             class="detail-input"
@@ -95,7 +95,7 @@
         </div>
 
         <div class="detail-row">
-          <span class="prompt">High cutoff:</span>
+          <span class="prompt cutoff">High cutoff:</span>
           <input
             type="text"
             class="detail-input"
@@ -483,6 +483,11 @@ export default class ImagesetItem extends Vue {
   }
 }
 
+select {
+  width: 70%;
+  max-width: fit-content;
+}
+
 .detail-container {
   font-size: 9pt;
   margin: 0px 5px;
@@ -508,6 +513,13 @@ export default class ImagesetItem extends Vue {
   display: flex;
   align-items: center;
   gap: 2px;
+  justify-content: flex-start;
+}
+
+.detail-input {
+  flex: 1;
+  min-width: 10px;
+  text-align: center;
 }
 
 .scrubber {
@@ -515,8 +527,9 @@ export default class ImagesetItem extends Vue {
   cursor: pointer;
 }
 
-.detail-input {
-  flex: 1;
-  text-align: center;
+.cutoff {
+  width: 84px;
+  padding-right: 0px;
 }
+
 </style>
