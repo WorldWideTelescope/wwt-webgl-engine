@@ -300,7 +300,7 @@
             
             <template v-else-if="currentTool == 'save-state'">
               <div class="save-state-container">
-                <label class="save-state-title">The current app state can be restored using:</label>
+                <label class="save-state-title">The current state can be restored using:</label>
                 <div class="save-state-content">
                   <span class="save-state-url">
                   {{ this.stateAsUrl() }}
@@ -903,8 +903,8 @@ class AnnotationMessageHandler {
 
   handleMultiModifyAnnotationMessage(msg: layers.MultiModifyAnnotationMessage) {
     for (const [index, option] of msg.settings.entries()) {
-        const setting: [string, any] = [option, msg.values[index]];
-        if (this.ann instanceof Circle && isCircleAnnotationSetting(setting)) {
+      const setting: [string, any] = [option, msg.values[index]];
+      if (this.ann instanceof Circle && isCircleAnnotationSetting(setting)) {
         applyCircleAnnotationSetting(this.ann, setting);
       } else if (this.ann instanceof Poly && isPolyAnnotationSetting(setting)) {
         applyPolyAnnotationSetting(this.ann, setting);
