@@ -109,8 +109,6 @@ export interface AddSourceMessage {
 }
 
 export function isAddSourceMessage(o: any): o is AddSourceMessage {
-  return typeof o.type === 'string' &&
-      o.type == 'add_source' &&
+  return o.type === 'add_source' &&
       typeof o.source === 'object';
-
 }
