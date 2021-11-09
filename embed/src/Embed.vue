@@ -339,7 +339,6 @@ export default class Embed extends WWTAwareComponent {
           });
 
           if (this.embedSettings.wtmlPlace) {
-
             // Currently, there is an issue with the `places` field of a `Folder`
             // object populating correctly. Thus, we iterate over `children` instead
             for (const pl of folder.get_children() ?? []) {
@@ -692,6 +691,7 @@ body {
     background-image: url("assets/wwt_globe_bg.png");
     background-repeat: no-repeat;
     background-size: contain;
+    background-position: center;
     width: 20rem;
     height: 20rem;
     max-width: 70%;
