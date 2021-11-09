@@ -365,13 +365,16 @@ interface Message {
 import {
   Annotation,
   Circle,
+  CircleAnnotationSetting,
   Color,
   Guid,
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
+  PolyAnnotationSetting,
   PolyLine,
+  PolyLineAnnotationSetting,
   SpreadSheetLayer,
   SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
@@ -404,13 +407,13 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
-import { imageSetLayerSettingNames } from "@wwtelescope/engine-helpers/src/imagesetlayer";
-import { isSpreadSheetLayerSetting, spreadSheetLayerSettingNames, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
+import { extractImageSetLayerSettings } from "@wwtelescope/engine-helpers/src/imagesetlayer";
+import { isSpreadSheetLayerSetting, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
 import { isLoadImageCollectionCompletedMessage, isLoadImageCollectionMessage, PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
 import { isLoadHipsCatalogCompletedMessage, isLoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
-import { circleAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/circleannotation";
-import { polyAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/polyannotation";
-import { polyLineAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/polylineannotation";
+import { extractCircleAnnotationSettings } from "@wwtelescope/engine-helpers/src/circleannotation";
+import { extractPolyAnnotationSettings } from "@wwtelescope/engine-helpers/src/polyannotation";
+import { extractPolyLineAnnotationSettings } from "@wwtelescope/engine-helpers/src/polylineannotation";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1579,12 +1582,12 @@ export default class App extends WWTAwareComponent {
 
 
         const state: SpreadSheetLayerState = this.wwtSpreadSheetLayers[id];
-        const values: any[] = spreadSheetLayerSettingNames.map(setting => (state as any)["get_" + setting]());
+        const layerSettings = extractSpreadSheetLayerSettings(state);
         catalogSettingsMessages.push({
           event: "table_layer_set_multi",
           id: catalog.name,
-          settings: spreadSheetLayerSettingNames,
-          values: values,
+          settings: layerSettings.map(s => s[0]),
+          values: layerSettings.map(s => s[1]),
         });
       }
 
@@ -1615,13 +1618,12 @@ export default class App extends WWTAwareComponent {
         });
 
         const state = this.wwtImagesetLayers[id];
-        const settings = state.settings;
-        const values: any[] = imageSetLayerSettingNames.map(setting => (settings as any)["get_" + setting]());
+        const layerSettings = extractImageSetLayerSettings(state.settings);
         imagerySettingMessages.push({
           event: "image_layer_set_multi",
           id: imageset.get_name(),
-          settings: imageSetLayerSettingNames,
-          values: values,
+          settings: layerSettings.map(s => s[0]),
+          values: layerSettings.map(s => s[1]),
         });
 
         imageryStretchMessages.push({
@@ -1663,20 +1665,19 @@ export default class App extends WWTAwareComponent {
         id: id,
       });
 
-      let settingNames: string[] = [];
+      let layerSettings: [string, any][] = [];  // eslint-disable-line @typescript-eslint/no-explicit-any
       if (shape === "circle") {
-        settingNames = circleAnnotationSettingNames;
+        layerSettings = extractCircleAnnotationSettings(annotation as Circle);
       } else if (shape === "polygon") {
-        settingNames = polyAnnotationSettingNames;
-      } else {
-        settingNames = polyLineAnnotationSettingNames;
+        layerSettings = extractPolyAnnotationSettings(annotation as Poly);
+      } else if (shape === "line") {
+        layerSettings = extractPolyLineAnnotationSettings(annotation as PolyLine);
       }
-      const values = settingNames.map(setting => (annotation as any)["get_" + setting]());
       annotationSettingsMessages.push({
         event: "annotation_set_multi",
         id: id,
-        settings: settingNames,
-        values: values,
+        settings: layerSettings.map(s => s[0]),
+        values: layerSettings.map(s => s[1]),
       });
     }
 
