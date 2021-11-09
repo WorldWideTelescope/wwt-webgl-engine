@@ -71,7 +71,7 @@ export interface LoadHipsCatalogCompletedMessage {
   spreadsheetInfo: SpreadSheetLayerInfo;
 }
 
-export function isLoadHipsCatalogCompletedMessage(o: any): o is LoadHipsCatalogCompletedMessage {
+export function isLoadHipsCatalogCompletedMessage(o: any): o is LoadHipsCatalogCompletedMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event == 'layer_hipscat_load_completed' &&
     typeof o.threadId == 'string' &&
     typeof o.spreadsheetInfo == 'object';
@@ -158,10 +158,10 @@ export interface MultiModifyTableLayerMessage {
   settings: string[];
 
   /** The values for these settings, in the same order as the setting names */
-  values: any[];
+  values: any[];  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-export function isMultiModifyTableLayerMessage(o: any): o is MultiModifyTableLayerMessage {
+export function isMultiModifyTableLayerMessage(o: any): o is MultiModifyTableLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event === 'table_layer_set_multi' &&
     typeof o.id === 'string' &&
     typeof o.settings === 'object' &&
@@ -183,10 +183,10 @@ export interface MultiModifyFitsLayerMessage {
   settings: string[];
 
   /** The values for these settings, in the same order as the setting names */
-  values: any[];
+  values: any[];  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-export function isMultiModifyFitsLayerMessage(o: any): o is MultiModifyFitsLayerMessage {
+export function isMultiModifyFitsLayerMessage(o: any): o is MultiModifyFitsLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event === 'image_layer_set_multi' &&
     typeof o.id === 'string' &&
     typeof o.settings === 'object' &&
@@ -199,7 +199,7 @@ export function isMultiModifyFitsLayerMessage(o: any): o is MultiModifyFitsLayer
  */
 export interface MultiModifyAnnotationMessage {
   /** The tag identifying this message type */
-  event: "annotation_set_multi",
+  event: "annotation_set_multi";
 
   /** The identifier of the annotation to modify */
   id: string;
@@ -208,10 +208,10 @@ export interface MultiModifyAnnotationMessage {
   settings: string[];
 
   /** The values for these settings, in the same order as the setting names */
-  values: any[];
+  values: any[];  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-export function isMultiModifyAnnotationMessage(o: any): o is MultiModifyAnnotationMessage {
+export function isMultiModifyAnnotationMessage(o: any): o is MultiModifyAnnotationMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event === 'annotation_set_multi' &&
     typeof o.id === 'string' &&
     typeof o.settings === 'object' &&

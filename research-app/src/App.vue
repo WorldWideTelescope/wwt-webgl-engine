@@ -345,6 +345,7 @@
 import * as moment from "moment";
 import * as screenfull from "screenfull";
 import "vue-select/dist/vue-select.css";
+import { Buffer } from "buffer";
 import { debounce } from "debounce";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { mapGetters, mapMutations, mapState } from "vuex";
@@ -1359,7 +1360,7 @@ export default class App extends WWTAwareComponent {
 
   parseFloatParam(param: string | (string | null)[], fallback: number): number {
     if (typeof param === 'string') {
-      let value = parseFloat(param);
+      const value = parseFloat(param);
       return value || fallback;
     }
     return fallback;
@@ -1395,7 +1396,7 @@ export default class App extends WWTAwareComponent {
     }
     const query = new URLSearchParams(location.search);
 
-    let msgs = query.get('messages');
+    const msgs = query.get('messages');
     if (!msgs) {
       return;
     }
@@ -1499,7 +1500,6 @@ export default class App extends WWTAwareComponent {
         const [completedType, completedMatcher] = completionInfo;
         const handler: (msg: any) => boolean = (msg) => {
 
-          //@ts-ignore
           const matchingMessages = messagesOfType.filter(x => completedMatcher(x, msg));
           matchingMessages.forEach(m => {
             messagesOfType.splice(messagesOfType.indexOf(m), 1);
@@ -1546,7 +1546,7 @@ export default class App extends WWTAwareComponent {
       let name = this.wwtBackgroundImageset.get_name();
       if (name === 'DSS') {
         name = 'Digitized Sky Survey (Color)'
-      };
+      }
       backgroundMessage = {
         event: "set_background_by_name",
         name: name,
@@ -2803,7 +2803,7 @@ export default class App extends WWTAwareComponent {
 
     for (const layerInfo of this.visibleTableLayers()) {
 
-      let layer = this.spreadSheetLayer(layerInfo);
+      const layer = this.spreadSheetLayer(layerInfo);
       if (layer == null) {
         continue;
       }

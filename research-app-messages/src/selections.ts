@@ -108,7 +108,7 @@ export interface AddSourceMessage {
   source: Source;
 }
 
-export function isAddSourceMessage(o: any): o is AddSourceMessage {
+export function isAddSourceMessage(o: any): o is AddSourceMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.type === 'add_source' &&
       typeof o.source === 'object';
 }
