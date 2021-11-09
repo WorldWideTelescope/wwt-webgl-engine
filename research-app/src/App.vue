@@ -363,7 +363,6 @@ interface Message {
 
 import {
   Annotation,
-  AnnotationSetting,
   Circle,
   Color,
   Guid,
@@ -381,7 +380,6 @@ import {
   applyPolyAnnotationSetting,
   applyPolyLineAnnotationSetting,
   extractSpreadSheetLayerSettings,
-  isAnnotationSetting,
   isCircleAnnotationSetting,
   isEngineSetting,
   isImageSetLayerSetting,
@@ -405,12 +403,10 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
-import { imageSetLayerSettingNames, ImageSetLayerState } from "@wwtelescope/engine-helpers/src/imagesetlayer";
+import { imageSetLayerSettingNames } from "@wwtelescope/engine-helpers/src/imagesetlayer";
 import { isSpreadSheetLayerSetting, spreadSheetLayerSettingNames, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
 import { isLoadImageCollectionCompletedMessage, isLoadImageCollectionMessage, PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
-import { type } from "os";
 import { isLoadHipsCatalogCompletedMessage, isLoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
-import { annotationSettingNames } from "@wwtelescope/engine-helpers/src/annotation";
 import { circleAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/circleannotation";
 import { polyAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/polyannotation";
 import { polyLineAnnotationSettingNames } from "@wwtelescope/engine-helpers/src/polylineannotation";
