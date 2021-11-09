@@ -125,7 +125,7 @@
                         showPopover = false;
                       "
                       tabindex="0"
-                    ><font-awesome-icon icon="save" /> Save current state</a>
+                    ><font-awesome-icon icon="save" /> Create link to current state</a>
                   </li>
                 </ul>
               </template>
