@@ -1694,7 +1694,9 @@ export default class App extends WWTAwareComponent {
       messages: outString,
     };
 
-    return window.location.origin + '/?' + (new URLSearchParams(params)).toString();
+    const url = new URL(window.location.href);
+    url.search = (new URLSearchParams(params)).toString();
+    return url.toString();
   }
 
   copyStateURL(): void {
