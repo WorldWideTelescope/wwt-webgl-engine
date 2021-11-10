@@ -759,32 +759,24 @@ class TableLayerMessageHandler {
     const layer = this.owner.spreadSheetLayerById(msg.id);
     if (layer) {
       
-      const settings: SpreadSheetLayerSetting[] = [];
       const pywwtSettings: PywwtSpreadSheetLayerSetting[] = [];
       for (const [index, option] of msg.settings.entries()) {
-        
         const setting: [string, any] = [option, msg.values[index]];
         if (classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
-          const converted = convertPywwtSpreadSheetLayerSetting(setting, layer);
-          if (converted !== null) {
-            settings.push(converted);
-          }
           pywwtSettings.push(setting);
-        } else if (isSpreadSheetLayerSetting(setting)) {
-          const converted = convertSpreadSheetLayerSetting(setting);
-          if (converted !== null) {
-            pywwtSettings.push(converted);
-          }
-          settings.push(setting);
         }
       }
 
       if (this.internalId === null) {
         pywwtSettings.forEach(setting => this.queuedSettings.push(setting));
       } else {
+        const layerSettings = pywwtSettings.flatMap(s => {
+         const pywwtSetting = convertPywwtSpreadSheetLayerSetting(s, layer);
+         return pywwtSetting ? [pywwtSetting] : []
+        });
         this.owner.applyTableLayerSettings({
           id: this.internalId,
-          settings: settings,
+          settings: layerSettings,
         });
       }
     }
@@ -1381,13 +1373,7 @@ export default class App extends WWTAwareComponent {
     for (let i = 0; i < names.length; i++) {
       const name = names[i];
       const value = values[i];
-      if (name === 'color') {
-        if (typeof value === 'string') {
-          values[i] = Color.load(value);
-        } else if (typeof value === 'object') {
-          values[i] = Color.fromArgb(value.a, value.r, value.g, value.b);
-        }
-      } else if ((name === 'beginRange' || name === 'endRange') && typeof value === 'string') {
+      if ((name === 'beginRange' || name === 'endRange') && typeof value === 'string') {
         values[i] = new Date(value);
       }
     }
@@ -1580,14 +1566,18 @@ export default class App extends WWTAwareComponent {
           name: catalog.name,
         });
 
-
         const state: SpreadSheetLayerState = this.wwtSpreadSheetLayers[id];
         const layerSettings = extractSpreadSheetLayerSettings(state);
+        const pywwtLayerSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = layerSettings.flatMap(s => {
+          const pywwtSetting = convertSpreadSheetLayerSetting(s);
+          return pywwtSetting ? [pywwtSetting] : [];
+        });
+
         catalogSettingsMessages.push({
           event: "table_layer_set_multi",
           id: catalog.name,
-          settings: layerSettings.map(s => s[0]),
-          values: layerSettings.map(s => s[1]),
+          settings: pywwtLayerSettings.map(s => s[0]),
+          values: pywwtLayerSettings.map(s => s[1]),
         });
       }
 
