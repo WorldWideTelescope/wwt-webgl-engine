@@ -1366,7 +1366,12 @@ export default class App extends WWTAwareComponent {
   }
 
   decodeObjectBase64(data: string): object {
-    return JSON.parse(Buffer.from(data, 'base64').toString());
+    try {
+      return JSON.parse(Buffer.from(data, 'base64').toString());
+    } catch (error) {
+      console.warn(`Error parsing messages: ${error}`);
+      return {};
+    }
   }
 
   adjustSettingsForImport(names: string[], values: any[]): void {
@@ -1690,7 +1695,6 @@ export default class App extends WWTAwareComponent {
     const outString = messageString;
 
     const params = {
-      origin: window.location.origin,
       messages: outString,
     };
 

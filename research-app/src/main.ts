@@ -127,9 +127,13 @@ Vue.directive("hide", {
 // control. This is OK because right now this app has no sense of user logins or
 // other credentials that can be abused.
 const queryParams = new URLSearchParams(window.location.search);
-const allowedOrigin = queryParams.get('origin');
-if (allowedOrigin === null) {
-  console.log("WWT embed: no \"?origin=\" given, so no incoming messages will be allowed")
+let allowedOrigin = queryParams.get('origin');
+const messages = queryParams.get('messages');
+if (messages !== null) {
+  allowedOrigin = window.location.origin;
+  console.log("WWT embed: incoming messages allowed from current origin in order to restore state");
+} else if (allowedOrigin === null) {
+  console.log("WWT embed: no \"?origin=\" given, so no incoming messages will be allowed");
 }
 
 new Vue({
