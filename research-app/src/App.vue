@@ -1374,6 +1374,10 @@ export default class App extends WWTAwareComponent {
     }
   }
 
+  /** NOTE: Currently, both pywwtSpreadSheetLayerSetting and SpreadSheetLayerSetting
+   * expect dates as `Date` objects. However, these are serialized as strings
+   * and thus we need to deserialize.
+   */
   adjustSettingsForImport(names: string[], values: any[]): void {
     for (let i = 0; i < names.length; i++) {
       const name = names[i];
@@ -1401,6 +1405,9 @@ export default class App extends WWTAwareComponent {
     const messages: Message[] = messageStrings.map(str => this.decodeObjectBase64(str))
                                     .filter((obj): obj is Message => "event" in obj || "type" in obj);
 
+    /** See the note on adjustSettingsForImport
+     * Some fields (i.e. dates) need to be properly deserialized
+    */
     messages.forEach(msg => {
       if (classicPywwt.isModifyTableLayerMessage(msg)) {
         this.adjustSettingsForImport([msg.setting], [msg.value]);
