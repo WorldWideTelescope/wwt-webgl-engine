@@ -1532,6 +1532,7 @@ export default class App extends WWTAwareComponent {
       ra: this.wwtRARad * R2D,
       dec: this.wwtDecRad * R2D,
       fov: this.wwtZoomDeg / 6,
+      roll: this.wwtRollRad * R2D,
       instant: true,
     };
 
