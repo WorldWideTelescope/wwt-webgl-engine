@@ -1394,7 +1394,7 @@ export default class App extends WWTAwareComponent {
     }
     const query = new URLSearchParams(location.search);
 
-    const msgs = query.get('messages');
+    const msgs = query.get('script');
     if (!msgs) {
       return;
     }
@@ -1703,7 +1703,7 @@ export default class App extends WWTAwareComponent {
     const outString = messageString;
 
     const params = {
-      messages: outString,
+      script: outString,
     };
 
     const url = new URL(window.location.href);

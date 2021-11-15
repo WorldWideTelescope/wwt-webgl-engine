@@ -128,8 +128,12 @@ Vue.directive("hide", {
 // other credentials that can be abused.
 const queryParams = new URLSearchParams(window.location.search);
 let allowedOrigin = queryParams.get('origin');
-const messages = queryParams.get('messages');
+const messages = queryParams.get('script');
 if (messages !== null) {
+  // The app has been given a startup script. For now, we override
+  // allowedOrigin, and so subsequent external scripting won't be possible. This
+  // seems OK, but we could make the behavior more sophisticated here if that
+  // turns out to be limiting.
   allowedOrigin = window.location.origin;
   console.log("WWT embed: incoming messages allowed from current origin in order to restore state");
 } else if (allowedOrigin === null) {
