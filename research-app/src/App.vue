@@ -125,7 +125,7 @@
                         showPopover = false;
                       "
                       tabindex="0"
-                    ><font-awesome-icon icon="save" /> Create link to current state</a>
+                    ><font-awesome-icon icon="save" /> Create link to current view</a>
                   </li>
                 </ul>
               </template>
@@ -300,7 +300,7 @@
             
             <template v-else-if="currentTool == 'save-state'">
               <div class="save-state-container">
-                <label class="save-state-title">The current state can be restored using:</label>
+                <label class="save-state-title">The current view can be restored using:</label>
                 <div class="save-state-content">
                   <span class="save-state-url">
                   {{ this.stateAsUrl() }}
