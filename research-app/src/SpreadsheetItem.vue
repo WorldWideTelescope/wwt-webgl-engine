@@ -299,7 +299,6 @@ export default class CatalogItem extends Vue {
   // Implementation
 
   mounted() {
-    this.color = this.defaultColor;
     this.isLayerHips = this.layer instanceof ImagesetInfo;
   }
 

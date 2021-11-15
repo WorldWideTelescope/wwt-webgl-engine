@@ -279,6 +279,9 @@ export interface WWTEngineVuexState {
   /** The current mode of the renderer */
   renderType: ImageSetType;
 
+  /** The current roll of the view camera, in radians */
+  rollRad: number;
+
   /** The number of times that a tour has played through to the end.
    *
    * The point of this property is that one can watch() it and get alerted to
@@ -429,7 +432,7 @@ function availableImagesets(): ImagesetInfo[] {
  */
 function spreadSheetLayerByKey(key: string): SpreadSheetLayer | null {
   if (Vue.$wwt.inst === null)
-    throw new Error('cannot get spreadSheetLayerById without linking to WWTInstance');
+    throw new Error('cannot get spreadSheetLayerByKey without linking to WWTInstance');
 
   const layer = Vue.$wwt.inst.lm.get_layerList()[key];
 
@@ -473,6 +476,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   isTourPlaying = false;
   raRad = 0.0;
   renderType = ImageSetType.sky;
+  rollRad = 0;
   timeAtStartup = Date.now();
   tourCompletions = 0;
   tourRunTime: number | null = null;
@@ -527,6 +531,10 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     const zoomDeg = wwt.ctl.renderContext.viewCamera.zoom;
     if (this.zoomDeg != zoomDeg)
       this.zoomDeg = zoomDeg;
+
+    const rollRad = wwt.ctl.renderContext.viewCamera.rotation;
+    if (this.rollRad != rollRad)
+      this.rollRad = rollRad;
 
     const bg = wwt.ctl.renderContext.get_backgroundImageset() || null; // TEMP
     if (this.backgroundImageset != bg)

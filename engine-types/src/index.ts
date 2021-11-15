@@ -624,7 +624,9 @@ export function isBaseSpreadSheetLayerSetting(obj: [string, any]): obj is BaseSp
   if (isBaseLayerSetting(obj))
     return true;
 
-  const key = obj[0] + "/" + typeof obj[1];
+  // We want to be able to properly recognize Date objects
+  const type = obj[1] instanceof Date ? 'Date' : typeof obj[1];
+  const key = obj[0] + "/" + type;
   const enumType = baseSpreadSheetLayerSettingTypeInfo[key];
 
   if (enumType === undefined) {
