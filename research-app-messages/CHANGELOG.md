@@ -1,4 +1,16 @@
-# rc: micro bump
+# rc: minor bump
+
+New APIs to help support startup scripting of the research app (#155,
+@Carifio24):
+
+- `layers.isLoadHipsCatalogCompletedMessage`
+- `layers.MultiModifyTableLayerMessage` and type guard function
+- `layers.MultiModifyFitsLayerMessage` and type guard function
+- `layers.MultiModifyAnnotationMessage` and type guard function
+- `selections.AddSourceMessage` and type guard function
+
+
+# @wwtelescope/research-app-messages 0.11.2 (2021-10-27)
 
 - Not quite "fix the fix", but ... improve it (#154, @pkgw). We only replaced
   the first instance of braces.

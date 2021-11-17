@@ -15,6 +15,7 @@ import {
   faChevronUp,
   faCircle,
   faCompress,
+  faCopy,
   faCrosshairs,
   faExpand,
   faEye,
@@ -28,6 +29,7 @@ import {
   faPhotoVideo,
   faPlus,
   faPlusCircle,
+  faSave,
   faSearchMinus,
   faSearchPlus,
   faSlidersH,
@@ -89,6 +91,8 @@ library.add(faSearchPlus);
 library.add(faSlidersH);
 library.add(faTimes);
 library.add(faWindowClose);
+library.add(faSave);
+library.add(faCopy);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('vue-color-chrome', Chrome);
@@ -123,9 +127,17 @@ Vue.directive("hide", {
 // control. This is OK because right now this app has no sense of user logins or
 // other credentials that can be abused.
 const queryParams = new URLSearchParams(window.location.search);
-const allowedOrigin = queryParams.get('origin');
-if (allowedOrigin === null) {
-  console.log("WWT embed: no \"?origin=\" given, so no incoming messages will be allowed")
+let allowedOrigin = queryParams.get('origin');
+const messages = queryParams.get('script');
+if (messages !== null) {
+  // The app has been given a startup script. For now, we override
+  // allowedOrigin, and so subsequent external scripting won't be possible. This
+  // seems OK, but we could make the behavior more sophisticated here if that
+  // turns out to be limiting.
+  allowedOrigin = window.location.origin;
+  console.log("WWT embed: incoming messages allowed from current origin in order to restore state");
+} else if (allowedOrigin === null) {
+  console.log("WWT embed: no \"?origin=\" given, so no incoming messages will be allowed");
 }
 
 new Vue({

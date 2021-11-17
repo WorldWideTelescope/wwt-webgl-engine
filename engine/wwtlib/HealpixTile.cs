@@ -251,8 +251,15 @@ namespace wwtlib
 
         public override bool IsTileBigEnough(RenderContext renderContext)
         {
-            double arcPixels = (3600 / (Math.Pow(2, Level) * 4));
-            return (renderContext.FovScale < arcPixels);
+            if(dataset.DataSetType == ImageSetType.Planet)
+            {
+                double arcPixels = (180 / (Math.Pow(2, Level) * 4));
+                return (renderContext.FovScale < arcPixels);
+            } else
+            {
+                double arcPixels = (3600 / (Math.Pow(2, Level) * 4));
+                return (renderContext.FovScale < arcPixels);
+            }
         }
 
         private Vector3d[] Boundaries(int x, int y, int step)
