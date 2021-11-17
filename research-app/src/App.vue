@@ -1512,7 +1512,7 @@ export default class App extends WWTAwareComponent {
             messagesOfType.splice(messagesOfType.indexOf(m), 1);
           });
           if (messagesOfType.length === 0) {
-            this.messageHandlers.delete(msgType);
+            this.messageHandlers.delete(completedType);
             finishedMessageTypes.push(msgType);
             nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
           }
