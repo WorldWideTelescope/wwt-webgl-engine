@@ -1,3 +1,8 @@
+# @wwtelescope/engine-types 0.6.1 (2021-11-17)
+
+- Correctly handle Date types in `isBaseSpreadSheetLayerSetting` (#155, @Carifio24).
+
+
 # @wwtelescope/engine-types 0.6.0 (2021-09-20)
 
 - Wire in the "Layer.enabled" setting

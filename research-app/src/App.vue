@@ -116,6 +116,17 @@
                       collection</a
                     >
                   </li>
+                  <li>
+                    <a
+                      href="#"
+                      v-close-popover
+                      @click="
+                        selectTool('save-state');
+                        showPopover = false;
+                      "
+                      tabindex="0"
+                    ><font-awesome-icon icon="save" /> Create link to current view</a>
+                  </li>
                 </ul>
               </template>
             </v-popover>
@@ -286,12 +297,32 @@
                 </div>
               </div>
             </template>
+            
+            <template v-else-if="currentTool == 'save-state'">
+              <div class="save-state-container">
+                <label class="save-state-title">The current view can be restored using:</label>
+                <div class="save-state-content">
+                  <span class="save-state-url">
+                  {{ this.stateAsUrl() }}
+                  </span>
+                  <font-awesome-icon
+                    icon="copy"
+                    size="lg"
+                    class="pointer"
+                    @click="copyStateURL"
+                    @keyup.enter="copyStateURL"
+                    tabindex="0"
+                  ></font-awesome-icon>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
       </div>
     </div>
 
     <notifications group="load-collection" position="top right" />
+    <notifications group="copy-url" position="top right" />
 
     <div
       id="webgl2-popup"
@@ -314,6 +345,7 @@
 import * as moment from "moment";
 import * as screenfull from "screenfull";
 import "vue-select/dist/vue-select.css";
+import { Buffer } from "buffer";
 import { debounce } from "debounce";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { mapGetters, mapMutations, mapState } from "vuex";
@@ -325,16 +357,26 @@ import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
 
+interface Message {
+  event?: string;
+  type?: string;
+}
+
 import {
   Annotation,
   Circle,
+  CircleAnnotationSetting,
   Color,
+  Guid,
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
+  PolyAnnotationSetting,
   PolyLine,
+  PolyLineAnnotationSetting,
   SpreadSheetLayer,
+  SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
 
 import {
@@ -365,6 +407,13 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
+import { extractImageSetLayerSettings } from "@wwtelescope/engine-helpers/src/imagesetlayer";
+import { isSpreadSheetLayerSetting, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
+import { isLoadImageCollectionCompletedMessage, isLoadImageCollectionMessage, PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
+import { isLoadHipsCatalogCompletedMessage, isLoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
+import { extractCircleAnnotationSettings } from "@wwtelescope/engine-helpers/src/circleannotation";
+import { extractPolyAnnotationSettings } from "@wwtelescope/engine-helpers/src/polyannotation";
+import { extractPolyLineAnnotationSettings } from "@wwtelescope/engine-helpers/src/polylineannotation";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -383,7 +432,8 @@ type AnyFitsLayerMessage =
   | classicPywwt.SetLayerOrderMessage
   | classicPywwt.StretchFitsLayerMessage
   | classicPywwt.ModifyFitsLayerMessage
-  | classicPywwt.RemoveImageSetLayerMessage;
+  | classicPywwt.RemoveImageSetLayerMessage
+  | layers.MultiModifyFitsLayerMessage;
 
 /** Helper for handling messages that mutate FITS / ImageSet layers. Because
  * FITS loading is asynchronous, and messages might arrive out of order, we need
@@ -537,6 +587,29 @@ class ImageSetLayerMessageHandler {
     }
   }
 
+  handleMultiModifyMessage(msg: layers.MultiModifyFitsLayerMessage) {
+
+    if (!layers.isMultiModifyFitsLayerMessage(msg)) return;
+    if (msg.settings.length !== msg.values.length) return;
+
+    const layerSettings: ImageSetLayerSetting[] = [];
+    for (const [index, option] of msg.settings.entries()) {
+      const setting: [string, any] = [option, msg.values[index]];
+      if (isImageSetLayerSetting(setting)) {
+        layerSettings.push(setting);
+      }
+    }
+
+    if (this.internalId === null) {
+      layerSettings.forEach(setting => this.queuedSettings.push(setting));
+    } else {
+      this.owner.applyFitsLayerSettings({
+        id: this.internalId,
+        settings: layerSettings,
+      });
+    }
+  }
+
   handleRemoveMessage(msg: classicPywwt.RemoveImageSetLayerMessage) {
     if (this.internalId === null) {
       // Layer not yet created or fully initialized. Queue up message for processing
@@ -556,7 +629,8 @@ type AnyTableLayerMessage =
   | classicPywwt.CreateTableLayerMessage
   | classicPywwt.UpdateTableLayerMessage
   | classicPywwt.ModifyTableLayerMessage
-  | classicPywwt.RemoveTableLayerMessage;
+  | classicPywwt.RemoveTableLayerMessage
+  | layers.MultiModifyTableLayerMessage;
 
 /** Helper for handling messages that mutate tabular / "spreadsheet" layers. */
 class TableLayerMessageHandler {
@@ -677,6 +751,37 @@ class TableLayerMessageHandler {
     }
   }
 
+  handleMultiModifyMessage(msg: layers.MultiModifyTableLayerMessage) {
+
+    if (!layers.isMultiModifyTableLayerMessage(msg)) return;
+    if (msg.settings.length !== msg.values.length) return;
+
+    const layer = this.owner.spreadSheetLayerById(msg.id);
+    if (layer) {
+      
+      const pywwtSettings: PywwtSpreadSheetLayerSetting[] = [];
+      for (const [index, option] of msg.settings.entries()) {
+        const setting: [string, any] = [option, msg.values[index]];
+        if (classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
+          pywwtSettings.push(setting);
+        }
+      }
+
+      if (this.internalId === null) {
+        pywwtSettings.forEach(setting => this.queuedSettings.push(setting));
+      } else {
+        const layerSettings = pywwtSettings.flatMap(s => {
+         const pywwtSetting = convertPywwtSpreadSheetLayerSetting(s, layer);
+         return pywwtSetting ? [pywwtSetting] : []
+        });
+        this.owner.applyTableLayerSettings({
+          id: this.internalId,
+          settings: layerSettings,
+        });
+      }
+    }
+  }
+
   async handleGetHipsDataInViewMessage(
     msg: layers.GetHipsCatalogDataInViewMessage
   ): Promise<layers.GetHipsCatalogDataInViewReply | null> {
@@ -737,7 +842,8 @@ type AnyAnnotationMessage =
   | classicPywwt.CreateAnnotationMessage
   | classicPywwt.ModifyAnnotationMessage
   | classicPywwt.RemoveAnnotationMessage
-  | classicPywwt.SetCircleCenterMessage;
+  | classicPywwt.SetCircleCenterMessage
+  | layers.MultiModifyAnnotationMessage;
 
 /** Helper for handling messages that mutate annotations. These are actually
  * much simpler to deal with than image or data layers, but it doesn't hurt
@@ -791,6 +897,22 @@ class AnnotationMessageHandler {
     }
   }
 
+  handleMultiModifyAnnotationMessage(msg: layers.MultiModifyAnnotationMessage) {
+    for (const [index, option] of msg.settings.entries()) {
+      const setting: [string, any] = [option, msg.values[index]];
+      if (this.ann instanceof Circle && isCircleAnnotationSetting(setting)) {
+        applyCircleAnnotationSetting(this.ann, setting);
+      } else if (this.ann instanceof Poly && isPolyAnnotationSetting(setting)) {
+        applyPolyAnnotationSetting(this.ann, setting);
+      } else if (
+        this.ann instanceof PolyLine &&
+        isPolyLineAnnotationSetting(setting)
+      ) {
+        applyPolyLineAnnotationSetting(this.ann, setting);
+      }
+    }
+  }
+
   handleRemoveAnnotationMessage(_msg: classicPywwt.RemoveAnnotationMessage) {
     this.owner.removeAnnotation(this.ann);
   }
@@ -811,6 +933,10 @@ class AnnotationMessageHandler {
     if (this.ann instanceof Poly) {
       this.ann.addPoint(msg.ra, msg.dec);
     }
+  }
+
+  annotation(): Annotation {
+    return this.ann;
   }
 }
 
@@ -1023,7 +1149,9 @@ export default class App extends WWTAwareComponent {
 
   addResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   addSource!: (source: Source) => void;
+  hipsCatalogs!: () => CatalogLayerInfo[];
   removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
+  appTableLayers!: () => CatalogLayerInfo[];
   visibleTableLayers!: () => CatalogLayerInfo[];
 
   // Lifecycle management
@@ -1036,7 +1164,13 @@ export default class App extends WWTAwareComponent {
         spreadsheetLayers: (_state, getters) => getters["tableLayers"](),
         sources: (state, _getters) => (state as WWTResearchAppModule).sources,
       }),
-      ...mapGetters(wwtResearchAppNamespace, ["visibleTableLayers"]),
+      ...mapGetters(wwtResearchAppNamespace, [
+        "hipsCatalogs",
+        "visibleTableLayers"
+      ]),
+      ...mapGetters(wwtResearchAppNamespace, {
+        appTableLayers: "tableLayers",
+      }),
       ...this.$options.computed,
     };
 
@@ -1063,7 +1197,12 @@ export default class App extends WWTAwareComponent {
     this.waitForReady().then(() => {
       // This returns a promise but I don't think that we need to wait for that
       // to resolve before going ahead and starting to listen for messages.
-      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true });
+      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true })
+        .then(() => {
+          // Get and handle the query parameters
+          // We (potentially) need the catalogs to have finished loading for this
+          this.handleQueryParameters(window.location);
+        });
 
       // Don't start listening for messages until the engine is ready to go.
       // There's no point in returning a "not ready yet" error or anything since
@@ -1200,6 +1339,7 @@ export default class App extends WWTAwareComponent {
         this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)
       )
     );
+
   }
 
   destroyed() {
@@ -1211,6 +1351,378 @@ export default class App extends WWTAwareComponent {
       window.clearInterval(this.updateIntervalId);
       this.updateIntervalId = null;
     }
+  }
+
+  parseFloatParam(param: string | (string | null)[], fallback: number): number {
+    if (typeof param === 'string') {
+      const value = parseFloat(param);
+      return value || fallback;
+    }
+    return fallback;
+  }
+
+  encodeObjectBase64(obj: object): string {
+    return Buffer.from(JSON.stringify(obj)).toString('base64');
+  }
+
+  decodeObjectBase64(data: string): object {
+    try {
+      return JSON.parse(Buffer.from(data, 'base64').toString());
+    } catch (error) {
+      console.warn(`Error parsing messages: ${error}`);
+      return {};
+    }
+  }
+
+  /** NOTE: Currently, both pywwtSpreadSheetLayerSetting and SpreadSheetLayerSetting
+   * expect dates as `Date` objects. However, these are serialized as strings
+   * and thus we need to deserialize.
+   */
+  adjustSettingsForImport(names: string[], values: any[]): void {
+    for (let i = 0; i < names.length; i++) {
+      const name = names[i];
+      const value = values[i];
+      if ((name === 'beginRange' || name === 'endRange') && typeof value === 'string') {
+        values[i] = new Date(value);
+      }
+    }
+  }
+
+  handleQueryParameters(location: Location): void {
+    if (!location) {
+      return;
+    }
+    const query = new URLSearchParams(location.search);
+
+    const msgs = query.get('script');
+    if (!msgs) {
+      return;
+    }
+
+    //const decoded = decompress(msgs) as string;
+    const decoded = msgs;
+    const messageStrings = decoded.split(",");
+    const messages: Message[] = messageStrings.map(str => this.decodeObjectBase64(str))
+                                    .filter((obj): obj is Message => "event" in obj || "type" in obj);
+
+    /** See the note on adjustSettingsForImport
+     * Some fields (i.e. dates) need to be properly deserialized
+    */
+    messages.forEach(msg => {
+      if (classicPywwt.isModifyTableLayerMessage(msg)) {
+        this.adjustSettingsForImport([msg.setting], [msg.value]);
+      } else if (layers.isMultiModifyTableLayerMessage(msg)) {
+        this.adjustSettingsForImport(msg.settings, msg.values);
+      }
+    });
+
+    // We need to handle messages in the correct order
+    // Generally, let's assume that our message can be any
+    // research app message
+    // Even though some (i.e. removal messages) are unlikely
+    // to come in a query string
+    const messagesAdjList: { [event: string]: string[] | undefined } = {
+      "table_layer_create": [ "table_layer_set", "table_layer_set_multi", "table_layer_remove", "table_layer_update", "add_source" ],
+      "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create" ],
+      "image_layer_create": [ "image_layer_set", "image_layer_set_multi", "image_layer_stretch" ],
+      "set_foreground_by_name": [ "set_foreground_opacity" ],
+      "layer_hipscat_load": [ "layer_hipscat_datainview", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
+      "annotation_create": [ "annotation_set", "annotation_set_multi" ],
+    };
+    const completion: { [event: string]: [string, (sent: Message, reply: Message) => boolean] | undefined } = {
+      "load_image_collection": ["load_image_collection_completed", (sent, reply) => {
+        if (!(isLoadImageCollectionMessage(sent) && isLoadImageCollectionCompletedMessage(reply))) return false;
+        return sent.url === reply.url;
+        }],
+      "layer_hipscat_load": ["layer_hipscat_load_completed", (sent, reply) => {
+        if (!(isLoadHipsCatalogMessage(sent) && isLoadHipsCatalogCompletedMessage(reply))) return false;
+        for (const [option, value] of reply.spreadsheetInfo.settings) {
+          if (option === 'name') {
+            return sent.name === value;
+          }
+        }
+        return false;
+      }],
+    };
+
+    const getType: (msg: Message) => string = msg => msg.event || msg.type || "";
+    const messageTypes: string[] = messages.map(getType);
+    const finishedMessageTypes: string[] = [];
+
+    const prerequisites: { [type: string]: string[] | undefined } = {};
+    messageTypes.forEach(t => {
+      const prereqs = [];
+      for (const [typ, deps] of Object.entries(messagesAdjList)) {
+        if (deps && deps.includes(t)) {
+          prereqs.push(typ);
+        }
+      }
+      prerequisites[t] = prereqs;
+    });
+
+    // The prerequisite to add messages of a type is
+    // all of the types that it depends on have been finished
+    // (this is trivially true are there aren't any of that type)
+    const prerequisitesMet: (msgType: string) => boolean = (msgType) => {
+      const prereqs = prerequisites[msgType];
+      if (prereqs === undefined) {
+        return true;
+      }
+      return prereqs.every(t => !messageTypes.includes(t) || finishedMessageTypes.includes(t));
+    }
+
+    // We define "root" messages as messages that either
+    // - Don't depend on another message type
+    // - Might depend on another message type, but there aren't
+    //    any of that type present.
+    //    For instance, if a user has loaded an imageset via WTML and has 
+    //    that as a background image, we need to wait until the WTML has loaded.
+    //    But they may also just have a built-in image as the background
+    const isRoot = (t: string) => {
+      const prereqs = prerequisites[t];
+      return (prereqs === undefined) || prereqs.length === 0 || prereqs.every(x => !messageTypes.includes(x));
+    }
+    const rootTypes = messageTypes.filter(isRoot);
+    
+
+    const addMessagesOfType: (msgType: string) => void = (msgType) => {
+      const messagesOfType = messages.filter(msg => getType(msg) === msgType);
+      this.messageQueue = this.messageQueue.concat(messagesOfType);
+
+      const nextTypes = messagesAdjList[msgType];
+      const completionInfo = completion[msgType];
+      if (!nextTypes) {
+        return;
+      }
+
+      const nextTypesPresent = nextTypes.filter(t => messageTypes.indexOf(t) >= 0);
+
+      if (completionInfo) {
+        const [completedType, completedMatcher] = completionInfo;
+        const handler: (msg: any) => boolean = (msg) => {
+
+          const matchingMessages = messagesOfType.filter(x => completedMatcher(x, msg));
+          matchingMessages.forEach(m => {
+            messagesOfType.splice(messagesOfType.indexOf(m), 1);
+          });
+          if (messagesOfType.length === 0) {
+            this.messageHandlers.delete(msgType);
+            finishedMessageTypes.push(msgType);
+            nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
+          }
+          return true;
+        };
+        this.messageHandlers.set(completedType, handler);
+      } else {
+        finishedMessageTypes.push(msgType);
+        nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
+      }
+    }
+
+    rootTypes.forEach(addMessagesOfType);
+  }
+
+  messageQueue: Message[] = [];
+
+  @Watch("messageQueue")
+  handleMessageQueueUpdate(queue: Message[]): void {
+    while (queue.length > 0) {
+      const message = queue.shift();
+      this.onMessage(message);
+    }
+  }
+
+  stateAsUrl(): string {
+
+    const coordinatesMessage: classicPywwt.CenterOnCoordinatesMessage = {
+      event: "center_on_coordinates",
+      ra: this.wwtRARad * R2D,
+      dec: this.wwtDecRad * R2D,
+      fov: this.wwtZoomDeg / 6,
+      roll: this.wwtRollRad * R2D,
+      instant: true,
+    };
+
+    let backgroundMessage: classicPywwt.SetBackgroundByNameMessage | null = null;
+    if (this.wwtBackgroundImageset !== null) {
+      let name = this.wwtBackgroundImageset.get_name();
+      if (name === 'DSS') {
+        name = 'Digitized Sky Survey (Color)'
+      }
+      backgroundMessage = {
+        event: "set_background_by_name",
+        name: name,
+      };
+    }
+    
+
+    let foregroundMessage: classicPywwt.SetForegroundByNameMessage | null = null;
+    if (this.wwtForegroundImageset !== null) {
+      foregroundMessage = {
+        event: "set_foreground_by_name",
+        name: this.wwtForegroundImageset.get_name(),
+      };
+    }
+
+    const threadId = Guid.create();
+    const catalogs = this.hipsCatalogs();
+    const loadCatalogsMessages: layers.LoadHipsCatalogMessage[] = [];
+    const catalogSettingsMessages: layers.MultiModifyTableLayerMessage[] = [];
+    catalogs.forEach(catalog => {
+      const layer = this.layerForHipsCatalog(catalog.name);
+      if (layer !== null) {
+        const id = layer.id.toString();
+        loadCatalogsMessages.push({
+          event: "layer_hipscat_load",
+          threadId: threadId, // We need this to get a response
+          tableId: id,
+          name: catalog.name,
+        });
+
+        const state: SpreadSheetLayerState = this.wwtSpreadSheetLayers[id];
+        const layerSettings = extractSpreadSheetLayerSettings(state);
+        const pywwtLayerSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = layerSettings.flatMap(s => {
+          const pywwtSetting = convertSpreadSheetLayerSetting(s);
+          return pywwtSetting ? [pywwtSetting] : [];
+        });
+
+        catalogSettingsMessages.push({
+          event: "table_layer_set_multi",
+          id: catalog.name,
+          settings: pywwtLayerSettings.map(s => s[0]),
+          values: pywwtLayerSettings.map(s => s[1]),
+        });
+      }
+
+    });
+
+    const loadWtmlMessages: classicPywwt.LoadImageCollectionMessage[] = 
+      this.loadedWtmlUrls.map(url => {
+        return {
+          event: "load_image_collection",
+          url: url,
+          loadChildFolders: true
+        }
+      });
+
+    const imageryLayerMessages: classicPywwt.CreateImageSetLayerMessage[] = [];
+    const imagerySettingMessages: layers.MultiModifyFitsLayerMessage[] = [];
+    const imageryStretchMessages: classicPywwt.StretchFitsLayerMessage[] = [];
+    this.activeImagesetLayerStates.forEach(info => {
+      const id = info.getGuid();
+      const imageset = this.imagesetForLayer(id);
+      if (imageset !== null) {
+        imageryLayerMessages.push({
+          event: "image_layer_create",
+          id: imageset.get_name(),
+          url: imageset.get_url(),
+          mode: "preloaded",
+          goto: false,
+        });
+
+        const state = this.wwtImagesetLayers[id];
+        const layerSettings = extractImageSetLayerSettings(state.settings);
+        imagerySettingMessages.push({
+          event: "image_layer_set_multi",
+          id: imageset.get_name(),
+          settings: layerSettings.map(s => s[0]),
+          values: layerSettings.map(s => s[1]),
+        });
+
+        imageryStretchMessages.push({
+          event: "image_layer_stretch",
+          id: imageset.get_name(),
+          version: 1, // Don't think that this should matter - we're only sending one per layer
+          stretch: state.scaleType,
+          vmin: state.vmin,
+          vmax: state.vmax,
+        });
+      }
+    });
+
+    const sourceMessages: selections.AddSourceMessage[] = this.sources.map(source => {
+      return {
+        type: "add_source",
+        source: this.prepareForMessaging(source),
+      };
+    });
+
+    const createAnnotationMessages: classicPywwt.CreateAnnotationMessage[] = [];
+    const annotationSettingsMessages: layers.MultiModifyAnnotationMessage[] = [];
+    for (const [id, handler] of this.annotations) {
+      const annotation = handler.annotation();
+      let shape: "circle" | "line" | "polygon" | undefined = undefined;
+      if (annotation instanceof Circle) {
+        shape = "circle";
+      } else if (annotation instanceof Poly) {
+        shape = "polygon";
+      } else if (annotation instanceof PolyLine) {
+        shape = "line"
+      }
+      if (shape == undefined) {
+        continue;
+      }
+      createAnnotationMessages.push({
+        event: "annotation_create",
+        shape: shape,
+        id: id,
+      });
+
+      let layerSettings: [string, any][] = [];  // eslint-disable-line @typescript-eslint/no-explicit-any
+      if (shape === "circle") {
+        layerSettings = extractCircleAnnotationSettings(annotation as Circle);
+      } else if (shape === "polygon") {
+        layerSettings = extractPolyAnnotationSettings(annotation as Poly);
+      } else if (shape === "line") {
+        layerSettings = extractPolyLineAnnotationSettings(annotation as PolyLine);
+      }
+      annotationSettingsMessages.push({
+        event: "annotation_set_multi",
+        id: id,
+        settings: layerSettings.map(s => s[0]),
+        values: layerSettings.map(s => s[1]),
+      });
+    }
+
+    const messageStrings = [
+      coordinatesMessage,
+      backgroundMessage,
+      foregroundMessage,
+      ...loadCatalogsMessages,
+      ...catalogSettingsMessages,
+      ...loadWtmlMessages,
+      ...imageryLayerMessages,
+      ...imagerySettingMessages,
+      ...imageryStretchMessages,
+      ...sourceMessages,
+      ...createAnnotationMessages,
+      ...annotationSettingsMessages,
+    ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
+
+    const messageString = messageStrings.join(",");
+    const outString = messageString;
+
+    const params = {
+      script: outString,
+    };
+
+    const url = new URL(window.location.href);
+    url.search = (new URLSearchParams(params)).toString();
+    return url.toString();
+  }
+
+  copyStateURL(): void {
+    navigator.clipboard.writeText(this.stateAsUrl())
+      .then(() => this.$notify({
+        group: "copy-url",
+        type: "success",
+        text: "URL successfully copied",
+      }))
+      .catch(_err => this.$notify({
+        group: "copy-url",
+        type: "error",
+        text: "Failed to copy URL"
+      }));
   }
 
   // Incoming message handling
@@ -1266,6 +1778,7 @@ export default class App extends WWTAwareComponent {
       this.handleSetFitsLayerColormap
     );
     this.messageHandlers.set("image_layer_set", this.handleModifyFitsLayer);
+    this.messageHandlers.set("image_layer_set_multi", this.handleMultiModifyFitsLayer);
     this.messageHandlers.set(
       "image_layer_remove",
       this.handleRemoveImageSetLayer
@@ -1275,6 +1788,7 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("table_layer_update", this.handleUpdateTableLayer);
     this.messageHandlers.set("table_layer_set", this.handleModifyTableLayer);
     this.messageHandlers.set("table_layer_remove", this.handleRemoveTableLayer);
+    this.messageHandlers.set("table_layer_set_multi", this.handleMultiModifyTableLayer);
 
     this.messageHandlers.set("layer_hipscat_load", this.handleLoadHipsCatalog);
     this.messageHandlers.set(
@@ -1284,6 +1798,7 @@ export default class App extends WWTAwareComponent {
 
     this.messageHandlers.set("annotation_create", this.handleCreateAnnotation);
     this.messageHandlers.set("annotation_set", this.handleModifyAnnotation);
+    this.messageHandlers.set("annotation_set_multi", this.handleMultiModifyAnnotation);
     this.messageHandlers.set("circle_set_center", this.handleSetCircleCenter);
     this.messageHandlers.set("line_add_point", this.handleAddLinePoint);
     this.messageHandlers.set("polygon_add_point", this.handleAddPolygonPoint);
@@ -1293,6 +1808,8 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+
+    this.messageHandlers.set("add_source", this.handleAddSource);
 
     // Ignore incoming view_state messages. When testing the app, you might want
     // to launch it as (e.g.)
@@ -1349,6 +1866,7 @@ export default class App extends WWTAwareComponent {
           this.allowedOrigin
         );
       }
+      this.loadedWtmlUrls.push(msg.url);
     });
     return true;
   }
@@ -1558,6 +2076,20 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
+  private handleMultiModifyFitsLayer(msg: any): boolean {
+    if (!layers.isMultiModifyFitsLayerMessage(msg)) return false;
+
+    this.getFitsLayerHandler(msg).handleMultiModifyMessage(msg);
+    return true;
+  }
+
+  private handleMultiModifyTableLayer(msg: any): boolean {
+    if (!layers.isMultiModifyTableLayerMessage(msg)) return false;
+
+    this.getTableLayerHandler(msg).handleMultiModifyMessage(msg);
+    return true;
+  }
+
   private handleRemoveImageSetLayer(msg: any): boolean {
     if (!classicPywwt.isRemoveImageSetLayerMessage(msg)) return false;
 
@@ -1645,6 +2177,16 @@ export default class App extends WWTAwareComponent {
     const handler = this.lookupAnnotationHandler(msg);
     if (handler !== undefined) {
       handler.handleModifyAnnotationMessage(msg);
+    }
+    return true;
+  }
+
+  private handleMultiModifyAnnotation(msg: any): boolean {
+    if (!layers.isMultiModifyAnnotationMessage(msg)) return false;
+
+    const handler = this.lookupAnnotationHandler(msg);
+    if (handler !== undefined) {
+      handler.handleMultiModifyAnnotationMessage(msg);
     }
     return true;
   }
@@ -2056,6 +2598,41 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
+  isMessageSpreadsheetLayer(layer: selections.CatalogLayerInfo): layer is selections.SpreadSheetLayerInfo {
+    return "referenceFrame" in layer;
+  }
+
+  isMessageImagesetInfo(layer: selections.CatalogLayerInfo): layer is selections.ImagesetInfo {
+    return 'url' in layer;
+  }
+
+  deserializeSource(src: selections.Source): Source {
+    const msgLayer = src.catalogLayer;
+    let layer: CatalogLayerInfo | undefined = this.appTableLayers().find(x => x.name === msgLayer.name);
+
+    // If the layer corresponding to the source doesn't exist
+    // we create a new CatalogLayerInfo object for the source to use
+    if (layer === undefined) {
+      if (this.isMessageSpreadsheetLayer(msgLayer)) {
+        layer = new SpreadSheetLayerInfo(msgLayer.id, msgLayer.referenceFrame, msgLayer.name);
+      } else {
+        layer = new ImagesetInfo(msgLayer.url, msgLayer.name, ImageSetType[msgLayer.type], msgLayer.description, msgLayer.extension)
+      }
+    }
+    return {
+      ...src,
+      catalogLayer: layer,
+    }
+  }
+
+  handleAddSource(msg: selections.AddSourceMessage): boolean {
+    if (!selections.isAddSourceMessage(msg)) return false;
+
+    const source = this.deserializeSource(msg.source);
+    this.addSource(source);
+    return true;
+  }
+
   // "Tools" menu
 
   currentTool: ToolType = null;
@@ -2153,11 +2730,11 @@ export default class App extends WWTAwareComponent {
   // Load WTML Collection tool
 
   wtmlCollectionUrl = "";
+  loadedWtmlUrls: string[] = [];
 
-  submitWtmlCollectionUrl() {
-    if (this.wtmlCollectionUrl) {
-      this.loadImageCollection({
-        url: this.wtmlCollectionUrl,
+  loadWtml(url: string) {
+    this.loadImageCollection({
+        url: url,
         loadChildFolders: true,
       }).then((_folder) => {
         this.$notify({
@@ -2165,8 +2742,13 @@ export default class App extends WWTAwareComponent {
           type: "success",
           text: "WTML collection successfully loaded",
         });
+        this.loadedWtmlUrls.push(url);
       });
+  }
 
+  submitWtmlCollectionUrl() {
+    if (this.wtmlCollectionUrl) {
+      this.loadWtml(this.wtmlCollectionUrl);
       this.wtmlCollectionUrl = "";
     }
   }
@@ -2226,7 +2808,7 @@ export default class App extends WWTAwareComponent {
 
     for (const layerInfo of this.visibleTableLayers()) {
 
-      let layer = this.spreadSheetLayer(layerInfo);
+      const layer = this.spreadSheetLayer(layerInfo);
       if (layer == null) {
         continue;
       }
@@ -2733,6 +3315,45 @@ ul.tool-menu {
     font-size: small;
     width: 100%;
   }
+}
+
+.save-state-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+}
+
+.save-state-title {
+  font-size: 16pt;
+  text-align: center;
+}
+
+.save-state-content {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.save-state-url {
+  white-space: nowrap;
+  overflow: scroll;
+  max-width: 25vw;
+  min-width: 150px;
+  font-family: monospace;
+  padding: 4px;
+  border: 1px solid white;
+  border-radius: 7px;
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // Edge, IE
+
+  // Chrome, Safari, Opera
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
 }
 
 .pointer {

@@ -317,6 +317,7 @@ export class WWTAwareComponent extends Vue {
         wwtIsTourPlaying: (state, _getters) => (state as WWTEngineVuexState).isTourPlaying,
         wwtRARad: (state, _getters) => (state as WWTEngineVuexState).raRad,
         wwtRenderType: (state, _getters) => (state as WWTEngineVuexState).renderType,
+        wwtRollRad: (state, _getters) => (state as WWTEngineVuexState).rollRad,
         wwtTourCompletions: (state, _getters) => (state as WWTEngineVuexState).tourCompletions,
         wwtTourRunTime: (state, _getters) => (state as WWTEngineVuexState).tourRunTime,
         wwtTourStopStartTimes: (state, _getters) => (state as WWTEngineVuexState).tourStopStartTimes,
@@ -482,6 +483,9 @@ export class WWTAwareComponent extends Vue {
    * [[setBackgroundImageByName]].
    */
   wwtRenderType!: ImageSetType;
+
+  /** The current roll of the view camera, in radians */
+  wwtRollRad!: number;
 
   /** A table of activated imageset layers.
    *

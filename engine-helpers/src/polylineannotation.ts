@@ -31,9 +31,9 @@ const justPolyLineAnnotationSettingNames = [
  *
  * This is a superset of the names available for generic annotations.
 */
-export const polyAnnotationSettingNames = annotationSettingNames.concat(justPolyLineAnnotationSettingNames);
+export const polyLineAnnotationSettingNames = annotationSettingNames.concat(justPolyLineAnnotationSettingNames);
 
-const polyAnnotationSettingTypeInfo: { [ix: string]: boolean } = {
+const polyLineAnnotationSettingTypeInfo: { [ix: string]: boolean } = {
   "lineColor/string": true,
   "lineWidth/number": true,
 }
@@ -41,7 +41,7 @@ const polyAnnotationSettingTypeInfo: { [ix: string]: boolean } = {
 /** Type guard function for `PolyLineAnnotationSetting`. */
 export function isPolyLineAnnotationSetting(obj: [string, any]): obj is PolyLineAnnotationSetting {
   const key = obj[0] + "/" + typeof obj[1];
-  return (key in polyAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
+  return (key in polyLineAnnotationSettingTypeInfo) || isAnnotationSetting(obj);
 }
 
 /** Apply a setting to a generic `PolyLineAnnotation` or equivalent. */

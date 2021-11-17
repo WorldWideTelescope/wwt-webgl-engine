@@ -1,3 +1,9 @@
+# @wwtelescope/engine 7.14.3 (2021-11-17)
+
+- Fix `HealpixTile::IsTileBigEnough` to work with planetary HiPS dataset (#157,
+  @imbasimba).
+
+
 # @wwtelescope/engine 7.14.2 (2021-10-21)
 
 - Fix display of tiled FITS images when using WebGL 1 (#150, @imbasimba).

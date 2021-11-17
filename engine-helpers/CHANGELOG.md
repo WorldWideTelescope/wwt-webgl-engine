@@ -1,3 +1,9 @@
+# @wwtelescope/engine-helpers 0.8.1 (2021-11-17)
+
+- Fix bad copy/paste-o that made the `polylineannotation` module pretty useless
+  (#155, @Carifio24).
+
+
 # @wwtelescope/engine-helpers 0.8.0 (2021-09-20)
 
 - Provide a homogeneous set of settings interfaces, building on the new
