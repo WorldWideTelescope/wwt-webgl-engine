@@ -1398,10 +1398,9 @@ export default class App extends WWTAwareComponent {
 
   getQueryScript(location: Location): string | null {
     if (!location) {
-      return;
+      return null;
     }
     const query = new URLSearchParams(location.search);
-
     return query.get('script');
   }
 
