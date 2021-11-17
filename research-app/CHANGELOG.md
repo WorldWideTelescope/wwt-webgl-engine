@@ -1,3 +1,17 @@
+# @wwtelescope/research-app 0.9.0 (2021-11-17)
+
+- Add the ability to script the app startup (#155, @Carifio24). The app can now
+  be launched with a query parameter named `script` that specifies a series of
+  control messages that the app will process and act upon as it starts up. In
+  particular, the parameter is a comma-separated list of messages to process,
+  where each message is BASE64-encoded, UTF8 JSON content. The app has logic to
+  wait for asynchronous messages to resolve appropriately. This new
+  functionality makes it possible to create pre-loaded embeds based on the
+  research app UI, in the same way that's already possible with the "embed" app
+  which is designed for non-specialists.
+- Fix the left panel to behave better when it's narrow (#156, @Carifio24).
+
+
 # @wwtelescope/research-app 0.8.1 (2021-10-26)
 
 - Fix some cases where invisible HTML elements prevent clicks from reaching the
