@@ -1,3 +1,11 @@
+# @wwtelescope/research-app 0.9.1 (2021-11-18)
+
+- Fix scripting in production builds --- whoops! (#159, @Carifio24) The
+  production builds seem to have different timing behavior with regards to
+  JavaScript "promise" evaluation that broke the scripting system's message
+  processing.
+
+
 # @wwtelescope/research-app 0.9.0 (2021-11-17)
 
 - Add the ability to script the app startup (#155, @Carifio24). The app can now
