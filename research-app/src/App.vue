@@ -1195,13 +1195,21 @@ export default class App extends WWTAwareComponent {
     }
 
     this.waitForReady().then(() => {
+
+      const script = this.getQueryScript(window.location);
+      if (script !== null) {
+        this.statusMessageDestination = window;
+      }
+
       // This returns a promise but I don't think that we need to wait for that
       // to resolve before going ahead and starting to listen for messages.
       this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true })
         .then(() => {
-          // Get and handle the query parameters
+          // Handle the query script
           // We (potentially) need the catalogs to have finished loading for this
-          this.handleQueryParameters(window.location);
+          if (script !== null) {
+            this.handleQueryScript(script);
+          }
         });
 
       // Don't start listening for messages until the engine is ready to go.
@@ -1388,20 +1396,17 @@ export default class App extends WWTAwareComponent {
     }
   }
 
-  handleQueryParameters(location: Location): void {
+  getQueryScript(location: Location): string | null {
     if (!location) {
-      return;
+      return null;
     }
     const query = new URLSearchParams(location.search);
+    return query.get('script');
+  }
 
-    const msgs = query.get('script');
-    if (!msgs) {
-      return;
-    }
+  handleQueryScript(script: string): void {
 
-    //const decoded = decompress(msgs) as string;
-    const decoded = msgs;
-    const messageStrings = decoded.split(",");
+    const messageStrings = script.split(",");
     const messages: Message[] = messageStrings.map(str => this.decodeObjectBase64(str))
                                     .filter((obj): obj is Message => "event" in obj || "type" in obj);
 
@@ -1506,7 +1511,7 @@ export default class App extends WWTAwareComponent {
             messagesOfType.splice(messagesOfType.indexOf(m), 1);
           });
           if (messagesOfType.length === 0) {
-            this.messageHandlers.delete(msgType);
+            this.messageHandlers.delete(completedType);
             finishedMessageTypes.push(msgType);
             nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
           }
