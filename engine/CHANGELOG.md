@@ -1,6 +1,15 @@
+# @wwtelescope/engine 7.14.4 (2021-12-02)
+
+- Fix error handling in web file requests that don't get proxied (#161, @imbasimba)
+- Increase the performance of drawing filled circles by a factor of ~50 (#160,
+  @imbasimba). The naive implementation was generating more than a thousand triangles,
+  when that number can be *much* smaller. We're currently still generating 72 triangles,
+  and could likely get another large improvement with more work if needed.
+
+
 # @wwtelescope/engine 7.14.3 (2021-11-17)
 
-- Fix `HealpixTile::IsTileBigEnough` to work with planetary HiPS dataset (#157,
+- Fix `HealpixTile::IsTileBigEnough` to work with planetary HiPS datasets (#157,
   @imbasimba).
 
 

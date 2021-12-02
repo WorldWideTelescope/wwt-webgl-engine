@@ -431,64 +431,12 @@ namespace wwtlib
             else
             {
                 InitLineBuffer();
-                //Matrix3d savedWorld = renderContext.World;
-                //Matrix3d savedView = renderContext.View;
-                //if (localCenter != Vector3d.Empty)
-                //{
-                //    usingLocalCenter = true;
-                //    Vector3d temp = localCenter;
-                //    if (UseNonRotatingFrame)
-                //    {
-                //        renderContext.World = Matrix3d.Translation(temp) * renderContext.WorldBaseNonRotating * Matrix3d.Translation(-renderContext.CameraPosition);
-                //    }
-                //    else
-                //    {
-                //        renderContext.World = Matrix3d.Translation(temp) * renderContext.WorldBase * Matrix3d.Translation(-renderContext.CameraPosition);
-                //    }
-                //    renderContext.View = Matrix3d.Translation(renderContext.CameraPosition) * renderContext.ViewBase;
-                //}
-
-                //DateTime baseDate = new DateTime(2010, 1, 1, 12, 00, 00);
-
-                //renderContext.devContext.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.LineList;
-
-
-                //LineShaderNormalDates11.Constants.JNow = (float)(SpaceTimeController.JNow - SpaceTimeController.UtcToJulian(baseDate));
-                //LineShaderNormalDates11.Constants.Sky = Sky ? 1 : 0;
-                //LineShaderNormalDates11.Constants.ShowFarSide = ShowFarSide ? 1 : 0;
-                //if (TimeSeries)
-                //{
-                //    LineShaderNormalDates11.Constants.Decay = (float)Decay;
-                //}
-                //else
-                //{
-                //    LineShaderNormalDates11.Constants.Decay = 0;
-                //}
-
-                //LineShaderNormalDates11.Constants.Opacity = opacity;
-                //LineShaderNormalDates11.Constants.CameraPosition = new SharpDX.Vector4(Vector3d.TransformCoordinate(renderContext.CameraPosition, Matrix3d.Invert(renderContext.World)).Vector311, 1);
-                //SharpDX.Matrix mat = (renderContext.World * renderContext.View * renderContext.Projection).Matrix11;
-                //mat.Transpose();
-
-                //LineShaderNormalDates11.Constants.WorldViewProjection = mat;
-
-                //LineShaderNormalDates11.Use(renderContext.devContext);
-
-                //renderContext.DepthStencilMode = DepthBuffered ? DepthStencilMode.ZReadWrite : DepthStencilMode.Off;
 
                 foreach (TimeSeriesLineVertexBuffer lineBuffer in lineBuffers)
                 {
                     LineShaderNormalDates.Use(renderContext, lineBuffer.VertexBuffer, Color.FromArgb(255, 255, 255, 255), zBuffer, (float)JNow, TimeSeries ? (float)Decay : 0);
                     renderContext.gl.drawArrays(GL.LINES, 0, lineBuffer.Count);
                 }
-
-                //renderContext.DepthStencilMode = DepthStencilMode.ZReadWrite;
-
-                //if (usingLocalCenter)
-                //{
-                //    renderContext.World = savedWorld;
-                //    renderContext.View = savedView;
-                //}
             }
 
         }
@@ -827,6 +775,92 @@ namespace wwtlib
                     LineShaderNormalDates.Use(renderContext, triBuffer.VertexBuffer, Color.FromArgb(255, 255, 255, 255), DepthBuffered, (float)JNow, TimeSeries ? (float)Decay : 0);
                     renderContext.gl.drawArrays(GL.TRIANGLES, 0, triBuffer.Count);
                 }
+            }
+        }
+    }
+
+    public class TriangleFanList
+    {
+
+        public TriangleFanList()
+        {
+        }
+        bool zBuffer = true;
+
+        public bool DepthBuffered
+        {
+            get { return zBuffer; }
+            set { zBuffer = value; }
+        }
+        public bool TimeSeries = false;
+        public double Decay = 0;
+        public double JNow = 0;
+
+        List<List<Vector3d>> shapes = new List<List<Vector3d>>();
+        List<Color> colors = new List<Color>();
+        List<Dates> dates = new List<Dates>();
+        public void AddShape(List<Vector3d> shapePoints, Color color, Dates date)
+        {
+            shapes.Add(shapePoints);
+            colors.Add(color);
+            dates.Add(date);
+        }
+
+        public void Draw(RenderContext renderContext, float opacity)
+        {
+            if (opacity <= 0)
+            {
+                return;
+            }
+            if (renderContext.gl != null)
+            {
+                InitBuffer();
+
+                foreach (TimeSeriesLineVertexBuffer buffer in buffers)
+                {
+                    LineShaderNormalDates.Use(renderContext, buffer.VertexBuffer, Color.FromArgb(255, 255, 255, 255), zBuffer, (float)JNow, TimeSeries ? (float)Decay : 0);
+                    renderContext.gl.drawArrays(GL.TRIANGLE_FAN, 0, buffer.Count);
+                }
+            }
+
+        }
+
+        List<TimeSeriesLineVertexBuffer> buffers = new List<TimeSeriesLineVertexBuffer>();
+        List<int> bufferCounts = new List<int>();
+
+        void InitBuffer()
+        {
+            if (buffers.Count != shapes.Count)
+            {
+                buffers.Clear();
+
+                int index = 0;
+
+                foreach (List<Vector3d> shape in shapes)
+                {
+                    TimeSeriesLineVertexBuffer buffer = new TimeSeriesLineVertexBuffer(shape.Count);
+
+                    TimeSeriesLineVertex[] pointList = (TimeSeriesLineVertex[])buffer.Lock(); // Lock the buffer (which will return our structs)
+
+                    buffers.Add(buffer);
+                    bufferCounts.Add(shape.Count);
+                    int counter = 0;
+                    foreach (Vector3d point in shape)
+                    {
+                        pointList[counter] = new TimeSeriesLineVertex();
+                        pointList[counter].Position = point;
+                        pointList[counter].Tu = (float)dates[index].StartDate;
+                        pointList[counter].Tv = (float)dates[index].EndDate;
+                        pointList[counter].Color = colors[index];
+                        counter++;
+                    }
+                    index++;
+                    if (buffer != null)
+                    {
+                        buffer.Unlock();
+                    }
+                }
+
             }
         }
     }
