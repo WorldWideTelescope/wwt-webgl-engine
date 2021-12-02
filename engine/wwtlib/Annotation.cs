@@ -15,6 +15,7 @@ namespace wwtlib
 
         protected static PointList PointList = null;
         protected static LineList LineList = null;
+        protected static TriangleFanList TriangleFanPointList = null;
         protected static TriangleList TriangleList = null;
 
         public static bool BatchDirty = true;
@@ -24,6 +25,7 @@ namespace wwtlib
             {
                 PointList = new PointList(renderContext);
                 LineList = new LineList();
+                TriangleFanPointList = new TriangleFanList();
                 TriangleList = new TriangleList();
                 LineList.DepthBuffered = false;
                 TriangleList.DepthBuffered = false;
@@ -46,6 +48,12 @@ namespace wwtlib
             if (LineList != null)
             {
                 LineList.DrawLines(renderContext, 1);
+            }
+
+
+            if (TriangleFanPointList != null)
+            {
+                TriangleFanPointList.Draw(renderContext, 1);
             }
 
             if (TriangleList != null)
@@ -155,7 +163,7 @@ namespace wwtlib
 
         bool fill = false;
 
-        
+
         public bool Fill
         {
             get { return fill; }
@@ -294,16 +302,12 @@ namespace wwtlib
                         {
                             LineList.AddLine(vertexList[i], vertexList[i + 1], lineColor, new Dates(0, 1));
                         }
-                        LineList.AddLine(vertexList[vertexList.Count - 1], vertexList[0], lineColor, new Dates(0, 1));
                     }
                     if (fill)
                     {
-                        List<int> indexes = Tessellator.TesselateSimplePoly(vertexList);
-
-                        for (int i = 0; i < indexes.Count; i += 3)
-                        {
-                            TriangleList.AddSubdividedTriangles(vertexList[indexes[i]], vertexList[indexes[i + 1]], vertexList[indexes[i + 2]], fillColor, new Dates(0, 1), 2);
-                        }
+                        Vector3d pos = Vector3d.Create(center.X, center.Y, center.Z);
+                        vertexList.Insert(0, pos);
+                        TriangleFanPointList.AddShape(vertexList, fillColor, new Dates(0, 1));
                     }
                     AnnotationDirty = false;
                 }
