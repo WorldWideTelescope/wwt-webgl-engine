@@ -115,7 +115,7 @@ namespace wwtlib
 
                             texReady = true;
                             Downloading = false;
-                            errored = false;
+                            errored = fitsImage.errored;
                             ReadyToRender = texReady && (DemReady || !demTile);
                             RequestPending = false;
                             TileCache.RemoveFromQueue(this.Key, true);
