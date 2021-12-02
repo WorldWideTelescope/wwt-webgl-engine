@@ -681,11 +681,11 @@ namespace wwtlib
                         });
                     } else
                     {
-                        FitsImageJs image = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
+                        fitsImage = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
                         {
                             texReady = true;
                             Downloading = false;
-                            errored = false;
+                            errored = fitsImage.errored;
                             ReadyToRender = texReady && (DemReady || !demTile);
                             RequestPending = false;
                             TileCache.RemoveFromQueue(this.Key, true);

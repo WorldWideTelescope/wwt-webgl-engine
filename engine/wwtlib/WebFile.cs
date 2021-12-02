@@ -124,9 +124,14 @@ namespace wwtlib
 
                                 string new_url = URLHelpers.singleton.activateProxy(_url);
 
-                                if (new_url != null) { // null => don't bother: we know that the proxy won't help
+                                if (new_url != null) // null => don't bother: we know that the proxy won't help
+                                {
                                     _url = new_url;
                                     CORS();
+                                } else
+                                {
+                                    _message = xhr.StatusText;
+                                    State = StateType.Error;
                                 }
                             }
                         }
