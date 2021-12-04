@@ -443,7 +443,6 @@ class ImageSetLayerMessageHandler {
   private owner: App;
   private created = false;
   private internalId: string | null = null;
-  private displayName: string | null = null;
   private colormapVersion = -1;
   private stretchVersion = -1;
   private orderVersion = -1;
