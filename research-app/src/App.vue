@@ -24,7 +24,7 @@
             </div>
             <imageset-item
               v-for="imageset of activeImagesetLayerStates"
-              v-bind:key="imageset.settings.name"
+              v-bind:key="imageset.guidText"
               v-bind:imageset="imageset"
             />
           </div>
@@ -467,11 +467,13 @@ class ImageSetLayerMessageHandler {
     // unspecified, we treat it as true.
     const gotoTarget = msg.goto == undefined ? true : msg.goto;
 
+    const displayName = msg.name == undefined ? msg.id : msg.name;
+
     this.owner
       .addImageSetLayer({
         url: msg.url,
         mode: mode,
-        name: msg.id,
+        name: displayName,
         goto: gotoTarget,
       })
       .then((layer) => this.layerInitialized(layer));
