@@ -823,7 +823,7 @@ namespace wwtlib
                             //    alt += offset / meanRadius;
                             // }
 
-                            Vector3d pos = Coordinates.GeoTo3dDoubleRad(Ycoord, Xcoord, alt);
+                            Vector3d pos = Coordinates.GeoTo3dRad(Ycoord, Xcoord, alt);
 
                             if (astronomical && !bufferIsFlat)
                             {
