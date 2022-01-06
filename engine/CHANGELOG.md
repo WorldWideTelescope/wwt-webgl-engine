@@ -1,3 +1,15 @@
+# @wwtelescope/engine 7.14.5 (2022-01-06)
+
+- Fix 180-degree rotation of longitudes when rendering data tables in 3D (#166,
+  @Carifio24, @pkgw). The problem pretty clearly seems to have stemmed from some
+  longitude flip that showed up in the early webclient implementation and has
+  been worked around in a successive series of hacks over time. This fix should
+  address the symptoms, but it would be nice to trace down the underlying cause
+  and get things back to being more in sync with the Windows client codebase.
+- Change the default FITS colormap to Viridis to agree with pywwt (#162,
+  @imbasimba).
+
+
 # @wwtelescope/engine 7.14.4 (2021-12-02)
 
 - Fix error handling in web file requests that don't get proxied (#161, @imbasimba)

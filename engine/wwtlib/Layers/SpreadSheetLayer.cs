@@ -811,7 +811,7 @@ namespace wwtlib
                                 }
                                 if (bufferIsFlat)
                                 {
-                                    Xcoord += 180;
+                                 //   Xcoord += 180;
                                 }
 
                             }
@@ -823,7 +823,7 @@ namespace wwtlib
                             //    alt += offset / meanRadius;
                             // }
 
-                            Vector3d pos = Coordinates.GeoTo3dDoubleRad(Ycoord, Xcoord, alt);
+                            Vector3d pos = Coordinates.GeoTo3dRad(Ycoord, Xcoord, alt);
 
                             if (astronomical && !bufferIsFlat)
                             {
@@ -1208,8 +1208,8 @@ namespace wwtlib
             //todo space? using RA/DEC
             for (int i = 0; i < (geo.PointList.Count); i++)
             {
-                vertexList.Add(Coordinates.GeoTo3dDoubleRad(geo.PointList[i].Lat, geo.PointList[i].Lng, 1 + (geo.PointList[i].Alt / meanRadius)));
-                vertexListGround.Add(Coordinates.GeoTo3dDoubleRad(geo.PointList[i].Lat, geo.PointList[i].Lng, 1));
+                vertexList.Add(Coordinates.GeoTo3dRad(geo.PointList[i].Lat, geo.PointList[i].Lng, 1 + (geo.PointList[i].Alt / meanRadius)));
+                vertexListGround.Add(Coordinates.GeoTo3dRad(geo.PointList[i].Lat, geo.PointList[i].Lng, 1));
             }
 
 
@@ -1267,7 +1267,7 @@ namespace wwtlib
 
             for (int i = 0; i < (geo.PointList.Count); i++)
             {
-                vertexList.Add(Coordinates.GeoTo3dDoubleRad(geo.PointList[i].Lat, geo.PointList[i].Lng, 1 + (geo.PointList[i].Alt / meanRadius)));
+                vertexList.Add(Coordinates.GeoTo3dRad(geo.PointList[i].Lat, geo.PointList[i].Lng, 1 + (geo.PointList[i].Alt / meanRadius)));
             }
 
 

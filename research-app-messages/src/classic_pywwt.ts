@@ -213,6 +213,9 @@ export interface CreateImageSetLayerMessage {
 
   /** Go to centre of the data. Defaults to true. */
   goto?: boolean;
+
+  /** The display name of the layer. Defaults to the id of the layer. */
+  name?: string;
 }
 
 /** Type guard function for [[CreateImageSetLayerMessage]]. */
@@ -222,7 +225,8 @@ export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMe
     typeof o.id === "string" &&
     typeof o.url === "string" &&
     (o.mode == "autodetect" || o.mode == "fits" || o.mode == "preloaded") &&
-    (o.goto === undefined || typeof o.goto === "boolean");
+    (o.goto === undefined || typeof o.goto === "boolean") &&
+    (o.name === undefined || typeof o.name === "string");
 }
 
 /** A command to create a FITS-backed images set layer.
