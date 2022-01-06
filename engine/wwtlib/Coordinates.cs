@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-
 
 namespace wwtlib
 {
@@ -10,39 +8,36 @@ namespace wwtlib
         protected const double RC = (3.1415927 / 180.0);
         protected const double RCRA = (3.1415927 / 12.0);
         protected const float radius = 1;
+
         static public Vector3d GeoTo3d(double lat, double lng)
         {
             return Vector3d.Create((Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius), (Math.Sin(lat * RC) * radius), (Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius));
-
         }
 
         static public Vector3d GeoTo3dDouble(double lat, double lng)
         {
             return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
-
         }
+
         static public Vector3d GeoTo3dDoubleRad(double lat, double lng, double radius)
         {
             lng -= 180;
             return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
-
         }
+
         static public Vector3d GeoTo3dRad(double lat, double lng, double radius)
         {
             return Vector3d.Create(((Math.Cos(lng * RC)) * (Math.Cos(lat * RC)) * radius), ((Math.Sin(lat * RC) * radius)), ((Math.Sin(lng * RC)) * (Math.Cos(lat * RC)) * radius));
-
         }
 
         static public Vector3d RADecTo3d(double ra, double dec)
         {
             return Vector3d.Create((Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * radius), (Math.Sin(dec * RC) * radius), (Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * radius));
-
         }
 
         static public Vector3d RADecTo3dAu(double ra, double dec, double au)
         {
             return Vector3d.Create((Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * au), (Math.Sin(dec * RC) * au), (Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * au));
-
         }
 
         static public Vector3d RADecTo3dMat(double ra, double dec, Matrix3d mat)
@@ -54,9 +49,10 @@ namespace wwtlib
         {
             point.Dec = -point.Dec;
             return Vector3d.Create((Math.Cos(point.RA * RCRA) * Math.Cos(point.Dec * RC) * radius), (Math.Sin(point.Dec * RC) * radius), (Math.Sin(point.RA * RCRA) * Math.Cos(point.Dec * RC) * radius));
-
         }
+
         const double EarthRadius = 6371000;
+
         static public Vector3d SterographicTo3d(double x, double y, double radius, double standardLat, double meridean, double falseEasting, double falseNorthing, double scale, bool north )
         {
             double lat=90;
@@ -64,8 +60,6 @@ namespace wwtlib
 
             x -= falseEasting;
             y -= falseNorthing;
-
-
 
             if (x != 0 || y != 0)
             {
