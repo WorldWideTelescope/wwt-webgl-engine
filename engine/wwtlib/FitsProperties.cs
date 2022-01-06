@@ -22,7 +22,7 @@ namespace wwtlib
         public double UpperCut = double.MinValue;
         public double LowerCut = double.MaxValue;
         public bool TransparentBlack = false;
-        public string ColorMapName = "gray";
+        public string ColorMapName = "viridis";
         public ScaleTypes ScaleType = ScaleTypes.Linear;
 
         // This field exists to support non-HiPS tiled FITS imagesets. We need a

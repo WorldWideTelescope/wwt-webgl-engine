@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-
 
 namespace wwtlib
 {
@@ -10,39 +8,41 @@ namespace wwtlib
         protected const double RC = (3.1415927 / 180.0);
         protected const double RCRA = (3.1415927 / 12.0);
         protected const float radius = 1;
+
+        // NB: these functions are redundant in the webclient because we don't
+        // have the single-precision `Vector3` type that's distinguished from
+        // `Vector3d`. To minimize the code delta from Windows, we keep both
+        // names for simplicity. But the `...Rad` functions are added because
+        // ScriptSharp can't deal with overloads.
+
         static public Vector3d GeoTo3d(double lat, double lng)
         {
-            return Vector3d.Create((Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius), (Math.Sin(lat * RC) * radius), (Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius));
-
+            return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
         }
 
         static public Vector3d GeoTo3dDouble(double lat, double lng)
         {
             return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
-
         }
-        static public Vector3d GeoTo3dDoubleRad(double lat, double lng, double radius)
-        {
-            lng -= 180;
-            return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
 
-        }
+        //static public Vector3d GeoTo3dDoubleRad(double lat, double lng, double radius)
+        //{
+        //    return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
+        //}
+
         static public Vector3d GeoTo3dRad(double lat, double lng, double radius)
         {
-            return Vector3d.Create(((Math.Cos(lng * RC)) * (Math.Cos(lat * RC)) * radius), ((Math.Sin(lat * RC) * radius)), ((Math.Sin(lng * RC)) * (Math.Cos(lat * RC)) * radius));
-
+            return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
         }
 
         static public Vector3d RADecTo3d(double ra, double dec)
         {
-            return Vector3d.Create((Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * radius), (Math.Sin(dec * RC) * radius), (Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * radius));
-
+            return Vector3d.Create(Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * radius, Math.Sin(dec * RC) * radius, Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * radius);
         }
 
         static public Vector3d RADecTo3dAu(double ra, double dec, double au)
         {
-            return Vector3d.Create((Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * au), (Math.Sin(dec * RC) * au), (Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * au));
-
+            return Vector3d.Create(Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * au, Math.Sin(dec * RC) * au, Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * au);
         }
 
         static public Vector3d RADecTo3dMat(double ra, double dec, Matrix3d mat)
@@ -54,9 +54,10 @@ namespace wwtlib
         {
             point.Dec = -point.Dec;
             return Vector3d.Create((Math.Cos(point.RA * RCRA) * Math.Cos(point.Dec * RC) * radius), (Math.Sin(point.Dec * RC) * radius), (Math.Sin(point.RA * RCRA) * Math.Cos(point.Dec * RC) * radius));
-
         }
+
         const double EarthRadius = 6371000;
+
         static public Vector3d SterographicTo3d(double x, double y, double radius, double standardLat, double meridean, double falseEasting, double falseNorthing, double scale, bool north )
         {
             double lat=90;
@@ -64,8 +65,6 @@ namespace wwtlib
 
             x -= falseEasting;
             y -= falseNorthing;
-
-           
 
             if (x != 0 || y != 0)
             {
@@ -108,7 +107,7 @@ namespace wwtlib
                     meridean = -meridean;
                 }
             }
-            return Coordinates.GeoTo3dDoubleRad(lat, 90 + lng + meridean, radius);
+            return Coordinates.GeoTo3dRad(lat, 90 + lng + meridean, radius);
         }
 
         //static public Coordinates EquitorialToHorizon4(Coordinates equitorial, Coordinates location, Date utc)
@@ -280,7 +279,7 @@ namespace wwtlib
 
             return Vector2d.Create(hrAngle,dec);
         }
-      
+
         //static void AltAzToRaDec2(double alt, double az, out double hrAngle, out double dec, double lat)
         //{
         //    if (alt == 0)
@@ -290,7 +289,7 @@ namespace wwtlib
         //    if (az == 0)
         //    {
         //        az = .00000000001;
-        //    } 
+        //    }
         //    double sin_dec;
         //    double cos_lat = Math.Cos(lat);
 
@@ -400,7 +399,7 @@ namespace wwtlib
             return mst;
         }
 
-        
+
 
         public double RA
         {
@@ -431,7 +430,7 @@ namespace wwtlib
         {
             get
             {
-                
+
                 return declination / RC;
             }
             set
@@ -457,7 +456,7 @@ namespace wwtlib
 
             }
             //todo This was broken check callers to see what effect it had.
-            set 
+            set
             {
                 ascention = ((value*RC)+(Math.PI*2)%(Math.PI*2));
             }
@@ -523,14 +522,14 @@ namespace wwtlib
             else
             {
                 ascention = 0;
-            } 
-               
-            
+            }
+
+
             return new Coordinates(ascention, declination);
 
         }
 
-        
+
         static public Coordinates CartesianToSpherical2(Vector3d vector)
         {
 		    double rho = Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
@@ -575,7 +574,7 @@ namespace wwtlib
         {
             return target < 0 ? -1 : 1;
         }
-     
+
         static public string FormatDMSSign(double angle, bool sign)
         {
 
@@ -736,7 +735,7 @@ namespace wwtlib
         //            }
 
         //            val = sign * (hours + minutes / 60 + seconds / 3600);
-        //        } 
+        //        }
         //        else
         //        {
         //            val = Convert.ToDouble(data);
@@ -750,7 +749,7 @@ namespace wwtlib
         //    {
         //        return false;
         //    }
-  
+
         //}
 
         //static public bool Validate(string data)
@@ -821,10 +820,10 @@ namespace wwtlib
 
         static public double ParseDec(string data)
         {
-          
+
             double dec = Parse(data);
             return Math.Max(Math.Min(dec, 90.00), -90);
-          
+
         }
 
         //static public bool ValidateDec(string data)
@@ -873,7 +872,7 @@ namespace wwtlib
 
         //            double val = sign * (hours + minutes / 60 + seconds / 3600);
         //            return (val >= -90 && val <= 90);
-        //        } 
+        //        }
         //        else
         //        {
         //            double val = Convert.ToDouble(data);
@@ -885,7 +884,7 @@ namespace wwtlib
         //    {
         //        return false;
         //    }
-        //} 
+        //}
 
         static public double Parse(string data)
         {
@@ -955,8 +954,8 @@ namespace wwtlib
             {
                 return 0;
             }
-        }   
-        
+        }
+
         //public static bool operator == (Coordinates one, Coordinates two)
         //{
         //    if (!(one is Coordinates))
@@ -1088,7 +1087,7 @@ namespace wwtlib
                                                + DMSToDegrees(0, 0, 1999.25) * Ucubed
                                                - DMSToDegrees(0, 0, 51.38) * U4
                                                - DMSToDegrees(0, 0, 249.67) * U5
-                                               - DMSToDegrees(0, 0, 39.05) * U6 
+                                               - DMSToDegrees(0, 0, 39.05) * U6
                                                + DMSToDegrees(0, 0, 7.12) * U7
                                                + DMSToDegrees(0, 0, 27.87) * U8
                                                + DMSToDegrees(0, 0, 5.79) * U9
