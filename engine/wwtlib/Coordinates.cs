@@ -108,7 +108,7 @@ namespace wwtlib
                     meridean = -meridean;
                 }
             }
-            return Coordinates.GeoTo3dDoubleRad(lat, 90 + lng + meridean, radius);
+            return Coordinates.GeoTo3dRad(lat, 90 + lng + meridean, radius);
         }
 
         //static public Coordinates EquitorialToHorizon4(Coordinates equitorial, Coordinates location, Date utc)
