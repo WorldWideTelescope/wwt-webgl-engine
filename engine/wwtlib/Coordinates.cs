@@ -65,7 +65,7 @@ namespace wwtlib
             x -= falseEasting;
             y -= falseNorthing;
 
-           
+
 
             if (x != 0 || y != 0)
             {
@@ -280,7 +280,7 @@ namespace wwtlib
 
             return Vector2d.Create(hrAngle,dec);
         }
-      
+
         //static void AltAzToRaDec2(double alt, double az, out double hrAngle, out double dec, double lat)
         //{
         //    if (alt == 0)
@@ -290,7 +290,7 @@ namespace wwtlib
         //    if (az == 0)
         //    {
         //        az = .00000000001;
-        //    } 
+        //    }
         //    double sin_dec;
         //    double cos_lat = Math.Cos(lat);
 
@@ -400,7 +400,7 @@ namespace wwtlib
             return mst;
         }
 
-        
+
 
         public double RA
         {
@@ -431,7 +431,7 @@ namespace wwtlib
         {
             get
             {
-                
+
                 return declination / RC;
             }
             set
@@ -457,7 +457,7 @@ namespace wwtlib
 
             }
             //todo This was broken check callers to see what effect it had.
-            set 
+            set
             {
                 ascention = ((value*RC)+(Math.PI*2)%(Math.PI*2));
             }
@@ -523,14 +523,14 @@ namespace wwtlib
             else
             {
                 ascention = 0;
-            } 
-               
-            
+            }
+
+
             return new Coordinates(ascention, declination);
 
         }
 
-        
+
         static public Coordinates CartesianToSpherical2(Vector3d vector)
         {
 		    double rho = Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
@@ -575,7 +575,7 @@ namespace wwtlib
         {
             return target < 0 ? -1 : 1;
         }
-     
+
         static public string FormatDMSSign(double angle, bool sign)
         {
 
@@ -736,7 +736,7 @@ namespace wwtlib
         //            }
 
         //            val = sign * (hours + minutes / 60 + seconds / 3600);
-        //        } 
+        //        }
         //        else
         //        {
         //            val = Convert.ToDouble(data);
@@ -750,7 +750,7 @@ namespace wwtlib
         //    {
         //        return false;
         //    }
-  
+
         //}
 
         //static public bool Validate(string data)
@@ -821,10 +821,10 @@ namespace wwtlib
 
         static public double ParseDec(string data)
         {
-          
+
             double dec = Parse(data);
             return Math.Max(Math.Min(dec, 90.00), -90);
-          
+
         }
 
         //static public bool ValidateDec(string data)
@@ -873,7 +873,7 @@ namespace wwtlib
 
         //            double val = sign * (hours + minutes / 60 + seconds / 3600);
         //            return (val >= -90 && val <= 90);
-        //        } 
+        //        }
         //        else
         //        {
         //            double val = Convert.ToDouble(data);
@@ -885,7 +885,7 @@ namespace wwtlib
         //    {
         //        return false;
         //    }
-        //} 
+        //}
 
         static public double Parse(string data)
         {
@@ -955,8 +955,8 @@ namespace wwtlib
             {
                 return 0;
             }
-        }   
-        
+        }
+
         //public static bool operator == (Coordinates one, Coordinates two)
         //{
         //    if (!(one is Coordinates))
@@ -1088,7 +1088,7 @@ namespace wwtlib
                                                + DMSToDegrees(0, 0, 1999.25) * Ucubed
                                                - DMSToDegrees(0, 0, 51.38) * U4
                                                - DMSToDegrees(0, 0, 249.67) * U5
-                                               - DMSToDegrees(0, 0, 39.05) * U6 
+                                               - DMSToDegrees(0, 0, 39.05) * U6
                                                + DMSToDegrees(0, 0, 7.12) * U7
                                                + DMSToDegrees(0, 0, 27.87) * U8
                                                + DMSToDegrees(0, 0, 5.79) * U9
