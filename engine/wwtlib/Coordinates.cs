@@ -9,6 +9,12 @@ namespace wwtlib
         protected const double RCRA = (3.1415927 / 12.0);
         protected const float radius = 1;
 
+        // NB: these functions are redundant in the webclient because we don't
+        // have the single-precision `Vector3` type that's distinguished from
+        // `Vector3d`. To minimize the code delta from Windows, we keep both
+        // names for simplicity. But the `...Rad` functions are added because
+        // ScriptSharp can't deal with overloads.
+
         static public Vector3d GeoTo3d(double lat, double lng)
         {
             return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
@@ -19,11 +25,10 @@ namespace wwtlib
             return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
         }
 
-        static public Vector3d GeoTo3dDoubleRad(double lat, double lng, double radius)
-        {
-            lng -= 180;
-            return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
-        }
+        //static public Vector3d GeoTo3dDoubleRad(double lat, double lng, double radius)
+        //{
+        //    return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
+        //}
 
         static public Vector3d GeoTo3dRad(double lat, double lng, double radius)
         {
