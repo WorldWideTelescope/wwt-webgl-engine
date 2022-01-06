@@ -11,7 +11,7 @@ namespace wwtlib
 
         static public Vector3d GeoTo3d(double lat, double lng)
         {
-            return Vector3d.Create((Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius), (Math.Sin(lat * RC) * radius), (Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius));
+            return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
         }
 
         static public Vector3d GeoTo3dDouble(double lat, double lng)
@@ -27,17 +27,17 @@ namespace wwtlib
 
         static public Vector3d GeoTo3dRad(double lat, double lng, double radius)
         {
-            return Vector3d.Create(((Math.Cos(lng * RC)) * (Math.Cos(lat * RC)) * radius), ((Math.Sin(lat * RC) * radius)), ((Math.Sin(lng * RC)) * (Math.Cos(lat * RC)) * radius));
+            return Vector3d.Create(Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius, Math.Sin(lat * RC) * radius, Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius);
         }
 
         static public Vector3d RADecTo3d(double ra, double dec)
         {
-            return Vector3d.Create((Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * radius), (Math.Sin(dec * RC) * radius), (Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * radius));
+            return Vector3d.Create(Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * radius, Math.Sin(dec * RC) * radius, Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * radius);
         }
 
         static public Vector3d RADecTo3dAu(double ra, double dec, double au)
         {
-            return Vector3d.Create((Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * au), (Math.Sin(dec * RC) * au), (Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * au));
+            return Vector3d.Create(Math.Cos(ra * RCRA) * Math.Cos(dec * RC) * au, Math.Sin(dec * RC) * au, Math.Sin(ra * RCRA) * Math.Cos(dec * RC) * au);
         }
 
         static public Vector3d RADecTo3dMat(double ra, double dec, Matrix3d mat)
