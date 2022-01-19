@@ -35,7 +35,7 @@
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/engine-vuex": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/research-app-messages": "263bedcc26dd2d13d03ba68daece76aa5e16f145"
+    "@wwtelescope/research-app-messages": "89ab8afeac329e57a9ce75b96fe74cf2a144a1b3"
   },
   "keywords": [
     "AAS WorldWide Telescope"
