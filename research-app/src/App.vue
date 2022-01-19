@@ -401,6 +401,9 @@ import {
   settings,
   ApplicationStateMessage,
   ViewStateMessage,
+  GetViewAsTourMessage,
+  GetViewAsTourReply,
+  isGetViewAsTourMessage
 } from "@wwtelescope/research-app-messages";
 
 import {
@@ -1815,6 +1818,7 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+    this.messageHandlers.set("get_view_as_tour", this.handleGetViewAsTour);
 
     this.messageHandlers.set("add_source", this.handleAddSource);
 
@@ -2270,6 +2274,32 @@ export default class App extends WWTAwareComponent {
 
     this.toggleTourPlayPauseState(); // note half-assed semantics here!
     return true;
+  }
+
+  private handleGetViewAsTour(msg: any): boolean {
+    if (!isGetViewAsTourMessage(msg)) return false;
+
+    this.viewAsTourXml().then(xml => {
+      const reply: GetViewAsTourReply = {
+        type: "get_view_as_tour_reply",
+        threadId: msg.threadId,
+        tourXml: xml,
+      };
+      console.log(reply);
+      
+      if (this.statusMessageDestination === null || this.allowedOrigin === null)
+        return false;
+      
+      this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+      return true;
+    
+    }).catch(error => {
+      console.log(error);
+      return false;
+    });
+
+    return true;
+
   }
 
   // Outgoing messages

@@ -358,6 +358,7 @@ export class WWTAwareComponent extends Vue {
         "loadFitsLayer",
         "addImageSetLayer",
         "loadTour",
+        "viewAsTourXml",
         "waitForReady",
       ]),
       ...mapMutations([
@@ -903,6 +904,8 @@ export class WWTAwareComponent extends Vue {
   */
   loadTour!: (o: LoadTourParams) => Promise<void>;
 
+  viewAsTourXml!: () => Promise<string | null>;
+
   /** Wait for the WWT engine to become ready for usage.
    *
    * You should invoke this action and wait for is completion before trying to
@@ -911,4 +914,5 @@ export class WWTAwareComponent extends Vue {
    * some supporting data files.
    */
   waitForReady!: () => Promise<void>;
+
 }

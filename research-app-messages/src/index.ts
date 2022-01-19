@@ -182,3 +182,19 @@ export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-dis
     typeof o.threadId === "string" &&
     (o.sessionId === undefined || typeof o.sessionId === "string");
 }
+
+export interface GetViewAsTourMessage {
+  type: "get_view_as_tour",
+  threadId: string;
+}
+
+export function isGetViewAsTourMessage(o: any): o is GetViewAsTourMessage {
+  return o.type === "get_view_as_tour" &&
+    typeof o.threadId === "string";
+}
+
+export interface GetViewAsTourReply {
+  type: "get_view_as_tour_reply",
+  threadId: string;
+  tourXml: string | null;
+}

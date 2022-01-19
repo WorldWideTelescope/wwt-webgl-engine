@@ -876,6 +876,28 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return states;
   }
 
+  @Action({ rawError: true})
+  async viewAsTourXml(name: string): Promise<string | null> {
+    WWTControl.singleton.createTour(name || "");
+    const editor = WWTControl.singleton.tourEdit;
+    editor.addSlide(false);
+    const tour = editor.get_tour();
+    if (tour === null) {
+      return new Promise((resolve, _reject) => resolve(null));
+    }
+    const blob = tour.saveToBlob();
+    const reader = new FileReader();
+    reader.readAsText(blob);
+
+    let tourXml = "";
+    return new Promise((resolve, _reject) => {
+      reader.onload = () => {
+        tourXml += reader.result;
+        resolve(tourXml);
+      }
+    });
+  }
+
   @Action({ rawError: true })
   async addImageSetLayer(
     options: AddImageSetLayerOptions
