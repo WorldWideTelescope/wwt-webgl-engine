@@ -1,3 +1,8 @@
+# @wwtelescope/research-app-messages 0.13.0 (2022-01-19)
+
+- Added `name` parameter for `image_layer_create` messages (#165, @imbasimba)
+
+
 # @wwtelescope/research-app-messages 0.12.0 (2021-11-17)
 
 New APIs to help support startup scripting of the research app (#155,

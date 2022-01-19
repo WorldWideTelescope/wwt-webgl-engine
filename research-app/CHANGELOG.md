@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.9.2 (2022-01-19)
+
+- Use the new `name` field on `image_layer_create` messages if provided (#165,
+  @imbasimba)
+
+
 # @wwtelescope/research-app 0.9.1 (2021-11-18)
 
 - Fix scripting in production builds --- whoops! (#159, @Carifio24) The
