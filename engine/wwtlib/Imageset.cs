@@ -832,6 +832,42 @@ namespace wwtlib
             }
         }
 
+        public double ViewCenterX
+        {
+            get {
+                if (Levels > 0)
+                {
+                    return CenterX - OffsetX;
+                }
+                else
+                {
+                    if (WcsImage != null)
+                    {
+                        return CenterX + OffsetX / ((WcsImage)WcsImage).SizeX * BaseTileDegrees;
+                    }
+                    return CenterX + OffsetX / 256 * BaseTileDegrees;
+                }
+            }
+        }
+
+        public double ViewCenterY
+        {
+            get
+            {
+                if (Levels > 0)
+                {
+                    return CenterY + OffsetY;
+                }
+                else
+                {
+                    if (WcsImage != null)
+                    {
+                        return CenterY + OffsetY / ((WcsImage)WcsImage).SizeY * BaseTileDegrees;
+                    }
+                    return CenterY + OffsetY / 256 * BaseTileDegrees;
+                }
+            }
+        }
         public static Imageset Create(string name, string url, ImageSetType dataSetType, BandPass bandPass, ProjectionType projection, int imageSetID, int baseLevel, int levels, int tileSize, double baseTileDegrees, string extension, bool bottomsUp, string quadTreeMap, double centerX, double centerY, double rotation, bool sparse, string thumbnailUrl, bool defaultSet, bool elevationModel, int wf, double offsetX, double offsetY, string credits, string creditsUrl, string demUrlIn, string alturl, double meanRadius, string referenceFrame)
         {
             Imageset temp = new Imageset();

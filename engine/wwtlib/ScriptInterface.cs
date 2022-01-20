@@ -376,8 +376,8 @@ namespace wwtlib
                 double zoom = imageset.GuessZoomSetting(WWTControl.Singleton.RenderContext.ViewCamera.Zoom);
 
                 WWTControl.Singleton.GotoRADecZoom(
-                    imageset.CenterX / 15,
-                    imageset.CenterY,
+                    imageset.ViewCenterX / 15,
+                    imageset.ViewCenterY,
                     zoom,
                     false,
                     null
@@ -447,8 +447,8 @@ namespace wwtlib
                     double zoom = imageset.GuessZoomSetting(WWTControl.Singleton.RenderContext.ViewCamera.Zoom);
 
                     WWTControl.Singleton.GotoRADecZoom(
-                        wcsImage.CenterX / 15,
-                        wcsImage.CenterY,
+                        wcsImage.ViewCenterX / 15,
+                        wcsImage.ViewCenterY,
                         zoom,
                         false,
                         null
