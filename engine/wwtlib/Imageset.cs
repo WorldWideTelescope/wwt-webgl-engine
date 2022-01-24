@@ -835,16 +835,16 @@ namespace wwtlib
         public double ViewCenterX
         {
             get {
+                if (WcsImage != null)
+                {
+                    return ((WcsImage)WcsImage).ViewCenterX;
+                }
                 if (Levels > 0)
                 {
                     return CenterX - OffsetX;
                 }
                 else
                 {
-                    if (WcsImage != null)
-                    {
-                        return CenterX + OffsetX / ((WcsImage)WcsImage).SizeX * BaseTileDegrees;
-                    }
                     return CenterX + OffsetX / 256 * BaseTileDegrees;
                 }
             }
@@ -854,16 +854,16 @@ namespace wwtlib
         {
             get
             {
+                if (WcsImage != null)
+                {
+                    return ((WcsImage)WcsImage).ViewCenterY;
+                }
                 if (Levels > 0)
                 {
                     return CenterY + OffsetY;
                 }
                 else
                 {
-                    if (WcsImage != null)
-                    {
-                        return CenterY + OffsetY / ((WcsImage)WcsImage).SizeY * BaseTileDegrees;
-                    }
                     return CenterY + OffsetY / 256 * BaseTileDegrees;
                 }
             }
