@@ -44,6 +44,8 @@ namespace wwtlib
 
         public static GL PrepDevice = null;
 
+        protected Vector3d GlobalCenter = Vector3d.Zero;
+
         protected Vector3d TopLeft;
         protected Vector3d BottomRight;
         protected Vector3d TopRight;
@@ -578,11 +580,11 @@ namespace wwtlib
                     FitsShader.BScale = (float)dataset.FitsProperties.BScale;
                     FitsShader.ScaleType = (int)dataset.FitsProperties.ScaleType;
                     FitsShader.TransparentBlack = dataset.FitsProperties.TransparentBlack;
-                    FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+                    FitsShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false, GlobalCenter);
                 }
                 else
                 {
-                    TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false);
+                    TileShader.Use(renderContext, VertexBuffer, GetIndexBuffer(part, accomidation), texture2d, (float)opacity, false, GlobalCenter);
                 }
                 renderContext.gl.drawElements(GL.TRIANGLES, TriangleCount * 3, GL.UNSIGNED_SHORT, 0);
             }
