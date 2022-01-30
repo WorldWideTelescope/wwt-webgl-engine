@@ -1160,12 +1160,12 @@ namespace wwtlib
         // Parameters:
         //   source:
         //     Source Microsoft.DirectX.Vector3d structure to subtract from the current instance.
-        public void Subtract(Vector3d source)
+        public Vector3d Subtract(Vector3d source)
         {
             this.X -= source.X;
             this.Y -= source.Y;
             this.Z -= source.Z;
-
+            return this;
         }
         //
         // Summary:
