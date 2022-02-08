@@ -689,7 +689,6 @@ namespace wwtlib
         public static Vector3d MidPoint(Vector3d left, Vector3d right)
         {
             Vector3d result = Vector3d.Create((left.X + right.X) / 2, (left.Y + right.Y) / 2, (left.Z + right.Z) / 2);
-            result.Normalize();
             return result;
         }
         public static Vector3d MidPointByLength(Vector3d left, Vector3d right)
