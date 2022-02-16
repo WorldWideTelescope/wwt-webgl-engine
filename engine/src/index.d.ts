@@ -1961,8 +1961,20 @@ export class TourDocument {
    * @returns The tour stop index
    */
   getTourStopIndexByID(id: string): number;
+
+  /** Get the tour document as an XML string */
+  getTourXML(): string;
+
+  /** Get a representation of the tour as a blob */
+  saveToBlob(): Blob;
 }
 
+export class TourEditTab {
+
+  addSlide(insert: boolean): void;
+
+  get_tour(): TourDocument | null;
+}
 
 export interface TourEndedCallback {
   /** Called when a [[TourPlayer]] has finished playing its tour. */
@@ -2406,6 +2418,9 @@ export class WWTControl {
    */
   renderType: ImageSetType;
 
+  /** TourEditTab */
+  tourEdit: TourEditTab;
+
   /** Get the name of the reference frame associated with the current view.
    *
    * The current reference frame defines the physical coordinates of the view
@@ -2603,6 +2618,9 @@ export class WWTControl {
 
   /** Stop the currently playing tour. */
   stopCurrentTour(): void;
+
+  /** Create a new tour */
+  createTour(name: string): TourDocument;
 
   /** Set the maximum allowed user zoom level in 3D ("solar system") mode.
    *
