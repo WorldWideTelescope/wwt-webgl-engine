@@ -891,7 +891,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
     let tourXml = "";
     return new Promise((resolve, _reject) => {
-      reader.onload = () => {
+      reader.onloadend = () => {
         tourXml += reader.result;
         resolve(tourXml);
       }
