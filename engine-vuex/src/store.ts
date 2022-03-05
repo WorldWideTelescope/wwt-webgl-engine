@@ -97,6 +97,9 @@ export class ImagesetInfo {
   /** The type of the imageset: panorama, sky, ... */
   type: ImageSetType;
 
+  /** The internal GUID of the layer, if it is a HiPS layer */
+  id: string | null;
+
   /** An (application-specific) string giving some additional information about
    * the imageset. */
   description: string;
@@ -108,23 +111,24 @@ export class ImagesetInfo {
    */
   extension: string;
 
-  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string) {
+  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string, id: string | null =  null) {
     this.url = url;
     this.name = name;
     this.type = type;
     this.description = description;
     this.extension = extension;
+    this.id = id;
   }
 }
 
 export class SpreadSheetLayerInfo {
-  /* The user-facing name of the layer */
+  /** The user-facing name of the layer */
   name: string;
 
-  /* The internal GUID of the layer */
+  /** The internal GUID of the layer */
   id: string;
 
-  /* The reference frame in which the data are defined. */
+  /** The reference frame in which the data are defined. */
   referenceFrame: string;
 
   setName(name: string) {
@@ -793,7 +797,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   @Mutation
   updateAvailableImagesets(): void {
     this.availableImagesets = WWTControl.getImageSets()
-      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
+      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension(), imageset.get_hipsProperties()?.get_catalogSpreadSheetLayer().id.toString() ?? null));
   }
 
   @Action({ rawError: true })
@@ -1111,6 +1115,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst == null)
       throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
 
+    console.log(options);
     const imgset = await Vue.$wwt.inst.addCatalogHipsByName(options);
 
     // Mirror the spreadsheet layer aspect into the reactivity system.
