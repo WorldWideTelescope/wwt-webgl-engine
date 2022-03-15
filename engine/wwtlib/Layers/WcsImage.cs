@@ -94,6 +94,12 @@ namespace wwtlib
             get { return centerX; }
             set { centerX = value; }
         }
+        
+        public double ViewCenterX
+        {
+            get { return centerX + (SizeX / 2 - ReferenceX) * ScaleX; }
+        }
+
         protected double centerY;
 
         public double CenterY
@@ -101,6 +107,12 @@ namespace wwtlib
             get { return centerY; }
             set { centerY = value; }
         }
+        
+        public double ViewCenterY
+        {
+            get { return centerY + (SizeY / 2 - ReferenceY) * ScaleY; }
+        }
+
         protected double rotation;
 
         public double Rotation
