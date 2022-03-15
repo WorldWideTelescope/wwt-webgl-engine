@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Html;
 using System.Runtime.CompilerServices;
 using System.Html.Media.Graphics;
@@ -409,7 +408,18 @@ namespace wwtlib
 
         public static string Create()
         {
-            return (string)Script.Literal(" 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); });");
+            return (string)Script.Literal("uuid.v4()");
+        }
+
+
+        // The value 1420736a-a637-40a7-813a-ba692e72204e is a UUID (generated using the uuid CLI)
+        // that serves as a 'namespace' for our GUIDs
+        // The key property here is that this function always yields the same result for a given input
+        // See for example https://www.sohamkamani.com/uuid-versions-explained/
+        public static Guid CreateFrom(string value)
+        {
+            string str = (string)Script.Literal("uuid.v5(value, '1420736a-a637-40a7-813a-ba692e72204e')");
+            return Guid.FromString(str);
         }
 
     }

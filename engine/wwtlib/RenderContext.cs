@@ -427,6 +427,18 @@ namespace wwtlib
             }
         }
 
+        public Imageset GetCatalogHipsByName(string name)
+        {
+            foreach (Imageset imageset in activeCatalogHipsImagesets)
+            {
+                if (imageset.Name == name)
+                {
+                    return imageset;
+                }
+            }
+            return null;
+        }
+
         public double GetAltitudeForLatLongForPlanet(int planetID, double viewLat, double viewLong)
         {
 

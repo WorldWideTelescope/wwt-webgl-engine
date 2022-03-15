@@ -2624,6 +2624,11 @@ namespace wwtlib
             }
         }
 
+        public Imageset GetCatalogHipsByName(string name)
+        {
+            return RenderContext.GetCatalogHipsByName(name);
+        }
+
         public void GetCatalogHipsDataInView(string name, bool limit, Action<InViewReturnMessage> onComplete)
         {
             Imageset catalogHips = GetImagesetByName(name);
