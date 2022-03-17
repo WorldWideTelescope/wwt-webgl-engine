@@ -119,6 +119,10 @@ export class ImagesetInfo {
     this.extension = extension;
     this.id = id;
   }
+
+  static fromImageset(imageset: Imageset): ImagesetInfo {
+    return new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension(), imageset.get_hipsProperties()?.get_catalogSpreadSheetLayer().id.toString() ?? null);
+  }
 }
 
 export class SpreadSheetLayerInfo {
@@ -425,8 +429,7 @@ function activeLayersList(): string[] {
  * inside either an action or a mutation.
  */
 function availableImagesets(): ImagesetInfo[] {
-  return WWTControl.getImageSets()
-      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
+  return WWTControl.getImageSets().map(ImagesetInfo.fromImageset);
 }
 
 /** This function get a SpreadSheetLayer by the key used to store it in the engine.
@@ -448,11 +451,7 @@ function spreadSheetLayerByKey(key: string): SpreadSheetLayer | null {
 }
 
 function catalogLayerKey(catalog: CatalogLayerInfo): string {
-  if (catalog instanceof ImagesetInfo) {
-    return catalog.name;
-  } else {
-    return catalog.id;
-  }
+  return catalog.id ?? "";
 }
 
 /** The store module class for the WWT Vuex implementation.
@@ -796,8 +795,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Mutation
   updateAvailableImagesets(): void {
-    this.availableImagesets = WWTControl.getImageSets()
-      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension(), imageset.get_hipsProperties()?.get_catalogSpreadSheetLayer().id.toString() ?? null));
+    this.availableImagesets = WWTControl.getImageSets().map(ImagesetInfo.fromImageset);
   }
 
   @Action({ rawError: true })
@@ -1115,7 +1113,6 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     if (Vue.$wwt.inst == null)
       throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
 
-    console.log(options);
     const imgset = await Vue.$wwt.inst.addCatalogHipsByName(options);
 
     // Mirror the spreadsheet layer aspect into the reactivity system.
@@ -1126,6 +1123,10 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       const wwtLayer = hips.get_catalogSpreadSheetLayer();
       const guidText = wwtLayer.id.toString();
       Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+      const info = availableImagesets().find(x => x.name === options.name);
+      if (info !== undefined) {
+        info.id = guidText;
+      }
     }
 
     (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();

@@ -213,7 +213,7 @@ export default class CatalogItem extends Vue {
   isLayerHips = false;
 
   layerId(): string {
-    return this.layer instanceof ImagesetInfo ? this.layer.name : this.layer.id;
+    return this.layer.id ?? "";
   }
 
   layerState(): SpreadSheetLayerSettingsInterfaceRO | null {
@@ -303,9 +303,6 @@ export default class CatalogItem extends Vue {
   }
 
   private applySettings(settings: SpreadSheetLayerSetting[]) {
-    // For HiPS layers, this builds on the hack/simplification that the GUID of
-    // the catalog's spreadsheet layer is its `datasetName`, even though that 
-    // is absolutely not a v4 GUID at all.
     this.applyTableLayerSettings({
       id: this.layerId(),
       settings: settings,

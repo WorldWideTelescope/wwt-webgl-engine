@@ -244,16 +244,15 @@
               <div id="catalog-select-container-tool" class="item-select-container">
                 <span class="item-select-title">Add catalog:</span>
                 <v-select
-                  v-model="catalogToAdd"
                   id="catalog-select-tool"
                   class="item-selector"
                   :searchable="true"
                   :clearable="false"
                   :options="curAvailableCatalogs"
                   :filter="filterCatalogs"
-                  @change="(cat) => addHipsByName(cat.name)"
+                  @input="addHips"
                   label="name"
-                  placeholder="Catalog"
+                  placeholder=""
                 >
                   <template #option="option">
                     <div class="item-option">
@@ -2421,7 +2420,6 @@ export default class App extends WWTAwareComponent {
   // HiPS catalogs (see also the table layer support)
 
   addHips(catalog: ImagesetInfo): Promise<Imageset> {
-    this.addResearchAppTableLayer(catalog);
     return this.addCatalogHipsByName({ name: catalog.name }).then((imgset) => {
       const hips = imgset.get_hipsProperties();
 
@@ -2434,18 +2432,11 @@ export default class App extends WWTAwareComponent {
             ["opacity", this.defaultColor.a],
           ],
         });
+        catalog.id = catId;
+        this.addResearchAppTableLayer(catalog);
       }
-
       return imgset;
     });
-  }
-
-  get catalogToAdd() {
-    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
-  }
-
-  set catalogToAdd(catalog: ImagesetInfo) {
-    this.addHips(catalog);
   }
 
   prepareForMessaging(source: Source): selections.Source {
