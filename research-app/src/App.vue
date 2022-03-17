@@ -251,7 +251,7 @@
                   :clearable="false"
                   :options="curAvailableCatalogs"
                   :filter="filterCatalogs"
-                  @change="(cat) => { console.log(cat); addHipsByName(cat.name); }"
+                  @change="(cat) => addHipsByName(cat.name)"
                   label="name"
                   placeholder="Catalog"
                 >
@@ -2421,7 +2421,6 @@ export default class App extends WWTAwareComponent {
   // HiPS catalogs (see also the table layer support)
 
   addHips(catalog: ImagesetInfo): Promise<Imageset> {
-    console.log(catalog);
     this.addResearchAppTableLayer(catalog);
     return this.addCatalogHipsByName({ name: catalog.name }).then((imgset) => {
       const hips = imgset.get_hipsProperties();
@@ -2446,7 +2445,6 @@ export default class App extends WWTAwareComponent {
   }
 
   set catalogToAdd(catalog: ImagesetInfo) {
-    console.log(catalog);
     this.addHips(catalog);
   }
 
