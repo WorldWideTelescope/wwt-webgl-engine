@@ -350,6 +350,9 @@ namespace wwtlib
                     if (imageset != null)
                     {
                         ImageSetLayer imageSetLayer = ImageSetLayer.Create(imageset);
+                        imageSetLayer.ID = id;
+                        imageSetLayer.Name = name;
+                        imageSetLayer.ReferenceFrame = "Sky";
                         imageSetLayer.SaveToXml(xmlWriter);
                     }
                     else
