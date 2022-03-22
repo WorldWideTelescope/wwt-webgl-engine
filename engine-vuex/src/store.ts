@@ -795,7 +795,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Mutation
   updateAvailableImagesets(): void {
-    this.availableImagesets = WWTControl.getImageSets().map(ImagesetInfo.fromImageset);
+    this.availableImagesets = availableImagesets();
   }
 
   @Action({ rawError: true })
@@ -1053,13 +1053,9 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return function (name: string): SpreadSheetLayer | null {
       if (Vue.$wwt.inst === null)
         throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
-
-      // NOTE! There is an intense hack in the HiPS catalog support where the
-      // GUID of each HiPS catalog's SpreadSheetLayer is the `datasetName` from
-      // the catalog metadata. This is possible because the WWT `Guid` class
-      // doesn't actually do any validation, and just accepts any string you
-      // give it.
-      return spreadSheetLayerByKey(name);
+      
+      const id = Guid.createFrom(name).toString();
+      return spreadSheetLayerByKey(id);
     }
   }
 
@@ -1068,8 +1064,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       if (Vue.$wwt.inst === null)
         throw new Error('cannot get spreadsheetStateForHipsCatalog without linking to WWTInstance');
 
-      // NOTE: hack as described above -- the name is the GUID.
-      return this.spreadSheetLayers[name] || null;
+      const id = Guid.createFrom(name).toString();
+      return this.spreadSheetLayers[id] || null;
     }
   }
 
@@ -1151,7 +1147,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     // we leverage the quasi-hack that the GUID of the spreadsheet layer is set
     // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
 
-    Vue.delete(this.spreadSheetLayers, name);
+    const id = Guid.createFrom(name).toString();
+    Vue.delete(this.spreadSheetLayers, id);
 
     this.activeLayers = activeLayersList();
   }
