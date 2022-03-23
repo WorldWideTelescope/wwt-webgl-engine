@@ -815,6 +815,10 @@ namespace wwtlib
                                 }
 
                             }
+                            else
+                            {
+                                Xcoord += 180;
+                            }
 
                             // TODO:
                             // double offset = EGM96Geoid.Height(Ycoord, Xcoord);
