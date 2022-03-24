@@ -645,6 +645,7 @@ class TableLayerMessageHandler {
   private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
   private queuedSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
   private queuedRemoval: classicPywwt.RemoveTableLayerMessage | null = null;
+  private queuedSelectability: selections.ModifySelectabilityMessage | null = null;
 
   constructor(owner: App) {
     this.owner = owner;
@@ -708,6 +709,11 @@ class TableLayerMessageHandler {
     if (this.queuedRemoval !== null) {
       this.handleRemoveMessage(this.queuedRemoval);
       this.queuedRemoval = null;
+    }
+
+    if (this.queuedSelectability !== null) {
+      this.handleSelectabilityMessage(this.queuedSelectability);
+      this.queuedSelectability = null;
     }
   }
 
@@ -833,6 +839,24 @@ class TableLayerMessageHandler {
         this.owner.deleteLayer(this.internalId);
         this.internalId = null;
         this.created = false;
+      }
+    }
+  }
+
+  handleSelectabilityMessage(msg: selections.ModifySelectabilityMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedSelectability === null) {
+        this.queuedSelectability = msg;
+      }
+    } else {
+      const layer = this.owner.spreadsheetLayers.find(x => x.name === msg.id);
+      if (layer !== undefined) {
+        this.owner.setResearchAppTableLayerSelectability({
+          layer: layer,
+          selectable: msg.selectable
+        });
       }
     }
   }
@@ -1151,10 +1175,15 @@ export default class App extends WWTAwareComponent {
 
   addResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   addSource!: (source: Source) => void;
+  setResearchAppTableLayerSelectability!: (args: {
+    layer: CatalogLayerInfo;
+    selectable: boolean;
+  }) => void;
   hipsCatalogs!: () => CatalogLayerInfo[];
   removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   appTableLayers!: () => CatalogLayerInfo[];
   visibleTableLayers!: () => CatalogLayerInfo[];
+  selectableTableLayers!: () => CatalogLayerInfo[];
 
   // Lifecycle management
 
@@ -1168,7 +1197,8 @@ export default class App extends WWTAwareComponent {
       }),
       ...mapGetters(wwtResearchAppNamespace, [
         "hipsCatalogs",
-        "visibleTableLayers"
+        "selectableTableLayers",
+        "visibleTableLayers",
       ]),
       ...mapGetters(wwtResearchAppNamespace, {
         appTableLayers: "tableLayers",
@@ -1182,6 +1212,7 @@ export default class App extends WWTAwareComponent {
         "addResearchAppTableLayer",
         "addSource",
         "removeResearchAppTableLayer",
+        "setResearchAppTableLayerSelectability"
       ]),
     };
   }
@@ -1817,6 +1848,8 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
 
     this.messageHandlers.set("add_source", this.handleAddSource);
+    this.messageHandlers.set("modify_selectability", this.handleModifySelectability);
+    this.messageHandlers.set("modify_all_selectability", this.handleModifyAllSelectability);
 
     // Ignore incoming view_state messages. When testing the app, you might want
     // to launch it as (e.g.)
@@ -2640,6 +2673,29 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
+  handleModifySelectability(msg: selections.ModifySelectabilityMessage): boolean {
+    if (!selections.isModifySelectabilityMessage(msg)) return false;
+
+    const handler = this.tableLayers.get(msg.id);
+    if (handler !== undefined) {
+      handler.handleSelectabilityMessage(msg);
+    }
+    return true;
+  }
+
+  handleModifyAllSelectability(msg: selections.ModifyAllSelectabilityMessage): boolean {
+    if (!selections.isModifyAllSelectabilityMessage(msg)) return false;
+
+    this.spreadsheetLayers.forEach(
+      layer =>
+        this.setResearchAppTableLayerSelectability({
+          layer: layer,
+          selectable: msg.selectable
+        })
+      );
+    return true;
+  }
+
   // "Tools" menu
 
   currentTool: ToolType = null;
@@ -2813,7 +2869,7 @@ export default class App extends WWTAwareComponent {
     const rowSeparator = "\r\n";
     const colSeparator = "\t";
 
-    for (const layerInfo of this.visibleTableLayers()) {
+    for (const layerInfo of this.selectableTableLayers()) {
 
       const layer = this.spreadSheetLayer(layerInfo);
       if (layer == null) {

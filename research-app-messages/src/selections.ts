@@ -112,3 +112,37 @@ export function isAddSourceMessage(o: any): o is AddSourceMessage {  // eslint-d
   return o.type === 'add_source' &&
       typeof o.source === 'object';
 }
+
+export interface ModifySelectabilityMessage {
+
+  /** The tag identifying this message type */
+  type: "modify_selectability";
+
+  /** The identifier of the layer to modify. */
+  id: string;
+
+  /** Whether to make the layer selectable. */
+  selectable: boolean;
+}
+
+/** A type-guard function for [[ModifySelectabilityMessage]]. */
+export function isModifySelectabilityMessage(o: any): o is ModifySelectabilityMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return o.type === 'modify_selectability' &&
+    typeof o.id === 'string' &&
+    typeof o.selectable === 'boolean';
+}
+
+export interface ModifyAllSelectabilityMessage {
+
+  /** The tag identifying this message type. */
+  type: "modify_all_selectability";
+
+  /** Whether to make all layers selectable. */
+  selectable: boolean;
+}
+
+/** A type-guard function for [[ModifyAllSelectabilityMessage]]. */
+export function isModifyAllSelectabilityMessage(o: any): o is ModifyAllSelectabilityMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return o.type === 'modify_all_selectability' &&
+    typeof o.selectable === 'boolean';
+}
