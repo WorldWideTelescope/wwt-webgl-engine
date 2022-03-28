@@ -58,7 +58,7 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
 }
 
 function infoKey(info: CatalogLayerInfo) {
-  return info instanceof ImagesetInfo ? info.name : info.id;
+  return info.id ?? "";
 }
 
 function sourcesEqual(s1: Source, s2: Source) {

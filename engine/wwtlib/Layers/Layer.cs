@@ -643,17 +643,29 @@ namespace wwtlib
             reader.OnLoadEnd = delegate (System.Html.Data.Files.FileProgressEvent e)
             {
                 string result = "";
-                try {
+                try
+                {
                     result = (string)Script.Literal("pako.inflate(e.target.result, { to: 'string' })");
                 }
                 catch (Exception err)
                 {
-                    if (err.ToString() == "incorrect header check") {
-                        result = (string)Script.Literal("String.fromCharCode.apply(null, new Uint8Array(e.target.result))");
-                    } else {
+                    string errString = err.ToString();
+                    if (errString == "incorrect header check" || errString == "unknown compression method")
+                    {
+                        try
+                        {
+                            result = (string)Script.Literal("String.fromCharCode.apply(null, new Uint8Array(e.target.result))");
+                        }
+                        catch (Exception error)
+                        {
+                            throw error;
+                        }
+                    }
+                    else
+                    {
                         throw err;
                     }
-                };
+                }
                 dataReady(result);
             };
             reader. ReadAsArrayBuffer(blob);

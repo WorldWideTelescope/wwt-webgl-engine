@@ -774,6 +774,11 @@ export namespace Guid {
    * better be globally unique, though, or you're going to run into problems.
    * */
   export function fromString(id: string): Guid;
+
+  /** Create a v5 UUID from the given string.
+   * The namespace used is a constant UUID specified in the implementation of the Guid class.
+   */
+  export function createFrom(Value: string): Guid;
 }
 
 /** Properties of HiPS imagesets */
