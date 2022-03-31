@@ -1572,6 +1572,8 @@ namespace wwtlib
         public static WebGLUniformLocation projMatLoc;
         public static WebGLUniformLocation mvMatLoc;
         public static WebGLUniformLocation sampLoc;
+        public static WebGLUniformLocation centerScreenLoc;
+        public static WebGLUniformLocation centerWorldLoc;
         public static WebGLUniformLocation sunLoc;
         public static WebGLUniformLocation opacityLoc;
         public static WebGLUniformLocation minBrightnessLoc;
@@ -1610,28 +1612,35 @@ namespace wwtlib
                       "   }                                                                                   \n";
 
 
-            String vertexShaderText =
-                    "     attribute vec3 aVertexPosition;                                              \n" +
-                    "     attribute vec2 aTextureCoord;                                                \n" +
-                    "                                                                                  \n" +
-                    "     uniform mat4 uMVMatrix;                                                      \n" +
-                    "     uniform mat4 uPMatrix;                                                       \n" +
-                    "                                                                                  \n" +
-                    "     varying vec2 vTextureCoord;                                                  \n" +
-                    "     varying vec3 vNormal;                                                        \n" +
-                    "     varying vec3 vCamVector;                                                     \n" +
-                    "                                                                                  \n" +
-                    "                                                                                  \n" +
-                    "     void main(void) {                                                            \n" +
-                    "         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);         \n" +
-                    "         vCamVector = normalize((mat3(uMVMatrix) * aVertexPosition).xyz);              \n" +
-                    "         vec3 normal = normalize(aVertexPosition);                                \n" +
-                    "         vec3 normalT = normalize(mat3(uMVMatrix) * normal);                      \n" +
-                    "         vTextureCoord = aTextureCoord;                                           \n" +
-                    "         vNormal = normalT;                                                       \n" +
-                    "     }                                                                            \n" +
-                    "                                                                                  \n";
+            String vertexShaderText = @"
+                    attribute vec3 aVertexPosition;
+                    attribute vec2 aTextureCoord;
+                    
+                    uniform mat4 uMVMatrix;
+                    uniform mat4 uPMatrix;
+                    uniform vec3 uCenterScreen;
+                    uniform vec3 uCenterWorld;
 
+                    varying vec2 vTextureCoord;
+                    varying vec3 vNormal;
+                    varying vec3 vCamVector;
+                    
+                    void main(void) {
+                        vec3 normal;
+                        if(length(uCenterWorld) > 0.00001){
+                            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 0.0) + vec4(uCenterScreen, 1.0);
+                            vCamVector = normalize((mat3(uMVMatrix) * (aVertexPosition + uCenterWorld)).xyz);
+                            normal = normalize(aVertexPosition + uCenterWorld);
+                        } else {
+                            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                            vCamVector = normalize((mat3(uMVMatrix) * aVertexPosition).xyz);
+                            normal = normalize(aVertexPosition);
+                        }
+                        vec3 normalT = normalize(mat3(uMVMatrix) * normal);
+                        vTextureCoord = aTextureCoord;
+                        vNormal = normalT;
+                    }";
+                    
             frag = gl.createShader(GL.FRAGMENT_SHADER);
             gl.shaderSource(frag, fragShaderText);
             gl.compileShader(frag);
@@ -1666,6 +1675,8 @@ namespace wwtlib
             projMatLoc = gl.getUniformLocation(prog, "uPMatrix");
             mvMatLoc = gl.getUniformLocation(prog, "uMVMatrix");
             sampLoc = gl.getUniformLocation(prog, "uSampler");
+            centerScreenLoc = gl.getUniformLocation(prog, "uCenterScreen");
+            centerWorldLoc = gl.getUniformLocation(prog, "uCenterWorld");
             sunLoc = gl.getUniformLocation(prog, "uSunPosition");
             minBrightnessLoc = gl.getUniformLocation(prog, "uMinBrightness");
             opacityLoc = gl.getUniformLocation(prog, "opacity");
@@ -1684,7 +1695,7 @@ namespace wwtlib
         public static float MinLightingBrightness = 1.0f;
 
         public static Color AtmosphereColor = Color.FromArgb(0, 0, 0, 0);
-        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth)
+        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth, Vector3d centerWorld)
         {
             if (texture == null)
             {
@@ -1712,6 +1723,19 @@ namespace wwtlib
                 else
                 {
                     gl.uniform3f(atmosphereColorLoc, 0f, 0f, 0f);
+                }
+                gl.uniform3f(centerWorldLoc, (float)centerWorld.X, (float)centerWorld.Y, (float)centerWorld.Z);
+
+                // This would be clearer by making the 'centerWorld' parameter optional. Unfortunately, that's not allowed in C# 2.0
+                if (centerWorld.LengthSq() > 0.001)
+                {
+                    Matrix3d wvp = Matrix3d.MultiplyMatrix(mvMat, renderContext.Projection);
+                    Vector3d centerScreen = wvp.Transform(centerWorld);
+                    gl.uniform3f(centerScreenLoc, (float)centerScreen.X, (float)centerScreen.Y, (float)centerScreen.Z);
+                }
+                else
+                {
+                    gl.uniform3f(centerScreenLoc, 0, 0, 0);
                 }
 
                 gl.uniformMatrix4fv(mvMatLoc, false, mvMat.FloatArray());
@@ -1781,6 +1805,7 @@ namespace wwtlib
         public static WebGLUniformLocation projMatLoc;
         public static WebGLUniformLocation mvMatLoc;
         public static WebGLUniformLocation sampLoc;
+        public static WebGLUniformLocation centerScreenLoc;
         public static WebGLUniformLocation colorLoc;
         public static WebGLUniformLocation blank;
         public static WebGLUniformLocation bzero;
@@ -1854,28 +1879,25 @@ namespace wwtlib
                 }
                 ";
 
-            String vertexShaderText =
-                      "#version 300 es  \n" +
-                    "     in vec3 aVertexPosition;                                              \n" +
-                    "     in vec2 aTextureCoord;                                                \n" +
-                    "                                                                                  \n" +
-                    "     uniform mat4 uMVMatrix;                                                      \n" +
-                    "     uniform mat4 uPMatrix;                                                       \n" +
-                    "                                                                                  \n" +
-                    "     out vec2 vTextureCoord;                                                  \n" +
-                    "     out vec3 vNormal;                                                        \n" +
-                    "     out vec3 vCamVector;                                                     \n" +
-                    "                                                                                  \n" +
-                    "                                                                                  \n" +
-                    "     void main(void) {                                                            \n" +
-                    "         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);         \n" +
-                    "         vCamVector = normalize((mat3(uMVMatrix) * aVertexPosition).xyz);              \n" +
-                    "         vec3 normal = normalize(aVertexPosition);                                \n" +
-                    "         vec3 normalT = normalize(mat3(uMVMatrix) * normal);                      \n" +
-                    "         vTextureCoord = aTextureCoord;                                           \n" +
-                    "         vNormal = normalT;                                                       \n" +
-                    "     }                                                                            \n" +
-                    "                                                                                  \n";
+            String vertexShaderText = @"#version 300 es
+                in vec3 aVertexPosition;
+                in vec2 aTextureCoord;
+                
+                uniform mat4 uMVMatrix;
+                uniform mat4 uPMatrix;
+                uniform vec3 uCenterScreen;
+                
+                out vec2 vTextureCoord;
+                
+                void main(void) {
+                    if(length(uCenterScreen) > 0.0000001) {
+                        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 0.0) + vec4(uCenterScreen, 1.0);
+                    } else {
+                        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                    }
+                    vTextureCoord = aTextureCoord;
+                }
+                ";
 
             frag = gl.createShader(GL.FRAGMENT_SHADER);
             gl.shaderSource(frag, fragShaderText);
@@ -1914,6 +1936,7 @@ namespace wwtlib
             mvMatLoc = gl.getUniformLocation(prog, "uMVMatrix");
             sampLoc = gl.getUniformLocation(prog, "uSampler");
             colorLoc = gl.getUniformLocation(prog, "colorSampler");
+            centerScreenLoc = gl.getUniformLocation(prog, "uCenterScreen");
             blank = gl.getUniformLocation(prog, "blank");
             bzero = gl.getUniformLocation(prog, "bzero");
             bscale = gl.getUniformLocation(prog, "bscale");
@@ -1941,7 +1964,7 @@ namespace wwtlib
         public static bool TransparentBlack = false;
         public static bool ContainsBlanks = false;
         public static int ScaleType = 0;
-        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth)
+        public static void Use(RenderContext renderContext, WebGLBuffer vertex, WebGLBuffer index, WebGLTexture texture, float opacity, bool noDepth, Vector3d centerWorld)
         {
             if (texture == null)
             {
@@ -1964,6 +1987,17 @@ namespace wwtlib
                 gl.uniformMatrix4fv(mvMatLoc, false, mvMat.FloatArray());
                 gl.uniformMatrix4fv(projMatLoc, false, renderContext.Projection.FloatArray());
 
+                // This would be clearer by making the 'centerWorld' parameter optional. Unfortunately, that's not allowed in C# 2.0
+                if (centerWorld.LengthSq() > 0.001)
+                {
+                    Matrix3d wvp = Matrix3d.MultiplyMatrix(mvMat, renderContext.Projection);
+                    Vector3d centerScreen = wvp.Transform(centerWorld);
+                    gl.uniform3f(centerScreenLoc, (float)centerScreen.X, (float)centerScreen.Y, (float)centerScreen.Z);
+                }
+                else
+                {
+                    gl.uniform3f(centerScreenLoc, 0, 0, 0);
+                }
 
                 gl.uniform1i(sampLoc, 0);
                 gl.uniform1i(colorLoc, 1);

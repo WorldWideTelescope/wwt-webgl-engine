@@ -48,10 +48,14 @@ namespace wwtlib
                     }
                 }
             }
-            else
+            else if (texture != null)
             {
                 Height = texture.NaturalHeight;
                 Width = texture.NaturalWidth;
+            } else
+            {
+                Height = 256;
+                Width = 256;
             }
 
             edges.latMin = 0 + (ScaleY * (Height - PixelCenterY));

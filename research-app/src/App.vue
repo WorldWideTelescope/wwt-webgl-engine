@@ -191,6 +191,7 @@
                   :filter="filterImagesets"
                   :close-on-select="true"
                   :reduce="(bg) => bg.name"
+                  :getOptionKey="JSON.stringify"
                   label="name"
                   placeholder="Background"
                 >
@@ -211,14 +212,15 @@
               <div class="item-select-container">
                 <span class="item-select-title">Add imagery layer:</span>
                 <v-select
-                  v-model="imageryToAdd"
                   class="item-selector"
                   :searchable="true"
                   :clearable="false"
                   :options="curAvailableImageryData"
                   :filter="filterImagesets"
+                  :getOptionKey="JSON.stringify"
+                  @input="addImagery"
                   label="name"
-                  placeholder="Dataset"
+                  placeholder=""
                 >
                   <template #option="option">
                     <div class="item-option">
@@ -244,16 +246,15 @@
               <div id="catalog-select-container-tool" class="item-select-container">
                 <span class="item-select-title">Add catalog:</span>
                 <v-select
-                  v-model="catalogToAdd"
                   id="catalog-select-tool"
                   class="item-selector"
                   :searchable="true"
                   :clearable="false"
                   :options="curAvailableCatalogs"
                   :filter="filterCatalogs"
-                  @change="(cat) => addHipsByName(cat.name)"
+                  @input="addHips"
                   label="name"
-                  placeholder="Catalog"
+                  placeholder=""
                 >
                   <template #option="option">
                     <div class="item-option">
@@ -2421,7 +2422,6 @@ export default class App extends WWTAwareComponent {
   // HiPS catalogs (see also the table layer support)
 
   addHips(catalog: ImagesetInfo): Promise<Imageset> {
-    this.addResearchAppTableLayer(catalog);
     return this.addCatalogHipsByName({ name: catalog.name }).then((imgset) => {
       const hips = imgset.get_hipsProperties();
 
@@ -2434,18 +2434,11 @@ export default class App extends WWTAwareComponent {
             ["opacity", this.defaultColor.a],
           ],
         });
+        catalog.id = catId;
+        this.addResearchAppTableLayer(catalog);
       }
-
       return imgset;
     });
-  }
-
-  get catalogToAdd() {
-    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
-  }
-
-  set catalogToAdd(catalog: ImagesetInfo) {
-    this.addHips(catalog);
   }
 
   prepareForMessaging(source: Source): selections.Source {
@@ -2703,11 +2696,7 @@ export default class App extends WWTAwareComponent {
 
   // Add Imagery As Layer tool
 
-  get imageryToAdd() {
-    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
-  }
-
-  set imageryToAdd(iinfo: ImagesetInfo) {
+  addImagery(iinfo: ImagesetInfo) {
     const msg: classicPywwt.CreateImageSetLayerMessage = {
       event: "image_layer_create",
       url: iinfo.url,
