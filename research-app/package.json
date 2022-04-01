@@ -12,7 +12,7 @@
     "@wwtelescope/engine": "^7.15.0",
     "@wwtelescope/engine-helpers": "^0.8.1",
     "@wwtelescope/engine-types": "^0.6.1",
-    "@wwtelescope/engine-vuex": "^0.13.0",
+    "@wwtelescope/engine-vuex": "^0.14.0",
     "@wwtelescope/research-app-messages": "^0.13.0",
     "moment": "^2.29.1",
     "screenfull": "^5",
@@ -52,5 +52,5 @@
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },
-  "version": "0.9.2"
+  "version": "0.9.3"
 }

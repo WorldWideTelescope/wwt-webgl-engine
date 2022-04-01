@@ -1,3 +1,10 @@
+# @wwtelescope/engine-vuex 0.14.0 (2022-04-01)
+
+- We now expose the internal layer GUID for progressive HiPS catalog imagesets
+  (#178, @carifio24).
+- Fix a URL typo in the `package.json` file (#173, @carifio24).
+
+
 # @wwtelescope/engine-vuex 0.13.0 (2021-11-17)
 
 - Expose the current roll angle of the camera view in `WWTAwareComponent` (#155,

@@ -1,3 +1,12 @@
+# @wwtelescope/research-app 0.9.3 (2022-04-01)
+
+- Internal updates to use the new UUID system for progressive HiPS catalog
+  datasets, which is needed to create tour files that are compatible with the
+  Windows client (#178, @carifio24).
+- Pin the version of fontawesome-svg-core more tightly to keep the build working
+  (@carifio24).
+
+
 # @wwtelescope/research-app 0.9.2 (2022-01-19)
 
 - Use the new `name` field on `image_layer_create` messages if provided (#165,
