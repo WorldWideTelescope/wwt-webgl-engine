@@ -1,3 +1,21 @@
+# @wwtelescope/engine 7.15.0 (2022-04-01)
+
+- Fix up emitted tour files to be compatible with the Windows client, including
+  a switch to use V5 UUIDs for internal HiPS catalog layer IDs (#178,
+  @Carifio24). This adds a new API that can be used by downstream modules.
+- Fix longitudes in non-astronomical spreadsheet layers, which were accidentally
+  flipped in the previous release (#180, @Carifio24).
+- Finally provide a hook to import the external `pako` JavaScript module in the
+  new engine, so that compression and decompression can work reliably (#170,
+  @Carifio24)
+- Fix "vibrations" of tiled imagesets when zoomed in to very high levels (#169,
+  @imbasimba)
+- Fix the location panned to when loading tiled imagesets with non-central
+  coordinate offsets (#168, @imbasimba)
+- Fix a URL typo in the package.json file (#173, @Carifio24).
+- Bump some dependency versions (#175, #185)
+
+
 # @wwtelescope/engine 7.14.5 (2022-01-06)
 
 - Fix 180-degree rotation of longitudes when rendering data tables in 3D (#166,

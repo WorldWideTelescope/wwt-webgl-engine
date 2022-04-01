@@ -2043,7 +2043,7 @@ namespace wwtlib
         {
             InitRings();
 
-            TileShader.Use(renderContext, ringsVertexBuffer.VertexBuffer, null, ringsTexture.Texture2d, 1.0f, false);
+            TileShader.Use(renderContext, ringsVertexBuffer.VertexBuffer, null, ringsTexture.Texture2d, 1.0f, false, Vector3d.Zero);
             renderContext.gl.drawArrays(GL.TRIANGLE_STRIP, 0, triangleCountRings);
         }
 

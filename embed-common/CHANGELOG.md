@@ -1,3 +1,8 @@
+# @wwtelescope/embed-common 0.3.2 (2022-04-01)
+
+- Fix a URL typo in the package.json file (@Carifio24).
+
+
 # @wwtelescope/embed-common 0.3.1 (2021-06-03)
 
 - No code changes, just syncing up Cranko with changes in the repository.

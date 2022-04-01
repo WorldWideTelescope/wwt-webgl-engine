@@ -2,10 +2,10 @@
   "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
   "bugs": {
     "email": "wwt@aas.org",
-    "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/fontawesome-svg-core": "~1.2.28",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/embed-common": "^0.2.0",
@@ -32,11 +32,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "github:WorldWideTelesope/wwt-webgl-engine",
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },
-  "version": "0.3.4"
+  "version": "0.3.5"
 }

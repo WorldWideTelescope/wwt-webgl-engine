@@ -1,3 +1,8 @@
+# @wwtelescope/astro 0.2.1 (2022-04-01)
+
+- Fix a URL typo in the package.json file (@Carifio24).
+
+
 # @wwtelescope/astro 0.2.0 (2021-09-20)
 
 - Add a function for calculating great-circle distance (@Carifio24).

@@ -2,7 +2,7 @@
   "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
   "bugs": {
     "email": "wwt@aas.org",
-    "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
     "@wwtelescope/astro": "^0.1.0",
@@ -25,11 +25,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "github:WorldWideTelesope/wwt-webgl-engine",
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "version": "0.8.1"
+  "version": "0.8.2"
 }

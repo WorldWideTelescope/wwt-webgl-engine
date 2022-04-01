@@ -191,6 +191,16 @@ namespace wwtlib
                         Layer newLayer = Layer.FromXml(layer,true);//.Layer.FromXml(layer, true);
                         if (newLayer != null)
                         {
+                            if (newLayer is ImageSetLayer)
+                            {
+                                ImageSetLayer imageSetLayer = (ImageSetLayer)newLayer;
+                                Imageset imageset = imageSetLayer.ImageSet;
+                                if (imageset.Projection == ProjectionType.Healpix && imageset.Extension == ".tsv")
+                                {
+                                    WWTControl.Singleton.AddCatalogHips(imageset);
+                                    continue;
+                                }
+                            }
                             string fileName = string.Format("{0}.txt", newLayer.ID.ToString());
                             if (LayerManager.LayerList.ContainsKey(newLayer.ID)) // && newLayer.ID != ISSLayer.ISSGuid)
                             {
@@ -334,7 +344,21 @@ namespace wwtlib
             {
                 if (LayerManager.LayerList.ContainsKey(id))
                 {
-                    LayerManager.LayerList[id].SaveToXml(xmlWriter);
+                    Layer layer = LayerManager.LayerList[id];
+                    string name = layer.Name;
+                    Imageset imageset = WWTControl.Singleton.RenderContext.GetCatalogHipsByName(name);
+                    if (imageset != null)
+                    {
+                        ImageSetLayer imageSetLayer = ImageSetLayer.Create(imageset);
+                        imageSetLayer.ID = id;
+                        imageSetLayer.Name = name;
+                        imageSetLayer.ReferenceFrame = "Sky";
+                        imageSetLayer.SaveToXml(xmlWriter);
+                    }
+                    else
+                    {
+                        LayerManager.LayerList[id].SaveToXml(xmlWriter);
+                    }
                 }
             }
             xmlWriter.WriteEndElement();

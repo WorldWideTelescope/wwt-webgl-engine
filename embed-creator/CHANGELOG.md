@@ -1,3 +1,9 @@
+# @wwtelescope/embed-creator 0.3.5 (2022-04-01)
+
+- Fix a URL typo in the package.json file (@Carifio24).
+- Pin the version of fontawesome-svg-core more tightly to keep the build working (@Carifio24)
+
+
 # @wwtelescope/embed-creator 0.3.4 (2021-06-03)
 
 - Loosen version requirements for Vue CLI tooling

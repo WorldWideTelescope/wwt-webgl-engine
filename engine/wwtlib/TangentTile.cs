@@ -164,12 +164,13 @@ namespace wwtlib
                 RenderTriangleLists[i] = new List<RenderTriangle>();
             }
 
+            GlobalCenter = GeoTo3dTan(0, 0);
             LatLngEdges edges = GetLatLngEdges();
 
-            TopLeft = GeoTo3dTan(edges.latMin, edges.lngMin);
-            BottomRight = GeoTo3dTan(edges.latMax, edges.lngMax);
-            TopRight = GeoTo3dTan(edges.latMin, edges.lngMax);
-            BottomLeft = GeoTo3dTan(edges.latMax, edges.lngMin);
+            TopLeft = GeoTo3dTan(edges.latMin, edges.lngMin).Subtract(GlobalCenter);
+            BottomRight = GeoTo3dTan(edges.latMax, edges.lngMax).Subtract(GlobalCenter);
+            TopRight = GeoTo3dTan(edges.latMin, edges.lngMax).Subtract(GlobalCenter);
+            BottomLeft = GeoTo3dTan(edges.latMax, edges.lngMin).Subtract(GlobalCenter);
 
             Vector3d center = Vector3d.MidPoint(TopLeft, BottomRight);
             Vector3d leftCenter = Vector3d.MidPoint(TopLeft, BottomLeft);

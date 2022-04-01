@@ -1,3 +1,8 @@
+# @wwtelescope/engine-types 0.6.2 (2022-04-01)
+
+- Fix a URL typo in the package.json file (@Carifio24).
+
+
 # @wwtelescope/engine-types 0.6.1 (2021-11-17)
 
 - Correctly handle Date types in `isBaseSpreadSheetLayerSetting` (#155, @Carifio24).

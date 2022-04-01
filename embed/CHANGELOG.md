@@ -1,3 +1,9 @@
+# @wwtelescope/embed 1.5.4 (2022-04-01)
+
+- Fix a URL typo in the package.json file (@Carifio24).
+- Pin the version of fontawesome-svg-core more tightly to keep the build working (@Carifio24)
+
+
 # @wwtelescope/embed 1.5.3 (2021-10-21)
 
 - Fix the centering of the background WWT logo in the "ready to start" tour
