@@ -610,43 +610,6 @@ namespace wwtlib
             }
         }
 
-        public override void MakeTexture()
-        {
-            if (PrepDevice != null)
-            {
-                try
-                {
-                    texture2d = PrepDevice.createTexture();
-
-                    PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
-                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-
-                    if (GetHipsFileExtension() == ".fits" && RenderContext.UseGlVersion2)
-                    {
-                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
-                    }
-                    else
-                    {
-                        ImageElement image = texture;
-                        PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-                        PrepDevice.generateMipmap(GL.TEXTURE_2D);
-                    }
-
-                    PrepDevice.bindTexture(GL.TEXTURE_2D, null);
-                }
-                catch
-                {
-                    errored = true;
-
-                }
-            }
-        }
-
-
         public override void RequestImage()
         {
             if (IsCatalogTile)
@@ -657,41 +620,6 @@ namespace wwtlib
                     catalogData = new WebFile(this.URL);
                     catalogData.OnStateChange = LoadCatalogData;
                     catalogData.Send();
-                }
-            }
-            else if (GetHipsFileExtension() == ".fits")
-            {
-                if (!Downloading && !ReadyToRender)
-                {
-                    Downloading = true;
-                    if (RenderContext.UseGlVersion2)
-                    {
-                        fitsImage = new FitsImageTile(dataset, URL, delegate (WcsImage wcsImage)
-                        {
-                            Downloading = false;
-                            errored = fitsImage.errored;
-                            TileCache.RemoveFromQueue(this.Key, true);
-                            if (!fitsImage.errored)
-                            {
-                                texReady = true;
-                                ReadyToRender = texReady && (DemReady || !demTile);
-                                RequestPending = false;
-                                MakeTexture();
-                            }
-                        });
-                    } else
-                    {
-                        fitsImage = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
-                        {
-                            texReady = true;
-                            Downloading = false;
-                            errored = fitsImage.errored;
-                            ReadyToRender = texReady && (DemReady || !demTile);
-                            RequestPending = false;
-                            TileCache.RemoveFromQueue(this.Key, true);
-                            texture2d = wcsImage.GetBitmap().GetTexture();
-                        });
-                    }
                 }
             }
             else

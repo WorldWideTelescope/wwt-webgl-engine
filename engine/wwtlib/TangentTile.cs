@@ -74,58 +74,6 @@ namespace wwtlib
                     ReadyToRender = true;
                 }
             }
-            else if (dataset.Extension == ".fits" && dataset.WcsImage == null)
-            {
-                if (!Downloading && !ReadyToRender)
-                {
-
-                    Downloading = true;
-                    if (RenderContext.UseGlVersion2)
-                    {
-                        fitsImage = new FitsImageTile(dataset, URL, delegate (WcsImage wcsImage)
-                        {
-                            Downloading = false;
-                            errored = fitsImage.errored;
-                            TileCache.RemoveFromQueue(this.Key, true);
-                            if (!fitsImage.errored)
-                            {
-                                // For a non-HiPS tiled FITS, this is our
-                                // mechanism for notifying the layer creator
-                                // that the initial FITS data have loaded and
-                                // the FitsProperties can be trusted.
-                                if (Level == 0) {
-                                    dataset.FitsProperties.FireMainImageLoaded(fitsImage);
-                                }
-
-                                texReady = true;
-                                ReadyToRender = texReady && (DemReady || !demTile);
-                                RequestPending = false;
-                                MakeTexture();
-                                ReadyToRender = true;
-                            }
-                        });
-                    }
-                    else
-                    {
-                        fitsImage = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
-                        {
-                            if (Level == 0) {
-                                dataset.FitsProperties.FireMainImageLoaded(fitsImage);
-                            }
-
-                            texReady = true;
-                            Downloading = false;
-                            errored = fitsImage.errored;
-                            ReadyToRender = texReady && (DemReady || !demTile);
-                            RequestPending = false;
-                            TileCache.RemoveFromQueue(this.Key, true);
-                            bmp = wcsImage.GetBitmap();
-                            texture2d = bmp.GetTexture();
-                            ReadyToRender = true;
-                        });
-                    }
-                }
-            }
             else
             {
                 base.RequestImage();
