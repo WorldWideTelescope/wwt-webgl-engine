@@ -3,3 +3,9 @@ upstream_urls = [
   'git@github.com:WorldWideTelescope/wwt-webgl-engine.git',
   'https://github.com/WorldWideTelescope/wwt-webgl-engine.git',
 ]
+
+[projects."csproj:wwtlib"]
+ignore = true
+
+[projects."npm:@wwtelescope/tests"]
+ignore = true
