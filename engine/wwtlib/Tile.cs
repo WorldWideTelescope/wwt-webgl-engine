@@ -87,18 +87,16 @@ namespace wwtlib
         {
             if (PrepDevice != null)
             {
-                //     PrepDevice.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
-
                 try
                 {
                     texture2d = PrepDevice.createTexture();
 
-                    if (dataset.Extension == ".fits" && RenderContext.UseGlVersion2)
-                    {
-                        PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+                    PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
+                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                    PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
+                    if (dataset.Extension.ToLowerCase().IndexOf("fits") > -1 && RenderContext.UseGlVersion2)
+                    {
                         PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.R32F, (int)fitsImage.SizeX, (int)fitsImage.SizeY, 0, GL.RED, GL.FLOAT, fitsImage.dataUnit);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
@@ -106,7 +104,6 @@ namespace wwtlib
                     else
                     {
                         ImageElement image = texture;
-
                         // Before we bind resize to a power of two if nessesary so we can MIPMAP
                         if (!Texture.IsPowerOfTwo(texture.Height) | !Texture.IsPowerOfTwo(texture.Width))
                         {
@@ -118,16 +115,10 @@ namespace wwtlib
                             //Substitute the resized image
                             image = (ImageElement)(Element)temp;
                         }
-
-                        PrepDevice.bindTexture(GL.TEXTURE_2D, texture2d);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                        PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
                         PrepDevice.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
                         PrepDevice.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
                         PrepDevice.generateMipmap(GL.TEXTURE_2D);
                     }
-
-
 
                     PrepDevice.bindTexture(GL.TEXTURE_2D, null);
                 }
@@ -193,72 +184,124 @@ namespace wwtlib
 
         public virtual void RequestImage()
         {
-            if (Dataset.WcsImage != null)
+            if (dataset.Extension.ToLowerCase().IndexOf("fits") > -1)
             {
-                texReady = true;
-                Downloading = false;
-                errored = false;
-                ReadyToRender = true;
-                RequestPending = false;
-                TileCache.RemoveFromQueue(this.Key, true);
-                return;
+                if (!Downloading && !ReadyToRender)
+                {
+                    Downloading = true;
+                    if (RenderContext.UseGlVersion2)
+                    {
+                        fitsImage = new FitsImageTile(dataset, URL, delegate (WcsImage wcsImage)
+                        {
+                            Downloading = false;
+                            errored = fitsImage.errored;
+                            TileCache.RemoveFromQueue(this.Key, true);
+                            if (!fitsImage.errored)
+                            {
+                                // For a non-HiPS tiled FITS, this is our
+                                // mechanism for notifying the layer creator
+                                // that the initial FITS data have loaded and
+                                // the FitsProperties can be trusted.
+                                if (Level == 0)
+                                {
+                                    dataset.FitsProperties.FireMainImageLoaded(fitsImage);
+                                    fitsImage.ApplyDisplaySettings();
+                                }
+                                texReady = true;
+                                ReadyToRender = texReady && (DemReady || !demTile);
+                                RequestPending = false;
+                                MakeTexture();
+                            }
+                        });
+                    }
+                    else
+                    {
+                        fitsImage = FitsImageJs.CreateTiledFits(dataset, URL, delegate (WcsImage wcsImage)
+                        {
+                            if (Level == 0)
+                            {
+                                dataset.FitsProperties.FireMainImageLoaded(fitsImage);
+                            }
+                            texReady = true;
+                            Downloading = false;
+                            errored = fitsImage.errored;
+                            ReadyToRender = texReady && (DemReady || !demTile);
+                            RequestPending = false;
+                            TileCache.RemoveFromQueue(this.Key, true);
+                            texture2d = wcsImage.GetBitmap().GetTexture();
+                        });
+                    }
+                }
             }
-
-            if (!Downloading && !ReadyToRender)
+            else
             {
-                Downloading = true;
-                texture = (ImageElement)Document.CreateElement("img");
-                CrossDomainImage xdomimg = (CrossDomainImage)(object)texture;
-
-                texture.AddEventListener("load", delegate (ElementEvent e)
+                if (Dataset.WcsImage != null)
                 {
                     texReady = true;
                     Downloading = false;
                     errored = false;
-                    ReadyToRender = texReady && (DemReady || !demTile);
+                    ReadyToRender = true;
                     RequestPending = false;
                     TileCache.RemoveFromQueue(this.Key, true);
-                    MakeTexture();
-                }, false);
+                    return;
+                }
 
-                texture.AddEventListener("error", delegate (ElementEvent e)
+                if (!Downloading && !ReadyToRender)
                 {
-                    if (!texture.HasAttribute("proxyattempt"))
+                    Downloading = true;
+                    texture = (ImageElement)Document.CreateElement("img");
+                    CrossDomainImage xdomimg = (CrossDomainImage)(object)texture;
+
+                    texture.AddEventListener("load", delegate (ElementEvent e)
                     {
-                        texture.SetAttribute("proxyattempt", true);
+                        texReady = true;
+                        Downloading = false;
+                        errored = false;
+                        ReadyToRender = texReady && (DemReady || !demTile);
+                        RequestPending = false;
+                        TileCache.RemoveFromQueue(this.Key, true);
+                        MakeTexture();
+                    }, false);
 
-                        // NOTE: `this.URL` is dynamically generated using
-                        // URLHelpers.rewrite(). Say that we request tiles from
-                        // example.com, which requires CORS proxying. Say also
-                        // that this callback is called for a request to a tile
-                        // that should in fact be available. If a different
-                        // request fails before this callback is called,
-                        // activateProxy() will be called on the example.com
-                        // domain, making it so that `this.URL` in the following
-                        // call goes through the proxy, making it so that
-                        // `new_url` is null, making it so that this tile is
-                        // erroneously marked as failed when it should not be.
-                        // The solution: make sure to check proxy activation
-                        // with the *original* request URL, `texture.Src`, not
-                        // the one that may have been updated, `this.URL`.
-                        string new_url = URLHelpers.singleton.activateProxy(texture.Src);
+                    texture.AddEventListener("error", delegate (ElementEvent e)
+                    {
+                        if (!texture.HasAttribute("proxyattempt"))
+                        {
+                            texture.SetAttribute("proxyattempt", true);
 
-                        if (new_url != null)
-                        {  // null => don't bother: we know that the proxy won't help
-                            texture.Src = new_url;
-                            return;
+                            // NOTE: `this.URL` is dynamically generated using
+                            // URLHelpers.rewrite(). Say that we request tiles from
+                            // example.com, which requires CORS proxying. Say also
+                            // that this callback is called for a request to a tile
+                            // that should in fact be available. If a different
+                            // request fails before this callback is called,
+                            // activateProxy() will be called on the example.com
+                            // domain, making it so that `this.URL` in the following
+                            // call goes through the proxy, making it so that
+                            // `new_url` is null, making it so that this tile is
+                            // erroneously marked as failed when it should not be.
+                            // The solution: make sure to check proxy activation
+                            // with the *original* request URL, `texture.Src`, not
+                            // the one that may have been updated, `this.URL`.
+                            string new_url = URLHelpers.singleton.activateProxy(texture.Src);
+
+                            if (new_url != null)
+                            {  // null => don't bother: we know that the proxy won't help
+                                texture.Src = new_url;
+                                return;
+                            }
                         }
-                    }
 
-                    Downloading = false;
-                    ReadyToRender = false;
-                    errored = true;
-                    RequestPending = false;
-                    TileCache.RemoveFromQueue(this.Key, true);
-                }, false);
+                        Downloading = false;
+                        ReadyToRender = false;
+                        errored = true;
+                        RequestPending = false;
+                        TileCache.RemoveFromQueue(this.Key, true);
+                    }, false);
 
-                xdomimg.crossOrigin = "anonymous";
-                texture.Src = this.URL;
+                    xdomimg.crossOrigin = "anonymous";
+                    texture.Src = this.URL;
+                }
             }
         }
 

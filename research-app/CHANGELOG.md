@@ -1,4 +1,13 @@
-# rc: micro bump
+# rc: minor bump
+
+- Get support for FITS TOAST rendering from the latest engine (#181, @imbasimba)
+- Support programmatic control of whether catalog items are selectable
+  (clickable) in the UI (#183, @Carifio24). The click testing was slowing down
+  the UI in some cases. At the moment this setting is only controllable through
+  the messaging API, and not the UI itself.
+
+
+# @wwtelescope/research-app 0.9.3 (2022-04-01)
 
 - Internal updates to use the new UUID system for progressive HiPS catalog
   datasets, which is needed to create tour files that are compatible with the
