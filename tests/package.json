@@ -25,9 +25,9 @@
   "name": "@wwtelescope/tests",
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
-    "bs-local": "node scripts/bslocal.runner.js -c dist/tests/bslocal.conf.js",
     "build": "tsc",
-    "local": "./node_modules/.bin/nightwatch -c dist/tests/local.conf.js"
+    "local": "./node_modules/.bin/nightwatch -c dist/tests/local.conf.js",
+    "bs-local": "node scripts/bslocal.runner.js -c dist/tests/bslocal.conf.js"
   },
-  "version": "0.0.0"
+  "version": "0.0.0-dev.0"
 }

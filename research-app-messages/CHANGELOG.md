@@ -1,3 +1,11 @@
+# @wwtelescope/research-app-messages 0.14.0 (2022-04-05)
+
+- Add messages to allow programmatic control of whether catalog items are
+  selectable (clickable) in the app UI (#183, @Carifio24). They are
+  `ModifySelectabilityMessage` and `ModifyAllSelectabilityMessage`. The click
+  testing was slowing down the UI in some cases.
+
+
 # @wwtelescope/research-app-messages 0.13.0 (2022-01-19)
 
 - Added `name` parameter for `image_layer_create` messages (#165, @imbasimba)

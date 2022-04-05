@@ -1,3 +1,11 @@
+# @wwtelescope/engine 7.16.0 (2022-04-05)
+
+- Add support for FITS TOAST rendering! (#181, @imbasimba). There aren't yet any
+  such datasets out in the wild, but we’ll work on tools to create them. This
+  change actually *reduced* the number of lines of code because it consolidated
+  existing functionalities.
+
+
 # @wwtelescope/engine 7.15.0 (2022-04-01)
 
 - Fix up emitted tour files to be compatible with the Windows client, including
