@@ -365,18 +365,14 @@ interface Message {
 import {
   Annotation,
   Circle,
-  CircleAnnotationSetting,
   Color,
   Guid,
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
-  PolyAnnotationSetting,
   PolyLine,
-  PolyLineAnnotationSetting,
   SpreadSheetLayer,
-  SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
 
 import {
@@ -399,11 +395,9 @@ import {
   layers,
   selections,
   settings,
+  tours,
   ApplicationStateMessage,
   ViewStateMessage,
-  GetViewAsTourMessage,
-  GetViewAsTourReply,
-  isGetViewAsTourMessage
 } from "@wwtelescope/research-app-messages";
 
 import {
@@ -411,7 +405,7 @@ import {
   convertSpreadSheetLayerSetting,
 } from "./settings";
 import { extractImageSetLayerSettings } from "@wwtelescope/engine-helpers/src/imagesetlayer";
-import { isSpreadSheetLayerSetting, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
+import { SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
 import { isLoadImageCollectionCompletedMessage, isLoadImageCollectionMessage, PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
 import { isLoadHipsCatalogCompletedMessage, isLoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
 import { extractCircleAnnotationSettings } from "@wwtelescope/engine-helpers/src/circleannotation";
@@ -2279,11 +2273,11 @@ export default class App extends WWTAwareComponent {
   }
 
   private handleGetViewAsTour(msg: any): boolean {
-    if (!isGetViewAsTourMessage(msg)) return false;
+    if (!tours.isGetViewAsTourMessage(msg)) return false;
 
     this.viewAsTourXml().then(xml => {
       if (xml !== null) {
-        const reply: GetViewAsTourReply = {
+        const reply: tours.GetViewAsTourReply = {
           type: "get_view_as_tour_reply",
           threadId: msg.threadId,
           tourXml: xml,
