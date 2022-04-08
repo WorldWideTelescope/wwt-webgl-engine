@@ -16,17 +16,17 @@
  * */
 
 export interface GetViewAsTourMessage {
-  type: "get_view_as_tour",
+  type: "get_view_as_tour";
   threadId: string;
 }
 
-export function isGetViewAsTourMessage(o: any): o is GetViewAsTourMessage {
+export function isGetViewAsTourMessage(o: any): o is GetViewAsTourMessage { // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.type === "get_view_as_tour" &&
     typeof o.threadId === "string";
 }
 
 export interface GetViewAsTourReply {
-  type: "get_view_as_tour_reply",
+  type: "get_view_as_tour_reply";
   threadId: string;
   tourXml: string | null;
 }
