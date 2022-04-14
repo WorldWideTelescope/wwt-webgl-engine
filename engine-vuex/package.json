@@ -3,7 +3,7 @@
   "browser": "dist/index.umd.js",
   "bugs": {
     "email": "wwt@aas.org",
-    "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
     "@wwtelescope/engine": "0.0.0-dev.0",
@@ -32,7 +32,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "github:WorldWideTelesope/wwt-webgl-engine",
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "vue-cli-service build --target lib --name index src/index.ts",
     "doc": "typedoc src/index.ts",

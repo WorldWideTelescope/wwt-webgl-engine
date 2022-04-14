@@ -97,6 +97,9 @@ export class ImagesetInfo {
   /** The type of the imageset: panorama, sky, ... */
   type: ImageSetType;
 
+  /** The internal GUID of the layer, if it is a HiPS layer */
+  id: string | null;
+
   /** An (application-specific) string giving some additional information about
    * the imageset. */
   description: string;
@@ -108,23 +111,28 @@ export class ImagesetInfo {
    */
   extension: string;
 
-  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string) {
+  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string, id: string | null =  null) {
     this.url = url;
     this.name = name;
     this.type = type;
     this.description = description;
     this.extension = extension;
+    this.id = id;
+  }
+
+  static fromImageset(imageset: Imageset): ImagesetInfo {
+    return new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension(), imageset.get_hipsProperties()?.get_catalogSpreadSheetLayer().id.toString() ?? null);
   }
 }
 
 export class SpreadSheetLayerInfo {
-  /* The user-facing name of the layer */
+  /** The user-facing name of the layer */
   name: string;
 
-  /* The internal GUID of the layer */
+  /** The internal GUID of the layer */
   id: string;
 
-  /* The reference frame in which the data are defined. */
+  /** The reference frame in which the data are defined. */
   referenceFrame: string;
 
   setName(name: string) {
@@ -421,8 +429,7 @@ function activeLayersList(): string[] {
  * inside either an action or a mutation.
  */
 function availableImagesets(): ImagesetInfo[] {
-  return WWTControl.getImageSets()
-      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
+  return WWTControl.getImageSets().map(ImagesetInfo.fromImageset);
 }
 
 /** This function get a SpreadSheetLayer by the key used to store it in the engine.
@@ -444,11 +451,7 @@ function spreadSheetLayerByKey(key: string): SpreadSheetLayer | null {
 }
 
 function catalogLayerKey(catalog: CatalogLayerInfo): string {
-  if (catalog instanceof ImagesetInfo) {
-    return catalog.name;
-  } else {
-    return catalog.id;
-  }
+  return catalog.id ?? "";
 }
 
 /** The store module class for the WWT Vuex implementation.
@@ -792,8 +795,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
 
   @Mutation
   updateAvailableImagesets(): void {
-    this.availableImagesets = WWTControl.getImageSets()
-      .map(imageset => new ImagesetInfo(imageset.get_url(), imageset.get_name(), imageset.get_dataSetType(), imageset.get_creditsText(), imageset.get_extension()));
+    this.availableImagesets = availableImagesets();
   }
 
   @Action({ rawError: true })
@@ -1073,13 +1075,9 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return function (name: string): SpreadSheetLayer | null {
       if (Vue.$wwt.inst === null)
         throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
-
-      // NOTE! There is an intense hack in the HiPS catalog support where the
-      // GUID of each HiPS catalog's SpreadSheetLayer is the `datasetName` from
-      // the catalog metadata. This is possible because the WWT `Guid` class
-      // doesn't actually do any validation, and just accepts any string you
-      // give it.
-      return spreadSheetLayerByKey(name);
+      
+      const id = Guid.createFrom(name).toString();
+      return spreadSheetLayerByKey(id);
     }
   }
 
@@ -1088,8 +1086,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       if (Vue.$wwt.inst === null)
         throw new Error('cannot get spreadsheetStateForHipsCatalog without linking to WWTInstance');
 
-      // NOTE: hack as described above -- the name is the GUID.
-      return this.spreadSheetLayers[name] || null;
+      const id = Guid.createFrom(name).toString();
+      return this.spreadSheetLayers[id] || null;
     }
   }
 
@@ -1143,6 +1141,10 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
       const wwtLayer = hips.get_catalogSpreadSheetLayer();
       const guidText = wwtLayer.id.toString();
       Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+      const info = availableImagesets().find(x => x.name === options.name);
+      if (info !== undefined) {
+        info.id = guidText;
+      }
     }
 
     (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
@@ -1167,7 +1169,8 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     // we leverage the quasi-hack that the GUID of the spreadsheet layer is set
     // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
 
-    Vue.delete(this.spreadSheetLayers, name);
+    const id = Guid.createFrom(name).toString();
+    Vue.delete(this.spreadSheetLayers, id);
 
     this.activeLayers = activeLayersList();
   }

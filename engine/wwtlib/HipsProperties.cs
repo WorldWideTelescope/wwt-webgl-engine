@@ -99,7 +99,7 @@ namespace wwtlib
         {
             catalogSpreadSheetLayer.UseHeadersFromVoTable(catalogColumnInfo);
             catalogSpreadSheetLayer.Name = datasetName;
-            catalogSpreadSheetLayer.ID = Guid.FromString(this.datasetName);
+            catalogSpreadSheetLayer.ID = Guid.CreateFrom(datasetName);
             LayerManager.AddSpreadsheetLayer(CatalogSpreadSheetLayer, "Sky");
             downloadComplete = true;
             if (onDownloadComplete != null)

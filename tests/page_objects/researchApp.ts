@@ -141,7 +141,7 @@ module.exports = {
       },
       props: {
         initialCoordinateText: "17:45:35 -28:53:59",
-        phatLayerCoordinates: "00:45:05 +41:42:31", // Both are at the same position
+        phatLayerCoordinates: "00:45:05 +41:45:35", // Both are at the same position
       },
     },
     controls: {

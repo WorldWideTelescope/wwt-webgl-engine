@@ -3,10 +3,12 @@
   "browser": "./src/index.js",
   "bugs": {
     "email": "wwt@aas.org",
-    "url": "https://github.com/WorldWideTelesope/wwt-webgl-engine/issues"
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/engine-types": "0.0.0-dev.0"
+    "@wwtelescope/engine-types": "0.0.0-dev.0",
+    "pako": "~1.0.3",
+    "uuid": "~8.3.2"
   },
   "description": "The AAS WorldWide Telescope WebGL engine",
   "files": [
@@ -32,7 +34,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "github:WorldWideTelesope/wwt-webgl-engine",
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "npm run concat-index && npm run uglify",
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",

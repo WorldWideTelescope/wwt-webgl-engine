@@ -24,6 +24,7 @@ export interface TableLayerStatus {
   visible: boolean;
   type: 'hips' | 'table';
   layer: CatalogLayerInfo;
+  selectable: boolean
 }
 
 type EquivalenceTest<T> = (t1: T, t2: T) => boolean;
@@ -58,7 +59,7 @@ function removeFromArray<T>(array: T[], item: T, equivalent: EquivalenceTest<T> 
 }
 
 function infoKey(info: CatalogLayerInfo) {
-  return info instanceof ImagesetInfo ? info.name : info.id;
+  return info.id ?? "";
 }
 
 function sourcesEqual(s1: Source, s2: Source) {
@@ -112,6 +113,10 @@ export class WWTResearchAppModule extends VuexModule {
     return () => getFilteredLayers(this._tableLayers, status => status.visible);
   }
 
+  get selectableTableLayers() {
+    return () => getFilteredLayers(this._tableLayers, status => status.visible && status.selectable);
+  }
+
   get researchAppTableLayerVisibility() {
     return (info: CatalogLayerInfo) => {
       const status = this._tableLayers[infoKey(info)];
@@ -122,12 +127,23 @@ export class WWTResearchAppModule extends VuexModule {
     }
   }
 
+  get researchAppTableLayerSelectability() {
+    return (info: CatalogLayerInfo) => {
+      const status = this._tableLayers[infoKey(info)];
+      if (status == undefined) {
+        return false;
+      }
+      return status.selectable;
+    }
+  }
+
   @Mutation
   addResearchAppTableLayer(info: CatalogLayerInfo) {
     const status: TableLayerStatus = {
       type: info instanceof ImagesetInfo ? 'hips' : 'table',
       visible: true,
       layer: info,
+      selectable: true
     };
     Vue.set(this._tableLayers, infoKey(info), status);
   }
@@ -142,6 +158,14 @@ export class WWTResearchAppModule extends VuexModule {
     const status = this._tableLayers[infoKey(args.layer)];
     if (status !== undefined) {
       Vue.set(status, 'visible', args.visible);
+    }
+  }
+
+  @Mutation
+  setResearchAppTableLayerSelectability(args: { layer: CatalogLayerInfo; selectable: boolean }) {
+    const status = this._tableLayers[infoKey(args.layer)];
+    if (status !== undefined) {
+      Vue.set(status, 'selectable', args.selectable);
     }
   }
 

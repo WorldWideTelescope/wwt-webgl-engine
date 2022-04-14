@@ -191,6 +191,7 @@
                   :filter="filterImagesets"
                   :close-on-select="true"
                   :reduce="(bg) => bg.name"
+                  :getOptionKey="JSON.stringify"
                   label="name"
                   placeholder="Background"
                 >
@@ -211,14 +212,15 @@
               <div class="item-select-container">
                 <span class="item-select-title">Add imagery layer:</span>
                 <v-select
-                  v-model="imageryToAdd"
                   class="item-selector"
                   :searchable="true"
                   :clearable="false"
                   :options="curAvailableImageryData"
                   :filter="filterImagesets"
+                  :getOptionKey="JSON.stringify"
+                  @input="addImagery"
                   label="name"
-                  placeholder="Dataset"
+                  placeholder=""
                 >
                   <template #option="option">
                     <div class="item-option">
@@ -244,16 +246,15 @@
               <div id="catalog-select-container-tool" class="item-select-container">
                 <span class="item-select-title">Add catalog:</span>
                 <v-select
-                  v-model="catalogToAdd"
                   id="catalog-select-tool"
                   class="item-selector"
                   :searchable="true"
                   :clearable="false"
                   :options="curAvailableCatalogs"
                   :filter="filterCatalogs"
-                  @change="(cat) => addHipsByName(cat.name)"
+                  @input="addHips"
                   label="name"
-                  placeholder="Catalog"
+                  placeholder=""
                 >
                   <template #option="option">
                     <div class="item-option">
@@ -642,6 +643,7 @@ class TableLayerMessageHandler {
   private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
   private queuedSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
   private queuedRemoval: classicPywwt.RemoveTableLayerMessage | null = null;
+  private queuedSelectability: selections.ModifySelectabilityMessage | null = null;
 
   constructor(owner: App) {
     this.owner = owner;
@@ -705,6 +707,11 @@ class TableLayerMessageHandler {
     if (this.queuedRemoval !== null) {
       this.handleRemoveMessage(this.queuedRemoval);
       this.queuedRemoval = null;
+    }
+
+    if (this.queuedSelectability !== null) {
+      this.handleSelectabilityMessage(this.queuedSelectability);
+      this.queuedSelectability = null;
     }
   }
 
@@ -830,6 +837,24 @@ class TableLayerMessageHandler {
         this.owner.deleteLayer(this.internalId);
         this.internalId = null;
         this.created = false;
+      }
+    }
+  }
+
+  handleSelectabilityMessage(msg: selections.ModifySelectabilityMessage) {
+    if (this.internalId === null) {
+      // Layer not yet created or fully initialized. Queue up message for processing
+      // once it's ready.
+      if (this.queuedSelectability === null) {
+        this.queuedSelectability = msg;
+      }
+    } else {
+      const layer = this.owner.spreadsheetLayers.find(x => x.name === msg.id);
+      if (layer !== undefined) {
+        this.owner.setResearchAppTableLayerSelectability({
+          layer: layer,
+          selectable: msg.selectable
+        });
       }
     }
   }
@@ -1148,10 +1173,15 @@ export default class App extends WWTAwareComponent {
 
   addResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   addSource!: (source: Source) => void;
+  setResearchAppTableLayerSelectability!: (args: {
+    layer: CatalogLayerInfo;
+    selectable: boolean;
+  }) => void;
   hipsCatalogs!: () => CatalogLayerInfo[];
   removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
   appTableLayers!: () => CatalogLayerInfo[];
   visibleTableLayers!: () => CatalogLayerInfo[];
+  selectableTableLayers!: () => CatalogLayerInfo[];
 
   // Lifecycle management
 
@@ -1165,7 +1195,8 @@ export default class App extends WWTAwareComponent {
       }),
       ...mapGetters(wwtResearchAppNamespace, [
         "hipsCatalogs",
-        "visibleTableLayers"
+        "selectableTableLayers",
+        "visibleTableLayers",
       ]),
       ...mapGetters(wwtResearchAppNamespace, {
         appTableLayers: "tableLayers",
@@ -1179,6 +1210,7 @@ export default class App extends WWTAwareComponent {
         "addResearchAppTableLayer",
         "addSource",
         "removeResearchAppTableLayer",
+        "setResearchAppTableLayerSelectability"
       ]),
     };
   }
@@ -1815,6 +1847,8 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("get_view_as_tour", this.handleGetViewAsTour);
 
     this.messageHandlers.set("add_source", this.handleAddSource);
+    this.messageHandlers.set("modify_selectability", this.handleModifySelectability);
+    this.messageHandlers.set("modify_all_selectability", this.handleModifyAllSelectability);
 
     // Ignore incoming view_state messages. When testing the app, you might want
     // to launch it as (e.g.)
@@ -2440,7 +2474,6 @@ export default class App extends WWTAwareComponent {
   // HiPS catalogs (see also the table layer support)
 
   addHips(catalog: ImagesetInfo): Promise<Imageset> {
-    this.addResearchAppTableLayer(catalog);
     return this.addCatalogHipsByName({ name: catalog.name }).then((imgset) => {
       const hips = imgset.get_hipsProperties();
 
@@ -2453,18 +2486,11 @@ export default class App extends WWTAwareComponent {
             ["opacity", this.defaultColor.a],
           ],
         });
+        catalog.id = catId;
+        this.addResearchAppTableLayer(catalog);
       }
-
       return imgset;
     });
-  }
-
-  get catalogToAdd() {
-    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
-  }
-
-  set catalogToAdd(catalog: ImagesetInfo) {
-    this.addHips(catalog);
   }
 
   prepareForMessaging(source: Source): selections.Source {
@@ -2659,6 +2685,29 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
+  handleModifySelectability(msg: selections.ModifySelectabilityMessage): boolean {
+    if (!selections.isModifySelectabilityMessage(msg)) return false;
+
+    const handler = this.tableLayers.get(msg.id);
+    if (handler !== undefined) {
+      handler.handleSelectabilityMessage(msg);
+    }
+    return true;
+  }
+
+  handleModifyAllSelectability(msg: selections.ModifyAllSelectabilityMessage): boolean {
+    if (!selections.isModifyAllSelectabilityMessage(msg)) return false;
+
+    this.spreadsheetLayers.forEach(
+      layer =>
+        this.setResearchAppTableLayerSelectability({
+          layer: layer,
+          selectable: msg.selectable
+        })
+      );
+    return true;
+  }
+
   // "Tools" menu
 
   currentTool: ToolType = null;
@@ -2722,11 +2771,7 @@ export default class App extends WWTAwareComponent {
 
   // Add Imagery As Layer tool
 
-  get imageryToAdd() {
-    return new ImagesetInfo("", "", ImageSetType.sky, "", "");
-  }
-
-  set imageryToAdd(iinfo: ImagesetInfo) {
+  addImagery(iinfo: ImagesetInfo) {
     const msg: classicPywwt.CreateImageSetLayerMessage = {
       event: "image_layer_create",
       url: iinfo.url,
@@ -2832,7 +2877,7 @@ export default class App extends WWTAwareComponent {
     const rowSeparator = "\r\n";
     const colSeparator = "\t";
 
-    for (const layerInfo of this.visibleTableLayers()) {
+    for (const layerInfo of this.selectableTableLayers()) {
 
       const layer = this.spreadSheetLayer(layerInfo);
       if (layer == null) {
