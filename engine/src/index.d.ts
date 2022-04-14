@@ -1969,10 +1969,21 @@ export class TourDocument {
   saveToBlob(): Blob;
 }
 
+/** A class that manages editing a tour.
+ * 
+ * Currently, only a small amount of this class's functionality
+ * is exposed to TypeScript.
+ */
 export class TourEditTab {
 
+  /** Add a slide to the current tour.
+   * 
+   * @param insert Whether to insert the new slide after the current tour stop.
+   * If false, the slide is added to the end of the tour.
+  */
   addSlide(insert: boolean): void;
 
+  /** Get the current tour. */
   get_tour(): TourDocument | null;
 }
 

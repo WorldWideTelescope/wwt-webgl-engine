@@ -756,7 +756,6 @@ class TableLayerMessageHandler {
     if (msg.settings.length !== msg.values.length) return;
 
     const layer = this.owner.spreadSheetLayerById(msg.id);
-    console.log(layer);
     if (layer) {
       
       const pywwtSettings: PywwtSpreadSheetLayerSetting[] = [];
@@ -778,7 +777,6 @@ class TableLayerMessageHandler {
           id: this.internalId,
           settings: layerSettings,
         });
-        console.log(JSON.stringify(layer));
       }
     }
   }
