@@ -366,18 +366,14 @@ interface Message {
 import {
   Annotation,
   Circle,
-  CircleAnnotationSetting,
   Color,
   Guid,
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
-  PolyAnnotationSetting,
   PolyLine,
-  PolyLineAnnotationSetting,
   SpreadSheetLayer,
-  SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
 
 import {
@@ -400,6 +396,7 @@ import {
   layers,
   selections,
   settings,
+  tours,
   ApplicationStateMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
@@ -409,7 +406,7 @@ import {
   convertSpreadSheetLayerSetting,
 } from "./settings";
 import { extractImageSetLayerSettings } from "@wwtelescope/engine-helpers/src/imagesetlayer";
-import { isSpreadSheetLayerSetting, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
+import { SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
 import { isLoadImageCollectionCompletedMessage, isLoadImageCollectionMessage, PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
 import { isLoadHipsCatalogCompletedMessage, isLoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
 import { extractCircleAnnotationSettings } from "@wwtelescope/engine-helpers/src/circleannotation";
@@ -1847,6 +1844,7 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+    this.messageHandlers.set("get_view_as_tour", this.handleGetViewAsTour);
 
     this.messageHandlers.set("add_source", this.handleAddSource);
     this.messageHandlers.set("modify_selectability", this.handleModifySelectability);
@@ -2304,6 +2302,27 @@ export default class App extends WWTAwareComponent {
 
     this.toggleTourPlayPauseState(); // note half-assed semantics here!
     return true;
+  }
+
+  private handleGetViewAsTour(msg: any): boolean {
+    if (!tours.isGetViewAsTourMessage(msg)) return false;
+
+    this.viewAsTourXml().then(xml => {
+      if (xml !== null) {
+        const reply: tours.GetViewAsTourReply = {
+          type: "get_view_as_tour_reply",
+          threadId: msg.threadId,
+          tourXml: xml,
+        };
+
+        if (this.statusMessageDestination !== null && this.allowedOrigin !== null) {
+          this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+        }
+      }
+    });
+
+    return true;
+
   }
 
   // Outgoing messages

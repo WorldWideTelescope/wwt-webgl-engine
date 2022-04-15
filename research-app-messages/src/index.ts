@@ -7,12 +7,14 @@ import * as classicPywwt from './classic_pywwt';
 import * as layers from './layers';
 import * as selections from './selections';
 import * as settings from './settings';
+import * as tours from './tours';
 
 export {
   classicPywwt,
   layers,
   selections,
   settings,
+  tours,
 };
 
 /** Information about the current position of the WWT view.
