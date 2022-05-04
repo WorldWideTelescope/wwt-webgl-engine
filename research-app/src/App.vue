@@ -1624,7 +1624,7 @@ export default class App extends WWTAwareComponent {
 
         catalogSettingsMessages.push({
           event: "table_layer_set_multi",
-          id: catalog.name,
+          id: id,
           settings: pywwtLayerSettings.map(s => s[0]),
           values: pywwtLayerSettings.map(s => s[1]),
         });
