@@ -27,6 +27,6 @@ module]. Note that if you are using [TypeScript] (which we strongly encourage),
 some manual futzing of your project files may be necessary to work around some
 issues in the current Vue build infrastructure.
 
-[Vue component]: https://vuejs.org/v2/guide/index.html#Composing-with-Components
+[Vue component]: https://v2.vuejs.org/v2/guide/#Composing-with-Components
 [Vuex module]: https://vuex.vuejs.org/guide/modules.html
 [TypeScript]: https://www.typescriptlang.org/
