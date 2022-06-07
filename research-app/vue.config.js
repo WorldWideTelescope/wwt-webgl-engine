@@ -3,9 +3,9 @@ const path = require('path');
 module.exports = {
   publicPath: "./",
 
-  /* the wwt-ts file is so big and bad that eslint basically takes forever to
-   * run on it. Besides giving it an eslint-disable marker, we seem to need to
-   * set this to get our builds to complete. */
+  // the wwt-ts file is so big and bad that eslint basically takes forever to
+  // run on it. Besides giving it an eslint-disable marker, we seem to need to
+  // set this to get our builds to complete.
   lintOnSave: false,
 
   // The engine-vuex library module must depend directly on Vue to get its types
@@ -20,4 +20,11 @@ module.exports = {
       },
     },
   },
+
+  // Needed for BrowserStack/Safari testing as of 2022 June. This makes the
+  // dev server insecure, but that's OK since we only use it in controlled
+  // circumstances. https://stackoverflow.com/questions/43619644
+  devServer: {
+    disableHostCheck: true
+  }
 };
