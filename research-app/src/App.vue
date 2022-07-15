@@ -1459,7 +1459,7 @@ export default class App extends WWTAwareComponent {
     // to come in a query string
     const messagesAdjList: { [event: string]: string[] | undefined } = {
       "table_layer_create": [ "table_layer_set", "table_layer_set_multi", "table_layer_remove", "table_layer_update", "add_source" ],
-      "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create" ],
+      "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create", "layer_hipscat_load" ],
       "image_layer_create": [ "image_layer_set", "image_layer_set_multi", "image_layer_stretch" ],
       "set_foreground_by_name": [ "set_foreground_opacity" ],
       "layer_hipscat_load": [ "layer_hipscat_datainview", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
