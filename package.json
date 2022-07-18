@@ -15,7 +15,7 @@
     "@types/debounce": "^1.2.0",
     "@types/jsdom": "^16.2.13",
     "@types/vue-color": "^2.4.3",
-    "@types/vue-select": "^3.11.1",
+    "@types/vue-select": "3.16.0",
     "@wwtelescope/astro": "file:astro",
     "@wwtelescope/embed": "file:embed",
     "@wwtelescope/embed-common": "file:embed-common",
