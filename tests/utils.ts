@@ -34,7 +34,7 @@ export async function parseXMLFromUrl(url: string): Promise<Document> {
     return axios.get(url)
         .then(response => response.data)
         .then(text => {
-            return new JSDOM(text).window.document;
+            return new JSDOM(text, { contentType: "text/xml" }).window.document;
         })
         .catch(err => {
             console.log(err);
