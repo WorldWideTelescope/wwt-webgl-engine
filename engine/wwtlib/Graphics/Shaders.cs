@@ -5,6 +5,28 @@ using System.Html;
 
 namespace wwtlib
 {
+    public class ShaderResetter
+    {
+        public static void ResetAllShaders()
+        {
+            SimpleLineShader.initialized = false;
+            SimpleLineShader2D.initialized = false;
+            OrbitLineShader.initialized = false;
+            LineShaderNormalDates.initialized = false;
+            TimeSeriesPointSpriteShader.initialized = false;
+            KeplerPointSpriteShader.initialized = false;
+            EllipseShader.initialized = false;
+            ModelShader.initialized = false;
+            ModelShaderTan.initialized = false;
+            TileShader.initialized = false;
+            FitsShader.initialized = false;
+            ImageShader.initialized = false;
+            ImageShader2.initialized = false;
+            SpriteShader.initialized = false;
+            ShapeSpriteShader.initialized = false;
+            TextShader.initialized = false;
+        }
+    }
 
     public class SimpleLineShader
     {
@@ -87,6 +109,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);
@@ -198,6 +224,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);
@@ -321,6 +351,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);
@@ -475,6 +509,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);
@@ -672,6 +710,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);
@@ -915,6 +957,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);
@@ -2479,6 +2525,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);
@@ -2605,6 +2655,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);
@@ -2736,6 +2790,10 @@ namespace wwtlib
             GL gl = renderContext.gl;
             if (gl != null)
             {
+                if (gl.isContextLost())
+                {
+                    return; // Lost context is further handled by the "webglcontextlost" event
+                }
                 if (!initialized)
                 {
                     Init(renderContext);

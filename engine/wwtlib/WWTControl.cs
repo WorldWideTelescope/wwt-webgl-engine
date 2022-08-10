@@ -396,7 +396,6 @@ namespace wwtlib
 
                     if (Mover.Complete)
                     {
-                        //Todo Notify interested parties that move is complete
                         scriptInterface.FireArrived(Mover.CurrentPosition.RA, Mover.CurrentPosition.Dec, WWTControl.Singleton.RenderContext.ViewCamera.Zoom);
                         Mover = null;
 
@@ -670,7 +669,8 @@ namespace wwtlib
 
                 if (RenderType == ImageSetType.Sky && Settings.Active.ShowSolarSystem)
                 {
-                    Planets.DrawPlanets(RenderContext, 1);
+                    // TODO reactivate planet drawing after they can handle loss of WebGL context
+                    //Planets.DrawPlanets(RenderContext, 1);
 
                     Constellation = Constellations.Containment.FindConstellationForPoint(RenderContext.ViewCamera.RA, RenderContext.ViewCamera.Dec);
 
@@ -1718,6 +1718,30 @@ namespace wwtlib
             return vPickRayDir;
         }
 
+        // WebGL events
+
+        public void OnWebGlContextLost(ElementEvent e){
+            WebGLContextEvent webGlContextEvent = (WebGLContextEvent)(object)e;
+            webGlContextEvent.PreventDefault();
+            Script.Literal("console.log('WebGL context lost: ' + {0})", webGlContextEvent.StatusMessage);
+            // For some unknown reason, the canvas size needs to change (At least as of August 2022) - Otherwise nothing is rendered when the context is restored.
+            // Therefore, size is temporarily set to 0, then back to its original size when the context is restored.
+            Canvas.Height = 0;
+            Canvas.Width = 0;
+            //TODO stop render loop, if RenderOneFrame is triggered from within the engine
+        }
+
+        public void OnWebGlContextRestored(ElementEvent e)
+        {
+            Script.Literal("console.log('Engine: WebGL context restored')");
+            // For some unknown reason, the canvas size needs to change (At least as of August 2022) - Otherwise nothing is rendered when the context is restored.
+            // Therefore, size is temporarily set to 0, then back to its original size when the context is restored.
+            Canvas.Height = Canvas.ParentNode.ClientHeight;
+            Canvas.Width = Canvas.ParentNode.ClientWidth;
+            ShaderResetter.ResetAllShaders();
+            RenderContext.ResetTiles();
+        }
+
         // Initialization
 
         public static ScriptInterface scriptInterface;
@@ -1879,6 +1903,7 @@ namespace wwtlib
             CanvasElement canvas = (CanvasElement) Document.CreateElement("canvas");
             canvas.Height = div.ClientHeight;
             canvas.Width = div.ClientWidth;
+            canvas.ID = DivId + "_wwtEngineCanvas";
             div.AppendChild(canvas);
             return canvas;
         }
@@ -1907,6 +1932,8 @@ namespace wwtlib
             canvas.AddEventListener("pointerdown", OnPointerDown, false);
             canvas.AddEventListener("pointermove", OnPointerMove, false);
             canvas.AddEventListener("pointerup", OnPointerUp, false);
+            canvas.AddEventListener("webglcontextlost", OnWebGlContextLost, false);
+            canvas.AddEventListener("webglcontextrestored", OnWebGlContextRestored, false);
 
             RenderContext.ViewCamera.Lat = startLat;
             RenderContext.ViewCamera.Lng = startLng;

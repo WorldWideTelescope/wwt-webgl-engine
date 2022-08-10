@@ -306,6 +306,43 @@ namespace wwtlib
         }
 
 
+        public void ResetTiles()
+        {
+            ToastTile.ResetStaticVariables();
+            ResetImageset(BackgroundImageset);
+            ResetImageset(ForegroundImageset);
+
+            foreach (Layer layer in LayerManager.AllMaps["Sky"].Layers)
+            {
+                if (layer is ImageSetLayer)
+                {
+                    ResetImageset(((ImageSetLayer)layer).ImageSet);
+                }
+            }
+        }
+
+        private void ResetImageset(Imageset imageset)
+        {
+            if (imageset == null)
+            {
+                return;
+            }
+            int maxX = GetTilesXForLevel(imageset, imageset.BaseLevel);
+            int maxY = GetTilesYForLevel(imageset, imageset.BaseLevel);
+
+            for (int x = 0; x < maxX; x++)
+            {
+                for (int y = 0; y < maxY; y++)
+                {
+                    Tile tile = TileCache.GetTile(imageset.BaseLevel, x, y, imageset, null);
+                    if (tile != null)
+                    {
+                        tile.Reset(this);
+                    }
+                }
+            }
+        }
+
         private List<Imageset> activeCatalogHipsImagesets = new List<Imageset>();
 
         public List<Imageset> CatalogHipsImagesets

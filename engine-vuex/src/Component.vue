@@ -65,6 +65,27 @@ export default class WWTComponent extends Vue {
       this.internalUpdate();
     };
 
+    const wwtcmpt0 = document.getElementById("wwtcmpt0");
+    if (wwtcmpt0 != null){
+      const wwtCanvas = wwtcmpt0.children[0];
+      if (wwtCanvas != null) {
+        wwtCanvas.addEventListener('webglcontextlost', (event) => {
+          const e = event as WebGLContextEvent;
+          console.log("Vue: WebGL context lost: " + e.statusMessage);
+          if (this.renderLoopId !== undefined) {
+            window.cancelAnimationFrame(this.renderLoopId);
+          }
+          e.preventDefault();
+        }, false);
+        wwtCanvas.addEventListener('webglcontextrestored', (event) => {
+          const e = event as WebGLContextEvent;
+          console.log("Vue: WebGL context restored: " + e.statusMessage);
+          render();
+        }, false);
+      }
+
+    }
+
     // Wait for the WWT engine to signal readiness, then wait another tick, then
     // start the rendering loop. This way, if a user wants to do some
     // initialization that has to wait for the ready signal, we won't flash any

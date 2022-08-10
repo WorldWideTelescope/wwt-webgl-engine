@@ -1231,6 +1231,14 @@ namespace wwtlib
                 renderChildPart[i] = BlendState.Create(false, 500);
             }
         }
+
+        public virtual void Reset(RenderContext renderContext)
+        {
+            GeometryCreated = false;
+            //TODO only call makeTexture if texture is ready to be created
+            MakeTexture();
+            //TODO propagate to children
+        }
     }
 
 }

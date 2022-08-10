@@ -706,6 +706,15 @@ namespace System.Html
         public void set(WebGLIntArray array, int offset) { }
     }
 
+    [ScriptIgnoreNamespace]
+    [ScriptImport]
+    public class WebGLContextEvent
+    {
+        [ScriptField]
+        public string StatusMessage { get { return null; } }
+        public void PreventDefault() { return; }
+    }
+
 
     [ScriptIgnoreNamespace]
     [ScriptImport]

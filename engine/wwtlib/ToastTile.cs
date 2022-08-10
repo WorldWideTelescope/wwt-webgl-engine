@@ -490,8 +490,6 @@ namespace wwtlib
             base.CreateGeometry(renderContext);
             if (!subDivided)
             {
-             
-
 
                 if (vertexList == null)
                 {
@@ -891,6 +889,42 @@ namespace wwtlib
 
             DemReady = true;
             return true;
+        }
+
+        public static void ResetStaticVariables()
+        {
+            ClearIndexBuffer(slashIndexBuffer);
+            ClearIndexBuffer(backSlashIndexBuffer);
+            ClearIndexBuffer(rootIndexBuffer);
+        }
+        public override void Reset(RenderContext renderContext)
+        {
+            GeometryCreated = false;
+            subDivided = false;
+            //TODO vertexList is still the same, but a new buffer needs to be created...
+            //Extract creation of new buffer instead of nulling vertexList!
+            vertexList = null; 
+
+            //TODO deal with async requests
+            if (texReady) // TODO deal with FITS 
+            {
+                MakeTexture();
+            }
+
+            foreach (Tile child in children){
+                if (child != null)
+                {
+                    child.Reset(renderContext);
+                }
+            }
+        }
+
+        private static void ClearIndexBuffer(WebGLBuffer[] buffer)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = null;
+            }
         }
     }
 
