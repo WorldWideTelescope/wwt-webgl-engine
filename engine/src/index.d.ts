@@ -750,6 +750,21 @@ export class Folder implements Thumbnail {
   childLoadCallback(callback: Action): void;
 }
 
+export class FolderUp implements Thumbnail {
+  get_name(): string;
+  get_thumbnail(): Thumbnail;
+  set_thumbnail(thumbnail: Thumbnail): Thumbnail;
+  get_thumbnailUrl(): string;
+  set_thumbnailUrl(url: string): string;
+  get_isImage(): boolean;
+  get_isTour(): boolean;
+  get_isFolder(): boolean;
+  get_isCloudCommunityItem(): boolean;
+  get_readOnly(): boolean;
+  get_children(): Thumbnail[] | null;
+  parent: Folder;
+}
+
 /** An simple Version 4 GUID.
  *
  * Note that in WWT, GUID contents are not validated in any way upon creation.
