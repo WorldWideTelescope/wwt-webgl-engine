@@ -411,7 +411,7 @@ namespace wwtlib
             // The tile rendering codepaths require that "Extension" is exactly
             // .fits -- multiple extensions are not currently supported.
 
-            bool isNonhipsTiledFits =
+            bool isNonHipsTiledFits =
                 imageset.Extension == ".fits" &&
                 layer.GetFitsImage() == null &&
                 imageset.Projection != ProjectionType.Healpix;
@@ -437,7 +437,7 @@ namespace wwtlib
             // the callback argument gets fired at the right time for such
             // datasets.
 
-            if (isNonhipsTiledFits) {
+            if (isNonHipsTiledFits) {
                 imageset.FitsProperties.OnMainImageLoaded = delegate (FitsImage image) {
                     image.ApplyDisplaySettings();
                     if (callback != null) {
@@ -450,7 +450,7 @@ namespace wwtlib
 
             // For everything not yet handled, just trigger the callback now, if
             // needed.
-            if (callback != null && !isNonhipsTiledFits) {
+            if (callback != null && (!isNonHipsTiledFits || imageset.FitsProperties.MainImageLoadedEventHasFired)) {
                 callback(layer);
             }
 

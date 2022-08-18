@@ -46,6 +46,7 @@ namespace wwtlib
         // suffices. The tiling framework already uses WcsLoaded so for that
         // case we need to add this extra hook.
         public Action<FitsImage> OnMainImageLoaded = null;
+        public bool MainImageLoadedEventHasFired = false;
 
         public FitsProperties()
         {
@@ -56,7 +57,8 @@ namespace wwtlib
         // data have loaded and these FitsProperties can be trusted.
         internal void FireMainImageLoaded(FitsImage image)
         {
-            if (OnMainImageLoaded != null) {
+            if (OnMainImageLoaded != null && !MainImageLoadedEventHasFired) {
+                MainImageLoadedEventHasFired = true;
                 OnMainImageLoaded(image);
             }
         }
