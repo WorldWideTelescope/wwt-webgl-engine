@@ -835,6 +835,10 @@ class TableLayerMessageHandler {
         }
       } else {
         this.owner.deleteLayer(this.internalId);
+        if (this.layer !== null) {
+          const info = new SpreadSheetLayerInfo(this.layer.id.toString(), this.layer.get_referenceFrame(), this.layer.get_name());
+          this.owner.removeResearchAppTableLayer(info);
+        }
         this.internalId = null;
         this.created = false;
       }
