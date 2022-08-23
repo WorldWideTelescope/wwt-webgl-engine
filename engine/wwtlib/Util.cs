@@ -105,8 +105,8 @@ namespace wwtlib
 
             if (parts.Length == 3)
             {
-                val += int.Parse(parts[0]) * 36000000;
-                val += int.Parse(parts[1]) * 600000;
+                val += int.Parse(parts[0]) * 3600000;
+                val += int.Parse(parts[1]) * 60000;
                 val += (int)(double.Parse(parts[2]) * 1000);
             }
             return val;
