@@ -1718,6 +1718,28 @@ namespace wwtlib
             return vPickRayDir;
         }
 
+        public Vector2d TransformWorldPointToPickSpace(Vector3d worldPoint, double backBufferWidth, double backBufferHeight)
+        {
+            Matrix3d m = Matrix3d.MultiplyMatrix(RenderContext.View, RenderContext.World);
+            m.Invert();
+            m.Transpose();
+            Vector2d p = new Vector2d();
+            double vz = worldPoint.X * m.M13 + worldPoint.Y * m.M23 + worldPoint.Z * m.M33;
+            double vx = (worldPoint.X * m.M11 + worldPoint.Y * m.M21 + worldPoint.Z * m.M31) / vz;
+            double vy = (worldPoint.X * m.M12 + worldPoint.Y * m.M22 + worldPoint.Z * m.M32) / vz;
+            p.X = Math.Round((1 + RenderContext.Projection.M11 * vx) * (backBufferWidth / 2));
+            p.Y = Math.Round((1 + RenderContext.Projection.M22 * vy) * (backBufferHeight / 2));
+            return p;
+        }
+
+        public Vector2d GetScreenPointForCoordinates(double ra, double dec)
+        {
+            Vector2d pt = Vector2d.Create(ra, dec);
+            Vector3d cartesian = Coordinates.SphericalSkyToCartesian(pt);
+            Vector2d result = TransformWorldPointToPickSpace(cartesian, RenderContext.Width, RenderContext.Height);
+            return result;
+        }
+
         // Initialization
 
         public static ScriptInterface scriptInterface;
