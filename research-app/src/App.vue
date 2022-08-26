@@ -3,9 +3,9 @@
     <WorldWideTelescope
       :wwt-namespace="wwtComponentNamespace"
       :class="['wwt', { pointer: this.lastClosePt !== null }]"
-      @mousemove.native="wwtOnMouseMove"
-      @mouseup.native="wwtOnMouseUp"
-      @mousedown.native="wwtOnMouseDown"
+      @pointermove.native="wwtOnPointerMove"
+      @pointerup.native="wwtOnPointerUp"
+      @pointerdown.native="wwtOnPointerDown"
     ></WorldWideTelescope>
 
     <!-- keydown.stops here and below prevent any keynav presses from reaching
@@ -398,6 +398,8 @@ import {
   settings,
   tours,
   ApplicationStateMessage,
+  PointerMoveMessage,
+  PointerUpMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
 
@@ -1984,7 +1986,26 @@ export default class App extends WWTAwareComponent {
     return false;
   }
 
-  wwtOnMouseMove(event: MouseEvent) {
+  wwtOnPointerMove(event: PointerEvent) {
+    // We would like to catch drag operations over wwt. Unfortunately we cannot
+    // detect whether the primary button is pressed when the pointer move event
+    // reaches us, because the ponterdown event can be triggered outside wwt.
+    // Instead we check whether 1 button is pressed, and assumes that the
+    // pressed button is the primary button.
+    if (event.buttons == 1){
+      const message: PointerMoveMessage = {
+        type: "wwt_pointer_move",
+        clientX: event.clientX,
+        clientY: event.clientY,
+        sessionId: this.statusMessageSessionId,
+      };
+      if (this.statusMessageDestination != null && this.allowedOrigin != null){
+        // NB: if we start allowing messages to go out to more destinations, we'll
+        // need to become smarter about allowedOrigin here.
+        this.statusMessageDestination.postMessage(message, this.allowedOrigin);
+      }
+    }
+    
     if (this.spreadsheetLayers.length == 0) {
       return;
     }
@@ -2006,11 +2027,22 @@ export default class App extends WWTAwareComponent {
     this.isMouseMoving = true;
   }
 
-  wwtOnMouseDown(_event: MouseEvent) {
+  wwtOnPointerDown(_event: PointerEvent) {
     this.isMouseMoving = false;
   }
 
-  wwtOnMouseUp(_event: MouseEvent) {
+  wwtOnPointerUp(_event: PointerEvent) {
+    const message: PointerUpMessage = {
+      type: "wwt_pointer_up",
+      clientX: _event.clientX,
+      clientY: _event.clientY,
+      sessionId: this.statusMessageSessionId,
+    };
+    if (this.statusMessageDestination != null && this.allowedOrigin != null){
+      // NB: if we start allowing messages to go out to more destinations, we'll
+      // need to become smarter about allowedOrigin here.
+      this.statusMessageDestination.postMessage(message, this.allowedOrigin);
+    }
     if (!this.isMouseMoving && this.lastClosePt !== null) {
       const source = this.sourceCreator(this.lastClosePt);
       this.addSource(source);
