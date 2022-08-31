@@ -1722,11 +1722,11 @@ namespace wwtlib
         {
             Matrix3d m = Matrix3d.MultiplyMatrix(RenderContext.View, RenderContext.World);
             m.Invert();
-            m.Transpose();
+
             Vector2d p = new Vector2d();
-            double vz = worldPoint.X * m.M13 + worldPoint.Y * m.M23 + worldPoint.Z * m.M33;
-            double vx = (worldPoint.X * m.M11 + worldPoint.Y * m.M21 + worldPoint.Z * m.M31) / vz;
-            double vy = (worldPoint.X * m.M12 + worldPoint.Y * m.M22 + worldPoint.Z * m.M32) / vz;
+            double vz = worldPoint.X * m.M31 + worldPoint.Y * m.M32 + worldPoint.Z * m.M33;
+            double vx = (worldPoint.X * m.M11 + worldPoint.Y * m.M12 + worldPoint.Z * m.M13) / vz;
+            double vy = (worldPoint.X * m.M21 + worldPoint.Y * m.M22 + worldPoint.Z * m.M23) / vz;
             p.X = Math.Round((1 + RenderContext.Projection.M11 * vx) * (backBufferWidth / 2));
             p.Y = Math.Round((1 + RenderContext.Projection.M22 * vy) * (backBufferHeight / 2));
             return p;
