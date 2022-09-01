@@ -358,6 +358,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as moment from "moment";
