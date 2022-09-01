@@ -1,5 +1,17 @@
 # rc: minor bump
 
+- Implement functionality to export the current view as a tour if request (#190,
+  @Carifio24). This isn't exposed in the user interface, for now, but
+  (re-)enables tour export in pywwt.
+- Emit new pointer movement messages, allowing containing applications (i.e.,
+  the WWT JupyterLab extension) to properly handle drag-and-drop across the WWT
+  embed (#205, @imbasimba).
+- Fix state restoration for HiPS catalogs (#191, #197, @Carifio24).
+- Fix API-based removal of non-HiPS catalog/table layers (#203, @Carifio24).
+
+
+# @wwtelescope/research-app 0.10.0 (2022-04-05)
+
 - Get support for FITS TOAST rendering from the latest engine (#181, @imbasimba)
 - Support programmatic control of whether catalog items are selectable
   (clickable) in the UI (#183, @Carifio24). The click testing was slowing down

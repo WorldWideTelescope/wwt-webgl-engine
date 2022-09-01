@@ -34,8 +34,8 @@
     "@wwtelescope/engine": "thiscommit:2022-04-04:M9auxuE",
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/engine-vuex": "thiscommit:2022-03-31:gjy510R",
-    "@wwtelescope/research-app-messages": "thiscommit:2022-04-04:UtNLrm9"
+    "@wwtelescope/engine-vuex": "b5a52a3815184a9b4d470bdd4e653f2fe819beb4",
+    "@wwtelescope/research-app-messages": "7e45dc1635eddfba744cc4ae924b10ae89fd3473"
   },
   "keywords": [
     "AAS WorldWide Telescope"

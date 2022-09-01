@@ -329,6 +329,7 @@ export class WWTAwareComponent extends Vue {
       ...mapGetters([
         "activeImagesetLayerStates",
         "findRADecForScreenPoint",
+        "findScreenPointForRADec",
         "imagesetForLayer",
         "imagesetStateForLayer",
         "layerForHipsCatalog",
@@ -358,6 +359,7 @@ export class WWTAwareComponent extends Vue {
         "loadFitsLayer",
         "addImageSetLayer",
         "loadTour",
+        "viewAsTourXml",
         "waitForReady",
       ]),
       ...mapMutations([
@@ -600,6 +602,9 @@ export class WWTAwareComponent extends Vue {
   /** Get the right ascension and declination, in degrees, for x, y coordinates on the screen */
   findRADecForScreenPoint!: (pt: { x: number; y: number }) => { ra: number; dec: number };
 
+  /** Given an RA and Dec position, return the x, y coordinates of the screen point */
+  findScreenPointForRADec!: (pt: { ra: number; dec: number }) => { x: number; y: number };
+
   /** Get the actual WWT `SpreadSheetLayer` for the table layer with the given ID.
    *
    * Do not use this function for UI purposes -- the WWT layer object is not
@@ -765,15 +770,15 @@ export class WWTAwareComponent extends Vue {
    */
   setupForImageset!: (o: SetupForImagesetOptions) => void;
 
-    /** Get reactive `SpreadSheetLayer` settings for the table layer with the given ID.
-   *
-   * The returned data structure is a component of the app's Vuex state. You can
-   * therefore use the settings to construct UI elements, and they will update
-   * reactively as the state evolves. The actual data structures used by WWT are
-   * separate, but the two mirror each other.
-   *
-   * @param id The identifier of the table layer.
-   */
+  /** Get reactive `SpreadSheetLayer` settings for the table layer with the given ID.
+ *
+ * The returned data structure is a component of the app's Vuex state. You can
+ * therefore use the settings to construct UI elements, and they will update
+ * reactively as the state evolves. The actual data structures used by WWT are
+ * separate, but the two mirror each other.
+ *
+ * @param id The identifier of the table layer.
+ */
   spreadsheetStateById!: (id: string) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   /** Get reactive `SpreadSheetLayer` settings for the named HiPS catalog.
@@ -787,7 +792,7 @@ export class WWTAwareComponent extends Vue {
    */
   spreadsheetStateForHipsCatalog!: (name: string) => SpreadSheetLayerSettingsInterfaceRO | null;
 
-  /** Get reactive `SpreadSheetLayer` settings for the table layer corresponding to 
+  /** Get reactive `SpreadSheetLayer` settings for the table layer corresponding to
    * the given CatalogLayerInfo.
    *
    * The returned data structure is a component of the app's Vuex state. You can
@@ -797,7 +802,7 @@ export class WWTAwareComponent extends Vue {
    *
    * @param catalog A CatalogLayerInfo object corresponding to the layer.
    */
-    spreadsheetState!: (catalog: CatalogLayerInfo) => SpreadSheetLayerSettingsInterfaceRO | null;
+  spreadsheetState!: (catalog: CatalogLayerInfo) => SpreadSheetLayerSettingsInterfaceRO | null;
 
   /** Start playback of the currently loaded tour.
    *
@@ -903,6 +908,8 @@ export class WWTAwareComponent extends Vue {
   */
   loadTour!: (o: LoadTourParams) => Promise<void>;
 
+  viewAsTourXml!: () => Promise<string | null>;
+
   /** Wait for the WWT engine to become ready for usage.
    *
    * You should invoke this action and wait for is completion before trying to
@@ -911,4 +918,5 @@ export class WWTAwareComponent extends Vue {
    * some supporting data files.
    */
   waitForReady!: () => Promise<void>;
+
 }

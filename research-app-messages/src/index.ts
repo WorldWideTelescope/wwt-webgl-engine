@@ -7,12 +7,14 @@ import * as classicPywwt from './classic_pywwt';
 import * as layers from './layers';
 import * as selections from './selections';
 import * as settings from './settings';
+import * as tours from './tours';
 
 export {
   classicPywwt,
   layers,
   selections,
   settings,
+  tours,
 };
 
 /** Information about the current position of the WWT view.
@@ -180,5 +182,74 @@ export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-dis
   return typeof o.type === "string" &&
     o.type == "wwt_ping_pong" &&
     typeof o.threadId === "string" &&
+    (o.sessionId === undefined || typeof o.sessionId === "string");
+}
+
+
+/** A message sent by the app to enable drag operations over the app. The
+ * message is triggered when the pointer moves over the app with any button
+ * pressed.
+ * */
+export interface PointerMoveMessage {
+  /** The tag identifying this message type. */
+  type: "wwt_pointer_move";
+
+  /** The clientX property of the originating pointer move event. */
+  clientX: number;
+
+  /** The clientY property of the originating pointer move event. */
+  clientY: number;
+
+  /** An app/client session identifier.
+   *
+   * If a single client is communicating with multiple apps, it needs to be able
+   * to tell which app is the source of any update messages. This session
+   * identifier allows clients to do so. The default value is "default". But if
+   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * that value will start appearing in these view state update messages.
+   */
+  sessionId?: string;
+}
+
+/** Type guard function for [[PointerMoveMessage]]. */
+export function isPointerMoveMessage(o: any): o is PointerMoveMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return typeof o.type === "string" &&
+    o.type == "wwt_pointer_move" &&
+    typeof o.clientX === "number" &&
+    typeof o.clientY === "number" &&
+    (o.sessionId === undefined || typeof o.sessionId === "string");
+}
+
+
+/** A message sent by the app to enable drag operations over the app. The
+ * message is triggered when the pointerup event is triggered within the app.
+ * */
+export interface PointerUpMessage {
+  /** The tag identifying this message type. */
+  type: "wwt_pointer_up";
+
+  /** The clientX property of the originating pointer up event. */
+  clientX: number;
+
+  /** The clientY property of the originating pointer up event. */
+  clientY: number;
+
+  /** An app/client session identifier.
+   *
+   * If a single client is communicating with multiple apps, it needs to be able
+   * to tell which app is the source of any update messages. This session
+   * identifier allows clients to do so. The default value is "default". But if
+   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * that value will start appearing in these view state update messages.
+   */
+  sessionId?: string;
+}
+
+/** Type guard function for [[PointerUpMessage]]. */
+export function isPointerUpMessage(o: any): o is PointerUpMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return typeof o.type === "string" &&
+    o.type == "wwt_pointer_up" &&
+    typeof o.clientX === "number" &&
+    typeof o.clientY === "number" &&
     (o.sessionId === undefined || typeof o.sessionId === "string");
 }

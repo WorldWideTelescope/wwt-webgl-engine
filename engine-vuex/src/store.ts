@@ -111,7 +111,7 @@ export class ImagesetInfo {
    */
   extension: string;
 
-  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string, id: string | null =  null) {
+  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string, id: string | null = null) {
     this.url = url;
     this.name = name;
     this.type = type;
@@ -506,6 +506,14 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     }
   }
 
+  get findScreenPointForRADec() {
+    return function (pt: { ra: number; dec: number }): { x: number; y: number } {
+      if (Vue.$wwt.inst === null)
+        throw new Error('cannot findScreenPointForRADec without linking to WWTInstance');
+      return Vue.$wwt.inst.ctl.getScreenPointForCoordinates(pt.ra / 15, pt.dec);
+    }
+  }
+
   @Mutation
   internalLinkToInstance(wwt: WWTInstance): void {
     Vue.$wwt.link(wwt);
@@ -879,6 +887,28 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   @Action({ rawError: true })
+  async viewAsTourXml(name: string): Promise<string | null> {
+    WWTControl.singleton.createTour(name || "");
+    const editor = WWTControl.singleton.tourEdit;
+    editor.addSlide(false);
+    const tour = editor.get_tour();
+    if (tour === null) {
+      return new Promise((resolve, _reject) => resolve(null));
+    }
+    const blob = tour.saveToBlob();
+    const reader = new FileReader();
+    reader.readAsText(blob);
+
+    let tourXml = "";
+    return new Promise((resolve, _reject) => {
+      reader.onloadend = () => {
+        tourXml += reader.result;
+        resolve(tourXml);
+      }
+    });
+  }
+
+  @Action({ rawError: true })
   async addImageSetLayer(
     options: AddImageSetLayerOptions
   ): Promise<ImageSetLayer> {
@@ -1053,7 +1083,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return function (name: string): SpreadSheetLayer | null {
       if (Vue.$wwt.inst === null)
         throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
-      
+
       const id = Guid.createFrom(name).toString();
       return spreadSheetLayerByKey(id);
     }
@@ -1070,7 +1100,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   get spreadSheetLayerById() {
-    return function(id: string): SpreadSheetLayer | null {
+    return function (id: string): SpreadSheetLayer | null {
       return spreadSheetLayerByKey(id);
     }
   }

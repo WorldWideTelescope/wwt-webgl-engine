@@ -1,5 +1,13 @@
 # rc: minor bump
 
+- Add `PointerMoveMessage` and `PointerUpMessage` to help the JupyterLab
+  extension fix drag-and-drop across WWT (#205, @imbasimba)
+- Add `GetViewAsTourMessage` and `GetViewAsTourReply` to help the research app
+  provide a way to export tours (#190, @Carifio24)
+
+
+# @wwtelescope/research-app-messages 0.14.0 (2022-04-05)
+
 - Add messages to allow programmatic control of whether catalog items are
   selectable (clickable) in the app UI (#183, @Carifio24). They are
   `ModifySelectabilityMessage` and `ModifyAllSelectabilityMessage`. The click

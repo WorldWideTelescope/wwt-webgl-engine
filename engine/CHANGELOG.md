@@ -1,5 +1,22 @@
 # rc: minor bump
 
+- Add interfaces to get the screen point for given spatial coordinates (#206,
+  @Carifio24). The primary intended use here is to improve interactive selection
+  of catalog items in the UI.
+- Fix some incorrect time-span parsing that was causing incorrect tour durations
+  (#54, #204, @Carifio24).
+- Properly trigger the `AddImageSetLayer` callback when adding a layer, even if
+  it was loaded previously (#202, @imbasimba).
+- Expose the `FolderUp` class to TypeScript, used for WTML folder navigation
+  in our custom collection explorer apps (#201, @Carifio24).
+- Fix loading of VOTable layers in tours (#193, @Carifio24).
+- Expose some tour-related functionality from the engine to TypeScript (#190,
+  @Carifio24). This supports the functionality for the research app to export
+  tours.
+
+
+# @wwtelescope/engine 7.16.0 (2022-04-05)
+
 - Add support for FITS TOAST rendering! (#181, @imbasimba). There aren't yet any
   such datasets out in the wild, but we’ll work on tools to create them. This
   change actually *reduced* the number of lines of code because it consolidated

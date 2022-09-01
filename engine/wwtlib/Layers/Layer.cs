@@ -560,6 +560,9 @@ namespace wwtlib
                 case "OrbitLayer":
                     newLayer = new OrbitLayer();
                     break;
+                case "VoTableLayer":
+                    newLayer = new VoTableLayer();
+                    break;
                 default:
                     return null;
             }
