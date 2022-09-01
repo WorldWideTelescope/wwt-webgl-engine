@@ -2616,6 +2616,9 @@ export class WWTControl {
   /** Given x and y coordinates on the screen, returns the RA and Dec */
   getCoordinatesForScreenPoint(x: number, y: number): { x: number; y: number };
 
+  /** Given RA and Dec, return the x and y coordinates of the corresponding screen point */
+  getScreenPointForCoordinates(ra: number, dec: number): { x: number; y: number };
+
   /** Start loading the tour stored at the specified URL.
    *
    * When loading is complete, a `tourReady` event will be issued, which you can

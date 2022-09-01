@@ -329,6 +329,7 @@ export class WWTAwareComponent extends Vue {
       ...mapGetters([
         "activeImagesetLayerStates",
         "findRADecForScreenPoint",
+        "findScreenPointForRADec",
         "imagesetForLayer",
         "imagesetStateForLayer",
         "layerForHipsCatalog",
@@ -600,6 +601,9 @@ export class WWTAwareComponent extends Vue {
 
   /** Get the right ascension and declination, in degrees, for x, y coordinates on the screen */
   findRADecForScreenPoint!: (pt: { x: number; y: number }) => { ra: number; dec: number };
+
+  /** Given an RA and Dec position, return the x, y coordinates of the screen point */
+  findScreenPointForRADec!: (pt:  { ra: number; dec: number }) => { x: number; y: number };
 
   /** Get the actual WWT `SpreadSheetLayer` for the table layer with the given ID.
    *
