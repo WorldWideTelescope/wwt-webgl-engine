@@ -1,3 +1,11 @@
+# @wwtelescope/engine-vuex 0.15.0 (2022-09-01)
+
+- Expose new world-to-screen interfaces into the Vue(x) framework (#206,
+  @Carifio24).
+- Expose new engine hooks for tour export into the Vue(x) framework (#190,
+  @Carifio24).
+
+
 # @wwtelescope/engine-vuex 0.14.0 (2022-04-01)
 
 - We now expose the internal layer GUID for progressive HiPS catalog imagesets

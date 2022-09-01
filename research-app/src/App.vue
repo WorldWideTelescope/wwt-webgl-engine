@@ -3,9 +3,9 @@
     <WorldWideTelescope
       :wwt-namespace="wwtComponentNamespace"
       :class="['wwt', { pointer: this.lastClosePt !== null }]"
-      @mousemove.native="wwtOnMouseMove"
-      @mouseup.native="wwtOnMouseUp"
-      @mousedown.native="wwtOnMouseDown"
+      @pointermove.native="wwtOnPointerMove"
+      @pointerup.native="wwtOnPointerUp"
+      @pointerdown.native="wwtOnPointerDown"
     ></WorldWideTelescope>
 
     <!-- keydown.stops here and below prevent any keynav presses from reaching
@@ -75,7 +75,8 @@
                         showPopover = false;
                       "
                       tabindex="0"
-                      ><font-awesome-icon icon="mountain" /> Choose background</a
+                      ><font-awesome-icon icon="mountain" /> Choose
+                      background</a
                     >
                   </li>
                   <li v-show="showAddImageryTool">
@@ -87,7 +88,8 @@
                         showPopover = false;
                       "
                       tabindex="0"
-                      ><font-awesome-icon icon="image" /> Add imagery as layer</a
+                      ><font-awesome-icon icon="image" /> Add imagery as
+                      layer</a
                     >
                   </li>
                   <li v-show="showCatalogTool">
@@ -125,7 +127,9 @@
                         showPopover = false;
                       "
                       tabindex="0"
-                    ><font-awesome-icon icon="save" /> Create link to current view</a>
+                      ><font-awesome-icon icon="save" /> Create link to current
+                      view</a
+                    >
                   </li>
                 </ul>
               </template>
@@ -198,7 +202,9 @@
                   <template #option="option">
                     <div class="item-option">
                       <h4 class="ellipsize">{{ option.name }}</h4>
-                      <p class="ellipsize"><em>{{ option.description }}</em></p>
+                      <p class="ellipsize">
+                        <em>{{ option.description }}</em>
+                      </p>
                     </div>
                   </template>
                   <template #selected-option="option">
@@ -225,7 +231,9 @@
                   <template #option="option">
                     <div class="item-option">
                       <h4 class="ellipsize">{{ option.name }}</h4>
-                      <p class="ellipsize"><em>{{ option.description }}</em></p>
+                      <p class="ellipsize">
+                        <em>{{ option.description }}</em>
+                      </p>
                     </div>
                   </template>
                   <template #selected-option="option">
@@ -236,14 +244,19 @@
                       No datasets matching <em>{{ search }}</em
                       >.
                     </template>
-                    <em v-else>No datasets available. Load a WTML collection?</em>
+                    <em v-else
+                      >No datasets available. Load a WTML collection?</em
+                    >
                   </template>
                 </v-select>
               </div>
             </template>
 
             <template v-else-if="showCatalogChooser">
-              <div id="catalog-select-container-tool" class="item-select-container">
+              <div
+                id="catalog-select-container-tool"
+                class="item-select-container"
+              >
                 <span class="item-select-title">Add catalog:</span>
                 <v-select
                   id="catalog-select-tool"
@@ -259,7 +272,9 @@
                   <template #option="option">
                     <div class="item-option">
                       <h4 class="ellipsize">{{ option.name }}</h4>
-                      <p class="ellipsize"><em>{{ option.description }}</em></p>
+                      <p class="ellipsize">
+                        <em>{{ option.description }}</em>
+                      </p>
                     </div>
                   </template>
                   <template #selected-option-container="">
@@ -298,13 +313,15 @@
                 </div>
               </div>
             </template>
-            
+
             <template v-else-if="currentTool == 'save-state'">
               <div class="save-state-container">
-                <label class="save-state-title">The current view can be restored using:</label>
+                <label class="save-state-title"
+                  >The current view can be restored using:</label
+                >
                 <div class="save-state-content">
                   <span class="save-state-url">
-                  {{ this.stateAsUrl() }}
+                    {{ this.stateAsUrl() }}
                   </span>
                   <font-awesome-icon
                     icon="copy"
@@ -341,6 +358,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as moment from "moment";
@@ -366,18 +384,14 @@ interface Message {
 import {
   Annotation,
   Circle,
-  CircleAnnotationSetting,
   Color,
   Guid,
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
   Poly,
-  PolyAnnotationSetting,
   PolyLine,
-  PolyLineAnnotationSetting,
   SpreadSheetLayer,
-  SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
 
 import {
@@ -392,7 +406,12 @@ import {
   isPolyLineAnnotationSetting,
 } from "@wwtelescope/engine-helpers";
 
-import { WWTAwareComponent, CatalogLayerInfo, ImagesetInfo, SpreadSheetLayerInfo } from "@wwtelescope/engine-vuex";
+import {
+  WWTAwareComponent,
+  CatalogLayerInfo,
+  ImagesetInfo,
+  SpreadSheetLayerInfo,
+} from "@wwtelescope/engine-vuex";
 
 import {
   classicPywwt,
@@ -400,7 +419,10 @@ import {
   layers,
   selections,
   settings,
+  tours,
   ApplicationStateMessage,
+  PointerMoveMessage,
+  PointerUpMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
 
@@ -409,9 +431,16 @@ import {
   convertSpreadSheetLayerSetting,
 } from "./settings";
 import { extractImageSetLayerSettings } from "@wwtelescope/engine-helpers/src/imagesetlayer";
-import { isSpreadSheetLayerSetting, SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
-import { isLoadImageCollectionCompletedMessage, isLoadImageCollectionMessage, PywwtSpreadSheetLayerSetting } from "@wwtelescope/research-app-messages/dist/classic_pywwt";
-import { isLoadHipsCatalogCompletedMessage, isLoadHipsCatalogMessage } from "@wwtelescope/research-app-messages/dist/layers";
+import { SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
+import {
+  isLoadImageCollectionCompletedMessage,
+  isLoadImageCollectionMessage,
+  PywwtSpreadSheetLayerSetting,
+} from "@wwtelescope/research-app-messages/dist/classic_pywwt";
+import {
+  isLoadHipsCatalogCompletedMessage,
+  isLoadHipsCatalogMessage,
+} from "@wwtelescope/research-app-messages/dist/layers";
 import { extractCircleAnnotationSettings } from "@wwtelescope/engine-helpers/src/circleannotation";
 import { extractPolyAnnotationSettings } from "@wwtelescope/engine-helpers/src/polyannotation";
 import { extractPolyLineAnnotationSettings } from "@wwtelescope/engine-helpers/src/polylineannotation";
@@ -591,7 +620,6 @@ class ImageSetLayerMessageHandler {
   }
 
   handleMultiModifyMessage(msg: layers.MultiModifyFitsLayerMessage) {
-
     if (!layers.isMultiModifyFitsLayerMessage(msg)) return;
     if (msg.settings.length !== msg.values.length) return;
 
@@ -604,7 +632,7 @@ class ImageSetLayerMessageHandler {
     }
 
     if (this.internalId === null) {
-      layerSettings.forEach(setting => this.queuedSettings.push(setting));
+      layerSettings.forEach((setting) => this.queuedSettings.push(setting));
     } else {
       this.owner.applyFitsLayerSettings({
         id: this.internalId,
@@ -646,7 +674,8 @@ class TableLayerMessageHandler {
   private queuedUpdate: classicPywwt.UpdateTableLayerMessage | null = null;
   private queuedSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
   private queuedRemoval: classicPywwt.RemoveTableLayerMessage | null = null;
-  private queuedSelectability: selections.ModifySelectabilityMessage | null = null;
+  private queuedSelectability: selections.ModifySelectabilityMessage | null =
+    null;
 
   constructor(owner: App) {
     this.owner = owner;
@@ -665,8 +694,13 @@ class TableLayerMessageHandler {
       })
       .then((layer) => {
         this.layerInitialized(layer);
-        this.owner.addResearchAppTableLayer(new SpreadSheetLayerInfo(layer.id.toString(), layer.get_referenceFrame(), layer.get_name()));
-        
+        this.owner.addResearchAppTableLayer(
+          new SpreadSheetLayerInfo(
+            layer.id.toString(),
+            layer.get_referenceFrame(),
+            layer.get_name()
+          )
+        );
       });
 
     this.created = true;
@@ -761,13 +795,11 @@ class TableLayerMessageHandler {
   }
 
   handleMultiModifyMessage(msg: layers.MultiModifyTableLayerMessage) {
-
     if (!layers.isMultiModifyTableLayerMessage(msg)) return;
     if (msg.settings.length !== msg.values.length) return;
 
     const layer = this.owner.spreadSheetLayerById(msg.id);
     if (layer) {
-      
       const pywwtSettings: PywwtSpreadSheetLayerSetting[] = [];
       for (const [index, option] of msg.settings.entries()) {
         const setting: [string, any] = [option, msg.values[index]];
@@ -777,11 +809,11 @@ class TableLayerMessageHandler {
       }
 
       if (this.internalId === null) {
-        pywwtSettings.forEach(setting => this.queuedSettings.push(setting));
+        pywwtSettings.forEach((setting) => this.queuedSettings.push(setting));
       } else {
-        const layerSettings = pywwtSettings.flatMap(s => {
-         const pywwtSetting = convertPywwtSpreadSheetLayerSetting(s, layer);
-         return pywwtSetting ? [pywwtSetting] : []
+        const layerSettings = pywwtSettings.flatMap((s) => {
+          const pywwtSetting = convertPywwtSpreadSheetLayerSetting(s, layer);
+          return pywwtSetting ? [pywwtSetting] : [];
         });
         this.owner.applyTableLayerSettings({
           id: this.internalId,
@@ -838,6 +870,14 @@ class TableLayerMessageHandler {
         }
       } else {
         this.owner.deleteLayer(this.internalId);
+        if (this.layer !== null) {
+          const info = new SpreadSheetLayerInfo(
+            this.layer.id.toString(),
+            this.layer.get_referenceFrame(),
+            this.layer.get_name()
+          );
+          this.owner.removeResearchAppTableLayer(info);
+        }
         this.internalId = null;
         this.created = false;
       }
@@ -852,11 +892,11 @@ class TableLayerMessageHandler {
         this.queuedSelectability = msg;
       }
     } else {
-      const layer = this.owner.spreadsheetLayers.find(x => x.name === msg.id);
+      const layer = this.owner.spreadsheetLayers.find((x) => x.name === msg.id);
       if (layer !== undefined) {
         this.owner.setResearchAppTableLayerSelectability({
           layer: layer,
-          selectable: msg.selectable
+          selectable: msg.selectable,
         });
       }
     }
@@ -1213,7 +1253,7 @@ export default class App extends WWTAwareComponent {
         "addResearchAppTableLayer",
         "addSource",
         "removeResearchAppTableLayer",
-        "setResearchAppTableLayerSelectability"
+        "setResearchAppTableLayerSelectability",
       ]),
     };
   }
@@ -1229,7 +1269,6 @@ export default class App extends WWTAwareComponent {
     }
 
     this.waitForReady().then(() => {
-
       const script = this.getQueryScript(window.location);
       if (script !== null) {
         this.statusMessageDestination = window;
@@ -1237,14 +1276,16 @@ export default class App extends WWTAwareComponent {
 
       // This returns a promise but I don't think that we need to wait for that
       // to resolve before going ahead and starting to listen for messages.
-      this.loadImageCollection({ url: this.hipsUrl, loadChildFolders: true })
-        .then(() => {
-          // Handle the query script
-          // We (potentially) need the catalogs to have finished loading for this
-          if (script !== null) {
-            this.handleQueryScript(script);
-          }
-        });
+      this.loadImageCollection({
+        url: this.hipsUrl,
+        loadChildFolders: true,
+      }).then(() => {
+        // Handle the query script
+        // We (potentially) need the catalogs to have finished loading for this
+        if (script !== null) {
+          this.handleQueryScript(script);
+        }
+      });
 
       // Don't start listening for messages until the engine is ready to go.
       // There's no point in returning a "not ready yet" error or anything since
@@ -1381,7 +1422,6 @@ export default class App extends WWTAwareComponent {
         this.doMove(this._kcs.bigMoveFactor * -this._kcs.moveAmount, 0)
       )
     );
-
   }
 
   destroyed() {
@@ -1396,7 +1436,7 @@ export default class App extends WWTAwareComponent {
   }
 
   parseFloatParam(param: string | (string | null)[], fallback: number): number {
-    if (typeof param === 'string') {
+    if (typeof param === "string") {
       const value = parseFloat(param);
       return value || fallback;
     }
@@ -1404,12 +1444,12 @@ export default class App extends WWTAwareComponent {
   }
 
   encodeObjectBase64(obj: object): string {
-    return Buffer.from(JSON.stringify(obj)).toString('base64');
+    return Buffer.from(JSON.stringify(obj)).toString("base64");
   }
 
   decodeObjectBase64(data: string): object {
     try {
-      return JSON.parse(Buffer.from(data, 'base64').toString());
+      return JSON.parse(Buffer.from(data, "base64").toString());
     } catch (error) {
       console.warn(`Error parsing messages: ${error}`);
       return {};
@@ -1424,7 +1464,10 @@ export default class App extends WWTAwareComponent {
     for (let i = 0; i < names.length; i++) {
       const name = names[i];
       const value = values[i];
-      if ((name === 'beginRange' || name === 'endRange') && typeof value === 'string') {
+      if (
+        (name === "beginRange" || name === "endRange") &&
+        typeof value === "string"
+      ) {
         values[i] = new Date(value);
       }
     }
@@ -1435,19 +1478,19 @@ export default class App extends WWTAwareComponent {
       return null;
     }
     const query = new URLSearchParams(location.search);
-    return query.get('script');
+    return query.get("script");
   }
 
   handleQueryScript(script: string): void {
-
     const messageStrings = script.split(",");
-    const messages: Message[] = messageStrings.map(str => this.decodeObjectBase64(str))
-                                    .filter((obj): obj is Message => "event" in obj || "type" in obj);
+    const messages: Message[] = messageStrings
+      .map((str) => this.decodeObjectBase64(str))
+      .filter((obj): obj is Message => "event" in obj || "type" in obj);
 
     /** See the note on adjustSettingsForImport
      * Some fields (i.e. dates) need to be properly deserialized
-    */
-    messages.forEach(msg => {
+     */
+    messages.forEach((msg) => {
       if (classicPywwt.isModifyTableLayerMessage(msg)) {
         this.adjustSettingsForImport([msg.setting], [msg.value]);
       } else if (layers.isMultiModifyTableLayerMessage(msg)) {
@@ -1461,35 +1504,79 @@ export default class App extends WWTAwareComponent {
     // Even though some (i.e. removal messages) are unlikely
     // to come in a query string
     const messagesAdjList: { [event: string]: string[] | undefined } = {
-      "table_layer_create": [ "table_layer_set", "table_layer_set_multi", "table_layer_remove", "table_layer_update", "add_source" ],
-      "load_image_collection": [ "set_background_by_name", "set_foreground_by_name", "image_layer_create" ],
-      "image_layer_create": [ "image_layer_set", "image_layer_set_multi", "image_layer_stretch" ],
-      "set_foreground_by_name": [ "set_foreground_opacity" ],
-      "layer_hipscat_load": [ "layer_hipscat_datainview", "table_layer_set", "table_layer_set_multi", "table_layer_update", "add_source" ],
-      "annotation_create": [ "annotation_set", "annotation_set_multi" ],
+      table_layer_create: [
+        "table_layer_set",
+        "table_layer_set_multi",
+        "table_layer_remove",
+        "table_layer_update",
+        "add_source",
+      ],
+      load_image_collection: [
+        "set_background_by_name",
+        "set_foreground_by_name",
+        "image_layer_create",
+        "layer_hipscat_load",
+      ],
+      image_layer_create: [
+        "image_layer_set",
+        "image_layer_set_multi",
+        "image_layer_stretch",
+      ],
+      set_foreground_by_name: ["set_foreground_opacity"],
+      layer_hipscat_load: [
+        "layer_hipscat_datainview",
+        "table_layer_set",
+        "table_layer_set_multi",
+        "table_layer_update",
+        "add_source",
+      ],
+      annotation_create: ["annotation_set", "annotation_set_multi"],
     };
-    const completion: { [event: string]: [string, (sent: Message, reply: Message) => boolean] | undefined } = {
-      "load_image_collection": ["load_image_collection_completed", (sent, reply) => {
-        if (!(isLoadImageCollectionMessage(sent) && isLoadImageCollectionCompletedMessage(reply))) return false;
-        return sent.url === reply.url;
-        }],
-      "layer_hipscat_load": ["layer_hipscat_load_completed", (sent, reply) => {
-        if (!(isLoadHipsCatalogMessage(sent) && isLoadHipsCatalogCompletedMessage(reply))) return false;
-        for (const [option, value] of reply.spreadsheetInfo.settings) {
-          if (option === 'name') {
-            return sent.name === value;
+    const completion: {
+      [event: string]:
+        | [string, (sent: Message, reply: Message) => boolean]
+        | undefined;
+    } = {
+      load_image_collection: [
+        "load_image_collection_completed",
+        (sent, reply) => {
+          if (
+            !(
+              isLoadImageCollectionMessage(sent) &&
+              isLoadImageCollectionCompletedMessage(reply)
+            )
+          )
+            return false;
+          return sent.url === reply.url;
+        },
+      ],
+      layer_hipscat_load: [
+        "layer_hipscat_load_completed",
+        (sent, reply) => {
+          if (
+            !(
+              isLoadHipsCatalogMessage(sent) &&
+              isLoadHipsCatalogCompletedMessage(reply)
+            )
+          )
+            return false;
+          for (const [option, value] of reply.spreadsheetInfo.settings) {
+            if (option === "name") {
+              return sent.name === value;
+            }
           }
-        }
-        return false;
-      }],
+          return false;
+        },
+      ],
     };
 
-    const getType: (msg: Message) => string = msg => msg.event || msg.type || "";
+    const getType: (msg: Message) => string = (msg) =>
+      msg.event || msg.type || "";
     const messageTypes: string[] = messages.map(getType);
     const finishedMessageTypes: string[] = [];
 
     const prerequisites: { [type: string]: string[] | undefined } = {};
-    messageTypes.forEach(t => {
+    messageTypes.forEach((t) => {
       const prereqs = [];
       for (const [typ, deps] of Object.entries(messagesAdjList)) {
         if (deps && deps.includes(t)) {
@@ -1507,25 +1594,30 @@ export default class App extends WWTAwareComponent {
       if (prereqs === undefined) {
         return true;
       }
-      return prereqs.every(t => !messageTypes.includes(t) || finishedMessageTypes.includes(t));
-    }
+      return prereqs.every(
+        (t) => !messageTypes.includes(t) || finishedMessageTypes.includes(t)
+      );
+    };
 
     // We define "root" messages as messages that either
     // - Don't depend on another message type
     // - Might depend on another message type, but there aren't
     //    any of that type present.
-    //    For instance, if a user has loaded an imageset via WTML and has 
+    //    For instance, if a user has loaded an imageset via WTML and has
     //    that as a background image, we need to wait until the WTML has loaded.
     //    But they may also just have a built-in image as the background
     const isRoot = (t: string) => {
       const prereqs = prerequisites[t];
-      return (prereqs === undefined) || prereqs.length === 0 || prereqs.every(x => !messageTypes.includes(x));
-    }
+      return (
+        prereqs === undefined ||
+        prereqs.length === 0 ||
+        prereqs.every((x) => !messageTypes.includes(x))
+      );
+    };
     const rootTypes = messageTypes.filter(isRoot);
-    
 
     const addMessagesOfType: (msgType: string) => void = (msgType) => {
-      const messagesOfType = messages.filter(msg => getType(msg) === msgType);
+      const messagesOfType = messages.filter((msg) => getType(msg) === msgType);
       this.messageQueue = this.messageQueue.concat(messagesOfType);
 
       const nextTypes = messagesAdjList[msgType];
@@ -1534,20 +1626,25 @@ export default class App extends WWTAwareComponent {
         return;
       }
 
-      const nextTypesPresent = nextTypes.filter(t => messageTypes.indexOf(t) >= 0);
+      const nextTypesPresent = nextTypes.filter(
+        (t) => messageTypes.indexOf(t) >= 0
+      );
 
       if (completionInfo) {
         const [completedType, completedMatcher] = completionInfo;
         const handler: (msg: any) => boolean = (msg) => {
-
-          const matchingMessages = messagesOfType.filter(x => completedMatcher(x, msg));
-          matchingMessages.forEach(m => {
+          const matchingMessages = messagesOfType.filter((x) =>
+            completedMatcher(x, msg)
+          );
+          matchingMessages.forEach((m) => {
             messagesOfType.splice(messagesOfType.indexOf(m), 1);
           });
           if (messagesOfType.length === 0) {
             this.messageHandlers.delete(completedType);
             finishedMessageTypes.push(msgType);
-            nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
+            nextTypesPresent
+              .filter(prerequisitesMet)
+              .forEach(addMessagesOfType);
           }
           return true;
         };
@@ -1556,7 +1653,7 @@ export default class App extends WWTAwareComponent {
         finishedMessageTypes.push(msgType);
         nextTypesPresent.filter(prerequisitesMet).forEach(addMessagesOfType);
       }
-    }
+    };
 
     rootTypes.forEach(addMessagesOfType);
   }
@@ -1572,7 +1669,6 @@ export default class App extends WWTAwareComponent {
   }
 
   stateAsUrl(): string {
-
     const coordinatesMessage: classicPywwt.CenterOnCoordinatesMessage = {
       event: "center_on_coordinates",
       ra: this.wwtRARad * R2D,
@@ -1582,20 +1678,21 @@ export default class App extends WWTAwareComponent {
       instant: true,
     };
 
-    let backgroundMessage: classicPywwt.SetBackgroundByNameMessage | null = null;
+    let backgroundMessage: classicPywwt.SetBackgroundByNameMessage | null =
+      null;
     if (this.wwtBackgroundImageset !== null) {
       let name = this.wwtBackgroundImageset.get_name();
-      if (name === 'DSS') {
-        name = 'Digitized Sky Survey (Color)'
+      if (name === "DSS") {
+        name = "Digitized Sky Survey (Color)";
       }
       backgroundMessage = {
         event: "set_background_by_name",
         name: name,
       };
     }
-    
 
-    let foregroundMessage: classicPywwt.SetForegroundByNameMessage | null = null;
+    let foregroundMessage: classicPywwt.SetForegroundByNameMessage | null =
+      null;
     if (this.wwtForegroundImageset !== null) {
       foregroundMessage = {
         event: "set_foreground_by_name",
@@ -1607,7 +1704,7 @@ export default class App extends WWTAwareComponent {
     const catalogs = this.hipsCatalogs();
     const loadCatalogsMessages: layers.LoadHipsCatalogMessage[] = [];
     const catalogSettingsMessages: layers.MultiModifyTableLayerMessage[] = [];
-    catalogs.forEach(catalog => {
+    catalogs.forEach((catalog) => {
       const layer = this.layerForHipsCatalog(catalog.name);
       if (layer !== null) {
         const id = layer.id.toString();
@@ -1620,34 +1717,34 @@ export default class App extends WWTAwareComponent {
 
         const state: SpreadSheetLayerState = this.wwtSpreadSheetLayers[id];
         const layerSettings = extractSpreadSheetLayerSettings(state);
-        const pywwtLayerSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = layerSettings.flatMap(s => {
-          const pywwtSetting = convertSpreadSheetLayerSetting(s);
-          return pywwtSetting ? [pywwtSetting] : [];
-        });
+        const pywwtLayerSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] =
+          layerSettings.flatMap((s) => {
+            const pywwtSetting = convertSpreadSheetLayerSetting(s);
+            return pywwtSetting ? [pywwtSetting] : [];
+          });
 
         catalogSettingsMessages.push({
           event: "table_layer_set_multi",
-          id: catalog.name,
-          settings: pywwtLayerSettings.map(s => s[0]),
-          values: pywwtLayerSettings.map(s => s[1]),
+          id: id,
+          settings: pywwtLayerSettings.map((s) => s[0]),
+          values: pywwtLayerSettings.map((s) => s[1]),
         });
       }
-
     });
 
-    const loadWtmlMessages: classicPywwt.LoadImageCollectionMessage[] = 
-      this.loadedWtmlUrls.map(url => {
+    const loadWtmlMessages: classicPywwt.LoadImageCollectionMessage[] =
+      this.loadedWtmlUrls.map((url) => {
         return {
           event: "load_image_collection",
           url: url,
-          loadChildFolders: true
-        }
+          loadChildFolders: true,
+        };
       });
 
     const imageryLayerMessages: classicPywwt.CreateImageSetLayerMessage[] = [];
     const imagerySettingMessages: layers.MultiModifyFitsLayerMessage[] = [];
     const imageryStretchMessages: classicPywwt.StretchFitsLayerMessage[] = [];
-    this.activeImagesetLayerStates.forEach(info => {
+    this.activeImagesetLayerStates.forEach((info) => {
       const id = info.getGuid();
       const imageset = this.imagesetForLayer(id);
       if (imageset !== null) {
@@ -1664,8 +1761,8 @@ export default class App extends WWTAwareComponent {
         imagerySettingMessages.push({
           event: "image_layer_set_multi",
           id: imageset.get_name(),
-          settings: layerSettings.map(s => s[0]),
-          values: layerSettings.map(s => s[1]),
+          settings: layerSettings.map((s) => s[0]),
+          values: layerSettings.map((s) => s[1]),
         });
 
         imageryStretchMessages.push({
@@ -1679,15 +1776,18 @@ export default class App extends WWTAwareComponent {
       }
     });
 
-    const sourceMessages: selections.AddSourceMessage[] = this.sources.map(source => {
-      return {
-        type: "add_source",
-        source: this.prepareForMessaging(source),
-      };
-    });
+    const sourceMessages: selections.AddSourceMessage[] = this.sources.map(
+      (source) => {
+        return {
+          type: "add_source",
+          source: this.prepareForMessaging(source),
+        };
+      }
+    );
 
     const createAnnotationMessages: classicPywwt.CreateAnnotationMessage[] = [];
-    const annotationSettingsMessages: layers.MultiModifyAnnotationMessage[] = [];
+    const annotationSettingsMessages: layers.MultiModifyAnnotationMessage[] =
+      [];
     for (const [id, handler] of this.annotations) {
       const annotation = handler.annotation();
       let shape: "circle" | "line" | "polygon" | undefined = undefined;
@@ -1696,7 +1796,7 @@ export default class App extends WWTAwareComponent {
       } else if (annotation instanceof Poly) {
         shape = "polygon";
       } else if (annotation instanceof PolyLine) {
-        shape = "line"
+        shape = "line";
       }
       if (shape == undefined) {
         continue;
@@ -1707,19 +1807,21 @@ export default class App extends WWTAwareComponent {
         id: id,
       });
 
-      let layerSettings: [string, any][] = [];  // eslint-disable-line @typescript-eslint/no-explicit-any
+      let layerSettings: [string, any][] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
       if (shape === "circle") {
         layerSettings = extractCircleAnnotationSettings(annotation as Circle);
       } else if (shape === "polygon") {
         layerSettings = extractPolyAnnotationSettings(annotation as Poly);
       } else if (shape === "line") {
-        layerSettings = extractPolyLineAnnotationSettings(annotation as PolyLine);
+        layerSettings = extractPolyLineAnnotationSettings(
+          annotation as PolyLine
+        );
       }
       annotationSettingsMessages.push({
         event: "annotation_set_multi",
         id: id,
-        settings: layerSettings.map(s => s[0]),
-        values: layerSettings.map(s => s[1]),
+        settings: layerSettings.map((s) => s[0]),
+        values: layerSettings.map((s) => s[1]),
       });
     }
 
@@ -1736,7 +1838,7 @@ export default class App extends WWTAwareComponent {
       ...sourceMessages,
       ...createAnnotationMessages,
       ...annotationSettingsMessages,
-    ].flatMap(s => s ? [this.encodeObjectBase64(s)] : []);
+    ].flatMap((s) => (s ? [this.encodeObjectBase64(s)] : []));
 
     const messageString = messageStrings.join(",");
     const outString = messageString;
@@ -1746,22 +1848,27 @@ export default class App extends WWTAwareComponent {
     };
 
     const url = new URL(window.location.href);
-    url.search = (new URLSearchParams(params)).toString();
+    url.search = new URLSearchParams(params).toString();
     return url.toString();
   }
 
   copyStateURL(): void {
-    navigator.clipboard.writeText(this.stateAsUrl())
-      .then(() => this.$notify({
-        group: "copy-url",
-        type: "success",
-        text: "URL successfully copied",
-      }))
-      .catch(_err => this.$notify({
-        group: "copy-url",
-        type: "error",
-        text: "Failed to copy URL"
-      }));
+    navigator.clipboard
+      .writeText(this.stateAsUrl())
+      .then(() =>
+        this.$notify({
+          group: "copy-url",
+          type: "success",
+          text: "URL successfully copied",
+        })
+      )
+      .catch((_err) =>
+        this.$notify({
+          group: "copy-url",
+          type: "error",
+          text: "Failed to copy URL",
+        })
+      );
   }
 
   // Incoming message handling
@@ -1817,7 +1924,10 @@ export default class App extends WWTAwareComponent {
       this.handleSetFitsLayerColormap
     );
     this.messageHandlers.set("image_layer_set", this.handleModifyFitsLayer);
-    this.messageHandlers.set("image_layer_set_multi", this.handleMultiModifyFitsLayer);
+    this.messageHandlers.set(
+      "image_layer_set_multi",
+      this.handleMultiModifyFitsLayer
+    );
     this.messageHandlers.set(
       "image_layer_remove",
       this.handleRemoveImageSetLayer
@@ -1827,7 +1937,10 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("table_layer_update", this.handleUpdateTableLayer);
     this.messageHandlers.set("table_layer_set", this.handleModifyTableLayer);
     this.messageHandlers.set("table_layer_remove", this.handleRemoveTableLayer);
-    this.messageHandlers.set("table_layer_set_multi", this.handleMultiModifyTableLayer);
+    this.messageHandlers.set(
+      "table_layer_set_multi",
+      this.handleMultiModifyTableLayer
+    );
 
     this.messageHandlers.set("layer_hipscat_load", this.handleLoadHipsCatalog);
     this.messageHandlers.set(
@@ -1837,7 +1950,10 @@ export default class App extends WWTAwareComponent {
 
     this.messageHandlers.set("annotation_create", this.handleCreateAnnotation);
     this.messageHandlers.set("annotation_set", this.handleModifyAnnotation);
-    this.messageHandlers.set("annotation_set_multi", this.handleMultiModifyAnnotation);
+    this.messageHandlers.set(
+      "annotation_set_multi",
+      this.handleMultiModifyAnnotation
+    );
     this.messageHandlers.set("circle_set_center", this.handleSetCircleCenter);
     this.messageHandlers.set("line_add_point", this.handleAddLinePoint);
     this.messageHandlers.set("polygon_add_point", this.handleAddPolygonPoint);
@@ -1847,10 +1963,17 @@ export default class App extends WWTAwareComponent {
     this.messageHandlers.set("load_tour", this.handleLoadTour);
     this.messageHandlers.set("pause_tour", this.handlePauseTour);
     this.messageHandlers.set("resume_tour", this.handleResumeTour);
+    this.messageHandlers.set("get_view_as_tour", this.handleGetViewAsTour);
 
     this.messageHandlers.set("add_source", this.handleAddSource);
-    this.messageHandlers.set("modify_selectability", this.handleModifySelectability);
-    this.messageHandlers.set("modify_all_selectability", this.handleModifyAllSelectability);
+    this.messageHandlers.set(
+      "modify_selectability",
+      this.handleModifySelectability
+    );
+    this.messageHandlers.set(
+      "modify_all_selectability",
+      this.handleModifyAllSelectability
+    );
 
     // Ignore incoming view_state messages. When testing the app, you might want
     // to launch it as (e.g.)
@@ -1982,7 +2105,26 @@ export default class App extends WWTAwareComponent {
     return false;
   }
 
-  wwtOnMouseMove(event: MouseEvent) {
+  wwtOnPointerMove(event: PointerEvent) {
+    // We would like to catch drag operations over wwt. Unfortunately we cannot
+    // detect whether the primary button is pressed when the pointer move event
+    // reaches us, because the ponterdown event can be triggered outside wwt.
+    // Instead we check whether 1 button is pressed, and assumes that the
+    // pressed button is the primary button.
+    if (event.buttons == 1) {
+      const message: PointerMoveMessage = {
+        type: "wwt_pointer_move",
+        clientX: event.clientX,
+        clientY: event.clientY,
+        sessionId: this.statusMessageSessionId,
+      };
+      if (this.statusMessageDestination != null && this.allowedOrigin != null) {
+        // NB: if we start allowing messages to go out to more destinations, we'll
+        // need to become smarter about allowedOrigin here.
+        this.statusMessageDestination.postMessage(message, this.allowedOrigin);
+      }
+    }
+
     if (this.spreadsheetLayers.length == 0) {
       return;
     }
@@ -2004,11 +2146,22 @@ export default class App extends WWTAwareComponent {
     this.isMouseMoving = true;
   }
 
-  wwtOnMouseDown(_event: MouseEvent) {
+  wwtOnPointerDown(_event: PointerEvent) {
     this.isMouseMoving = false;
   }
 
-  wwtOnMouseUp(_event: MouseEvent) {
+  wwtOnPointerUp(_event: PointerEvent) {
+    const message: PointerUpMessage = {
+      type: "wwt_pointer_up",
+      clientX: _event.clientX,
+      clientY: _event.clientY,
+      sessionId: this.statusMessageSessionId,
+    };
+    if (this.statusMessageDestination != null && this.allowedOrigin != null) {
+      // NB: if we start allowing messages to go out to more destinations, we'll
+      // need to become smarter about allowedOrigin here.
+      this.statusMessageDestination.postMessage(message, this.allowedOrigin);
+    }
     if (!this.isMouseMoving && this.lastClosePt !== null) {
       const source = this.sourceCreator(this.lastClosePt);
       this.addSource(source);
@@ -2306,6 +2459,29 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
+  private handleGetViewAsTour(msg: any): boolean {
+    if (!tours.isGetViewAsTourMessage(msg)) return false;
+
+    this.viewAsTourXml().then((xml) => {
+      if (xml !== null) {
+        const reply: tours.GetViewAsTourReply = {
+          type: "get_view_as_tour_reply",
+          threadId: msg.threadId,
+          tourXml: xml,
+        };
+
+        if (
+          this.statusMessageDestination !== null &&
+          this.allowedOrigin !== null
+        ) {
+          this.statusMessageDestination.postMessage(reply, this.allowedOrigin);
+        }
+      }
+    });
+
+    return true;
+  }
+
   // Outgoing messages
 
   updateIntervalId: number | null = null;
@@ -2480,7 +2656,7 @@ export default class App extends WWTAwareComponent {
     if (sourceLayer instanceof ImagesetInfo) {
       layer = {
         ...sourceLayer,
-        type: selections.ImageSetTypes[sourceLayer.type]
+        type: selections.ImageSetTypes[sourceLayer.type],
       };
     } else {
       layer = sourceLayer;
@@ -2536,7 +2712,9 @@ export default class App extends WWTAwareComponent {
     const msg: selections.SelectionStateMessage = {
       type: "wwt_selection_state",
       sessionId: this.statusMessageSessionId,
-      selectedSources: sources.map(source => this.prepareForMessaging(source)),
+      selectedSources: sources.map((source) =>
+        this.prepareForMessaging(source)
+      ),
     };
 
     this.statusMessageDestination.postMessage(msg, this.allowedOrigin);
@@ -2631,31 +2809,47 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  isMessageSpreadsheetLayer(layer: selections.CatalogLayerInfo): layer is selections.SpreadSheetLayerInfo {
+  isMessageSpreadsheetLayer(
+    layer: selections.CatalogLayerInfo
+  ): layer is selections.SpreadSheetLayerInfo {
     return "referenceFrame" in layer;
   }
 
-  isMessageImagesetInfo(layer: selections.CatalogLayerInfo): layer is selections.ImagesetInfo {
-    return 'url' in layer;
+  isMessageImagesetInfo(
+    layer: selections.CatalogLayerInfo
+  ): layer is selections.ImagesetInfo {
+    return "url" in layer;
   }
 
   deserializeSource(src: selections.Source): Source {
     const msgLayer = src.catalogLayer;
-    let layer: CatalogLayerInfo | undefined = this.appTableLayers().find(x => x.name === msgLayer.name);
+    let layer: CatalogLayerInfo | undefined = this.appTableLayers().find(
+      (x) => x.name === msgLayer.name
+    );
 
     // If the layer corresponding to the source doesn't exist
     // we create a new CatalogLayerInfo object for the source to use
     if (layer === undefined) {
       if (this.isMessageSpreadsheetLayer(msgLayer)) {
-        layer = new SpreadSheetLayerInfo(msgLayer.id, msgLayer.referenceFrame, msgLayer.name);
+        layer = new SpreadSheetLayerInfo(
+          msgLayer.id,
+          msgLayer.referenceFrame,
+          msgLayer.name
+        );
       } else {
-        layer = new ImagesetInfo(msgLayer.url, msgLayer.name, ImageSetType[msgLayer.type], msgLayer.description, msgLayer.extension)
+        layer = new ImagesetInfo(
+          msgLayer.url,
+          msgLayer.name,
+          ImageSetType[msgLayer.type],
+          msgLayer.description,
+          msgLayer.extension
+        );
       }
     }
     return {
       ...src,
       catalogLayer: layer,
-    }
+    };
   }
 
   handleAddSource(msg: selections.AddSourceMessage): boolean {
@@ -2666,7 +2860,9 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  handleModifySelectability(msg: selections.ModifySelectabilityMessage): boolean {
+  handleModifySelectability(
+    msg: selections.ModifySelectabilityMessage
+  ): boolean {
     if (!selections.isModifySelectabilityMessage(msg)) return false;
 
     const handler = this.tableLayers.get(msg.id);
@@ -2676,16 +2872,17 @@ export default class App extends WWTAwareComponent {
     return true;
   }
 
-  handleModifyAllSelectability(msg: selections.ModifyAllSelectabilityMessage): boolean {
+  handleModifyAllSelectability(
+    msg: selections.ModifyAllSelectabilityMessage
+  ): boolean {
     if (!selections.isModifyAllSelectabilityMessage(msg)) return false;
 
-    this.spreadsheetLayers.forEach(
-      layer =>
-        this.setResearchAppTableLayerSelectability({
-          layer: layer,
-          selectable: msg.selectable
-        })
-      );
+    this.spreadsheetLayers.forEach((layer) =>
+      this.setResearchAppTableLayerSelectability({
+        layer: layer,
+        selectable: msg.selectable,
+      })
+    );
     return true;
   }
 
@@ -2786,16 +2983,16 @@ export default class App extends WWTAwareComponent {
 
   loadWtml(url: string) {
     this.loadImageCollection({
-        url: url,
-        loadChildFolders: true,
-      }).then((_folder) => {
-        this.$notify({
-          group: "load-collection",
-          type: "success",
-          text: "WTML collection successfully loaded",
-        });
-        this.loadedWtmlUrls.push(url);
+      url: url,
+      loadChildFolders: true,
+    }).then((_folder) => {
+      this.$notify({
+        group: "load-collection",
+        type: "success",
+        text: "WTML collection successfully loaded",
       });
+      this.loadedWtmlUrls.push(url);
+    });
   }
 
   submitWtmlCollectionUrl() {
@@ -2859,7 +3056,6 @@ export default class App extends WWTAwareComponent {
     const colSeparator = "\t";
 
     for (const layerInfo of this.selectableTableLayers()) {
-
       const layer = this.spreadSheetLayer(layerInfo);
       if (layer == null) {
         continue;
@@ -2922,8 +3118,7 @@ export default class App extends WWTAwareComponent {
 </script>
 
 <style lang="less">
-
-/** Note: the CSS is designed to keep the tools element (which contains the various dropdown selectors) 
+/** Note: the CSS is designed to keep the tools element (which contains the various dropdown selectors)
   * centered at all times. This is done by using nested flexbox containers, based on the first answer
   * from https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths
 */
@@ -2989,7 +3184,7 @@ body {
   margin-right: auto;
 }
 .element-box:last-child {
-  margin-left: auto; 
+  margin-left: auto;
 }
 
 #display-panel-box {
@@ -3353,7 +3548,6 @@ ul.tool-menu {
   .vs__selected {
     overflow: hidden;
   }
-
 }
 
 .item-option {
@@ -3405,7 +3599,6 @@ ul.tool-menu {
   &::-webkit-scrollbar {
     display: none;
   }
-
 }
 
 .pointer {

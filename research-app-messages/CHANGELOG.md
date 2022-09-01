@@ -1,3 +1,11 @@
+# @wwtelescope/research-app-messages 0.15.0 (2022-09-01)
+
+- Add `PointerMoveMessage` and `PointerUpMessage` to help the JupyterLab
+  extension fix drag-and-drop across WWT (#205, @imbasimba)
+- Add `GetViewAsTourMessage` and `GetViewAsTourReply` to help the research app
+  provide a way to export tours (#190, @Carifio24)
+
+
 # @wwtelescope/research-app-messages 0.14.0 (2022-04-05)
 
 - Add messages to allow programmatic control of whether catalog items are

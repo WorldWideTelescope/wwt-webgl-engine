@@ -6,7 +6,7 @@ using System.Html;
 
 namespace wwtlib
 {
-    class FolderUp : IThumbnail
+    public class FolderUp : IThumbnail
     {
         public FolderUp()
         {

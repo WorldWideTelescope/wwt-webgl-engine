@@ -750,6 +750,21 @@ export class Folder implements Thumbnail {
   childLoadCallback(callback: Action): void;
 }
 
+export class FolderUp implements Thumbnail {
+  get_name(): string;
+  get_thumbnail(): Thumbnail;
+  set_thumbnail(thumbnail: Thumbnail): Thumbnail;
+  get_thumbnailUrl(): string;
+  set_thumbnailUrl(url: string): string;
+  get_isImage(): boolean;
+  get_isTour(): boolean;
+  get_isFolder(): boolean;
+  get_isCloudCommunityItem(): boolean;
+  get_readOnly(): boolean;
+  get_children(): Thumbnail[] | null;
+  parent: Folder;
+}
+
 /** An simple Version 4 GUID.
  *
  * Note that in WWT, GUID contents are not validated in any way upon creation.
@@ -1966,8 +1981,31 @@ export class TourDocument {
    * @returns The tour stop index
    */
   getTourStopIndexByID(id: string): number;
+
+  /** Get the tour document as an XML string */
+  getTourXML(): string;
+
+  /** Get a representation of the tour as a blob */
+  saveToBlob(): Blob;
 }
 
+/** A class that manages editing a tour.
+ *
+ * Currently, only a small amount of this class's functionality
+ * is exposed to TypeScript.
+ */
+export class TourEditTab {
+
+  /** Add a slide to the current tour.
+   *
+   * @param insert Whether to insert the new slide after the current tour stop.
+   * If false, the slide is added to the end of the tour.
+  */
+  addSlide(insert: boolean): void;
+
+  /** Get the current tour. */
+  get_tour(): TourDocument | null;
+}
 
 export interface TourEndedCallback {
   /** Called when a [[TourPlayer]] has finished playing its tour. */
@@ -2411,6 +2449,9 @@ export class WWTControl {
    */
   renderType: ImageSetType;
 
+  /** TourEditTab */
+  tourEdit: TourEditTab;
+
   /** Get the name of the reference frame associated with the current view.
    *
    * The current reference frame defines the physical coordinates of the view
@@ -2575,6 +2616,9 @@ export class WWTControl {
   /** Given x and y coordinates on the screen, returns the RA and Dec */
   getCoordinatesForScreenPoint(x: number, y: number): { x: number; y: number };
 
+  /** Given RA and Dec, return the x and y coordinates of the corresponding screen point */
+  getScreenPointForCoordinates(ra: number, dec: number): { x: number; y: number };
+
   /** Start loading the tour stored at the specified URL.
    *
    * When loading is complete, a `tourReady` event will be issued, which you can
@@ -2608,6 +2652,9 @@ export class WWTControl {
 
   /** Stop the currently playing tour. */
   stopCurrentTour(): void;
+
+  /** Create a new tour */
+  createTour(name: string): TourDocument;
 
   /** Set the maximum allowed user zoom level in 3D ("solar system") mode.
    *

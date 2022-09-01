@@ -550,6 +550,16 @@ namespace wwtlib
 
         }
 
+        static public Vector3d SphericalSkyToCartesian(Vector2d vector)
+        {
+            double ra = vector.X * (Math.PI / 12);
+            double dec = vector.Y * (Math.PI / 180);
+            double x = Math.Cos(ra) * Math.Cos(dec);
+            double y = -Math.Sin(dec);
+            double z = Math.Sin(ra) * Math.Cos(dec);
+            return Vector3d.Create(x, y, z);
+        }
+
         static public Vector2d CartesianToLatLng(Vector3d vector)
         {
             double rho = Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
