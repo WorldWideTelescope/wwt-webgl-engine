@@ -24,7 +24,7 @@ export interface TableLayerStatus {
   visible: boolean;
   type: 'hips' | 'table';
   layer: CatalogLayerInfo;
-  selectable: boolean
+  selectable: boolean;
 }
 
 type EquivalenceTest<T> = (t1: T, t2: T) => boolean;

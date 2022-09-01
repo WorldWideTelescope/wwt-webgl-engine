@@ -196,7 +196,7 @@ export interface PointerMoveMessage {
 
   /** The clientX property of the originating pointer move event. */
   clientX: number;
-  
+
   /** The clientY property of the originating pointer move event. */
   clientY: number;
 
@@ -224,13 +224,13 @@ export function isPointerMoveMessage(o: any): o is PointerMoveMessage {  // esli
 /** A message sent by the app to enable drag operations over the app. The
  * message is triggered when the pointerup event is triggered within the app.
  * */
- export interface PointerUpMessage {
+export interface PointerUpMessage {
   /** The tag identifying this message type. */
   type: "wwt_pointer_up";
 
   /** The clientX property of the originating pointer up event. */
   clientX: number;
-  
+
   /** The clientY property of the originating pointer up event. */
   clientY: number;
 

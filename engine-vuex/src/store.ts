@@ -111,7 +111,7 @@ export class ImagesetInfo {
    */
   extension: string;
 
-  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string, id: string | null =  null) {
+  constructor(url: string, name: string, type: ImageSetType, description: string, extension: string, id: string | null = null) {
     this.url = url;
     this.name = name;
     this.type = type;
@@ -886,7 +886,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return states;
   }
 
-  @Action({ rawError: true})
+  @Action({ rawError: true })
   async viewAsTourXml(name: string): Promise<string | null> {
     WWTControl.singleton.createTour(name || "");
     const editor = WWTControl.singleton.tourEdit;
@@ -1083,7 +1083,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
     return function (name: string): SpreadSheetLayer | null {
       if (Vue.$wwt.inst === null)
         throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
-      
+
       const id = Guid.createFrom(name).toString();
       return spreadSheetLayerByKey(id);
     }
@@ -1100,7 +1100,7 @@ export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexStat
   }
 
   get spreadSheetLayerById() {
-    return function(id: string): SpreadSheetLayer | null {
+    return function (id: string): SpreadSheetLayer | null {
       return spreadSheetLayerByKey(id);
     }
   }
