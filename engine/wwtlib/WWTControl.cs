@@ -1988,7 +1988,14 @@ namespace wwtlib
 
         public void GotoRADecZoom(double ra, double dec, double zoom, bool instant, double? roll)
         {
-            ra = DoubleUtilities.Clamp(ra, 0, 24);
+            while (ra > 24)
+            {
+                ra -= 24;
+            }
+            while (ra < 0)
+            {
+                ra += 24;
+            }
             dec = DoubleUtilities.Clamp(dec, -90, 90);
             zoom = DoubleUtilities.Clamp(zoom, ZoomMin, ZoomMax);
             double rotation = roll == null ? WWTControl.Singleton.RenderContext.ViewCamera.Rotation : (double)roll;
