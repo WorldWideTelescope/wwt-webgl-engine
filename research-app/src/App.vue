@@ -365,7 +365,6 @@ import * as moment from "moment";
 import * as screenfull from "screenfull";
 import "vue-select/dist/vue-select.css";
 import { Buffer } from "buffer";
-import { debounce } from "debounce";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { mapGetters, mapMutations, mapState } from "vuex";
 
@@ -1204,7 +1203,7 @@ export default class App extends WWTAwareComponent {
   wwtComponentNamespace = wwtEngineNamespace;
   lastClosePt: RawSourceInfo | null = null;
   lastSelectedSource: Source | null = null;
-  distanceThreshold = 0.01;
+  distanceThreshold = 4;
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
   isMouseMoving = false;
@@ -2128,10 +2127,12 @@ export default class App extends WWTAwareComponent {
     if (this.spreadsheetLayers.length == 0) {
       return;
     }
+    this.updateLastClosePoint(event);
+  }
+  
+  updateLastClosePoint(event: MouseEvent): void {
     const pt = { x: event.offsetX, y: event.offsetY };
-    const raDecDeg = this.findRADecForScreenPoint(pt);
-    const raDecRad = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
-    const closestPt = this.closestInView(raDecRad, this.distanceThreshold);
+    const closestPt = this.closestInView(pt, this.distanceThreshold);
     if (closestPt == null && this.lastClosePt == null) {
       return;
     }
@@ -3046,7 +3047,7 @@ export default class App extends WWTAwareComponent {
   }
 
   closestInView(
-    target: AngleCoordinates,
+    point: { x: number; y: number },
     threshold?: number
   ): RawSourceInfo | null {
     let minDist = Infinity;
@@ -3054,6 +3055,9 @@ export default class App extends WWTAwareComponent {
 
     const rowSeparator = "\r\n";
     const colSeparator = "\t";
+
+    const raDecDeg = this.findRADecForScreenPoint(point);
+    const target = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
 
     for (const layerInfo of this.selectableTableLayers()) {
       const layer = this.spreadSheetLayer(layerInfo);
@@ -3089,8 +3093,13 @@ export default class App extends WWTAwareComponent {
         }
       }
     }
-    if (!threshold || minDist < threshold) {
-      return closestPt;
+    if (closestPt !== null) {
+      const closestRADecDeg = { ra: closestPt.ra * R2D, dec: closestPt.dec * R2D };
+      const closestScreenPoint = this.findScreenPointForRADec(closestRADecDeg);
+      const pixelDist = Math.sqrt((point.x - closestScreenPoint.x) ** 2 + (point.y - closestScreenPoint.y) ** 2);
+      if (!threshold || pixelDist < threshold) {
+        return closestPt;
+      }
     }
     return null;
   }
@@ -3099,20 +3108,6 @@ export default class App extends WWTAwareComponent {
     return {
       showPopover: false,
     };
-  }
-
-  /** The factor of 0.00002 converts between the WWT
-   * engine zoom and the distance between points.
-   * This value doesn't come from anywhere in particular,
-   * other than the cursor -> pointer change feeling natural
-   */
-  updateDistanceThreshold = debounce((app: App, newZoom: number) => {
-    app.distanceThreshold = 0.00002 * newZoom;
-  }, 20);
-
-  @Watch("wwtZoomDeg", { immediate: true })
-  onZoomChange(val: number) {
-    this.updateDistanceThreshold(this, val);
   }
 }
 </script>
