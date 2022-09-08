@@ -22,10 +22,18 @@ namespace wwtlib
             }
             double tileDegrees = this.dataset.BaseTileDegrees / (Math.Pow(2, this.Level));
 
-            double latMin = (((double)this.dataset.BaseTileDegrees / 2 - (((double)this.tileY) * tileDegrees)) + dataset.OffsetY);
-            double latMax = (((double)this.dataset.BaseTileDegrees / 2 - (((double)(this.tileY + 1)) * tileDegrees)) + dataset.OffsetY);
-            double lngMin = ((((double)this.tileX * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX);
-            double lngMax = (((((double)(this.tileX + 1)) * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX);
+
+            // The position needs to be adjusted by half a pixel to make sure that
+            // the center of the pixel is displayed at the target position,
+            // instead of a corner of that pixel. Each tile is 256 pixels and we
+            // want to adjust the entire dataset with one half pixel of the pixel
+            // size of the original image, i.e. the BaseLevel + Levels
+            double halfPixelCorrection = this.dataset.BaseTileDegrees / Math.Pow(2, this.dataset.BaseLevel + this.dataset.Levels) / 256 / 2;
+
+            double latMin = (((double)this.dataset.BaseTileDegrees / 2 - (((double)this.tileY) * tileDegrees)) + dataset.OffsetY) - halfPixelCorrection;
+            double latMax = (((double)this.dataset.BaseTileDegrees / 2 - (((double)(this.tileY + 1)) * tileDegrees)) + dataset.OffsetY) - halfPixelCorrection;
+            double lngMin = ((((double)this.tileX * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX) + halfPixelCorrection;
+            double lngMax = (((((double)(this.tileX + 1)) * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX) + halfPixelCorrection;
 
             double latCenter = (latMin + latMax) / 2.0;
             double lngCenter = (lngMin + lngMax) / 2.0;
@@ -84,11 +92,17 @@ namespace wwtlib
         {
             double tileDegrees = (double)this.dataset.BaseTileDegrees / ((double)Math.Pow(2, this.Level));
 
+            // The position needs to be adjusted by half a pixel to make sure that
+            // the center of the pixel is displayed at the target position,
+            // instead of a corner of that pixel. Each tile is 256 pixels and we
+            // want to adjust the entire dataset with one half pixel of the pixel
+            // size of the original image, i.e. the BaseLevel + Levels
+            double halfPixelCorrection = this.dataset.BaseTileDegrees / Math.Pow(2, this.dataset.BaseLevel + this.dataset.Levels) / 256 / 2;
 
-            double latMin = ((double)this.dataset.BaseTileDegrees / 2 + (((double)(this.tileY + 1)) * tileDegrees)) + dataset.OffsetY;
-            double latMax = ((double)this.dataset.BaseTileDegrees / 2 + (((double)this.tileY) * tileDegrees)) + dataset.OffsetY;
-            double lngMin = (((double)this.tileX * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
-            double lngMax = ((((double)(this.tileX + 1)) * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
+            double latMin = ((double)this.dataset.BaseTileDegrees / 2 + (((double)(this.tileY + 1)) * tileDegrees)) + dataset.OffsetY + halfPixelCorrection;
+            double latMax = ((double)this.dataset.BaseTileDegrees / 2 + (((double)this.tileY) * tileDegrees)) + dataset.OffsetY + halfPixelCorrection;
+            double lngMin = (((double)this.tileX * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX + halfPixelCorrection;
+            double lngMax = ((((double)(this.tileX + 1)) * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX + halfPixelCorrection;
 
             double latCenter = (latMin + latMax) / 2.0;
             double lngCenter = (lngMin + lngMax) / 2.0;
@@ -228,10 +242,17 @@ namespace wwtlib
         {
             double tileDegrees = this.dataset.BaseTileDegrees / (Math.Pow(2, this.Level));
             LatLngEdges edges = new LatLngEdges();
-            edges.latMin = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)this.tileY) * tileDegrees)) + this.dataset.OffsetY);
-            edges.latMax = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)(this.tileY + 1)) * tileDegrees)) + this.dataset.OffsetY);
-            edges.lngMin = ((((double)this.tileX * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX);
-            edges.lngMax = (((((double)(this.tileX + 1)) * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX);
+
+            // The position needs to be adjusted by half a pixel to make sure that
+            // the center of the pixel is displayed at the target position,
+            // instead of a corner of that pixel. Each tile is 256 pixels and we
+            // want to adjust the entire dataset with one half pixel of the pixel
+            // size of the original image, i.e. the BaseLevel + Levels
+            double halfPixelCorrection = this.dataset.BaseTileDegrees / Math.Pow(2, this.dataset.BaseLevel + this.dataset.Levels) / 256 / 2;
+            edges.latMin = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)this.tileY) * tileDegrees)) + this.dataset.OffsetY) - halfPixelCorrection;
+            edges.latMax = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)(this.tileY + 1)) * tileDegrees)) + this.dataset.OffsetY) - halfPixelCorrection;
+            edges.lngMin = ((((double)this.tileX * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX) + halfPixelCorrection;
+            edges.lngMax = (((((double)(this.tileX + 1)) * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX) + halfPixelCorrection;
             return edges;
         }
 
