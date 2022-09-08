@@ -841,7 +841,7 @@ namespace wwtlib
                 }
                 if (Levels > 0)
                 {
-                    return CenterX - OffsetX;
+                    return CenterX;
                 }
                 else
                 {
@@ -860,7 +860,7 @@ namespace wwtlib
                 }
                 if (Levels > 0)
                 {
-                    return CenterY + OffsetY;
+                    return CenterY;
                 }
                 else
                 {
