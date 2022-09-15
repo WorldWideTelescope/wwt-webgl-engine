@@ -1154,11 +1154,6 @@ class KeyboardControlSettings {
   }
 }
 
-interface AngleCoordinates {
-  ra: number;
-  dec: number;
-}
-
 interface RawSourceInfo {
   ra: number;
   dec: number;
