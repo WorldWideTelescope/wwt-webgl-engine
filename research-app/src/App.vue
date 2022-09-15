@@ -2146,11 +2146,11 @@ export default class App extends WWTAwareComponent {
     this.isMouseMoving = false;
   }
 
-  wwtOnPointerUp(_event: PointerEvent) {
+  wwtOnPointerUp(event: PointerEvent) {
     const message: PointerUpMessage = {
       type: "wwt_pointer_up",
-      clientX: _event.clientX,
-      clientY: _event.clientY,
+      clientX: event.clientX,
+      clientY: event.clientY,
       sessionId: this.statusMessageSessionId,
     };
     if (this.statusMessageDestination != null && this.allowedOrigin != null) {
@@ -2158,7 +2158,9 @@ export default class App extends WWTAwareComponent {
       // need to become smarter about allowedOrigin here.
       this.statusMessageDestination.postMessage(message, this.allowedOrigin);
     }
-    if (!this.isMouseMoving && this.lastClosePt !== null) {
+
+    this.updateLastClosePoint(event);
+    if (this.lastClosePt !== null) {
       const source = this.sourceCreator(this.lastClosePt);
       this.addSource(source);
       this.lastSelectedSource = source;
@@ -3088,6 +3090,7 @@ export default class App extends WWTAwareComponent {
         }
       }
     }
+
     if (closestPt !== null) {
       const closestRADecDeg = { ra: closestPt.ra * R2D, dec: closestPt.dec * R2D };
       const closestScreenPoint = this.findScreenPointForRADec(closestRADecDeg);
