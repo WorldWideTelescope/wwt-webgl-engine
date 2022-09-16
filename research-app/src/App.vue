@@ -1201,7 +1201,9 @@ export default class App extends WWTAwareComponent {
   distanceThreshold = 4;
   hideAllChrome = false;
   hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
-  isMouseMoving = false;
+  isPointerMoving = false;
+  pointerMoveThreshold = 6;
+  pointerStartPosition: { x: number; y: number } | null = null;
 
   // From the store
   catalogNameMappings!: { [catalogName: string]: [string, string] };
@@ -2119,13 +2121,20 @@ export default class App extends WWTAwareComponent {
       }
     }
 
+    if (!this.isPointerMoving && this.pointerStartPosition !== null) {
+      const dist = Math.sqrt((event.pageX - this.pointerStartPosition.x) ** 2 + (event.pageY - this.pointerStartPosition.y) ** 2);
+      if (dist > this.pointerMoveThreshold) {
+        this.isPointerMoving = true;
+      }
+    }
+
     if (this.spreadsheetLayers.length == 0) {
       return;
     }
     this.updateLastClosePoint(event);
   }
   
-  updateLastClosePoint(event: MouseEvent): void {
+  updateLastClosePoint(event: PointerEvent): void {
     const pt = { x: event.offsetX, y: event.offsetY };
     const closestPt = this.closestInView(pt, this.distanceThreshold);
     if (closestPt == null && this.lastClosePt == null) {
@@ -2139,11 +2148,11 @@ export default class App extends WWTAwareComponent {
     if (needsUpdate) {
       this.lastClosePt = closestPt;
     }
-    this.isMouseMoving = true;
   }
 
-  wwtOnPointerDown(_event: PointerEvent) {
-    this.isMouseMoving = false;
+  wwtOnPointerDown(event: PointerEvent) {
+    this.isPointerMoving = false;
+    this.pointerStartPosition = { x: event.pageX, y: event.pageY };
   }
 
   wwtOnPointerUp(event: PointerEvent) {
@@ -2160,12 +2169,13 @@ export default class App extends WWTAwareComponent {
     }
 
     this.updateLastClosePoint(event);
-    if (this.lastClosePt !== null) {
+    if (!this.isPointerMoving && this.lastClosePt !== null) {
       const source = this.sourceCreator(this.lastClosePt);
       this.addSource(source);
       this.lastSelectedSource = source;
     }
-    this.isMouseMoving = false;
+    this.pointerStartPosition = null;
+    this.isPointerMoving = false;
   }
 
   newSourceName = (function () {
