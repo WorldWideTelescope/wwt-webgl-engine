@@ -2168,12 +2168,15 @@ export default class App extends WWTAwareComponent {
       this.statusMessageDestination.postMessage(message, this.allowedOrigin);
     }
 
-    this.updateLastClosePoint(event);
-    if (!this.isPointerMoving && this.lastClosePt !== null) {
-      const source = this.sourceCreator(this.lastClosePt);
-      this.addSource(source);
-      this.lastSelectedSource = source;
+    if (!this.isPointerMoving) {
+      this.updateLastClosePoint(event);
+      if (this.lastClosePt !== null) {
+        const source = this.sourceCreator(this.lastClosePt);
+        this.addSource(source);
+        this.lastSelectedSource = source;
+      }
     }
+
     this.pointerStartPosition = null;
     this.isPointerMoving = false;
   }
