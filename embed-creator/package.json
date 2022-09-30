@@ -7,18 +7,15 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "~1.2.28",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
-    "@fortawesome/vue-fontawesome": "^0.1.9",
     "@wwtelescope/embed-common": "0.0.0-dev.0",
     "bootstrap-vue": "^2.13.0",
-    "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
-    "vue-clipboard2": "^0.3.1",
-    "vue-property-decorator": "^8.4.1"
+    "vue-clipboard2": "^0.3.1"
   },
   "description": "An web app for creating AAS WorldWide Telescope embeds",
   "devDependencies": {
-    "@vue/cli-plugin-eslint": "^4.3.0",
-    "@vue/cli-plugin-typescript": "^4.3.0"
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-plugin-typescript": "^5.0.8"
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
