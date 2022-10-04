@@ -5,8 +5,8 @@
 // descriptions of pretty much everything in this file. Update those docs when
 // adding new features here.
 
-import Vue from "vue";
-import { Module, VuexModule, Mutation, MutationAction, Action } from 'vuex-module-decorators';
+import { VueWWT as Vue } from "./global-state";
+import { defineStore } from 'pinia';
 
 import { D2R, H2R } from "@wwtelescope/astro";
 
@@ -272,7 +272,7 @@ export interface WWTEngineVuexState {
    */
   isTourPlayerActive: boolean;
 
-  /** Whether a tour is actively playing righ now.
+  /** Whether a tour is actively playing right now.
    *
    * It might be the case that a tour player is active, but the tour is paused.
    */
@@ -289,6 +289,9 @@ export interface WWTEngineVuexState {
 
   /** The current roll of the view camera, in radians */
   rollRad: number;
+
+  /** The time when the state is created */
+  timeAtStartup: number;
 
   /** The number of times that a tour has played through to the end.
    *
@@ -339,6 +342,7 @@ export interface WWTEngineVuexState {
 
   /** Settings for all registered WWT spreadsheet layers. */
   spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState };
+  
 }
 
 /** The parameters for the [[WWTEngineVuexModule.createTableLayer]] action. */
@@ -399,8 +403,8 @@ export interface LoadImageCollectionParams {
  * Keeping this functionality outside of the store allows us to use it from
  * inside either an action or a mutation.
  */
-function activeLayersList(): string[] {
-  if (Vue.$wwt.inst === null)
+function activeLayersList(wwt: WWTGlobalState): string[] {
+  if (wwt.inst === null)
     throw new Error('cannot get activeLayersList without linking to WWTInstance');
 
   const layers: string[] = [];
@@ -415,7 +419,7 @@ function activeLayersList(): string[] {
     }
   }
 
-  const rootlm = Vue.$wwt.inst.lm.get_allMaps()[Vue.$wwt.inst.ctl.getCurrentReferenceFrame()];
+  const rootlm = wwt.inst.lm.get_allMaps()[wwt.inst.ctl.getCurrentReferenceFrame()];
   if (rootlm) {
     accum(rootlm);
   }
@@ -437,11 +441,11 @@ function availableImagesets(): ImagesetInfo[] {
  * Keeping this functionality outside of the store allows us to use it from
  * inside either an action or a mutation.
  */
-function spreadSheetLayerByKey(key: string): SpreadSheetLayer | null {
-  if (Vue.$wwt.inst === null)
+function spreadSheetLayerByKey(wwt: WWTGlobalState, key: string): SpreadSheetLayer | null {
+  if (wwt.inst === null)
     throw new Error('cannot get spreadSheetLayerByKey without linking to WWTInstance');
 
-  const layer = Vue.$wwt.inst.lm.get_layerList()[key];
+  const layer = wwt.inst.lm.get_layerList()[key];
 
   if (layer !== null && layer instanceof SpreadSheetLayer) {
     return layer;
@@ -459,750 +463,678 @@ function catalogLayerKey(catalog: CatalogLayerInfo): string {
  * See [[WWTAwareComponent]] for an organized overview of the state variables,
  * getters, actions, and mutations exposed by this module.
  */
-@Module({
-  namespaced: true,
-  stateFactory: true,
-})
-export class WWTEngineVuexModule extends VuexModule implements WWTEngineVuexState {
-  // NOTE: We were orginally alphabetizing these all, but now I think it will be
+export const useEngineStore = defineStore('wwt-engine', {
+
+  // NOTE: We were originally alphabetizing these all, but now I think it will be
   // better to group topically related fields.
+  state: (): WWTEngineVuexState => ({
+    activeLayers: [],
+    availableImagesets: [],
+    backgroundImageset: null,
+    clockDiscontinuities: 0,
+    clockRate: 1.0,
+    currentTime: new Date(),
+    decRad: 0.0,
+    foregroundImageset: null,
+    foregroundOpacity: 100,
+    imagesetLayers: {},
+    isTourPlayerActive: false,
+    isTourPlaying: false,
+    raRad: 0.0,
+    renderType: ImageSetType.sky,
+    rollRad: 0,
+    spreadSheetLayers: {},
+    timeAtStartup: Date.now(),
+    tourCompletions: 0,
+    tourRunTime: null,
+    tourStopStartTimes: [],
+    tourTimecode: 0.0,
+    showWebGl2Warning: false,
+    zoomDeg: 0.0,
+  }),
 
-  availableImagesets: ImagesetInfo[] = [];
-  backgroundImageset: Imageset | null = null;
-  clockDiscontinuities = 0;
-  clockRate = 1.0;
-  currentTime = new Date();
-  decRad = 0.0;
-  foregroundImageset: Imageset | null = null;
-  foregroundOpacity = 100;
-  isTourPlayerActive = false;
-  isTourPlaying = false;
-  raRad = 0.0;
-  renderType = ImageSetType.sky;
-  rollRad = 0;
-  timeAtStartup = Date.now();
-  tourCompletions = 0;
-  tourRunTime: number | null = null;
-  tourStopStartTimes: number[] = [];
-  tourTimecode = 0.0;
-  showWebGl2Warning = false;
-  zoomDeg = 0.0;
-
-  get lookupImageset() {
-    // This is how you create a parametrized getter in vuex-module-decorators:
-    return function (imagesetName: string): Imageset | null {
-      if (Vue.$wwt.inst === null)
+  getters: {
+    lookupImageset: (state) => function (imagesetName: string): Imageset | null {
+      if (this.$wwt.inst === null)
         throw new Error('cannot lookupImageset without linking to WWTInstance');
-      return Vue.$wwt.inst.ctl.getImagesetByName(imagesetName);
-    }
-  }
+      return this.$wwt.inst.ctl.getImagesetByName(imagesetName);
+    },
 
-  get findRADecForScreenPoint() {
-    return function (pt: { x: number; y: number }): { ra: number; dec: number } {
-      if (Vue.$wwt.inst === null)
+    findRADecForScreenPoint: (state) => function (pt: { x: number; y: number }): { ra: number; dec: number } {
+      if (this.$wwt.inst === null)
         throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
-      const coords = Vue.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
+      const coords = this.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
       return { ra: (15 * coords.x + 720) % 360, dec: coords.y };
-    }
-  }
+    },
 
-  get findScreenPointForRADec() {
-    return function (pt: { ra: number; dec: number }): { x: number; y: number } {
-      if (Vue.$wwt.inst === null)
+    findScreenPointForRADec: (state) => function (pt: { ra: number; dec: number }): { x: number; y: number } {
+      if (this.$wwt.inst === null)
         throw new Error('cannot findScreenPointForRADec without linking to WWTInstance');
-      return Vue.$wwt.inst.ctl.getScreenPointForCoordinates(pt.ra / 15, pt.dec);
-    }
-  }
-
-  @Mutation
-  internalLinkToInstance(wwt: WWTInstance): void {
-    Vue.$wwt.link(wwt);
-  }
-
-  @Mutation
-  internalUnlinkFromInstance(): void {
-    Vue.$wwt.unlink();
-  }
-
-  @Mutation
-  internalUpdate(): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot internalUpdate without linking to WWTInstance');
-
-    const wwt = Vue.$wwt.inst;
-
-    const raRad = wwt.si.getRA() * H2R;
-    if (this.raRad != raRad)
-      this.raRad = raRad;
-
-    const decRad = wwt.si.getDec() * D2R;
-    if (this.decRad != decRad)
-      this.decRad = decRad;
-
-    const zoomDeg = wwt.ctl.renderContext.viewCamera.zoom;
-    if (this.zoomDeg != zoomDeg)
-      this.zoomDeg = zoomDeg;
-
-    const rollRad = wwt.ctl.renderContext.viewCamera.rotation;
-    if (this.rollRad != rollRad)
-      this.rollRad = rollRad;
-
-    const bg = wwt.ctl.renderContext.get_backgroundImageset() || null; // TEMP
-    if (this.backgroundImageset != bg)
-      this.backgroundImageset = bg;
-
-    const time = wwt.stc.get_now();
-    if (this.currentTime != time)
-      this.currentTime = time;
-
-    const fg = wwt.ctl.renderContext.get_foregroundImageset() || null; // TEMP
-    if (this.foregroundImageset != fg)
-      this.foregroundImageset = fg;
-
-    if (this.foregroundOpacity != wwt.ctl.renderContext.viewCamera.opacity)
-      this.foregroundOpacity = wwt.ctl.renderContext.viewCamera.opacity;
-
-    if (this.renderType != wwt.ctl.renderType)
-      this.renderType = wwt.ctl.renderType;
-
-    const player = wwt.getActiveTourPlayer();
-    this.tourTimecode = wwt.getEffectiveTourTimecode();
-
-    if (player !== null) {
-      this.isTourPlayerActive = true;
-      this.isTourPlaying = wwt.getIsTourPlaying(player);
-    } else {
-      this.isTourPlayerActive = false;
-      this.isTourPlaying = false;
-    }
-
-    const showWebGl2Warning = !wwt.si.isUsingWebGl2()
-      && (Date.now() - this.timeAtStartup) < 15000;
-    if (this.showWebGl2Warning != showWebGl2Warning) {
-      this.showWebGl2Warning = showWebGl2Warning;
-    }
-  }
-
-  @Mutation
-  internalIncrementTourCompletions(): void {
-    this.tourCompletions += 1;
-  }
-
-  @Mutation
-  applySetting(setting: EngineSetting): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot applySetting without linking to WWTInstance');
-    Vue.$wwt.inst.applySetting(setting);
-  }
-
-  @Mutation
-  setBackgroundImageByName(imagesetName: string): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setBackgroundImageByName without linking to WWTInstance');
-    Vue.$wwt.inst.setBackgroundImageByName(imagesetName);
-  }
-
-  @Mutation
-  setForegroundImageByName(imagesetName: string): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setForegroundImageByName without linking to WWTInstance');
-    Vue.$wwt.inst.setForegroundImageByName(imagesetName);
-  }
-
-  @Mutation
-  setForegroundOpacity(opacity: number): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setForegroundOpacity without linking to WWTInstance');
-    Vue.$wwt.inst.setForegroundOpacity(opacity);
-    this.foregroundOpacity = opacity;
-  }
-
-  @Mutation
-  setupForImageset(options: SetupForImagesetOptions): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setupForImageset without linking to WWTInstance');
-    Vue.$wwt.inst.setupForImageset(options);
-  }
-
-  @Mutation
-  zoom(factor: number): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot zoom without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.zoom(factor);
-  }
-
-  @Mutation
-  move(args: { x: number; y: number }): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot move without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.move(args.x, args.y);
-  }
-
-  @Mutation
-  tilt(args: { x: number; y: number }): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot tilt without linking to WWTInstance');
-    Vue.$wwt.inst.ctl._tilt(args.x, args.y);
-  }
-
-  @Mutation
-  setTime(time: Date): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setTime without linking to WWTInstance');
-    Vue.$wwt.inst.stc.set_now(time);
-    this.clockDiscontinuities += 1;
-  }
-
-  @Mutation
-  setClockRate(rate: number): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setClockRate without linking to WWTInstance');
-
-    if (Vue.$wwt.inst.stc.get_timeRate() != rate) {
-      Vue.$wwt.inst.stc.set_timeRate(rate);
-      this.clockRate = rate;
-      this.clockDiscontinuities += 1;
-    }
-  }
-
-  @Mutation
-  setClockSync(isSynced: boolean): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setClockSync without linking to WWTInstance');
-
-    if (Vue.$wwt.inst.stc.get_syncToClock() != isSynced) {
-      Vue.$wwt.inst.stc.set_syncToClock(isSynced);
-
-      if (isSynced) {
-        this.clockRate = Vue.$wwt.inst.stc.get_timeRate();
-      } else {
-        this.clockRate = 0;
-      }
-
-      this.clockDiscontinuities += 1;
-    }
-  }
-
-  @Mutation
-  startTour(): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot start tour without linking to WWTInstance');
-
-    const player = Vue.$wwt.inst.getActiveTourPlayer();
-    if (player === null)
-      throw new Error('no tour to start');
-
-    player.play();
-  }
-
-  @Mutation
-  toggleTourPlayPauseState(): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot play/pause tour without linking to WWTInstance');
-
-    const player = Vue.$wwt.inst.getActiveTourPlayer();
-    if (player === null)
-      throw new Error('no tour to play/pause');
-
-    // Despite the unclear name, this function does toggle play/pause state.
-    player.pauseTour();
-  }
-
-  @Mutation
-  setTourPlayerLeaveSettingsWhenStopped(value: boolean): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setTourPlayerLeaveSettingsWhenStopped without linking to WWTInstance');
-
-    const player = Vue.$wwt.inst.getActiveTourPlayer();
-    if (player === null)
-      throw new Error('no tour player to control');
-
-    player.set_leaveSettingsWhenStopped(value);
-  }
-
-  @Mutation
-  seekToTourTimecode(value: number): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot seekToTourTimecode without linking to WWTInstance');
-
-    Vue.$wwt.inst.seekToTourTimecode(value);
-  }
-
-  @Action({ rawError: true })
-  async waitForReady(): Promise<void> {
-    if (Vue.$wwt.inst !== null) {
-      return Vue.$wwt.inst.waitForReady();
-    } else {
-      return new Promise((resolve, _reject) => {
-        const waitThenResolve = (): void => {
-          (Vue.$wwt.inst as WWTInstance).waitForReady().then(resolve);
-        };
-
-        if (Vue.$wwt.inst !== null) {
-          waitThenResolve();
-        } else {
-          Vue.$wwt.onLinkedCallbacks.push(waitThenResolve);
-        }
-      });
-    }
-  }
-
-  @Action({ rawError: true })
-  async gotoRADecZoom(
-    { raRad, decRad, zoomDeg, instant, rollRad }: GotoRADecZoomParams
-  ): Promise<void> {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
-    return Vue.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad);
-  }
-
-  @Action({ rawError: true })
-  async gotoTarget(options: GotoTargetOptions): Promise<void> {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot gotoTarget without linking to WWTInstance');
-    return Vue.$wwt.inst.gotoTarget(options);
-  }
-
-  @Mutation
-  setTrackedObject(obj: SolarSystemObjects): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setTrackedObject without linking to WWTInstance');
-    Vue.$wwt.inst.ctl.renderContext.set_solarSystemTrack(obj);
-  }
-
-  @MutationAction
-  async loadTour(
-    { url, play }: LoadTourParams
-  ) {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot loadTour without linking to WWTInstance');
-
-    if (play)
-      await Vue.$wwt.inst.loadAndPlayTour(url);
-    else
-      await Vue.$wwt.inst.loadTour(url);
-
-    let tourRunTime: number | null = null;
-    const tourStopStartTimes: number[] = [];
-
-    const player = Vue.$wwt.inst.getActiveTourPlayer();
-    if (player !== null) {
-      const tour = player.get_tour();
-      if (tour !== null) {
-        tourRunTime = tour.get_runTime() * 0.001; // ms => s
-        const nStops = tour.get_tourStops().length;
-
-        for (let i = 0; i < nStops; i++) {
-          tourStopStartTimes.push(tour.elapsedTimeTillTourstop(i));
-        }
-      }
-    }
-
-    return { tourRunTime, tourStopStartTimes };
-  }
-
-  @Mutation
-  updateAvailableImagesets(): void {
-    this.availableImagesets = availableImagesets();
-  }
-
-  @Action({ rawError: true })
-  async loadImageCollection(
-    { url, loadChildFolders }: LoadImageCollectionParams
-  ): Promise<Folder> {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot loadImageCollection without linking to WWTInstance');
-    const result = await Vue.$wwt.inst.loadImageCollection(url, loadChildFolders);
-    (this.context.state as WWTEngineVuexState).availableImagesets = availableImagesets();
-    return result;
-  }
-
-  // General layers
-
-  activeLayers: string[] = [];
-
-  @Mutation
-  deleteLayer(id: string | Guid): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot deleteLayer without linking to WWTInstance');
-
-    let stringId = "";
-
-    if (typeof id === "string") {
-      stringId = id;
-      const guid = Guid.fromString(id);
-      Vue.$wwt.inst.lm.deleteLayerByID(guid, true, true);
-    } else {
-      stringId = id.toString();
-      Vue.$wwt.inst.lm.deleteLayerByID(id, true, true);
-    }
-
-    // Mirror modification in the reactive system. Here we just
-    // delete willy-nilly and ignore any missing cases.
-
-    Vue.delete(this.imagesetLayers, stringId);
-    Vue.delete(this.spreadSheetLayers, stringId);
-
-    this.activeLayers = activeLayersList();
-  }
-
-  // Imageset layers, including FITS layers
-
-  imagesetLayers: { [guidtext: string]: ImageSetLayerState } = {};
-
-  get imagesetStateForLayer() {
-    return (guidtext: string): ImageSetLayerState | null => {
-      if (Vue.$wwt.inst === null)
+      return this.$wwt.inst.ctl.getScreenPointForCoordinates(pt.ra / 15, pt.dec);
+    },
+
+    imagesetStateForLayer: (state) => function (guidtext: string): ImageSetLayerState | null {
+      if (this.$wwt.inst === null)
         throw new Error('cannot get imagesetStateForLayer without linking to WWTInstance');
-      return this.imagesetLayers[guidtext] || null;
-    }
-  }
+      return state.imagesetLayers[guidtext] || null;
+    },
 
-  get imagesetForLayer() {
-    return function (guidtext: string): Imageset | null {
-      if (Vue.$wwt.inst === null)
+    activeImagesetLayerStates: (state) => function () {
+      const states: ImageSetLayerState[] = [];
+  
+      for (const guid of state.activeLayers) {
+        const layerState = state.imagesetLayers[guid];
+        if (layerState) {
+          states.push(layerState);
+        }
+      }
+  
+      return states;
+    },
+
+    imagesetForLayer: (state) => function (guidtext: string): Imageset | null {
+      if (this.$wwt.inst === null)
         throw new Error('cannot get imagesetForLayer without linking to WWTInstance');
 
-      const layer = Vue.$wwt.inst.lm.get_layerList()[guidtext];
+      const layer = this.$wwt.inst.lm.get_layerList()[guidtext];
 
       if (layer !== null && layer instanceof ImageSetLayer) {
         return layer.get_imageSet();
       } else {
         return null;
       }
-    }
-  }
+    },
 
-  get activeImagesetLayerStates() {
-    const states: ImageSetLayerState[] = [];
-
-    for (const guid of this.activeLayers) {
-      const state = this.imagesetLayers[guid];
-      if (state) {
-        states.push(state);
-      }
-    }
-
-    return states;
-  }
-
-  @Action({ rawError: true })
-  async viewAsTourXml(name: string): Promise<string | null> {
-    WWTControl.singleton.createTour(name || "");
-    const editor = WWTControl.singleton.tourEdit;
-    editor.addSlide(false);
-    const tour = editor.get_tour();
-    if (tour === null) {
-      return new Promise((resolve, _reject) => resolve(null));
-    }
-    const blob = tour.saveToBlob();
-    const reader = new FileReader();
-    reader.readAsText(blob);
-
-    let tourXml = "";
-    return new Promise((resolve, _reject) => {
-      reader.onloadend = () => {
-        tourXml += reader.result;
-        resolve(tourXml);
-      }
-    });
-  }
-
-  @Action({ rawError: true })
-  async addImageSetLayer(
-    options: AddImageSetLayerOptions
-  ): Promise<ImageSetLayer> {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot addImageSetLayer without linking to WWTInstance');
-
-    // Mirror the layer state into the reactivity system.
-    const wwtLayer = await Vue.$wwt.inst.addImageSetLayer(options);
-    const guidText = wwtLayer.id.toString();
-    Vue.set(this.imagesetLayers, guidText, new ImageSetLayerState(wwtLayer));
-
-    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
-    return wwtLayer;
-  }
-
-  // deprecated, but maintained for compatibility:
-  @Action({ rawError: true })
-  async loadFitsLayer(
-    options: LoadFitsLayerOptions
-  ): Promise<ImageSetLayer> {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot loadFitsLayer without linking to WWTInstance');
-
-    const addImageSetLayerOptions: AddImageSetLayerOptions = {
-      url: options.url,
-      mode: "fits",
-      name: options.name,
-      goto: options.gotoTarget
-    };
-
-    return Vue.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
-  }
-
-  @Mutation
-  setImageSetLayerOrder(options: SetLayerOrderOptions): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
-
-    Vue.$wwt.inst.setImageSetLayerOrder(options);
-    this.activeLayers = activeLayersList();
-  }
-
-
-  @Mutation
-  stretchFitsLayer(options: StretchFitsLayerOptions): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot stretchFitsLayer without linking to WWTInstance');
-
-    Vue.$wwt.inst.stretchFitsLayer(options);
-
-    // Update the reactive mirror.
-    const state = this.imagesetLayers[options.id];
-    if (state) {
-      state.scaleType = options.stretch;
-      state.vmin = options.vmin;
-      state.vmax = options.vmax;
-    }
-  }
-
-  @Mutation
-  setFitsLayerColormap(options: SetFitsLayerColormapOptions): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot setFitsLayerColormap without linking to WWTInstance');
-
-    Vue.$wwt.inst.setFitsLayerColormap(options);
-
-    // Update the reactive mirror.
-    const state = this.imagesetLayers[options.id];
-    if (state) {
-      state.colormapName = options.name;
-    }
-  }
-
-  @Mutation
-  applyFitsLayerSettings(options: ApplyFitsLayerSettingsOptions): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot applyFitsLayerSettings without linking to WWTInstance');
-
-    Vue.$wwt.inst.applyFitsLayerSettings(options);
-
-    // Update the reactive mirror.
-    const state = this.imagesetLayers[options.id];
-    if (state) {
-      for (const s of options.settings) {
-        applyImageSetLayerSetting(state.settings, s);
-      }
-    }
-  }
-
-  // Spreadsheet layers
-
-  spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState } = {};
-
-  @Action({ rawError: true })
-  async createTableLayer(
-    options: CreateTableLayerParams
-  ): Promise<SpreadSheetLayer> {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot createTableLayer without linking to WWTInstance');
-
-    const layer = Vue.$wwt.inst.lm.createSpreadsheetLayer(
-      options.referenceFrame,
-      options.name,
-      options.dataCsv
-    );
-
-    // Value-add init copied from the pywwt JS component.
-    // Override any column guesses:
-    layer.set_lngColumn(-1);
-    layer.set_latColumn(-1);
-    layer.set_altColumn(-1);
-    layer.set_sizeColumn(-1);
-    layer.set_colorMapColumn(-1);
-    layer.set_startDateColumn(-1);
-    layer.set_endDateColumn(-1);
-    layer.set_xAxisColumn(-1);
-    layer.set_yAxisColumn(-1);
-    layer.set_zAxisColumn(-1);
-
-    layer.set_altUnit(AltUnits.meters);
-    layer.set_referenceFrame(options.referenceFrame);
-
-    if (options.referenceFrame == 'Sky') {
-      layer.set_astronomical(true);
-    }
-
-    // Currently, table creation is synchronous, but treat it as async
-    // in case our API needs to get more sophisticated later.
-    const prom = new Promise<SpreadSheetLayer>((resolve, _reject) => resolve(layer));
-
-    // Mirror the layer state into the reactivity system.
-    const wwtLayer = await prom;
-    const guidText = wwtLayer.id.toString();
-    Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
-
-    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
-    return wwtLayer;
-  }
-
-  @Mutation
-  applyTableLayerSettings(options: ApplyTableLayerSettingsOptions): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot applyTableLayerSettings without linking to WWTInstance');
-
-    Vue.$wwt.inst.applyTableLayerSettings(options);
-
-    // Mirror changes in the reactive framework.
-    const state = this.spreadSheetLayers[options.id];
-
-    if (state !== undefined) {
-      for (const s of options.settings) {
-        applySpreadSheetLayerSetting(state, s);
-      }
-    }
-  }
-
-  @Mutation
-  updateTableLayer(options: UpdateTableLayerOptions): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot updateTableLayer without linking to WWTInstance');
-    Vue.$wwt.inst.updateTableLayer(options);
-
-    // Nothing to mirror in reactive-land -- this call affects the table data.
-  }
-
-  // Progressive HiPS catalogs.
-  //
-  // These have some characteristics of imagesets, and some characteristics
-  // of spreadsheet layers.
-
-  get layerForHipsCatalog() {
-    return function (name: string): SpreadSheetLayer | null {
-      if (Vue.$wwt.inst === null)
+    layerForHipsCatalog: (state) => function (name: string): SpreadSheetLayer | null {
+      if (state.$wwt.inst === null)
         throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
 
       const id = Guid.createFrom(name).toString();
-      return spreadSheetLayerByKey(id);
-    }
-  }
+      return spreadSheetLayerByKey($wwt, id);
+    },
 
-  get spreadsheetStateForHipsCatalog() {
-    return (name: string): SpreadSheetLayerSettingsInterfaceRO | null => {
-      if (Vue.$wwt.inst === null)
+    spreadsheetStateForHipsCatalog: (state) => function (name: string): SpreadSheetLayerSettingsInterfaceRO | null {
+      if (this.$wwt.inst === null)
         throw new Error('cannot get spreadsheetStateForHipsCatalog without linking to WWTInstance');
 
       const id = Guid.createFrom(name).toString();
-      return this.spreadSheetLayers[id] || null;
-    }
-  }
+      return state.spreadSheetLayers[id] || null;
+    },
 
-  get spreadSheetLayerById() {
-    return function (id: string): SpreadSheetLayer | null {
-      return spreadSheetLayerByKey(id);
-    }
-  }
+    spreadSheetLayerById: (state) => function (id: string): SpreadSheetLayer | null {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot get spreadsheetLayerById without linking to WWTInstance');
+      return spreadSheetLayerByKey(this.$wwt, id);
+    },
 
-  get spreadsheetStateById() {
-    return (id: string): SpreadSheetLayerSettingsInterfaceRO | null => {
-      if (Vue.$wwt.inst === null)
+    spreadsheetStateById: (state) => function (id: string): SpreadSheetLayerSettingsInterfaceRO | null {
+      if (this.$wwt.inst === null)
         throw new Error('cannot get spreadsheetStateById without linking to WWTInstance');
 
-      return this.spreadSheetLayers[id] || null;
-    }
-  }
-
-  get spreadSheetLayer() {
-    return (catalog: CatalogLayerInfo): SpreadSheetLayer | null => {
-      if (Vue.$wwt.inst === null)
+      return state.spreadSheetLayers[id] || null;
+    },
+  
+    spreadSheetLayer: (state) => function (catalog: CatalogLayerInfo): SpreadSheetLayer | null {
+      if (this.$wwt.inst === null)
         throw new Error('cannot get spreadSheetLayer without linking to WWTInstance');
 
       const key = catalogLayerKey(catalog);
-      return spreadSheetLayerByKey(key);
-    }
-  }
-
-  get spreadsheetState() {
-    return (catalog: CatalogLayerInfo): SpreadSheetLayerSettingsInterfaceRO | null => {
-      if (Vue.$wwt.inst === null)
+      return spreadSheetLayerByKey(this.$wwt, key);
+    },
+  
+    spreadsheetState: (state) => function (catalog: CatalogLayerInfo): SpreadSheetLayerSettingsInterfaceRO | null {
+      if (this.$wwt.inst === null)
         throw new Error('cannot get spreadsheetState without linking to WWTInstance');
 
       const key = catalogLayerKey(catalog);
-      return this.spreadSheetLayers[key] || null;
+      return state.spreadSheetLayers[key] || null;
     }
-  }
 
-  @Action({ rawError: true })
-  async addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
+  },
 
-    const imgset = await Vue.$wwt.inst.addCatalogHipsByName(options);
+  actions: {
+    internalLinkToInstance(wwt: WWTInstance): void {
+      this.$wwt.link(wwt);
+    },
 
-    // Mirror the spreadsheet layer aspect into the reactivity system.
+    internalUnlinkFromInstance(): void {
+      this.$wwt.unlink();
+    },
 
-    const hips = imgset.get_hipsProperties();
+    internalUpdate(): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot internalUpdate without linking to WWTInstance');
+  
+      const wwt = this.$wwt.inst;
+  
+      const raRad = wwt.si.getRA() * H2R;
+      if (this.raRad != raRad)
+        this.raRad = raRad;
+  
+      const decRad = wwt.si.getDec() * D2R;
+      if (this.decRad != decRad)
+        this.decRad = decRad;
+  
+      const zoomDeg = wwt.ctl.renderContext.viewCamera.zoom;
+      if (this.zoomDeg != zoomDeg)
+        this.zoomDeg = zoomDeg;
+  
+      const rollRad = wwt.ctl.renderContext.viewCamera.rotation;
+      if (this.rollRad != rollRad)
+        this.rollRad = rollRad;
+  
+      const bg = wwt.ctl.renderContext.get_backgroundImageset() || null; // TEMP
+      if (this.backgroundImageset != bg)
+        this.backgroundImageset = bg;
+  
+      const time = wwt.stc.get_now();
+      if (this.currentTime != time)
+        this.currentTime = time;
+  
+      const fg = wwt.ctl.renderContext.get_foregroundImageset() || null; // TEMP
+      if (this.foregroundImageset != fg)
+        this.foregroundImageset = fg;
+  
+      if (this.foregroundOpacity != wwt.ctl.renderContext.viewCamera.opacity)
+        this.foregroundOpacity = wwt.ctl.renderContext.viewCamera.opacity;
+  
+      if (this.renderType != wwt.ctl.renderType)
+        this.renderType = wwt.ctl.renderType;
+  
+      const player = wwt.getActiveTourPlayer();
+      this.tourTimecode = wwt.getEffectiveTourTimecode();
+  
+      if (player !== null) {
+        this.isTourPlayerActive = true;
+        this.isTourPlaying = wwt.getIsTourPlaying(player);
+      } else {
+        this.isTourPlayerActive = false;
+        this.isTourPlaying = false;
+      }
+  
+      const showWebGl2Warning = !wwt.si.isUsingWebGl2()
+        && (Date.now() - this.timeAtStartup) < 15000;
+      if (this.showWebGl2Warning != showWebGl2Warning) {
+        this.showWebGl2Warning = showWebGl2Warning;
+      }
+    },
 
-    if (hips !== null) {
-      const wwtLayer = hips.get_catalogSpreadSheetLayer();
+    applySetting(setting: EngineSetting): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot applySetting without linking to WWTInstance');
+      this.$wwt.inst.applySetting(setting);
+    },
+
+    setBackgroundImageByName(imagesetName: string): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setBackgroundImageByName without linking to WWTInstance');
+      this.$wwt.inst.setBackgroundImageByName(imagesetName);
+    },
+
+    setForegroundImageByName(imagesetName: string): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setForegroundImageByName without linking to WWTInstance');
+      this.$wwt.inst.setForegroundImageByName(imagesetName);
+    },
+
+    setForegroundOpacity(opacity: number): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setForegroundOpacity without linking to WWTInstance');
+      this.$wwt.inst.setForegroundOpacity(opacity);
+      this.foregroundOpacity = opacity;
+    },
+
+    setupForImageset(options: SetupForImagesetOptions): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setupForImageset without linking to WWTInstance');
+      this.$wwt.inst.setupForImageset(options);
+    },
+
+    zoom(factor: number): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot zoom without linking to WWTInstance');
+      this.$wwt.inst.ctl.zoom(factor);
+    },
+
+    move(args: { x: number; y: number }): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot move without linking to WWTInstance');
+      this.$wwt.inst.ctl.move(args.x, args.y);
+    },
+
+    tilt(args: { x: number; y: number }): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot tilt without linking to WWTInstance');
+      this.$wwt.inst.ctl._tilt(args.x, args.y);
+    },
+  
+    setTime(time: Date): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setTime without linking to WWTInstance');
+      this.$wwt.inst.stc.set_now(time);
+      this.clockDiscontinuities += 1;
+    },
+  
+    setClockRate(rate: number): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setClockRate without linking to WWTInstance');
+  
+      if (this.$wwt.inst.stc.get_timeRate() != rate) {
+        this.$wwt.inst.stc.set_timeRate(rate);
+        this.clockRate = rate;
+        this.clockDiscontinuities += 1;
+      }
+    },
+  
+    setClockSync(isSynced: boolean): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setClockSync without linking to WWTInstance');
+  
+      if (this.$wwt.inst.stc.get_syncToClock() != isSynced) {
+        this.$wwt.inst.stc.set_syncToClock(isSynced);
+  
+        if (isSynced) {
+          this.clockRate = this.$wwt.inst.stc.get_timeRate();
+        } else {
+          this.clockRate = 0;
+        }
+  
+        this.clockDiscontinuities += 1;
+      }
+    },
+  
+    startTour(): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot start tour without linking to WWTInstance');
+  
+      const player = this.$wwt.inst.getActiveTourPlayer();
+      if (player === null)
+        throw new Error('no tour to start');
+  
+      player.play();
+    },
+  
+    toggleTourPlayPauseState(): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot play/pause tour without linking to WWTInstance');
+  
+      const player = this.$wwt.inst.getActiveTourPlayer();
+      if (player === null)
+        throw new Error('no tour to play/pause');
+  
+      // Despite the unclear name, this function does toggle play/pause state.
+      player.pauseTour();
+    },
+  
+    setTourPlayerLeaveSettingsWhenStopped(value: boolean): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setTourPlayerLeaveSettingsWhenStopped without linking to WWTInstance');
+  
+      const player = this.$wwt.inst.getActiveTourPlayer();
+      if (player === null)
+        throw new Error('no tour player to control');
+  
+      player.set_leaveSettingsWhenStopped(value);
+    },
+  
+    seekToTourTimecode(value: number): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot seekToTourTimecode without linking to WWTInstance');
+  
+      this.$wwt.inst.seekToTourTimecode(value);
+    },
+
+    async waitForReady(): Promise<void> {
+      if (this.$wwt.inst !== null) {
+        return this.$wwt.inst.waitForReady();
+      } else {
+        return new Promise((resolve, _reject) => {
+          const waitThenResolve = (): void => {
+            (this.$wwt.inst as WWTInstance).waitForReady().then(resolve);
+          };
+  
+          if (this.$wwt.inst !== null) {
+            waitThenResolve();
+          } else {
+            this.$wwt.onLinkedCallbacks.push(waitThenResolve);
+          }
+        });
+      }
+    },
+
+    async gotoRADecZoom(
+      { raRad, decRad, zoomDeg, instant, rollRad }: GotoRADecZoomParams
+    ): Promise<void> {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
+      return this.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad);
+    },
+
+    async gotoTarget(options: GotoTargetOptions): Promise<void> {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot gotoTarget without linking to WWTInstance');
+      return this.$wwt.inst.gotoTarget(options);
+    },
+
+    setTrackedObject(obj: SolarSystemObjects): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setTrackedObject without linking to WWTInstance');
+      this.$wwt.inst.ctl.renderContext.set_solarSystemTrack(obj);
+    },
+
+    async loadTour(
+      { url, play }: LoadTourParams
+    ) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot loadTour without linking to WWTInstance');
+  
+      if (play)
+        await this.$wwt.inst.loadAndPlayTour(url);
+      else
+        await this.$wwt.inst.loadTour(url);
+  
+      let tourRunTime: number | null = null;
+      const tourStopStartTimes: number[] = [];
+  
+      const player = this.$wwt.inst.getActiveTourPlayer();
+      if (player !== null) {
+        const tour = player.get_tour();
+        if (tour !== null) {
+          tourRunTime = tour.get_runTime() * 0.001; // ms => s
+          const nStops = tour.get_tourStops().length;
+  
+          for (let i = 0; i < nStops; i++) {
+            tourStopStartTimes.push(tour.elapsedTimeTillTourstop(i));
+          }
+        }
+      }
+  
+      return { tourRunTime, tourStopStartTimes };
+    },
+
+    async loadImageCollection(
+      { url, loadChildFolders }: LoadImageCollectionParams
+    ): Promise<Folder> {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot loadImageCollection without linking to WWTInstance');
+      const result = await this.$wwt.inst.loadImageCollection(url, loadChildFolders);
+      this.availableImagesets = availableImagesets();
+      return result;
+    },
+
+    // General layers
+
+    deleteLayer(id: string | Guid): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot deleteLayer without linking to WWTInstance');
+  
+      let stringId = "";
+  
+      if (typeof id === "string") {
+        stringId = id;
+        const guid = Guid.fromString(id);
+        this.$wwt.inst.lm.deleteLayerByID(guid, true, true);
+      } else {
+        stringId = id.toString();
+        this.$wwt.inst.lm.deleteLayerByID(id, true, true);
+      }
+  
+      // Mirror modification in the reactive system. Here we just
+      // delete willy-nilly and ignore any missing cases.
+  
+      Vue.delete(this.imagesetLayers, stringId);
+      Vue.delete(this.spreadSheetLayers, stringId);
+  
+      this.activeLayers = activeLayersList(this.$wwt);
+    },
+
+    // Imageset layers, including FITS layers
+
+    async viewAsTourXml(name: string): Promise<string | null> {
+      WWTControl.singleton.createTour(name || "");
+      const editor = WWTControl.singleton.tourEdit;
+      editor.addSlide(false);
+      const tour = editor.get_tour();
+      if (tour === null) {
+        return new Promise((resolve, _reject) => resolve(null));
+      }
+      const blob = tour.saveToBlob();
+      const reader = new FileReader();
+      reader.readAsText(blob);
+  
+      let tourXml = "";
+      return new Promise((resolve, _reject) => {
+        reader.onloadend = () => {
+          tourXml += reader.result;
+          resolve(tourXml);
+        }
+      });
+    },
+
+    async addImageSetLayer(
+      options: AddImageSetLayerOptions
+    ): Promise<ImageSetLayer> {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot addImageSetLayer without linking to WWTInstance');
+  
+      // Mirror the layer state into the reactivity system.
+      const wwtLayer = await this.$wwt.inst.addImageSetLayer(options);
+      const guidText = wwtLayer.id.toString();
+      Vue.set(this.imagesetLayers, guidText, new ImageSetLayerState(wwtLayer));
+  
+      this.activeLayers = activeLayersList();
+      return wwtLayer;
+    },
+
+    // deprecated, but maintained for compatibility:
+    async loadFitsLayer(
+      options: LoadFitsLayerOptions
+    ): Promise<ImageSetLayer> {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot loadFitsLayer without linking to WWTInstance');
+  
+      const addImageSetLayerOptions: AddImageSetLayerOptions = {
+        url: options.url,
+        mode: "fits",
+        name: options.name,
+        goto: options.gotoTarget
+      };
+  
+      return this.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
+    },
+
+    setImageSetLayerOrder(options: SetLayerOrderOptions): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
+  
+      this.$wwt.inst.setImageSetLayerOrder(options);
+      this.activeLayers = activeLayersList();
+    },
+
+    stretchFitsLayer(options: StretchFitsLayerOptions): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot stretchFitsLayer without linking to WWTInstance');
+  
+      this.$wwt.inst.stretchFitsLayer(options);
+  
+      // Update the reactive mirror.
+      const state = this.imagesetLayers[options.id];
+      if (state) {
+        state.scaleType = options.stretch;
+        state.vmin = options.vmin;
+        state.vmax = options.vmax;
+      }
+    },
+
+    setFitsLayerColormap(options: SetFitsLayerColormapOptions): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot setFitsLayerColormap without linking to WWTInstance');
+  
+      this.$wwt.inst.setFitsLayerColormap(options);
+  
+      // Update the reactive mirror.
+      const state = this.imagesetLayers[options.id];
+      if (state) {
+        state.colormapName = options.name;
+      }
+    },
+
+    applyFitsLayerSettings(options: ApplyFitsLayerSettingsOptions): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot applyFitsLayerSettings without linking to WWTInstance');
+  
+      this.$wwt.inst.applyFitsLayerSettings(options);
+  
+      // Update the reactive mirror.
+      const state = this.imagesetLayers[options.id];
+      if (state) {
+        for (const s of options.settings) {
+          applyImageSetLayerSetting(state.settings, s);
+        }
+      }
+    },
+
+    // Spreadsheet layers
+
+    async createTableLayer(
+      options: CreateTableLayerParams
+    ): Promise<SpreadSheetLayer> {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createTableLayer without linking to WWTInstance');
+  
+      const layer = this.$wwt.inst.lm.createSpreadsheetLayer(
+        options.referenceFrame,
+        options.name,
+        options.dataCsv
+      );
+  
+      // Value-add init copied from the pywwt JS component.
+      // Override any column guesses:
+      layer.set_lngColumn(-1);
+      layer.set_latColumn(-1);
+      layer.set_altColumn(-1);
+      layer.set_sizeColumn(-1);
+      layer.set_colorMapColumn(-1);
+      layer.set_startDateColumn(-1);
+      layer.set_endDateColumn(-1);
+      layer.set_xAxisColumn(-1);
+      layer.set_yAxisColumn(-1);
+      layer.set_zAxisColumn(-1);
+  
+      layer.set_altUnit(AltUnits.meters);
+      layer.set_referenceFrame(options.referenceFrame);
+  
+      if (options.referenceFrame == 'Sky') {
+        layer.set_astronomical(true);
+      }
+  
+      // Currently, table creation is synchronous, but treat it as async
+      // in case our API needs to get more sophisticated later.
+      const prom = new Promise<SpreadSheetLayer>((resolve, _reject) => resolve(layer));
+  
+      // Mirror the layer state into the reactivity system.
+      const wwtLayer = await prom;
       const guidText = wwtLayer.id.toString();
       Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
-      const info = availableImagesets().find(x => x.name === options.name);
-      if (info !== undefined) {
-        info.id = guidText;
+  
+      this.activeLayers = activeLayersList();
+      return wwtLayer;
+    },
+
+    applyTableLayerSettings(options: ApplyTableLayerSettingsOptions): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot applyTableLayerSettings without linking to WWTInstance');
+  
+      this.$wwt.inst.applyTableLayerSettings(options);
+  
+      // Mirror changes in the reactive framework.
+      const state = this.spreadSheetLayers[options.id];
+  
+      if (state !== undefined) {
+        for (const s of options.settings) {
+          applySpreadSheetLayerSetting(state, s);
+        }
       }
+    },
+
+    updateTableLayer(options: UpdateTableLayerOptions): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot updateTableLayer without linking to WWTInstance');
+      this.$wwt.inst.updateTableLayer(options);
+  
+      // Nothing to mirror in reactive-land -- this call affects the table data.
+    },
+
+    // Progressive HiPS catalogs.
+    //
+    // These have some characteristics of imagesets, and some characteristics
+    // of spreadsheet layers.
+    async addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
+      if (this.$wwt.inst == null)
+        throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
+  
+      const imgset = await this.$wwt.inst.addCatalogHipsByName(options);
+  
+      // Mirror the spreadsheet layer aspect into the reactivity system.
+  
+      const hips = imgset.get_hipsProperties();
+  
+      if (hips !== null) {
+        const wwtLayer = hips.get_catalogSpreadSheetLayer();
+        const guidText = wwtLayer.id.toString();
+        Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+        const info = availableImagesets().find(x => x.name === options.name);
+        if (info !== undefined) {
+          info.id = guidText;
+        }
+      }
+  
+      this.activeLayers = activeLayersList();
+      return imgset;
+    },
+
+    getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
+      if (this.$wwt.inst == null)
+        throw new Error('cannot getCatalogHipsDataInView without linking to WWTInstance');
+      return this.$wwt.inst.getCatalogHipsDataInView(options);
+    },
+
+    removeCatalogHipsByName(name: string): void {
+      if (this.$wwt.inst == null)
+        throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
+  
+      this.$wwt.inst.ctl.removeCatalogHipsByName(name);
+  
+      // Un-mirror the spreadsheet layer aspect from the reactivity system. Here
+      // we leverage the quasi-hack that the GUID of the spreadsheet layer is set
+      // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
+  
+      const id = Guid.createFrom(name).toString();
+      Vue.delete(this.spreadSheetLayers, id);
+  
+      this.activeLayers = activeLayersList();
+    },
+
+    // Annotations
+
+    addAnnotation(ann: Annotation): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot addAnnotation without linking to WWTInstance');
+      this.$wwt.inst.si.addAnnotation(ann);
+    },
+
+    removeAnnotation(ann: Annotation): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeAnnotation without linking to WWTInstance');
+      this.$wwt.inst.si.removeAnnotation(ann);
+    },
+
+    clearAnnotations(): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot clearAnnotations without linking to WWTInstance');
+      this.$wwt.inst.si.clearAnnotations();
     }
 
-    (this.context.state as WWTEngineVuexState).activeLayers = activeLayersList();
-    return imgset;
-  }
+  },
 
-  @Action({ rawError: true })
-  getCatalogHipsDataInView(options: GetCatalogHipsDataInViewOptions): Promise<InViewReturnMessage> {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot getCatalogHipsDataInView without linking to WWTInstance');
-    return Vue.$wwt.inst.getCatalogHipsDataInView(options);
-  }
-
-  @Mutation
-  removeCatalogHipsByName(name: string): void {
-    if (Vue.$wwt.inst == null)
-      throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
-
-    Vue.$wwt.inst.ctl.removeCatalogHipsByName(name);
-
-    // Un-mirror the spreadsheet layer aspect from the reactivity system. Here
-    // we leverage the quasi-hack that the GUID of the spreadsheet layer is set
-    // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
-
-    const id = Guid.createFrom(name).toString();
-    Vue.delete(this.spreadSheetLayers, id);
-
-    this.activeLayers = activeLayersList();
-  }
-
-  // Annotations
-
-  @Mutation
-  addAnnotation(ann: Annotation): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot addAnnotation without linking to WWTInstance');
-    Vue.$wwt.inst.si.addAnnotation(ann);
-  }
-
-  @Mutation
-  removeAnnotation(ann: Annotation): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot removeAnnotation without linking to WWTInstance');
-    Vue.$wwt.inst.si.removeAnnotation(ann);
-  }
-
-  @Mutation
-  clearAnnotations(): void {
-    if (Vue.$wwt.inst === null)
-      throw new Error('cannot clearAnnotations without linking to WWTInstance');
-    Vue.$wwt.inst.si.clearAnnotations();
-  }
-}
+});

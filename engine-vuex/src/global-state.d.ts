@@ -1,13 +1,8 @@
-import Vue from 'vue';
+import 'pinia';
+import { WWTGlobalState } from './store';
 
-import { WWTGlobalState } from "./store";
-
-declare module 'vue/types/vue' {
-  interface Vue {
-    $wwt: WWTGlobalState;
-  }
-
-  interface VueConstructor {
+declare module 'pinia' {
+  export interface PiniaCustomProperties {
     $wwt: WWTGlobalState;
   }
 }
