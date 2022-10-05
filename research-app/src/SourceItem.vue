@@ -44,26 +44,26 @@
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
         <div class="detail-row">
-          <span class="prompt">RA:</span><span>{{ this.raStr }}</span>
+          <span class="prompt">RA:</span><span>{{ raStr }}</span>
         </div>
         <div class="detail-row">
-          <span class="prompt">Dec:</span><span>{{ this.decStr }}</span>
+          <span class="prompt">Dec:</span><span>{{ decStr }}</span>
         </div>
         <div class="detail-row">
           <span class="prompt">Table:</span
-          ><span>{{ this.source.catalogLayer.name }}</span>
+          ><span>{{ source.catalogLayer.name }}</span>
         </div>
         <div class="detail-row">
           <span class="prompt">Query Coordinates:</span
           ><a
-            :href="this.simbadCoordinatesURL"
+            :href="simbadCoordinatesURL"
             target="_blank"
             rel="noopener noreferrer"
             >SIMBAD</a
           >
           |
           <a
-            :href="this.nedCoordinatesURL"
+            :href="nedCoordinatesURL"
             target="_blank"
             rel="noopener noreferrer"
             >NED</a
@@ -75,141 +75,133 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/camelcase */
 
-import { mapActions, mapMutations, mapState } from "vuex";
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { PropType } from "vue";
+import { mapActions, mapState } from "pinia";
 
-import { Source } from "./store";
-import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
-import { WWTEngineVuexState } from "@wwtelescope/engine-vuex";
+import { Source, useResearchAppStore } from "./store";
+import { useEngineStore } from "@wwtelescope/engine-vuex";
 import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
+import { defineComponent } from "@vue/runtime-core";
 
 const R2D = 180 / Math.PI;
 
-@Component
-export default class SourceItem extends Vue {
-  @Prop({ required: true }) source!: Source;
-  hasFocus = false;
-  isSelected = false;
-  editing = false;
+export default defineComponent({
 
-  // From the stores
-  wwtDegZoom!: number;
-  gotoRADecZoom!: (args: {
-    raRad: number;
-    decRad: number;
-    zoomDeg: number;
-    instant: boolean;
-    rollRad?: number;
-  }) => Promise<void>;
-  removeSource!: (source: Source) => void;
+  props: {
+    source: { type: Object as PropType<Source>, required: true }
+  },
 
-  beforeCreate(): void {
-    this.$options.computed = {
-      ...mapState(wwtEngineNamespace, {
-        wwtDegZoom: (state, _getters) => (state as WWTEngineVuexState).zoomDeg,
-      }),
-      ...this.$options.computed,
-    };
-
-    this.$options.methods = {
-      ...this.$options.methods,
-      ...mapActions(wwtEngineNamespace, ["gotoRADecZoom"]),
-      ...mapMutations(wwtResearchAppNamespace, [
-        "removeSource",
-        "setSourceName",
-      ]),
-    };
-  }
-
-  handleDelete() {
-    this.removeSource(this.source);
-  }
-
-  handleMarkerClick() {
-    this.gotoRADecZoom({
-      zoomDeg: this.source.zoomDeg ?? this.wwtDegZoom,
-      raRad: this.source.ra,
-      decRad: this.source.dec,
-      instant: false,
-    }).catch((err) => console.log(err));
-  }
-
-  handleEditClick() {
-    this.editing = !this.editing;
-  }
-
-  @Watch("editing")
-  editingChanged(val: boolean, _oldVal: boolean) {
-    const input: HTMLInputElement = this.$el.getElementsByClassName(
-      "name-input"
-    )[0] as HTMLInputElement;
-    if (val) {
-      input.value = this.sourceName;
-    } else {
-      this.sourceName = input.value;
+  data() {
+    return {
+      hasFocus: false,
+      isSelected: false,
+      editing: false
     }
+  },
+
+  computed: {
+    ...mapState(useEngineStore, {
+      wwtDegZoom: "zoomDeg"
+    }),
+
+    raStr() {
+      return fmtHours(this.source.ra);
+    },
+
+    decStr() {
+      return fmtDegLat(this.source.dec);
+    },
+
+    searchRadius() {
+      // The return value is in arcminutes
+      // The minimum value that this can return is 1/6 arcminute = 10 arcseconds
+      return Math.max((2 * this.wwtDegZoom) / 360, 1 / 6);
+    },
+
+    sourceName: {
+      get(): string {
+        return this.source.name;
+      },
+      set(name: string) {
+        // eslint-disable-next-line vue/no-mutating-props
+        this.source.name = name;
+      }
+    },
+
+    simbadCoordinatesURL() {
+      const baseURL = "http://simbad.u-strasbg.fr/simbad/sim-coo?";
+      const params = {
+        "output.format": "HTML",
+        Coord: `${this.source.ra * R2D} ${this.source.dec * R2D}`,
+        Radius: String(this.searchRadius),
+        "Radius.unit": "arcmin",
+      };
+      return baseURL + new URLSearchParams(params).toString();
+    },
+
+    nedCoordinatesURL() {
+      const raString = fmtHours(this.source.ra, "h", "m") + "s";
+      const decString = fmtDegLat(this.source.dec, "d", "m") + "s";
+      const baseURL = "https://ned.ipac.caltech.edu/conesearch?";
+      const params = {
+        in_csys: "Equatorial",
+        in_equinox: "J2000",
+        coordinates: `${raString} ${decString}`,
+        radius: String(this.searchRadius),
+        hconst: "67.8",
+        omegam: "0.308",
+        omegav: "0.692",
+        wmap: "4",
+        corr_z: "1",
+        z_constraint: "Unconstrained",
+        z_unit: "z",
+        ot_include: "ANY",
+        nmp_op: "ANY",
+        search_type: "Near Position Search",
+        out_csys: "Same as Input",
+        obj_sort: "Distance to search center",
+      };
+      return baseURL + new URLSearchParams(params).toString();
+    }
+  },
+
+  methods: {
+    ...mapActions(useEngineStore, ["gotoRADecZoom"]),
+    ...mapActions(useResearchAppStore, ["removeSource"]),
+
+    handleDelete() {
+      this.removeSource(this.source);
+    },
+
+    handleMarkerClick() {
+      this.gotoRADecZoom({
+        zoomDeg: this.source.zoomDeg ?? this.wwtDegZoom,
+        raRad: this.source.ra,
+        decRad: this.source.dec,
+        instant: false,
+      }).catch((err) => console.log(err));
+    },
+
+    handleEditClick() {
+      this.editing = !this.editing;
+    }
+  },
+
+  watch: {
+    editing(val: boolean, _oldVal: boolean) {
+      const input: HTMLInputElement = this.$el.getElementsByClassName(
+        "name-input"
+      )[0] as HTMLInputElement;
+      if (val) {
+        input.value = this.sourceName;
+      } else {
+        this.sourceName = input.value;
+      }
+    } 
   }
 
-  get raStr() {
-    return fmtHours(this.source.ra);
-  }
-
-  get decStr() {
-    return fmtDegLat(this.source.dec);
-  }
-
-  get searchRadius() {
-    // The return value is in arcminutes
-    // The minimum value that this can return is 1/6 arcminute = 10 arcseconds
-    return Math.max((2 * this.wwtDegZoom) / 360, 1 / 6);
-  }
-
-  get sourceName(): string {
-    return this.source.name;
-  }
-
-  set sourceName(name: string) {
-    this.source.name = name;
-  }
-
-  get simbadCoordinatesURL() {
-    const baseURL = "http://simbad.u-strasbg.fr/simbad/sim-coo?";
-    const params = {
-      "output.format": "HTML",
-      Coord: `${this.source.ra * R2D} ${this.source.dec * R2D}`,
-      Radius: String(this.searchRadius),
-      "Radius.unit": "arcmin",
-    };
-    return baseURL + new URLSearchParams(params).toString();
-  }
-
-  get nedCoordinatesURL() {
-    const raString = fmtHours(this.source.ra, "h", "m") + "s";
-    const decString = fmtDegLat(this.source.dec, "d", "m") + "s";
-    const baseURL = "https://ned.ipac.caltech.edu/conesearch?";
-    const params = {
-      in_csys: "Equatorial",
-      in_equinox: "J2000",
-      coordinates: `${raString} ${decString}`,
-      radius: String(this.searchRadius),
-      hconst: "67.8",
-      omegam: "0.308",
-      omegav: "0.692",
-      wmap: "4",
-      corr_z: "1",
-      z_constraint: "Unconstrained",
-      z_unit: "z",
-      ot_include: "ANY",
-      nmp_op: "ANY",
-      search_type: "Near Position Search",
-      out_csys: "Same as Input",
-      obj_sort: "Distance to search center",
-    };
-    return baseURL + new URLSearchParams(params).toString();
-  }
-}
+});
 </script>
 
 <style scoped lang="less">
