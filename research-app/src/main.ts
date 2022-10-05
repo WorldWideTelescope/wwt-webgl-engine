@@ -1,7 +1,5 @@
 import Vue, { createApp } from "vue";
-import VTooltip from "v-tooltip";
-
-import { createPinia } from "pinia";
+import FloatingVue from "floating-vue";
 
 import vSelect from 'vue-select';
 import Chrome from 'vue-color/src/components/Chrome.vue';
@@ -37,7 +35,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-import Notifications from 'vue-notification';
+import Notifications from '@kyvg/vue3-notification';
 
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
@@ -48,8 +46,7 @@ import ImagesetItem from "./ImagesetItem.vue";
 import SourceItem from "./SourceItem.vue";
 import SpreadsheetItem from "./SpreadsheetItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
-import { WWTResearchAppModule } from "./store";
-import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
+import { wwtEngineNamespace } from "./namespaces";
 
 
 library.add(faAdjust);
@@ -106,8 +103,7 @@ createApp(App)
 
   // Plugins
   .use(Notifications)
-  .use(VTooltip)
-  .use(createPinia())
+  .use(FloatingVue)
 
   // Provide values
   .provide('wwtNamespace', wwtEngineNamespace)

@@ -7,18 +7,18 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "~1.2.28",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
+    "@kyvg/vue3-notification": "^2.4.1",
     "@wwtelescope/astro": "0.0.0-dev.0",
     "@wwtelescope/engine": "0.0.0-dev.0",
     "@wwtelescope/engine-helpers": "0.0.0-dev.0",
     "@wwtelescope/engine-types": "0.0.0-dev.0",
     "@wwtelescope/engine-vuex": "0.0.0-dev.0",
     "@wwtelescope/research-app-messages": "0.0.0-dev.0",
+    "floating-vue": "^2.0.0-beta.20",
     "moment": "^2.29.1",
     "screenfull": "^5",
-    "v-tooltip": "^2.1",
     "vue": "^3",
-    "vue3-notification": "^1.0.0",
-    "vuex": "^4.0.2"
+    "vue-slider-component": "^4.1.0-beta.2"
   },
   "description": "The AAS WorldWide Telescope research app.",
   "devDependencies": {
