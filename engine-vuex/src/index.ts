@@ -14,7 +14,7 @@ export {
   LoadImageCollectionParams,
   LoadTourParams,
   SpreadSheetLayerInfo,
-  WWTEngineVuexState,
+  WWTEnginePiniaState,
   useEngineStore
 } from "./store";
 

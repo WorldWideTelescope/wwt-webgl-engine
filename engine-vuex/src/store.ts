@@ -226,7 +226,7 @@ export class ImageSetLayerState {
  * The duplication of WWT's data structures is annoying, but the actual amount
  * of mirrored data isn't very big.
  */
-export interface WWTEngineVuexState {
+export interface WWTEnginePiniaState {
   // NOTE: We were orginally alphabetizing these all, but now I think it will be
   // better to group topically related fields.
 
@@ -466,7 +466,7 @@ export const useEngineStore = defineStore('wwt-engine', {
 
   // NOTE: We were originally alphabetizing these all, but now I think it will be
   // better to group topically related fields.
-  state: (): WWTEngineVuexState => ({
+  state: (): WWTEnginePiniaState => ({
     activeLayers: [],
     availableImagesets: [],
     backgroundImageset: null,
