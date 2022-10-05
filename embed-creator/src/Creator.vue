@@ -448,7 +448,6 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
 import {
   BButton,
   BCollapse,
@@ -473,6 +472,7 @@ import {
   EmbedQueryStringBuilder,
   PlanetaryBodies
 } from "@wwtelescope/embed-common";
+import { defineComponent } from "@vue/runtime-core";
 
 // From Tom Gruner @ http://stackoverflow.com/a/12034334/1660815 (without forward-slash subst)
 const entityMap: { [index: string]: string } = {
@@ -487,7 +487,8 @@ function escapeHtml(source: string) {
   return source.replace(/[&<>"']/g, s => entityMap[s]);
 }
 
-@Component({
+export default defineComponent({
+
   components: {
     BButton,
     BCollapse,
@@ -505,93 +506,101 @@ function escapeHtml(source: string) {
     BRow,
     BTab,
     BTabs
-  }
-})
-export default class Creator extends Vue {
-  CreditMode = CreditMode;
-  PlanetaryBodies = PlanetaryBodies;
+  },
 
-  qsb = new EmbedQueryStringBuilder();
-
-  currentTabIndex = 0;
-  clipboardNoticeFadeOut = false;
-  clipboardNoticeText = "";
-  showImageUrlValidity: boolean | null = null;
-  suggestDefaultStyling = true;
-
-  get queryString() {
-    const qs = new URLSearchParams(this.qsb.toQueryItems()).toString();
-    if (qs.length)
-      return "?" + qs;
-    return "";
-  }
-
-  get iframeBaseUrl() {
-    // note: in production, the environment variable will be replaced with a literal value
-    if (process.env.NODE_ENV == "development") {
-      return "http://localhost:23000/";
+  data() {
+    return {
+      CreditMode: CreditMode,
+      PlanetaryBodies: PlanetaryBodies,
+      qsb: new EmbedQueryStringBuilder(),
+      currentTabIndex: 0,
+      clipboardNoticeFadeOut: false,
+      clipboardNoticeText: "",
+      showImageUrlValidity: null as boolean | null,
+      suggestDefaultStyling: true
     }
+  },
 
-    return "https://web.wwtassets.org/embed/1/wwt/";
-  }
+  computed: {
+    queryString(): string {
+      const qs = new URLSearchParams(this.qsb.toQueryItems()).toString();
+      if (qs.length)
+        return "?" + qs;
+      return "";
+    },
 
-  get iframeSource() {
-    return `${this.iframeBaseUrl}${this.queryString}`;
-  }
-
-  get embedCode() {
-    const style = this.suggestDefaultStyling ? " frameborder=\"0\" style=\"width: 100%; height: 360px;\"" : "";
-    return `<iframe class="wwt-embed" src="${escapeHtml(this.iframeSource)}" allow="accelerometer; autoplay; clipboard-write; gyroscope" allowfullscreen ${style}>
-  <p>Cannot display WorldWide Telescope because your browser does not support iframes.</p>
-</iframe>`;
-  }
-
-  onShowImageUrlInput(url: string) {
-    let urlIsOk = false;
-
-    try {
-      const parsed = new URL(url);
-      const queryParams = new URLSearchParams(parsed.search);
-
-      if (parsed.pathname.toLowerCase() == "/wwtweb/showimage.aspx") {
-        const name = (queryParams.get("name") || "").replace(",", "");
-        queryParams.set("wtml", "true");
-        parsed.search = "?" + queryParams.toString();
-        this.qsb.s.wtmlUrl = parsed.toString();
-        this.qsb.s.wtmlPlace = name;
-        urlIsOk = true;
+    iframeBaseUrl(): string {
+      // note: in production, the environment variable will be replaced with a literal value
+      if (process.env.NODE_ENV == "development") {
+        return "http://localhost:23000/";
       }
-    } catch {
-      // We get an exception if `url` can't be parsed in the `new URL()` call.
-      urlIsOk = false;
+
+      return "https://web.wwtassets.org/embed/1/wwt/";
+    },
+
+    iframeSource(): string {
+      return `${this.iframeBaseUrl}${this.queryString}`;
+    },
+
+    embedCode(): string {
+      const style = this.suggestDefaultStyling ? " frameborder=\"0\" style=\"width: 100%; height: 360px;\"" : "";
+      return `<iframe class="wwt-embed" src="${escapeHtml(this.iframeSource)}" allow="accelerometer; autoplay; clipboard-write; gyroscope" allowfullscreen ${style}>
+      <p>Cannot display WorldWide Telescope because your browser does not support iframes.</p>
+      </iframe>`;
     }
 
-    this.showImageUrlValidity = urlIsOk;
+  },
 
-    if (urlIsOk) {
-      // Clear out state for other modes with which we're mutually exclusive.
-      this.qsb.planetaryBody = null;
+  methods: {
+    onShowImageUrlInput(url: string) {
+      let urlIsOk = false;
+
+      try {
+        const parsed = new URL(url);
+        const queryParams = new URLSearchParams(parsed.search);
+
+        if (parsed.pathname.toLowerCase() == "/wwtweb/showimage.aspx") {
+          const name = (queryParams.get("name") || "").replace(",", "");
+          queryParams.set("wtml", "true");
+          parsed.search = "?" + queryParams.toString();
+          this.qsb.s.wtmlUrl = parsed.toString();
+          this.qsb.s.wtmlPlace = name;
+          urlIsOk = true;
+        }
+      } catch {
+        // We get an exception if `url` can't be parsed in the `new URL()` call.
+        urlIsOk = false;
+      }
+
+      this.showImageUrlValidity = urlIsOk;
+
+      if (urlIsOk) {
+        // Clear out state for other modes with which we're mutually exclusive.
+        this.qsb.planetaryBody = null;
+      }
+    },
+
+    onClipboardSuccess() {
+      this.clipboardNoticeText = "Copied!";
+      this.clipboardNoticeFadeOut = true;
+      setTimeout(() => {
+        this.clipboardNoticeText = "";
+        this.clipboardNoticeFadeOut = false;
+      }, 2000);
+    },
+
+    onClipboardError() {
+      this.clipboardNoticeText = "Error copying to clipboard :-(";
+      this.clipboardNoticeFadeOut = true;
+      setTimeout(() => {
+        this.clipboardNoticeText = "";
+        this.clipboardNoticeFadeOut = false;
+      }, 2000);
     }
+
   }
 
-  onClipboardSuccess() {
-    this.clipboardNoticeText = "Copied!";
-    this.clipboardNoticeFadeOut = true;
-    setTimeout(() => {
-      this.clipboardNoticeText = "";
-      this.clipboardNoticeFadeOut = false;
-    }, 2000);
-  }
-
-  onClipboardError() {
-    this.clipboardNoticeText = "Error copying to clipboard :-(";
-    this.clipboardNoticeFadeOut = true;
-    setTimeout(() => {
-      this.clipboardNoticeText = "";
-      this.clipboardNoticeFadeOut = false;
-    }, 2000);
-  }
-}
+});
 </script>
 
 <style lang="scss">
