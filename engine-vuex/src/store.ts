@@ -494,100 +494,116 @@ export const useEngineStore = defineStore('wwt-engine', {
   }),
 
   getters: {
-    lookupImageset: (state) => function (imagesetName: string): Imageset | null {
+    lookupImageset(_state) {
+      return (imagesetName: string) => {
       if (this.$wwt.inst === null)
         throw new Error('cannot lookupImageset without linking to WWTInstance');
       return this.$wwt.inst.ctl.getImagesetByName(imagesetName);
+      }
     },
 
-    findRADecForScreenPoint: (state) => function (pt: { x: number; y: number }): { ra: number; dec: number } {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
-      const coords = this.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
-      return { ra: (15 * coords.x + 720) % 360, dec: coords.y };
+    findRADecForScreenPoint(_state) {
+      return (pt: { x: number; y: number }): { ra: number; dec: number } => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
+        const coords = this.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
+        return { ra: (15 * coords.x + 720) % 360, dec: coords.y };
+      }
     },
 
-    findScreenPointForRADec: (state) => function (pt: { ra: number; dec: number }): { x: number; y: number } {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot findScreenPointForRADec without linking to WWTInstance');
-      return this.$wwt.inst.ctl.getScreenPointForCoordinates(pt.ra / 15, pt.dec);
+    findScreenPointForRADec(_state) {
+      return (pt: { ra: number; dec: number }): { x: number; y: number } => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot findScreenPointForRADec without linking to WWTInstance');
+        return this.$wwt.inst.ctl.getScreenPointForCoordinates(pt.ra / 15, pt.dec);
+      }
     },
 
-    imagesetStateForLayer: (state) => function (guidtext: string): ImageSetLayerState | null {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot get imagesetStateForLayer without linking to WWTInstance');
-      return state.imagesetLayers[guidtext] || null;
+    imagesetStateForLayer(state) {
+      return (guidtext: string): ImageSetLayerState | null => {
+        return state.imagesetLayers[guidtext] || null;
+      }
     },
 
-    activeImagesetLayerStates: (state) => function () {
-      const states: ImageSetLayerState[] = [];
-  
-      for (const guid of state.activeLayers) {
-        const layerState = state.imagesetLayers[guid];
-        if (layerState) {
-          states.push(layerState);
+    activeImagesetLayerStates(state) {
+      return (): ImageSetLayerState[] => {
+        const states: ImageSetLayerState[] = [];
+    
+        for (const guid of state.activeLayers) {
+          const layerState = state.imagesetLayers[guid];
+          if (layerState) {
+            states.push(layerState);
+          }
+        }
+    
+        return states;
+      }
+    },
+
+    imagesetForLayer(_state){
+      return (guidtext: string): Imageset | null => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot get imagesetForLayer without linking to WWTInstance');
+
+        const layer = this.$wwt.inst.lm.get_layerList()[guidtext];
+
+        if (layer !== null && layer instanceof ImageSetLayer) {
+          return layer.get_imageSet();
+        } else {
+          return null;
         }
       }
-  
-      return states;
     },
 
-    imagesetForLayer: (state) => function (guidtext: string): Imageset | null {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot get imagesetForLayer without linking to WWTInstance');
+    layerForHipsCatalog(_state) {
+      return (name: string): SpreadSheetLayer | null => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
 
-      const layer = this.$wwt.inst.lm.get_layerList()[guidtext];
-
-      if (layer !== null && layer instanceof ImageSetLayer) {
-        return layer.get_imageSet();
-      } else {
-        return null;
+        const id = Guid.createFrom(name).toString();
+        return spreadSheetLayerByKey(this.$wwt, id);
       }
     },
 
-    layerForHipsCatalog: (state) => function (name: string): SpreadSheetLayer | null {
-      if (state.$wwt.inst === null)
-        throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
+    spreadsheetStateForHipsCatalog(state) {
+      return (name: string): SpreadSheetLayerSettingsInterfaceRO | null => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot get spreadsheetStateForHipsCatalog without linking to WWTInstance');
 
-      const id = Guid.createFrom(name).toString();
-      return spreadSheetLayerByKey($wwt, id);
+        const id = Guid.createFrom(name).toString();
+        return state.spreadSheetLayers[id] || null;
+      }
     },
 
-    spreadsheetStateForHipsCatalog: (state) => function (name: string): SpreadSheetLayerSettingsInterfaceRO | null {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot get spreadsheetStateForHipsCatalog without linking to WWTInstance');
-
-      const id = Guid.createFrom(name).toString();
-      return state.spreadSheetLayers[id] || null;
+    spreadSheetLayerById(_state) {
+      return (id: string): SpreadSheetLayer | null => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot get spreadsheetLayerById without linking to WWTInstance');
+        return spreadSheetLayerByKey(this.$wwt, id);
+      }
     },
 
-    spreadSheetLayerById: (state) => function (id: string): SpreadSheetLayer | null {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot get spreadsheetLayerById without linking to WWTInstance');
-      return spreadSheetLayerByKey(this.$wwt, id);
-    },
-
-    spreadsheetStateById: (state) => function (id: string): SpreadSheetLayerSettingsInterfaceRO | null {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot get spreadsheetStateById without linking to WWTInstance');
-
-      return state.spreadSheetLayers[id] || null;
+    spreadsheetStateById(state) {
+      return (id: string): SpreadSheetLayerSettingsInterfaceRO | null => {
+        return state.spreadSheetLayers[id] || null;
+      }
     },
   
-    spreadSheetLayer: (state) => function (catalog: CatalogLayerInfo): SpreadSheetLayer | null {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot get spreadSheetLayer without linking to WWTInstance');
+    spreadSheetLayer(_state) {
+      return (catalog: CatalogLayerInfo): SpreadSheetLayer | null => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot get spreadSheetLayer without linking to WWTInstance');
 
-      const key = catalogLayerKey(catalog);
-      return spreadSheetLayerByKey(this.$wwt, key);
+        const key = catalogLayerKey(catalog);
+        return spreadSheetLayerByKey(this.$wwt, key);
+      }
     },
   
-    spreadsheetState: (state) => function (catalog: CatalogLayerInfo): SpreadSheetLayerSettingsInterfaceRO | null {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot get spreadsheetState without linking to WWTInstance');
-
-      const key = catalogLayerKey(catalog);
-      return state.spreadSheetLayers[key] || null;
+    spreadsheetState(state) {
+      return (catalog: CatalogLayerInfo): SpreadSheetLayerSettingsInterfaceRO | null => {
+        const key = catalogLayerKey(catalog);
+        return state.spreadSheetLayers[key] || null;
+      }
     }
 
   },
@@ -896,7 +912,7 @@ export const useEngineStore = defineStore('wwt-engine', {
       editor.addSlide(false);
       const tour = editor.get_tour();
       if (tour === null) {
-        return new Promise((resolve, _reject) => resolve(null));
+        return Promise.resolve(null);
       }
       const blob = tour.saveToBlob();
       const reader = new FileReader();
@@ -922,7 +938,7 @@ export const useEngineStore = defineStore('wwt-engine', {
       const guidText = wwtLayer.id.toString();
       Vue.set(this.imagesetLayers, guidText, new ImageSetLayerState(wwtLayer));
   
-      this.activeLayers = activeLayersList();
+      this.activeLayers = activeLayersList(this.$wwt);
       return wwtLayer;
     },
 
@@ -948,7 +964,7 @@ export const useEngineStore = defineStore('wwt-engine', {
         throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
   
       this.$wwt.inst.setImageSetLayerOrder(options);
-      this.activeLayers = activeLayersList();
+      this.activeLayers = activeLayersList(this.$wwt);
     },
 
     stretchFitsLayer(options: StretchFitsLayerOptions): void {
@@ -1037,7 +1053,7 @@ export const useEngineStore = defineStore('wwt-engine', {
       const guidText = wwtLayer.id.toString();
       Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
   
-      this.activeLayers = activeLayersList();
+      this.activeLayers = activeLayersList(this.$wwt);
       return wwtLayer;
     },
 
@@ -1089,7 +1105,7 @@ export const useEngineStore = defineStore('wwt-engine', {
         }
       }
   
-      this.activeLayers = activeLayersList();
+      this.activeLayers = activeLayersList(this.$wwt);
       return imgset;
     },
 
@@ -1112,7 +1128,7 @@ export const useEngineStore = defineStore('wwt-engine', {
       const id = Guid.createFrom(name).toString();
       Vue.delete(this.spreadSheetLayers, id);
   
-      this.activeLayers = activeLayersList();
+      this.activeLayers = activeLayersList(this.$wwt);
     },
 
     // Annotations
