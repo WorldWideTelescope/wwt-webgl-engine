@@ -433,7 +433,7 @@ export default defineComponent({
 
       document.addEventListener("pointermove", onmove, { capture: true });
       document.addEventListener("pointerup", cleanup, { capture: true });
-      document.addEventListener("pointercancel", cleanup), { capture: true };
+      document.addEventListener("pointercancel", cleanup, { capture: true });
       document.addEventListener("keydown", onkeydown, { capture: true });
       document.documentElement.classList.add("pointer-tracking");
     }
