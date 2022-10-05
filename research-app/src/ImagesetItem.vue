@@ -119,9 +119,8 @@ import { mapActions, mapState } from "pinia";
 
 import { D2R } from "@wwtelescope/astro";
 import { ProjectionType, ScaleTypes } from "@wwtelescope/engine-types";
-import { Imageset, ImageSetLayerSetting } from "@wwtelescope/engine";
+import { ImageSetLayerSetting } from "@wwtelescope/engine";
 import {
-  ApplyFitsLayerSettingsOptions,
   StretchFitsLayerOptions,
 } from "@wwtelescope/engine-helpers";
 import {
@@ -129,7 +128,6 @@ import {
   useEngineStore,
 } from "@wwtelescope/engine-vuex";
 
-import { wwtEngineNamespace } from "./namespaces";
 import { defineComponent } from "@vue/runtime-core";
 
 interface UiColorMaps {
