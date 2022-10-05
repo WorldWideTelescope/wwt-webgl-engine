@@ -15,6 +15,7 @@ export {
   LoadTourParams,
   SpreadSheetLayerInfo,
   WWTEngineVuexState,
+  useEngineStore
 } from "./store";
 
 export { WWTAwareComponent } from "./wwtaware";
