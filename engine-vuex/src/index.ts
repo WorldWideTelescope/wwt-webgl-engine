@@ -23,30 +23,7 @@ import WWTComponent from "./Component.vue";
 import { WWTGlobalState } from './store';
 export { WWTComponent }
 
-// The Vue plugin that activates everything.
 const pinia = createPinia();
 pinia.use(({ store }) => {
   store.$wwt = new WWTGlobalState();
 });
-
-
-/** Docstring for engine plugin options. */
-// export interface WWTEnginePluginOptions<S> {
-//   store: Store<S>;
-//   namespace: string;
-// }
-
-// /** This function is a hack to allow TypeScript to infer the `<S>` parent store type. */
-// export function createPlugin<S>(): PluginObject<WWTEnginePluginOptions<S>> {
-//   return {
-//     install(Vue: VueConstructor, options: WWTEnginePluginOptions<S> | undefined): void {
-//       if (!options || !options.store) {
-//         throw new Error('You must provide a "store" when initializing the WWT engine-vuex plugin.');
-//       }
-
-//       options.store.registerModule(options.namespace, WWTEngineVuexModule);
-//       Vue.component('WorldWideTelescope', WWTComponent);
-//       Vue.$wwt = new WWTGlobalState();
-//     }
-//   }
-// }

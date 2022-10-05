@@ -5,7 +5,6 @@
 // descriptions of pretty much everything in this file. Update those docs when
 // adding new features here.
 
-import { VueWWT as Vue } from "./global-state";
 import { defineStore } from 'pinia';
 
 import { D2R, H2R } from "@wwtelescope/astro";
@@ -675,6 +674,10 @@ export const useEngineStore = defineStore('wwt-engine', {
       }
     },
 
+    internalIncrementTourCompletions(): void {
+      this.tourCompletions += 1;
+    },
+
     applySetting(setting: EngineSetting): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot applySetting without linking to WWTInstance');
@@ -897,9 +900,8 @@ export const useEngineStore = defineStore('wwt-engine', {
   
       // Mirror modification in the reactive system. Here we just
       // delete willy-nilly and ignore any missing cases.
-  
-      Vue.delete(this.imagesetLayers, stringId);
-      Vue.delete(this.spreadSheetLayers, stringId);
+      delete this.imagesetLayers[stringId];
+      delete this.spreadSheetLayers[stringId];
   
       this.activeLayers = activeLayersList(this.$wwt);
     },
@@ -936,7 +938,7 @@ export const useEngineStore = defineStore('wwt-engine', {
       // Mirror the layer state into the reactivity system.
       const wwtLayer = await this.$wwt.inst.addImageSetLayer(options);
       const guidText = wwtLayer.id.toString();
-      Vue.set(this.imagesetLayers, guidText, new ImageSetLayerState(wwtLayer));
+      this.imagesetLayers[guidText] = new ImageSetLayerState(wwtLayer);
   
       this.activeLayers = activeLayersList(this.$wwt);
       return wwtLayer;
@@ -1046,12 +1048,12 @@ export const useEngineStore = defineStore('wwt-engine', {
   
       // Currently, table creation is synchronous, but treat it as async
       // in case our API needs to get more sophisticated later.
-      const prom = new Promise<SpreadSheetLayer>((resolve, _reject) => resolve(layer));
+      const prom = Promise.resolve(layer);
   
       // Mirror the layer state into the reactivity system.
       const wwtLayer = await prom;
       const guidText = wwtLayer.id.toString();
-      Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+      this.spreadSheetLayers[guidText] = new SpreadSheetLayerState(wwtLayer);
   
       this.activeLayers = activeLayersList(this.$wwt);
       return wwtLayer;
@@ -1098,7 +1100,7 @@ export const useEngineStore = defineStore('wwt-engine', {
       if (hips !== null) {
         const wwtLayer = hips.get_catalogSpreadSheetLayer();
         const guidText = wwtLayer.id.toString();
-        Vue.set(this.spreadSheetLayers, guidText, new SpreadSheetLayerState(wwtLayer));
+        this.spreadSheetLayers[guidText] = new SpreadSheetLayerState(wwtLayer);
         const info = availableImagesets().find(x => x.name === options.name);
         if (info !== undefined) {
           info.id = guidText;
@@ -1126,7 +1128,7 @@ export const useEngineStore = defineStore('wwt-engine', {
       // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
   
       const id = Guid.createFrom(name).toString();
-      Vue.delete(this.spreadSheetLayers, id);
+      delete this.spreadSheetLayers[id];
   
       this.activeLayers = activeLayersList(this.$wwt);
     },
