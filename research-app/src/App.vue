@@ -358,21 +358,20 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as moment from "moment";
 import * as screenfull from "screenfull";
 import "vue-select/dist/vue-select.css";
 import { Buffer } from "buffer";
-import { Component, Prop, Watch } from "vue-property-decorator";
-import { mapGetters, mapMutations, mapState } from "vuex";
+import { mapActions, mapState } from "pinia";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
-import { Source, WWTResearchAppModule } from "./store";
+import { Source, useResearchAppStore } from "./store";
 import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
 
+import { useEngineStore } from "@wwtelescope/engine-vuex";
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
 
 interface Message {
@@ -443,6 +442,7 @@ import {
 import { extractCircleAnnotationSettings } from "@wwtelescope/engine-helpers/src/circleannotation";
 import { extractPolyAnnotationSettings } from "@wwtelescope/engine-helpers/src/polyannotation";
 import { extractPolyLineAnnotationSettings } from "@wwtelescope/engine-helpers/src/polylineannotation";
+import { defineComponent } from "@vue/runtime-core";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1188,22 +1188,30 @@ function eventSourceAsWindow(e: MessageEvent): Window | null {
 }
 
 /** The main "research app" Vue component. */
-@Component
-export default class App extends WWTAwareComponent {
-  @Prop({ default: null }) readonly allowedOrigin!: string | null;
-  @Prop({ default: () => new KeyboardControlSettings({}) })
-  private _kcs!: KeyboardControlSettings;
+export default defineComponent({
 
-  defaultColor = Color.fromArgb(1, 255, 255, 255);
-  wwtComponentNamespace = wwtEngineNamespace;
-  lastClosePt: RawSourceInfo | null = null;
-  lastSelectedSource: Source | null = null;
-  distanceThreshold = 4;
-  hideAllChrome = false;
-  hipsUrl = "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips"; // Temporary
-  isPointerMoving = false;
-  pointerMoveThreshold = 6;
-  pointerStartPosition: { x: number; y: number } | null = null;
+  props: {
+    allowedOrigin: { type: [String, null], default: null },
+    kcs: { type: KeyboardControlSettings, default: new KeyboardControlSettings({}) }
+  },
+
+  data() {
+    return {
+      defaultColor: Color.fromArgb(1, 255, 255, 255),
+      wwtComponentNamespace: wwtEngineNamespace,
+      lastClosePt: null as RawSourceInfo | null,
+      lastSelectedSource: null as Source | null,
+      distanceThreshold: 4,
+      hideAllChrome: false,
+      hipsUrl: "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips", // Temporary
+      isPointerMoving: false,
+      pointerMoveThreshold: 6,
+      pointerStartPosition: null as { x: number; y: number } | null
+    }
+  },
+
+
+
 
   // From the store
   catalogNameMappings!: { [catalogName: string]: [string, string] };
@@ -3120,7 +3128,7 @@ export default class App extends WWTAwareComponent {
       showPopover: false,
     };
   }
-}
+});
 </script>
 
 <style lang="less">
