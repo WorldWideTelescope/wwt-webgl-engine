@@ -62,10 +62,10 @@
               }"
             ></font-awesome-icon>
             <template v-slot:popover>
-              <vue-color-chrome
-                :value="color"
-                @input="handleColorChange"
-              ></vue-color-chrome>
+              <color-picker
+                :color="color"
+                @changeColor="handleColorChange"
+              ></color-picker>
             </template>
           </v-popover>
         </div>
@@ -439,7 +439,7 @@ export default defineComponent({
 
 // For styling the nested vue-color component
 // This lets us style that component without de-scoping this CSS
-/deep/ * {
+:deep(*) {
   &.vc-chrome-body {
     background-color: #404040;
   }

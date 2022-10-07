@@ -2,7 +2,7 @@ import Vue, { createApp } from "vue";
 import FloatingVue from "floating-vue";
 
 import vSelect from 'vue-select';
-import Chrome from 'vue-color/src/components/Chrome.vue';
+import { ColorPicker } from "vue-color-kit";
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -127,7 +127,7 @@ createApp(App)
 
   // Add our components here
   .component('font-awesome-icon', FontAwesomeIcon)
-  .component('vue-color-chrome', Chrome)
+  .component('color-picker', ColorPicker)
   .component('v-select', vSelect)
   .component('vue-slider', VueSlider)
   .component('spreadsheet-item', SpreadsheetItem)
