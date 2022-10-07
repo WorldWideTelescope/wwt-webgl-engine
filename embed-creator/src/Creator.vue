@@ -465,7 +465,7 @@ import {
   BRow,
   BTab,
   BTabs
-} from "bootstrap-vue";
+} from "bootstrap-vue-3";
 
 import {
   CreditMode,
