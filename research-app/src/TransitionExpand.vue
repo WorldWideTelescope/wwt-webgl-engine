@@ -13,62 +13,67 @@
 </template>
 
 <script lang="ts">
-import { Component, Emit, Vue } from "vue-property-decorator";
+import { defineComponent } from "@vue/runtime-core";
 
-@Component
-export default class TransitionExpand extends Vue {
-  name = "TransitionExpand";
 
-  @Emit()
-  enter(element: HTMLElement) {
-    const width = getComputedStyle(element).width;
+export default defineComponent({
+  name: "TransitionExpand",
 
-    element.style.width = width;
-    element.style.position = "absolute";
-    element.style.visibility = "hidden";
-    element.style.height = "auto";
+  emits: ['enter', 'after-enter', 'leave'],
 
-    const height = getComputedStyle(element).height;
+  methods: {
+    enter(element: HTMLElement) {
+      const width = getComputedStyle(element).width;
 
-    element.style.width = "";
-    element.style.position = "";
-    element.style.visibility = "visible";
-    element.style.height = "0px";
+      element.style.width = width;
+      element.style.position = "absolute";
+      element.style.visibility = "hidden";
+      element.style.height = "auto";
 
-    // Force repaint to make sure the
-    // animation is triggered correctly.
-    getComputedStyle(element).height;
+      const height = getComputedStyle(element).height;
 
-    // Trigger the animation.
-    // We use `requestAnimationFrame` because we need
-    // to make sure the browser has finished
-    // painting after setting the `height`
-    // to `0` in the line above.
-    requestAnimationFrame(() => {
+      element.style.width = "";
+      element.style.position = "";
+      element.style.visibility = "visible";
+      element.style.height = "0px";
+
+      // Force repaint to make sure the
+      // animation is triggered correctly.
+      getComputedStyle(element).height;
+
+      // Trigger the animation.
+      // We use `requestAnimationFrame` because we need
+      // to make sure the browser has finished
+      // painting after setting the `height`
+      // to `0` in the line above.
+      requestAnimationFrame(() => {
+        element.style.height = height;
+      });
+
+      this.$emit('enter');
+    },
+
+    afterEnter(element: HTMLElement) {
+      element.style.height = "auto";
+      this.$emit('after-enter');
+    },
+
+    leave(element: HTMLElement) {
+      const height = getComputedStyle(element).height;
+
       element.style.height = height;
-    });
+
+      // Force repaint to make sure the
+      // animation is triggered correctly.
+      getComputedStyle(element).height;
+
+      requestAnimationFrame(() => {
+        element.style.height = "0";
+      });
+      this.$emit('leave')
+    }
   }
-
-  @Emit()
-  afterEnter(element: HTMLElement) {
-    element.style.height = "auto";
-  }
-
-  @Emit()
-  leave(element: HTMLElement) {
-    const height = getComputedStyle(element).height;
-
-    element.style.height = height;
-
-    // Force repaint to make sure the
-    // animation is triggered correctly.
-    getComputedStyle(element).height;
-
-    requestAnimationFrame(() => {
-      element.style.height = "0";
-    });
-  }
-}
+});
 </script>
 
 <style scoped>
