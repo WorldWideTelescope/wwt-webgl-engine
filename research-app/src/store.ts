@@ -79,7 +79,7 @@ function getFilteredLayers(statusMap: { [id: string]: TableLayerStatus | undefin
 }
 
 interface WWTResearchAppPiniaState {
-  tableLayers: { [id: string]: TableLayerStatus | undefined };
+  _tableLayers: { [id: string]: TableLayerStatus | undefined };
   catalogNameMappings: { [catalogName: string]: [string, string] };
   sources: Source[];
 }
@@ -87,7 +87,7 @@ interface WWTResearchAppPiniaState {
 export const useResearchAppStore = defineStore('wwt-research-app', {
   
   state: (): WWTResearchAppPiniaState => ({
-    tableLayers: {},
+    _tableLayers: {},
     catalogNameMappings: {
       "2MASS All-Sky Catalog of Point Sources (Cutri+ 2003)": ["2MASS", "2MASS"],
       "The Guide Star Catalog, Version 2.3.2 (GSC2.3) (STScI, 2006)": ["GSC23", "GSC 2.3"],
@@ -103,28 +103,28 @@ export const useResearchAppStore = defineStore('wwt-research-app', {
   getters: {
 
     hipsCatalogs(state) {
-      return () => getFilteredLayers(state.tableLayers, status => status.type == 'hips');
+      return () => getFilteredLayers(state._tableLayers, status => status.type == 'hips');
     },
 
     visibleHipsCatalogs(state) {
-      return () => getFilteredLayers(state.tableLayers, status => status.type == 'hips' && status.visible);
+      return () => getFilteredLayers(state._tableLayers, status => status.type == 'hips' && status.visible);
     },
 
     tableLayers(state) {
-      return () => getFilteredLayers(state.tableLayers, _status => true);
+      return () => getFilteredLayers(state._tableLayers, _status => true);
     },
 
     visibleTableLayers(state) {
-      return () => getFilteredLayers(state.tableLayers, status => status.visible);
+      return () => getFilteredLayers(state._tableLayers, status => status.visible);
     },
 
     selectableTableLayers(state) {
-      return () => getFilteredLayers(state.tableLayers, status => status.visible && status.selectable);
+      return () => getFilteredLayers(state._tableLayers, status => status.visible && status.selectable);
     },
 
     researchAppTableLayerVisibility(state) {
       return (info: CatalogLayerInfo) => {
-        const status = state.tableLayers[infoKey(info)];
+        const status = state._tableLayers[infoKey(info)];
         if (status == undefined) {
           return false;
         }
@@ -134,7 +134,7 @@ export const useResearchAppStore = defineStore('wwt-research-app', {
 
     researchAppTableLayerSelectability(state) {
       return (info: CatalogLayerInfo) => {
-        const status = state.tableLayers[infoKey(info)];
+        const status = state._tableLayers[infoKey(info)];
         if (status == undefined) {
           return false;
         }
@@ -151,22 +151,22 @@ export const useResearchAppStore = defineStore('wwt-research-app', {
         layer: info,
         selectable: true
       };
-      this.tableLayers[infoKey(info)] = status;
+      this._tableLayers[infoKey(info)] = status;
     },
 
     removeResearchAppTableLayer(layer: CatalogLayerInfo) {
-      delete this.tableLayers[infoKey(layer)];
+      delete this._tableLayers[infoKey(layer)];
     },
 
     setResearchAppTableLayerVisibility(args: { layer: CatalogLayerInfo; visible: boolean }) {
-      const status = this.tableLayers[infoKey(args.layer)];
+      const status = this._tableLayers[infoKey(args.layer)];
       if (status !== undefined) {
         status.visible = args.visible;
       }
     },
 
     setResearchAppTableLayerSelectability(args: { layer: CatalogLayerInfo; selectable: boolean }) {
-      const status = this.tableLayers[infoKey(args.layer)];
+      const status = this._tableLayers[infoKey(args.layer)];
       if (status !== undefined) {
         status.selectable = args.selectable;
       }

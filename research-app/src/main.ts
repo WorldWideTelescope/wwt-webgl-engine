@@ -1,6 +1,6 @@
 import Vue, { createApp } from "vue";
-import FloatingVue from "floating-vue";
 
+import FloatingVue from "floating-vue";
 import vSelect from 'vue-select';
 import { ColorPicker } from "vue-color-kit";
 
@@ -47,6 +47,8 @@ import SourceItem from "./SourceItem.vue";
 import SpreadsheetItem from "./SpreadsheetItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import { wwtEngineNamespace } from "./namespaces";
+import { wwtPinia } from "@wwtelescope/engine-vuex";
+import { WWTComponent } from "@wwtelescope/engine-vuex";
 
 
 library.add(faAdjust);
@@ -99,15 +101,15 @@ if (messages !== null) {
   console.log("WWT embed: no \"?origin=\" given, so no incoming messages will be allowed");
 }
 
-createApp(App)
+createApp(App, {
+    "wwtNamespace": wwtEngineNamespace,
+    "allowedOrigin": allowedOrigin
+  })
 
   // Plugins
   .use(Notifications)
   .use(FloatingVue)
-
-  // Provide values
-  .provide('wwtNamespace', wwtEngineNamespace)
-  .provide("allowedOrigin", allowedOrigin)
+  .use(wwtPinia)
   
   // Directives
   .directive(
@@ -126,6 +128,7 @@ createApp(App)
   })
 
   // Add our components here
+  .component('WorldWideTelescope', WWTComponent)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('color-picker', ColorPicker)
   .component('v-select', vSelect)

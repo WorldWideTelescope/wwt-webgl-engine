@@ -53,7 +53,7 @@
 
         <div class="detail-row">
           <span class="prompt">Color:</span>
-          <v-popover class="circle-popover">
+          <!-- <v-popover class="circle-popover">
             <font-awesome-icon
               icon="circle"
               size="lg"
@@ -67,7 +67,7 @@
                 @changeColor="handleColorChange"
               ></color-picker>
             </template>
-          </v-popover>
+          </v-popover> -->
         </div>
 
         <div class="detail-row">

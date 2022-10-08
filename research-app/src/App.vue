@@ -55,8 +55,8 @@
       <div class="element-box" id="controls-box">
         <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
           <li v-show="showToolMenu">
-            <v-popover placement="left" trigger="manual" :open="showPopover">
-              <font-awesome-icon
+            <!-- <VTooltip :placement="'left'" :triggers="['manual']" :shown="showPopover"> -->
+              <!-- <font-awesome-icon
                 class="tooltip-target tooltip-icon"
                 icon="sliders-h"
                 size="lg"
@@ -64,12 +64,12 @@
                 @keyup.enter="showPopover = !showPopover"
                 @click="showPopover = !showPopover"
               ></font-awesome-icon>
-              <template v-slot:popover tabindex="-1" show="showPopover">
+              <template #popper> -->
                 <ul class="tooltip-content tool-menu" tabindex="-1">
                   <li v-show="showBackgroundChooser">
                     <a
                       href="#"
-                      v-close-popover
+                      v-close-popper
                       @click="
                         selectTool('choose-background');
                         showPopover = false;
@@ -82,7 +82,7 @@
                   <li v-show="showAddImageryTool">
                     <a
                       href="#"
-                      v-close-popover
+                      v-close-popper
                       @click="
                         selectTool('add-imagery-layer');
                         showPopover = false;
@@ -95,7 +95,7 @@
                   <li v-show="showCatalogTool">
                     <a
                       href="#"
-                      v-close-popover
+                      v-close-popper
                       @click="
                         selectTool('choose-catalog');
                         showPopover = false;
@@ -108,7 +108,7 @@
                   <li v-show="showCollectionLoader">
                     <a
                       href="#"
-                      v-close-popover
+                      v-close-popper
                       @click="
                         selectTool('load-collection');
                         showPopover = false;
@@ -121,7 +121,7 @@
                   <li>
                     <a
                       href="#"
-                      v-close-popover
+                      v-close-popper
                       @click="
                         selectTool('save-state');
                         showPopover = false;
@@ -132,8 +132,8 @@
                     >
                   </li>
                 </ul>
-              </template>
-            </v-popover>
+              <!-- </template> -->
+            <!-- </VTooltip> -->
           </li>
           <li v-show="!wwtIsTourPlaying">
             <font-awesome-icon
@@ -224,7 +224,7 @@
                   :options="curAvailableImageryData"
                   :filter="filterImagesets"
                   :getOptionKey="JSON.stringify"
-                  @input="addImagery"
+                  @update:modelValue="addImagery"
                   label="name"
                   placeholder=""
                 >
@@ -265,7 +265,7 @@
                   :clearable="false"
                   :options="curAvailableCatalogs"
                   :filter="filterCatalogs"
-                  @input="addHips"
+                  @update:modelValue="addHips"
                   label="name"
                   placeholder=""
                 >
@@ -277,7 +277,7 @@
                       </p>
                     </div>
                   </template>
-                  <template #selected-option-container="">
+                  <template #selected-option-container="{}">
                     <div></div>
                   </template>
                 </v-select>
@@ -2715,6 +2715,7 @@ const App = defineComponent({
     // Add Imagery As Layer tool
 
     addImagery(iinfo: ImagesetInfo) {
+      console.log(iinfo);
       const msg: classicPywwt.CreateImageSetLayerMessage = {
         event: "image_layer_create",
         url: iinfo.url,
@@ -3342,18 +3343,18 @@ body {
 
 /* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */
 
-.tooltip {
+.v-popper {
   display: block !important;
   z-index: 10000;
 
-  .tooltip-inner {
+  .tooltip-content {
     background: black;
     color: white;
     border-radius: 16px;
     padding: 5px 10px 4px;
   }
 
-  .tooltip-arrow {
+  .v-popper__arrow-container {
     width: 0;
     height: 0;
     border-style: solid;
@@ -3363,10 +3364,10 @@ body {
     z-index: 1;
   }
 
-  &[x-placement^="top"] {
+  &[data-popper-placement^="top"] {
     margin-bottom: 5px;
 
-    .tooltip-arrow {
+    .v-popper__arrow-container {
       border-width: 5px 5px 0 5px;
       border-left-color: transparent !important;
       border-right-color: transparent !important;
@@ -3378,10 +3379,10 @@ body {
     }
   }
 
-  &[x-placement^="bottom"] {
+  &[data-popper-placement^="bottom"] {
     margin-top: 5px;
 
-    .tooltip-arrow {
+    .v-popper__arrow-container {
       border-width: 0 5px 5px 5px;
       border-left-color: transparent !important;
       border-right-color: transparent !important;
@@ -3393,10 +3394,10 @@ body {
     }
   }
 
-  &[x-placement^="right"] {
+  &[data-popper-placement^="right"] {
     margin-left: 5px;
 
-    .tooltip-arrow {
+    .v-popper__arrow-container {
       border-width: 5px 5px 5px 0;
       border-left-color: transparent !important;
       border-top-color: transparent !important;
@@ -3408,10 +3409,10 @@ body {
     }
   }
 
-  &[x-placement^="left"] {
+  &[data-popper-placement^="left"] {
     margin-right: 5px;
 
-    .tooltip-arrow {
+    .v-popper__arrow-container {
       border-width: 5px 0 5px 5px;
       border-top-color: transparent !important;
       border-right-color: transparent !important;
@@ -3423,15 +3424,15 @@ body {
     }
   }
 
-  &.popover {
-    .popover-inner {
+  &.v-popper__wrapper {
+    .v-popper__inner {
       background: #f9f9f9;
       color: black;
       padding: 8px;
       border-radius: 5px;
     }
 
-    .popover-arrow {
+    .v-popper__arrow-container {
       border-color: #f9f9f9;
     }
   }

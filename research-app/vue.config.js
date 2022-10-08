@@ -24,7 +24,7 @@ module.exports = {
   // Needed for BrowserStack/Safari testing as of 2022 June. This makes the
   // dev server insecure, but that's OK since we only use it in controlled
   // circumstances. https://stackoverflow.com/questions/43619644
-  devServer: {
-    disableHostCheck: true
-  }
+  // devServer: {
+  //   disableHostCheck: true
+  // }
 };
