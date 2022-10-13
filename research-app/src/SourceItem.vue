@@ -79,8 +79,8 @@
 import { PropType } from "vue";
 import { mapActions, mapState } from "pinia";
 
-import { Source, useResearchAppStore } from "./store";
-import { useEngineStore } from "@wwtelescope/engine-vuex";
+import { Source, researchAppStore } from "./store";
+import { engineStore } from "@wwtelescope/engine-vuex";
 import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
 import { defineComponent } from "@vue/runtime-core";
 
@@ -101,7 +101,7 @@ export default defineComponent({
   },
 
   computed: {
-    ...mapState(useEngineStore, {
+    ...mapState(engineStore, {
       wwtDegZoom: "zoomDeg"
     }),
 
@@ -167,8 +167,8 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useEngineStore, ["gotoRADecZoom"]),
-    ...mapActions(useResearchAppStore, ["removeSource"]),
+    ...mapActions(engineStore, ["gotoRADecZoom"]),
+    ...mapActions(researchAppStore, ["removeSource"]),
 
     handleDelete() {
       this.removeSource(this.source);

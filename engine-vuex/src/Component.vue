@@ -5,7 +5,7 @@
 <script lang="ts">
 import { defineComponent, nextTick } from "vue";
 import { mapActions } from "pinia";
-import { useEngineStore } from "./store"
+import { engineStore } from "./store"
 
 import { WWTInstance } from "@wwtelescope/engine-helpers";
 
@@ -33,7 +33,7 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useEngineStore, [
+    ...mapActions(engineStore, [
       "internalIncrementTourCompletions",
       "internalLinkToInstance",
       "internalUnlinkFromInstance",

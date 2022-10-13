@@ -125,8 +125,8 @@ import {
 } from "@wwtelescope/engine";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
-import { CatalogLayerInfo, ImagesetInfo, useEngineStore } from "@wwtelescope/engine-vuex";
-import { useResearchAppStore } from "./store";
+import { CatalogLayerInfo, ImagesetInfo, engineStore } from "@wwtelescope/engine-vuex";
+import { researchAppStore } from "./store";
 
 interface UiPlotTypes {
   wwt: PlotTypes;
@@ -170,8 +170,8 @@ export default defineComponent({
   },
 
   computed: {
-    ...mapState(useResearchAppStore, ["researchAppTableLayerVisibility"]),
-    ...mapState(useEngineStore, ["spreadsheetState"]),
+    ...mapState(researchAppStore, ["researchAppTableLayerVisibility"]),
+    ...mapState(engineStore, ["spreadsheetState"]),
 
     visible(): boolean {
       return this.researchAppTableLayerVisibility(this.layer);
@@ -267,12 +267,12 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useEngineStore, [
+    ...mapActions(engineStore, [
       "applyTableLayerSettings",
       "deleteLayer",
       "removeCatalogHipsByName",
     ]),
-    ...mapActions(useResearchAppStore, [
+    ...mapActions(researchAppStore, [
       "removeResearchAppTableLayer",
       "setResearchAppTableLayerVisibility",
     ]),

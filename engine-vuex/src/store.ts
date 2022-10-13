@@ -462,7 +462,7 @@ function catalogLayerKey(catalog: CatalogLayerInfo): string {
  * See [[WWTAwareComponent]] for an organized overview of the state variables,
  * getters, actions, and mutations exposed by this module.
  */
-export const useEngineStore = defineStore('wwt-engine', {
+export const engineStore = defineStore('wwt-engine', {
 
   // NOTE: We were originally alphabetizing these all, but now I think it will be
   // better to group topically related fields.

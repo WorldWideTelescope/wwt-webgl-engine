@@ -125,7 +125,7 @@ import {
 } from "@wwtelescope/engine-helpers";
 import {
   ImageSetLayerState,
-  useEngineStore,
+  engineStore,
 } from "@wwtelescope/engine-vuex";
 
 import { defineComponent } from "@vue/runtime-core";
@@ -182,8 +182,8 @@ export default defineComponent({
   },
 
   computed: {
-    ...mapState(useEngineStore, ["imagesetForLayer"]),
-    ...mapState(useEngineStore, {
+    ...mapState(engineStore, ["imagesetForLayer"]),
+    ...mapState(engineStore, {
       wwtZoomDeg: "zoomDeg"
     }),
 
@@ -281,7 +281,7 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useEngineStore, [
+    ...mapActions(engineStore, [
       "applyFitsLayerSettings",
       "gotoRADecZoom",
       "deleteLayer",

@@ -3,7 +3,7 @@
 
 import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
-import { useEngineStore } from "./store";
+import { engineStore } from "./store";
 
 /** A class for Vue components that wish to interact with a [[WWTComponent]]
  * through the Vuex state management system.
@@ -252,7 +252,7 @@ export const WWTAwareComponent = defineComponent({
   },
 
   computed: {
-    ...mapState(useEngineStore, {
+    ...mapState(engineStore, {
 
       /** The GUIDs of all rendered layers, in their draw order.
        *
@@ -404,7 +404,7 @@ export const WWTAwareComponent = defineComponent({
       wwtZoomDeg: 'zoomDeg',
     }),
 
-    ...mapState(useEngineStore, [
+    ...mapState(engineStore, [
       /** Get the reactive state for the active imageset layers
        *
        * These layers are created using the [[addImageSetLayer]] action. The state
@@ -534,7 +534,7 @@ export const WWTAwareComponent = defineComponent({
   },
 
   methods: {
-    ...mapActions(useEngineStore, [
+    ...mapActions(engineStore, [
       
       /** Add a "catalog HiPS" dataset to the current view, by name.
        *

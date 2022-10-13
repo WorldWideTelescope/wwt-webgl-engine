@@ -15,7 +15,7 @@ export {
   LoadTourParams,
   SpreadSheetLayerInfo,
   WWTEnginePiniaState,
-  useEngineStore
+  engineStore
 } from "./store";
 
 export { WWTAwareComponent } from "./wwtaware";
@@ -24,7 +24,7 @@ import WWTComponent from "./Component.vue";
 import { WWTGlobalState } from './store';
 export { WWTComponent }
 
-const pinia = createPinia();
-pinia.use(({ store }) => {
+export const wwtPinia = createPinia();
+wwtPinia.use(({ store }) => {
   store.$wwt = new WWTGlobalState();
 });

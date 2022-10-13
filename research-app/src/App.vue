@@ -368,7 +368,7 @@ import { mapActions, mapState } from "pinia";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
-import { Source, useResearchAppStore } from "./store";
+import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
@@ -1240,14 +1240,14 @@ const App = defineComponent({
   },
 
   computed: {
-    ...mapState(useResearchAppStore, [
+    ...mapState(researchAppStore, [
       'catalogNameMappings',
       'hipsCatalogs',
       'selectableTableLayers',
       'sources',
       'visibleTableLayers'
     ]),
-    ...mapState(useResearchAppStore, {
+    ...mapState(researchAppStore, {
       appTableLayers: store => store.tableLayers,
       spreadsheetLayers: store => store.tableLayers()
     }),
@@ -1368,7 +1368,7 @@ const App = defineComponent({
   },
 
   methods: {
-    ...mapActions(useResearchAppStore, [
+    ...mapActions(researchAppStore, [
       'addResearchAppTableLayer',
       'addSource',
       'removeResearchAppTableLayer',

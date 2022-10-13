@@ -84,7 +84,7 @@ interface WWTResearchAppPiniaState {
   sources: Source[];
 }
 
-export const useResearchAppStore = defineStore('wwt-research-app', {
+export const researchAppStore = defineStore('wwt-research-app', {
   
   state: (): WWTResearchAppPiniaState => ({
     _tableLayers: {},
