@@ -61,12 +61,14 @@
                 color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
               }"
             ></font-awesome-icon>
-            <template v-slot:popover>
+            <template v-slot:popover> -->
               <color-picker
-                :color="color"
+                theme="dark"
+                :color="colorString"
+                :colors-default="[]"
                 @changeColor="handleColorChange"
               ></color-picker>
-            </template>
+            <!--</template>
           </v-popover> -->
         </div>
 
@@ -150,6 +152,7 @@ interface VueColorData {
     g: number;
     b: number;
   };
+  hex: string;
 }
 
 export default defineComponent({
@@ -201,6 +204,10 @@ export default defineComponent({
           ["opacity", value.a],
         ]);
       }
+    },
+
+    colorString(): string {
+      return `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a})`;
     },
 
     enabled(): boolean {
@@ -301,8 +308,8 @@ export default defineComponent({
     },
 
     handleColorChange(colorData: VueColorData) {
-      const rgba = colorData["rgba"];
-      this.color = Color.fromArgb(rgba["a"], rgba["r"], rgba["g"], rgba["b"]);
+      const rgba = colorData.rgba;
+      this.color = Color.fromArgb(rgba.a, rgba.r, rgba.g, rgba.b);
     },
 
     handleEditClick() {

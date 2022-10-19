@@ -3,6 +3,7 @@ import Vue, { createApp } from "vue";
 import FloatingVue from "floating-vue";
 import vSelect from 'vue-select';
 import { ColorPicker } from "vue-color-kit";
+import 'vue-color-kit/dist/vue-color-kit.css'
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -39,7 +40,6 @@ import Notifications from '@kyvg/vue3-notification';
 
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
-
 
 import App from "./App.vue";
 import ImagesetItem from "./ImagesetItem.vue";
