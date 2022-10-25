@@ -385,11 +385,17 @@ namespace wwtlib
 
             if (header.ContainsKey("CRPIX1"))
             {
-                referenceX = double.Parse(header["CRPIX1"].Trim()) - 1;
+                // In FITS/ WCS, pixel coordinates are 1 - based and integer pixel
+                // coordinates land on pixel centers. Therefore in standard FITS
+                // orientation, where the "first" pixel is at the lower-left, the
+                // lower-left corner of the image has pixel coordinate (0.5, 0.5). For
+                // the WWT offset parameters, the lower-left corner of the image has
+                // coordinate (0, 0).
+                referenceX = double.Parse(header["CRPIX1"].Trim()) - 0.5;
 
                 if (header.ContainsKey("CRPIX2"))
                 {
-                    referenceY = double.Parse(header["CRPIX2"].Trim()) - 1;
+                    referenceY = double.Parse(header["CRPIX2"].Trim()) - 0.5;
                     hasPixel = true;
                 }
             }

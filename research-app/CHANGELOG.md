@@ -1,3 +1,11 @@
+# @wwtelescope/research-app 0.11.1 (2022-10-25)
+
+- Improve the point selection user experience in the research app (#213,
+  @Carifio24). The effective radius for hit testing is now 4 pixels, rather
+  than an unscaled constant gave bad results on unusual viewport sizes. The
+  experience should now also be much more mobile-friendly.
+
+
 # @wwtelescope/research-app 0.11.0 (2022-09-01)
 
 - Implement functionality to export the current view as a tour if request (#190,
