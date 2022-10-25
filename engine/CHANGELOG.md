@@ -1,4 +1,19 @@
-# rc: minor bump
+# rc: micro bump
+
+- Fix a half-pixel offset in the positioning of untiled FITS files (#211,
+  @imbasimba). This stemmed from the difference between the FITS and WWT pixel
+  coordinate systems.
+- Allow negative RA's in the `GotoRADecZoom()` API (#212, @imbasimba).
+- Improve the logic that guesses where the center of an Imageset is (#212,
+  @imbasimba, @pkgw). This can't be done reliably with only an Imageset in hand;
+  you need to wrap it in a Place and specify its visual center manually. But
+  sometimes we need to guess. The previous logic could yield bad results because
+  it failed to account for the image rotation, among other issues. For un-tiled
+  images, we must guess the image size; the current hardcoded guess is 800x800
+  pixels.
+
+
+# @wwtelescope/engine 7.17.0 (2022-09-01)
 
 - Add interfaces to get the screen point for given spatial coordinates (#206,
   @Carifio24). The primary intended use here is to improve interactive selection
