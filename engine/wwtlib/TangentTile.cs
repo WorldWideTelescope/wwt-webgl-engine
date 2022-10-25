@@ -12,20 +12,21 @@ namespace wwtlib
         //Cached bitmap for performance reasons
         //Only used in legacy rendering of FITS (WebGL 1.0) inside SkyImageTile
         protected Bitmap bmp;
+
         protected void ComputeBoundingSphere()
         {
-            //insideOut = this.Dataset.DataSetType == ImageSetType.Sky || this.Dataset.DataSetType == ImageSetType.Panorama;
             if (!topDown)
             {
                 ComputeBoundingSphereBottomsUp();
                 return;
             }
-            double tileDegrees = this.dataset.BaseTileDegrees / (Math.Pow(2, this.Level));
 
-            double latMin = (((double)this.dataset.BaseTileDegrees / 2 - (((double)this.tileY) * tileDegrees)) + dataset.OffsetY);
-            double latMax = (((double)this.dataset.BaseTileDegrees / 2 - (((double)(this.tileY + 1)) * tileDegrees)) + dataset.OffsetY);
-            double lngMin = ((((double)this.tileX * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX);
-            double lngMax = (((((double)(this.tileX + 1)) * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX);
+            double tileDegrees = this.dataset.BaseTileDegrees / Math.Pow(2, this.Level);
+
+            double latMin = ((double) this.dataset.BaseTileDegrees / 2 - ((double) this.tileY) * tileDegrees) + dataset.OffsetY;
+            double latMax = ((double) this.dataset.BaseTileDegrees / 2 - ((double) (this.tileY + 1)) * tileDegrees) + dataset.OffsetY;
+            double lngMin = (((double) this.tileX) * tileDegrees - (double) this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
+            double lngMax = (((double) (this.tileX + 1)) * tileDegrees - (double) this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
 
             double latCenter = (latMin + latMax) / 2.0;
             double lngCenter = (lngMin + lngMax) / 2.0;
@@ -40,6 +41,34 @@ namespace wwtlib
             Vector3d distVect = GeoTo3dTan(latMin, lngMin);
             distVect.Subtract(sphereCenter);
             this.sphereRadius = distVect.Length();
+        }
+
+        protected void ComputeBoundingSphereBottomsUp()
+        {
+            double tileDegrees = this.dataset.BaseTileDegrees / Math.Pow(2, this.Level);
+
+            double latMin = ((double) this.dataset.BaseTileDegrees / 2 + ((double) (this.tileY + 1)) * tileDegrees) + dataset.OffsetY;
+            double latMax = ((double) this.dataset.BaseTileDegrees / 2 + ((double) this.tileY) * tileDegrees) + dataset.OffsetY;
+            double lngMin = (((double) this.tileX) * tileDegrees - (double) this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
+            double lngMax = (((double) (this.tileX + 1)) * tileDegrees - (double) this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
+
+            TopLeft = GeoTo3dTan(latMin, lngMin);
+            BottomRight = GeoTo3dTan(latMax, lngMax);
+            TopRight = GeoTo3dTan(latMin, lngMax);
+            BottomLeft = GeoTo3dTan(latMax, lngMin);
+        }
+
+        protected virtual LatLngEdges GetLatLngEdges()
+        {
+            double tileDegrees = this.dataset.BaseTileDegrees / Math.Pow(2, this.Level);
+
+            LatLngEdges edges = new LatLngEdges();
+            edges.latMin = ((double) this.dataset.BaseTileDegrees / 2 - ((double) this.tileY) * tileDegrees) + this.dataset.OffsetY;
+            edges.latMax = ((double) this.dataset.BaseTileDegrees / 2 - ((double) (this.tileY + 1)) * tileDegrees) + this.dataset.OffsetY;
+            edges.lngMin = (((double) this.tileX) * tileDegrees - (double) this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX;
+            edges.lngMax = (((double) (this.tileX + 1)) * tileDegrees - (double) this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX;
+
+            return edges;
         }
 
         protected Vector3d GeoTo3dTan(double lat, double lng)
@@ -78,25 +107,6 @@ namespace wwtlib
             {
                 base.RequestImage();
             }
-        }
-
-        protected void ComputeBoundingSphereBottomsUp()
-        {
-            double tileDegrees = (double)this.dataset.BaseTileDegrees / ((double)Math.Pow(2, this.Level));
-
-
-            double latMin = ((double)this.dataset.BaseTileDegrees / 2 + (((double)(this.tileY + 1)) * tileDegrees)) + dataset.OffsetY;
-            double latMax = ((double)this.dataset.BaseTileDegrees / 2 + (((double)this.tileY) * tileDegrees)) + dataset.OffsetY;
-            double lngMin = (((double)this.tileX * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
-            double lngMax = ((((double)(this.tileX + 1)) * tileDegrees) - this.dataset.BaseTileDegrees / dataset.WidthFactor) + dataset.OffsetX;
-
-            double latCenter = (latMin + latMax) / 2.0;
-            double lngCenter = (lngMin + lngMax) / 2.0;
-
-            TopLeft = GeoTo3dTan(latMin, lngMin);
-            BottomRight = GeoTo3dTan(latMax, lngMax);
-            TopRight = GeoTo3dTan(latMin, lngMax);
-            BottomLeft = GeoTo3dTan(latMax, lngMin);
         }
 
         public override bool CreateGeometry(RenderContext renderContext)
@@ -222,20 +232,8 @@ namespace wwtlib
             this.topDown = !dataset.BottomsUp;
             this.ComputeBoundingSphere();
         }
-
-
-        protected virtual LatLngEdges GetLatLngEdges()
-        {
-            double tileDegrees = this.dataset.BaseTileDegrees / (Math.Pow(2, this.Level));
-            LatLngEdges edges = new LatLngEdges();
-            edges.latMin = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)this.tileY) * tileDegrees)) + this.dataset.OffsetY);
-            edges.latMax = (((double)this.dataset.BaseTileDegrees / 2.0 - (((double)(this.tileY + 1)) * tileDegrees)) + this.dataset.OffsetY);
-            edges.lngMin = ((((double)this.tileX * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX);
-            edges.lngMax = (((((double)(this.tileX + 1)) * tileDegrees) - (double)this.dataset.BaseTileDegrees / dataset.WidthFactor) + this.dataset.OffsetX);
-            return edges;
-        }
-
     }
+
     public class LatLngEdges
     {
         public double latMin;
