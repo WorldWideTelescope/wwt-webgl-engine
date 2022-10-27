@@ -4,6 +4,7 @@ import FloatingVue from "floating-vue";
 import vSelect from 'vue-select';
 import { ColorPicker } from "vue-color-kit";
 import 'vue-color-kit/dist/vue-color-kit.css'
+import Popper from "vue3-popper";
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -128,6 +129,7 @@ createApp(App, {
   })
 
   // Add our components here
+  .component('Popper', Popper)
   .component('WorldWideTelescope', WWTComponent)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('color-picker', ColorPicker)

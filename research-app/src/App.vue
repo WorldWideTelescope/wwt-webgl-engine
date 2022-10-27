@@ -55,8 +55,8 @@
       <div class="element-box" id="controls-box">
         <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
           <li v-show="showToolMenu">
-            <!-- <VTooltip :placement="'left'" :triggers="['manual']" :shown="showPopover"> -->
-              <!-- <font-awesome-icon
+            <Popper placement="left" :show="showPopover">
+              <font-awesome-icon
                 class="tooltip-target tooltip-icon"
                 icon="sliders-h"
                 size="lg"
@@ -64,7 +64,7 @@
                 @keyup.enter="showPopover = !showPopover"
                 @click="showPopover = !showPopover"
               ></font-awesome-icon>
-              <template #popper> -->
+              <template #content>
                 <ul class="tooltip-content tool-menu" tabindex="-1">
                   <li v-show="showBackgroundChooser">
                     <a
@@ -132,8 +132,8 @@
                     >
                   </li>
                 </ul>
-              <!-- </template> -->
-            <!-- </VTooltip> -->
+              </template>
+            </Popper>
           </li>
           <li v-show="!wwtIsTourPlaying">
             <font-awesome-icon

@@ -18,7 +18,8 @@
     "moment": "^2.29.1",
     "screenfull": "^5",
     "vue": "^3",
-    "vue-slider-component": "^4.1.0-beta.2"
+    "vue-slider-component": "^4.1.0-beta.2",
+    "vue3-popper": "^1.5.0"
   },
   "description": "The AAS WorldWide Telescope research app.",
   "devDependencies": {

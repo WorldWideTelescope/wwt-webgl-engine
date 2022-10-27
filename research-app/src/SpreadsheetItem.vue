@@ -53,7 +53,9 @@
 
         <div class="detail-row">
           <span class="prompt">Color:</span>
-          <!-- <v-popover class="circle-popover">
+          <Popper
+            placement="right"
+            class="circle-popover">
             <font-awesome-icon
               icon="circle"
               size="lg"
@@ -61,15 +63,16 @@
                 color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
               }"
             ></font-awesome-icon>
-            <template v-slot:popover> -->
+            <template #content>
               <color-picker
+                class="app-color-picker"
                 theme="dark"
                 :color="colorString"
                 :colors-default="[]"
                 @changeColor="handleColorChange"
               ></color-picker>
-            <!--</template>
-          </v-popover> -->
+            </template>
+          </Popper>
         </div>
 
         <div class="detail-row">
@@ -129,6 +132,7 @@ import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { CatalogLayerInfo, ImagesetInfo, engineStore } from "@wwtelescope/engine-vuex";
 import { researchAppStore } from "./store";
+import 'vue-color-kit/dist/vue-color-kit.css';
 
 interface UiPlotTypes {
   wwt: PlotTypes;
@@ -363,7 +367,7 @@ export default defineComponent({
   font-weight: bold;
   font-size: 12pt;
   padding: 0px;
-  overflow: hidden;
+  /*overflow: hidden;*/
 
   &:hover {
     background: #999999;
