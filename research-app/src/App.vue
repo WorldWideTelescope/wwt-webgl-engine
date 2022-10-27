@@ -3105,6 +3105,10 @@ export default App;
   * from https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths
 */
 
+:root {
+  --popper-theme-background-color: white;
+}
+
 html {
   height: 100%;
   margin: 0;
