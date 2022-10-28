@@ -55,7 +55,7 @@
       <div class="element-box" id="controls-box">
         <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
           <li v-show="showToolMenu">
-            <Popper placement="left" arrow="true">
+            <Popper placement="left" :arrow="true">
               <font-awesome-icon
                 class="tooltip-target tooltip-icon"
                 icon="sliders-h"

@@ -54,7 +54,7 @@
         <div class="detail-row">
           <span class="prompt">Color:</span>
           <Popper
-            arrow="true"
+            :arrow="true"
             placement="right"
             >
             <font-awesome-icon
