@@ -72,6 +72,9 @@ module.exports = {
     },
     loadWtmlButton: {
       selector: ".tool-menu > li > a > .fa-photo-video"
+    },
+    notification: {
+      selector: ".vue-notification-wrapper"
     }
   },
 
@@ -148,10 +151,10 @@ module.exports = {
       selector: "#controls",
       elements: {
         controlItem: {
-          selector: "li"
+          selector: "#controls > li"
         },
         toolChooser: {
-          selector: "li .v-popover .fa-sliders-h"
+          selector: "li .fa-sliders-h"
         },
         zoomIn: {
           selector: "li .fa-search-plus"
@@ -240,7 +243,7 @@ module.exports = {
           firstBackgroundName: "Digitized Sky Survey (Color)",
           firstBackgroundDescription: "Copyright DSS Consortium",
           firstCatalogName: firstCatalogName,
-          firstCatalogRegex: new RegExp(`${utils.escapeRegExp(firstCatalogName)}(\s+)?`),
+          firstCatalogRegex: new RegExp(`${utils.escapeRegExp(firstCatalogName)}(\\s+)?`),
           phatWtmlUrl: "http://data1.wwtassets.org/packages/2021/09_phat_fits/index.wtml",
           phatImageryCount: 2,
           phatLayerNames: ["PHAT-f475w", "PHAT-f814w"],

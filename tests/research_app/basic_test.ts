@@ -80,7 +80,7 @@ const tests = {
         // Open the list of options
         // Check that the count is correct
         tools.click("@backgroundSelectionToggle");
-        app.expect.element("@toolMenu").to.not.be.present;
+        app.expect.element("@toolMenu").to.not.be.visible;
         tools.expect.element("@backgroundDropdown").to.be.present;
         browser.perform(async() => {
             tools.expect.elements("@backgroundDropdownOption").count.to.equal(await app.backgroundCount());
@@ -126,7 +126,7 @@ const tests = {
         // Open the list of options
         // Check that the count is correct
         tools.click("@catalogSelectionToggle");
-        app.expect.element("@toolMenu").to.not.be.present;
+        app.expect.element("@toolMenu").to.not.be.visible;
         tools.expect.element("@catalogDropdown").to.be.present;
         browser.perform(async() => {
             tools.expect.elements("@catalogDropdownOption").count.to.equal(await app.hipsCount());
@@ -185,8 +185,12 @@ const tests = {
         tools.updateValue("@wtmlUrlInput", tools.props.phatWtmlUrl);
         tools.sendKeys("@wtmlUrlInput", browser.Keys.ENTER);
 
+        // Wait for the WTML loaded notification to go away
+        app.waitForElementPresent("@notification", 3000);
+        app.waitForElementNotPresent("@notification", 7000);
+
         // Check that the appropriate imagery layers now exist
-        const phatLayerRegExps = tools.props.phatLayerNames.map((name: string) => new RegExp(`${utils.escapeRegExp(name)}(\s+)?`));
+        const phatLayerRegExps = tools.props.phatLayerNames.map((name: string) => new RegExp(`${utils.escapeRegExp(name)}(\\s+)?`));
         controls.click("@toolChooser");
         app.click("@imageryButton");
         tools.click("@imagerySelectionToggle");
