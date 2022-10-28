@@ -55,7 +55,7 @@
       <div class="element-box" id="controls-box">
         <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
           <li v-show="showToolMenu">
-            <Popper placement="left" :show="showPopover">
+            <Popper placement="left" arrow="true">
               <font-awesome-icon
                 class="tooltip-target tooltip-icon"
                 icon="sliders-h"
@@ -3106,7 +3106,15 @@ export default App;
 */
 
 :root {
-  --popper-theme-background-color: white;
+  --popper-theme-background-color: black;
+  --popper-theme-background-color-hover: black;
+  --popper-theme-border-color: white;
+  --popper-theme-padding: 5px;
+  --popper-theme-border-width: 1px;
+  --popper-theme-border-style: solid;
+  --popper-theme-border-radius: 6px;
+  --popper-theme-box-shadow: none;
+  --popper-theme-text-color: white;
 }
 
 html {
@@ -3345,114 +3353,6 @@ body {
   margin-top: 0.75rem;
 }
 
-/* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */
-
-.v-popper {
-  display: block !important;
-  z-index: 10000;
-
-  .tooltip-content {
-    background: black;
-    color: white;
-    border-radius: 16px;
-    padding: 5px 10px 4px;
-  }
-
-  .v-popper__arrow-container {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    position: absolute;
-    margin: 5px;
-    border-color: black;
-    z-index: 1;
-  }
-
-  &[data-popper-placement^="top"] {
-    margin-bottom: 5px;
-
-    .v-popper__arrow-container {
-      border-width: 5px 5px 0 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      bottom: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[data-popper-placement^="bottom"] {
-    margin-top: 5px;
-
-    .v-popper__arrow-container {
-      border-width: 0 5px 5px 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-top-color: transparent !important;
-      top: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[data-popper-placement^="right"] {
-    margin-left: 5px;
-
-    .v-popper__arrow-container {
-      border-width: 5px 5px 5px 0;
-      border-left-color: transparent !important;
-      border-top-color: transparent !important;
-      border-bottom-color: transparent !important;
-      left: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &[data-popper-placement^="left"] {
-    margin-right: 5px;
-
-    .v-popper__arrow-container {
-      border-width: 5px 0 5px 5px;
-      border-top-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      right: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &.v-popper__wrapper {
-    .v-popper__inner {
-      background: #f9f9f9;
-      color: black;
-      padding: 8px;
-      border-radius: 5px;
-    }
-
-    .v-popper__arrow-container {
-      border-color: #f9f9f9;
-    }
-  }
-
-  &[aria-hidden="true"] {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.15s, visibility 0.15s;
-  }
-
-  &[aria-hidden="false"] {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.15s;
-  }
-}
 
 .ellipsize {
   white-space: nowrap;

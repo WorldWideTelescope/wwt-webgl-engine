@@ -54,8 +54,9 @@
         <div class="detail-row">
           <span class="prompt">Color:</span>
           <Popper
+            arrow="true"
             placement="right"
-            class="circle-popover">
+            >
             <font-awesome-icon
               icon="circle"
               size="lg"
@@ -392,14 +393,6 @@ export default defineComponent({
   }
 }
 
-.circle-popover {
-  display: inline;
-
-  &:hover {
-    cursor: pointer;
-  }
-}
-
 .detail-container {
   font-size: 9pt;
   margin: 0px 5px;
@@ -448,38 +441,20 @@ export default defineComponent({
   text-align: center;
 }
 
-// For styling the nested vue-color component
-// This lets us style that component without de-scoping this CSS
-// :deep(*) {
-//   &.vc-chrome-body {
-//     background-color: #404040;
-//   }
-
-//   &.vc-chrome-fields .vc-input__input {
-//     background-color: #cccccc;
-//   }
-
-//   &.vc-chrome-fields .vc-input__label {
-//     color: #cccccc;
-//   }
-
-//   &.vc-chrome-toggle-icon path {
-//     fill: #cccccc;
-//   }
-
-//   &.vc-chrome-toggle-icon:hover path {
-//     fill: #404040;
-//   }
-// }
-
 :deep(*) {
 
   &.app-color-picker {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
 
     & .color-set {
       display: flex;
       gap: 3px;
     }
+
   }
 }
 </style>
