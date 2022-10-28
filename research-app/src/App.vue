@@ -55,7 +55,11 @@
       <div class="element-box" id="controls-box">
         <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
           <li v-show="showToolMenu">
-            <Popper placement="left" :arrow="true">
+            <Popper placement="left"
+              :arrow="true"
+              :interactive="true"
+              :show="showPopover"
+              >
               <font-awesome-icon
                 class="tooltip-target tooltip-icon"
                 icon="sliders-h"
@@ -395,12 +399,17 @@ import {
   applyCircleAnnotationSetting,
   applyPolyAnnotationSetting,
   applyPolyLineAnnotationSetting,
+  extractCircleAnnotationSettings,
+  extractPolyAnnotationSettings,
+  extractPolyLineAnnotationSettings,
   extractSpreadSheetLayerSettings,
+  extractImageSetLayerSettings,
   isCircleAnnotationSetting,
   isEngineSetting,
   isImageSetLayerSetting,
   isPolyAnnotationSetting,
   isPolyLineAnnotationSetting,
+  SpreadSheetLayerState
 } from "@wwtelescope/engine-helpers";
 
 import {
@@ -427,20 +436,6 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
-import { extractImageSetLayerSettings } from "@wwtelescope/engine-helpers/src/imagesetlayer";
-import { SpreadSheetLayerState } from "@wwtelescope/engine-helpers/src/spreadsheetlayer";
-import {
-  isLoadImageCollectionCompletedMessage,
-  isLoadImageCollectionMessage,
-  PywwtSpreadSheetLayerSetting,
-} from "@wwtelescope/research-app-messages/dist/classic_pywwt";
-import {
-  isLoadHipsCatalogCompletedMessage,
-  isLoadHipsCatalogMessage,
-} from "@wwtelescope/research-app-messages/dist/layers";
-import { extractCircleAnnotationSettings } from "@wwtelescope/engine-helpers/src/circleannotation";
-import { extractPolyAnnotationSettings } from "@wwtelescope/engine-helpers/src/polyannotation";
-import { extractPolyLineAnnotationSettings } from "@wwtelescope/engine-helpers/src/polylineannotation";
 import { defineComponent } from "@vue/runtime-core";
 
 const D2R = Math.PI / 180.0;
@@ -799,7 +794,7 @@ class TableLayerMessageHandler {
 
     const layer = this.owner.spreadSheetLayerById(msg.id);
     if (layer) {
-      const pywwtSettings: PywwtSpreadSheetLayerSetting[] = [];
+      const pywwtSettings: classicPywwt.PywwtSpreadSheetLayerSetting[] = [];
       for (const [index, option] of msg.settings.entries()) {
         const setting: [string, any] = [option, msg.values[index]];
         if (classicPywwt.isPywwtSpreadSheetLayerSetting(setting)) {
@@ -1482,8 +1477,8 @@ const App = defineComponent({
           (sent, reply) => {
             if (
               !(
-                isLoadImageCollectionMessage(sent) &&
-                isLoadImageCollectionCompletedMessage(reply)
+                classicPywwt.isLoadImageCollectionMessage(sent) &&
+                classicPywwt.isLoadImageCollectionCompletedMessage(reply)
               )
             )
               return false;
@@ -1495,8 +1490,8 @@ const App = defineComponent({
           (sent, reply) => {
             if (
               !(
-                isLoadHipsCatalogMessage(sent) &&
-                isLoadHipsCatalogCompletedMessage(reply)
+                layers.isLoadHipsCatalogMessage(sent) &&
+                layers.isLoadHipsCatalogCompletedMessage(reply)
               )
             )
               return false;
@@ -1674,7 +1669,7 @@ const App = defineComponent({
       const imageryLayerMessages: classicPywwt.CreateImageSetLayerMessage[] = [];
       const imagerySettingMessages: layers.MultiModifyFitsLayerMessage[] = [];
       const imageryStretchMessages: classicPywwt.StretchFitsLayerMessage[] = [];
-      this.activeImagesetLayerStates().forEach((info) => {
+      this.activeImagesetLayerStates.forEach((info) => {
         const id = info.getGuid();
         const imageset = this.imagesetForLayer(id);
         if (imageset !== null) {

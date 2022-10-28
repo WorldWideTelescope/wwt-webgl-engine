@@ -524,19 +524,17 @@ export const engineStore = defineStore('wwt-engine', {
       }
     },
 
-    activeImagesetLayerStates(state) {
-      return (): ImageSetLayerState[] => {
+    activeImagesetLayerStates(): ImageSetLayerState[] {
         const states: ImageSetLayerState[] = [];
     
-        for (const guid of state.activeLayers) {
-          const layerState = state.imagesetLayers[guid];
+        for (const guid of this.activeLayers) {
+          const layerState = this.imagesetLayers[guid];
           if (layerState) {
             states.push(layerState);
           }
         }
     
-        return states;
-      }
+      return states;
     },
 
     imagesetForLayer(_state){
