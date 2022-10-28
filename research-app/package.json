@@ -14,7 +14,6 @@
     "@wwtelescope/engine-types": "0.0.0-dev.0",
     "@wwtelescope/engine-vuex": "0.0.0-dev.0",
     "@wwtelescope/research-app-messages": "0.0.0-dev.0",
-    "floating-vue": "^2.0.0-beta.20",
     "moment": "^2.29.1",
     "screenfull": "^5",
     "vue": "^3",

@@ -1,6 +1,5 @@
 import Vue, { createApp } from "vue";
 
-import FloatingVue from "floating-vue";
 import vSelect from 'vue-select';
 import { ColorPicker } from "vue-color-kit";
 import 'vue-color-kit/dist/vue-color-kit.css'
@@ -48,8 +47,7 @@ import SourceItem from "./SourceItem.vue";
 import SpreadsheetItem from "./SpreadsheetItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import { wwtEngineNamespace } from "./namespaces";
-import { wwtPinia } from "@wwtelescope/engine-vuex";
-import { WWTComponent } from "@wwtelescope/engine-vuex";
+import { wwtPinia, WWTComponent } from "@wwtelescope/engine-vuex";
 
 
 library.add(faAdjust);
@@ -103,13 +101,12 @@ if (messages !== null) {
 }
 
 createApp(App, {
-    "wwtNamespace": wwtEngineNamespace,
-    "allowedOrigin": allowedOrigin
+    wwtNamespace: wwtEngineNamespace,
+    allowedOrigin: allowedOrigin
   })
 
   // Plugins
   .use(Notifications)
-  .use(FloatingVue)
   .use(wwtPinia)
   
   // Directives
@@ -129,8 +126,8 @@ createApp(App, {
   })
 
   // Add our components here
-  .component('Popper', Popper)
   .component('WorldWideTelescope', WWTComponent)
+  .component('Popper', Popper)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('color-picker', ColorPicker)
   .component('v-select', vSelect)

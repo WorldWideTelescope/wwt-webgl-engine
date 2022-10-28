@@ -55,28 +55,25 @@
       <div class="element-box" id="controls-box">
         <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
           <li v-show="showToolMenu">
-            <Popper placement="left"
+            <Popper
+              placement="left"
               :arrow="true"
               :interactive="true"
-              :show="showPopover"
-              >
+            >
               <font-awesome-icon
                 class="tooltip-target tooltip-icon"
                 icon="sliders-h"
                 size="lg"
                 tabindex="0"
-                @keyup.enter="showPopover = !showPopover"
-                @click="showPopover = !showPopover"
               ></font-awesome-icon>
-              <template #content>
+              <template #content="props">
                 <ul class="tooltip-content tool-menu" tabindex="-1">
                   <li v-show="showBackgroundChooser">
                     <a
                       href="#"
-                      v-close-popper
                       @click="
                         selectTool('choose-background');
-                        showPopover = false;
+                        props.close();
                       "
                       tabindex="0"
                       ><font-awesome-icon icon="mountain" /> Choose
@@ -86,10 +83,9 @@
                   <li v-show="showAddImageryTool">
                     <a
                       href="#"
-                      v-close-popper
                       @click="
                         selectTool('add-imagery-layer');
-                        showPopover = false;
+                        props.close();
                       "
                       tabindex="0"
                       ><font-awesome-icon icon="image" /> Add imagery as
@@ -99,10 +95,9 @@
                   <li v-show="showCatalogTool">
                     <a
                       href="#"
-                      v-close-popper
                       @click="
                         selectTool('choose-catalog');
-                        showPopover = false;
+                        props.close();
                       "
                       tabindex="0"
                       ><font-awesome-icon icon="map-marked-alt" /> Add HiPS
@@ -112,10 +107,9 @@
                   <li v-show="showCollectionLoader">
                     <a
                       href="#"
-                      v-close-popper
                       @click="
                         selectTool('load-collection');
-                        showPopover = false;
+                        props.close();
                       "
                       tabindex="0"
                       ><font-awesome-icon icon="photo-video" /> Load WTML
@@ -125,10 +119,9 @@
                   <li>
                     <a
                       href="#"
-                      v-close-popper
                       @click="
                         selectTool('save-state');
-                        showPopover = false;
+                        props.close();
                       "
                       tabindex="0"
                       ><font-awesome-icon icon="save" /> Create link to current
@@ -1206,7 +1199,6 @@ const App = defineComponent({
       pointerMoveThreshold: 6,
       pointerStartPosition: null as { x: number; y: number } | null,
       updateIntervalId: null as number | null,
-      showPopover: false,
       messageHandlers: new Map<string, (msg: any) => boolean>(),
       fitsLayers: new Map<string, ImageSetLayerMessageHandler>(),
       tableLayers: new Map<string, TableLayerMessageHandler>(),

@@ -38,38 +38,49 @@
 
     <ul id="controls">
       <li v-show="showToolMenu">
-        <v-popover placement="left">
+        <Popper
+          placement="left"
+          :arrow="true"
+          :interactive="true"
+        >
           <font-awesome-icon
             class="tooltip-target"
             icon="sliders-h"
             size="lg"
           ></font-awesome-icon>
-          <template v-slot:popover>
+          <template #content="props">
             <ul class="tooltip-content tool-menu">
               <li v-show="showCrossfader">
-                <a href="#" v-close-popover @click="selectTool('crossfade')"
+                <a href="#"
+                  @click="
+                    selectTool('crossfade');
+                    props.close()
+                  "
                   ><font-awesome-icon icon="adjust" /> Crossfade</a
                 >
               </li>
               <li v-show="showBackgroundChooser">
                 <a
                   href="#"
-                  v-close-popover
-                  @click="selectTool('choose-background')"
+                  @click="
+                    selectTool('choose-background');
+                    props.close()
+                  "
                   ><font-awesome-icon icon="mountain" /> Choose background</a
                 >
               </li>
               <li v-show="showPlaybackControls">
                 <a
                   href="#"
-                  v-close-popover
-                  @click="selectTool('playback-controls')"
+                    @click="selectTool('playback-controls');
+                    props.close()
+                  "
                   ><font-awesome-icon icon="redo" /> Tour player controls</a
                 >
               </li>
             </ul>
           </template>
-        </v-popover>
+        </Popper>
       </li>
       <li v-show="!wwtIsTourPlaying">
         <font-awesome-icon
@@ -611,6 +622,18 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+:root {
+  --popper-theme-background-color: black;
+  --popper-theme-background-color-hover: black;
+  --popper-theme-border-color: white;
+  --popper-theme-padding: 5px;
+  --popper-theme-border-width: 1px;
+  --popper-theme-border-style: solid;
+  --popper-theme-border-radius: 6px;
+  --popper-theme-box-shadow: none;
+  --popper-theme-text-color: white;
+}
+
 html {
   height: 100%;
   margin: 0;
@@ -748,6 +771,7 @@ body {
   right: 0.5rem;
   color: #fff;
 
+
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -832,116 +856,16 @@ body {
   }
 }
 
-/* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */
-
-.tooltip {
-  display: block !important;
-  z-index: 10000;
-
-  .tooltip-inner {
-    background: black;
-    color: white;
-    border-radius: 16px;
-    padding: 5px 10px 4px;
-  }
-
-  .tooltip-arrow {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    position: absolute;
-    margin: 5px;
-    border-color: black;
-    z-index: 1;
-  }
-
-  &[x-placement^="top"] {
-    margin-bottom: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 5px 0 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      bottom: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[x-placement^="bottom"] {
-    margin-top: 5px;
-
-    .tooltip-arrow {
-      border-width: 0 5px 5px 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-top-color: transparent !important;
-      top: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[x-placement^="right"] {
-    margin-left: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 5px 5px 0;
-      border-left-color: transparent !important;
-      border-top-color: transparent !important;
-      border-bottom-color: transparent !important;
-      left: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &[x-placement^="left"] {
-    margin-right: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 0 5px 5px;
-      border-top-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      right: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &.popover {
-    .popover-inner {
-      background: #f9f9f9;
-      color: black;
-      padding: 8px;
-      border-radius: 5px;
-    }
-
-    .popover-arrow {
-      border-color: #f9f9f9;
-    }
-  }
-
-  &[aria-hidden="true"] {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.15s, visibility 0.15s;
-  }
-
-  &[aria-hidden="false"] {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.15s;
-  }
-}
 
 /* Specialized styling for popups */
+
+
+/** The popup window shows up too small without this
+    TODO: Come up with a better way to handle this
+*/
+.popper {
+  min-width: 200px;
+}
 
 ul.tool-menu {
   list-style-type: none;
