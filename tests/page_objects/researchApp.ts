@@ -147,7 +147,7 @@ const displayPanel = {
   },
   props: {
     initialCoordinateText: "17:45:35 -28:53:59",
-    phatLayerCoordinates: "00:45:05 +41:45:35", // Both are at the same position
+    phatLayerCoordinates: "00:45:12 +41:45:02", // Both are at the same position
   },
 };
 

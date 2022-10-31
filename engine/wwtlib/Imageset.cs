@@ -832,42 +832,83 @@ namespace wwtlib
             }
         }
 
+        // Calculate either the X or Y coordinate of the estimated image center.
+        //
+        // This estimate has some important limitations. First, because images
+        // might contain transparent regions, the "center" of the image that a
+        // user will perceive might have nothing to do with the center of the
+        // image bitmap. For instance, imagine that the bitmap is 100x100 but
+        // that everything is transparent except for 10x10 pixels in the
+        // top-left corner. We don't know anything about the "barycenter" of the
+        // image here, so we can't account for that.
+        //
+        // Second, for untiled SkyImage imagesets, to properly compute the
+        // bitmap center we need its dimensions, which simply aren't available
+        // here. All we can do is guess a "reasonable" image size.
+        //
+        // For these reasons, this method should be avoided when possible. The
+        // preferred way to "know" the location of an image's center is to wrap
+        // the image in a Place object, which can just specify the exact
+        // coordinates and zoom level too.
+        //
+        // Even disregarding the above, it's non-trivial to locate the image
+        // center because of the OffsetX/Y parameters and potential rotation of
+        // the image's coordinate system relative to the sky.
+        private double CalcViewCenterCoordinate(bool isX)
+        {
+            double rot = Coordinates.DegreesToRadians(rotation);
+            double crot = Math.Cos(rot);
+            double srot = Math.Sin(rot);
+
+            double dx = 0, dy = 0;
+
+            if (Levels > 0) {
+                dx = -offsetX;
+                dy = offsetY;
+            } else {
+                // This is the part where we need the image's dimensions to
+                // be able to compute the center coordinate correctly. Since
+                // we don't have that information, we just guess :-(
+                double effWidth = 800;
+                double effHeight = 800;
+
+                dx = (offsetX - effWidth / 2) * baseTileDegrees;
+                dy = (effHeight / 2 - offsetY) * baseTileDegrees;
+            }
+
+            if (bottomsUp) {
+                dx = -dx;
+            }
+
+            if (isX) {
+                return centerX + dx * crot + dy * srot;
+            } else {
+                return centerY - dx * srot + dy * crot;
+            }
+        }
+
         public double ViewCenterX
         {
             get {
-                if (WcsImage != null)
-                {
-                    return ((WcsImage)WcsImage).ViewCenterX;
-                }
-                if (Levels > 0)
-                {
-                    return CenterX - OffsetX;
-                }
-                else
-                {
-                    return CenterX + OffsetX / 256 * BaseTileDegrees;
+                if (WcsImage != null) {
+                    return ((WcsImage) WcsImage).ViewCenterX;
+                } else {
+                    return CalcViewCenterCoordinate(true);
                 }
             }
         }
 
         public double ViewCenterY
         {
-            get
-            {
-                if (WcsImage != null)
-                {
-                    return ((WcsImage)WcsImage).ViewCenterY;
-                }
-                if (Levels > 0)
-                {
-                    return CenterY + OffsetY;
-                }
-                else
-                {
-                    return CenterY + OffsetY / 256 * BaseTileDegrees;
+            get {
+                if (WcsImage != null) {
+                    return ((WcsImage) WcsImage).ViewCenterY;
+                } else {
+                    return CalcViewCenterCoordinate(false);
                 }
             }
         }
+
         public static Imageset Create(string name, string url, ImageSetType dataSetType, BandPass bandPass, ProjectionType projection, int imageSetID, int baseLevel, int levels, int tileSize, double baseTileDegrees, string extension, bool bottomsUp, string quadTreeMap, double centerX, double centerY, double rotation, bool sparse, string thumbnailUrl, bool defaultSet, bool elevationModel, int wf, double offsetX, double offsetY, string credits, string creditsUrl, string demUrlIn, string alturl, double meanRadius, string referenceFrame)
         {
             Imageset temp = new Imageset();
