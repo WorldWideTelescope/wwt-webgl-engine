@@ -6,17 +6,17 @@
   },
   "dependencies": {
     "@types/jsdom": "^16.2.13",
-    "@types/nightwatch": "^2.3.12",
     "axios": "^0.21.4",
     "browserstack-local": "^1.4.8",
     "jsdom": "^16.5.0"
   },
   "description": "Tests for the AAS WorldWide Telescope engine and apps.",
   "devDependencies": {
+    "@types/nightwatch": "^2.3.12",
     "chromedriver": "^92.0.2",
     "edgedriver": "^4.17134.1",
     "geckodriver": "^2.0.3",
-    "nightwatch": "^2.4.1"
+    "nightwatch": "^1.7.13"
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "keywords": [
