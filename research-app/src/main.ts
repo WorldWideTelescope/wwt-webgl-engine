@@ -1,5 +1,7 @@
 import Vue, { createApp } from "vue";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
 import vSelect from 'vue-select';
 import { ColorPicker } from "vue-color-kit";
 import 'vue-color-kit/dist/vue-color-kit.css'

@@ -15,7 +15,6 @@
     "@types/debounce": "^1.2.0",
     "@types/express-serve-static-core": "4.17.28",
     "@types/jsdom": "^16.2.13",
-    "@types/vue-select": "3.16.0",
     "@wwtelescope/astro": "file:astro",
     "@wwtelescope/embed": "file:embed",
     "@wwtelescope/embed-common": "file:embed-common",
