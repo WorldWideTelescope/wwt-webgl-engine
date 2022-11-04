@@ -3219,7 +3219,6 @@ body {
 }
 
 #tools {
-  pointer-events: auto;
   order: 2;
   color: #fff;
   display: flex;
@@ -3240,6 +3239,10 @@ body {
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  .v-select {
+    pointer-events: auto;
   }
 }
 
