@@ -52,119 +52,6 @@
         </div>
       </div>
 
-      <div class="element-box" id="controls-box">
-        <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
-          <li v-show="showToolMenu">
-            <Popper
-              placement="left"
-              :arrow="true"
-              :interactive="true"
-            >
-              <font-awesome-icon
-                class="tooltip-target tooltip-icon"
-                icon="sliders-h"
-                size="lg"
-                tabindex="0"
-              ></font-awesome-icon>
-              <template #content="props">
-                <ul class="tooltip-content tool-menu" tabindex="-1">
-                  <li v-show="showBackgroundChooser">
-                    <a
-                      href="#"
-                      @click="
-                        selectTool('choose-background');
-                        props.close();
-                      "
-                      tabindex="0"
-                      ><font-awesome-icon icon="mountain" /> Choose
-                      background</a
-                    >
-                  </li>
-                  <li v-show="showAddImageryTool">
-                    <a
-                      href="#"
-                      @click="
-                        selectTool('add-imagery-layer');
-                        props.close();
-                      "
-                      tabindex="0"
-                      ><font-awesome-icon icon="image" /> Add imagery as
-                      layer</a
-                    >
-                  </li>
-                  <li v-show="showCatalogTool">
-                    <a
-                      href="#"
-                      @click="
-                        selectTool('choose-catalog');
-                        props.close();
-                      "
-                      tabindex="0"
-                      ><font-awesome-icon icon="map-marked-alt" /> Add HiPS
-                      catalogs</a
-                    >
-                  </li>
-                  <li v-show="showCollectionLoader">
-                    <a
-                      href="#"
-                      @click="
-                        selectTool('load-collection');
-                        props.close();
-                      "
-                      tabindex="0"
-                      ><font-awesome-icon icon="photo-video" /> Load WTML
-                      collection</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      @click="
-                        selectTool('save-state');
-                        props.close();
-                      "
-                      tabindex="0"
-                      ><font-awesome-icon icon="save" /> Create link to current
-                      view</a
-                    >
-                  </li>
-                </ul>
-              </template>
-            </Popper>
-          </li>
-          <li v-show="!wwtIsTourPlaying">
-            <font-awesome-icon
-              icon="search-plus"
-              size="lg"
-              class="tooltip-icon"
-              @keyup.enter="doZoom(true)"
-              @click="doZoom(true)"
-              tabindex="0"
-            ></font-awesome-icon>
-          </li>
-          <li v-show="!wwtIsTourPlaying">
-            <font-awesome-icon
-              icon="search-minus"
-              size="lg"
-              class="tooltip-icon"
-              @keyup.enter="doZoom(false)"
-              @click="doZoom(false)"
-              tabindex="0"
-            ></font-awesome-icon>
-          </li>
-          <li v-show="fullscreenAvailable">
-            <font-awesome-icon
-              v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
-              size="lg"
-              class="nudgeright1 tooltip-icon"
-              @keyup.enter="toggleFullscreen()"
-              @click="toggleFullscreen()"
-              tabindex="0"
-            ></font-awesome-icon>
-          </li>
-        </ul>
-      </div>
-
       <div class="element-box" id="tools-box" v-if="!hideAllChrome">
         <div id="tools" v-if="!hideAllChrome" @keydown.stop>
           <div class="tool-container">
@@ -333,6 +220,119 @@
             </template>
           </div>
         </div>
+      </div>
+
+      <div class="element-box" id="controls-box">
+        <ul id="controls" v-if="!hideAllChrome" @keydown.stop>
+          <li v-show="showToolMenu">
+            <Popper
+              placement="left"
+              :arrow="true"
+              :interactive="true"
+            >
+              <font-awesome-icon
+                class="tooltip-target tooltip-icon"
+                icon="sliders-h"
+                size="lg"
+                tabindex="0"
+              ></font-awesome-icon>
+              <template #content="props">
+                <ul class="tooltip-content tool-menu" tabindex="-1">
+                  <li v-show="showBackgroundChooser">
+                    <a
+                      href="#"
+                      @click="
+                        selectTool('choose-background');
+                        props.close();
+                      "
+                      tabindex="0"
+                      ><font-awesome-icon icon="mountain" /> Choose
+                      background</a
+                    >
+                  </li>
+                  <li v-show="showAddImageryTool">
+                    <a
+                      href="#"
+                      @click="
+                        selectTool('add-imagery-layer');
+                        props.close();
+                      "
+                      tabindex="0"
+                      ><font-awesome-icon icon="image" /> Add imagery as
+                      layer</a
+                    >
+                  </li>
+                  <li v-show="showCatalogTool">
+                    <a
+                      href="#"
+                      @click="
+                        selectTool('choose-catalog');
+                        props.close();
+                      "
+                      tabindex="0"
+                      ><font-awesome-icon icon="map-marked-alt" /> Add HiPS
+                      catalogs</a
+                    >
+                  </li>
+                  <li v-show="showCollectionLoader">
+                    <a
+                      href="#"
+                      @click="
+                        selectTool('load-collection');
+                        props.close();
+                      "
+                      tabindex="0"
+                      ><font-awesome-icon icon="photo-video" /> Load WTML
+                      collection</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      @click="
+                        selectTool('save-state');
+                        props.close();
+                      "
+                      tabindex="0"
+                      ><font-awesome-icon icon="save" /> Create link to current
+                      view</a
+                    >
+                  </li>
+                </ul>
+              </template>
+            </Popper>
+          </li>
+          <li v-show="!wwtIsTourPlaying">
+            <font-awesome-icon
+              icon="search-plus"
+              size="lg"
+              class="tooltip-icon"
+              @keyup.enter="doZoom(true)"
+              @click="doZoom(true)"
+              tabindex="0"
+            ></font-awesome-icon>
+          </li>
+          <li v-show="!wwtIsTourPlaying">
+            <font-awesome-icon
+              icon="search-minus"
+              size="lg"
+              class="tooltip-icon"
+              @keyup.enter="doZoom(false)"
+              @click="doZoom(false)"
+              tabindex="0"
+            ></font-awesome-icon>
+          </li>
+          <li v-show="fullscreenAvailable">
+            <font-awesome-icon
+              v-bind:icon="fullscreenModeActive ? 'compress' : 'expand'"
+              size="lg"
+              class="nudgeright1 tooltip-icon"
+              @keyup.enter="toggleFullscreen()"
+              @click="toggleFullscreen()"
+              tabindex="0"
+            ></font-awesome-icon>
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -3241,6 +3241,7 @@ body {
     }
   }
 
+  input,
   .v-select {
     pointer-events: auto;
   }
@@ -3457,6 +3458,7 @@ ul.tool-menu {
   display: flex;
   gap: 10px;
   align-items: center;
+  pointer-events: auto;
 }
 
 .save-state-url {
