@@ -115,7 +115,7 @@ jobs:
 
 - job: build_macos
   pool:
-    vmImage: macos-10.15
+    vmImage: macos-11
   steps:
   - template: azure-job-setup.yml
     parameters:
