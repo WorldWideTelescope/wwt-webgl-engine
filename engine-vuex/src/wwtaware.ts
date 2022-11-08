@@ -787,14 +787,6 @@ export const WWTAwareComponent = defineComponent({
       /** Tilts the position of the view */
       "tilt",
     ]),
-  },
-
-  // beforeCreate(): void {
-  //   // Wire up this component to its backing WWT Vuex state module. We have to
-  //   // wait until now to do so because we don't know a priori which Vuex module
-  //   // namespace we'll be using. TODO: would like to be able to validate that
-  //   // the namespace actually exists
-  //   const namespace = this.$options.propsData ? (this.$options.propsData as any).wwtNamespace : "wwt";  // eslint-disable-line @typescript-eslint/no-explicit-any
-  // }
+  }
 
 });
