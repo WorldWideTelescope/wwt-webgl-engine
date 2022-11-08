@@ -12,7 +12,7 @@
     "bootstrap": "^5.2.2",
     "bootstrap-vue-3": "^0.3.11",
     "vue": "^3",
-    "vue-clipboard2": "^0.3.1"
+    "vue-clipboard3": "^2.0.0"
   },
   "description": "An web app for creating AAS WorldWide Telescope embeds",
   "devDependencies": {

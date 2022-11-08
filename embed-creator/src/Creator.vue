@@ -408,9 +408,7 @@
             <div class="mt-2 d-flex align-items-center">
               <b-button
                 variant="primary"
-                v-clipboard:copy="embedCode"
-                v-clipboard:success="onClipboardSuccess"
-                v-clipboard:error="onClipboardError"
+                @click="copyToClipboard"
                 >Copy to Clipboard</b-button
               >
               <span
@@ -473,6 +471,7 @@ import {
   PlanetaryBodies
 } from "@wwtelescope/embed-common";
 import { defineComponent } from "@vue/runtime-core";
+import useClipboard from "vue-clipboard3";
 
 // From Tom Gruner @ http://stackoverflow.com/a/12034334/1660815 (without forward-slash subst)
 const entityMap: { [index: string]: string } = {
@@ -552,6 +551,16 @@ export default defineComponent({
   },
 
   methods: {
+    async copyToClipboard(): Promise<void> {
+      const { toClipboard } = useClipboard();
+      try {
+        await toClipboard(this.embedCode);
+        this.onClipboardSuccess();
+      } catch (e) {
+        this.onClipboardError();
+      }
+    },
+
     onShowImageUrlInput(url: string) {
       let urlIsOk = false;
 
