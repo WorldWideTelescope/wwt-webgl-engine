@@ -3242,6 +3242,7 @@ body {
   }
 
   input,
+  .load-collection-icon,
   .v-select {
     pointer-events: auto;
   }
