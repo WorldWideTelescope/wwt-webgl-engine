@@ -801,6 +801,27 @@ export const engineStore = defineStore('wwt-engine', {
       this.$wwt.inst.seekToTourTimecode(value);
     },
 
+    async viewAsTourXml(name: string): Promise<string | null> {
+      WWTControl.singleton.createTour(name || "");
+      const editor = WWTControl.singleton.tourEdit;
+      editor.addSlide(false);
+      const tour = editor.get_tour();
+      if (tour === null) {
+        return Promise.resolve(null);
+      }
+      const blob = tour.saveToBlob();
+      const reader = new FileReader();
+      reader.readAsText(blob);
+  
+      let tourXml = "";
+      return new Promise((resolve, _reject) => {
+        reader.onloadend = () => {
+          tourXml += reader.result;
+          resolve(tourXml);
+        }
+      });
+    },
+
     async waitForReady(): Promise<void> {
       if (this.$wwt.inst !== null) {
         return this.$wwt.inst.waitForReady();
@@ -905,27 +926,6 @@ export const engineStore = defineStore('wwt-engine', {
     },
 
     // Imageset layers, including FITS layers
-
-    async viewAsTourXml(name: string): Promise<string | null> {
-      WWTControl.singleton.createTour(name || "");
-      const editor = WWTControl.singleton.tourEdit;
-      editor.addSlide(false);
-      const tour = editor.get_tour();
-      if (tour === null) {
-        return Promise.resolve(null);
-      }
-      const blob = tour.saveToBlob();
-      const reader = new FileReader();
-      reader.readAsText(blob);
-  
-      let tourXml = "";
-      return new Promise((resolve, _reject) => {
-        reader.onloadend = () => {
-          tourXml += reader.result;
-          resolve(tourXml);
-        }
-      });
-    },
 
     async addImageSetLayer(
       options: AddImageSetLayerOptions
@@ -1120,11 +1120,7 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
   
       this.$wwt.inst.ctl.removeCatalogHipsByName(name);
-  
-      // Un-mirror the spreadsheet layer aspect from the reactivity system. Here
-      // we leverage the quasi-hack that the GUID of the spreadsheet layer is set
-      // to the HiPS dataset name (which is most assuredly not in UUIDv4 format).
-  
+
       const id = Guid.createFrom(name).toString();
       delete this.spreadSheetLayers[id];
   
