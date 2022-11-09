@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick } from "vue";
+import { defineComponent, markRaw, nextTick } from "vue";
 import { mapActions } from "pinia";
 import { engineStore } from "./store"
 
@@ -52,14 +52,14 @@ export default defineComponent({
   },
 
   mounted() {
-    this.wwt = new WWTInstance({
+    this.wwt = markRaw(new WWTInstance({
       elId: this.uniqueId,
       startInternalRenderLoop: false,
 
       // Start at the Galactic Center by default. RA of the GC ~= 266.4 deg; in WWT, lng = 360 - RA.
       startLatDeg: -28.9,
       startLngDeg: 93.6,
-    });
+    }));
 
     // TODO: The build fails with a TypeScript error without "as WWTInstance"
     // Figure out why!
