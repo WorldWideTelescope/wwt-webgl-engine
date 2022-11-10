@@ -8,5 +8,5 @@
   {%- set_global rel_top_work = rel_top_work | concat(with="..") -%}
 {%- endfor -%}
 {%- set rel_top = rel_top_work | join(sep="/") -%}
-{%- set url = rel_top ~ "/apiref/engine-vuex/" ~ p -%}
+{%- set url = rel_top ~ "/apiref/engine-pinia/" ~ p -%}
 <a class="apiref-link" href="{{url | safe}}">{{t}}</a>

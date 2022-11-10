@@ -11,9 +11,9 @@ packages:
 - [@wwtelescope/engine](./engine/), the unadorned WebGL engine
 - [@wwtelescope/engine-helpers](./engine-helpers/), idiomatic TypeScript wrappers around the core engine
 - [@wwtelescope/engine-types](./engine-types/), basic data types related to the engine
-- [@wwtelescope/engine-vuex](./engine-vuex/), the engine wrapped into a reusable [Vue]/[Vuex] component library
+- [@wwtelescope/engine-pinia](./engine-pinia/), the engine wrapped into a reusable [Vue]/[Pinia] component library
 - [@wwtelescope/research-app-messages](./research-app-messages/), commands that
   can be sent to the research app
 
 [Vue]: https://vuejs.org/
-[Vuex]: https://vuex.vuejs.org/
+[Pinia]: https://pinia.vuejs.org/

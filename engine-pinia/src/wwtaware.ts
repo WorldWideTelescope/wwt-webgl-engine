@@ -40,8 +40,7 @@ import { engineStore } from "./store";
  *   import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
  *   import { WWTAwareComponent } from "@wwtelescope/engine-pinia";
  *
- *   @Component
- *   export default const App = defineComponent({
+ *   export default App = defineComponent({
  *     extends: WWTAwareComponent,
  * 
  *     computed: {
