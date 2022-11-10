@@ -10,7 +10,6 @@ This package turns the [AAS WorldWide Telescope][wwt] rendering engine,
 
 The important top-level interfaces are:
 
-- The [createPlugin] function for initializing the engine
 - The [WWTAwareComponent] component defining Vue/Pinia hooks for interfacing with the
   engine
 

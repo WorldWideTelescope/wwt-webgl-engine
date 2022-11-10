@@ -6,7 +6,7 @@
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine?label=@wwtelescope/engine)](https://www.npmjs.com/package/@wwtelescope/engine)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine-helpers?label=@wwtelescope/engine-helpers)](https://www.npmjs.com/package/@wwtelescope/engine-helpers)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine-types?label=@wwtelescope/engine-types)](https://www.npmjs.com/package/@wwtelescope/engine-types)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-vuex?label=@wwtelescope/engine-vuex)](https://www.npmjs.com/package/@wwtelescope/engine-vuex)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-pinia?label=@wwtelescope/engine-pinia)](https://www.npmjs.com/package/@wwtelescope/engine-pinia)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/research-app?label=@wwtelescope/research-app)](https://www.npmjs.com/package/@wwtelescope/research-app)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/research-app-messages?label=@wwtelescope/research-app-messages)](https://www.npmjs.com/package/@wwtelescope/research-app-messages)
 
@@ -67,8 +67,8 @@ The most important subdirectories are:
 
 - `@wwtelescope/engine` in `engine/`, the core engine code transpiled from C# and
   wrapped in TypeScript annotations
-- `@wwtelescope/engine-vuex` in `engine-vuex/`, a higher-level package that turns the
-  engine into a reusable [Vue]/[Vuex] component
+- `@wwtelescope/engine-pinia` in `engine-vuex/`, a higher-level package that turns the
+  engine into a reusable [Vue]/[Pinia] component
 - `@wwtelescope/embed` in `embed/`, a web application that turns WWT into a
   configurable, embeddable iframe
 - `@wwtelescope/research-app` in `research-app/`, an embeddable web application for
