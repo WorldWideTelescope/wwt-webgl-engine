@@ -35,7 +35,7 @@ Learn more about WWT [here][wwt-home].
 1. `npm run lint` (uses [ESLint])
 1. `npm run build` creates:
    1. The core engine package in the `engine/` package.
-   1. The engine tidied up into a [Vue]/[Vuex] module in `engine-vuex/`
+   1. The engine tidied up into a [Vue]/[Pinia] module in `engine-pinia/`
    1. The WWT embed app intended for iframe inclusion in `embed/`
    1. The WWT research app in `research-app/`
    1. The user-facing app for creating embed iframe code in `embed-creator/`
@@ -50,7 +50,7 @@ Learn more about WWT [here][wwt-home].
 [npm]: https://www.npmjs.com/get-npm
 [vue6270]: https://github.com/vuejs/vue-cli/issues/6270
 [Vue]: https://vuejs.org/
-[Vuex]: https://vuex.vuejs.org/
+[Pinia]: https://pinia.vuejs.org/
 [ESLint]: https://eslint.org/
 [mocha]: https://mochajs.org/
 [chai]: https://www.chaijs.com/

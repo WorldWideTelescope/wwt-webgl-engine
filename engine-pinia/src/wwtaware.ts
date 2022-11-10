@@ -6,10 +6,10 @@ import { mapActions, mapState } from "pinia";
 import { engineStore } from "./store";
 
 /** A class for Vue components that wish to interact with a [[WWTComponent]]
- * through the Vuex state management system.
+ * through the Pinia state management system.
  *
- * Skip to [The WWT Vuex Interface](#the-wwt-vuex-interface) for a quick summary
- * of how WWT's state is exposed and controlled in Vuex.
+ * Skip to [The WWT Pinia Interface](#the-wwt-pinia-interface) for a quick summary
+ * of how WWT's state is exposed and controlled in Pinia.
  *
  * ## Introduction
  *
@@ -21,11 +21,11 @@ import { engineStore } from "./store";
  *
  * [components]: https://vuejs.org/v2/guide/components.html
  *
- * In particular, if your component’s TypeScript class [extends] this class, it
+ * In particular, if your component [extends] this class, it
  * will automatically be set up with fields and methods allowing you to interact
  * with the WWT engine’s state. A minimal example:
  *
- * [extends]: https://www.typescriptlang.org/docs/handbook/classes.html#inheritance
+ * [extends]: https://vuejs.org/api/options-composition.html#extends
  *
  * ```vue
  * <template>
@@ -36,16 +36,20 @@ import { engineStore } from "./store";
  * </template>
  *
  * <script lang="ts">
- *   import { Component } from "vue-property-decorator";
+ *   import { defineComponent } from "vue";
  *   import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
- *   import { WWTAwareComponent } from "@wwtelescope/engine-vuex";
+ *   import { WWTAwareComponent } from "@wwtelescope/engine-pinia";
  *
  *   @Component
- *   export default class App extends WWTAwareComponent {
- *     get coordText() {
- *       return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+ *   export default const App = defineComponent({
+ *     extends: WWTAwareComponent,
+ * 
+ *     computed: {
+ *      coordText() {
+ *        return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+ *      }
  *     }
- *   }
+ *   });
  * </script>
  * ```
  *
@@ -56,34 +60,30 @@ import { engineStore } from "./store";
  * ## Props
  *
  * Classes inheriting from [[WWTAwareComponent]] automatically define a prop
- * named [[wwtNamespace]]. This should be set to the namespace of the [Vuex
+ * named [[wwtNamespace]]. This should be set to the namespace of the [Pinia
  * module] used to track the `<WorldWideTelescope>` component’s state — that is,
  * it should have the same value as that component’s own `wwtNamespace` prop.
  * The default value is `"wwt"`.
  *
- * [Vuex module]: https://vuex.vuejs.org/guide/modules.html
+ * [Pinia module]: https://pinia.vuejs.org/core-concepts/
  *
- * ## The WWT Vuex Interface
+ * ## The WWT Pinia Interface
  *
  * Your [[WWTAwareComponent]] can monitor or manipulate the state of the WWT
  * renderer using the following interfaces, grouped by category. As a reminder,
- * in the Vuex paradigm, state is expressed in [state variables] and [getters],
- * and modified through instantaneous [mutations] and asynchronous [actions].
+ * in the Pinia paradigm, state is expressed in [state variables] and [getters],
+ * and modified either directly or through [actions] (which can be asynchronous).
  *
- * [state variables]: https://vuex.vuejs.org/guide/state.html
- * [getters]: https://vuex.vuejs.org/guide/getters.html
- * [mutations]: https://vuex.vuejs.org/guide/mutations.html
- * [actions]: https://vuex.vuejs.org/guide/actions.html
+ * [state variables]: https://pinia.vuejs.org/core-concepts/state.html
+ * [getters]: https://pinia.vuejs.org/core-concepts/getters.html
+ * [actions]: https://pinia.vuejs.org/core-concepts/actions.html
  *
  * ### Initialization
- *
- * Mutations:
- *
- * - [[setupForImageset]]
  *
  * Actions:
  *
  * - [[waitForReady]]
+ * - [[setupForImageset]]
  *
  * ### Basic View Information
  *
@@ -100,18 +100,15 @@ import { engineStore } from "./store";
  *
  * - [[findRADecForScreenPoint]]
  *
- * Mutations:
+ * Actions:
  *
+ * - [[gotoRADecZoom]]
+ * - [[gotoTarget]]
  * - [[setClockRate]]
  * - [[setClockSync]]
  * - [[setTime]]
  * - [[setTrackedObject]]
  * - [[zoom]]
- *
- * Actions:
- *
- * - [[gotoRADecZoom]]
- * - [[gotoTarget]]
  *
  * ### Image Sets
  *
@@ -127,17 +124,14 @@ import { engineStore } from "./store";
  *
  * - [[lookupImageset]]
  *
- * Mutations:
+ * Actions:
  *
+ * - [[loadImageCollection]]
  * - [[setBackgroundImageByName]]
  * - [[setForegroundImageByName]]
  * - [[setForegroundOpacity]]
  * - [[setupForImageset]]
  * - [[updateAvailableImagesets]]
- *
- * Actions:
- *
- * - [[loadImageCollection]]
  *
  * ### Imageset Layers (including FITS imagery)
  *
@@ -152,18 +146,15 @@ import { engineStore } from "./store";
  * - [[imagesetForLayer]]
  * - [[imagesetStateForLayer]]
  *
- * Mutations:
+ * Actions:
  *
+ * - [[addImageSetLayer]]
+ * - [[loadFitsLayer]] (deprecated)
  * - [[applyFitsLayerSettings]]
  * - [[setFitsLayerColormap]]
  * - [[stretchFitsLayer]]
  * - [[setImageSetLayerOrder]]
  * - [[deleteLayer]]
- *
- * Actions:
- *
- * - [[addImageSetLayer]]
- * - [[loadFitsLayer]] (deprecated)
  *
  * ### Tabular Data Layers
  *
@@ -172,19 +163,16 @@ import { engineStore } from "./store";
  * - [[wwtActiveLayers]]
  * - [[wwtSpreadSheetLayers]]
  *
- * Mutations:
- *
- * - [[applyTableLayerSettings]]
- * - [[updateTableLayer]]
- * - [[deleteLayer]]
- *
  * Actions:
  *
  * - [[createTableLayer]]
+ * - [[applyTableLayerSettings]]
+ * - [[updateTableLayer]]
+ * - [[deleteLayer]] 
  *
  * ### Annotations
  *
- * Mutations:
+ * Actions:
  *
  * - [[addAnnotation]]
  * - [[clearAnnotations]]
@@ -200,15 +188,12 @@ import { engineStore } from "./store";
  * - [[layerForHipsCatalog]]
  * - [[spreadsheetStateForHipsCatalog]]
  *
- * Mutations:
- *
- * - [[applyTableLayerSettings]]
- * - [[removeCatalogHipsByName]]
- *
  * Actions:
  *
  * - [[addCatalogHipsByName]]
+ *  * - [[applyTableLayerSettings]]
  * - [[getCatalogHipsDataInView]]
+ * - [[removeCatalogHipsByName]]
  *
  * ### Tours
  *
@@ -221,16 +206,13 @@ import { engineStore } from "./store";
  * - [[wwtTourStopStartTimes]]
  * - [[wwtTourTimecode]]
  *
- * Mutations:
+ * Actions:
  *
+ * - [[loadTour]]
  * - [[seekToTourTimecode]]
  * - [[setTourPlayerLeaveSettingsWhenStopped]]
  * - [[startTour]]
  * - [[toggleTourPlayPauseState]]
- *
- * Actions:
- *
- * - [[loadTour]]
  *
  * ### Miscellaneous
  *
@@ -238,12 +220,12 @@ import { engineStore } from "./store";
  *
  * - [[showWebGl2Warning]]
  *
- * Mutations:
+ * Actions:
  *
  * - [[applySetting]]
  **/
 export const WWTAwareComponent = defineComponent({
-  /** The namespace of the Vuex module used to track the WWT component’s state.
+  /** The namespace of the Pinia module used to track the WWT component’s state.
    * This prop should have the same value in all components in the app that
    * reference WWT.
    */
@@ -746,7 +728,6 @@ export const WWTAwareComponent = defineComponent({
        */
       "setupForImageset",
 
-
       /** Start playback of the currently loaded tour.
        *
        * Nothing happens if no tour is loaded.
@@ -771,10 +752,9 @@ export const WWTAwareComponent = defineComponent({
 
       //"updateAvailableImagesets",
 
-
       /** Set the zoom level of the view.
        *
-       * This mutation may result in an action that takes a perceptible amount of
+       * This action may result in an action that takes a perceptible amount of
        * time to resolve, if the "smooth pan" renderer option is enabled. To have
        * proper asynchronous feedback about when the zoom operation completes, use
        * [[gotoRADecZoom]].

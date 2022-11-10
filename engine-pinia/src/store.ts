@@ -60,7 +60,7 @@ export class WWTGlobalState {
 
   link(inst: WWTInstance): void {
     if (this.inst !== null)
-      throw new Error("must unlink WWT Vuex global state before relinking");
+      throw new Error("must unlink WWT Pinia global state before relinking");
 
     this.inst = inst;
 
@@ -200,16 +200,16 @@ export class ImageSetLayerState {
   }
 }
 
-/** This interface expresses the properties exposed by the WWT Engine’s Vuex
+/** This interface expresses the properties exposed by the WWT Engine’s Pinia
  * store module.
  *
  * See [[WWTAwareComponent]] for an organized overview of the different aspects
- * of WWT state that are exposed in the Vuex framework, along with associated
- * getters, actions, and mutations.
+ * of WWT state that are exposed in the Pinia framework, along with associated
+ * getters and actions.
  *
  * Much of this interface duplicates state that is already stored within the WWT
- * engine itself (i.e., the `WWTInstance`). Due to the way that the Vue/Vuex
- * reactivity framework works, we need to mirror the engine state into Vuex. The
+ * engine itself (i.e., the `WWTInstance`). Due to the way that the Vue/Pinia
+ * reactivity framework works, we need to mirror the engine state into Pinia. The
  * first reason to do this is that, as far as I can tell, there's no good way to
  * integrate the "external" state of the WWT instance into the reactivity
  * framework so that dependencies can be mapped correctly. And we can't just
@@ -218,7 +218,7 @@ export class ImageSetLayerState {
  * whatnot. I.e., the WWT types that hold state are not "plain old data".
  *
  * The second reason is that it is recommended for app state to be flattened and
- * normalized when expressed in Vuex, as in [this post]. The WWT engine
+ * normalized when expressed in a store, as in [this post]. The WWT engine
  * certainly does *not* express its state in such a manner.
  *
  * [this post]: https://forum.vuejs.org/t/vuex-best-practices-for-complex-objects/10143/2
@@ -344,7 +344,7 @@ export interface WWTEnginePiniaState {
   
 }
 
-/** The parameters for the [[WWTEngineVuexModule.createTableLayer]] action. */
+/** The parameters for the [[createTableLayer]] action. */
 export interface CreateTableLayerParams {
   /** The name to assign the layer. TODO: understand where (if anywhere) this name is exposed. */
   name: string;
@@ -356,7 +356,7 @@ export interface CreateTableLayerParams {
   dataCsv: string;
 }
 
-/** The parameters for the [[WWTEngineVuexModule.gotoRADecZoom]] action. */
+/** The parameters for the [[gotoRADecZoom]] action. */
 export interface GotoRADecZoomParams {
   /** The right ascension to go to, in radians. */
   raRad: number;
@@ -380,7 +380,7 @@ export interface GotoRADecZoomParams {
   rollRad?: number;
 }
 
-/** The parameters for the [[WWTEngineVuexModule.loadTour]] action.
+/** The parameters for the [[loadTour]] action.
  */
 export interface LoadTourParams {
   /** The tour URL to load. */
@@ -390,7 +390,7 @@ export interface LoadTourParams {
   play: boolean;
 }
 
-/** The parameters for the [[WWTEngineVuexModule.loadImageCollection]] action. */
+/** The parameters for the [[loadImageCollection]] action. */
 export interface LoadImageCollectionParams {
   /** The WTML URL to load. */
   url: string;
@@ -457,10 +457,10 @@ function catalogLayerKey(catalog: CatalogLayerInfo): string {
   return catalog.id ?? "";
 }
 
-/** The store module class for the WWT Vuex implementation.
+/** The WWT Pinia implementation.
  *
  * See [[WWTAwareComponent]] for an organized overview of the state variables,
- * getters, actions, and mutations exposed by this module.
+ * getters, and actions exposed by this module.
  */
 export const engineStore = defineStore('wwt-engine', {
 

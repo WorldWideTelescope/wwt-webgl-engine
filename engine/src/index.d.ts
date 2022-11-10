@@ -44,8 +44,8 @@ import {
 // First: interfaces for settings (state)
 //
 // These are implicitly defined by the engine. We extract their definitions from
-// main WWT classes because our Vuex implementation needs to mirror this state
-// within the Vuex data store pattern.
+// main WWT classes because our Pinia implementation needs to mirror this state
+// within the Pinia data store pattern.
 //
 // Along with these interfaces, see SettingsInterface defined in engine-types.
 // We have to define these interfaces here because some of their methods depend

@@ -26,8 +26,8 @@
     "src/**/*.vue"
   ],
   "typedocOptions": {
-    "readme": "../docs/engine/engine-vuex-index.md",
-    "out": "../docs/engine/static/apiref/engine-vuex",
+    "readme": "../docs/engine/engine-pinia-index.md",
+    "out": "../docs/engine/static/apiref/engine-pinia",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
     "validation": {
