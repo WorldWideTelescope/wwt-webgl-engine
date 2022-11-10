@@ -23,7 +23,7 @@
   "internalDepVersions": {
     "@wwtelescope/embed-common": "manual:^0.2.0",
     "@wwtelescope/engine": "1dded843ee47f132873d8b264bdba50badfea25f",
-    "@wwtelescope/engine-pinia": "98d79e2c009c0fbabe676730787e8582dd1b8adb"
+    "@wwtelescope/engine-pinia": "thiscommit:2022-11-10:R3G9gH3"
   },
   "keywords": [
     "AAS WorldWide Telescope"

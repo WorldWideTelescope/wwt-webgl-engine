@@ -429,7 +429,7 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
-import { defineComponent } from "@vue/runtime-core";
+import { defineComponent } from "vue";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
