@@ -3,7 +3,7 @@
 
 import { defineStore } from 'pinia';
 
-import { ImagesetInfo, SpreadSheetLayerInfo } from '@wwtelescope/engine-vuex';
+import { ImagesetInfo, SpreadSheetLayerInfo } from '@wwtelescope/engine-pinia';
 
 export interface Source {
   ra: number;

@@ -49,7 +49,7 @@ import SourceItem from "./SourceItem.vue";
 import SpreadsheetItem from "./SpreadsheetItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import { wwtEngineNamespace } from "./namespaces";
-import { wwtPinia, WWTComponent } from "@wwtelescope/engine-vuex";
+import { wwtPinia, WWTComponent } from "@wwtelescope/engine-pinia";
 
 
 library.add(faAdjust);

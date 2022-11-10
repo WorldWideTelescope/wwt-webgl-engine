@@ -131,7 +131,7 @@ import {
 } from "@wwtelescope/engine";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
-import { CatalogLayerInfo, ImagesetInfo, engineStore } from "@wwtelescope/engine-vuex";
+import { CatalogLayerInfo, ImagesetInfo, engineStore } from "@wwtelescope/engine-pinia";
 import { researchAppStore } from "./store";
 import 'vue-color-kit/dist/vue-color-kit.css';
 

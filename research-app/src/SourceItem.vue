@@ -80,7 +80,7 @@ import { PropType } from "vue";
 import { mapActions, mapState } from "pinia";
 
 import { Source, researchAppStore } from "./store";
-import { engineStore } from "@wwtelescope/engine-vuex";
+import { engineStore } from "@wwtelescope/engine-pinia";
 import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
 import { defineComponent } from "@vue/runtime-core";
 

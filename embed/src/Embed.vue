@@ -181,7 +181,7 @@ import { ImageSetType } from "@wwtelescope/engine-types";
 import {
   SetupForImagesetOptions,
   WWTAwareComponent,
-} from "@wwtelescope/engine-vuex";
+} from "@wwtelescope/engine-pinia";
 
 import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
 

@@ -126,7 +126,7 @@ import {
 import {
   ImageSetLayerState,
   engineStore,
-} from "@wwtelescope/engine-vuex";
+} from "@wwtelescope/engine-pinia";
 
 import { defineComponent } from "@vue/runtime-core";
 

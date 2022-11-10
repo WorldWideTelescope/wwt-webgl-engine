@@ -21,7 +21,7 @@ import 'vue-slider-component/theme/default.css';
 import Popper from "vue3-popper";
 
 import { EmbedSettings } from "@wwtelescope/embed-common";
-import { wwtPinia, WWTComponent } from "@wwtelescope/engine-vuex";
+import { wwtPinia, WWTComponent } from "@wwtelescope/engine-pinia";
 
 import Embed from "./Embed.vue";
 

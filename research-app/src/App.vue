@@ -410,7 +410,7 @@ import {
   CatalogLayerInfo,
   ImagesetInfo,
   SpreadSheetLayerInfo,
-} from "@wwtelescope/engine-vuex";
+} from "@wwtelescope/engine-pinia";
 
 import {
   classicPywwt,
