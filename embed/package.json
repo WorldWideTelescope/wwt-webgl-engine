@@ -9,7 +9,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@wwtelescope/embed-common": "0.0.0-dev.0",
     "@wwtelescope/engine": "0.0.0-dev.0",
-    "@wwtelescope/engine-vuex": "0.0.0-dev.0",
+    "@wwtelescope/engine-pinia": "0.0.0-dev.0",
     "screenfull": "^5",
     "vue": "^3",
     "v-tooltip": "^2.1"
@@ -17,14 +17,13 @@
   "description": "The AAS WorldWide Telescope as an embeddable iframe.",
   "devDependencies": {
     "@vue/cli-plugin-eslint": "^5.0.8",
-    "@vue/cli-plugin-typescript": "^5.0.8",
-    "@vue/cli-plugin-vuex": "^5.0.8"
+    "@vue/cli-plugin-typescript": "^5.0.8"
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/embed-common": "manual:^0.2.0",
     "@wwtelescope/engine": "1dded843ee47f132873d8b264bdba50badfea25f",
-    "@wwtelescope/engine-vuex": "98d79e2c009c0fbabe676730787e8582dd1b8adb"
+    "@wwtelescope/engine-pinia": "98d79e2c009c0fbabe676730787e8582dd1b8adb"
   },
   "keywords": [
     "AAS WorldWide Telescope"

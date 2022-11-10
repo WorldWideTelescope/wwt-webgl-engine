@@ -8,14 +8,13 @@
   "dependencies": {
     "@wwtelescope/engine": "0.0.0-dev.0",
     "@wwtelescope/engine-helpers": "0.0.0-dev.0",
-    "vue": "^3",
-    "vuex": "^4.0.2"
+    "pinia": "^2.0.22",
+    "vue": "^3"
   },
-  "description": "The AAS WorldWide Telescope WebGL engine wrapped into a Vue/Vuex component",
+  "description": "The AAS WorldWide Telescope WebGL engine wrapped into a Vue/Pinia component",
   "devDependencies": {
     "@vue/cli-plugin-eslint": "^5.0.8",
-    "@vue/cli-plugin-typescript": "^5.0.8",
-    "@vue/cli-plugin-vuex": "^5.0.8"
+    "@vue/cli-plugin-typescript": "^5.0.8"
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
@@ -28,7 +27,7 @@
   "license": "MIT",
   "main": "dist/index.common.js",
   "module": "dist/",
-  "name": "@wwtelescope/engine-vuex",
+  "name": "@wwtelescope/engine-pinia",
   "publishConfig": {
     "access": "public"
   },
@@ -38,6 +37,6 @@
     "doc": "typedoc src/index.ts",
     "lint": "vue-cli-service lint src"
   },
-  "types": "dist/engine-vuex/src/index.d.ts",
+  "types": "dist/engine-pinia/src/index.d.ts",
   "version": "0.0.0-dev.0"
 }
