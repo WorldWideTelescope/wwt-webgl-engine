@@ -1689,12 +1689,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/astro@file:astro::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/astro@file:astro#astro::hash=87f613&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  checksum: f0c23099845c5fed8d60f80e3408d4e23c51b634033f112ed3006b63b3bd93e74752ceaa752dfae3bb1ba9649bdd2f5cef0a0842384af28c70a1b7d81c8d3139
+"@wwtelescope/astro@link:astro::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/astro@link:astro::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@wwtelescope/embed-common@0.0.0-dev.0, @wwtelescope/embed-common@workspace:embed-common":
   version: 0.0.0-use.local
@@ -1704,30 +1703,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/embed-common@file:embed-common::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/embed-common@file:embed-common#embed-common::hash=e7f67d&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  dependencies:
-    "@wwtelescope/engine-types": 0.0.0-dev.0
-  checksum: 950547d28173acf2277cb9431e9ec3a934048eda190cf90d77acb030facc83be63c26fa6c1ae89eea108341eb7054fd7faf0f9aa1a0c36ad58618ed159665244
+"@wwtelescope/embed-common@link:embed-common::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/embed-common@link:embed-common::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
-"@wwtelescope/embed-creator@file:embed-creator::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/embed-creator@file:embed-creator#embed-creator::hash=1e9610&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  dependencies:
-    "@fortawesome/fontawesome-svg-core": ~1.2.28
-    "@fortawesome/free-solid-svg-icons": ^5.13.0
-    "@fortawesome/vue-fontawesome": ^3
-    "@wwtelescope/embed-common": 0.0.0-dev.0
-    bootstrap: ^5.2.2
-    bootstrap-vue-3: ^0.3.11
-    vue: ^3
-    vue-clipboard3: ^2.0.0
-  checksum: 36c6b02c1f7a08b41ec2766303a2e54cb2420f5a736ea731dacb9096d5fa8fce05e82b8d0f783212059c5ee2302f0fd6f16428c9519a8806fda992d41bf2edd3
+"@wwtelescope/embed-creator@link:embed-creator::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/embed-creator@link:embed-creator::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@wwtelescope/embed-creator@workspace:embed-creator":
   version: 0.0.0-use.local
@@ -1746,21 +1732,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/embed@file:embed::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/embed@file:embed#embed::hash=83b3c8&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  dependencies:
-    "@fortawesome/fontawesome-svg-core": ~6.2.0
-    "@fortawesome/free-solid-svg-icons": ^6.2.0
-    "@wwtelescope/embed-common": 0.0.0-dev.0
-    "@wwtelescope/engine": 0.0.0-dev.0
-    "@wwtelescope/engine-pinia": 0.0.0-dev.0
-    screenfull: ^5
-    v-tooltip: ^2.1
-    vue: ^3
-  checksum: 324f06a18dd62964b7222ec2747e89c0a82661d339512faed45554a1e841297d1cc570aec530c83444d7c6660836b09714e0522d041ad896e888d4cdf110680a
+"@wwtelescope/embed@link:embed::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/embed@link:embed::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@wwtelescope/embed@workspace:embed":
   version: 0.0.0-use.local
@@ -1789,16 +1765,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-helpers@file:engine-helpers::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/engine-helpers@file:engine-helpers#engine-helpers::hash=b79963&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  dependencies:
-    "@wwtelescope/astro": 0.0.0-dev.0
-    "@wwtelescope/engine": 0.0.0-dev.0
-    "@wwtelescope/engine-types": 0.0.0-dev.0
-  checksum: 7e271b4dba5de422ca5622e078590bb3b33068895b1cacdd533252f89c22446b8771ca4447f0f05ff85ab3b0eeb89bbee41a5f1e4286031f7a95442eca187b5c
+"@wwtelescope/engine-helpers@link:engine-helpers::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/engine-helpers@link:engine-helpers::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@wwtelescope/engine-pinia@0.0.0-dev.0, @wwtelescope/engine-pinia@workspace:engine-pinia":
   version: 0.0.0-use.local
@@ -1813,17 +1784,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-pinia@file:engine-pinia::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/engine-pinia@file:engine-pinia#engine-pinia::hash=3152ee&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  dependencies:
-    "@wwtelescope/engine": 0.0.0-dev.0
-    "@wwtelescope/engine-helpers": 0.0.0-dev.0
-    pinia: ^2.0.22
-    vue: ^3
-  checksum: 83e8fd7c5461a6ea8b7b139b3e7ac89ecd5de8bae7fce792d12e8e97c8d4706c30b76a79d5626e38c2207d2e9a1b4b8a71ee5a3ddb3aa19accdcebf0158e7061
+"@wwtelescope/engine-pinia@link:engine-pinia::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/engine-pinia@link:engine-pinia::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@wwtelescope/engine-types@0.0.0-dev.0, @wwtelescope/engine-types@workspace:engine-types":
   version: 0.0.0-use.local
@@ -1831,12 +1796,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-types@file:engine-types::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/engine-types@file:engine-types#engine-types::hash=a1c779&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  checksum: 595ea4f69b12061cd451191c8c2b5285ec2dc0057c120da4d9b442b68c1a041b9a8410717d2eeaa8596893fabbf0237175e38b3fa24d26f9b047ace9f0ff40cf
+"@wwtelescope/engine-types@link:engine-types::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/engine-types@link:engine-types::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@wwtelescope/engine@0.0.0-dev.0, @wwtelescope/engine@workspace:engine":
   version: 0.0.0-use.local
@@ -1848,16 +1812,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine@file:engine::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/engine@file:engine#engine::hash=0e5be2&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  dependencies:
-    "@wwtelescope/engine-types": 0.0.0-dev.0
-    pako: ~1.0.3
-    uuid: ~8.3.2
-  checksum: 3f5c36a30b58f17fdfe4dc107946b5bf87ff7878e521e9a040957b0f8449fc90c66dac12714f6451814d6ac743a3fa418cdd72ee26acdc7de1098f9d5e6222d1
+"@wwtelescope/engine@link:engine::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/engine@link:engine::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@wwtelescope/research-app-messages@0.0.0-dev.0, @wwtelescope/research-app-messages@workspace:research-app-messages":
   version: 0.0.0-use.local
@@ -1865,34 +1824,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/research-app-messages@file:research-app-messages::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/research-app-messages@file:research-app-messages#research-app-messages::hash=c911af&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  checksum: 1558e38aaef41416fe9e92703d7db5cce25346aae2a83d14a8f8893ccfb9edd554ad31042bc6c1fc434fdfe01a2cff0a068472cf5f718b60158b6fba20059f9c
+"@wwtelescope/research-app-messages@link:research-app-messages::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/research-app-messages@link:research-app-messages::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
-"@wwtelescope/research-app@file:research-app::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-dev.0
-  resolution: "@wwtelescope/research-app@file:research-app#research-app::hash=1a2a1a&locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  dependencies:
-    "@fortawesome/fontawesome-svg-core": ~1.2.28
-    "@fortawesome/free-solid-svg-icons": ^5.13.0
-    "@kyvg/vue3-notification": ^2.4.1
-    "@wwtelescope/astro": 0.0.0-dev.0
-    "@wwtelescope/engine": 0.0.0-dev.0
-    "@wwtelescope/engine-helpers": 0.0.0-dev.0
-    "@wwtelescope/engine-pinia": 0.0.0-dev.0
-    "@wwtelescope/engine-types": 0.0.0-dev.0
-    "@wwtelescope/research-app-messages": 0.0.0-dev.0
-    moment: ^2.29.1
-    screenfull: ^5
-    vue: ^3
-    vue-slider-component: ^4.1.0-beta.2
-    vue3-popper: ^1.5.0
-  checksum: 9a5ca0d60ee343b2127dc9cfbe7003dc1b3628cee0092d9fdd7e441390d4cc7174cebebdb45ab92fdf7877a2614742bce86bc03c72f5c8dc244dd0de1d8b74f3
+"@wwtelescope/research-app@link:research-app::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/research-app@link:research-app::locator=wwt-webgl-engine-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@wwtelescope/research-app@workspace:research-app":
   version: 0.0.0-use.local
@@ -12420,16 +12362,16 @@ __metadata:
     "@vue/cli-service": ^5.0.8
     "@vue/eslint-config-typescript": ^11.0.2
     "@vue/test-utils": 2.1.0
-    "@wwtelescope/astro": "file:astro"
-    "@wwtelescope/embed": "file:embed"
-    "@wwtelescope/embed-common": "file:embed-common"
-    "@wwtelescope/embed-creator": "file:embed-creator"
-    "@wwtelescope/engine": "file:engine"
-    "@wwtelescope/engine-helpers": "file:engine-helpers"
-    "@wwtelescope/engine-pinia": "file:engine-pinia"
-    "@wwtelescope/engine-types": "file:engine-types"
-    "@wwtelescope/research-app": "file:research-app"
-    "@wwtelescope/research-app-messages": "file:research-app-messages"
+    "@wwtelescope/astro": "link:astro"
+    "@wwtelescope/embed": "link:embed"
+    "@wwtelescope/embed-common": "link:embed-common"
+    "@wwtelescope/embed-creator": "link:embed-creator"
+    "@wwtelescope/engine": "link:engine"
+    "@wwtelescope/engine-helpers": "link:engine-helpers"
+    "@wwtelescope/engine-pinia": "link:engine-pinia"
+    "@wwtelescope/engine-types": "link:engine-types"
+    "@wwtelescope/research-app": "link:research-app"
+    "@wwtelescope/research-app-messages": "link:research-app-messages"
     axios: ^0.22.0
     chai: ^4.2.0
     concat-cli: ^4.0.0
