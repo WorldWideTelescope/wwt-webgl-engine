@@ -42,7 +42,7 @@ import { engineStore } from "./store";
  *
  *   export default App = defineComponent({
  *     extends: WWTAwareComponent,
- * 
+ *
  *     computed: {
  *      coordText() {
  *        return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
@@ -167,7 +167,7 @@ import { engineStore } from "./store";
  * - [[createTableLayer]]
  * - [[applyTableLayerSettings]]
  * - [[updateTableLayer]]
- * - [[deleteLayer]] 
+ * - [[deleteLayer]]
  *
  * ### Annotations
  *
@@ -269,7 +269,7 @@ export const WWTAwareComponent = defineComponent({
        * been changed discontinuously.
        *
        * The main use of this state variable is that you can
-       * [watch](https://vuex.vuejs.org/api/#watch) for changes to it and be alerted
+       * [watch](https://vuejs.org/api/reactivity-core.html#watch) for changes to it and be alerted
        * when the clock has been altered. */
       wwtClockDiscontinuities: 'clockDiscontinuities',
 
@@ -336,11 +336,11 @@ export const WWTAwareComponent = defineComponent({
        * layer.
        */
       wwtSpreadSheetLayers: 'spreadSheetLayers',
-        
+
       /** The number of times that a WWT tour has completed playing.
        *
        * The main use of this state variable is that you can
-       * [watch](https://vuex.vuejs.org/api/#watch) for changes to it and be alerted
+       * [watch](https://vuejs.org/api/reactivity-core.html#watch) for changes to it and be alerted
        * when a tour finishes. Watching [[wwtIsTourPlaying]] doesn't suffice because
        * that will trigger when a tour is paused. */
       wwtTourCompletions: 'tourCompletions',
@@ -389,7 +389,7 @@ export const WWTAwareComponent = defineComponent({
       /** Get the reactive state for the active imageset layers
        *
        * These layers are created using the [[addImageSetLayer]] action. The state
-       * structures returned by this function are part of the reactive Vuex store, so
+       * structures returned by this function are part of the reactive store, so
        * you can wire them up to your UI and they will update correctly. The list is
        * returned in the engine's render order.
        *
@@ -420,7 +420,7 @@ export const WWTAwareComponent = defineComponent({
       /** Look up the reactive state for an active imageset layer.
        *
        * These layers are created using the [[addImageSetLayer]] action. The state
-       * returned by this function is part of the reactive Vuex store, so you can
+       * returned by this function is part of the reactive store, so you can
        * wire it up to your UI and it will update as the layer settings are changed.
        * If you need "runtime" state not captured in the reactivity system, you may
        * need to use [[imagesetForLayer]] instead.
@@ -481,7 +481,7 @@ export const WWTAwareComponent = defineComponent({
       /** Get reactive `SpreadSheetLayer` settings for the table layer corresponding to
        * the given CatalogLayerInfo.
        *
-       * The returned data structure is a component of the app's Vuex state. You can
+       * The returned data structure is a component of the app's reactive state. You can
        * therefore use the settings to construct UI elements, and they will update
        * reactively as the state evolves. The actual data structures used by WWT are
        * separate, but the two mirror each other.
@@ -492,7 +492,7 @@ export const WWTAwareComponent = defineComponent({
 
       /** Get reactive `SpreadSheetLayer` settings for the table layer with the given ID.
        *
-       * The returned data structure is a component of the app's Vuex state. You can
+       * The returned data structure is a component of the app's reactive state. You can
        * therefore use the settings to construct UI elements, and they will update
        * reactively as the state evolves. The actual data structures used by WWT are
        * separate, but the two mirror each other.
@@ -503,7 +503,7 @@ export const WWTAwareComponent = defineComponent({
 
       /** Get reactive `SpreadSheetLayer` settings for the named HiPS catalog.
        *
-       * The returned data structure is a component of the app's Vuex state. You can
+       * The returned data structure is a component of the app's reactive state. You can
        * therefore use the settings to construct UI elements, and they will update
        * reactively as the state evolves. The actual data structures used by WWT are
        * separate, but the two mirror each other.
@@ -516,7 +516,7 @@ export const WWTAwareComponent = defineComponent({
 
   methods: {
     ...mapActions(engineStore, [
-      
+
       /** Add a "catalog HiPS" dataset to the current view, by name.
        *
        * If the catalog name is not in the engine's registry, the promise rejects.
@@ -649,7 +649,7 @@ export const WWTAwareComponent = defineComponent({
        * and the overall "mode" of the WWT renderer.
        */
       "setBackgroundImageByName",
-      
+
       /** Set the rate at which the WWT clock progresses compared to wall-clock time.
        *
        * A value of 10 means that the WWT clock progresses ten times faster than

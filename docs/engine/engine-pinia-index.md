@@ -76,7 +76,7 @@ you to observe the WWT component and control it programmatically.
 The associated main application file might look like this:
 
 ```ts
-import {createApp }, from "vue";
+import { createApp } from "vue";
 import { wwtPinia, WWTComponent } from "@wwtelescope/engine-pinia";
 
 import App from "./App.vue";

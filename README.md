@@ -67,7 +67,7 @@ The most important subdirectories are:
 
 - `@wwtelescope/engine` in `engine/`, the core engine code transpiled from C# and
   wrapped in TypeScript annotations
-- `@wwtelescope/engine-pinia` in `engine-vuex/`, a higher-level package that turns the
+- `@wwtelescope/engine-pinia` in `engine-pinia/`, a higher-level package that turns the
   engine into a reusable [Vue]/[Pinia] component
 - `@wwtelescope/embed` in `embed/`, a web application that turns WWT into a
   configurable, embeddable iframe
@@ -77,6 +77,11 @@ The most important subdirectories are:
 
 README files inside the individual subdirectories give more information about
 their contents and development workflows.
+
+Previous versions used [Vuex] instead of [Pinia] in the `engine-vuex/`
+subdirectory. That module has been superseded by the Pinia version.
+
+[Vuex]: https://vuex.vuejs.org/
 
 
 ## The `engine/wwtlib/bin/wwtlib.js` file
