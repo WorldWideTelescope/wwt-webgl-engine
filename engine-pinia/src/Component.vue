@@ -3,59 +3,67 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import { createNamespacedHelpers } from "vuex";
+import { defineComponent, markRaw, nextTick } from "vue";
+import { mapActions } from "pinia";
+import { engineStore } from "./store"
 
 import { WWTInstance } from "@wwtelescope/engine-helpers";
 
 let idCounter = 0;
 
-/** This is the component docstring. */
-@Component
-export default class WWTComponent extends Vue {
-  /** This is the uniqueId */
-  uniqueId!: string;
+interface ComponentData {
+  uniqueId: string;
   wwt: WWTInstance | undefined;
   renderLoopId: number | undefined;
+}
 
-  @Prop({default: "wwt"}) readonly wwtNamespace!: string;
+/** This is the component docstring. */
+export default defineComponent({
 
-  beforeCreate() {
-    // Wire up this component to its backing Vuex state module.
-    const namespace = this.$options.propsData ? (this.$options.propsData as any).wwtNamespace : "wwt";  // eslint-disable-line @typescript-eslint/no-explicit-any
-    const { mapActions, mapMutations } = createNamespacedHelpers(namespace);
+  props: {
+    wwtNamespace: { type: String, default: "wwt", required: true }
+  },
 
-    this.$options.methods = {
-      ...mapMutations([
-        "internalIncrementTourCompletions",
-        "internalLinkToInstance",
-        "internalUnlinkFromInstance",
-        "internalUpdate",
-      ]),
-      ...mapActions([
-        "waitForReady",
-      ])
-    };
+  data(): ComponentData {
+    return {
+      uniqueId: "",
+      wwt: undefined,
+      renderLoopId: undefined
+    }
+  },
 
+  methods: {
+    ...mapActions(engineStore, [
+      "internalIncrementTourCompletions",
+      "internalLinkToInstance",
+      "internalUnlinkFromInstance",
+      "internalUpdate",
+      "waitForReady",
+    ])
+  },
+
+  created() {
     // Create a globally unique ID for the div that the WWT engine can latch onto.
     const uid = `wwtcmpt${idCounter}`;
     Object.defineProperties(this, {
       uniqueId: { get() { return uid; } },
     });
     idCounter += 1;
-  }
+  },
 
   mounted() {
-    this.wwt = new WWTInstance({
+    this.wwt = markRaw(new WWTInstance({
       elId: this.uniqueId,
       startInternalRenderLoop: false,
 
       // Start at the Galactic Center by default. RA of the GC ~= 266.4 deg; in WWT, lng = 360 - RA.
       startLatDeg: -28.9,
       startLngDeg: 93.6,
-    });
+    }));
 
-    this.internalLinkToInstance(this.wwt);
+    // TODO: The build fails with a TypeScript error without "as WWTInstance"
+    // Figure out why!
+    this.internalLinkToInstance(this.wwt as WWTInstance);
 
     const render = () => {
       const wwt = this.wwt as WWTInstance;
@@ -70,7 +78,7 @@ export default class WWTComponent extends Vue {
     // initialization that has to wait for the ready signal, we won't flash any
     // weirdly-initialized content.
     this.waitForReady().then(() => {
-      Vue.nextTick().then(() => {
+      nextTick().then(() => {
         this.renderLoopId = window.requestAnimationFrame(render);
       });
     });
@@ -78,9 +86,9 @@ export default class WWTComponent extends Vue {
     this.wwt.tourEndedCallback = ((_tp) => {
       this.internalIncrementTourCompletions();
     });
-  }
+  },
 
-  destroyed() {
+  unmounted() {
     if (this.renderLoopId !== undefined) {
       window.cancelAnimationFrame(this.renderLoopId);
       this.renderLoopId = undefined;
@@ -93,11 +101,5 @@ export default class WWTComponent extends Vue {
     this.internalUnlinkFromInstance();
   }
 
-  // Hacks to make TypeScript happy with our programmatically-created properties
-  internalIncrementTourCompletions!: () => void;
-  internalLinkToInstance!: (_wwt: WWTInstance) => void;
-  internalUnlinkFromInstance!: () => void;
-  internalUpdate!: () => void;
-  waitForReady!: () => Promise<void>;
-}
+});
 </script>

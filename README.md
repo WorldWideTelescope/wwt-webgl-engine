@@ -6,7 +6,7 @@
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine?label=@wwtelescope/engine)](https://www.npmjs.com/package/@wwtelescope/engine)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine-helpers?label=@wwtelescope/engine-helpers)](https://www.npmjs.com/package/@wwtelescope/engine-helpers)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine-types?label=@wwtelescope/engine-types)](https://www.npmjs.com/package/@wwtelescope/engine-types)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-vuex?label=@wwtelescope/engine-vuex)](https://www.npmjs.com/package/@wwtelescope/engine-vuex)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-pinia?label=@wwtelescope/engine-pinia)](https://www.npmjs.com/package/@wwtelescope/engine-pinia)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/research-app?label=@wwtelescope/research-app)](https://www.npmjs.com/package/@wwtelescope/research-app)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/research-app-messages?label=@wwtelescope/research-app-messages)](https://www.npmjs.com/package/@wwtelescope/research-app-messages)
 
@@ -35,7 +35,7 @@ Learn more about WWT [here][wwt-home].
 1. `npm run lint` (uses [ESLint])
 1. `npm run build` creates:
    1. The core engine package in the `engine/` package.
-   1. The engine tidied up into a [Vue]/[Vuex] module in `engine-vuex/`
+   1. The engine tidied up into a [Vue]/[Pinia] module in `engine-pinia/`
    1. The WWT embed app intended for iframe inclusion in `embed/`
    1. The WWT research app in `research-app/`
    1. The user-facing app for creating embed iframe code in `embed-creator/`
@@ -50,7 +50,7 @@ Learn more about WWT [here][wwt-home].
 [npm]: https://www.npmjs.com/get-npm
 [vue6270]: https://github.com/vuejs/vue-cli/issues/6270
 [Vue]: https://vuejs.org/
-[Vuex]: https://vuex.vuejs.org/
+[Pinia]: https://pinia.vuejs.org/
 [ESLint]: https://eslint.org/
 [mocha]: https://mochajs.org/
 [chai]: https://www.chaijs.com/
@@ -67,8 +67,8 @@ The most important subdirectories are:
 
 - `@wwtelescope/engine` in `engine/`, the core engine code transpiled from C# and
   wrapped in TypeScript annotations
-- `@wwtelescope/engine-vuex` in `engine-vuex/`, a higher-level package that turns the
-  engine into a reusable [Vue]/[Vuex] component
+- `@wwtelescope/engine-pinia` in `engine-pinia/`, a higher-level package that turns the
+  engine into a reusable [Vue]/[Pinia] component
 - `@wwtelescope/embed` in `embed/`, a web application that turns WWT into a
   configurable, embeddable iframe
 - `@wwtelescope/research-app` in `research-app/`, an embeddable web application for
@@ -77,6 +77,11 @@ The most important subdirectories are:
 
 README files inside the individual subdirectories give more information about
 their contents and development workflows.
+
+Previous versions used [Vuex] instead of [Pinia] in the `engine-vuex/`
+subdirectory. That module has been superseded by the Pinia version.
+
+[Vuex]: https://vuex.vuejs.org/
 
 
 ## The `engine/wwtlib/bin/wwtlib.js` file

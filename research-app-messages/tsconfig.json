@@ -26,6 +26,8 @@
     "out": "../docs/engine/static/apiref/research-app-messages",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
-    "listInvalidSymbolLinks": true
+    "validation": {
+      "invalidLink": true
+    }
   }
 }

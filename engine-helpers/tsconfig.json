@@ -28,6 +28,8 @@
     "out": "../docs/engine/static/apiref/engine-helpers",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
-    "listInvalidSymbolLinks": true
+    "validation": {
+      "invalidLink": true
+    }
   }
 }

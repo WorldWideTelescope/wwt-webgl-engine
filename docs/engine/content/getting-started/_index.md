@@ -23,11 +23,11 @@ prepared to use.
   the {{engineapi(p="index.html",t="@wwtelescope/engine")}} package into your
   project and interface with it using the [TypeScript] language.
 - If the bundled TypeScript approach sounds good *and* you can use [Vue] with
-  [Vuex] — or if you don’t know that you *can’t* use them — we strongly
-  recommend the **[Vue/Vuex component
+  [Pinia] — or if you don’t know that you *can’t* use them — we strongly
+  recommend the **[Vue/Pinia component
   model](@/getting-started/vue-component-model.md)**.
 
 [npm]: https://npmjs.com/
 [TypeScript]: https://www.typescriptlang.org/
 [Vue]: https://vuejs.org/
-[Vuex]: https://vuex.vuejs.org/
+[Pinia]: https://pinia.vuejs.org/

@@ -1,21 +1,19 @@
 import "@babel/polyfill";
 import "mutationobserver-shim";
-import Vue from "vue";
-import VueClipboard from "vue-clipboard2";
+import { createApp } from "vue";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import "./plugins/bootstrap-vue";
 import Creator from "./Creator.vue";
 
-Vue.config.productionTip = false;
-
-Vue.use(VueClipboard);
+import BootstrapVue from "bootstrap-vue-3";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue-3/dist/bootstrap-vue-3.css";
 
 library.add(faExternalLinkAlt);
-Vue.component('font-awesome-icon', FontAwesomeIcon);
 
-new Vue({
-  render: h => h(Creator)
-}).$mount("#app");
+createApp(Creator)
+  .use(BootstrapVue)
+  .component('font-awesome-icon', FontAwesomeIcon)
+  .mount("#app");

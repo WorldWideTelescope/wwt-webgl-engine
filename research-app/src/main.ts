@@ -1,11 +1,11 @@
-import Vue from "vue";
-import VTooltip from "v-tooltip";
-import Vuex from "vuex";
+import Vue, { createApp } from "vue";
 
-import { VNode, VNodeDirective } from "vue";
-
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
 import vSelect from 'vue-select';
-import Chrome from 'vue-color/src/components/Chrome.vue';
+import { ColorPicker } from "vue-color-kit";
+import 'vue-color-kit/dist/vue-color-kit.css'
+import Popper from "vue3-popper";
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -38,34 +38,19 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-import Notifications from 'vue-notification';
+import Notifications from '@kyvg/vue3-notification';
 
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
-
-import { createPlugin } from "@wwtelescope/engine-vuex";
 
 import App from "./App.vue";
 import ImagesetItem from "./ImagesetItem.vue";
 import SourceItem from "./SourceItem.vue";
 import SpreadsheetItem from "./SpreadsheetItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
-import { WWTResearchAppModule } from "./store";
-import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
+import { wwtEngineNamespace } from "./namespaces";
+import { wwtPinia, WWTComponent } from "@wwtelescope/engine-pinia";
 
-Vue.config.productionTip = false;
-
-Vue.use(Notifications);
-Vue.use(VTooltip);
-Vue.use(Vuex);
-
-const store = new Vuex.Store({});
-store.registerModule(wwtResearchAppNamespace, WWTResearchAppModule);
-
-Vue.use(createPlugin(), {
-  store,
-  namespace: wwtEngineNamespace,
-});
 
 library.add(faAdjust);
 library.add(faArrowCircleRight);
@@ -94,32 +79,9 @@ library.add(faWindowClose);
 library.add(faSave);
 library.add(faCopy);
 
-Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.component('vue-color-chrome', Chrome);
-Vue.component('v-select', vSelect);
-Vue.component('vue-slider', VueSlider);
-
-Vue.component('spreadsheet-item', SpreadsheetItem);
-Vue.component('imageset-item', ImagesetItem);
-Vue.component('source-item', SourceItem);
-Vue.component('transition-expand', TransitionExpand);
-
 /** v-hide directive take from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
-const update = (el: HTMLElement,
-  binding: VNodeDirective,
-  _vnode: VNode,
-  _oldVnode: VNode) => el.style.visibility = (binding.value) ? "hidden" : "";
-
-/**
-* Hides an HTML element, keeping the space it would have used if it were visible (css: Visibility)
-*/
-Vue.directive("hide", {
-  // Run on initialisation (first render) of the directive on the element
-  bind: update,
-  // Run on subsequent updates to the value supplied to the directive
-  update: update
-});
+const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visibility = (binding.value) ? "hidden" : "";
 
 // If postMessages are to be allowed, our creator has to tell us where they'll
 // come from. This only trivially prevents unexpected messages; it of course
@@ -140,15 +102,42 @@ if (messages !== null) {
   console.log("WWT embed: no \"?origin=\" given, so no incoming messages will be allowed");
 }
 
-new Vue({
-  store,
-  el: "#app",
-  render: createElement => {
-    return createElement(App, {
-      props: {
-        "wwtNamespace": wwtEngineNamespace,
-        "allowedOrigin": allowedOrigin,
-      }
-    });
-  }
-});
+createApp(App, {
+    wwtNamespace: wwtEngineNamespace,
+    allowedOrigin: allowedOrigin
+  })
+
+  // Plugins
+  .use(Notifications)
+  .use(wwtPinia)
+  
+  // Directives
+  .directive(
+  /**
+  * Hides an HTML element, keeping the space it would have used if it were visible (css: Visibility)
+  */
+  "hide", {
+    // Run on initialisation (first render) of the directive on the element
+    beforeMount(el, binding, _vnode, _prevVnode) {
+      update(el, binding)
+    },
+    // Run on subsequent updates to the value supplied to the directive
+    updated(el, binding, _vnode, _prevVnode) {
+      update(el, binding)
+    }
+  })
+
+  // Add our components here
+  .component('WorldWideTelescope', WWTComponent)
+  .component('Popper', Popper)
+  .component('font-awesome-icon', FontAwesomeIcon)
+  .component('color-picker', ColorPicker)
+  .component('v-select', vSelect)
+  .component('vue-slider', VueSlider)
+  .component('spreadsheet-item', SpreadsheetItem)
+  .component('imageset-item', ImagesetItem)
+  .component('source-item', SourceItem)
+  .component('transition-expand', TransitionExpand)
+
+  // Mount the app
+  .mount("#app");
