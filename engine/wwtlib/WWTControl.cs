@@ -1515,13 +1515,13 @@ namespace wwtlib
 
             if (pointerIds[0] == pe.PointerId)
             {
-                pointerIds[0] = 0;
+                pointerIds[0] = -2;
                 pinchingZoomRect[0] = null;
             }
 
             if (pointerIds[1] == pe.PointerId)
             {
-                pointerIds[1] = 0;
+                pointerIds[1] = -2;
                 pinchingZoomRect[1] = null;
             }
         }
