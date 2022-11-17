@@ -11,8 +11,8 @@
     "@wwtelescope/engine": "0.0.0-dev.0",
     "@wwtelescope/engine-pinia": "0.0.0-dev.0",
     "screenfull": "^5",
-    "vue": "^3",
-    "v-tooltip": "^2.1"
+    "v-tooltip": "^2.1",
+    "vue": "^3"
   },
   "description": "The AAS WorldWide Telescope as an embeddable iframe.",
   "devDependencies": {

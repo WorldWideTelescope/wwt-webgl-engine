@@ -19,7 +19,6 @@
     "doc": "yarn workspaces foreach run doc",
     "lint": "yarn workspaces foreach run lint",
     "test": "yarn workspaces foreach run test",
-    "pack": "yarn exec npm pack",
     "serve-creator": "concurrently \"cd embed && yarn run serve -- --port=23000\" \"cd embed-creator && yarn run serve -- --port=8080\"",
     "serve-embed": "cd embed && yarn run serve",
     "serve-research": "cd research-app && yarn run serve"
@@ -77,5 +76,6 @@
     "typescript": "~4.8.4",
     "uglify-js": "^3.9.1",
     "vue-template-compiler": "~2.6.11"
-  }
+  },
+  "packageManager": "yarn@3.3.0"
 }
