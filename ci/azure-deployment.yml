@@ -360,7 +360,7 @@ jobs:
       env:
         GITHUB_TOKEN: $(GITHUB_TOKEN)
 
-  - job: npm_publish
+  - job: yarn_publish
     pool:
       vmImage: ubuntu-20.04
     variables:
@@ -369,10 +369,10 @@ jobs:
     - template: azure-job-setup.yml
       parameters:
         setupBuild: true
-        setupNpm: true
+        setupYarn: true
 
-    - bash: npm run build
-      displayName: NPM build
+    - bash: yarn run build
+      displayName: Yarn build
 
     # Very important! Revert the `cranko npm lerna-workaround` (in
     # azure-job-setup.yml) that's needed for the build to work reliably.
@@ -388,5 +388,5 @@ jobs:
         cranko npm foreach-released npm publish
       displayName: Publish to NPM
 
-    - bash: shred ~/.npmrc
+    - bash: shred ~/.yarnrc.yml
       displayName: Clean up credentials
