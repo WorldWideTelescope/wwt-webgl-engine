@@ -429,7 +429,7 @@ import {
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
-import { defineComponent } from "vue";
+import { defineComponent, isProxy, toRaw } from "vue";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -3042,10 +3042,11 @@ const App = defineComponent({
       if (this.$options.statusMessageDestination === null || this.allowedOrigin === null)
         return;
 
+      const rawSource = isProxy(source) ? toRaw(source) : source;
       const msg: selections.SelectionStateMessage = {
         type: "wwt_selection_state",
         sessionId: this.statusMessageSessionId,
-        mostRecentSource: this.prepareForMessaging(source),
+        mostRecentSource: this.prepareForMessaging(rawSource),
       };
 
       this.$options.statusMessageDestination.postMessage(msg, this.allowedOrigin);
