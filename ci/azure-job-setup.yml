@@ -87,7 +87,7 @@ steps:
   # `--no-ci` seemingly needed for proper bootstrapping when making releases
   # in some cases. **On CI systems only**, lerna will run `npm ci` rather than
   # `npm install` and that caused issues for me (2022 March).
-  - bash: yarn install
+  - bash: yarn install --no-immutable
     displayName: Yarn setup
 
 - ${{ if parameters.setupGit }}:
