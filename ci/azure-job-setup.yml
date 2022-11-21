@@ -87,8 +87,13 @@ steps:
   # `--no-ci` seemingly needed for proper bootstrapping when making releases
   # in some cases. **On CI systems only**, lerna will run `npm ci` rather than
   # `npm install` and that caused issues for me (2022 March).
+
+  # Adding --no-immutable allows the yarn.lock file to be modified
   - bash: yarn install --no-immutable
     displayName: Yarn setup
+
+  - bash: yarn info @wwtelescope/engine-pinia
+    displayName: Show engine-pinia version
 
 - ${{ if parameters.setupGit }}:
   - bash: |
