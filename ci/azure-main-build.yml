@@ -36,7 +36,7 @@ jobs:
   - bash: |
       set -xeuo pipefail
       mkdir -p $ARTIFACT_STAGING/yarn
-      cp */*.tgz $ARTIFACT_STAGING/yarn
+      cp *.tgz $ARTIFACT_STAGING/yarn
     displayName: Stage Yarn package artifacts
 
   - task: PublishPipelineArtifact@0
