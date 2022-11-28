@@ -38,14 +38,16 @@ export function isGenericSetting(obj: any): obj is GenericSetting {  // eslint-d
 /** Settings for the overall application.
  *
  * This should be thought of as an enumeration type, all of whose options are
- * compatible with [[GenericSetting]]. Right now, there is only one option
+ * compatible with [[GenericSetting]]. Right now, there are only two options
  * available, though.
  * */
 export type AppSetting =
-  ["hideAllChrome", boolean];
+  ["hideAllChrome", boolean] |
+  ["selectionProximity", number];
 
-const appSettingTypeInfo: { [i: string]: boolean } = {
+const appSettingTypeInfo: { [i: string]: boolean | number } = {
   "hideAllChrome/boolean": true,
+  "selectionProximity/number": 4
 };
 
 /** Type guard function for [[AppSetting]]. */
