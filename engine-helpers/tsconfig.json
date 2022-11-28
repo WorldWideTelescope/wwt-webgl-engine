@@ -12,16 +12,21 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "outDir": "dist",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../astro"
+    },
+    {
+      "path": "../engine"
+    },
+    {
+      "path": "../engine-types"
+    }
   ],
   "typedocOptions": {
     "readme": "../docs/engine/engine-helpers-index.md",

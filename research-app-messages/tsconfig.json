@@ -1,26 +1,23 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "composite": true,
-    "declaration": true,
-    "esModuleInterop": true,
-    "incremental": true,
-    "jsx": "react",
+    "target": "es5",
     "module": "esnext",
-    "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "preserveWatchOutput": true,
-    "resolveJsonModule": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "composite": true,
     "strict": true,
-    "strictNullChecks": false,
-    "target": "es2017",
-    "types": []
+    "jsx": "preserve",
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src"
   },
-  "include": ["src/*"],
+  "include": [
+    "src/**/*.ts"
+  ],
   "typedocOptions": {
     "readme": "../docs/engine/research-app-messages-index.md",
     "out": "../docs/engine/static/apiref/research-app-messages",

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": "..",
     "target": "es5",
     "module": "commonjs",
     "composite": true,
@@ -16,11 +15,6 @@
     "baseUrl": ".",
     "outDir": "dist",
     "declaration": true,
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "lib": [
       "dom",
       "dom.iterable",

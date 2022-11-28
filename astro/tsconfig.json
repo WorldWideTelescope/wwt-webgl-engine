@@ -12,13 +12,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "outDir": "dist",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts"
