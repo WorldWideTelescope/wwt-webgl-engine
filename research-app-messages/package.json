@@ -27,7 +27,7 @@
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "clean": "rimraf dist",
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },

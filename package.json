@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "build": "yarn workspaces foreach -vt run build",
+    "clean": "yarn workspaces foreach -vt run clean && rimraf docs/engine/static/apiref docs/engine/static/embed docs/research-app/static/app",
     "doc": "yarn workspaces foreach -vt run doc",
     "lint": "yarn workspaces foreach -vt run lint",
     "test": "yarn workspaces foreach -vt run test",
@@ -36,7 +37,8 @@
     "@wwtelescope/research-app-messages": "link:research-app-messages"
   },
   "devDependencies": {
-    "concurrently": "^5.2.0"
+    "concurrently": "^5.2.0",
+    "rimraf": "^3"
   },
   "packageManager": "yarn@3.3.0"
 }

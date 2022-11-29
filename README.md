@@ -129,6 +129,7 @@ Once setup is complete, the following commands will be useful:
 - `yarn lint` to lint the subpackages (using [eslint] with TypeScript extensions)
 - `yarn test` to run the tests (mainly using [mocha] and [chai])
 - `yarn doc` to build most of the documentation (using [TypeDoc]) — but see below
+- `yarn clean` to remove built files
 
 You can run these commands from the top level, which will run them for all of
 the packages, or from the subdirectory of the package you’re interested in.
