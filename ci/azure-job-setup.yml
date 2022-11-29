@@ -1,4 +1,4 @@
-# Copyright 2020 the .NET Foundation
+# Copyright 2020-2022 the .NET Foundation
 # Licensed under the MIT License
 
 # Setup steps for the build and deployment processes.
@@ -75,9 +75,6 @@ steps:
       mkdir -p engine/wwtlib/bin
       cp $PIPELINE_WORKSPACE/scriptsharp/wwtlib.js engine/wwtlib/bin/
     displayName: Restore ScriptSharp wwtlib.js
-
-  - bash: cranko npm lerna-workaround
-    displayName: Fake internal version requirements for Lerna
 
   # Adding --no-immutable allows the yarn.lock file to be modified
   - bash: yarn install --no-immutable

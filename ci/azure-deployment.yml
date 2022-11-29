@@ -1,4 +1,4 @@
-# Copyright 2020 the .NET Foundation
+# Copyright 2020-2022 the .NET Foundation
 # Licensed under the MIT License
 
 parameters:
@@ -374,19 +374,10 @@ jobs:
     - bash: yarn run build
       displayName: Yarn build
 
-    # Very important! Revert the `cranko npm lerna-workaround` (in
-    # azure-job-setup.yml) that's needed for the build to work reliably.
-    # Nothing about the build process should be embedding the hacked
-    # internal version requirements anywhere that will linger in our
-    # published artifacts.
-
-    - bash: git reset --hard release
-      displayName: Undo Lerna-driven internal requirement mods
-
     - bash: |
         set -xeou pipefail
-        cranko npm foreach-released npm publish
+        cranko npm foreach-released yarn npm publish
       displayName: Publish to NPM
 
-    - bash: shred ~/.yarnrc.yml
+    - bash: shred ~/.npmrc.yml
       displayName: Clean up credentials

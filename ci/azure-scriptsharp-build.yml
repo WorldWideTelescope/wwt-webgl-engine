@@ -22,7 +22,6 @@ jobs:
 
   - bash: |
       set -xeuo pipefail
-      git status # seems to help with mysterious Windows dirtiness issue
       cranko release-workflow apply-versions
       git add .
       cranko release-workflow commit

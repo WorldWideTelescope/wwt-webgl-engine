@@ -1,4 +1,4 @@
-# Copyright 2020 the .NET Foundation
+# Copyright 2020-2022 the .NET Foundation
 # Licensed under the MIT License
 
 # Main build stage. The ScriptSharp stage has already run, creating a Cranko
@@ -23,21 +23,13 @@ jobs:
     displayName: Yarn build
 
   # Create and stage our panoply of artifacts. (No reason not to do this ASAP --
-  # these can help debug build problems.) The `git reset` is to revert the
-  # `cranko npm lerna-workaround` (in azure-job-setup.yml) that's needed for the
-  # build to work reliably.
-
-  - bash: git reset --hard release
-    displayName: Undo Lerna-driven internal requirement mods
-
-  - bash: yarn pack
-    displayName: Yarn pack
+  # these can help debug build problems.)
 
   - bash: |
       set -xeuo pipefail
       mkdir -p $ARTIFACT_STAGING/yarn
-      cp *.tgz $ARTIFACT_STAGING/yarn
-    displayName: Stage Yarn package artifacts
+      yarn workspaces foreach pack -o $ARTIFACT_STAGING/yarn/%s-%v.tgz
+    displayName: Create and stage Yarn package artifacts
 
   - task: PublishPipelineArtifact@0
     displayName: Publish Yarn package artifacts
@@ -168,10 +160,7 @@ jobs:
       yarn run serve-research &
       sleep 10 # give the local service time to start up
       cd tests
-      yarn install
-
       yarn run bs-local -- -e default,firefox,edge,safari -o reports
-
       pkill -f vue-cli-service  # stop the servers
     displayName: BrowserStack test local research app
 
