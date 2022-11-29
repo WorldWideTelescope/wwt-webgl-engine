@@ -11,7 +11,7 @@
     "worldwide-telescope"
   ],
   "license": "MIT",
-  "main": "./src/index.ts",
+  "main": "./dist/src/index.js",
   "name": "@wwtelescope/engine-types",
   "publishConfig": {
     "access": "public"
@@ -22,5 +22,6 @@
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
+  "types": "./dist/src/index.d.ts",
   "version": "0.0.0-dev.0"
 }

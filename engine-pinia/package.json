@@ -25,7 +25,7 @@
     "AAS WorldWide Telescope"
   ],
   "license": "MIT",
-  "main": "dist/index.common.js",
+  "main": "./dist/index.common.js",
   "module": "dist/",
   "name": "@wwtelescope/engine-pinia",
   "publishConfig": {
@@ -37,6 +37,6 @@
     "doc": "typedoc src/index.ts",
     "lint": "vue-cli-service lint src"
   },
-  "types": "dist/engine-pinia/src/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "version": "0.0.0-dev.0"
 }

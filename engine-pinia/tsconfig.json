@@ -13,7 +13,6 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": ".."
   },
   "include": [
     "src/**/*.ts",
