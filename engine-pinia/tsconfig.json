@@ -20,11 +20,17 @@
   ],
   "references": [
     {
+      "path": "../astro"
+    },
+    {
       "path": "../engine"
     },
     {
       "path": "../engine-helpers"
-    }
+    },
+    {
+      "path": "../engine-types"
+    },
   ],
   "typedocOptions": {
     "readme": "../docs/engine/engine-pinia-index.md",
