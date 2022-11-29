@@ -20,7 +20,7 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/astro": "manual:^0.1.0",
+    "@wwtelescope/astro": "manual:workspace:>=0.1.0",
     "@wwtelescope/engine": "1dded843ee47f132873d8b264bdba50badfea25f",
     "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2"
   },

@@ -39,7 +39,7 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/embed-common": "manual:^0.2.0"
+    "@wwtelescope/embed-common": "manual:workspace:>=0.2.0"
   },
   "keywords": [
     "AAS WorldWide Telescope"
