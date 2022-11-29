@@ -11,6 +11,9 @@ jobs:
 
   steps:
 
+  # Set up the release commit. We do a `yarn install` to update the lockfile
+  # with the proper internal versions once Cranko has applied them.
+
   - pwsh: |
       $d = Join-Path $Env:Temp cranko-$(New-Guid)
       [void][System.IO.Directory]::CreateDirectory($d)
@@ -20,15 +23,27 @@ jobs:
       echo "##vso[task.prependpath]$d"
     displayName: Install latest Cranko (Windows)
 
+  - task: NodeTool@0
+    displayName: Set up node.js
+    inputs:
+      versionSpec: '16'
+
+  - bash: cranko release-workflow apply-versions
+    displayName: Apply versions with Cranko
+
+  # The --no-immutable allows the yarn.lock file to be modified -- in CI, the
+  # default is that it can't be.
+  - bash: yarn install --no-immutable
+    displayName: yarn install
+
   - bash: |
       set -xeuo pipefail
-      cranko release-workflow apply-versions
       git add .
       cranko release-workflow commit
       git show
-    displayName: Apply versions and generate release commit
+    displayName: Generate release commit
 
-  # Publish release commit as an artifact -- the next stages will need it.
+  # Publish release commit as an artifact -- subsequent stages will need it.
 
   - pwsh: |
       mkdir $(Build.ArtifactStagingDirectory)\git-release

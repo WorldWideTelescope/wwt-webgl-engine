@@ -76,9 +76,8 @@ steps:
       cp $PIPELINE_WORKSPACE/scriptsharp/wwtlib.js engine/wwtlib/bin/
     displayName: Restore ScriptSharp wwtlib.js
 
-  # Adding --no-immutable allows the yarn.lock file to be modified
-  - bash: yarn install --no-immutable
-    displayName: Yarn setup
+  - bash: yarn install
+    displayName: Install Yarn dependencies
 
 - ${{ if parameters.setupGit }}:
   - bash: |
