@@ -4,6 +4,9 @@ upstream_urls = [
   'https://github.com/WorldWideTelescope/wwt-webgl-engine.git',
 ]
 
+[npm]
+internal_dep_protocol = "workspace"
+
 [projects."csproj:wwtlib"]
 ignore = true
 
