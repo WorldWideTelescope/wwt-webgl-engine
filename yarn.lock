@@ -536,7 +536,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@popperjs/core@npm:^2.9.2":
+"@popperjs/core@npm:^2.11.6, @popperjs/core@npm:^2.9.2":
   version: 2.11.6
   resolution: "@popperjs/core@npm:2.11.6"
   checksum: 47fb328cec1924559d759b48235c78574f2d71a8a6c4c03edb6de5d7074078371633b91e39bbf3f901b32aa8af9b9d8f82834856d2f5737a23475036b16817f0
@@ -1637,6 +1637,7 @@ __metadata:
     "@fortawesome/fontawesome-svg-core": ~1.2.28
     "@fortawesome/free-solid-svg-icons": ^5.13.0
     "@fortawesome/vue-fontawesome": ^3
+    "@popperjs/core": ^2.11.6
     "@typescript-eslint/eslint-plugin": ^5.38.1
     "@typescript-eslint/parser": ^5.38.1
     "@vue/cli-plugin-eslint": ^5.0.8
@@ -1658,6 +1659,7 @@ __metadata:
     vue: ^3
     vue-clipboard3: ^2.0.0
     vue-template-compiler: ~2.6.11
+    webpack: ^5.0.0
   languageName: unknown
   linkType: soft
 
@@ -1696,6 +1698,7 @@ __metadata:
     vue: ^3
     vue-template-compiler: ~2.6.11
     vue3-popper: ^1.5.0
+    webpack: ^5.0.0
   languageName: unknown
   linkType: soft
 
@@ -1852,6 +1855,7 @@ __metadata:
     vue-slider-component: ^4.1.0-beta.2
     vue-template-compiler: ~2.6.11
     vue3-popper: ^1.5.0
+    webpack: ^5.0.0
   languageName: unknown
   linkType: soft
 
@@ -11294,7 +11298,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.54.0":
+"webpack@npm:^5.0.0, webpack@npm:^5.54.0":
   version: 5.75.0
   resolution: "webpack@npm:5.75.0"
   dependencies:
