@@ -9,6 +9,7 @@
     "@wwtelescope/astro": "0.0.0-dev.0",
     "@wwtelescope/engine": "0.0.0-dev.0",
     "@wwtelescope/engine-helpers": "0.0.0-dev.0",
+    "@wwtelescope/engine-types": "0.0.0-dev.0",
     "pinia": "^2.0.22",
     "vue": "^3"
   },
@@ -31,7 +32,8 @@
   "internalDepVersions": {
     "@wwtelescope/astro": "thiscommit:2022-11-29:pfBFAzl",
     "@wwtelescope/engine": "1db0165e463b4d094c0c0e6eb3795a0c892f41a0",
-    "@wwtelescope/engine-helpers": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2"
+    "@wwtelescope/engine-helpers": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2",
+    "@wwtelescope/engine-types": "thiscommit:2022-11-29:OIQ6vzL"
   },
   "keywords": [
     "AAS WorldWide Telescope"
