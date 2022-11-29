@@ -47,7 +47,7 @@
   },
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
-    "build": "npm run concat-index && npm run uglify",
+    "build": "yarn run concat-index && yarn run uglify",
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
     "doc": "typedoc src/index.d.ts",
     "lint": "tsc",
