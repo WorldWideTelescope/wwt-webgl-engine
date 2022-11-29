@@ -5,7 +5,7 @@ import {
     expectAllVisible
 } from "../utils";
 
-import { ResearchAppPage, ResearchAppSections } from "page_objects/researchApp";
+import { ResearchAppPage, ResearchAppSections } from "../page_objects/researchApp";
 
 import {
     EnhancedPageObject,
