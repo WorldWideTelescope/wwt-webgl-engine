@@ -247,7 +247,7 @@ const tools = {
   },
   props: {
     firstBackgroundName: "Digitized Sky Survey (Color)",
-    firstBackgroundDescription: "Copyright DSS Consortium",
+    firstBackgroundDescription: "Copyright DSS Consortium. These data are from the DSS2 survey.",
     firstCatalogName: firstCatalogName,
     firstCatalogRegex: new RegExp(`${escapeRegExp(firstCatalogName)}(\\s+)?`),
     phatWtmlUrl: "http://data1.wwtassets.org/packages/2021/09_phat_fits/index.wtml",
