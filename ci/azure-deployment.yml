@@ -1,4 +1,4 @@
-# Copyright 2020 the .NET Foundation
+# Copyright 2020-2022 the .NET Foundation
 # Licensed under the MIT License
 
 parameters:
@@ -360,7 +360,7 @@ jobs:
       env:
         GITHUB_TOKEN: $(GITHUB_TOKEN)
 
-  - job: npm_publish
+  - job: yarn_publish
     pool:
       vmImage: ubuntu-20.04
     variables:
@@ -371,21 +371,12 @@ jobs:
         setupBuild: true
         setupNpm: true
 
-    - bash: npm run build
-      displayName: NPM build
-
-    # Very important! Revert the `cranko npm lerna-workaround` (in
-    # azure-job-setup.yml) that's needed for the build to work reliably.
-    # Nothing about the build process should be embedding the hacked
-    # internal version requirements anywhere that will linger in our
-    # published artifacts.
-
-    - bash: git reset --hard release
-      displayName: Undo Lerna-driven internal requirement mods
+    - bash: yarn run build
+      displayName: Yarn build
 
     - bash: |
         set -xeou pipefail
-        cranko npm foreach-released npm publish
+        cranko npm foreach-released yarn npm publish
       displayName: Publish to NPM
 
     - bash: shred ~/.npmrc

@@ -12,22 +12,23 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "outDir": "dist",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../engine-types"
+    }
   ],
   "typedocOptions": {
     "readme": "../docs/engine/embed-common-index.md",
     "out": "../docs/engine/static/apiref/embed-common",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
-    "listInvalidSymbolLinks": true
+    "validation": {
+      "invalidLink": true
+    }
   }
 }

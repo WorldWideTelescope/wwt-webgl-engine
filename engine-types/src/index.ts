@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 // Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 //
@@ -5,7 +7,6 @@
 //
 // Try to keep everything alphabetized.
 
-/* eslint-disable @typescript-eslint/camelcase */
 
 export enum AltTypes {
   depth = 0,
@@ -765,7 +766,7 @@ export function isBaseVoTableLayerSetting(obj: [string, any]): obj is BaseVoTabl
 // https://stackoverflow.com/q/57922745/3760486
 type StringEnum = { [key: string]: string };
 
-function keysOf<K extends {}>(o: K): (keyof K)[];
+function keysOf<K extends Record<string,unknown>>(o: K): (keyof K)[];
 function keysOf(o: any) { return Object.keys(o); }  // eslint-disable-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any
 
 export function enumLookup<E extends StringEnum>(

@@ -1,4 +1,4 @@
-# Copyright 2020 the .NET Foundation
+# Copyright 2020-2022 the .NET Foundation
 # Licensed under the MIT License
 
 # Main build stage. The ScriptSharp stage has already run, creating a Cranko
@@ -19,31 +19,23 @@ jobs:
     parameters:
       setupBuild: true
 
-  - bash: npm run build
-    displayName: NPM build
+  - bash: yarn run build
+    displayName: Yarn build
 
   # Create and stage our panoply of artifacts. (No reason not to do this ASAP --
-  # these can help debug build problems.) The `git reset` is to revert the
-  # `cranko npm lerna-workaround` (in azure-job-setup.yml) that's needed for the
-  # build to work reliably.
-
-  - bash: git reset --hard release
-    displayName: Undo Lerna-driven internal requirement mods
-
-  - bash: npm run pack
-    displayName: NPM pack
+  # these can help debug build problems.)
 
   - bash: |
       set -xeuo pipefail
-      mkdir -p $ARTIFACT_STAGING/npm
-      cp */*.tgz $ARTIFACT_STAGING/npm
-    displayName: Stage NPM package artifacts
+      mkdir -p $ARTIFACT_STAGING/yarn
+      yarn workspaces foreach pack -o $ARTIFACT_STAGING/yarn/%s-%v.tgz
+    displayName: Create and stage Yarn package artifacts
 
   - task: PublishPipelineArtifact@0
-    displayName: Publish NPM package artifacts
+    displayName: Publish Yarn package artifacts
     inputs:
-      artifactName: npm
-      targetPath: $(Build.ArtifactStagingDirectory)/npm
+      artifactName: yarn
+      targetPath: $(Build.ArtifactStagingDirectory)/yarn
 
   - bash: |
       set -xeuo pipefail
@@ -96,14 +88,10 @@ jobs:
       artifactName: research-app
       targetPath: $(Build.ArtifactStagingDirectory)/research-app
 
-  # NPM Test
-  #
-  # In principle we could/should reapply the Lerna workaround here, but correct
-  # ordering shouldn't matter for the tests. Likewise for the other NPM commands
-  # in this file.
+  # OK, now actually test
 
-  - bash: npm run test
-    displayName: NPM test
+  - bash: yarn run test
+    displayName: Yarn test
 
   - task: PublishTestResults@2
     displayName: Publish test results
@@ -115,17 +103,17 @@ jobs:
 
 - job: build_macos
   pool:
-    vmImage: macos-10.15
+    vmImage: macos-11
   steps:
   - template: azure-job-setup.yml
     parameters:
       setupBuild: true
 
-  - bash: npm run build
-    displayName: NPM build
+  - bash: yarn run build
+    displayName: Yarn build
 
-  - bash: npm run test
-    displayName: NPM test
+  - bash: yarn run test
+    displayName: Yarn test
 
   - task: PublishTestResults@2
     displayName: Publish test results
@@ -143,13 +131,13 @@ jobs:
     parameters:
       setupBuild: true
 
-  - bash: npm run build
-    displayName: NPM build
+  - bash: yarn run build
+    displayName: Yarn build
 
   - bash: |
       set -xeuo pipefail
       cd tests
-      npm run build
+      yarn run build
     displayName: Build test code
 
   # We can't use the BrowserStackConfig@0 task because it relies on an Azure
@@ -165,13 +153,10 @@ jobs:
 
   - bash: |
       set -xeuo pipefail
-      npm run serve-research &
+      yarn run serve-research &
       sleep 10 # give the local service time to start up
       cd tests
-      npm install
-
-      npm run bs-local -- -e default,firefox,edge,safari -o reports
-
+      yarn run bs-local -- -e default,firefox,edge,safari -o reports
       pkill -f vue-cli-service  # stop the servers
     displayName: BrowserStack test local research app
 
@@ -191,11 +176,11 @@ jobs:
     parameters:
       setupBuild: true
 
-  - bash: npm run build
-    displayName: NPM build
+  - bash: yarn run build
+    displayName: Yarn build
 
-  - bash: npm run lint
-    displayName: NPM lint
+  - bash: yarn run lint
+    displayName: Yarn lint
 
 
 - job: docs_engine
@@ -206,11 +191,11 @@ jobs:
     parameters:
       setupBuild: true
 
-  - bash: npm run build
-    displayName: NPM build
+  - bash: yarn run build
+    displayName: Yarn build
 
-  - script: npm run doc
-    displayName: NPM doc
+  - script: yarn run doc
+    displayName: Yarn doc
 
   - bash: |
       set -xeuo pipefail
@@ -248,11 +233,11 @@ jobs:
     parameters:
       setupBuild: true
 
-  - bash: npm run build
-    displayName: NPM build
+  - bash: yarn run build
+    displayName: Yarn build
 
-  - script: npm run doc
-    displayName: NPM doc
+  - script: yarn run doc
+    displayName: Yarn doc
 
   - bash: |
       set -xeuo pipefail

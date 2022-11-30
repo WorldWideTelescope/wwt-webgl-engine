@@ -5,14 +5,22 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/astro": "^0.1.0",
-    "@wwtelescope/engine": "^7.14.0",
-    "@wwtelescope/engine-types": "^0.6.0"
+    "@wwtelescope/astro": "workspace:>=0.1.0",
+    "@wwtelescope/engine": "workspace:^7.14.0",
+    "@wwtelescope/engine-types": "workspace:>=0.6.0"
   },
   "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "eslint": "^8.24.0",
+    "rimraf": "^3",
+    "typedoc": "0.23.20",
+    "typescript": "~4.8.4"
+  },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/astro": "manual:^0.1.0",
+    "@wwtelescope/astro": "manual:workspace:>=0.1.0",
     "@wwtelescope/engine": "1dded843ee47f132873d8b264bdba50badfea25f",
     "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2"
   },
@@ -20,7 +28,7 @@
     "AAS WorldWide Telescope"
   ],
   "license": "MIT",
-  "main": "./src/index.ts",
+  "main": "./dist/src/index.js",
   "name": "@wwtelescope/engine-helpers",
   "publishConfig": {
     "access": "public"
@@ -28,8 +36,10 @@
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
+    "clean": "rimraf dist",
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
+  "types": "./dist/src/index.d.ts",
   "version": "0.8.2"
 }

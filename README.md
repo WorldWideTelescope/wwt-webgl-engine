@@ -6,7 +6,7 @@
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine?label=@wwtelescope/engine)](https://www.npmjs.com/package/@wwtelescope/engine)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine-helpers?label=@wwtelescope/engine-helpers)](https://www.npmjs.com/package/@wwtelescope/engine-helpers)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine-types?label=@wwtelescope/engine-types)](https://www.npmjs.com/package/@wwtelescope/engine-types)
-[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-vuex?label=@wwtelescope/engine-vuex)](https://www.npmjs.com/package/@wwtelescope/engine-vuex)
+[![npm](https://img.shields.io/npm/v/@wwtelescope/engine-pinia?label=@wwtelescope/engine-pinia)](https://www.npmjs.com/package/@wwtelescope/engine-pinia)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/research-app?label=@wwtelescope/research-app)](https://www.npmjs.com/package/@wwtelescope/research-app)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/research-app-messages?label=@wwtelescope/research-app-messages)](https://www.npmjs.com/package/@wwtelescope/research-app-messages)
 
@@ -26,34 +26,33 @@ Learn more about WWT [here][wwt-home].
 
 ## Developers’ quick start
 
-1. Check out this repository to a machine with [Node.js] and [npm].
+1. Check out this repository to a machine with [Node.js] and [Yarn].
 1. `git submodule update --init`
-1. `npx lerna bootstrap -- --legacy-peer-deps` (You may be able to omit
-   the arguments here, depending on your version of NPM. See [this bug][vue6270].)
+1. `yarn install`
 1. Either build or obtain the file `engine/wwtlib/bin/wwtlib.js` as described
    below.
-1. `npm run lint` (uses [ESLint])
-1. `npm run build` creates:
+1. `yarn lint` (uses [ESLint])
+1. `yarn build` creates:
    1. The core engine package in the `engine/` package.
-   1. The engine tidied up into a [Vue]/[Vuex] module in `engine-vuex/`
+   1. The engine tidied up into a [Vue]/[Pinia] module in `engine-pinia/`
    1. The WWT embed app intended for iframe inclusion in `embed/`
    1. The WWT research app in `research-app/`
    1. The user-facing app for creating embed iframe code in `embed-creator/`
 1. Commands to serve the web apps:
-   1. `npm run serve-embed` to serve the embed app
-   1. `npm run serve-research` to serve the research app
-   1. `npm run serve-creator` to serve the embed creator app
-1. `npm run test` (mainly uses [mocha] and [chai])
-1. `npm run doc` (uses [TypeDoc])
+   1. `yarn run serve-embed` to serve the embed app
+   1. `yarn run serve-research` to serve the research app
+   1. `yarn run serve-creator` to serve the embed creator app
+1. `yarn test` (mainly uses [mocha] and [chai]; see also [Integration Testing] below)
+1. `yarn doc` (uses [TypeDoc])
 
 [Node.js]: https://nodejs.org/en/
-[npm]: https://www.npmjs.com/get-npm
-[vue6270]: https://github.com/vuejs/vue-cli/issues/6270
+[Yarn]: https://yarnpkg.com/
 [Vue]: https://vuejs.org/
-[Vuex]: https://vuex.vuejs.org/
+[Pinia]: https://pinia.vuejs.org/
 [ESLint]: https://eslint.org/
 [mocha]: https://mochajs.org/
 [chai]: https://www.chaijs.com/
+[Integration Testing]: #integration-testing
 [TypeDoc]: https://typedoc.org/
 
 
@@ -67,8 +66,8 @@ The most important subdirectories are:
 
 - `@wwtelescope/engine` in `engine/`, the core engine code transpiled from C# and
   wrapped in TypeScript annotations
-- `@wwtelescope/engine-vuex` in `engine-vuex/`, a higher-level package that turns the
-  engine into a reusable [Vue]/[Vuex] component
+- `@wwtelescope/engine-pinia` in `engine-pinia/`, a higher-level package that turns the
+  engine into a reusable [Vue]/[Pinia] component
 - `@wwtelescope/embed` in `embed/`, a web application that turns WWT into a
   configurable, embeddable iframe
 - `@wwtelescope/research-app` in `research-app/`, an embeddable web application for
@@ -77,6 +76,11 @@ The most important subdirectories are:
 
 README files inside the individual subdirectories give more information about
 their contents and development workflows.
+
+Previous versions used [Vuex] instead of [Pinia] in the `engine-vuex/`
+subdirectory. That module has been superseded by the Pinia version.
+
+[Vuex]: https://vuex.vuejs.org/
 
 
 ## The `engine/wwtlib/bin/wwtlib.js` file
@@ -113,37 +117,22 @@ request and access the artifacts associated with your pull request builds.
 ## Building the rest of the code
 
 Besides the creation of the file `engine/wwtlib/bin/wwtlib.js`, virtually
-everything in this repository is built using standard [Node.js]/[npm] tooling.
-These tools must be installed before you can do anything else.
+everything in this repository is built using standard [Node.js]/[Yarn] tooling.
+These tools must be installed before you can do anything else. To set up your
+checkout, follow the instructions in the [Developers’ Quick Start][dqs] above.
 
-The multi-package structure of this repository is dealt with using [Lerna]. This
-means that once you’ve checked out the code and install [npm], the setup
-sequence is:
-
-[Lerna]: https://lerna.js.org/
-
-1. Run `git submodule update --init` to pull in needed Git submodules, namely
-   the documentation theme in `docs/*/themes/wwtguide`.
-1. Run `npx lerna bootstrap` to install all of the project dependencies and set
-   up the necessary cross-links between individual packages in this repository.
+[dqs]: #developers-quick-start
 
 Once setup is complete, the following commands will be useful:
 
-- `npm run build` to build the subpackages
-- `npm run lint` to lint the subpackages (using [eslint] with TypeScript extensions)
-- `npm run test` to run the tests (mainly using [mocha] and [chai])
-- `npm run doc` to build most of the documentation (using [TypeDoc]) — but see below
+- `yarn build` to build the subpackages
+- `yarn lint` to lint the subpackages (using [eslint] with TypeScript extensions)
+- `yarn test` to run the tests (mainly using [mocha] and [chai])
+- `yarn doc` to build most of the documentation (using [TypeDoc]) — but see below
+- `yarn clean` to remove built files
 
-Running these commands from inside package subdirectories unfortunately *will
-not* work due to the centralized `node_modules` directory we use with Lerna. To
-run the `lint` command only for the `engine-types` submodule, run:
-
-```
-npx lerna run --scope @wwtelescope/engine-types lint
-```
-
-(The `--scope` argument can be a glob expression if you want to run on a subset
-of packages.)
+You can run these commands from the top level, which will run them for all of
+the packages, or from the subdirectory of the package you’re interested in.
 
 
 ## Building the full documentation
@@ -151,7 +140,7 @@ of packages.)
 Documentation is maintained in subdirectories of `docs/`. The documentation is a
 Frankenstein combination of the autogenerated API documentation and narrative
 material written in [CommonMark Markdown]. The final HTML is assembled with the
-static site generator [Zola],
+static site generator [Zola].
 
 [CommonMark Markdown]: https://commonmark.org/
 [Zola]: https://getzola.org/
@@ -159,7 +148,7 @@ static site generator [Zola],
 
 1. Zola is fast and self-contained and [ridiculously easy to
    install][install-zola].
-1. The `npm run doc` command will install the autogenerated documentation into
+1. The `yarn doc` command will install the autogenerated documentation into
    `docs/engine/static/`
 1. Running `zola build` in a subdirectory of `docs` will assembled the final HTML
    into `docs/{subdir}/public/`.
@@ -196,11 +185,10 @@ point to the localhost port that you will be using (the default is
 To run the test suite on a local version of the app with ChromeDriver:
 
 ```
-npm run serve-research &  # or equivalent
+yarn run serve-research &  # or equivalent
 cd tests
-npm install
-npm run build
-npm run local
+yarn build
+yarn run local
 ```
 
 To run tests on a local version of the app via BrowserStack's multi-browser,
@@ -212,14 +200,14 @@ username and access key, respectively. You can find these values in your Browser
 
 [Account Settings]: https://www.browserstack.com/accounts/settings
 
-* Run the test suite as above but with the final command: `npm run bs-local`
+* Run the test suite as above but with the final command: `yarn run bs-local`
 
 By default, both of these local options will run the tests in Chrome. You can
 adjust the testing environments adding the `-e` option, which can be
 accomplished with syntax such as
 
 ```
-npm run bs-local -- -e firefox,edge
+yarn run bs-local -- -e firefox,edge
 ```
 
 

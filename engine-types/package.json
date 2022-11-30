@@ -5,13 +5,21 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "description": "Types used by the AAS WorldWide Telescope.",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "eslint": "^8.24.0",
+    "rimraf": "^3",
+    "typedoc": "0.23.20",
+    "typescript": "~4.8.4"
+  },
   "homepage": "https://worldwidetelescope.org/home/",
   "keywords": [
     "AAS WorldWide Telescope",
     "worldwide-telescope"
   ],
   "license": "MIT",
-  "main": "./src/index.ts",
+  "main": "./dist/src/index.js",
   "name": "@wwtelescope/engine-types",
   "publishConfig": {
     "access": "public"
@@ -19,8 +27,10 @@
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
+    "clean": "rimraf dist",
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "version": "0.6.2"
+  "types": "./dist/src/index.d.ts",
+  "version": "0.6.3"
 }

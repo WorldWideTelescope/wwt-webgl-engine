@@ -1,3 +1,10 @@
+# @wwtelescope/engine-types 0.6.3 (2022-11-30)
+
+- No code changes.
+- Update the `package.json` file to align with new Yarn-based build system
+  (#217, @Carifio24, @pkgw).
+
+
 # @wwtelescope/engine-types 0.6.2 (2022-04-01)
 
 - Fix a URL typo in the package.json file (@Carifio24).

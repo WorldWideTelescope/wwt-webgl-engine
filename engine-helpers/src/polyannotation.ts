@@ -1,7 +1,6 @@
 // Copyright 2020-2021 the .NET Foundation
 // Licensed under the MIT License
 
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** Helpers for handling poly annotation settings. */
