@@ -1,3 +1,10 @@
+# @wwtelescope/engine 7.17.2 (2022-11-30)
+
+- Fix mouse-based selection of catalog entries in Firefox (#216, #219, @Carifio24).
+- Cleanups and improvements to the build and packaging infrastructure (#217,
+  @Carifio24, @pkgw). The source repository is now based on Yarn.
+
+
 # @wwtelescope/engine 7.17.1 (2022-10-25)
 
 - Fix a half-pixel offset in the positioning of untiled FITS files (#211,

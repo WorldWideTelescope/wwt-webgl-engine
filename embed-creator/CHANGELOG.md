@@ -1,3 +1,12 @@
+# @wwtelescope/embed-creator 0.4.0 (2022-11-30)
+
+- Update to Vue 3 (#215, @Carifio24)! Functional changes should be nil, but
+  this modernizes many of the internals.
+- Cleanups and improvements to the build and packaging infrastructure (#217,
+  @Carifio24, @pkgw). The source repository is now based on Yarn.
+- Update to FontAwesome 6.
+
+
 # @wwtelescope/embed-creator 0.3.5 (2022-04-01)
 
 - Fix a URL typo in the package.json file (@Carifio24).

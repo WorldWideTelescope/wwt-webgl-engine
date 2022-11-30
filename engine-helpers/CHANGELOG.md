@@ -1,3 +1,10 @@
+# @wwtelescope/engine-helpers 0.8.3 (2022-11-30)
+
+- No code changes.
+- Cleanups and improvements to the build and packaging infrastructure (#217,
+  @Carifio24, @pkgw). The source repository is now based on Yarn.
+
+
 # @wwtelescope/engine-helpers 0.8.2 (2022-04-01)
 
 - Fix a URL typo in the package.json file (@Carifio24).

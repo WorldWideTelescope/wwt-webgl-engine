@@ -1,3 +1,10 @@
+# @wwtelescope/engine-types 0.6.4 (2022-11-30)
+
+- No code changes. Make another release because the package of the previous
+  release was accidentally incomplete, due to being produced manually as the
+  kinks were being worked out in the updated build system.
+
+
 # @wwtelescope/engine-types 0.6.3 (2022-11-30)
 
 - No code changes.
