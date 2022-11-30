@@ -1637,7 +1637,7 @@ __metadata:
     "@vue/eslint-config-typescript": ^11.0.2
     "@wwtelescope/embed-common": "workspace:>=0.2.0"
     "@wwtelescope/engine": "workspace:^7.14.0"
-    "@wwtelescope/engine-pinia": "workspace:>=0.0.0"
+    "@wwtelescope/engine-pinia": "workspace:>=0.1.0"
     copyfiles: ^2.2.0
     eslint: ^8.24.0
     eslint-plugin-vue: ^9.5.1
@@ -1673,7 +1673,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-pinia@workspace:*, @wwtelescope/engine-pinia@workspace:>=0.0.0, @wwtelescope/engine-pinia@workspace:engine-pinia":
+"@wwtelescope/engine-pinia@workspace:*, @wwtelescope/engine-pinia@workspace:>=0.1.0, @wwtelescope/engine-pinia@workspace:engine-pinia":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine-pinia@workspace:engine-pinia"
   dependencies:
@@ -1760,7 +1760,7 @@ __metadata:
     "@wwtelescope/astro": "workspace:>=0.2.0"
     "@wwtelescope/engine": "workspace:^7.16.0"
     "@wwtelescope/engine-helpers": "workspace:>=0.8.1"
-    "@wwtelescope/engine-pinia": "workspace:>=0.0.0"
+    "@wwtelescope/engine-pinia": "workspace:>=0.1.0"
     "@wwtelescope/engine-types": "workspace:>=0.6.1"
     "@wwtelescope/research-app-messages": "workspace:>=0.15.0"
     copyfiles: ^2.2.0

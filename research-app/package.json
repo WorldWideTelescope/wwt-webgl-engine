@@ -11,7 +11,7 @@
     "@wwtelescope/astro": "workspace:>=0.2.0",
     "@wwtelescope/engine": "workspace:^7.16.0",
     "@wwtelescope/engine-helpers": "workspace:>=0.8.1",
-    "@wwtelescope/engine-pinia": "workspace:>=0.0.0",
+    "@wwtelescope/engine-pinia": "workspace:>=0.1.0",
     "@wwtelescope/engine-types": "workspace:>=0.6.1",
     "@wwtelescope/research-app-messages": "workspace:>=0.15.0",
     "moment": "^2.29.1",

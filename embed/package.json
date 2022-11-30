@@ -9,7 +9,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@wwtelescope/embed-common": "workspace:>=0.2.0",
     "@wwtelescope/engine": "workspace:^7.14.0",
-    "@wwtelescope/engine-pinia": "workspace:>=0.0.0",
+    "@wwtelescope/engine-pinia": "workspace:>=0.1.0",
     "screenfull": "^5",
     "v-tooltip": "^2.1",
     "vue": "^3",
