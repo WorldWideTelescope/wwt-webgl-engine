@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": "..",
     "target": "es5",
     "module": "commonjs",
     "composite": true,
@@ -13,14 +12,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
     "outDir": "dist",
     "declaration": true,
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "lib": [
       "dom",
       "dom.iterable",

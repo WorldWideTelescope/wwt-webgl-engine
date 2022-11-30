@@ -12,16 +12,15 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "outDir": "dist",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../engine-types"
+    }
   ],
   "typedocOptions": {
     "readme": "../docs/engine/embed-common-index.md",

@@ -1,4 +1,4 @@
-# Copyright 2020 the .NET Foundation
+# Copyright 2020-2022 the .NET Foundation
 # Licensed under the MIT License
 
 # Setup steps for the build and deployment processes.
@@ -76,19 +76,8 @@ steps:
       cp $PIPELINE_WORKSPACE/scriptsharp/wwtlib.js engine/wwtlib/bin/
     displayName: Restore ScriptSharp wwtlib.js
 
-  - bash: cranko npm lerna-workaround
-    displayName: Fake internal version requirements for Lerna
-
-  # With various versions of NPM we currently (July 2021) get bitten by:
-  #   https://github.com/vuejs/vue-cli/issues/6270
-  # Passing --legacy-peer-deps to NPM masks the issue. I guess we should
-  # upgrade to Vue 3?
-  #
-  # `--no-ci` seemingly needed for proper bootstrapping when making releases
-  # in some cases. **On CI systems only**, lerna will run `npm ci` rather than
-  # `npm install` and that caused issues for me (2022 March).
-  - bash: npx lerna bootstrap --no-ci --concurrency=1 -- --legacy-peer-deps
-    displayName: Lerna NPM setup
+  - bash: yarn install
+    displayName: Install Yarn dependencies
 
 - ${{ if parameters.setupGit }}:
   - bash: |

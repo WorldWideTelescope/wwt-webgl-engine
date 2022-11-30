@@ -5,7 +5,7 @@ import {
     expectAllVisible
 } from "../utils";
 
-import { ResearchAppPage, ResearchAppSections } from "page_objects/researchApp";
+import { ResearchAppPage, ResearchAppSections } from "../page_objects/researchApp";
 
 import {
     EnhancedPageObject,
@@ -97,7 +97,7 @@ const tests: appTests = {
         tools.click("@backgroundSelectionToggle");
         app.expect.element("@toolMenu").to.not.be.visible;
         tools.expect.element("@backgroundDropdown").to.be.present;
-        browser.perform(async() => {
+        browser.perform(async () => {
             tools.expect.elements("@backgroundDropdownOption").count.to.equal(await app.backgroundCount());
         });
 
@@ -106,7 +106,7 @@ const tests: appTests = {
             "@backgroundDropdownOption",
             "@backgroundDropdownOptionName",
             "@backgroundDropdownOptionDescription"
-        ].map(selector =>({selector: selector, index: 0}));
+        ].map(selector => ({ selector: selector, index: 0 }));
         expectAllPresent(tools, [firstBackgroundOption, firstBackgroundName, firstBackgroundDescription]);
         tools.expect.element(firstBackgroundName).text.to.equal(tools.props.firstBackgroundName);
         tools.expect.element(firstBackgroundDescription).text.to.equal(tools.props.firstBackgroundDescription);
@@ -144,7 +144,7 @@ const tests: appTests = {
         tools.click("@catalogSelectionToggle");
         app.expect.element("@toolMenu").to.not.be.visible;
         tools.expect.element("@catalogDropdown").to.be.present;
-        browser.perform(async() => {
+        browser.perform(async () => {
             tools.expect.elements("@catalogDropdownOption").count.to.equal(await app.hipsCount());
         });
 
@@ -154,18 +154,18 @@ const tests: appTests = {
         const [firstCatalogOption, firstCatalogName] = [
             "@catalogDropdownOption",
             "@catalogDropdownOptionName"
-        ].map(selector => ({selector: selector, index: 0}));
+        ].map(selector => ({ selector: selector, index: 0 }));
         expectAllPresent(tools, [firstCatalogOption, firstCatalogName]);
         tools.expect.element(firstCatalogName).text.to.equal(tools.props.firstCatalogName);
         tools.click(firstCatalogOption);
 
         // Check that the catalog displays in the panel
         // with the correct name
-        const firstCatalogTitle = {selector: "@catalogTitle", index: 0};
+        const firstCatalogTitle = { selector: "@catalogTitle", index: 0 };
         const firstCatalogButtons = [
             "@catalogVisibilityButton",
             "@catalogDeleteButton",
-        ].map(selector =>({selector: selector, index: 0}));
+        ].map(selector => ({ selector: selector, index: 0 }));
         displayPanel.expect.elements("@catalogItem").count.to.equal(1);
         expectAllPresent(displayPanel, firstCatalogButtons);
         displayPanel.expect.element(firstCatalogTitle).text.to.match(tools.props.firstCatalogRegex);
@@ -176,7 +176,7 @@ const tests: appTests = {
         // If we click on catalog title, check that the UI container becomes
         // visible. The buttons should appear as well.
         const toClick = firstCatalogTitle;
-        const firstCatalogDetail = {selector: "@catalogDetailContainer", index: 0};
+        const firstCatalogDetail = { selector: "@catalogDetailContainer", index: 0 };
         displayPanel.click(toClick);
         expectAllVisible(displayPanel, firstCatalogButtons.concat([firstCatalogDetail]));
 
@@ -189,7 +189,7 @@ const tests: appTests = {
         displayPanel.expect.elements("@catalogItem").count.to.equal(0);
     },
 
-    'PHAT FITS': function(browser: NightwatchBrowser) {
+    'PHAT FITS': function (browser: NightwatchBrowser) {
         const app = this.app;
         const sections = app.section as ResearchAppSections;
         const controls = sections.controls;
@@ -213,22 +213,22 @@ const tests: appTests = {
         tools.click("@imagerySelectionToggle");
         tools.expect.elements("@imageryDropdownOption").count.to.equal(tools.props.phatImageryCount);
         for (let i = 0; i < tools.props.phatImageryCount; i++) {
-            tools.expect.element({selector: "@imageryDropdownOptionName", index: i}).text.to.match(phatLayerRegExps[i]);
+            tools.expect.element({ selector: "@imageryDropdownOptionName", index: i }).text.to.match(phatLayerRegExps[i]);
         }
 
         // Select the first PHAT imagery layer
-        tools.click({selector: "@imageryDropdownOption", index: 0});
+        tools.click({ selector: "@imageryDropdownOption", index: 0 });
 
         // Check that the layer displays in the panel with the correct name
         displayPanel.expect.elements("@imageryItem").count.to.equal(1);
-        displayPanel.expect.element({selector: "@imageryTitle", index: 0}).text.to.match(phatLayerRegExps[0]);
+        displayPanel.expect.element({ selector: "@imageryTitle", index: 0 }).text.to.match(phatLayerRegExps[0]);
 
         // Initially, none of the icon buttons should be visible
         const buttons = [
             "@imageryGotoButton",
             "@imageryVisibilityButton",
             "@imageryDeleteButton"
-        ].map((selector) => ({selector: selector, index: 0}));
+        ].map((selector) => ({ selector: selector, index: 0 }));
         expectAllNotVisible(displayPanel, buttons);
 
         // We should have already moved to the correct position
@@ -238,11 +238,11 @@ const tests: appTests = {
         // Also, the buttons should be visible
         displayPanel.click("@imageryTitle");
         expectAllVisible(displayPanel, buttons);
-        displayPanel.expect.element({selector: "@imageryDetailContainer", index: 0}).to.be.visible;
+        displayPanel.expect.element({ selector: "@imageryDetailContainer", index: 0 }).to.be.visible;
 
         // If we click the title again, the detail container should go away
         displayPanel.click("@imageryTitle");
-        displayPanel.expect.element({selector: "@imageryDetailContainer", index: 0}).to.not.be.present;
+        displayPanel.expect.element({ selector: "@imageryDetailContainer", index: 0 }).to.not.be.present;
 
         // If we click the delete button, the layer should be removed from the display panel
         displayPanel.click(buttons[2]);

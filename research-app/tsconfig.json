@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": "..",
     "target": "es5",
     "module": "esnext",
     "composite": true,
@@ -13,13 +12,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
     "outDir": "dist",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "lib": [
       "dom",
       "dom.iterable",
@@ -29,5 +22,25 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.vue"
+  ],
+  "references": [
+    {
+      "path": "../astro"
+    },
+    {
+      "path": "../engine"
+    },
+    {
+      "path": "../engine-helpers"
+    },
+    {
+      "path": "../engine-pinia"
+    },
+    {
+      "path": "../engine-types"
+    },
+    {
+      "path": "../research-app-messages"
+    }
   ]
 }

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": "..",
     "target": "es5",
     "module": "esnext",
     "composite": true,
@@ -13,17 +12,25 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "outDir": "dist",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.vue"
+  ],
+  "references": [
+    {
+      "path": "../astro"
+    },
+    {
+      "path": "../engine"
+    },
+    {
+      "path": "../engine-helpers"
+    },
+    {
+      "path": "../engine-types"
+    },
   ],
   "typedocOptions": {
     "readme": "../docs/engine/engine-pinia-index.md",
