@@ -29,7 +29,7 @@
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf dist",
+    "clean": "rimraf dist tests_output",
     "local": "nightwatch -c dist/local.conf.js",
     "bs-local": "node scripts/bslocal.runner.js -c dist/bslocal.conf.js"
   },

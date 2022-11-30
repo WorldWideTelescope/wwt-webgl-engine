@@ -11,7 +11,7 @@ const researchAppCommands = {
       .waitForElementVisible("@app")
       .waitForElementVisible("@wwtComponent");
   },
-  
+
   async backgroundCount(this: PageObjectModel): Promise<number> {
     const docHandler = (doc: Document): number => {
       const items = [...doc.querySelectorAll("ImageSet")];
@@ -71,10 +71,10 @@ const researchAppElements = {
     selector: ".tool-menu > li > a > .fa-image"
   },
   catalogButton: {
-    selector: ".tool-menu > li > a > .fa-map-marked-alt"
+    selector: ".tool-menu > li > a > .fa-map-location-dot"
   },
   loadWtmlButton: {
-    selector: ".tool-menu > li > a > .fa-photo-video"
+    selector: ".tool-menu > li > a > .fa-photo-film"
   },
   notification: {
     selector: ".vue-notification-wrapper"
@@ -120,7 +120,7 @@ const displayPanel = {
       selector: "#spreadsheets-container .fa-eye"
     },
     catalogDeleteButton: {
-      selector: "#spreadsheets-container .fa-times"
+      selector: "#spreadsheets-container .fa-xmark"
     },
     imageryItem: {
       selector: "#imagery-container #root-container"
@@ -135,13 +135,13 @@ const displayPanel = {
       selector: "#imagery-container #name-label"
     },
     imageryGotoButton: {
-      selector: "#imagery-container .fa-map-marker-alt"
+      selector: "#imagery-container .fa-location-dot"
     },
     imageryVisibilityButton: {
       selector: "#imagery-container .fa-eye"
     },
     imageryDeleteButton: {
-      selector: "#imagery-container .fa-times"
+      selector: "#imagery-container .fa-xmark"
     },
 
   },
@@ -159,13 +159,13 @@ const controls = {
       selector: "#controls > li"
     },
     toolChooser: {
-      selector: "li .fa-sliders-h"
+      selector: "li .fa-sliders"
     },
     zoomIn: {
-      selector: "li .fa-search-plus"
+      selector: "li .fa-magnifying-glass-plus"
     },
     zoomOut: {
-      selector: "li .fa-search-minus"
+      selector: "li .fa-magnifying-glass-minus"
     },
     fullScreen: {
       selector: "li .fa-expand"
@@ -282,9 +282,9 @@ const researchAppPage: PageObjectModel = {
 export default researchAppPage;
 
 export type ResearchAppPage = EnhancedPageObject<typeof researchAppCommands,
-                                                 typeof researchAppElements,
-                                                 typeof researchAppSections> &
-                                                 { props: typeof researchAppProps };
+  typeof researchAppElements,
+  typeof researchAppSections> &
+{ props: typeof researchAppProps };
 
 type Section = keyof typeof researchAppSections;
 type SectionInfo<T extends Section> = typeof researchAppSections[T];
