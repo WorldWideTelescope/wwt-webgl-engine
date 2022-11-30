@@ -53,21 +53,27 @@
 
         <div class="detail-row">
           <span class="prompt">Color:</span>
-          <v-popover class="circle-popover">
+          <Popper
+            :arrow="true"
+            placement="right"
+            >
             <font-awesome-icon
               icon="circle"
               size="lg"
               :style="{
-                color: `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a})`,
+                color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
               }"
             ></font-awesome-icon>
-            <template slot="popover">
-              <vue-color-chrome
-                :value="this.color"
-                @input="handleColorChange"
-              ></vue-color-chrome>
+            <template #content>
+              <color-picker
+                class="app-color-picker"
+                theme="dark"
+                :color="colorString"
+                :colors-default="[]"
+                @changeColor="handleColorChange"
+              ></color-picker>
             </template>
-          </v-popover>
+          </Popper>
         </div>
 
         <div class="detail-row">
@@ -115,20 +121,19 @@
 </template>
 
 <script lang="ts">
-import { mapGetters, mapMutations, mapState } from "vuex";
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { defineComponent, PropType } from "vue";
+import { mapActions, mapState } from "pinia";
 
 import {
   Color,
-  Guid,
   SpreadSheetLayerSetting,
   SpreadSheetLayerSettingsInterfaceRO,
 } from "@wwtelescope/engine";
-import { ApplyTableLayerSettingsOptions } from "@wwtelescope/engine-helpers";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
-import { wwtEngineNamespace, wwtResearchAppNamespace } from "./namespaces";
-import { CatalogLayerInfo, ImagesetInfo } from "@wwtelescope/engine-vuex";
+import { CatalogLayerInfo, ImagesetInfo, engineStore } from "@wwtelescope/engine-pinia";
+import { researchAppStore } from "./store";
+import 'vue-color-kit/dist/vue-color-kit.css';
 
 interface UiPlotTypes {
   wwt: PlotTypes;
@@ -152,221 +157,209 @@ interface VueColorData {
     g: number;
     b: number;
   };
+  hex: string;
 }
 
-@Component
-export default class CatalogItem extends Vue {
-  @Prop({ required: true }) layer!: CatalogLayerInfo;
-  @Prop({ required: false, default: Color.fromArgb(1, 255, 255, 255) })
+export default defineComponent({
 
-  defaultColor!: Color;
+  props: {
+    layer: { type: Object as PropType<CatalogLayerInfo>, required: true },
+    defaultColor: { default: Color.fromArgb(1, 255, 255, 255), required: false }
+  },
 
-  uiPlotTypes = uiPlotTypes;
-
-  // Vuex integration
-
-  beforeCreate(): void {
-    this.$options.computed = {
-      ...mapState(wwtResearchAppNamespace, {
-        visible: (_state, getters) =>
-          getters["researchAppTableLayerVisibility"](this.layer),
-      }),
-      ...mapGetters(wwtEngineNamespace, [
-        "spreadsheetState",
-      ]),
-      ...this.$options.computed,
-    };
-
-    this.$options.methods = {
-      ...this.$options.methods,
-      ...mapMutations(wwtEngineNamespace, [
-        "applyTableLayerSettings",
-        "deleteLayer",
-        "removeCatalogHipsByName",
-      ]),
-      ...mapMutations(wwtResearchAppNamespace, [
-        "removeResearchAppTableLayer",
-        "setResearchAppTableLayerVisibility",
-      ]),
-    };
-  }
-
-  // Tied to the store value
-  visible!: boolean;
-
-  spreadsheetState!: (layer: CatalogLayerInfo) => SpreadSheetLayerSettingsInterfaceRO | null;
-
-  applyTableLayerSettings!: (_o: ApplyTableLayerSettingsOptions) => void;
-  deleteLayer!: (id: string | Guid) => void;
-  removeCatalogHipsByName!: (name: string) => void;
-  removeResearchAppTableLayer!: (layer: CatalogLayerInfo) => void;
-  setResearchAppTableLayerVisibility!: (args: {
-    layer: CatalogLayerInfo;
-    visible: boolean;
-  }) => void;
-
-  // Local state
-
-  editing = false;
-  hasFocus = false;
-  isSelected = false;
-  isLayerHips = false;
-
-  layerId(): string {
-    return this.layer.id ?? "";
-  }
-
-  layerState(): SpreadSheetLayerSettingsInterfaceRO | null {
-    return this.spreadsheetState(this.layer);
-  }
-
-  get color(): Color {
-    const state = this.layerState();
-
-    if (state !== null) {
-      return state.get_color();
-    } else {
-      return this.defaultColor;
+  data() {
+    return {
+      uiPlotTypes,
+      editing: false,
+      hasFocus: false,
+      isSelected: false,
+      isLayerHips: false,
     }
-  }
+  },
 
-  set color(value: Color) {
-    this.applySettings([
-      ["color", value],
-      ["opacity", value.a],
-    ]);
-  }
+  computed: {
+    ...mapState(researchAppStore, ["researchAppTableLayerVisibility"]),
+    ...mapState(engineStore, ["spreadsheetState"]),
 
-  get enabled(): boolean {
-    const state = this.layerState();
+    visible(): boolean {
+      return this.researchAppTableLayerVisibility(this.layer);
+    },
 
-    if (state !== null) {
-      return state.get_enabled();
-    } else {
-      return true;
+    layerId(): string {
+      return this.layer.id ?? "";
+    },
+
+    layerState(): SpreadSheetLayerSettingsInterfaceRO | null {
+      return this.spreadsheetState(this.layer);
+    },
+
+    color: {
+      get(): Color {
+        const state = this.layerState;
+
+        if (state !== null) {
+          return state.get_color();
+        } else {
+          return this.defaultColor;
+        }
+      },
+      set(value: Color) {
+        this.applySettings([
+          ["color", value],
+          ["opacity", value.a],
+        ]);
+      }
+    },
+
+    colorString(): string {
+      return `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a})`;
+    },
+
+    enabled(): boolean {
+      const state = this.layerState;
+
+      if (state !== null) {
+        return state.get_enabled();
+      } else {
+        return true;
+      }
+    },
+
+    plotType: {
+      get(): PlotTypes {
+        const state = this.layerState;
+
+        if (state !== null) {
+          return state.get_plotType();
+        }
+
+        return PlotTypes.gaussian;
+      },
+      set(value: PlotTypes) {
+        this.applySettings([["plotType", value]]);
+      }
+    },
+
+    scaleFactorDb: {
+      get(): number {
+        const state = this.layerState;
+
+        if (state !== null) {
+          return 10 * Math.log10(state.get_scaleFactor());
+        }
+
+        return 0.0;
+      },
+      set(value: number) {
+        this.applySettings([["scaleFactor", Math.pow(10, 0.1 * value)]]);
+      }
+    },
+
+    scaleFactorDbText: {
+      // I can't find a customizable Vue numeric input that has good TypeScript
+      // support, so we just hand-roll the processing to give nice textual
+      // presentation.
+      get(): string {
+        if (this.scaleFactorDb == 0) {
+          return "0.00";
+        } else if (this.scaleFactorDb < 0) {
+          return this.scaleFactorDb.toFixed(2);
+        } else {
+          return "+" + this.scaleFactorDb.toFixed(2);
+        }
+      },
+      set(value: string) {
+        const n = Number(value);
+
+        if (isFinite(n)) {
+          this.scaleFactorDb = n;
+        }
+      }
     }
-  }
+  },
 
-  get plotType(): PlotTypes {
-    const state = this.layerState();
+  methods: {
+    ...mapActions(engineStore, [
+      "applyTableLayerSettings",
+      "deleteLayer",
+      "removeCatalogHipsByName",
+    ]),
+    ...mapActions(researchAppStore, [
+      "removeResearchAppTableLayer",
+      "setResearchAppTableLayerVisibility",
+    ]),
 
-    if (state !== null) {
-      return state.get_plotType();
+    applySettings(settings: SpreadSheetLayerSetting[]) {
+      this.applyTableLayerSettings({
+        id: this.layerId,
+        settings: settings,
+      });
+    },
+
+    handleDelete() {
+      this.removeResearchAppTableLayer(this.layer);
+      if (this.layer instanceof ImagesetInfo) {
+        this.removeCatalogHipsByName(this.layer.name);
+      } else {
+        this.deleteLayer(this.layer.id);
+      }
+    },
+
+    handleToggle() {
+      this.setResearchAppTableLayerVisibility({
+        layer: this.layer,
+        visible: !this.visible,
+      });
+    },
+
+    handleColorChange(colorData: VueColorData) {
+      const rgba = colorData.rgba;
+      this.color = Color.fromArgb(rgba.a, rgba.r, rgba.g, rgba.b);
+    },
+
+    handleEditClick() {
+      this.editing = !this.editing;
+    },
+
+    doAdjustSize(bigger: boolean) {
+      if (bigger) {
+        this.scaleFactorDb += 0.5;
+      } else {
+        this.scaleFactorDb -= 0.5;
+      }
     }
-
-    return PlotTypes.gaussian;
-  }
-
-  set plotType(value: PlotTypes) {
-    this.applySettings([["plotType", value]]);
-  }
-
-  get scaleFactorDb(): number {
-    const state = this.layerState();
-
-    if (state !== null) {
-      return 10 * Math.log10(state.get_scaleFactor());
-    }
-
-    return 0.0;
-  }
-
-  set scaleFactorDb(value: number) {
-    this.applySettings([["scaleFactor", Math.pow(10, 0.1 * value)]]);
-  }
-
-  // I can't find a customizable Vue numeric input that has good TypeScript
-  // support, so we just hand-roll the processing to give nice textual
-  // presentation.
-  get scaleFactorDbText(): string {
-    if (this.scaleFactorDb == 0) {
-      return "0.00";
-    } else if (this.scaleFactorDb < 0) {
-      return this.scaleFactorDb.toFixed(2);
-    } else {
-      return "+" + this.scaleFactorDb.toFixed(2);
-    }
-  }
-
-  set scaleFactorDbText(value: string) {
-    const n = Number(value);
-
-    if (isFinite(n)) {
-      this.scaleFactorDb = n;
-    }
-  }
-
-  // Implementation
+  },
 
   mounted() {
     this.isLayerHips = this.layer instanceof ImagesetInfo;
-  }
+  },
 
-  private applySettings(settings: SpreadSheetLayerSetting[]) {
-    this.applyTableLayerSettings({
-      id: this.layerId(),
-      settings: settings,
-    });
-  }
+  watch: {
+    visible(val: boolean) {
+      this.applySettings([["enabled", val]]);
+    },
 
-  handleDelete() {
-    this.removeResearchAppTableLayer(this.layer);
-    if (this.layer instanceof ImagesetInfo) {
-      this.removeCatalogHipsByName(this.layer.name);
-    } else {
-      this.deleteLayer(this.layer.id);
+    enabled(val: boolean) {
+      this.setResearchAppTableLayerVisibility({
+        layer: this.layer,
+        visible: val,
+      });
+    },
+
+    editing(val: boolean) {
+      const input: HTMLInputElement = this.$el.getElementsByClassName(
+        "name-input"
+      )[0] as HTMLInputElement;
+      if (val) {
+        input.value = this.layer.name;
+      } else {
+        // eslint-disable-next-line vue/no-mutating-props
+        this.layer.name = input.value;
+      }
     }
   }
 
-  handleToggle() {
-    this.setResearchAppTableLayerVisibility({
-      layer: this.layer,
-      visible: !this.visible,
-    });
-  }
-
-  handleColorChange(colorData: VueColorData) {
-    const rgba = colorData["rgba"];
-    this.color = Color.fromArgb(rgba["a"], rgba["r"], rgba["g"], rgba["b"]);
-  }
-
-  handleEditClick() {
-    this.editing = !this.editing;
-  }
-
-  @Watch("visible")
-  onVisibilityChange(val: boolean) {
-    this.applySettings([["enabled", val]]);
-  }
-
-  @Watch("enabled")
-  onEnabledChange(val: boolean) {
-    this.setResearchAppTableLayerVisibility({
-      layer: this.layer,
-      visible: val,
-    });
-  }
-
-  @Watch("editing")
-  editingChanged(val: boolean, _oldVal: boolean) {
-    const input: HTMLInputElement = this.$el.getElementsByClassName(
-      "name-input"
-    )[0] as HTMLInputElement;
-    if (val) {
-      input.value = this.layer.name;
-    } else {
-      this.layer.name = input.value;
-    }
-  }
-
-  doAdjustSize(bigger: boolean) {
-    if (bigger) {
-      this.scaleFactorDb += 0.5;
-    } else {
-      this.scaleFactorDb -= 0.5;
-    }
-  }
-}
+});
 </script>
 
 <style scoped lang="less">
@@ -375,7 +368,7 @@ export default class CatalogItem extends Vue {
   font-weight: bold;
   font-size: 12pt;
   padding: 0px;
-  overflow: hidden;
+  /*overflow: hidden;*/
 
   &:hover {
     background: #999999;
@@ -394,14 +387,6 @@ export default class CatalogItem extends Vue {
   display: inline-block;
   flex: 1;
   padding-right: 10px;
-
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.circle-popover {
-  display: inline;
 
   &:hover {
     cursor: pointer;
@@ -456,27 +441,20 @@ export default class CatalogItem extends Vue {
   text-align: center;
 }
 
-// For styling the nested vue-color component
-// This lets us style that component without de-scoping this CSS
-/deep/ * {
-  &.vc-chrome-body {
-    background-color: #404040;
-  }
+:deep(*) {
 
-  &.vc-chrome-fields .vc-input__input {
-    background-color: #cccccc;
-  }
+  &.app-color-picker {
 
-  &.vc-chrome-fields .vc-input__label {
-    color: #cccccc;
-  }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
 
-  &.vc-chrome-toggle-icon path {
-    fill: #cccccc;
-  }
+    & .color-set {
+      display: flex;
+      gap: 3px;
+    }
 
-  &.vc-chrome-toggle-icon:hover path {
-    fill: #404040;
   }
 }
 </style>

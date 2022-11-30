@@ -5,16 +5,21 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "description": "Data structures for messages sent to the AAS WorldWide Telescope research app.",
-  "files": [
-    "dist/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,tsbuildinfo,ttf}"
-  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "eslint": "^8.24.0",
+    "rimraf": "^3",
+    "typedoc": "0.23.20",
+    "typescript": "~4.8.4"
+  },
   "homepage": "https://worldwidetelescope.org/home/",
   "keywords": [
     "AAS WorldWide Telescope",
     "worldwide-telescope"
   ],
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "./dist/src/index.js",
   "name": "@wwtelescope/research-app-messages",
   "publishConfig": {
     "access": "public"
@@ -22,10 +27,10 @@
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "clean": "rimraf dist",
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
-  "types": "dist/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "version": "0.0.0-dev.0"
 }

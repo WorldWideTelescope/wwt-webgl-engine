@@ -12,22 +12,29 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "outDir": "dist",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../astro"
+    },
+    {
+      "path": "../engine"
+    },
+    {
+      "path": "../engine-types"
+    }
   ],
   "typedocOptions": {
     "readme": "../docs/engine/engine-helpers-index.md",
     "out": "../docs/engine/static/apiref/engine-helpers",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
-    "listInvalidSymbolLinks": true
+    "validation": {
+      "invalidLink": true
+    }
   }
 }

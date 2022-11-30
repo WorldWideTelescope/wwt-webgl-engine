@@ -38,38 +38,49 @@
 
     <ul id="controls">
       <li v-show="showToolMenu">
-        <v-popover placement="left">
+        <Popper
+          placement="left"
+          :arrow="true"
+          :interactive="true"
+        >
           <font-awesome-icon
             class="tooltip-target"
             icon="sliders-h"
             size="lg"
           ></font-awesome-icon>
-          <template slot="popover">
+          <template #content="props">
             <ul class="tooltip-content tool-menu">
               <li v-show="showCrossfader">
-                <a href="#" v-close-popover @click="selectTool('crossfade')"
+                <a href="#"
+                  @click="
+                    selectTool('crossfade');
+                    props.close()
+                  "
                   ><font-awesome-icon icon="adjust" /> Crossfade</a
                 >
               </li>
               <li v-show="showBackgroundChooser">
                 <a
                   href="#"
-                  v-close-popover
-                  @click="selectTool('choose-background')"
+                  @click="
+                    selectTool('choose-background');
+                    props.close()
+                  "
                   ><font-awesome-icon icon="mountain" /> Choose background</a
                 >
               </li>
               <li v-show="showPlaybackControls">
                 <a
                   href="#"
-                  v-close-popover
-                  @click="selectTool('playback-controls')"
+                    @click="selectTool('playback-controls');
+                    props.close()
+                  "
                   ><font-awesome-icon icon="redo" /> Tour player controls</a
                 >
               </li>
             </ul>
           </template>
-        </v-popover>
+        </Popper>
       </li>
       <li v-show="!wwtIsTourPlaying">
         <font-awesome-icon
@@ -161,9 +172,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Watch } from "vue-property-decorator";
-
-import * as screenfull from "screenfull";
+import screenfull from "screenfull";
+import { defineComponent } from "vue";
 
 import { fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { Place } from "@wwtelescope/engine";
@@ -171,7 +181,8 @@ import { ImageSetType } from "@wwtelescope/engine-types";
 import {
   SetupForImagesetOptions,
   WWTAwareComponent,
-} from "@wwtelescope/engine-vuex";
+} from "@wwtelescope/engine-pinia";
+
 import { CreditMode, EmbedSettings } from "@wwtelescope/embed-common";
 
 /** The overall state of the WWT embed component. */
@@ -225,88 +236,139 @@ const defaultWindowShape: Shape = { width: 1200, height: 900 };
 
 type WwtComponentLayout = { top: string; height: string };
 
-@Component
-export default class Embed extends WWTAwareComponent {
-  CreditMode = CreditMode;
+export default defineComponent({
+  extends: WWTAwareComponent,
 
-  @Prop({ default: new EmbedSettings() })
-  readonly embedSettings!: EmbedSettings;
+  props: {
+    embedSettings: { type: EmbedSettings, default: new EmbedSettings(), required: true }
+  },
 
-  componentState = ComponentState.LoadingResources;
-  backgroundImagesets: BackgroundImageset[] = [];
-  currentTool: ToolType = null;
-  fullscreenModeActive = false;
-  tourPlaybackJustEnded = false;
-  windowShape = defaultWindowShape;
+  data() {
+    return {
+      CreditMode: CreditMode,
+      componentState: ComponentState.LoadingResources,
+      backgroundImagesets: [] as BackgroundImageset[],
+      currentTool: null as ToolType | null,
+      fullscreenModeActive: false,
+      tourPlaybackJustEnded: false,
+      windowShape: defaultWindowShape
+    }
+  },
 
-  get isLoadingState() {
-    return this.componentState == ComponentState.LoadingResources;
-  }
+  computed: {
+    isLoadingState(): boolean {
+      return this.componentState == ComponentState.LoadingResources;
+    },
 
-  get isReadyToStartState() {
-    return this.componentState == ComponentState.ReadyToStart;
-  }
+    isReadyToStartState(): boolean {
+      return this.componentState == ComponentState.ReadyToStart;
+    },
 
-  get coordText() {
-    if (this.wwtRenderType == ImageSetType.sky) {
-      return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+    coordText(): string {
+      if (this.wwtRenderType == ImageSetType.sky) {
+        return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+      }
+
+      return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+    },
+
+    curBackgroundImagesetName: {
+      get(): string {
+        if (this.wwtBackgroundImageset == null) return "";
+        return this.wwtBackgroundImageset.get_name();
+      },
+      set(name: string) {
+        this.setBackgroundImageByName(name);
+      }
+    },
+
+    foregroundOpacity: {
+      get(): number {
+        return this.wwtForegroundOpacity;
+      },
+      set(o: number) {
+        return this.setForegroundOpacity(o);
+      }
+    },
+
+    fullscreenAvailable(): boolean {
+      return screenfull.isEnabled;
+    },
+
+    showBackgroundChooser(): boolean {
+      if (this.wwtIsTourPlaying) return false;
+
+      // TODO: we should wire in choices for other modes!
+      return this.wwtRenderType == ImageSetType.sky;
+    },
+
+    showCrossfader(): boolean {
+      if (this.wwtIsTourPlaying) return false; // maybe show this if tour player is active but not playing?
+
+      if (
+        this.wwtForegroundImageset == null ||
+        this.wwtForegroundImageset === undefined
+      )
+        return false;
+
+      return this.wwtForegroundImageset != this.wwtBackgroundImageset;
+    },
+
+    showPlaybackControls(): boolean {
+      return this.wwtIsTourPlayerActive && !this.wwtIsTourPlaying;
+    },
+
+    showToolMenu(): boolean {
+      // This should return true if there are any tools to show.
+      return (
+        this.showBackgroundChooser ||
+        this.showCrossfader ||
+        this.showPlaybackControls
+      );
+    },
+
+    tourPlaybackIcon(): string {
+      if (this.tourPlaybackJustEnded) {
+        return "undo-alt";
+      }
+
+      if (this.wwtIsTourPlaying) {
+        return "pause";
+      }
+
+      return "play";
+    },
+
+    twoWayTourTimecode: {
+      get(): number {
+        return this.wwtTourTimecode;
+      },
+      set(code: number) {
+        this.seekToTourTimecode(code);
+        this.tourPlaybackJustEnded = false;
+      }
+    },
+
+    // This property is used to achieve a widescreen effect when playing tours
+    // back on a portrait-mode screen, such as on a mobile device. Tours have to
+    // be designed with a target screen aspect ratio in mind, so without the
+    // widescreen effect the content will get cut off.
+    //
+    // Keep this in sync with toggleTourPlayback.
+    wwtComponentLayout(): WwtComponentLayout {
+      if (this.wwtIsTourPlaying) {
+        if (this.windowShape.height > this.windowShape.width) {
+          const wwtHeight = this.windowShape.width * 0.75; // => 4:3 aspect ratio
+          const height = wwtHeight + "px";
+          const top = 0.5 * (this.windowShape.height - wwtHeight) + "px";
+          return { top, height };
+        }
+      }
+
+      return { top: "0", height: "100%" };
     }
 
-    return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
-  }
-
-  get curBackgroundImagesetName() {
-    if (this.wwtBackgroundImageset == null) return "";
-    return this.wwtBackgroundImageset.get_name();
-  }
-
-  set curBackgroundImagesetName(name: string) {
-    this.setBackgroundImageByName(name);
-  }
-
-  get foregroundOpacity() {
-    return this.wwtForegroundOpacity;
-  }
-
-  set foregroundOpacity(o: number) {
-    this.setForegroundOpacity(o);
-  }
-
-  get fullscreenAvailable() {
-    return screenfull.isEnabled;
-  }
-
-  get showBackgroundChooser() {
-    if (this.wwtIsTourPlaying) return false;
-
-    // TODO: we should wire in choices for other modes!
-    return this.wwtRenderType == ImageSetType.sky;
-  }
-
-  get showCrossfader() {
-    if (this.wwtIsTourPlaying) return false; // maybe show this if tour player is active but not playing?
-
-    if (
-      this.wwtForegroundImageset == null ||
-      this.wwtForegroundImageset === undefined
-    )
-      return false;
-
-    return this.wwtForegroundImageset != this.wwtBackgroundImageset;
-  }
-
-  get showPlaybackControls() {
-    return this.wwtIsTourPlayerActive && !this.wwtIsTourPlaying;
-  }
-
-  get showToolMenu() {
-    // This should return true if there are any tools to show.
-    return (
-      this.showBackgroundChooser ||
-      this.showCrossfader ||
-      this.showPlaybackControls
-    );
-  }
+  },
 
   created() {
     let prom = this.waitForReady().then(() => {
@@ -425,7 +487,7 @@ export default class Embed extends WWTAwareComponent {
         this.componentState = ComponentState.Started;
       });
     }
-  }
+  },
 
   mounted() {
     if (screenfull.isEnabled) {
@@ -438,7 +500,7 @@ export default class Embed extends WWTAwareComponent {
     // const ro = new ResizeObserver(entries => this.onResizeEvent());
     // ro.observer(this.$el);
     this.onResizeEvent();
-  }
+  },
 
   destroyed() {
     if (screenfull.isEnabled) {
@@ -446,153 +508,132 @@ export default class Embed extends WWTAwareComponent {
     }
 
     window.removeEventListener("resize", this.onResizeEvent);
-  }
+  },
 
-  selectTool(name: ToolType) {
-    if (this.currentTool == name) {
-      this.currentTool = null;
-    } else {
-      this.currentTool = name;
-    }
-  }
-
-  doZoom(zoomIn: boolean) {
-    if (zoomIn) {
-      this.zoom(1 / 1.3);
-    } else {
-      this.zoom(1.3);
-    }
-  }
-
-  toggleFullscreen() {
-    if (screenfull.isEnabled) {
-      screenfull.toggle();
-    }
-  }
-
-  onFullscreenEvent() {
-    // NB: we need the isEnabled check to make TypeScript happy even though it
-    // is not necessary in practice here.
-    if (screenfull.isEnabled) {
-      this.fullscreenModeActive = screenfull.isFullscreen;
-    }
-  }
-
-  onResizeEvent() {
-    const width = this.$el.clientWidth;
-    const height = this.$el.clientHeight;
-
-    if (width > 0 && height > 0) {
-      this.windowShape = { width, height };
-    } else {
-      this.windowShape = defaultWindowShape;
-    }
-  }
-
-  startInteractive() {
-    this.componentState = ComponentState.Started;
-
-    if (this.embedSettings.tourUrl.length) {
-      this.startTour();
-    }
-  }
-
-  get tourPlaybackIcon() {
-    if (this.tourPlaybackJustEnded) {
-      return "undo-alt";
-    }
-
-    if (this.wwtIsTourPlaying) {
-      return "pause";
-    }
-
-    return "play";
-  }
-
-  tourPlaybackButtonClicked() {
-    if (this.wwtIsTourPlayerActive) {
-      // If we're playing and our window is tall, we have styling active that
-      // keeps the WWT widget in a widescreen-ish format to preserve tour
-      // layout. If we're stopping playback, this styling will go away. Since
-      // the WWT widget tracks its view height as an angular size, we need to
-      // tweak it in order to preserve continuity when the tour is paused. This
-      // isn't 100% necessary but is cool when it works. It doesn't work if the
-      // pause occurs in a very zoomed-out state, where we can't zoom out any
-      // farther because we hit the zoom clamps.
-      //
-      // Keep this in sync with wwtComponentLayout.
-      //
-      // TODO: make sure this works in 3D mode.
-      let newView = null;
-
-      if (this.wwtIsTourPlaying && this.wwtComponentLayout.top != "0") {
-        const curHeight = this.windowShape.width * 0.75;
-        newView = {
-          raRad: 1.0 * this.wwtRARad,
-          decRad: 1.0 * this.wwtDecRad,
-          zoomDeg: (this.wwtZoomDeg * this.windowShape.height) / curHeight,
-          instant: true,
-        };
-      }
-
-      if (this.tourPlaybackJustEnded) {
-        // Restart from beginning. (seekToTourTimecode() starts playback.)
-        this.seekToTourTimecode(0);
-        this.tourPlaybackJustEnded = false;
+  methods: {
+    selectTool(name: ToolType) {
+      if (this.currentTool == name) {
+        this.currentTool = null;
       } else {
-        this.toggleTourPlayPauseState();
+        this.currentTool = name;
       }
+    },
 
-      if (newView !== null) {
-        this.gotoRADecZoom(newView);
+
+    doZoom(zoomIn: boolean) {
+      if (zoomIn) {
+        this.zoom(1 / 1.3);
+      } else {
+        this.zoom(1.3);
       }
+    },
+
+    toggleFullscreen() {
+      if (screenfull.isEnabled) {
+        screenfull.toggle();
+      }
+    },
+
+    onFullscreenEvent() {
+      // NB: we need the isEnabled check to make TypeScript happy even though it
+      // is not necessary in practice here.
+      if (screenfull.isEnabled) {
+        this.fullscreenModeActive = screenfull.isFullscreen;
+      }
+    },
+
+    onResizeEvent() {
+      const width = this.$el.clientWidth;
+      const height = this.$el.clientHeight;
+
+      if (width > 0 && height > 0) {
+        this.windowShape = { width, height };
+      } else {
+        this.windowShape = defaultWindowShape;
+      }
+    },
+
+    startInteractive() {
+      this.componentState = ComponentState.Started;
+
+      if (this.embedSettings.tourUrl.length) {
+        this.startTour();
+      }
+    },
+
+    tourPlaybackButtonClicked() {
+      if (this.wwtIsTourPlayerActive) {
+        // If we're playing and our window is tall, we have styling active that
+        // keeps the WWT widget in a widescreen-ish format to preserve tour
+        // layout. If we're stopping playback, this styling will go away. Since
+        // the WWT widget tracks its view height as an angular size, we need to
+        // tweak it in order to preserve continuity when the tour is paused. This
+        // isn't 100% necessary but is cool when it works. It doesn't work if the
+        // pause occurs in a very zoomed-out state, where we can't zoom out any
+        // farther because we hit the zoom clamps.
+        //
+        // Keep this in sync with wwtComponentLayout.
+        //
+        // TODO: make sure this works in 3D mode.
+        let newView = null;
+
+        if (this.wwtIsTourPlaying && this.wwtComponentLayout.top != "0") {
+          const curHeight = this.windowShape.width * 0.75;
+          newView = {
+            raRad: 1.0 * this.wwtRARad,
+            decRad: 1.0 * this.wwtDecRad,
+            zoomDeg: (this.wwtZoomDeg * this.windowShape.height) / curHeight,
+            instant: true,
+          };
+        }
+
+        if (this.tourPlaybackJustEnded) {
+          // Restart from beginning. (seekToTourTimecode() starts playback.)
+          this.seekToTourTimecode(0);
+          this.tourPlaybackJustEnded = false;
+        } else {
+          this.toggleTourPlayPauseState();
+        }
+
+        if (newView !== null) {
+          this.gotoRADecZoom(newView);
+        }
+      }
+    },
+
+    formatTimecode(seconds: number): string {
+      if (seconds < 0) return "-:--";
+
+      const minutes = Math.floor(seconds / 60);
+      seconds = Math.round(seconds - 60 * minutes);
+      return minutes.toString() + ":" + seconds.toString().padStart(2, "0");
+    }
+
+
+  },
+
+  watch: {
+    wwtTourCompletions(_newCount: number, _oldCount: number) {
+      this.tourPlaybackJustEnded = true;
     }
   }
 
-  formatTimecode(seconds: number): string {
-    if (seconds < 0) return "-:--";
-
-    const minutes = Math.floor(seconds / 60);
-    seconds = Math.round(seconds - 60 * minutes);
-    return minutes.toString() + ":" + seconds.toString().padStart(2, "0");
-  }
-
-  get twoWayTourTimecode() {
-    return this.wwtTourTimecode;
-  }
-
-  set twoWayTourTimecode(code: number) {
-    this.seekToTourTimecode(code);
-    this.tourPlaybackJustEnded = false;
-  }
-
-  @Watch("wwtTourCompletions")
-  onTourCompletionsChanged(_count: number) {
-    this.tourPlaybackJustEnded = true;
-  }
-
-  // This property is used to achieve a widescreen effect when playing tours
-  // back on a portrait-mode screen, such as on a mobile device. Tours have to
-  // be designed with a target screen aspect ratio in mind, so without the
-  // widescreen effect the content will get cut off.
-  //
-  // Keep this in sync with toggleTourPlayback.
-  get wwtComponentLayout(): WwtComponentLayout {
-    if (this.wwtIsTourPlaying) {
-      if (this.windowShape.height > this.windowShape.width) {
-        const wwtHeight = this.windowShape.width * 0.75; // => 4:3 aspect ratio
-        const height = wwtHeight + "px";
-        const top = 0.5 * (this.windowShape.height - wwtHeight) + "px";
-        return { top, height };
-      }
-    }
-
-    return { top: "0", height: "100%" };
-  }
-}
+});
 </script>
 
 <style lang="less">
+:root {
+  --popper-theme-background-color: black;
+  --popper-theme-background-color-hover: black;
+  --popper-theme-border-color: white;
+  --popper-theme-padding: 5px;
+  --popper-theme-border-width: 1px;
+  --popper-theme-border-style: solid;
+  --popper-theme-border-radius: 6px;
+  --popper-theme-box-shadow: none;
+  --popper-theme-text-color: white;
+}
+
 html {
   height: 100%;
   margin: 0;
@@ -730,6 +771,7 @@ body {
   right: 0.5rem;
   color: #fff;
 
+
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -814,116 +856,16 @@ body {
   }
 }
 
-/* Generic v-tooltip CSS derived from: https://github.com/Akryum/v-tooltip#sass--less */
-
-.tooltip {
-  display: block !important;
-  z-index: 10000;
-
-  .tooltip-inner {
-    background: black;
-    color: white;
-    border-radius: 16px;
-    padding: 5px 10px 4px;
-  }
-
-  .tooltip-arrow {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    position: absolute;
-    margin: 5px;
-    border-color: black;
-    z-index: 1;
-  }
-
-  &[x-placement^="top"] {
-    margin-bottom: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 5px 0 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      bottom: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[x-placement^="bottom"] {
-    margin-top: 5px;
-
-    .tooltip-arrow {
-      border-width: 0 5px 5px 5px;
-      border-left-color: transparent !important;
-      border-right-color: transparent !important;
-      border-top-color: transparent !important;
-      top: -5px;
-      left: calc(50% - 5px);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  &[x-placement^="right"] {
-    margin-left: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 5px 5px 0;
-      border-left-color: transparent !important;
-      border-top-color: transparent !important;
-      border-bottom-color: transparent !important;
-      left: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &[x-placement^="left"] {
-    margin-right: 5px;
-
-    .tooltip-arrow {
-      border-width: 5px 0 5px 5px;
-      border-top-color: transparent !important;
-      border-right-color: transparent !important;
-      border-bottom-color: transparent !important;
-      right: -5px;
-      top: calc(50% - 5px);
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &.popover {
-    .popover-inner {
-      background: #f9f9f9;
-      color: black;
-      padding: 8px;
-      border-radius: 5px;
-    }
-
-    .popover-arrow {
-      border-color: #f9f9f9;
-    }
-  }
-
-  &[aria-hidden="true"] {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.15s, visibility 0.15s;
-  }
-
-  &[aria-hidden="false"] {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.15s;
-  }
-}
 
 /* Specialized styling for popups */
+
+
+/** The popup window shows up too small without this
+    TODO: Come up with a better way to handle this
+*/
+.popper {
+  min-width: 200px;
+}
 
 ul.tool-menu {
   list-style-type: none;

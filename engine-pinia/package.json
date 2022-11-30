@@ -1,0 +1,57 @@
+{
+  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "browser": "dist/index.umd.js",
+  "bugs": {
+    "email": "wwt@aas.org",
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
+  },
+  "dependencies": {
+    "@wwtelescope/astro": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine-helpers": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0",
+    "pinia": "^2.0.22",
+    "vue": "^3"
+  },
+  "description": "The AAS WorldWide Telescope WebGL engine wrapped into a Vue/Pinia component",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-plugin-typescript": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "@vue/eslint-config-typescript": "^11.0.2",
+    "eslint": "^8.24.0",
+    "eslint-plugin-vue": "^9.5.1",
+    "rimraf": "^3",
+    "typedoc": "0.23.20",
+    "typescript": "~4.8.4",
+    "vue-template-compiler": "~2.6.11"
+  },
+  "homepage": "https://worldwidetelescope.org/home/",
+  "internalDepVersions": {
+    "@wwtelescope/astro": "thiscommit:2022-11-29:pfBFAzl",
+    "@wwtelescope/engine": "1db0165e463b4d094c0c0e6eb3795a0c892f41a0",
+    "@wwtelescope/engine-helpers": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2",
+    "@wwtelescope/engine-types": "thiscommit:2022-11-29:OIQ6vzL"
+  },
+  "keywords": [
+    "AAS WorldWide Telescope"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.common.js",
+  "module": "dist/",
+  "name": "@wwtelescope/engine-pinia",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
+  "scripts": {
+    "build": "vue-cli-service build --target lib --name index src/index.ts",
+    "clean": "rimraf dist",
+    "doc": "typedoc src/index.ts",
+    "lint": "vue-cli-service lint src"
+  },
+  "types": "./dist/src/index.d.ts",
+  "version": "0.0.0-dev.0"
+}

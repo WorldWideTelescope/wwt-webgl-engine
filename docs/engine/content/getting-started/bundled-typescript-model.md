@@ -19,7 +19,7 @@ start, there are innumerable tutorials out there. To pick one example, the
 TypeScript docs [show how to create a simple app using the `gulp`
 tool][ts-gulp-example]. If you don’t have a preferred UI framework, we recommend
 [Vue] since that’s what the existing WWT apps use, and
-the {{vuexapi(p="index.html",t="@wwtelescope/engine-vuex")}} package provides lots
+the {{piniaapi(p="index.html",t="@wwtelescope/engine-pinia")}} package provides lots
 of useful tools for building sophisticated WWT-powered apps in a Vue
 environment.
 

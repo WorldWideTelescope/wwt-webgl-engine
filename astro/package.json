@@ -5,12 +5,20 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "description": "Basic astronomy utilities for the AAS WorldWide Telescope framework.",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "eslint": "^8.24.0",
+    "rimraf": "^3",
+    "typedoc": "0.23.20",
+    "typescript": "~4.8.4"
+  },
   "homepage": "https://worldwidetelescope.org/home/",
   "keywords": [
     "AAS WorldWide Telescope"
   ],
   "license": "MIT",
-  "main": "./src/index.ts",
+  "main": "./dist/src/index.js",
   "name": "@wwtelescope/astro",
   "publishConfig": {
     "access": "public"
@@ -18,8 +26,10 @@
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "tsc",
+    "clean": "rimraf dist",
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
+  "types": "./dist/src/index.d.ts",
   "version": "0.0.0-dev.0"
 }
