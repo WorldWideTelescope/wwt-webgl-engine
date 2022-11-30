@@ -37,5 +37,5 @@
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
   "types": "./dist/src/index.d.ts",
-  "version": "0.3.2"
+  "version": "0.3.3"
 }

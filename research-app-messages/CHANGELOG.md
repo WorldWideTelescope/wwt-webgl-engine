@@ -1,3 +1,9 @@
+# @wwtelescope/research-app-messages 0.15.1 (2022-11-30)
+
+- No code changes.
+- Update the `package.json` file to align with new Yarn-based build system (#217, @Carifio24, @pkgw).
+
+
 # @wwtelescope/research-app-messages 0.15.0 (2022-09-01)
 
 - Add `PointerMoveMessage` and `PointerUpMessage` to help the JupyterLab
