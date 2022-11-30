@@ -369,7 +369,7 @@ jobs:
     - template: azure-job-setup.yml
       parameters:
         setupBuild: true
-        setupYarn: true
+        setupNpm: true
 
     - bash: yarn run build
       displayName: Yarn build
