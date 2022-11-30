@@ -88,11 +88,7 @@ jobs:
       artifactName: research-app
       targetPath: $(Build.ArtifactStagingDirectory)/research-app
 
-  # Yarn Test
-  #
-  # In principle we could/should reapply the Lerna workaround here, but correct
-  # ordering shouldn't matter for the tests. Likewise for the other Yarn commands
-  # in this file.
+  # OK, now actually test
 
   - bash: yarn run test
     displayName: Yarn test

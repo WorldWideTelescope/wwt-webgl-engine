@@ -379,5 +379,5 @@ jobs:
         cranko npm foreach-released yarn npm publish
       displayName: Publish to NPM
 
-    - bash: shred ~/.npmrc.yml
+    - bash: shred ~/.npmrc
       displayName: Clean up credentials
