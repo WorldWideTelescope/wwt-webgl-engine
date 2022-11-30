@@ -1561,7 +1561,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wwtelescope/astro@workspace:*, @wwtelescope/astro@workspace:>=0.1.0, @wwtelescope/astro@workspace:>=0.2.0, @wwtelescope/astro@workspace:>=0.2.1, @wwtelescope/astro@workspace:astro":
+"@wwtelescope/astro@workspace:*, @wwtelescope/astro@workspace:>=0.1.0, @wwtelescope/astro@workspace:>=0.2.0, @wwtelescope/astro@workspace:>=0.2.2, @wwtelescope/astro@workspace:astro":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/astro@workspace:astro"
   dependencies:
@@ -1683,7 +1683,7 @@ __metadata:
     "@vue/cli-plugin-typescript": ^5.0.8
     "@vue/cli-service": ^5.0.8
     "@vue/eslint-config-typescript": ^11.0.2
-    "@wwtelescope/astro": "workspace:>=0.2.1"
+    "@wwtelescope/astro": "workspace:>=0.2.2"
     "@wwtelescope/engine": "workspace:^7.17.0"
     "@wwtelescope/engine-helpers": "workspace:>=0.8.0"
     "@wwtelescope/engine-types": "workspace:>=0.6.3"
