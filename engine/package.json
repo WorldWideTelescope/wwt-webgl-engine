@@ -49,7 +49,7 @@
   "repository": "github:WorldWideTelescope/wwt-webgl-engine",
   "scripts": {
     "build": "yarn run concat-index && yarn run uglify",
-    "clean": "rimraf src/index.js src/index.min.js tsconfig.tsbuildinfo",
+    "clean": "rimraf src/index.js src/index.min.js tests/results.xml tsconfig.tsbuildinfo",
     "concat-index": "concat-cli -f src/umd_header.js scriptsharp-0.8.0/ss.js src/umd_middle.js wwtlib/bin/wwtlib.js src/umd_footer.js -o src/index.js",
     "doc": "typedoc src/index.d.ts",
     "lint": "tsc",
