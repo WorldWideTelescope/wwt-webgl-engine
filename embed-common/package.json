@@ -5,7 +5,7 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/engine-types": "0.0.0-dev.0"
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
   },
   "description": "Basic types and classes for the WWT embed framework.",
   "devDependencies": {

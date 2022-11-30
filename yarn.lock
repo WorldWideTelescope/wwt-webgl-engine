@@ -1561,7 +1561,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wwtelescope/astro@0.0.0-dev.0, @wwtelescope/astro@workspace:astro":
+"@wwtelescope/astro@workspace:*, @wwtelescope/astro@workspace:0.0.0-dev.0, @wwtelescope/astro@workspace:astro":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/astro@workspace:astro"
   dependencies:
@@ -1574,19 +1574,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/astro@link:astro::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/astro@link:astro::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/embed-common@0.0.0-dev.0, @wwtelescope/embed-common@workspace:embed-common":
+"@wwtelescope/embed-common@workspace:*, @wwtelescope/embed-common@workspace:0.0.0-dev.0, @wwtelescope/embed-common@workspace:embed-common":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/embed-common@workspace:embed-common"
   dependencies:
     "@typescript-eslint/eslint-plugin": ^5.38.1
     "@typescript-eslint/parser": ^5.38.1
-    "@wwtelescope/engine-types": 0.0.0-dev.0
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
     eslint: ^8.24.0
     rimraf: ^3
     typedoc: 0.23.20
@@ -1594,19 +1588,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/embed-common@link:embed-common::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/embed-common@link:embed-common::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/embed-creator@link:embed-creator::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/embed-creator@link:embed-creator::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/embed-creator@workspace:embed-creator":
+"@wwtelescope/embed-creator@workspace:*, @wwtelescope/embed-creator@workspace:embed-creator":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/embed-creator@workspace:embed-creator"
   dependencies:
@@ -1621,7 +1603,7 @@ __metadata:
     "@vue/cli-plugin-typescript": ^5.0.8
     "@vue/cli-service": ^5.0.8
     "@vue/eslint-config-typescript": ^11.0.2
-    "@wwtelescope/embed-common": 0.0.0-dev.0
+    "@wwtelescope/embed-common": "workspace:0.0.0-dev.0"
     bootstrap: ^5.2.2
     bootstrap-vue-3: ^0.3.11
     eslint: ^8.24.0
@@ -1641,13 +1623,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/embed@link:embed::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/embed@link:embed::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/embed@workspace:embed":
+"@wwtelescope/embed@workspace:*, @wwtelescope/embed@workspace:embed":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/embed@workspace:embed"
   dependencies:
@@ -1659,9 +1635,9 @@ __metadata:
     "@vue/cli-plugin-typescript": ^5.0.8
     "@vue/cli-service": ^5.0.8
     "@vue/eslint-config-typescript": ^11.0.2
-    "@wwtelescope/embed-common": 0.0.0-dev.0
-    "@wwtelescope/engine": 0.0.0-dev.0
-    "@wwtelescope/engine-pinia": 0.0.0-dev.0
+    "@wwtelescope/embed-common": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0"
     copyfiles: ^2.2.0
     eslint: ^8.24.0
     eslint-plugin-vue: ^9.5.1
@@ -1681,15 +1657,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-helpers@0.0.0-dev.0, @wwtelescope/engine-helpers@workspace:engine-helpers":
+"@wwtelescope/engine-helpers@workspace:*, @wwtelescope/engine-helpers@workspace:0.0.0-dev.0, @wwtelescope/engine-helpers@workspace:engine-helpers":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine-helpers@workspace:engine-helpers"
   dependencies:
     "@typescript-eslint/eslint-plugin": ^5.38.1
     "@typescript-eslint/parser": ^5.38.1
-    "@wwtelescope/astro": 0.0.0-dev.0
-    "@wwtelescope/engine": 0.0.0-dev.0
-    "@wwtelescope/engine-types": 0.0.0-dev.0
+    "@wwtelescope/astro": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
     eslint: ^8.24.0
     rimraf: ^3
     typedoc: 0.23.20
@@ -1697,13 +1673,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-helpers@link:engine-helpers::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/engine-helpers@link:engine-helpers::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/engine-pinia@0.0.0-dev.0, @wwtelescope/engine-pinia@workspace:engine-pinia":
+"@wwtelescope/engine-pinia@workspace:*, @wwtelescope/engine-pinia@workspace:0.0.0-dev.0, @wwtelescope/engine-pinia@workspace:engine-pinia":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine-pinia@workspace:engine-pinia"
   dependencies:
@@ -1713,10 +1683,10 @@ __metadata:
     "@vue/cli-plugin-typescript": ^5.0.8
     "@vue/cli-service": ^5.0.8
     "@vue/eslint-config-typescript": ^11.0.2
-    "@wwtelescope/astro": 0.0.0-dev.0
-    "@wwtelescope/engine": 0.0.0-dev.0
-    "@wwtelescope/engine-helpers": 0.0.0-dev.0
-    "@wwtelescope/engine-types": 0.0.0-dev.0
+    "@wwtelescope/astro": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine-helpers": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
     eslint: ^8.24.0
     eslint-plugin-vue: ^9.5.1
     pinia: ^2.0.22
@@ -1728,13 +1698,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-pinia@link:engine-pinia::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/engine-pinia@link:engine-pinia::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/engine-types@0.0.0-dev.0, @wwtelescope/engine-types@workspace:engine-types":
+"@wwtelescope/engine-types@workspace:*, @wwtelescope/engine-types@workspace:0.0.0-dev.0, @wwtelescope/engine-types@workspace:engine-types":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine-types@workspace:engine-types"
   dependencies:
@@ -1747,19 +1711,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-types@link:engine-types::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/engine-types@link:engine-types::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/engine@0.0.0-dev.0, @wwtelescope/engine@workspace:engine":
+"@wwtelescope/engine@workspace:*, @wwtelescope/engine@workspace:0.0.0-dev.0, @wwtelescope/engine@workspace:engine":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine@workspace:engine"
   dependencies:
     "@typescript-eslint/eslint-plugin": ^5.38.1
     "@typescript-eslint/parser": ^5.38.1
-    "@wwtelescope/engine-types": 0.0.0-dev.0
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
     chai: ^4.2.0
     concat-cli: ^4.0.0
     eslint: ^8.24.0
@@ -1773,13 +1731,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine@link:engine::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/engine@link:engine::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/research-app-messages@0.0.0-dev.0, @wwtelescope/research-app-messages@workspace:research-app-messages":
+"@wwtelescope/research-app-messages@workspace:*, @wwtelescope/research-app-messages@workspace:0.0.0-dev.0, @wwtelescope/research-app-messages@workspace:research-app-messages":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/research-app-messages@workspace:research-app-messages"
   dependencies:
@@ -1792,19 +1744,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/research-app-messages@link:research-app-messages::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/research-app-messages@link:research-app-messages::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/research-app@link:research-app::locator=wwt-webgl-engine-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@wwtelescope/research-app@link:research-app::locator=wwt-webgl-engine-monorepo%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"@wwtelescope/research-app@workspace:research-app":
+"@wwtelescope/research-app@workspace:*, @wwtelescope/research-app@workspace:research-app":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/research-app@workspace:research-app"
   dependencies:
@@ -1817,12 +1757,12 @@ __metadata:
     "@vue/cli-plugin-typescript": ^5.0.8
     "@vue/cli-service": ^5.0.8
     "@vue/eslint-config-typescript": ^11.0.2
-    "@wwtelescope/astro": 0.0.0-dev.0
-    "@wwtelescope/engine": 0.0.0-dev.0
-    "@wwtelescope/engine-helpers": 0.0.0-dev.0
-    "@wwtelescope/engine-pinia": 0.0.0-dev.0
-    "@wwtelescope/engine-types": 0.0.0-dev.0
-    "@wwtelescope/research-app-messages": 0.0.0-dev.0
+    "@wwtelescope/astro": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine-helpers": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0"
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
+    "@wwtelescope/research-app-messages": "workspace:0.0.0-dev.0"
     copyfiles: ^2.2.0
     eslint: ^8.24.0
     eslint-plugin-vue: ^9.5.1
@@ -11565,16 +11505,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wwt-webgl-engine-monorepo@workspace:."
   dependencies:
-    "@wwtelescope/astro": "link:astro"
-    "@wwtelescope/embed": "link:embed"
-    "@wwtelescope/embed-common": "link:embed-common"
-    "@wwtelescope/embed-creator": "link:embed-creator"
-    "@wwtelescope/engine": "link:engine"
-    "@wwtelescope/engine-helpers": "link:engine-helpers"
-    "@wwtelescope/engine-pinia": "link:engine-pinia"
-    "@wwtelescope/engine-types": "link:engine-types"
-    "@wwtelescope/research-app": "link:research-app"
-    "@wwtelescope/research-app-messages": "link:research-app-messages"
+    "@wwtelescope/astro": "workspace:*"
+    "@wwtelescope/embed": "workspace:*"
+    "@wwtelescope/embed-common": "workspace:*"
+    "@wwtelescope/embed-creator": "workspace:*"
+    "@wwtelescope/engine": "workspace:*"
+    "@wwtelescope/engine-helpers": "workspace:*"
+    "@wwtelescope/engine-pinia": "workspace:*"
+    "@wwtelescope/engine-types": "workspace:*"
+    "@wwtelescope/research-app": "workspace:*"
+    "@wwtelescope/research-app-messages": "workspace:*"
     concurrently: ^5.2.0
     rimraf: ^3
   languageName: unknown

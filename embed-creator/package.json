@@ -10,7 +10,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/vue-fontawesome": "^3",
     "@popperjs/core": "^2.11.6",
-    "@wwtelescope/embed-common": "0.0.0-dev.0",
+    "@wwtelescope/embed-common": "workspace:0.0.0-dev.0",
     "bootstrap": "^5.2.2",
     "bootstrap-vue-3": "^0.3.11",
     "mutationobserver-shim": "^0.3.3",

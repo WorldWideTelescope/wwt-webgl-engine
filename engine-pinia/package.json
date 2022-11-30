@@ -6,10 +6,10 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/astro": "0.0.0-dev.0",
-    "@wwtelescope/engine": "0.0.0-dev.0",
-    "@wwtelescope/engine-helpers": "0.0.0-dev.0",
-    "@wwtelescope/engine-types": "0.0.0-dev.0",
+    "@wwtelescope/astro": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine-helpers": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0",
     "pinia": "^2.0.22",
     "vue": "^3"
   },

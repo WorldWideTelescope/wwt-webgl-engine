@@ -5,9 +5,9 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/astro": "0.0.0-dev.0",
-    "@wwtelescope/engine": "0.0.0-dev.0",
-    "@wwtelescope/engine-types": "0.0.0-dev.0"
+    "@wwtelescope/astro": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
   },
   "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
   "devDependencies": {

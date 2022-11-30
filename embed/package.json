@@ -7,9 +7,9 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "~6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
-    "@wwtelescope/embed-common": "0.0.0-dev.0",
-    "@wwtelescope/engine": "0.0.0-dev.0",
-    "@wwtelescope/engine-pinia": "0.0.0-dev.0",
+    "@wwtelescope/embed-common": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0",
     "screenfull": "^5",
     "v-tooltip": "^2.1",
     "vue": "^3",

@@ -25,16 +25,16 @@
     "serve-research": "cd research-app && yarn run serve"
   },
   "dependencies": {
-    "@wwtelescope/astro": "link:astro",
-    "@wwtelescope/embed": "link:embed",
-    "@wwtelescope/embed-common": "link:embed-common",
-    "@wwtelescope/embed-creator": "link:embed-creator",
-    "@wwtelescope/engine": "link:engine",
-    "@wwtelescope/engine-helpers": "link:engine-helpers",
-    "@wwtelescope/engine-pinia": "link:engine-pinia",
-    "@wwtelescope/engine-types": "link:engine-types",
-    "@wwtelescope/research-app": "link:research-app",
-    "@wwtelescope/research-app-messages": "link:research-app-messages"
+    "@wwtelescope/astro": "workspace:*",
+    "@wwtelescope/embed": "workspace:*",
+    "@wwtelescope/embed-common": "workspace:*",
+    "@wwtelescope/embed-creator": "workspace:*",
+    "@wwtelescope/engine": "workspace:*",
+    "@wwtelescope/engine-helpers": "workspace:*",
+    "@wwtelescope/engine-pinia": "workspace:*",
+    "@wwtelescope/engine-types": "workspace:*",
+    "@wwtelescope/research-app": "workspace:*",
+    "@wwtelescope/research-app-messages": "workspace:*"
   },
   "devDependencies": {
     "concurrently": "^5.2.0",
