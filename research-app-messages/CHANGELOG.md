@@ -1,3 +1,8 @@
+# @wwtelescope/research-app-messages 0.16.0 (2022-12-01)
+
+- Allow changing research app selection pixel proximity (#220, @Carifio24).
+
+
 # @wwtelescope/research-app-messages 0.15.1 (2022-11-30)
 
 - No code changes.

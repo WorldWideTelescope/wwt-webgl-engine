@@ -1731,7 +1731,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/research-app-messages@workspace:*, @wwtelescope/research-app-messages@workspace:>=0.15.0, @wwtelescope/research-app-messages@workspace:research-app-messages":
+"@wwtelescope/research-app-messages@workspace:*, @wwtelescope/research-app-messages@workspace:>=0.16.0, @wwtelescope/research-app-messages@workspace:research-app-messages":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/research-app-messages@workspace:research-app-messages"
   dependencies:
@@ -1762,7 +1762,7 @@ __metadata:
     "@wwtelescope/engine-helpers": "workspace:>=0.8.1"
     "@wwtelescope/engine-pinia": "workspace:>=0.1.0"
     "@wwtelescope/engine-types": "workspace:>=0.6.1"
-    "@wwtelescope/research-app-messages": "workspace:>=0.15.0"
+    "@wwtelescope/research-app-messages": "workspace:>=0.16.0"
     copyfiles: ^2.2.0
     eslint: ^8.24.0
     eslint-plugin-vue: ^9.5.1
