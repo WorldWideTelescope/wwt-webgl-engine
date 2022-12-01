@@ -1191,7 +1191,7 @@ const App = defineComponent({
       currentTool: null as ToolType,
       lastClosePt: null as RawSourceInfo | null,
       lastSelectedSource: null as Source | null,
-      distanceThreshold: 4,
+      selectionProximity: 4,
       hideAllChrome: false,
       hipsUrl: "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips", // Temporary
       isPointerMoving: false,
@@ -2012,6 +2012,7 @@ const App = defineComponent({
       if (appModified !== null) {
         for (const s of appModified) {
           if (s[0] == "hideAllChrome") this.hideAllChrome = s[1];
+          if (s[0] == "selectionProximity") this.selectionProximity = s[1];
         }
 
         return true;
@@ -2055,7 +2056,7 @@ const App = defineComponent({
     
     updateLastClosePoint(event: PointerEvent): void {
       const pt = { x: event.offsetX, y: event.offsetY };
-      const closestPt = this.closestInView(pt, this.distanceThreshold);
+      const closestPt = this.closestInView(pt, this.selectionProximity);
       if (closestPt == null && this.lastClosePt == null) {
         return;
       }
