@@ -1,3 +1,17 @@
+# @wwtelescope/embed 1.6.0 (2022-12-01)
+
+- Update to Vue 3 and Pinia (#215, @Carifio24)! The overall user experience
+  should be essentially the same as before, but this modernizes many of the
+  package's internals. Some fronted components had to be migrated to new
+  equivalents that are compatible with Vue 3.
+- Control APIs should be unaffected, so we are treating this as a non-breaking
+  change. If you actually depend upon this package in an NPM/Yarn project,
+  however, this is likely a breaking change because the dependency on `vue` has
+  gone from the 2.x series to the 3.x series.
+- Cleanups and improvements to the build and packaging infrastructure (#217,
+  @Carifio24, @pkgw). The source repository is now based on Yarn.
+
+
 # @wwtelescope/embed 1.5.4 (2022-04-01)
 
 - Fix a URL typo in the package.json file (@Carifio24).
