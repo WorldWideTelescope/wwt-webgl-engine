@@ -1,3 +1,22 @@
+# @wwtelescope/research-app 0.12.0 (2022-12-01)
+
+- Update to Vue 3 and Pinia (#215, @Carifio24)! The overall user experience
+  should be essentially the same as before, but this modernizes many of the
+  package's internals. Some fronted components had to be migrated to new
+  equivalents that are compatible with Vue 3.
+- Control APIs should be unaffected, so we are treating this as a non-breaking
+  change. If you actually depend upon this package in an NPM/Yarn project,
+  however, this is likely a breaking change because the dependency on `vue` has
+  gone from the 2.x series to the 3.x series.
+- Allow the proximity threshold for clicking on catalog entries to be
+  controlled through the API (#220, @Carifio24).
+- Use a newer version of the engine that should fix clicking on catalog entries
+  in Firefox (#219, @Carifio24).
+- Cleanups and improvements to the build and packaging infrastructure (#217,
+  @Carifio24, @pkgw). The source repository is now based on Yarn.
+- Update to icons FontAwesome 6 (#217, @pkgw).
+
+
 # @wwtelescope/research-app 0.11.1 (2022-10-25)
 
 - Improve the point selection user experience in the research app (#213,
