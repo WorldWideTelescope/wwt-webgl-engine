@@ -2034,7 +2034,7 @@ namespace wwtlib
             return cameraParams;
         }
 
-        public double GotoRADecZoomTime(double ra, double dec, double zoom, double? roll)
+        public double TimeToRADecZoom(double ra, double dec, double zoom, double? roll)
         {
             CameraParameters cameraParams = CameraParametersFromRADecZoom(ra, dec, zoom, roll);
             return TimeToTargetFull(cameraParams, false);
