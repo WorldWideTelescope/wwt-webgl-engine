@@ -2374,6 +2374,12 @@ namespace wwtlib
             }
         }
 
+        double SlewTimeBetweenTargets(CameraParameters from, CameraParameters to)
+        {
+            ViewMoverSlew mover = ViewMoverSlew.Create(from, to);
+            return mover.MoveTime;
+        }
+
         public double TimeToTargetFull(CameraParameters cameraParams, bool noZoom)
         {
             if (noZoom)
@@ -2382,8 +2388,7 @@ namespace wwtlib
                 cameraParams.Angle = RenderContext.ViewCamera.Angle;
                 cameraParams.Rotation = RenderContext.ViewCamera.Rotation;
             }
-            ViewMoverSlew mover = ViewMoverSlew.Create(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
-            return mover.MoveTime;
+            return SlewTimeBetweenTargets(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
         }
 
         internal void FreezeView()
