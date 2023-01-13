@@ -356,6 +356,20 @@ export interface CreateTableLayerParams {
   dataCsv: string;
 }
 
+export interface TimeToRADecZoomParams {
+  /** The right ascension of the target, in radians. */
+  raRad: number;
+
+  /** The declination of the target, in radians. */
+  decRad: number;
+
+  /** The zoom level of the target, in *degrees*. */
+  zoomDeg: number;
+
+  /** Optional: The target roll of the target, in radians. */
+  rollRad?: number;
+}
+
 /** The parameters for the [[gotoRADecZoom]] action. */
 export interface GotoRADecZoomParams {
   /** The right ascension to go to, in radians. */
@@ -846,6 +860,14 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
       return this.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad);
+    },
+
+    timeToRADecZoom(
+      { raRad, decRad, zoomDeg, rollRad }: TimeToRADecZoomParams
+    ): number {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot get timeToRADecZoom without linking to WWTInstance');
+      return this.$wwt.inst.timeToRADecZoom(raRad, decRad, zoomDeg, rollRad);
     },
 
     async gotoTarget(options: GotoTargetOptions): Promise<void> {
