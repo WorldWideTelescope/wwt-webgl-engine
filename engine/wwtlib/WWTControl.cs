@@ -2037,15 +2037,8 @@ namespace wwtlib
         public double GotoRADecZoomTime(double ra, double dec, double zoom, double? roll)
         {
             CameraParameters cameraParams = CameraParametersFromRADecZoom(ra, dec, zoom, roll);
-            return TimeToTargetFull(cameraParams);
+            return TimeToTargetFull(cameraParams, false);
         }
-
-        public double TimeToTargetFull(CameraParameters cameraParams)
-        {
-            ViewMoverSlew mover = ViewMoverSlew.Create(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
-            return mover.MoveTime;
-        }
-
 
         bool tracking = false;
         Place trackingObject = null;
@@ -2379,6 +2372,18 @@ namespace wwtlib
                 RenderNeeded = true;
                 Mover.Midpoint = mover_Midpoint;
             }
+        }
+
+        public double TimeToTargetFull(CameraParameters cameraParams, bool noZoom)
+        {
+            if (noZoom)
+            {
+                cameraParams.Zoom = RenderContext.ViewCamera.Zoom;
+                cameraParams.Angle = RenderContext.ViewCamera.Angle;
+                cameraParams.Rotation = RenderContext.ViewCamera.Rotation;
+            }
+            ViewMoverSlew mover = ViewMoverSlew.Create(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
+            return mover.MoveTime;
         }
 
         internal void FreezeView()
