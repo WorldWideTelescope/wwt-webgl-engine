@@ -1997,6 +1997,21 @@ namespace wwtlib
 
         public void GotoRADecZoom(double ra, double dec, double zoom, bool instant, double? roll)
         {
+
+            tracking = false;
+            trackingObject = null;
+
+            GotoTargetFull(
+                false,  // noZoom
+                instant,
+                CameraParametersFromRADecZoom(ra, dec, zoom, roll),
+                WWTControl.Singleton.RenderContext.ForegroundImageset,
+                WWTControl.Singleton.RenderContext.BackgroundImageset
+            );
+        }
+
+        CameraParameters CameraParametersFromRADecZoom(double ra, double dec, double zoom, double? roll)
+        {
             while (ra > 24)
             {
                 ra -= 24;
@@ -2008,24 +2023,27 @@ namespace wwtlib
             dec = DoubleUtilities.Clamp(dec, -90, 90);
             zoom = DoubleUtilities.Clamp(zoom, ZoomMin, ZoomMax);
             double rotation = roll == null ? WWTControl.Singleton.RenderContext.ViewCamera.Rotation : (double)roll;
-
-            tracking = false;
-            trackingObject = null;
-
-            GotoTargetFull(
-                false,  // noZoom
-                instant,
-                CameraParameters.Create(
-                    dec,
-                    WWTControl.Singleton.RenderContext.RAtoViewLng(ra),
-                    zoom,
-                    rotation,
-                    WWTControl.Singleton.RenderContext.ViewCamera.Angle,
-                    (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity
-                ),
-                WWTControl.Singleton.RenderContext.ForegroundImageset,
-                WWTControl.Singleton.RenderContext.BackgroundImageset
+            CameraParameters cameraParams = CameraParameters.Create(
+                dec,
+                WWTControl.Singleton.RenderContext.RAtoViewLng(ra),
+                zoom,
+                rotation,
+                WWTControl.Singleton.RenderContext.ViewCamera.Angle,
+                (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity
             );
+            return cameraParams;
+        }
+
+        public double GotoRADecZoomTime(double ra, double dec, double zoom, double? roll)
+        {
+            CameraParameters cameraParams = CameraParametersFromRADecZoom(ra, dec, zoom, roll);
+            return TimeToTargetFull(cameraParams);
+        }
+
+        public double TimeToTargetFull(CameraParameters cameraParams)
+        {
+            ViewMoverSlew mover = ViewMoverSlew.Create(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
+            return mover.MoveTime;
         }
 
 
