@@ -2307,6 +2307,14 @@ namespace wwtlib
             GotoTargetFull(noZoom, instant, camParams, RenderContext.ForegroundImageset, RenderContext.BackgroundImageset);
         }
 
+        private bool TooCloseForSlewMove(CameraParameters cameraParams)
+        {
+           return Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 &&
+                  Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 &&
+                  Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001 &&
+                  Math.Abs(RenderContext.ViewCamera.Rotation - cameraParams.Rotation) < .000000000001;
+        }
+
         public void GotoTargetFull(bool noZoom, bool instant, CameraParameters cameraParams, Imageset studyImageSet, Imageset backgroundImageSet)
         {
             RenderNeeded = true;
@@ -2340,12 +2348,7 @@ namespace wwtlib
                 }
             }
 
-            if (instant ||
-                (Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 &&
-                 Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 &&
-                 Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001 &&
-                 Math.Abs(RenderContext.ViewCamera.Rotation - cameraParams.Rotation) < .000000000001
-                 ))
+            if (instant || TooCloseForSlewMove(cameraParams))
             {
                 Mover = null;
                 RenderContext.TargetCamera = cameraParams.Copy();
@@ -2388,6 +2391,11 @@ namespace wwtlib
                 cameraParams.Angle = RenderContext.ViewCamera.Angle;
                 cameraParams.Rotation = RenderContext.ViewCamera.Rotation;
             }
+            if (TooCloseForSlewMove(cameraParams))
+            {
+                return 0;
+            }
+            
             return SlewTimeBetweenTargets(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
         }
 
