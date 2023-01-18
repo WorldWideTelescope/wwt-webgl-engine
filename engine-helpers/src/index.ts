@@ -467,6 +467,27 @@ export class WWTInstance {
     return this.makeArrivePromise(instant);
   }
 
+  /** Returns how long moving to a given position will take, in seconds.
+   *
+   * This wraps the underlying engine function of the same name, but homogenizing some
+   * of the angular arguments to use radians.
+   *
+   * @param raRad The RA of the target position, in radians
+   * @param decRad The declination of the target position, in radians
+   * @param zoomDeg The zoom setting, in *degrees*
+   * @param rollRad If specified, the roll of the target camera position, in radians
+   * @returns The amount of time, in seconds, that moving to the given position would take.
+   */
+   timeToRADecZoom(raRad: number, decRad: number, zoomDeg: number, rollRad?: number): number {
+    const time = this.ctl.timeToRADecZoom(
+      raRad * R2H,
+      decRad * R2D,
+      zoomDeg,
+      rollRad
+    );
+    return time;
+  }
+
   /** Command the view to show a Place.
    *
    * @param options The options for the goto command.

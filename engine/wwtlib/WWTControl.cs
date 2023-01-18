@@ -1997,6 +1997,21 @@ namespace wwtlib
 
         public void GotoRADecZoom(double ra, double dec, double zoom, bool instant, double? roll)
         {
+
+            tracking = false;
+            trackingObject = null;
+
+            GotoTargetFull(
+                false,  // noZoom
+                instant,
+                CameraParametersFromRADecZoom(ra, dec, zoom, roll),
+                WWTControl.Singleton.RenderContext.ForegroundImageset,
+                WWTControl.Singleton.RenderContext.BackgroundImageset
+            );
+        }
+
+        CameraParameters CameraParametersFromRADecZoom(double ra, double dec, double zoom, double? roll)
+        {
             while (ra > 24)
             {
                 ra -= 24;
@@ -2008,26 +2023,22 @@ namespace wwtlib
             dec = DoubleUtilities.Clamp(dec, -90, 90);
             zoom = DoubleUtilities.Clamp(zoom, ZoomMin, ZoomMax);
             double rotation = roll == null ? WWTControl.Singleton.RenderContext.ViewCamera.Rotation : (double)roll;
-
-            tracking = false;
-            trackingObject = null;
-
-            GotoTargetFull(
-                false,  // noZoom
-                instant,
-                CameraParameters.Create(
-                    dec,
-                    WWTControl.Singleton.RenderContext.RAtoViewLng(ra),
-                    zoom,
-                    rotation,
-                    WWTControl.Singleton.RenderContext.ViewCamera.Angle,
-                    (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity
-                ),
-                WWTControl.Singleton.RenderContext.ForegroundImageset,
-                WWTControl.Singleton.RenderContext.BackgroundImageset
+            CameraParameters cameraParams = CameraParameters.Create(
+                dec,
+                WWTControl.Singleton.RenderContext.RAtoViewLng(ra),
+                zoom,
+                rotation,
+                WWTControl.Singleton.RenderContext.ViewCamera.Angle,
+                (float)WWTControl.Singleton.RenderContext.ViewCamera.Opacity
             );
+            return cameraParams;
         }
 
+        public double TimeToRADecZoom(double ra, double dec, double zoom, double? roll)
+        {
+            CameraParameters cameraParams = CameraParametersFromRADecZoom(ra, dec, zoom, roll);
+            return TimeToTargetFull(cameraParams, false);
+        }
 
         bool tracking = false;
         Place trackingObject = null;
@@ -2296,6 +2307,14 @@ namespace wwtlib
             GotoTargetFull(noZoom, instant, camParams, RenderContext.ForegroundImageset, RenderContext.BackgroundImageset);
         }
 
+        private bool TooCloseForSlewMove(CameraParameters cameraParams)
+        {
+           return Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 &&
+                  Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 &&
+                  Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001 &&
+                  Math.Abs(RenderContext.ViewCamera.Rotation - cameraParams.Rotation) < .000000000001;
+        }
+
         public void GotoTargetFull(bool noZoom, bool instant, CameraParameters cameraParams, Imageset studyImageSet, Imageset backgroundImageSet)
         {
             RenderNeeded = true;
@@ -2329,12 +2348,7 @@ namespace wwtlib
                 }
             }
 
-            if (instant ||
-                (Math.Abs(RenderContext.ViewCamera.Lat - cameraParams.Lat) < .000000000001 &&
-                 Math.Abs(RenderContext.ViewCamera.Lng - cameraParams.Lng) < .000000000001 &&
-                 Math.Abs(RenderContext.ViewCamera.Zoom - cameraParams.Zoom) < .000000000001 &&
-                 Math.Abs(RenderContext.ViewCamera.Rotation - cameraParams.Rotation) < .000000000001
-                 ))
+            if (instant || TooCloseForSlewMove(cameraParams))
             {
                 Mover = null;
                 RenderContext.TargetCamera = cameraParams.Copy();
@@ -2361,6 +2375,28 @@ namespace wwtlib
                 RenderNeeded = true;
                 Mover.Midpoint = mover_Midpoint;
             }
+        }
+
+        double SlewTimeBetweenTargets(CameraParameters from, CameraParameters to)
+        {
+            ViewMoverSlew mover = ViewMoverSlew.Create(from, to);
+            return mover.MoveTime;
+        }
+
+        public double TimeToTargetFull(CameraParameters cameraParams, bool noZoom)
+        {
+            if (noZoom)
+            {
+                cameraParams.Zoom = RenderContext.ViewCamera.Zoom;
+                cameraParams.Angle = RenderContext.ViewCamera.Angle;
+                cameraParams.Rotation = RenderContext.ViewCamera.Rotation;
+            }
+            if (TooCloseForSlewMove(cameraParams))
+            {
+                return 0;
+            }
+            
+            return SlewTimeBetweenTargets(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
         }
 
         internal void FreezeView()
