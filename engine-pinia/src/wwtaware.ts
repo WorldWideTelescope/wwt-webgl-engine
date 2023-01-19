@@ -190,7 +190,7 @@ import { engineStore } from "./store";
  * Actions:
  *
  * - [[addCatalogHipsByName]]
- *  * - [[applyTableLayerSettings]]
+ * - [[applyTableLayerSettings]]
  * - [[getCatalogHipsDataInView]]
  * - [[removeCatalogHipsByName]]
  *
@@ -540,6 +540,9 @@ export const WWTAwareComponent = defineComponent({
        * TODO: document semantics when not in 2D sky mode!
        */
       "gotoRADecZoom",
+
+      /** Returns the time it would take, in seconds, to navigate to the given target. */
+      "timeToRADecZoom",
 
       /** Command the view to steer as specified in
        * [the options](../../engine-helpers/interfaces/gototargetoptions.html).

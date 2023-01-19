@@ -24,6 +24,7 @@ import {
   Imageset,
   ImageSetLayer,
   InViewReturnMessage,
+  Layer,
   LayerMap,
   SpreadSheetLayer,
   SpreadSheetLayerSettingsInterfaceRO,
@@ -356,6 +357,20 @@ export interface CreateTableLayerParams {
   dataCsv: string;
 }
 
+export interface TimeToRADecZoomParams {
+  /** The right ascension of the target, in radians. */
+  raRad: number;
+
+  /** The declination of the target, in radians. */
+  decRad: number;
+
+  /** The zoom level of the target, in *degrees*. */
+  zoomDeg: number;
+
+  /** Optional: The target roll of the target, in radians. */
+  rollRad?: number;
+}
+
 /** The parameters for the [[gotoRADecZoom]] action. */
 export interface GotoRADecZoomParams {
   /** The right ascension to go to, in radians. */
@@ -433,28 +448,6 @@ function activeLayersList(wwt: WWTGlobalState): string[] {
  */
 function availableImagesets(): ImagesetInfo[] {
   return WWTControl.getImageSets().map(ImagesetInfo.fromImageset);
-}
-
-/** This function get a SpreadSheetLayer by the key used to store it in the engine.
- * For regular table layers this is the layer ID; for HiPS catalogs it is the layer name.
- * Keeping this functionality outside of the store allows us to use it from
- * inside either an action or a mutation.
- */
-function spreadSheetLayerByKey(wwt: WWTGlobalState, key: string): SpreadSheetLayer | null {
-  if (wwt.inst === null)
-    throw new Error('cannot get spreadSheetLayerByKey without linking to WWTInstance');
-
-  const layer = wwt.inst.lm.get_layerList()[key];
-
-  if (layer !== null && layer instanceof SpreadSheetLayer) {
-    return layer;
-  } else {
-    return null;
-  }
-}
-
-function catalogLayerKey(catalog: CatalogLayerInfo): string {
-  return catalog.id ?? "";
 }
 
 /** The WWT Pinia implementation.
@@ -537,6 +530,12 @@ export const engineStore = defineStore('wwt-engine', {
       return states;
     },
 
+    catalogLayerKey(_state) {
+      return (catalog: CatalogLayerInfo): string => {
+        return catalog.id ?? "";
+      }
+    },
+
     imagesetForLayer(_state){
       return (guidtext: string): Imageset | null => {
         if (this.$wwt.inst === null)
@@ -552,13 +551,34 @@ export const engineStore = defineStore('wwt-engine', {
       }
     },
 
+    imagesetLayerById(_state) {
+      return (id: string): ImageSetLayer | null => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot get imagesetLayerById without linking to WWTInstance');
+        const layer = this.layerById(id);
+        if (layer !== null && layer instanceof ImageSetLayer) {
+          return layer;
+        } else {
+          return null;
+        }
+      }
+    },
+
     layerForHipsCatalog(_state) {
       return (name: string): SpreadSheetLayer | null => {
         if (this.$wwt.inst === null)
           throw new Error('cannot get layerForHipsCatalog without linking to WWTInstance');
 
         const id = Guid.createFrom(name).toString();
-        return spreadSheetLayerByKey(this.$wwt, id);
+        return this.spreadSheetLayerById(id);
+      }
+    },
+
+    layerById(_state) {
+      return (id: string): Layer | null => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot get layerById without linking to WWTInstance');
+        return this.$wwt.inst.lm.get_layerList()[id];
       }
     },
 
@@ -576,7 +596,12 @@ export const engineStore = defineStore('wwt-engine', {
       return (id: string): SpreadSheetLayer | null => {
         if (this.$wwt.inst === null)
           throw new Error('cannot get spreadsheetLayerById without linking to WWTInstance');
-        return spreadSheetLayerByKey(this.$wwt, id);
+        const layer = this.layerById(id);
+        if (layer !== null && layer instanceof SpreadSheetLayer) {
+          return layer;
+        } else {
+          return null;
+        }
       }
     },
 
@@ -591,14 +616,14 @@ export const engineStore = defineStore('wwt-engine', {
         if (this.$wwt.inst === null)
           throw new Error('cannot get spreadSheetLayer without linking to WWTInstance');
 
-        const key = catalogLayerKey(catalog);
-        return spreadSheetLayerByKey(this.$wwt, key);
+        const key = this.catalogLayerKey(catalog);
+        return this.spreadSheetLayerById(key);
       }
     },
   
     spreadsheetState(state) {
       return (catalog: CatalogLayerInfo): SpreadSheetLayerSettingsInterfaceRO | null => {
-        const key = catalogLayerKey(catalog);
+        const key = this.catalogLayerKey(catalog);
         return state.spreadSheetLayers[key] || null;
       }
     }
@@ -846,6 +871,14 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
       return this.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad);
+    },
+
+    timeToRADecZoom(
+      { raRad, decRad, zoomDeg, rollRad }: TimeToRADecZoomParams
+    ): number {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot get timeToRADecZoom without linking to WWTInstance');
+      return this.$wwt.inst.timeToRADecZoom(raRad, decRad, zoomDeg, rollRad);
     },
 
     async gotoTarget(options: GotoTargetOptions): Promise<void> {
