@@ -1,3 +1,9 @@
+# @wwtelescope/engine-helpers 0.9.0 (2023-01-19)
+
+- Expose new engine APIs for getting the amount of time that basic "goto"
+  movements will take to execute (#222, @Carifio24)
+
+
 # @wwtelescope/engine-helpers 0.8.3 (2022-11-30)
 
 - No code changes.

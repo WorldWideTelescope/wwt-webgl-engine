@@ -7,8 +7,8 @@
   },
   "dependencies": {
     "@wwtelescope/astro": "workspace:>=0.2.2",
-    "@wwtelescope/engine": "workspace:^7.17.0",
-    "@wwtelescope/engine-helpers": "workspace:>=0.8.0",
+    "@wwtelescope/engine": "workspace:^7.18.0",
+    "@wwtelescope/engine-helpers": "workspace:>=0.9.0",
     "@wwtelescope/engine-types": "workspace:>=0.6.3",
     "pinia": "^2.0.22",
     "vue": "^3"
@@ -31,8 +31,8 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "thiscommit:2022-11-29:pfBFAzl",
-    "@wwtelescope/engine": "1db0165e463b4d094c0c0e6eb3795a0c892f41a0",
-    "@wwtelescope/engine-helpers": "f86ca4d8ffb8e1a1d66c9f8ed384acfb4d0750a2",
+    "@wwtelescope/engine": "thiscommit:2023-01-19:1dVpLjF",
+    "@wwtelescope/engine-helpers": "thiscommit:2023-01-19:hqcPMQX",
     "@wwtelescope/engine-types": "thiscommit:2022-11-29:OIQ6vzL"
   },
   "keywords": [
@@ -53,5 +53,5 @@
     "lint": "vue-cli-service lint src"
   },
   "types": "./dist/src/index.d.ts",
-  "version": "0.1.0"
+  "version": "0.2.0"
 }

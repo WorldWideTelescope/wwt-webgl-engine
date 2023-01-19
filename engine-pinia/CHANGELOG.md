@@ -1,3 +1,11 @@
+# @wwtelescope/engine-pinia 0.2.0 (2023-01-19)
+
+- Expose new engine APIs for getting the amount of time that basic "goto"
+  movements will take to execute (#222, @Carifio24)
+- Add new store APIs for accessing generic layers and imageset layers in the
+  Pinia framework: `layerById`, `imagesetLayerById` (#223, @Carifio24)
+
+
 # @wwtelescope/engine-pinia 0.1.0 (2022-11-30)
 
 This package wraps the core rendering engine of the [AAS] [WorldWide

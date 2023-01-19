@@ -1,3 +1,9 @@
+# @wwtelescope/engine 7.18.0 (2023-01-19)
+
+- Add APIs for getting the amount of time that basic "goto" movements
+  will take to execute (#222, @Carifio24)
+
+
 # @wwtelescope/engine 7.17.2 (2022-11-30)
 
 - Fix mouse-based selection of catalog entries in Firefox (#216, #219, @Carifio24).

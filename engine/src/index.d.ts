@@ -2492,6 +2492,16 @@ export class WWTControl {
    */
   gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean, roll_deg?: number): void;
 
+    /** Returns how long moving to the given position will take, in seconds.
+   *
+   * @param ra_hours The target right ascension, in hours.
+   * @param dec_deg The target declination, in degrees.
+   * @param zoom The target zoom level (see below)
+   * @param roll_deg Optional, The roll of the camera, in degrees.
+   *
+   */
+  timeToRADecZoom(ra_hours: number, dec_deg: number, zoom: number, roll_deg?: number): number;
+
   /** Start navigating the view to the specified [[Place]].
    *
    * @param place The destination of the view
