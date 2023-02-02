@@ -470,7 +470,7 @@ namespace wwtlib
             }
 
 
-            NamesBatch = new Text3dBatch(Settings.Active.ConstellationNamesHeight);
+            NamesBatch = new Text3dBatch(Settings.Active.ConstellationLabelsHeight);
 
 
             foreach (string key in ConstellationCentroids.Keys)
@@ -485,7 +485,7 @@ namespace wwtlib
                 {
                     name = name.Replace(" ", "\n   ");
                 }
-                NamesBatch.Add(new Text3d(center, up, name, Settings.Active.ConstellationNamesHeight, .000125));
+                NamesBatch.Add(new Text3d(center, up, name, Settings.Active.ConstellationLabelsHeight, .000125));
             }
         }
 

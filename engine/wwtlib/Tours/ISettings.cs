@@ -10,7 +10,7 @@ namespace wwtlib
         ConstellationFilter ConstellationBoundariesFilter { get; }
         ConstellationFilter ConstellationFiguresFilter { get; }
         ConstellationFilter ConstellationNamesFilter { get; }
-        int ConstellationNamesHeight { get; }
+        int ConstellationLabelsHeight { get; }
         string ConstellationsEnabled { get; }
         bool EarthCutawayView { get; }
         Color EclipticColor { get; }

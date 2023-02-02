@@ -2017,11 +2017,11 @@ namespace wwtlib
             set { equatorialGridColor = value; }
         }
 
-        private int constellationNamesHeight = 80;
-        public int ConstellationNamesHeight
+        private int constellationLabelsHeight = 80;
+        public int ConstellationLabelsHeight
         {
-            get { return constellationNamesHeight; }
-            set { constellationNamesHeight = value; }
+            get { return constellationLabelsHeight; }
+            set { constellationLabelsHeight = value; }
         }
     }
 
