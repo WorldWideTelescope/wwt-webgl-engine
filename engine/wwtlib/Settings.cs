@@ -354,8 +354,50 @@ namespace wwtlib
             get { return showAltAzGrid; }
             set { showAltAzGrid = value; }
         }
-        private bool showAltAzGridText = false;
 
+        private Color eclipticGridColor = Colors.Green;
+        public Color EclipticGridColor
+        {
+            get { return eclipticGridColor; }
+            set { eclipticGridColor = value; }
+        }
+
+        private Color galacticGridColor = Colors.Cyan;
+        public Color GalacticGridColor
+        {
+            get { return galacticGridColor; }
+            set { galacticGridColor = value; }
+        }
+
+        private Color altAzGridColor = Colors.Magenta;
+        public Color AltAzGridColor
+        {
+            get { return altAzGridColor; }
+            set { altAzGridColor = value; }
+        }
+
+        private Color precessionChartColor = Colors.Orange;
+        public Color PrecessionChartColor
+        {
+            get { return precessionChartColor; }
+            set { precessionChartColor = value; }
+        }
+
+        private Color eclipticColor = Colors.Blue;
+        public Color EclipticColor
+        {
+            get { return eclipticColor; }
+            set { eclipticColor = value; }
+        }
+
+        private Color equatorialGridColor = Colors.White;
+        public Color EquatorialGridColor
+        {
+            get { return equatorialGridColor; }
+            set { equatorialGridColor = value; }
+        }
+
+        private bool showAltAzGridText = false;
         public bool ShowAltAzGridText
         {
             get { return showAltAzGridText; }
