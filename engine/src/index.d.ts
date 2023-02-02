@@ -658,13 +658,19 @@ export class Constellations {
  */
 // NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
 export type EngineSetting = BaseEngineSetting |
+["altAzGridColor", Color] |
 ["constellationArtFilter", ConstellationFilter] |
 ["constellationBoundariesFilter", ConstellationFilter] |
 ["constellationBoundryColor", Color] |
 ["constellationFigureColor", Color] |
 ["constellationFiguresFilter", ConstellationFilter] |
 ["constellationNamesFilter", ConstellationFilter] |
-["constellationSelectionColor", Color];
+["constellationSelectionColor", Color] |
+["eclipticColor", Color] |
+["eclipticGridColor", Color] |
+["equatorialGridColor", Color] |
+["galacticGridColor", Color] |
+["precessionChartColor", Color];
 
 export class FitsImage extends WcsImage {
   histogramMaxCount: number;
