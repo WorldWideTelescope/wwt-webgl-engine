@@ -2016,6 +2016,13 @@ namespace wwtlib
             get { return equatorialGridColor; }
             set { equatorialGridColor = value; }
         }
+
+        private int constellationNamesHeight = 80;
+        public int ConstellationNamesHeight
+        {
+            get { return constellationNamesHeight; }
+            set { constellationNamesHeight = value; }
+        }
     }
 
     public class LayerInfo

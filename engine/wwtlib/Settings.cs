@@ -259,14 +259,14 @@ namespace wwtlib
         public bool SolarSystemStars
         {
             get { return solarSystemStars; }
-            set {  solarSystemStars = value; }
+            set { solarSystemStars = value; }
         }
 
         public bool SolarSystemMilkyWay
         {
             get { return solarSystemMilkyWay; }
             set { solarSystemMilkyWay = value; }
-       }
+        }
 
         public bool SolarSystemCosmos
         {
@@ -290,13 +290,13 @@ namespace wwtlib
         {
             get { return solarSystemLighting; }
             set { solarSystemLighting = value; }
-       }
+        }
 
         public bool SolarSystemMultiRes
         {
             get { return true; }
             set { solarSystemMultiRes = value; }
-       }
+        }
 
         public int SolarSystemScale
         {
@@ -423,6 +423,13 @@ namespace wwtlib
         {
             get { return showConstellationLabels; }
             set { showConstellationLabels = value; }
+        }
+
+        private int constellationNamesHeight = 80;
+        public int ConstellationNamesHeight
+        {
+            get { return constellationNamesHeight; }
+            set { constellationNamesHeight = value; }
         }
 
         //public string ConstellationsEnabled = false;
