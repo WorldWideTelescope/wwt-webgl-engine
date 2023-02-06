@@ -144,9 +144,8 @@ const uiPlotTypes: UiPlotTypes[] = [
   { wwt: PlotTypes.gaussian, desc: "Gaussian" },
   { wwt: PlotTypes.circle, desc: "Circle" },
   { wwt: PlotTypes.pushPin, desc: "Push-pin" },
-  // The other types don't currently render well.
-  // "point": starts out OK but gets gnarly if the catalog is dense and you zoom in.
-  // "square": actually renders as a flag
+  { wwt: PlotTypes.point, desc: "Point" },
+  { wwt: PlotTypes.square, desc: "Square" },
   // "custom": handled same as push-pin in the engine
 ];
 
