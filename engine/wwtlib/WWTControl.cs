@@ -28,6 +28,13 @@ namespace wwtlib
             SpaceTimeController.UpdateClock();
         }
 
+        // In "freestanding" mode, no worldwidetelescope.org resources are
+        // relied upon. The default screen is black sky, and the 3D solar system
+        // mode is unavailable because it relies on so many built-in assets. If
+        // you want to see anything, you need to load it in yourself.
+
+        public bool FreestandingMode = false;
+
         // Note: ImageSets must remain public because there is JS code in the
         // wild that accesses `WWTControl.imageSets`.
         public static List<Imageset> ImageSets = new List<Imageset>();
@@ -1770,6 +1777,7 @@ namespace wwtlib
             return InitControl2(DivId, true);
         }
 
+        // Prefer using WWTControlBuilder rather than this interface directly.
         public static ScriptInterface InitControl2(string DivId, bool startRenderLoop)
         {
             return InitControl6(
@@ -1782,6 +1790,7 @@ namespace wwtlib
             );
         }
 
+        // Prefer using WWTControlBuilder rather than this interface directly.
         public static ScriptInterface InitControl6(
             string DivId,
             bool startRenderLoop,
@@ -1857,6 +1866,39 @@ namespace wwtlib
                         "",  // altUrl
                         6371000,  // meanRadius
                         "Earth"  // referenceFrame
+                    );
+                } else if (startMode == "black") {
+                    // Black sky init -- probably because we are in freestanding mode
+                    Singleton.RenderContext.BackgroundImageset = Imageset.Create(
+                        "Black Sky Background",  // name
+                        "",  // url
+                        ImageSetType.Sky,  // dataSetType
+                        BandPass.Visible,  // bandPass
+                        ProjectionType.Toast,  // projectionType
+                        102,  // imageSetID
+                        0,  // baseLevel
+                        0,  // levels
+                        256,  // tileSize (unused)
+                        180,  // baseTileDegrees
+                        ".png",  // extension
+                        false,  // bottomsUp
+                        "0123",  // quadTreeMap
+                        0,  // centerX
+                        0,  // centerY
+                        0,  // rotation
+                        false,  // sparse
+                        "",  // thumbnailUrl
+                        false,  // defaultSet
+                        false,  // elevationModel
+                        2,  // widthFactor
+                        0,  // offsetX
+                        0,  // offsetY
+                        "",  // creditsText
+                        "",  // creditsUrl
+                        "",  // demUrl
+                        "",  // altUrl
+                        1,  // meanRadius
+                        "Sky"  // referenceFrame
                     );
                 } else {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
@@ -2395,7 +2437,7 @@ namespace wwtlib
             {
                 return 0;
             }
-            
+
             return SlewTimeBetweenTargets(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
         }
 
@@ -2846,13 +2888,60 @@ namespace wwtlib
         }
 
     }
-    public delegate void BlobReady(System.Html.Data.Files.Blob blob);
 
+    public class WWTControlBuilder
+    {
+        string divId = null;
+
+        public WWTControlBuilder(string divId) {
+            this.divId = divId;
+        }
+
+        bool startRenderLoop = false;
+
+        public void StartRenderLoop(bool value) {
+            startRenderLoop = value;
+        }
+
+        double startLat = 0.0;
+        double startLng = 0.0;
+        double startZoom = 360.0;
+
+        public void InitialView(double lat, double lng, double zoom) {
+            startLat = lat;
+            startLng = lng;
+            startZoom = zoom;
+        }
+
+        bool freestandingMode = false;
+
+        public void FreestandingMode(bool value) {
+            freestandingMode = value;
+        }
+
+        public ScriptInterface Create()
+        {
+            string startMode = "sky";
+
+            WWTControl.Singleton.FreestandingMode = freestandingMode;
+
+            if (freestandingMode) {
+                startMode = "black";
+            }
+
+            return WWTControl.InitControl6(
+                divId, startRenderLoop, startLat, startLng, startZoom, startMode
+            );
+        }
+    }
+
+    public delegate void BlobReady(System.Html.Data.Files.Blob blob);
 
     public class WWTElementEvent
     {
         public double OffsetX;
         public double OffsetY;
+
         public WWTElementEvent(double x, double y)
         {
             OffsetX = x;

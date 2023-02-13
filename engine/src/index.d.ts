@@ -1,4 +1,4 @@
-// Copyright 2020-2021 the .NET Foundation
+// Copyright 2020-2023 the .NET Foundation
 // Licensed under the MIT License
 //
 // TypeScript definitions for the WWT WebGL engine. Base data types that do not
@@ -2512,14 +2512,14 @@ export class WWTControl {
    */
   gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean, roll_deg?: number): void;
 
-    /** Returns how long moving to the given position will take, in seconds.
-   *
-   * @param ra_hours The target right ascension, in hours.
-   * @param dec_deg The target declination, in degrees.
-   * @param zoom The target zoom level (see below)
-   * @param roll_deg Optional, The roll of the camera, in degrees.
-   *
-   */
+  /** Returns how long moving to the given position will take, in seconds.
+ *
+ * @param ra_hours The target right ascension, in hours.
+ * @param dec_deg The target declination, in degrees.
+ * @param zoom The target zoom level (see below)
+ * @param roll_deg Optional, The roll of the camera, in degrees.
+ *
+ */
   timeToRADecZoom(ra_hours: number, dec_deg: number, zoom: number, roll_deg?: number): number;
 
   /** Start navigating the view to the specified [[Place]].
@@ -2753,17 +2753,25 @@ export namespace Wtml {
 export namespace WWTControl {
   /** Initialize the WWT engine and launch its rendering loop.
    *
+   * While this function is maintained for backwards compatibility, modern users
+   * should use the [[WWTControlBuilder]] class to initialize and instantiate
+   * the engine.
+   *
+   * The engine is not immediately usable since it must perform initialization
+   * that includes fetching resources from the network.
+   *
    * @param divId The `id` of the DOM element into which the WWT WebGL surface
    * will be inserted.
    * @return A handle to a [[ScriptInterface]] associated with this engine
    * instance.
-   *
-   * The engine is not immediately usable since it must perform initialization
-   * that includes fetching resources from the network.
    */
   export function initControl(divId: string): ScriptInterface;
 
   /** Initialize the WWT engine with defaults.
+   *
+   * While this function is maintained for backwards compatibility, modern users
+   * should use the [[WWTControlBuilder]] class to initialize and instantiate
+   * the engine.
    *
    * The same as [[initControl6]], with `startLat` and `startLng` defaulting to
    * 0, `startZoom` defaulting to 360, and `startMode` defaulting to `"Sky"`.
@@ -2771,6 +2779,15 @@ export namespace WWTControl {
   export function initControl2(divId: string, startRenderLoop: boolean): ScriptInterface;
 
   /** Initialize the WWT engine.
+   *
+   * While this function is maintained for backwards compatibility, modern users
+   * should use the [[WWTControlBuilder]] class to initialize and instantiate
+   * the engine.
+   *
+   * The engine is not immediately usable since it must perform initialization
+   * that includes fetching resources from the network.
+   *
+   * If the value of `startMode` is not recognized, Sky mode is assumed.
    *
    * @param divId The `id` of the DOM element into which the WWT WebGL surface
    * will be inserted.
@@ -2782,18 +2799,9 @@ export namespace WWTControl {
    * degrees.
    * @param startZoom The starting zoom level for the view.
    * @param startMode The starting mode for the view: one of `"earth"` or
-   * `"Sky"`.
+   * `"Sky"` or `"black"`.
    * @return A handle to a [[ScriptInterface]] associated with this engine
    * instance.
-   *
-   * The engine is not immediately usable since it must perform initialization
-   * that includes fetching resources from the network.
-   *
-   * If the value of `startMode` is not recognized, Sky mode is assumed.
-   *
-   * Additional variants of this function, taking additional arguments, may be
-   * added over time. Existing versions will be preserved to maintain backwards
-   * compatibility.
    */
   export function initControl6(
     divId: string,
@@ -2806,4 +2814,76 @@ export namespace WWTControl {
 
   /** The global WWTControl singleton instance. */
   export const singleton: WWTControl;
+}
+
+/** A class used to initialize the WWT engine.
+ *
+ * You can use the various methods on this class to configure how the engine
+ * will work, and finally invoke the {@link create} method to instantiate it.
+ *
+ * After instantiation, the engine generally can't be used immediately since it
+ * must perform initialization that includes fetching resources from the
+ * network.
+ */
+export class WWTControlBuilder {
+  /** Create a WWT engine builder.
+   *
+   * @param divId The `id` of the DOM element into which the WWT WebGL surface
+   * will be inserted when the engine is instantiated.
+   */
+  constructor(divId: string);
+
+  /** Configure whether the WWT engine should start and run its own render loop.
+   * The default is false.
+   *
+   * If set to true, upon engine instantiation of the engine, it will queue a
+   * callback that renders the scene and then requeues itself to rerun in 10
+   * milliseconds. It is generally better to manage the render loop yourself and
+   * call {@link WWTControl.renderOneFrame} manually.
+   *
+   * @param value Whether the engine should run its own render loop.
+   */
+  startRenderLoop(value: boolean): void;
+
+  /** Configure the initial view of the WWT engine.
+   *
+   * The default is to have a latitude and longitude of zero and zoom level of
+   * 360, which corresponds to a viewport height of 60 degrees in the 2D sky
+   * mode.
+   *
+   * @param startLat The starting declination or latitude for the view, in
+   * degrees.
+   * @param startLng The starting longitude or right ascension for the view, in
+   * degrees.
+   * @param startZoom The starting zoom level for the view.
+   */
+  initialView(lat: number, lng: number, zoom: number): void;
+
+  /** Configure whether the WWT engine should operate in freestanding mode. The
+   * default is false.
+   *
+   * If set to true, the engine will avoid the use of any resources available
+   * from the main `worldwidetelescope.org` website. The initial view will be
+   * black sky, and the 3D solar system mode will be unavailable due to its need
+   * for centralized assets. In order to see anything, you will need to load
+   * data definitions into the engine and configure it to show something.
+   *
+   * @param value Whether the engine should run in freestanding mode.
+   */
+  freestandingMode(value: boolean): void;
+
+  /** Instantiate the WWT engine.
+   *
+   * After instantiation, the engine generally can't be used immediately since it
+   * must perform initialization that includes fetching resources from the
+   * network.
+   *
+   * Along with the returned {@link ScriptInterface} instance, the primary way to
+   * interact with the WWT engine is through the global singleton
+   * {@link WWTControl.singleton}.
+   *
+   * @return A handle to a {@link ScriptInterface} associated with the engine
+   * instance.
+   */
+  create(): ScriptInterface;
 }
