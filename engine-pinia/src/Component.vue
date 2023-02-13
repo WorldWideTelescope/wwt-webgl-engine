@@ -21,7 +21,8 @@ interface ComponentData {
 export default defineComponent({
 
   props: {
-    wwtNamespace: { type: String, default: "wwt", required: true }
+    wwtNamespace: { type: String, default: "wwt", required: true },
+    wwtFreestanding: { type: Boolean, default: false, required: false },
   },
 
   data(): ComponentData {
@@ -59,6 +60,8 @@ export default defineComponent({
       // Start at the Galactic Center by default. RA of the GC ~= 266.4 deg; in WWT, lng = 360 - RA.
       startLatDeg: -28.9,
       startLngDeg: 93.6,
+
+      freestandingMode: this.wwtFreestanding,
     }));
 
     // TODO: The build fails with a TypeScript error without "as WWTInstance"

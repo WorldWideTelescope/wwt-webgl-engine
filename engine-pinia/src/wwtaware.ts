@@ -224,12 +224,13 @@ import { engineStore } from "./store";
  * - [[applySetting]]
  **/
 export const WWTAwareComponent = defineComponent({
-  /** The namespace of the Pinia module used to track the WWT component’s state.
-   * This prop should have the same value in all components in the app that
-   * reference WWT.
-   */
   props: {
-    wwtNamespace: { type: String, default: "wwt", required: true }
+    /** The namespace of the Pinia module used to track the WWT component’s state.
+     * This prop should have the same value in all components in the app that
+     * reference WWT.
+     */
+    wwtNamespace: { type: String, default: "wwt", required: true },
+    wwtFreestanding: { type: Boolean, default: false, required: false },
   },
 
   computed: {
