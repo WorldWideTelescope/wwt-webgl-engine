@@ -1,3 +1,12 @@
+# @wwtelescope/engine 7.19.0 (2023-02-13)
+
+- Make it possible to customize the colors used for various coordinate
+  grid overlays and the heigh of the constellation names (#226, @Carifio24).
+  These are exposed as new engine settings.
+- In various table data layers, fix the icons used for circle and square
+  plot types (#228, @Carifio24).
+
+
 # @wwtelescope/engine 7.18.0 (2023-01-19)
 
 - Add APIs for getting the amount of time that basic "goto" movements

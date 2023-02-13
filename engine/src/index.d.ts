@@ -658,13 +658,19 @@ export class Constellations {
  */
 // NOTE: isEngineSetting in engine-helpers needs to be kept in sync.
 export type EngineSetting = BaseEngineSetting |
+["altAzGridColor", Color] |
 ["constellationArtFilter", ConstellationFilter] |
 ["constellationBoundariesFilter", ConstellationFilter] |
 ["constellationBoundryColor", Color] |
 ["constellationFigureColor", Color] |
 ["constellationFiguresFilter", ConstellationFilter] |
 ["constellationNamesFilter", ConstellationFilter] |
-["constellationSelectionColor", Color];
+["constellationSelectionColor", Color] |
+["eclipticColor", Color] |
+["eclipticGridColor", Color] |
+["equatorialGridColor", Color] |
+["galacticGridColor", Color] |
+["precessionChartColor", Color];
 
 export class FitsImage extends WcsImage {
   histogramMaxCount: number;
@@ -1600,26 +1606,40 @@ export class Settings implements EngineSettingsInterface {
   set_solarSystemScale(v: number): number;
   get_showEquatorialGridText(): boolean;
   set_showEquatorialGridText(v: boolean): boolean;
+  get_equatorialGridColor(): Color;
+  set_equatorialGridColor(v: Color): Color;
   get_showGalacticGrid(): boolean;
   set_showGalacticGrid(v: boolean): boolean;
   get_showGalacticGridText(): boolean;
   set_showGalacticGridText(v: boolean): boolean;
+  get_galacticGridColor(): Color;
+  set_galacticGridColor(v: Color): Color;
   get_showEclipticGrid(): boolean;
   set_showEclipticGrid(v: boolean): boolean;
   get_showEclipticGridText(): boolean;
   set_showEclipticGridText(v: boolean): boolean;
+  get_eclipticGridColor(): Color;
+  set_eclipticGridColor(v: Color): Color;
   get_showEclipticOverviewText(): boolean;
   set_showEclipticOverviewText(v: boolean): boolean;
+  get_eclipticColor(): Color;
+  set_eclipticColor(v: Color): Color;
   get_showAltAzGrid(): boolean;
   set_showAltAzGrid(v: boolean): boolean;
   get_showAltAzGridText(): boolean;
   set_showAltAzGridText(v: boolean): boolean;
+  get_altAzGridColor(): Color;
+  set_altAzGridColor(v: Color): Color;
   get_showPrecessionChart(): boolean;
   set_showPrecessionChart(v: boolean): boolean;
+  get_precessionChartColor(): Color;
+  set_precessionChartColor(v: Color): Color;
   get_showConstellationPictures(): boolean;
   set_showConstellationPictures(v: boolean): boolean;
   get_showConstellationLabels(): boolean;
   set_showConstellationLabels(v: boolean): boolean;
+  get_constellationLabelsHeight(): number;
+  set_constellationLabelsHeight(v: number): number;
   get_solarSystemCMB(): boolean;
   set_solarSystemCMB(v: boolean): boolean;
   get_solarSystemMinorPlanets(): boolean;

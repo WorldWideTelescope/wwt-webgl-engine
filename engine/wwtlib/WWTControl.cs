@@ -907,52 +907,52 @@ namespace wwtlib
 
             if (Settings.Active.ShowEclipticGrid)
             {
-                Grids.DrawEclipticGrid(RenderContext, 1, Colors.Green);
+                Grids.DrawEclipticGrid(RenderContext, 1, Settings.Active.EclipticGridColor);
                 if (Settings.Active.ShowEclipticGridText)
                 {
-                    Grids.DrawEclipticGridText(RenderContext, 1, Colors.Green);
+                    Grids.DrawEclipticGridText(RenderContext, 1, Settings.Active.EclipticGridColor);
                 }
             }
 
             if (Settings.Active.ShowGalacticGrid)
             {
-                Grids.DrawGalacticGrid(RenderContext, 1, Colors.Cyan);
+                Grids.DrawGalacticGrid(RenderContext, 1, Settings.Active.GalacticGridColor);
                 if (Settings.Active.ShowGalacticGridText)
                 {
-                    Grids.DrawGalacticGridText(RenderContext, 1, Colors.Cyan);
+                    Grids.DrawGalacticGridText(RenderContext, 1, Settings.Active.GalacticGridColor);
                 }
             }
 
             if (Settings.Active.ShowAltAzGrid)
             {
-                Grids.DrawAltAzGrid(RenderContext, 1, Colors.Magenta);
+                Grids.DrawAltAzGrid(RenderContext, 1, Settings.Active.AltAzGridColor);
                 if (Settings.Active.ShowAltAzGridText)
                 {
-                    Grids.DrawAltAzGridText(RenderContext, 1, Colors.Magenta);
+                    Grids.DrawAltAzGridText(RenderContext, 1, Settings.Active.AltAzGridColor);
                 }
             }
 
             if (Settings.Active.ShowPrecessionChart)
             {
-                Grids.DrawPrecessionChart(RenderContext, 1, Colors.Orange);
+                Grids.DrawPrecessionChart(RenderContext, 1, Settings.Active.PrecessionChartColor);
 
             }
 
             if (Settings.Active.ShowEcliptic)
             {
-                Grids.DrawEcliptic(RenderContext, 1, Colors.Blue);
+                Grids.DrawEcliptic(RenderContext, 1, Settings.Active.EclipticColor);
                 if (Settings.Active.ShowEclipticOverviewText)
                 {
-                    Grids.DrawEclipticText(RenderContext, 1, Colors.Blue);
+                    Grids.DrawEclipticText(RenderContext, 1, Settings.Active.EclipticColor);
                 }
             }
 
             if (Settings.Active.ShowGrid)
             {
-                Grids.DrawEquitorialGrid(RenderContext, 1, Colors.White);
+                Grids.DrawEquitorialGrid(RenderContext, 1, Settings.Active.EquatorialGridColor);
                 if (Settings.Active.ShowEquatorialGridText)
                 {
-                    Grids.DrawEquitorialGridText(RenderContext, 1, Colors.White);
+                    Grids.DrawEquitorialGridText(RenderContext, 1, Settings.Active.EquatorialGridColor);
                 }
             }
 

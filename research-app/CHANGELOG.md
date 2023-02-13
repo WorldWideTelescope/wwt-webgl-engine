@@ -1,3 +1,10 @@
+# @wwtelescope/research-app 0.13.0 (2023-02-13)
+
+- Add new circle and square plot types as options for rendering table layers
+  (#228, @Carifio24). These had been hidden since there was a silly bug in their
+  implementation in the engine layer.
+
+
 # @wwtelescope/research-app 0.12.0 (2022-12-01)
 
 - Update to Vue 3 and Pinia (#215, @Carifio24)! The overall user experience

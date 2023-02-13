@@ -1,3 +1,10 @@
+# @wwtelescope/engine-helpers 0.10.0 (2023-02-13)
+
+- Expose some new engine settings that make make it possible to customize the
+  colors used for various coordinate grid overlays and the heigh of the
+  constellation names (#226, @Carifio24).
+
+
 # @wwtelescope/engine-helpers 0.9.0 (2023-01-19)
 
 - Expose new engine APIs for getting the amount of time that basic "goto"
