@@ -2859,6 +2859,19 @@ export class WWTControlBuilder {
    */
   initialView(lat: number, lng: number, zoom: number): void;
 
+  /** Configure the initial mode of the WWT engine.
+   *
+   * The default is `"sky"`, where engine starts in Sky mode showing the DSS sky
+   * map, unless {@link freestandingMode} has been activated, in which case the
+   * engine starts showing a content-free black sky map. The value `"black"`
+   * explicitly starts in this mode, but without invoking
+   * {@link freestandingMode} itself. The value `"earth"` causes the engine to
+   * start in Earth mode showing the "Blue Marble" map.
+   *
+   * @param value The starting mode: one of `"earth"`, `"Sky"`, or `"black"`.
+   */
+  initialMode(mode: string): void;
+
   /** Configure whether the WWT engine should operate in freestanding mode. The
    * default is false.
    *

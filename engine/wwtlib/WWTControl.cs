@@ -2919,18 +2919,28 @@ namespace wwtlib
             freestandingMode = value;
         }
 
+        string startMode = "";
+
+        public void InitialMode(string value) {
+            startMode = value;
+        }
+
         public ScriptInterface Create()
         {
-            string startMode = "sky";
+            string trueStartMode;
+
+            if (startMode != "") {
+                trueStartMode = startMode;
+            } else if (freestandingMode) {
+                trueStartMode = "black";
+            } else {
+                trueStartMode = "sky";
+            }
 
             WWTControl.Singleton.FreestandingMode = freestandingMode;
 
-            if (freestandingMode) {
-                startMode = "black";
-            }
-
             return WWTControl.InitControl6(
-                divId, startRenderLoop, startLat, startLng, startZoom, startMode
+                divId, startRenderLoop, startLat, startLng, startZoom, trueStartMode
             );
         }
     }
