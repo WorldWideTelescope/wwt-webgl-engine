@@ -1,4 +1,4 @@
-// Copyright 2020-2021 the .NET Foundation
+// Copyright 2020-2023 the .NET Foundation
 // Licensed under the MIT License
 
 import { D2H, R2D, R2H } from "@wwtelescope/astro";
@@ -23,6 +23,7 @@ import {
   TourPlayer,
   Wtml,
   WWTControl,
+  WWTControlBuilder,
   SpaceTimeController,
   SpreadSheetLayer,
   SpreadSheetLayerSetting,
@@ -129,6 +130,11 @@ export interface InitControlSettings {
    * unspecified, defaults to `false`. */
   startInternalRenderLoop?: boolean;
 
+  /** Whether to launch the engine in "freestanding" mode, where no
+   * network-based assets are loaded. The initial view will consist of only
+   * black sky, and the 3D solar system mode will be unavailable. */
+  freestandingMode?: boolean;
+
   /** The starting latitude (or declination) of the WWT view, in degrees. */
   startLatDeg?: number;
 
@@ -141,15 +147,6 @@ export interface InitControlSettings {
   /** The starting mode of the WWT view. */
   startMode?: InitControlViewType;
 }
-
-const initControlDefaults: InitControlSettings = {
-  elId: "wwt",
-  startInternalRenderLoop: false,
-  startLatDeg: 0,
-  startLngDeg: 0,
-  startZoomDeg: 360,
-  startMode: InitControlViewType.Sky,
-};
 
 /** Options for [[WWTInstance.gotoTarget]]. */
 export interface GotoTargetOptions {
@@ -336,17 +333,27 @@ export class WWTInstance {
   constructor(
     options: InitControlSettings = {}
   ) {
-    const o = { ...initControlDefaults, ...options };
+    const builder = new WWTControlBuilder(options.elId || "wwt");
+
+    if (options.startInternalRenderLoop !== undefined) {
+      builder.startRenderLoop(options.startInternalRenderLoop);
+    }
+
+    if (options.freestandingMode !== undefined) {
+      builder.freestandingMode(options.freestandingMode);
+    }
+
+    if (options.startLatDeg !== undefined && options.startLngDeg !== undefined) {
+      const zoom = options.startZoomDeg || 360;
+      builder.initialView(options.startLatDeg, options.startLngDeg, zoom);
+    }
+
+    if (options.startMode !== undefined) {
+      builder.initialMode(options.startMode);
+    }
 
     // We pretend that these objects aren't all singletons. One day.
-    this.si = WWTControl.initControl6(
-      o.elId as string,
-      o.startInternalRenderLoop as boolean,
-      o.startLatDeg as number,
-      o.startLngDeg as number,
-      o.startZoomDeg as number,
-      o.startMode as InitControlViewType,
-    );
+    this.si = builder.create();
     this.ctl = WWTControl.singleton;
     this.lm = LayerManager;
     this.stc = SpaceTimeController;
@@ -478,7 +485,7 @@ export class WWTInstance {
    * @param rollRad If specified, the roll of the target camera position, in radians
    * @returns The amount of time, in seconds, that moving to the given position would take.
    */
-   timeToRADecZoom(raRad: number, decRad: number, zoomDeg: number, rollRad?: number): number {
+  timeToRADecZoom(raRad: number, decRad: number, zoomDeg: number, rollRad?: number): number {
     const time = this.ctl.timeToRADecZoom(
       raRad * R2H,
       decRad * R2D,
