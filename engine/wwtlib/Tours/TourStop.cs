@@ -1053,6 +1053,7 @@ namespace wwtlib
             xmlWriter.WriteAttributeString("ShowConstellationFigures", showConstellationFigures.ToString());
             xmlWriter.WriteAttributeString("ShowConstellationSelection", showConstellationSelection.ToString());
             xmlWriter.WriteAttributeString("ShowEcliptic", showEcliptic.ToString());
+            xmlWriter.WriteAttributeString("EclipticColor", eclipticColor.Save());
             xmlWriter.WriteAttributeString("ShowElevationModel", showElevationModel.ToString());
             showFieldOfView = false;
             xmlWriter.WriteAttributeString("ShowFieldOfView", showFieldOfView.ToString());
@@ -1087,14 +1088,19 @@ namespace wwtlib
             xmlWriter.WriteAttributeString("ShowEarthSky", showEarthSky.ToString());
 
             xmlWriter.WriteAttributeString("ShowEquatorialGridText", ShowEquatorialGridText.ToString());
+            xmlWriter.WriteAttributeString("EquatorialGridColor", EquatorialGridColor.Save());
             xmlWriter.WriteAttributeString("ShowGalacticGrid", ShowGalacticGrid.ToString());
             xmlWriter.WriteAttributeString("ShowGalacticGridText", ShowGalacticGridText.ToString());
+            xmlWriter.WriteAttributeString("GalacticGridColor", GalacticGridColor.Save());
             xmlWriter.WriteAttributeString("ShowEclipticGrid", ShowEclipticGrid.ToString());
             xmlWriter.WriteAttributeString("ShowEclipticGridText", ShowEclipticGridText.ToString());
+            xmlWriter.WriteAttributeString("EclipticGridColor", EclipticGridColor.Save());
             xmlWriter.WriteAttributeString("ShowEclipticOverviewText", ShowEclipticOverviewText.ToString());
             xmlWriter.WriteAttributeString("ShowAltAzGrid", ShowAltAzGrid.ToString());
             xmlWriter.WriteAttributeString("ShowAltAzGridText", ShowAltAzGridText.ToString());
+            xmlWriter.WriteAttributeString("AltAzGridColor", AltAzGridColor.Save());
             xmlWriter.WriteAttributeString("ShowPrecessionChart", ShowPrecessionChart.ToString());
+            xmlWriter.WriteAttributeString("PrecessionChartColor", PrecessionChartColor.Save());
             xmlWriter.WriteAttributeString("ConstellationPictures", ShowConstellationPictures.ToString());
             xmlWriter.WriteAttributeString("ConstellationsEnabled", ConstellationsEnabled);
             xmlWriter.WriteAttributeString("ShowConstellationLabels", ShowConstellationLabels.ToString());
@@ -1323,6 +1329,10 @@ namespace wwtlib
                 {
                     newTourStop.showEcliptic = bool.Parse(tourStop.Attributes.GetNamedItem("ShowEcliptic").Value);
                 }
+                if (tourStop.Attributes.GetNamedItem("EclipticColor") != null)
+                {
+                    newTourStop.eclipticColor = Color.Load(tourStop.Attributes.GetNamedItem("EclipticColor").Value);
+                }
 
                 if (tourStop.Attributes.GetNamedItem("ShowElevationModel") != null)
                 {
@@ -1430,14 +1440,22 @@ namespace wwtlib
                 {
                     newTourStop.showEquatorialGridText = bool.Parse(tourStop.Attributes.GetNamedItem("ShowEquatorialGridText").Value);
                 }
+                if (tourStop.Attributes.GetNamedItem("EquatorialGridColor") != null)
+                {
+                    newTourStop.equatorialGridColor = Color.Load(tourStop.Attributes.GetNamedItem("EquatorialGridColor").Value);
+                }
+
                 if (tourStop.Attributes.GetNamedItem("ShowGalacticGrid") != null)
                 {
                     newTourStop.showGalacticGrid = bool.Parse(tourStop.Attributes.GetNamedItem("ShowGalacticGrid").Value);
                 }
-
                 if (tourStop.Attributes.GetNamedItem("ShowGalacticGridText") != null)
                 {
                     newTourStop.showGalacticGridText = bool.Parse(tourStop.Attributes.GetNamedItem("ShowGalacticGridText").Value);
+                }
+                if (tourStop.Attributes.GetNamedItem("GalacticGridColor") != null)
+                {
+                    newTourStop.galacticGridColor = Color.Load(tourStop.Attributes.GetNamedItem("GalacticGridColor").Value);
                 }
 
                 if (tourStop.Attributes.GetNamedItem("ShowEclipticGrid") != null)
@@ -1447,6 +1465,10 @@ namespace wwtlib
                 if (tourStop.Attributes.GetNamedItem("ShowEclipticGridText") != null)
                 {
                     newTourStop.showEclipticGridText = bool.Parse(tourStop.Attributes.GetNamedItem("ShowEclipticGridText").Value);
+                }
+                if (tourStop.Attributes.GetNamedItem("EclipticGridColor") != null)
+                {
+                    newTourStop.eclipticGridColor = Color.Load(tourStop.Attributes.GetNamedItem("EclipticGridColor").Value);
                 }
 
                 if (tourStop.Attributes.GetNamedItem("ShowEclipticOverviewText") != null)
@@ -1458,15 +1480,22 @@ namespace wwtlib
                 {
                     newTourStop.showAltAzGrid = bool.Parse(tourStop.Attributes.GetNamedItem("ShowAltAzGrid").Value);
                 }
-
                 if (tourStop.Attributes.GetNamedItem("ShowAltAzGridText") != null)
                 {
                     newTourStop.showAltAzGridText = bool.Parse(tourStop.Attributes.GetNamedItem("ShowAltAzGridText").Value);
+                }
+                if (tourStop.Attributes.GetNamedItem("AltAzGridColor") != null)
+                {
+                    newTourStop.altAzGridColor = Color.Load(tourStop.Attributes.GetNamedItem("AltAzGridColor").Value);
                 }
 
                 if (tourStop.Attributes.GetNamedItem("ShowPrecessionChart") != null)
                 {
                     newTourStop.showPrecessionChart = bool.Parse(tourStop.Attributes.GetNamedItem("ShowPrecessionChart").Value);
+                }
+                if (tourStop.Attributes.GetNamedItem("PrecessionChartColor") != null)
+                {
+                    newTourStop.precessionChartColor = Color.Load(tourStop.Attributes.GetNamedItem("PrecessionChartColor").Value);
                 }
 
                 if (tourStop.Attributes.GetNamedItem("ShowConstellationPictures") != null)
@@ -1944,6 +1973,55 @@ namespace wwtlib
             }
 
             return new SettingParameter(false,1,false,null);
+        }
+
+        private Color eclipticGridColor = Colors.Green;
+        public Color EclipticGridColor
+        {
+            get { return eclipticGridColor; }
+            set { eclipticGridColor = value; }
+        }
+
+        private Color galacticGridColor = Colors.Cyan;
+        public Color GalacticGridColor
+        {
+            get { return galacticGridColor; }
+            set { galacticGridColor = value; }
+        }
+
+        private Color altAzGridColor = Colors.Magenta;
+        public Color AltAzGridColor
+        {
+            get { return altAzGridColor; }
+            set { altAzGridColor = value; }
+        }
+
+        private Color precessionChartColor = Colors.Orange;
+        public Color PrecessionChartColor
+        {
+            get { return precessionChartColor; }
+            set { precessionChartColor = value; }
+        }
+
+        private Color eclipticColor = Colors.Blue;
+        public Color EclipticColor
+        {
+            get { return eclipticColor; }
+            set { eclipticColor = value; }
+        }
+
+        private Color equatorialGridColor = Colors.White;
+        public Color EquatorialGridColor
+        {
+            get { return equatorialGridColor; }
+            set { equatorialGridColor = value; }
+        }
+
+        private int constellationLabelsHeight = 80;
+        public int ConstellationLabelsHeight
+        {
+            get { return constellationLabelsHeight; }
+            set { constellationLabelsHeight = value; }
         }
     }
 

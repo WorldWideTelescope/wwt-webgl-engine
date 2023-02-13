@@ -20,17 +20,23 @@ import {
 /** A list of the names of the core engine settings. */
 export const engineSettingNames = [
   "actualPlanetScale",
+  "altAzGridColor",
   "constellationArtFilter",
   "constellationBoundariesFilter",
   "constellationFigureColor",
   "constellationFiguresFilter",
   "constellationBoundryColor",
   "constellationNamesFilter",
+  "constellationLabelsHeight",
   "constellations",
   "constellationSelectionColor",
   "constellationsEnabled",
   "crosshairsColor",
   "earthCutawayView",
+  "eclipticColor",
+  "eclipticGridColor",
+  "equatorialGridColor",
+  "galacticGridColor",
   "galacticMode",
   "localHorizonMode",
   "locationAltitude",
@@ -39,6 +45,7 @@ export const engineSettingNames = [
   "milkyWayModel",
   "minorPlanetsFilter",
   "planetOrbitsFilter",
+  "precessionChartColor",
   "showAltAzGrid",
   "showAltAzGridText",
   "showConstellationBoundries",
@@ -82,6 +89,7 @@ export const engineSettingNames = [
 ];
 
 const engineSettingTypeInfo: { [ix: string]: boolean } = {
+  "altAzGridColor/Color": true,
   "constellationArtFilter/ConstellationFilter": true,
   "constellationBoundariesFilter/ConstellationFilter": true,
   "constellationBoundryColor/Color": true,
@@ -90,7 +98,12 @@ const engineSettingTypeInfo: { [ix: string]: boolean } = {
   "constellationNamesFilter/ConstellationFilter": true,
   "constellationSelectionColor/Color": true,
   "crosshairsColor/Color": true,
-}
+  "eclipticColor/Color": true,
+  "eclipticGridColor/Color": true,
+  "equatorialGridColor/Color": true,
+  "galacticGridColor/Color": true,
+  "precessionChartColor/Color": true,
+};
 
 /** Type guard function for `EngineSetting`. */
 export function isEngineSetting(obj: [string, any]): obj is EngineSetting {

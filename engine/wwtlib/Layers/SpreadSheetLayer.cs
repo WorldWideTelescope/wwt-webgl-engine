@@ -2678,10 +2678,10 @@ namespace wwtlib
                         pointList.DrawTextured(renderContext, CircleTexture.Texture2d, opacity * Opacity);
                         break;
                     case PlotTypes.Point:
-                        pointList.DrawTextured(renderContext, PushPin.GetPushPinTexture(35), opacity * Opacity);
+                        pointList.DrawTextured(renderContext, PushPin.GetPushPinTexture(19), opacity * Opacity);
                         break;
                     case PlotTypes.Square:
-                        pointList.DrawTextured(renderContext, PushPin.GetPushPinTexture(67), opacity * Opacity);
+                        pointList.DrawTextured(renderContext, PushPin.GetPushPinTexture(35), opacity * Opacity);
                         break;
                     case PlotTypes.Custom:
                     case PlotTypes.PushPin:

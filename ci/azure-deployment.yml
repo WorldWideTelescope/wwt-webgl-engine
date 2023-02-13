@@ -60,11 +60,11 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Unpublish-AzCdnEndpointContent `
+        Clear-AzCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
-          -PurgeContent '/engine/$(ENGINE_DEPLOYMENT_TAG)/*'
+          -ContentPath @('/engine/$(ENGINE_DEPLOYMENT_TAG)/*')
 
 - job: deploy_embed
   pool:
@@ -110,11 +110,11 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Unpublish-AzCdnEndpointContent `
+        Clear-AzCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
-          -PurgeContent '/embed/$(EMBED_DEPLOYMENT_TAG)/wwt/*'
+          -ContentPath @('/embed/$(EMBED_DEPLOYMENT_TAG)/wwt/*')
 
 # The embed creator is not versioned - both master and RC deploy to prod. YOLO.
 
@@ -165,11 +165,11 @@ jobs:
       scriptType: 'inlineScript'
       inline: |
         $names = @('/', '/*', '/css/*', '/js/*')
-        Unpublish-AzCdnEndpointContent `
+        Clear-AzCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtwebembed-prod `
-          -PurgeContent $names
+          -ContentPath $names
 
 - job: deploy_research_app
   pool:
@@ -219,11 +219,11 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Unpublish-AzCdnEndpointContent `
+        Clear-AzCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
-          -PurgeContent '/research/$(RESEARCH_APP_DEPLOYMENT_TAG)/*'
+          -ContentPath @('/research/$(RESEARCH_APP_DEPLOYMENT_TAG)/*')
 
 # Since the engine docs combine outputs from nearly every submodule, we deploy new
 # versions on every update. Because the docs combine many different submodules,
@@ -270,11 +270,11 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Unpublish-AzCdnEndpointContent `
+        Clear-AzCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtwebdocs-prod `
-          -PurgeContent '/webgl-reference/$(ENGINE_DOCS_DEPLOYMENT_TAG)/*'
+          -ContentPath @('/webgl-reference/$(ENGINE_DOCS_DEPLOYMENT_TAG)/*')
 
 - job: deploy_research_app_docs
   pool:
@@ -316,11 +316,11 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Unpublish-AzCdnEndpointContent `
+        Clear-AzCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtwebdocs-prod `
-          -PurgeContent '/research-app/$(RESEARCH_APP_DOCS_DEPLOYMENT_TAG)/*'
+          -ContentPath @('/research-app/$(RESEARCH_APP_DOCS_DEPLOYMENT_TAG)/*')
 
 # Deployment jobs that should only happen on updates to `rc`, i.e.
 # primary releases.
