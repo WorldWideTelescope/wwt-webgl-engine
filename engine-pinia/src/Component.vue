@@ -22,7 +22,7 @@ export default defineComponent({
 
   props: {
     wwtNamespace: { type: String, default: "wwt", required: true },
-    wwtFreestanding: { type: Boolean, default: false, required: false },
+    wwtFreestandingAssetBaseurl: String,
   },
 
   data(): ComponentData {
@@ -61,7 +61,7 @@ export default defineComponent({
       startLatDeg: -28.9,
       startLngDeg: 93.6,
 
-      freestandingMode: this.wwtFreestanding,
+      freestandingAssetBaseurl: this.wwtFreestandingAssetBaseurl,
     }));
 
     // TODO: The build fails with a TypeScript error without "as WWTInstance"

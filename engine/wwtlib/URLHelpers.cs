@@ -146,6 +146,10 @@ namespace wwtlib
             this.flagship_static_lcpaths["/wwtweb/wmstoast.aspx"] = true;
         }
 
+        public void overrideAssetBaseurl(String baseurl) {
+            this.engine_asset_baseurl = baseurl;
+        }
+
         public String rewrite(String url, URLRewriteMode rwmode) {
             // Sadly, we can't take advantage of JS/browser URL parsing
             // because this function might be passed template URLs like

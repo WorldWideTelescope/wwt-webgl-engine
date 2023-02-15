@@ -130,10 +130,16 @@ export interface InitControlSettings {
    * unspecified, defaults to `false`. */
   startInternalRenderLoop?: boolean;
 
-  /** Whether to launch the engine in "freestanding" mode, where no
-   * network-based assets are loaded. The initial view will consist of only
-   * black sky, and the 3D solar system mode will be unavailable. */
-  freestandingMode?: boolean;
+  /** This controls whether the engine is launched in "freestanding" mode, where
+   * no core `worldwidetelescope.org` APIs are relied upon. The initial view
+   * will consist of only black sky, and the 3D solar system mode will be
+   * unavailable. This value is a base URL for locating various engine static
+   * assets. The default used by WWT is
+   * `https://web.wwtassets.org/engine/assets`. You can use that value here to
+   * activate freestanding mode if you are comfortable depending on the
+   * existence of the `wwtassets.org` domain. Otherwise, you can provide your
+   * own asset baseurl here.*/
+  freestandingAssetBaseurl?: string;
 
   /** The starting latitude (or declination) of the WWT view, in degrees. */
   startLatDeg?: number;
@@ -339,8 +345,8 @@ export class WWTInstance {
       builder.startRenderLoop(options.startInternalRenderLoop);
     }
 
-    if (options.freestandingMode !== undefined) {
-      builder.freestandingMode(options.freestandingMode);
+    if (options.freestandingAssetBaseurl !== undefined) {
+      builder.freestandingMode(options.freestandingAssetBaseurl);
     }
 
     if (options.startLatDeg !== undefined && options.startLngDeg !== undefined) {

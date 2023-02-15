@@ -230,7 +230,7 @@ export const WWTAwareComponent = defineComponent({
      * reference WWT.
      */
     wwtNamespace: { type: String, default: "wwt", required: true },
-    wwtFreestanding: { type: Boolean, default: false, required: false },
+    wwtFreestandingAssetBaseurl: String,
   },
 
   computed: {

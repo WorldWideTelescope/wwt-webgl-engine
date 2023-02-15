@@ -2917,10 +2917,10 @@ namespace wwtlib
             startZoom = zoom;
         }
 
-        bool freestandingMode = false;
+        string freestandingAssetBaseurl = "";
 
-        public void FreestandingMode(bool value) {
-            freestandingMode = value;
+        public void FreestandingMode(string asset_baseurl) {
+            freestandingAssetBaseurl = asset_baseurl;
         }
 
         string startMode = "";
@@ -2931,6 +2931,7 @@ namespace wwtlib
 
         public ScriptInterface Create()
         {
+            bool freestandingMode = freestandingAssetBaseurl != "";
             string trueStartMode;
 
             if (startMode != "") {
@@ -2942,6 +2943,10 @@ namespace wwtlib
             }
 
             WWTControl.Singleton.FreestandingMode = freestandingMode;
+
+            if (freestandingMode) {
+                URLHelpers.singleton.overrideAssetBaseurl(freestandingAssetBaseurl);
+            }
 
             return WWTControl.InitControl6(
                 divId, startRenderLoop, startLat, startLng, startZoom, trueStartMode

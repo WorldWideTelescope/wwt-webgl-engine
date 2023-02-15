@@ -2872,18 +2872,26 @@ export class WWTControlBuilder {
    */
   initialMode(mode: string): void;
 
-  /** Configure whether the WWT engine should operate in freestanding mode. The
-   * default is false.
+  /** Configure the WWT engine to operate in freestanding mode. The default is
+   * not to do so.
    *
-   * If set to true, the engine will avoid the use of any resources available
-   * from the main `worldwidetelescope.org` website. The initial view will be
-   * black sky, and the 3D solar system mode will be unavailable due to its need
-   * for centralized assets. In order to see anything, you will need to load
-   * data definitions into the engine and configure it to show something.
+   * Calling this function configures the engine to avoid the use of any
+   * resources available from the main `worldwidetelescope.org` website. The
+   * initial view will be black sky, and the 3D solar system mode will be
+   * unavailable due to its need for centralized assets. In order to see
+   * anything, you will need to load data definitions into the engine and
+   * configure it to show something. See [the Freestanding Mode
+   * documentation][fsd] for more information.
    *
-   * @param value Whether the engine should run in freestanding mode.
+   * [fsd]: ../../../freestanding-mode/
+   *
+   * @param asset_baseurl The baseurl to use for engine static assets. The
+   * default value used by WWT is `https://web.wwtassets.org/engine/assets`. You
+   * can use that value here to activate freestanding mode if you are
+   * comfortable depending on the existence of the `wwtassets.org` domain.
+   * Otherwise, you can provide your own baseurl here.
    */
-  freestandingMode(value: boolean): void;
+  freestandingMode(asset_baseurl: string): void;
 
   /** Instantiate the WWT engine.
    *
