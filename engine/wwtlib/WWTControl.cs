@@ -1834,6 +1834,7 @@ namespace wwtlib
                 Singleton.Setup(canvas, startLat, startLng, startZoom);
 
                 Constellations.InitializeConstellations();
+                LayerManager.OneTimeInitialization();
 
                 if (startMode == "earth") {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(

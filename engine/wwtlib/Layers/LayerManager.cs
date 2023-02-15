@@ -169,12 +169,15 @@ namespace wwtlib
             }
         }
 
-
-        //static List<Layer> layers = new List<Layer>();
-        static LayerManager()
+        // This function *can* be called multiple times safely, but it only
+        // needs to be called once upon app startup. The `InitLayers` function
+        // can be called more than once, if/when the `TourLayers` setting is
+        // toggled.
+        static public void OneTimeInitialization()
         {
-            GetMoonFile(URLHelpers.singleton.engineAssetUrl("moons.txt"));
-            //InitLayers();
+            if (webFileMoons == null) {
+                GetMoonFile(URLHelpers.singleton.engineAssetUrl("moons.txt"));
+            }
         }
 
         static string moonfile = "";
