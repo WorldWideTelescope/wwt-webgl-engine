@@ -29,13 +29,22 @@ Activating the freestanding mode causes the engine to be limited in the followin
   - Hipparcos star database
   - Minor planets database
   - Planet and moon textures
+- **Most tours will not work.** If a tour relies on assets provided by the core
+  WWT APIs, they will not have been loaded and will be missing. If you construct
+  a tour that does *not* rely on these assets, it will work as expected.
 - **No constellation artwork.** These images are pulled from a WWT web API.
 - **No ISS (International Space Station) coordinate frame or 3D model.** WWT’s
   support for showing the ISS depends on web APIs to provide its current orbital
   parameters and a 3D model, so this support must be disabled in freestanding
   mode.
-- **No automatic name-based thumbnail images for places.** These will use a
-  generic star thumbnail image instead.
+- **Tour URLs in WTML folders must be specified.** In the standard mode,
+  references to tours can be resolved to a URL that fetches their data based on
+  a UUID registered with the WWT webservice. This is not possible in
+  freestanding mode.
+- **No automatic ID-based thumbnail images for tours.** As above. These will use
+  a generic star thumbnail image instead.
+- **No automatic name-based thumbnail images for Places in WTML folders.** These
+  will use a generic star thumbnail image instead.
 - **No automatic Bing-based DEM data for Mercator projection imagesets.** Some
   Earth data have elevation data automatically attached. This feature will be
   deactivated.
