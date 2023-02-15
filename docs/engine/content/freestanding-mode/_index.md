@@ -18,7 +18,7 @@ Activating the freestanding mode causes the engine to be limited in the followin
 
 - **No default sky map.** WWT’s built-in DSS sky map will not be
   available. The sky view will only be able to show an empty, black sky unless
-  you import your own all-sky surveys.
+  you import your own all-sky survey(s).
 - **No built-in image sets.** Likewise, WWT’s built-in database of all-sky maps
   and “study” images will not be available. If you wish to show any surveys or
   studies, you must load them in yourself.
@@ -26,11 +26,14 @@ Activating the freestanding mode causes the engine to be limited in the followin
   this mode, but it will be virtually useless. Many aspects of this mode rely on
   WWT APIs.
 - **No constellation artwork.** These images are pulled from a WWT web API.
-- **No ISS (International Space Station) frame.** WWT’s support for showing the
-  location of the ISS depends on a web API to provide its current orbital
-  parameters, so this support must be disabled in freestanding mode.
+- **No ISS (International Space Station) coordinate frame.** WWT’s support for
+  showing the location of the ISS depends on a web API to provide its current
+  orbital parameters, so this support must be disabled in freestanding mode.
 - **No automatic name-based thumbnail images for places.** These will use a
   generic star thumbnail image instead.
+- **No automatic Bing-based DEM data for Mercator projection imagesets.** Some
+  Earth data have elevation data automatically attached. This feature will be
+  deactivated.
 
 
 ## Activating Freestanding Mode
