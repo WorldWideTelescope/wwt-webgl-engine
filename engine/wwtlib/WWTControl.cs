@@ -1833,6 +1833,8 @@ namespace wwtlib
                 Singleton.RenderContext.Height = canvas.Height;
                 Singleton.Setup(canvas, startLat, startLng, startZoom);
 
+                Constellations.InitializeConstellations();
+
                 if (startMode == "earth") {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                         "Blue Marble",  // name
