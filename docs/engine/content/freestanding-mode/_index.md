@@ -26,6 +26,8 @@ Activating the freestanding mode causes the engine to be limited in the followin
 - **No ISS (International Space Station) frame.** WWT’s support for showing the
   location of the ISS depends on a web API to provide its current orbital
   parameters, so this support must be disabled in freestanding mode.
+- **No automatic name-based thumbnail images for places.** These will use a
+  generic star thumbnail image instead.
 
 
 ## Activating Freestanding Mode
