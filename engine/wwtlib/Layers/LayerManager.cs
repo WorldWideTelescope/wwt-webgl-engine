@@ -178,6 +178,8 @@ namespace wwtlib
             if (webFileMoons == null) {
                 GetMoonFile(URLHelpers.singleton.engineAssetUrl("moons.txt"));
             }
+
+            PushPin.TriggerLoadSprite();
         }
 
         static string moonfile = "";
