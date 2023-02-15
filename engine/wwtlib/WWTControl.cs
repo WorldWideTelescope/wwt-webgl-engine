@@ -1995,11 +1995,17 @@ namespace wwtlib
                 fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
             }
 
-            Wtml.GetWtmlFile(
-                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
-                SetupComplete,
-                true
-            );
+            if (FreestandingMode) {
+                SetupComplete();
+            } else {
+                // To line up with Windows client history, this uses `X=` when
+                // `W=` would be more appropriate.
+                Wtml.GetWtmlFile(
+                    URLHelpers.singleton.coreDynamicUrl("wwtweb/catalog.aspx?X=ImageSets6"),
+                    SetupComplete,
+                    true
+                );
+            }
         }
 
         void SetupComplete()
