@@ -620,7 +620,7 @@ namespace wwtlib
                 Vector3d position = Coordinates.GeoTo3dDouble(dec, ra);
 
                 if(!IsPointInFrustum(position, WWTControl.Singleton.RenderContext.Frustum))
-                { 
+                {
                     continue;
                 }
                 first = true;
@@ -3154,7 +3154,15 @@ namespace wwtlib
     public class PushPin
     {
         static Dictionary<int, WebGLTexture> pinTextureCache = new Dictionary<int, WebGLTexture>();
-        static Texture Pins = Planets.LoadPlanetTexture(URLHelpers.singleton.engineAssetUrl("pins.png"));
+        static Texture Pins = null;
+
+        public static void TriggerLoadSprite()
+        {
+            if (Pins == null) {
+                Pins = Planets.LoadPlanetTexture(URLHelpers.singleton.engineAssetUrl("pins.png"));
+            }
+        }
+
         public static WebGLTexture GetPushPinTexture(int pinId)
         {
             WebGLTexture texture = null;

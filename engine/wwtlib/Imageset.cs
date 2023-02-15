@@ -162,7 +162,7 @@ namespace wwtlib
         {
             get
             {
-                if (String.IsNullOrEmpty(demUrl) && projection == ProjectionType.Mercator)
+                if (String.IsNullOrEmpty(demUrl) && projection == ProjectionType.Mercator && !WWTControl.Singleton.FreestandingMode)
                 {
                     return URLHelpers.singleton.coreStaticUrl("wwtweb/BingDemTile.aspx?Q={0},{1},{2}");
                 }

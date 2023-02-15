@@ -18,12 +18,14 @@ namespace wwtlib
             get { return name; }
             set { name = value; }
         }
+
         string url;
         public List<Lineset> lines;
         int pointCount = 0;
         bool boundry = false;
         bool noInterpollation = false;
         public bool ReadOnly = false;
+
         public static Constellations CreateBasic(string name)
         {
             Constellations temp = new Constellations();
@@ -36,7 +38,6 @@ namespace wwtlib
             }
             return temp;
         }
-
 
         public Constellations()
         {
@@ -84,111 +85,104 @@ namespace wwtlib
             }
             lines = new List<Lineset>();
 
-
-
-            Lineset lineSet = null; 
-
+            Lineset lineSet = null;
 
             try
             {
                 string[] rows = data.Split("\r\n");
+                string abrv;
+                string abrvOld = "";
+                double ra;
+                double dec;
+                double lastRa = 0;
+                PointType type = PointType.Move;
 
+                foreach(string row in rows)
+                {
+                    string line = row;
 
-                    string abrv;
-                    string abrvOld = "";
-                    double ra;
-                    double dec;
-                    double lastRa = 0;
-                    PointType type = PointType.Move;
-                    foreach(string row in rows)
+                    if (line.Substr(11, 2) == "- ")
                     {
-                        string line = row;
-
-                        if (line.Substr(11, 2) == "- ")
-                        {
-                            line = line.Substr(0, 11) + " -" + line.Substr(13, (line.Length - 13));
-                        }
-                        if (line.Substr(11, 2) == "+ ")
-                        {
-                            line = line.Substr(0, 11) + " +" + line.Substr(13, (line.Length - 13));
-                        }
-                        dec = double.Parse(line.Substr(11, 10));
-                        if (noInterpollation)
-                        {
-                            ra = double.Parse(line.Substr(0, 10));
-                        }
-                        else
-                        {
-                            ra = double.Parse(line.Substr(0, 10));
-                        }
-
-                        abrv = line.Substr(23, 4).Trim();
-                        if (!boundry)
-                        {
-                            if (line.Substr(28, 1).Trim() != "")
-                            {
-                                type = (PointType)int.Parse(line.Substr(28, 1));
-                            }
-                        }
-                        else
-                        {
-                            if (this.noInterpollation && line.Substr(28, 1) != "O")
-                            {
-                                continue;
-                            }
-                        }
-
-                        //				if (abrv != abrvOld || type == PointType.Move)
-                        if (abrv != abrvOld)
-                        {
-                            type = PointType.Start;
-                            lineSet = new Lineset(abrv);
-                            lines.Add(lineSet);
-                            if (boundry && !noInterpollation)
-                            {
-                                boundries[abrv] =  lineSet;
-                            }
-                            abrvOld = abrv;
-                            lastRa = 0;
-                        }
-
-
-                        if (this.noInterpollation)
-                        {
-                            if (Math.Abs(ra - lastRa) > 12)
-                            {
-                                ra = ra - (24 * ((ra - lastRa) < 0 ? -1 : 1));
-                            }
-                            lastRa = ra;
-                            //console.WriteLine(String.Format("{0}, ra:{1}",abrv,ra));
-                        }
-                        string starName = null;
-                        if (line.Length > 30)
-                        {
-                            starName = line.Substr(30).Trim();
-                        }
-
-                        if (starName == null || starName != "Empty")
-                        {
-                            lineSet.Add(ra, dec, type, starName);
-                        }
-                        pointCount++;
-                        type = PointType.Line;
-
+                        line = line.Substr(0, 11) + " -" + line.Substr(13, (line.Length - 13));
                     }
-                    
-                
+                    if (line.Substr(11, 2) == "+ ")
+                    {
+                        line = line.Substr(0, 11) + " +" + line.Substr(13, (line.Length - 13));
+                    }
+                    dec = double.Parse(line.Substr(11, 10));
+                    if (noInterpollation)
+                    {
+                        ra = double.Parse(line.Substr(0, 10));
+                    }
+                    else
+                    {
+                        ra = double.Parse(line.Substr(0, 10));
+                    }
+
+                    abrv = line.Substr(23, 4).Trim();
+                    if (!boundry)
+                    {
+                        if (line.Substr(28, 1).Trim() != "")
+                        {
+                            type = (PointType)int.Parse(line.Substr(28, 1));
+                        }
+                    }
+                    else
+                    {
+                        if (this.noInterpollation && line.Substr(28, 1) != "O")
+                        {
+                            continue;
+                        }
+                    }
+
+                    //				if (abrv != abrvOld || type == PointType.Move)
+                    if (abrv != abrvOld)
+                    {
+                        type = PointType.Start;
+                        lineSet = new Lineset(abrv);
+                        lines.Add(lineSet);
+                        if (boundry && !noInterpollation)
+                        {
+                            boundries[abrv] =  lineSet;
+                        }
+                        abrvOld = abrv;
+                        lastRa = 0;
+                    }
+
+
+                    if (this.noInterpollation)
+                    {
+                        if (Math.Abs(ra - lastRa) > 12)
+                        {
+                            ra = ra - (24 * ((ra - lastRa) < 0 ? -1 : 1));
+                        }
+                        lastRa = ra;
+                        //console.WriteLine(String.Format("{0}, ra:{1}",abrv,ra));
+                    }
+                    string starName = null;
+                    if (line.Length > 30)
+                    {
+                        starName = line.Substr(30).Trim();
+                    }
+
+                    if (starName == null || starName != "Empty")
+                    {
+                        lineSet.Add(ra, dec, type, starName);
+                    }
+                    pointCount++;
+                    type = PointType.Line;
+
+                }
             }
             catch
             {
             }
+
             WWTControl.RenderNeeded = true;
         }
 
-
         protected const double RC = 0.017453292519943;
         protected double radius = 1.0f;
-
 
         public void Draw(RenderContext renderContext, bool showOnlySelected, string focusConsteallation, bool clearExisting)
         {
@@ -202,7 +196,6 @@ namespace wwtlib
             }
 
             constToDraw = focusConsteallation;
-
 
             foreach (Lineset ls in this.lines)
             {
@@ -222,6 +215,7 @@ namespace wwtlib
 
             }
         }
+
         int drawCount = 0;
         static double maxSeperation = .745;
 
@@ -298,8 +292,8 @@ namespace wwtlib
         //protected Vector3d RaDecTo3d(double lat, double lng)
         //{
         //    return Vector3d.Create((Math.Cos(lng * RC) * Math.Cos(lat * RC) * radius), (Math.Sin(lat * RC) * radius), (Math.Sin(lng * RC) * Math.Cos(lat * RC) * radius));
-
         //}
+
         private void DrawSingleConstellationOld(RenderContext renderContext, Lineset ls)
         {
             bool reverse = false;
@@ -386,14 +380,7 @@ namespace wwtlib
             }
         }
 
-
-        public static Constellations Containment = Constellations.Create(
-            "Constellations",
-            URLHelpers.singleton.engineAssetUrl("constellations.txt"),
-            true,  // "boundry"
-            true,  // "noInterpollation"
-            true  // "resource"
-        );
+        public static Constellations Containment = null; // initialized in InitializeConstellations
 
         static string constToDraw = "";
 
@@ -448,11 +435,12 @@ namespace wwtlib
         }
 
         static Text3dBatch NamesBatch;
+
         public static void DrawConstellationNames(RenderContext renderContext, float opacity, Color drawColor)
         {
             if (NamesBatch == null)
             {
-            
+
                 InitializeConstellationNames();
                 if (NamesBatch == null)
                 {
@@ -469,14 +457,12 @@ namespace wwtlib
                 return;
             }
 
-
             NamesBatch = new Text3dBatch(Settings.Active.ConstellationLabelsHeight);
-
 
             foreach (string key in ConstellationCentroids.Keys)
             {
                 IPlace centroid = ConstellationCentroids[key];
-            
+
                 Vector3d center = Coordinates.RADecTo3dAu(centroid.RA, centroid.Dec, 1);
                 Vector3d up = Vector3d.Create(0, 1, 0);
                 string name = centroid.Name;
@@ -489,10 +475,12 @@ namespace wwtlib
             }
         }
 
-
-
         static Folder artFile = null;
         public static List<Place> Artwork = null;
+
+        // The WWTControl driver will not (and should not) call this function in
+        // "freestanding mode", because the functionality depends on a
+        // worldwidetelescope.org API.
         public static void DrawArtwork(RenderContext renderContext)
         {
             if (Artwork == null)
@@ -505,8 +493,8 @@ namespace wwtlib
 
                 return;
             }
-            maxSeperation = Math.Max(.50, Math.Cos((renderContext.FovAngle * 2) / 180.0 * Math.PI));
 
+            maxSeperation = Math.Max(.50, Math.Cos((renderContext.FovAngle * 2) / 180.0 * Math.PI));
 
             foreach (Place place in Artwork)
             {
@@ -531,15 +519,15 @@ namespace wwtlib
                 }
             }
         }
+
         static void OnArtReady()
         {
             artFile.ChildLoadCallback(LoadArtList);
-
         }
+
         static void LoadArtList()
         {
             Artwork = artFile.Places;
-
         }
 
         public static Dictionary<string, Lineset> boundries = null;
@@ -548,13 +536,23 @@ namespace wwtlib
         public static Dictionary<string, Place> ConstellationCentroids;
         public static Dictionary<string, BlendState> PictureBlendStates = new Dictionary<string, BlendState>();
 
-
-        static Constellations()
+        // Repeated invocations of this function are OK.
+        public static void InitializeConstellations()
         {
-            string url = URLHelpers.singleton.engineAssetUrl("ConstellationNamePositions_EN.txt");
-            webFileConstNames = new WebFile(url);
-            webFileConstNames.OnStateChange = LoadNames;
-            webFileConstNames.Send();
+            if (Containment == null) {
+                string url = URLHelpers.singleton.engineAssetUrl("ConstellationNamePositions_EN.txt");
+                webFileConstNames = new WebFile(url);
+                webFileConstNames.OnStateChange = LoadNames;
+                webFileConstNames.Send();
+
+                Containment = Constellations.Create(
+                    "Constellations",
+                    URLHelpers.singleton.engineAssetUrl("constellations.txt"),
+                    true,  // "boundry"
+                    true,  // "noInterpollation"
+                    true  // "resource"
+                );
+            }
         }
 
         static void LoadNames()
@@ -576,7 +574,7 @@ namespace wwtlib
             Abbreviations = new Dictionary<string, string>();
             BitIDs = new Dictionary<string, int>();
             string[] rows = file.Split("\r\n");
-            int id = 0;        
+            int id = 0;
             string line;
             foreach (string row in rows)
             {

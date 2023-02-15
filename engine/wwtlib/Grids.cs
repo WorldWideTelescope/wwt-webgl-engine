@@ -35,7 +35,7 @@ namespace wwtlib
             double lngMin = -64;
             double lngMax = 64;
 
-            //// Create a vertex buffer 
+            //// Create a vertex buffer
             galaxyImageVertexBuffer = new PositionTextureVertexBuffer((subdivs + 1) * (subdivs + 1));
             PositionTexture[] verts = (PositionTexture[])galaxyImageVertexBuffer.Lock();
 
@@ -181,7 +181,7 @@ namespace wwtlib
 
         public static void InitStarVertexBuffer(RenderContext renderContext)
         {
-            if (!starsDownloading)
+            if (!starsDownloading && !WWTControl.Singleton.FreestandingMode)
             {
                 GetStarFile(URLHelpers.singleton.coreStaticUrl("wwtweb/catalog.aspx?Q=hipparcos"));
                 starsDownloading = true;
@@ -445,7 +445,7 @@ namespace wwtlib
 
         internal static bool DownloadCosmosFile()
         {
-            if (!downloadingGalaxy)
+            if (!downloadingGalaxy && !WWTControl.Singleton.FreestandingMode)
             {
                 GetGalaxyFile(URLHelpers.singleton.coreStaticUrl("wwtweb/catalog.aspx?Q=cosmosnewbin"));
                 downloadingGalaxy = true;

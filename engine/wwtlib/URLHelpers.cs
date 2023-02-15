@@ -146,6 +146,10 @@ namespace wwtlib
             this.flagship_static_lcpaths["/wwtweb/wmstoast.aspx"] = true;
         }
 
+        public void overrideAssetBaseurl(String baseurl) {
+            this.engine_asset_baseurl = baseurl;
+        }
+
         public String rewrite(String url, URLRewriteMode rwmode) {
             // Sadly, we can't take advantage of JS/browser URL parsing
             // because this function might be passed template URLs like
@@ -194,6 +198,14 @@ namespace wwtlib
                         url = (String) Script.Literal("(new URL({0}, window.location.href)).toString()", url);
                         return this.rewrite(url, URLRewriteMode.AsIfAbsolute);
                 }
+            }
+
+            // If we're freestanding, we can't use the proxy and we don't want
+            // to forcibly rewrite URLs to potentially point at any core WWT
+            // domains, so there is nothing more to do (now that we've potentially
+            // handled origin-relative URLs).
+            if (WWTControl.Singleton.FreestandingMode) {
+                return url;
             }
 
             string domain;
@@ -293,6 +305,11 @@ namespace wwtlib
         // The exception is for flagship website URLs, which we know that the proxy
         // won't help with. For those, null is returned.
         public string activateProxy(string url) {
+            // If we're freestanding, we never proxy.
+            if (WWTControl.Singleton.FreestandingMode) {
+                return null;
+            }
+
             // Get the domain. XXX copy/pastey from the above.
 
             string lc = url.ToLowerCase();
