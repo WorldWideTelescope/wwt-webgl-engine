@@ -86,7 +86,7 @@ namespace wwtlib
 
 
 
-            Lineset lineSet = null; 
+            Lineset lineSet = null;
 
 
             try
@@ -176,8 +176,8 @@ namespace wwtlib
                         type = PointType.Line;
 
                     }
-                    
-                
+
+
             }
             catch
             {
@@ -452,7 +452,7 @@ namespace wwtlib
         {
             if (NamesBatch == null)
             {
-            
+
                 InitializeConstellationNames();
                 if (NamesBatch == null)
                 {
@@ -476,7 +476,7 @@ namespace wwtlib
             foreach (string key in ConstellationCentroids.Keys)
             {
                 IPlace centroid = ConstellationCentroids[key];
-            
+
                 Vector3d center = Coordinates.RADecTo3dAu(centroid.RA, centroid.Dec, 1);
                 Vector3d up = Vector3d.Create(0, 1, 0);
                 string name = centroid.Name;
@@ -493,6 +493,10 @@ namespace wwtlib
 
         static Folder artFile = null;
         public static List<Place> Artwork = null;
+
+        // The WWTControl driver will not (and should not) call this function in
+        // "freestanding mode", because the functionality depends on a
+        // worldwidetelescope.org API.
         public static void DrawArtwork(RenderContext renderContext)
         {
             if (Artwork == null)
@@ -505,8 +509,8 @@ namespace wwtlib
 
                 return;
             }
-            maxSeperation = Math.Max(.50, Math.Cos((renderContext.FovAngle * 2) / 180.0 * Math.PI));
 
+            maxSeperation = Math.Max(.50, Math.Cos((renderContext.FovAngle * 2) / 180.0 * Math.PI));
 
             foreach (Place place in Artwork)
             {
@@ -531,15 +535,16 @@ namespace wwtlib
                 }
             }
         }
+
         static void OnArtReady()
         {
             artFile.ChildLoadCallback(LoadArtList);
 
         }
+
         static void LoadArtList()
         {
             Artwork = artFile.Places;
-
         }
 
         public static Dictionary<string, Lineset> boundries = null;
@@ -576,7 +581,7 @@ namespace wwtlib
             Abbreviations = new Dictionary<string, string>();
             BitIDs = new Dictionary<string, int>();
             string[] rows = file.Split("\r\n");
-            int id = 0;        
+            int id = 0;
             string line;
             foreach (string row in rows)
             {

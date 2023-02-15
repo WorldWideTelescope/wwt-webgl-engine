@@ -22,6 +22,7 @@ Activating the freestanding mode causes the engine to be limited in the followin
 - **No built-in image sets.** Likewise, WWT’s built-in database of all-sky maps
   and “study” images will not be available. If you wish to show any surveys or
   studies, you must load them in yourself.
+- **No constellation artwork.** These images are pulled from a WWT web API.
 - **No ISS (International Space Station) frame.** WWT’s support for showing the
   location of the ISS depends on a web API to provide its current orbital
   parameters, so this support must be disabled in freestanding mode.

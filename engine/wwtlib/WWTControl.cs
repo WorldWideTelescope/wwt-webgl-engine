@@ -891,7 +891,7 @@ namespace wwtlib
 
         private void DrawSkyOverlays()
         {
-            if (Settings.Active.ShowConstellationPictures)
+            if (Settings.Active.ShowConstellationPictures && !FreestandingMode)
             {
                 Constellations.DrawArtwork(RenderContext);
             }
