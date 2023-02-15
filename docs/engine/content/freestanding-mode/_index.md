@@ -14,7 +14,8 @@ adopters who are unwilling or unable to depend on external services.
 
 ## Limitations of Freestanding Mode
 
-Activating the freestanding mode causes the engine to be limited in the following ways:
+Activating the freestanding mode causes the engine to be limited in the
+following ways:
 
 - **No default sky map.** WWT’s built-in DSS sky map will not be
   available. The sky view will only be able to show an empty, black sky unless
@@ -32,6 +33,11 @@ Activating the freestanding mode causes the engine to be limited in the followin
 - **Most tours will not work.** If a tour relies on assets provided by the core
   WWT APIs, they will not have been loaded and will be missing. If you construct
   a tour that does *not* rely on these assets, it will work as expected.
+- **No automatic proxying.** When fetching web resources, if the WWT engine runs
+  into a problem that seems to be due to HTTP/HTTPS mismatches or CORS
+  restrictions, it will reroute the relevant requests through a proxy service on
+  `worldwidetelescope.org` that works around the issue(s). In freestanding mode,
+  this behavior is disabled.
 - **No constellation artwork.** These images are pulled from a WWT web API.
 - **No ISS (International Space Station) coordinate frame or 3D model.** WWT’s
   support for showing the ISS depends on web APIs to provide its current orbital

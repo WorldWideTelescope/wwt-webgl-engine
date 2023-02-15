@@ -200,6 +200,14 @@ namespace wwtlib
                 }
             }
 
+            // If we're freestanding, we can't use the proxy and we don't want
+            // to forcibly rewrite URLs to potentially point at any core WWT
+            // domains, so there is nothing more to do (now that we've potentially
+            // handled origin-relative URLs).
+            if (WWTControl.Singleton.FreestandingMode) {
+                return url;
+            }
+
             string domain;
             string rest; // potentially "/foo/CASE/bar?q=1&b=1#fragment"
             int slash_index = url_no_protocol.IndexOf('/');
@@ -297,6 +305,11 @@ namespace wwtlib
         // The exception is for flagship website URLs, which we know that the proxy
         // won't help with. For those, null is returned.
         public string activateProxy(string url) {
+            // If we're freestanding, we never proxy.
+            if (WWTControl.Singleton.FreestandingMode) {
+                return null;
+            }
+
             // Get the domain. XXX copy/pastey from the above.
 
             string lc = url.ToLowerCase();
