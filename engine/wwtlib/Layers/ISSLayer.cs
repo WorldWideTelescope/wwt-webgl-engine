@@ -8,6 +8,7 @@ using System.Html.Data.Files;
 namespace wwtlib
 {
     delegate void BackInitDelegate();
+
     public class ISSLayer : Object3dLayer
     {
         public ISSLayer()
@@ -15,7 +16,7 @@ namespace wwtlib
             ID = ISSGuid;
         }
 
-        public static Guid ISSGuid =  Guid.FromString("00000001-0002-0003-0405-060708090a0b");
+        public static Guid ISSGuid = Guid.FromString("00000001-0002-0003-0405-060708090a0b");
 
         public override bool Draw(RenderContext renderContext, float opacity, bool flat)
         {
@@ -53,7 +54,6 @@ namespace wwtlib
             object3d = issmodel;
             return base.Draw(renderContext, opacity, flat);
         }
-
 
         //todo need to synce the ISS settings to settings.active thru keeping copy of last setting & enabled state and setting the other to match when changed.
         //public override bool Enabled
@@ -94,7 +94,10 @@ namespace wwtlib
 
         public static void LoadBackground()
         {
-            if (loading)
+            // The ISS frame cannot be created in freestanding mode, so I'm not
+            // sure if this function will even get called, but just in case, we
+            // make sure to noop if we're in freestanding mode.
+            if (loading || WWTControl.Singleton.FreestandingMode)
             {
                 return;
             }

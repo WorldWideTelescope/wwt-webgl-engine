@@ -26,9 +26,10 @@ Activating the freestanding mode causes the engine to be limited in the followin
   this mode, but it will be virtually useless. Many aspects of this mode rely on
   WWT APIs.
 - **No constellation artwork.** These images are pulled from a WWT web API.
-- **No ISS (International Space Station) coordinate frame.** WWT’s support for
-  showing the location of the ISS depends on a web API to provide its current
-  orbital parameters, so this support must be disabled in freestanding mode.
+- **No ISS (International Space Station) coordinate frame or 3D model.** WWT’s
+  support for showing the ISS depends on web APIs to provide its current orbital
+  parameters and a 3D model, so this support must be disabled in freestanding
+  mode.
 - **No automatic name-based thumbnail images for places.** These will use a
   generic star thumbnail image instead.
 - **No automatic Bing-based DEM data for Mercator projection imagesets.** Some
