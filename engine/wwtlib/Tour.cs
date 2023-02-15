@@ -127,7 +127,9 @@ namespace wwtlib
                 thumbnail = value;
             }
         }
+
         string thumbnailUrlField = "";
+
         public string ThumbnailUrl
         {
             get
@@ -136,7 +138,10 @@ namespace wwtlib
                 {
                     return thumbnailUrlField;
                 }
-                else
+                else if (WWTControl.Singleton.FreestandingMode)
+                {
+                    return URLHelpers.singleton.engineAssetUrl("thumb_star.jpg");
+                }
                 {
                     return String.Format(URLHelpers.singleton.coreStaticUrl("wwtweb/GetTourThumbnail.aspx?GUID={0}"), Id);
                 }
@@ -147,12 +152,14 @@ namespace wwtlib
                 thumbnailUrlField = value.ToString();
             }
         }
+
         string tourUrl;
+
         public string TourUrl
         {
             get
             {
-                if (string.IsNullOrEmpty(tourUrl))
+                if (string.IsNullOrEmpty(tourUrl) && !WWTControl.Singleton.FreestandingMode)
                 {
                     return string.Format(URLHelpers.singleton.coreStaticUrl("wwtweb/GetTour.aspx?GUID={0}"), this.Id);
                 }

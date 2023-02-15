@@ -28,6 +28,13 @@ namespace wwtlib
             SpaceTimeController.UpdateClock();
         }
 
+        // In "freestanding" mode, no worldwidetelescope.org resources are
+        // relied upon. The default screen is black sky, and the 3D solar system
+        // mode is unavailable because it relies on so many built-in assets. If
+        // you want to see anything, you need to load it in yourself.
+
+        public bool FreestandingMode = false;
+
         // Note: ImageSets must remain public because there is JS code in the
         // wild that accesses `WWTControl.imageSets`.
         public static List<Imageset> ImageSets = new List<Imageset>();
@@ -884,7 +891,7 @@ namespace wwtlib
 
         private void DrawSkyOverlays()
         {
-            if (Settings.Active.ShowConstellationPictures)
+            if (Settings.Active.ShowConstellationPictures && !FreestandingMode)
             {
                 Constellations.DrawArtwork(RenderContext);
             }
@@ -1692,37 +1699,35 @@ namespace wwtlib
 
         public Vector2d GetCoordinatesForScreenPoint(double x, double y)
         {
-            Vector2d result;
-            Vector3d PickRayDir;
             Vector2d pt = Vector2d.Create(x, y);
-            PickRayDir = TransformPickPointToWorldSpace(pt, RenderContext.Width, RenderContext.Height);
-            result = Coordinates.CartesianToSphericalSky(PickRayDir);
-
-            return result;
+            Vector3d PickRayDir = TransformPickPointToWorldSpace(pt, RenderContext.Width, RenderContext.Height);
+            return Coordinates.CartesianToSphericalSky(PickRayDir);
         }
 
         public Vector3d TransformPickPointToWorldSpace(Vector2d ptCursor, double backBufferWidth, double backBufferHeight)
         {
-            Vector3d vPickRayOrig;
-            Vector3d vPickRayDir;
+            Vector3d vPickRayDir = new Vector3d();
 
-            Vector3d v = new Vector3d();
-            v.X = (((2.0f * ptCursor.X) / backBufferWidth) - 1) / (RenderContext.Projection.M11);// / (backBufferWidth / 2));
-            v.Y = (((2.0f * ptCursor.Y) / backBufferHeight) - 1) / (RenderContext.Projection.M22);// / (backBufferHeight / 2));
-            v.Z = 1.0f;
+            // It is possible for this function to be called before the RenderContext is
+            // set up, in which case the Projection is null. In that case we'll leave the
+            // vector at its 0,0,0 default.
 
-            Matrix3d m = Matrix3d.MultiplyMatrix(RenderContext.View, RenderContext.World);
+            if (RenderContext.Projection != null) {
+                Vector3d v = new Vector3d();
+                v.X = (((2.0f * ptCursor.X) / backBufferWidth) - 1) / (RenderContext.Projection.M11);// / (backBufferWidth / 2));
+                v.Y = (((2.0f * ptCursor.Y) / backBufferHeight) - 1) / (RenderContext.Projection.M22);// / (backBufferHeight / 2));
+                v.Z = 1.0f;
 
-            m.Invert();
+                Matrix3d m = Matrix3d.MultiplyMatrix(RenderContext.View, RenderContext.World);
 
-            vPickRayDir = new Vector3d();
-            vPickRayOrig = new Vector3d();
-            // Transform the screen space pick ray into 3D space
-            vPickRayDir.X = v.X * m.M11 + v.Y * m.M21 + v.Z * m.M31;
-            vPickRayDir.Y = v.X * m.M12 + v.Y * m.M22 + v.Z * m.M32;
-            vPickRayDir.Z = v.X * m.M13 + v.Y * m.M23 + v.Z * m.M33;
+                m.Invert();
 
-            vPickRayDir.Normalize();
+                // Transform the screen space pick ray into 3D space
+                vPickRayDir.X = v.X * m.M11 + v.Y * m.M21 + v.Z * m.M31;
+                vPickRayDir.Y = v.X * m.M12 + v.Y * m.M22 + v.Z * m.M32;
+                vPickRayDir.Z = v.X * m.M13 + v.Y * m.M23 + v.Z * m.M33;
+                vPickRayDir.Normalize();
+            }
 
             return vPickRayDir;
         }
@@ -1770,6 +1775,7 @@ namespace wwtlib
             return InitControl2(DivId, true);
         }
 
+        // Prefer using WWTControlBuilder rather than this interface directly.
         public static ScriptInterface InitControl2(string DivId, bool startRenderLoop)
         {
             return InitControl6(
@@ -1782,6 +1788,7 @@ namespace wwtlib
             );
         }
 
+        // Prefer using WWTControlBuilder rather than this interface directly.
         public static ScriptInterface InitControl6(
             string DivId,
             bool startRenderLoop,
@@ -1826,6 +1833,9 @@ namespace wwtlib
                 Singleton.RenderContext.Height = canvas.Height;
                 Singleton.Setup(canvas, startLat, startLng, startZoom);
 
+                Constellations.InitializeConstellations();
+                LayerManager.OneTimeInitialization();
+
                 if (startMode == "earth") {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
                         "Blue Marble",  // name
@@ -1857,6 +1867,39 @@ namespace wwtlib
                         "",  // altUrl
                         6371000,  // meanRadius
                         "Earth"  // referenceFrame
+                    );
+                } else if (startMode == "black") {
+                    // Black sky init -- probably because we are in freestanding mode
+                    Singleton.RenderContext.BackgroundImageset = Imageset.Create(
+                        "Black Sky Background",  // name
+                        "",  // url
+                        ImageSetType.Sky,  // dataSetType
+                        BandPass.Visible,  // bandPass
+                        ProjectionType.Toast,  // projectionType
+                        102,  // imageSetID
+                        0,  // baseLevel
+                        0,  // levels
+                        256,  // tileSize (unused)
+                        180,  // baseTileDegrees
+                        ".png",  // extension
+                        false,  // bottomsUp
+                        "0123",  // quadTreeMap
+                        0,  // centerX
+                        0,  // centerY
+                        0,  // rotation
+                        false,  // sparse
+                        "",  // thumbnailUrl
+                        false,  // defaultSet
+                        false,  // elevationModel
+                        2,  // widthFactor
+                        0,  // offsetX
+                        0,  // offsetY
+                        "",  // creditsText
+                        "",  // creditsUrl
+                        "",  // demUrl
+                        "",  // altUrl
+                        1,  // meanRadius
+                        "Sky"  // referenceFrame
                     );
                 } else {
                     Singleton.RenderContext.BackgroundImageset = Imageset.Create(
@@ -1953,11 +1996,17 @@ namespace wwtlib
                 fgDevice = (CanvasContext2D)foregroundCanvas.GetContext(Rendering.Render2D);
             }
 
-            Wtml.GetWtmlFile(
-                URLHelpers.singleton.engineAssetUrl("builtin-image-sets.wtml"),
-                SetupComplete,
-                true
-            );
+            if (FreestandingMode) {
+                Script.SetTimeout(delegate () { SetupComplete(); }, 0);
+            } else {
+                // To line up with Windows client history, this uses `X=` when
+                // `W=` would be more appropriate.
+                Wtml.GetWtmlFile(
+                    URLHelpers.singleton.coreDynamicUrl("wwtweb/catalog.aspx?X=ImageSets6"),
+                    SetupComplete,
+                    true
+                );
+            }
         }
 
         void SetupComplete()
@@ -2395,7 +2444,7 @@ namespace wwtlib
             {
                 return 0;
             }
-            
+
             return SlewTimeBetweenTargets(WWTControl.Singleton.RenderContext.ViewCamera, cameraParams);
         }
 
@@ -2846,13 +2895,75 @@ namespace wwtlib
         }
 
     }
-    public delegate void BlobReady(System.Html.Data.Files.Blob blob);
 
+    public class WWTControlBuilder
+    {
+        string divId = null;
+
+        public WWTControlBuilder(string divId) {
+            this.divId = divId;
+        }
+
+        bool startRenderLoop = false;
+
+        public void StartRenderLoop(bool value) {
+            startRenderLoop = value;
+        }
+
+        double startLat = 0.0;
+        double startLng = 0.0;
+        double startZoom = 360.0;
+
+        public void InitialView(double lat, double lng, double zoom) {
+            startLat = lat;
+            startLng = lng;
+            startZoom = zoom;
+        }
+
+        string freestandingAssetBaseurl = "";
+
+        public void FreestandingMode(string asset_baseurl) {
+            freestandingAssetBaseurl = asset_baseurl;
+        }
+
+        string startMode = "";
+
+        public void InitialMode(string value) {
+            startMode = value;
+        }
+
+        public ScriptInterface Create()
+        {
+            bool freestandingMode = freestandingAssetBaseurl != "";
+            string trueStartMode;
+
+            if (startMode != "") {
+                trueStartMode = startMode;
+            } else if (freestandingMode) {
+                trueStartMode = "black";
+            } else {
+                trueStartMode = "sky";
+            }
+
+            WWTControl.Singleton.FreestandingMode = freestandingMode;
+
+            if (freestandingMode) {
+                URLHelpers.singleton.overrideAssetBaseurl(freestandingAssetBaseurl);
+            }
+
+            return WWTControl.InitControl6(
+                divId, startRenderLoop, startLat, startLng, startZoom, trueStartMode
+            );
+        }
+    }
+
+    public delegate void BlobReady(System.Html.Data.Files.Blob blob);
 
     public class WWTElementEvent
     {
         public double OffsetX;
         public double OffsetY;
+
         public WWTElementEvent(double x, double y)
         {
             OffsetX = x;

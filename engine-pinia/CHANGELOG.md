@@ -1,3 +1,9 @@
+# @wwtelescope/engine-pinia 0.3.0 (2023-02-15)
+
+- Expose the "freestanding mode" that was added to the engine (#230, @pkgw). It
+  can be activated by setting a Vue "prop" on the WWT Vue component.
+
+
 # @wwtelescope/engine-pinia 0.2.0 (2023-01-19)
 
 - Expose new engine APIs for getting the amount of time that basic "goto"

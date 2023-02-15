@@ -1,3 +1,8 @@
+# @wwtelescope/engine-helpers 0.11.0 (2023-02-15)
+
+- Expose the "freestanding mode" that was added to the engine (#230, @pkgw).
+
+
 # @wwtelescope/engine-helpers 0.10.0 (2023-02-13)
 
 - Expose some new engine settings that make make it possible to customize the

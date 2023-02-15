@@ -226,23 +226,27 @@ namespace wwtlib
                     {
                         return studyImageset.ThumbnailUrl;
                     }
+
                     if (backgroundImageSet != null && !string.IsNullOrEmpty(backgroundImageSet.ThumbnailUrl))
                     {
                         return backgroundImageSet.ThumbnailUrl;
-                    }       
+                    }
+
                     string name = this.Name;
 
                     if (name.IndexOf(";") > -1)
                     {
                         name = name.Substring(0, name.IndexOf(";"));
                     }
-                    if (Classification == Classification.Star)
+
+                    if (Classification == Classification.Star || WWTControl.Singleton.FreestandingMode)
                     {
-                        return URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=star");
+                        return URLHelpers.singleton.engineAssetUrl("thumb_star.jpg");
                     }
 
                     return URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=" + name.ToLowerCase());
                 }
+
                 return this.thumbnailField;
             }
             set
