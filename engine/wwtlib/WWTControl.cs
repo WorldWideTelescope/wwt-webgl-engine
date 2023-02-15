@@ -1699,37 +1699,35 @@ namespace wwtlib
 
         public Vector2d GetCoordinatesForScreenPoint(double x, double y)
         {
-            Vector2d result;
-            Vector3d PickRayDir;
             Vector2d pt = Vector2d.Create(x, y);
-            PickRayDir = TransformPickPointToWorldSpace(pt, RenderContext.Width, RenderContext.Height);
-            result = Coordinates.CartesianToSphericalSky(PickRayDir);
-
-            return result;
+            Vector3d PickRayDir = TransformPickPointToWorldSpace(pt, RenderContext.Width, RenderContext.Height);
+            return Coordinates.CartesianToSphericalSky(PickRayDir);
         }
 
         public Vector3d TransformPickPointToWorldSpace(Vector2d ptCursor, double backBufferWidth, double backBufferHeight)
         {
-            Vector3d vPickRayOrig;
-            Vector3d vPickRayDir;
+            Vector3d vPickRayDir = new Vector3d();
 
-            Vector3d v = new Vector3d();
-            v.X = (((2.0f * ptCursor.X) / backBufferWidth) - 1) / (RenderContext.Projection.M11);// / (backBufferWidth / 2));
-            v.Y = (((2.0f * ptCursor.Y) / backBufferHeight) - 1) / (RenderContext.Projection.M22);// / (backBufferHeight / 2));
-            v.Z = 1.0f;
+            // It is possible for this function to be called before the RenderContext is
+            // set up, in which case the Projection is null. In that case we'll leave the
+            // vector at its 0,0,0 default.
 
-            Matrix3d m = Matrix3d.MultiplyMatrix(RenderContext.View, RenderContext.World);
+            if (RenderContext.Projection != null) {
+                Vector3d v = new Vector3d();
+                v.X = (((2.0f * ptCursor.X) / backBufferWidth) - 1) / (RenderContext.Projection.M11);// / (backBufferWidth / 2));
+                v.Y = (((2.0f * ptCursor.Y) / backBufferHeight) - 1) / (RenderContext.Projection.M22);// / (backBufferHeight / 2));
+                v.Z = 1.0f;
 
-            m.Invert();
+                Matrix3d m = Matrix3d.MultiplyMatrix(RenderContext.View, RenderContext.World);
 
-            vPickRayDir = new Vector3d();
-            vPickRayOrig = new Vector3d();
-            // Transform the screen space pick ray into 3D space
-            vPickRayDir.X = v.X * m.M11 + v.Y * m.M21 + v.Z * m.M31;
-            vPickRayDir.Y = v.X * m.M12 + v.Y * m.M22 + v.Z * m.M32;
-            vPickRayDir.Z = v.X * m.M13 + v.Y * m.M23 + v.Z * m.M33;
+                m.Invert();
 
-            vPickRayDir.Normalize();
+                // Transform the screen space pick ray into 3D space
+                vPickRayDir.X = v.X * m.M11 + v.Y * m.M21 + v.Z * m.M31;
+                vPickRayDir.Y = v.X * m.M12 + v.Y * m.M22 + v.Z * m.M32;
+                vPickRayDir.Z = v.X * m.M13 + v.Y * m.M23 + v.Z * m.M33;
+                vPickRayDir.Normalize();
+            }
 
             return vPickRayDir;
         }
@@ -1996,7 +1994,7 @@ namespace wwtlib
             }
 
             if (FreestandingMode) {
-                SetupComplete();
+                Script.SetTimeout(delegate () { SetupComplete(); }, 0);
             } else {
                 // To line up with Windows client history, this uses `X=` when
                 // `W=` would be more appropriate.
