@@ -24,7 +24,11 @@ Activating the freestanding mode causes the engine to be limited in the followin
   studies, you must load them in yourself.
 - **No 3D “solar system” mode.** The engine won't prevent you from activating
   this mode, but it will be virtually useless. Many aspects of this mode rely on
-  WWT APIs.
+  WWT APIs, including:
+  - COSMOS galaxies database
+  - Hipparcos star database
+  - Minor planets database
+  - Planet and moon textures
 - **No constellation artwork.** These images are pulled from a WWT web API.
 - **No ISS (International Space Station) coordinate frame or 3D model.** WWT’s
   support for showing the ISS depends on web APIs to provide its current orbital

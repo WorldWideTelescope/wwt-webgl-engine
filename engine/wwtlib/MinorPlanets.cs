@@ -11,7 +11,7 @@ namespace wwtlib
     class MinorPlanets
     {
         public static List<EOE> MPCList = new List<EOE>();
-      
+
         static WebFile webMpcFile;
 
         public static void GetMpcFile(string url)
@@ -65,7 +65,7 @@ namespace wwtlib
         static BlendState[] mpcBlendStates = new BlendState[7];
 
         public static Texture starTexture = null;
-        // ** Begin 
+        // ** Begin
         public static void DrawMPC3D(RenderContext renderContext, float opacity, Vector3d centerPoint)
         {
             double zoom = renderContext.ViewCamera.Zoom;
@@ -73,7 +73,7 @@ namespace wwtlib
 
             int alpha = Math.Min(255, Math.Max(0, (int)distAlpha));
 
-        
+
 
             if (alpha > 254)
             {
@@ -121,18 +121,18 @@ namespace wwtlib
                         KeplerPointSpriteShader.Use(renderContext, matrixWV, mpcVertexBuffer[i].VertexBuffer, starTexture.Texture2d, Colors.White,
                             opacity * mpcBlendStates[i].Opacity, false,
                             (float)(SpaceTimeController.JNow - KeplerVertex.baseDate), 0, renderContext.CameraPosition, 200f, .1f);
-                     
+
                         renderContext.gl.drawArrays(GL.POINTS, 0, mpcVertexBuffer[i].Count);
                     }
                 }
             }
-        }          
- 
+        }
 
-    
         private static void StartInit()
         {
-            GetMpcFile(URLHelpers.singleton.coreStaticUrl("wwtweb/catalog.aspx?Q=mpcbin"));
+            if (!WWTControl.Singleton.FreestandingMode) {
+                GetMpcFile(URLHelpers.singleton.coreStaticUrl("wwtweb/catalog.aspx?Q=mpcbin"));
+            }
         }
 
         public static void InitMPCVertexBuffer()
@@ -201,7 +201,7 @@ namespace wwtlib
             }
             finally
             {
-    
+
             }
         }
 
