@@ -1085,7 +1085,7 @@ namespace wwtlib
             {
                 string rewritten_url = URLHelpers.singleton.rewrite(dataset.DemUrl, URLRewriteMode.AsIfAbsolute);
 
-                if (dataset.Projection == ProjectionType.Mercator)
+                if (dataset.Projection == ProjectionType.Mercator && !WWTControl.Singleton.FreestandingMode)
                 {
                     string baseUrl = URLHelpers.singleton.coreStaticUrl("wwtweb/demtile.aspx?q={0},{1},{2},M");
                     if (!String.IsNullOrEmpty(rewritten_url))

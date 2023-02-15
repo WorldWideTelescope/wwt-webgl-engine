@@ -1,5 +1,10 @@
 # rc: minor bump
 
+- Expose the "freestanding mode" that was added to the engine (#230, @pkgw).
+
+
+# @wwtelescope/engine-helpers 0.10.0 (2023-02-13)
+
 - Expose some new engine settings that make make it possible to customize the
   colors used for various coordinate grid overlays and the heigh of the
   constellation names (#226, @Carifio24).

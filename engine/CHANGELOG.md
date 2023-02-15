@@ -1,5 +1,16 @@
 # rc: minor bump
 
+- Add a "freestanding mode", for WWT adopters who are unable or unwilling to
+  rely on WWT's centralized webservices (#230, @pkgw). This forces the
+  deactivation of a lot of engine functionality, but what's left is still very
+  capable.
+- Add a new class `WWTControlBuilder` that allows for more future-proof
+  configuration of the WWT engine initialization (#230, @pkgw).
+- Avoid a potential exception in screen coordinate computation (#230, @pkgw).
+
+
+# @wwtelescope/engine 7.19.0 (2023-02-13)
+
 - Make it possible to customize the colors used for various coordinate
   grid overlays and the heigh of the constellation names (#226, @Carifio24).
   These are exposed as new engine settings.

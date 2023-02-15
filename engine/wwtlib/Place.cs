@@ -241,23 +241,27 @@ namespace wwtlib
                     {
                         return studyImageset.ThumbnailUrl;
                     }
+
                     if (backgroundImageSet != null && !string.IsNullOrEmpty(backgroundImageSet.ThumbnailUrl))
                     {
                         return backgroundImageSet.ThumbnailUrl;
-                    }       
+                    }
+
                     string name = this.Name;
 
                     if (name.IndexOf(";") > -1)
                     {
                         name = name.Substr(0, name.IndexOf(";"));
                     }
-                    if (Classification == Classification.Star)
+
+                    if (Classification == Classification.Star || WWTControl.Singleton.FreestandingMode)
                     {
-                        return URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=star");
+                        return URLHelpers.singleton.engineAssetUrl("thumb_star.jpg");
                     }
 
                     return URLHelpers.singleton.coreStaticUrl("wwtweb/thumbnail.aspx?name=" + name.ToLowerCase());
                 }
+
                 return this.thumbnailField;
             }
             set
@@ -453,7 +457,7 @@ namespace wwtlib
             {
                 xmlWriter.WriteStartElement("BackgroundImageSet");
                 Imageset.SaveToXml(xmlWriter, backgroundImageSet, "");
-                
+
                 xmlWriter.WriteEndElement();
             }
 
@@ -498,11 +502,11 @@ namespace wwtlib
             {
                 newPlace.constellation = place.Attributes.GetNamedItem("Constellation").Value;
             }
-        
+
             if (place.Attributes.GetNamedItem("Classification") != null)
             {
                 newPlace.classification = (Classification)Enums.Parse("Classification", place.Attributes.GetNamedItem("Classification").Value);
-          
+
             }
 
             if (place.Attributes.GetNamedItem("Magnitude") != null)
