@@ -52,4 +52,83 @@ Activating the freestanding mode causes the engine to be limited in the followin
 
 ## Activating Freestanding Mode
 
-TKTK.
+If you are using WWT in [the Vue/Pinia component model](../getting-started/vue-component-model.md),
+activate freestanding mode by specifying the [Vue prop] `wwt-freestanding-asset-baseurl`:
+
+```xml
+<template>
+  <div>
+    <WorldWideTelescope
+      id="wwt"
+      wwt-freestanding-asset-baseurl="https://myassets.org/wwtengine"
+    ></WorldWideTelescope>
+    <div id="my-ui-controls">...</div>
+  </div>
+</template>
+```
+
+[Vue prop]: https://vuejs.org/guide/components/props.html
+
+This value is a base URL that will be used to look up simple, static data assets
+used by the engine. The default value used in the production version of WWT is
+`https://web.wwtassets.org/engine/assets`, and you can use that value here if
+you don’t mind depending on `wwtassets.org`.
+
+If you're using the [bundled TypeScript
+model](../getting-started/bundled-typescript-model.md), you can activate the
+mode with an analogous parameter,
+{{helpersapi(p="interfaces/InitControlSettings.html#freestandingAssetBaseurl",t="InitControlSettings#freestandingAssetBaseurl")}},
+when calling {{helpersapi(p="classes/WWTInstance.html#constructor",t="the WWTInstance constructor")}}
+provided in the {{helpersapi(p="index.html",t="@wwtelescope/engine-helpers")}} package.
+
+Finally, at the lowest levels of abstraction, such as what you would have in the
+[hosted JavaScript model](../getting-started/hosted-javascript-model.md), you
+can call the {{engineapi(p="classes/WWTControlBuilder.html#freestandingMode",
+t="freestandingMode() method")}} on the
+{{engineapi(p="classes/WWTControlBuilder.html", t="WWTControlBuilder class")}}
+exported in the {{engineapi(p="index.html",t="@wwtelescope/engine")}} package.
+Once again, this API takes the same asset baseurl parameter as seen above.
+
+
+## Engine Assets
+
+Currently, the engine assets are not indexed elsewhere. To serve up your own assets,
+download the following files from the default baseurl given above:
+
+- `callisto.png`
+- `circle.png`
+- `ConstellationNamePositions_EN.txt`
+- `constellations.txt`
+- `earth.png`
+- `europa.png`
+- `figures.txt`
+- `ganymede.png`
+- `glyphs1.png`
+- `glyphs1.xml`
+- `io.png`
+- `jupiter.png`
+- `mars.png`
+- `mercury.png`
+- `moon.png`
+- `moons.txt`
+- `moonshadow.png`
+- `neptune.png`
+- `pins.png`
+- `pluto.png`
+- `saturn.png`
+- `StarProfileAlpha.png`
+- `sun.png`
+- `sunCorona.png`
+- `thumb_folder.jpg`
+- `thumb_folderup.jpg`
+- `thumb_star.jpg`
+- `uranus.png`
+- `venus.png`
+
+The following assets are only used in 3D mode and so are unlikely to be needed if
+you are using WWT in freestanding mode:
+
+- `galimg/gal_$N.jpg` for *N* ranging from `0000` to `0255`, inclusive
+- `milkywaybar.jpg`
+- `saturnringsshadow.png`
+- `saturnringsstrip.png`
