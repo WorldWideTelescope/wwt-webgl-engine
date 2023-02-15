@@ -178,14 +178,16 @@ namespace wwtlib
         }
 
         static string moonfile = "";
+
         static public void InitLayers()
         {
             ClearLayers();
+
             LayerMap iss = null;
-            if (!TourLayers)
+            bool doISS = !TourLayers && !WWTControl.Singleton.FreestandingMode;
+
+            if (doISS)
             {
-
-
                 iss = new LayerMap("ISS", ReferenceFrames.Custom);
                 iss.Frame.Epoch = SpaceTimeController.TwoLineDateToJulian("10184.51609218");
                 iss.Frame.SemiMajorAxis = 6728829.41;
@@ -226,8 +228,6 @@ namespace wwtlib
 
                 webFile.Send();
                 iss.Enabled = true;
-
-
             }
 
             LayerMaps["Sun"] = new LayerMap("Sun", ReferenceFrames.Sun);
@@ -236,7 +236,7 @@ namespace wwtlib
             LayerMaps["Sun"].AddChild(new LayerMap("Earth", ReferenceFrames.Earth));
             LayerMaps["Sun"].ChildMaps["Earth"].AddChild(new LayerMap("Moon", ReferenceFrames.Moon));
 
-            if (!TourLayers)
+            if (doISS)
             {
                 LayerMaps["Sun"].ChildMaps["Earth"].AddChild(iss);
             }
@@ -256,7 +256,6 @@ namespace wwtlib
             LayerMaps["Sun"].AddChild(new LayerMap("Neptune", ReferenceFrames.Neptune));
             LayerMaps["Sun"].AddChild(new LayerMap("Pluto", ReferenceFrames.Pluto));
 
-
             AddMoons(moonfile);
 
             LayerMaps["Sky"] = new LayerMap("Sky", ReferenceFrames.Sky);
@@ -264,15 +263,14 @@ namespace wwtlib
             allMaps = new Dictionary<string, LayerMap>();
 
             AddAllMaps(LayerMaps, null);
-            if (!TourLayers)
+
+            if (doISS)
             {
                 AddIss();
             }
 
-
             version++;
             LoadTree();
-
         }
 
         static void AddIss()
