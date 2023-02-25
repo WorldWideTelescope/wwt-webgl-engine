@@ -39,8 +39,8 @@ namespace wwtlib
         Dictionary<String, bool> flagship_static_lcpaths;
 
         public URLHelpers() {
-            this.origin_protocol = (string) Script.Literal("window.location.protocol");
-            this.origin_domain = (string) Script.Literal("window.location.hostname");
+            this.origin_protocol = (string) Script.Literal("typeof window === \"undefined\" ? \"https:\" : window.location.protocol");
+            this.origin_domain = (string)Script.Literal("typeof window === \"undefined\" ? \"\" :window.location.hostname");
             this.force_https = (this.origin_protocol == "https:");
 
             this.domain_handling = new Dictionary<string, DomainHandling>();

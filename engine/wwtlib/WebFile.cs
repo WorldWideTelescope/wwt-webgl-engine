@@ -30,6 +30,7 @@ namespace wwtlib
 
         public void Send()
         {
+            Script.Literal("if (typeof navigator === \"undefined\") { return; }");
             //send the appropriate request based on browser type
             // have to do this because IE8 and 9 don't support CORS
             string version = Navigator.AppVersion;
