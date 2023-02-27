@@ -61,6 +61,7 @@ namespace wwtlib
         public void Load(string url)
         {
             URL = url;
+            Script.Literal("if (typeof document === \"undefined\") { return; }");
             if (!Downloading)
             {
                 Downloading = true;

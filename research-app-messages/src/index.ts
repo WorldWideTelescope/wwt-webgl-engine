@@ -74,6 +74,9 @@ export interface ViewStateMessage {
   /** The current height of the viewport (zoom level), in degrees. */
   fovDeg: number;
 
+  /** The current roll angle of the view, in degrees */
+  rollDeg: number;
+
   /** The current value of WWT's internal clock, as an
    * [ISO-T](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)
    * datetime string.

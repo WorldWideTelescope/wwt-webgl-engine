@@ -5,7 +5,7 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "~6.2.0",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/vue-fontawesome": "^3",
     "@kyvg/vue3-notification": "^2.4.1",
@@ -51,7 +51,7 @@
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/engine-pinia": "thiscommit:2022-11-10:R3G9gH3",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/research-app-messages": "thiscommit:2022-11-30:h6SkuRt"
+    "@wwtelescope/research-app-messages": "thiscommit:2023-02-19:Kuk5Ppd"
   },
   "keywords": [
     "AAS WorldWide Telescope"

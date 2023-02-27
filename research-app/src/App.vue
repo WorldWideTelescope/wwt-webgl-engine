@@ -1216,6 +1216,7 @@ const App = defineComponent({
       lastUpdatedRA: 0.0,
       lastUpdatedDec: 0.0,
       lastUpdatedFov: 1.0,
+      lastUpdatedRoll: 0.0,
       lastUpdatedClockRate: 1.0,
       lastUpdatedTimestamp: 0, // `Date.now()` value
       
@@ -2406,12 +2407,14 @@ const App = defineComponent({
       const ra = this.wwtRARad;
       const dec = this.wwtDecRad;
       const fov = this.wwtZoomDeg / 6; // WWT convention, zoom = 6*fov
+      const roll = this.wwtRollRad * R2D;
       const clockRate = this.wwtClockRate;
 
       const needUpdate =
         ra != this.lastUpdatedRA ||
         dec != this.lastUpdatedDec ||
         fov != this.lastUpdatedFov ||
+        roll != this.lastUpdatedRoll ||
         clockRate != this.lastUpdatedClockRate ||
         Date.now() - this.lastUpdatedTimestamp > 60000;
 
@@ -2423,6 +2426,7 @@ const App = defineComponent({
         raRad: ra,
         decRad: dec,
         fovDeg: fov,
+        rollDeg: roll,
         engineClockISOT: this.wwtCurrentTime.toISOString(),
         systemClockISOT: new Date().toISOString(),
         engineClockRateFactor: clockRate,
@@ -2435,6 +2439,7 @@ const App = defineComponent({
       this.lastUpdatedRA = ra;
       this.lastUpdatedDec = dec;
       this.lastUpdatedFov = fov;
+      this.lastUpdatedRoll = roll;
       this.lastUpdatedClockRate = clockRate;
       this.lastUpdatedTimestamp = Date.now();
     },
