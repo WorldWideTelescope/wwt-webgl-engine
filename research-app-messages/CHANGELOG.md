@@ -1,3 +1,8 @@
+# @wwtelescope/research-app-messages 0.17.0 (2023-02-27)
+
+- Add the camera roll angle to the view state message definition (#231, @Carifio24).
+
+
 # @wwtelescope/research-app-messages 0.16.0 (2022-12-01)
 
 - Allow changing research app selection pixel proximity (#220, @Carifio24).

@@ -1,3 +1,8 @@
+# @wwtelescope/engine-pinia 0.3.1 (2023-02-27)
+
+- No code changes; just making Cranko happy.
+
+
 # @wwtelescope/engine-pinia 0.3.0 (2023-02-15)
 
 - Expose the "freestanding mode" that was added to the engine (#230, @pkgw). It

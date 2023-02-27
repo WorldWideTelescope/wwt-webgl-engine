@@ -5,7 +5,7 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "~6.2.0",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/vue-fontawesome": "^3",
     "@kyvg/vue3-notification": "^2.4.1",
@@ -14,7 +14,7 @@
     "@wwtelescope/engine-helpers": "workspace:>=0.8.1",
     "@wwtelescope/engine-pinia": "workspace:>=0.1.0",
     "@wwtelescope/engine-types": "workspace:>=0.6.1",
-    "@wwtelescope/research-app-messages": "workspace:>=0.16.0",
+    "@wwtelescope/research-app-messages": "workspace:>=0.17.0",
     "moment": "^2.29.1",
     "screenfull": "^5",
     "vue": "^3",
@@ -51,7 +51,7 @@
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/engine-pinia": "thiscommit:2022-11-10:R3G9gH3",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/research-app-messages": "thiscommit:2022-11-30:h6SkuRt"
+    "@wwtelescope/research-app-messages": "thiscommit:2023-02-19:Kuk5Ppd"
   },
   "keywords": [
     "AAS WorldWide Telescope"
@@ -69,5 +69,5 @@
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },
-  "version": "0.13.0"
+  "version": "0.14.0"
 }

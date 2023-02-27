@@ -1,3 +1,8 @@
+# @wwtelescope/engine-helpers 0.11.1 (2023-02-27)
+
+- No code changes; just making Cranko happy.
+
+
 # @wwtelescope/engine-helpers 0.11.0 (2023-02-15)
 
 - Expose the "freestanding mode" that was added to the engine (#230, @pkgw).

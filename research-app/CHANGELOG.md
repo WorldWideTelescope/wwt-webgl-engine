@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.14.0 (2023-02-27)
+
+- Send the roll angle of the camera in view state messages (#231, @Carifio24).
+- Correct missing @fortawesome/vue-fontawesome dependencies (#233, @pkgw).
+
+
 # @wwtelescope/research-app 0.13.0 (2023-02-13)
 
 - Add new circle and square plot types as options for rendering table layers

@@ -5,7 +5,7 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "~6.2.0",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/vue-fontawesome": "^3",
     "@wwtelescope/embed-common": "workspace:>=0.2.0",
@@ -59,5 +59,5 @@
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },
-  "version": "1.6.0"
+  "version": "1.6.1"
 }

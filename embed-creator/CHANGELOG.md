@@ -1,3 +1,8 @@
+# @wwtelescope/embed-creator 0.4.1 (2023-02-27)
+
+- Update dependency version specifications (#233, @pkgw)
+
+
 # @wwtelescope/embed-creator 0.4.0 (2022-11-30)
 
 - Update to Vue 3 (#215, @Carifio24)! Functional changes should be nil, but

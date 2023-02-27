@@ -1,3 +1,13 @@
+# @wwtelescope/engine 7.21.0 (2023-02-27)
+
+- Add guards for undefined variables allowing the engine to be imported in
+  headless contexts (#232, @Carifio24). The engine can't run in any meaningful
+  way in these contexts, but one may need access to types provided by the
+  engine. In particular, in a Vue app with server-side rendering, the same code
+  wants to run on both the client and the server-side rendering process, and
+  this change makes this feasible.
+
+
 # @wwtelescope/engine 7.20.0 (2023-02-15)
 
 - Add a "freestanding mode", for WWT adopters who are unable or unwilling to

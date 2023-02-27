@@ -1,3 +1,8 @@
+# @wwtelescope/embed 1.6.1 (2023-02-27)
+
+- Correct missing @fortawesome/vue-fontawesome dependencies (#233, @pkgw)
+
+
 # @wwtelescope/embed 1.6.0 (2022-12-01)
 
 - Update to Vue 3 and Pinia (#215, @Carifio24)! The overall user experience
