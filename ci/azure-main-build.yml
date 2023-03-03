@@ -156,7 +156,7 @@ jobs:
       yarn run serve-research &
       sleep 10 # give the local service time to start up
       cd tests
-      yarn run bs-local -- -e default,firefox,edge,safari -o reports
+      yarn bs-local -e default,firefox,edge,safari -o reports
       pkill -f vue-cli-service  # stop the servers
     displayName: BrowserStack test local research app
 
