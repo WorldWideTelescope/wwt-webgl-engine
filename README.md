@@ -188,7 +188,7 @@ To run the test suite on a local version of the app with ChromeDriver:
 yarn run serve-research &  # or equivalent
 cd tests
 yarn build
-yarn run local
+yarn local
 ```
 
 To run tests on a local version of the app via BrowserStack's multi-browser,
@@ -200,14 +200,14 @@ username and access key, respectively. You can find these values in your Browser
 
 [Account Settings]: https://www.browserstack.com/accounts/settings
 
-* Run the test suite as above but with the final command: `yarn run bs-local`
+* Run the test suite as above but with the final command: `yarn bs-local`
 
 By default, both of these local options will run the tests in Chrome. You can
 adjust the testing environments adding the `-e` option, which can be
 accomplished with syntax such as
 
 ```
-yarn run bs-local -- -e firefox,edge
+yarn bs-local -e firefox,edge
 ```
 
 

@@ -98,19 +98,19 @@ function loadServices(): Services {
   const s: Services = {};
     try {
     s.seleniumServer = require('selenium-server');
-  } catch (err) {}
+  } catch (err) { /* empty */ }
 
   try {
     s.chromedriver = require('chromedriver');
-  } catch (err) {}
+  } catch (err) { /* empty */ }
 
   try {
     s.geckodriver = require('geckodriver');
-  } catch (err) {}
+  } catch (err) { /* empty */ }
 
   try {
     s.edgedriver = require('edgedriver');
-  } catch (err) {}
+  } catch (err) { /* empty */ }
   return s;
 }
   

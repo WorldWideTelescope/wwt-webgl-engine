@@ -19,15 +19,15 @@ export interface Capabilities {
 }
 
 export interface BrowserCapabilities extends Capabilities {
-  browser_version: string,
+  browserVersion: string,
   os: string,
-  os_version: string;
+  osVersion: string;
 }
 
 export interface MobileCapabilities extends Capabilities {
   device: string,
-  real_mobile: boolean,
-  os_version: string;
+  realMobile: boolean,
+  osVersion: string;
 }
 
 export interface TestEnvironment {
@@ -51,17 +51,17 @@ export interface Configuration {
 export function browserCapabilities(browserName: string, browserVersion: string, osName: string, osVersion: string): BrowserCapabilities {
   return {
     'browserName': browserName,
-    'browser_version': browserVersion,
+    'browserVersion': browserVersion,
     'os': osName,
-    'os_version': osVersion,
+    'osVersion': osVersion,
   }
 }
 
-export function mobileCapabilities(deviceOS: string, deviceName: string, osVersion: string, realMobile: boolean=true): MobileCapabilities {
+export function mobileCapabilities(deviceOS: string, deviceName: string, osVersion: string, realMobile=true): MobileCapabilities {
   return {
     'device': deviceName,
-    'os_version': osVersion,
-    'real_mobile': realMobile,
+    'osVersion': osVersion,
+    'realMobile': realMobile,
     'browserName': deviceOS, // Seems strange, but this is what BrowserStack shows in their examples
   }
 }
@@ -80,7 +80,7 @@ export function addBrowsers(environments: { [env: string]: TestEnvironment | und
   }
 }
 
-export function addPhones(environments: { [env: string]: TestEnvironment | undefined }, baseCapabilities: object, osType: string, devicesAndVersions: string[][], envKeyMaker: (device: string, osVersion: string) => string, realMobile: boolean=true) {
+export function addPhones(environments: { [env: string]: TestEnvironment | undefined }, baseCapabilities: object, osType: string, devicesAndVersions: string[][], envKeyMaker: (device: string, osVersion: string) => string, realMobile=true) {
   for (const [device, osVersion] of devicesAndVersions) {
     const key = envKeyMaker(device, osVersion);
     environments[key] = {
