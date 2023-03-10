@@ -303,6 +303,18 @@ export interface SetupForImagesetOptions {
   background?: Imageset;
 }
 
+/** Options for [CaptureFrame] */
+export interface CaptureFrameOptions {
+  /** The desired image width. */
+  width: number;
+
+  /** The desired image height. */
+  height: number;
+
+  /** The desired image format (e.g. `"image/jpeg"`). */
+  format: string;
+}
+
 interface ResolveFunction<T> {
   (value: T): void;
 }
@@ -994,5 +1006,19 @@ export class WWTInstance {
 
     // Apply the change.
     player.playFromTourstop(stops[index]);
+  }
+
+  /** Capture the current frame as an image.
+   *
+   * This function returns a Promise whose resolved value is the image
+   * represented as a `Blob`.
+  */
+  captureFrame(options: CaptureFrameOptions): Promise<Blob | null> {
+    return new Promise((resolve, _reject) => {
+      this.ctl.captureFrame(blob => resolve(blob),
+        options.width,
+        options.height,
+        options.format);
+    });
   }
 }

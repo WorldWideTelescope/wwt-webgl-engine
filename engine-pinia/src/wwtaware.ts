@@ -618,6 +618,10 @@ export const WWTAwareComponent = defineComponent({
       /** Alter one [WWT engine setting](../../engine/modules.html#enginesetting). */
       "applySetting",
 
+      /** Capture the current frame as an image `Blob` with the desired width, height, and format.
+       * The first argument is a callback function to execute on the created `Blob`. */
+      'captureFrame',
+
       /** Clear all [Annotations](../../engine/classes/annotation.html) from the view. */
       "clearAnnotations",
 
