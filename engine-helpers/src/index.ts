@@ -305,13 +305,13 @@ export interface SetupForImagesetOptions {
 
 /** Options for [CaptureFrame] */
 export interface CaptureFrameOptions {
-  /** The desired image width. */
+  /** The desired image width, in pixels. */
   width: number;
 
-  /** The desired image height. */
+  /** The desired image height, in pixels. */
   height: number;
 
-  /** The desired image format (e.g. `"image/jpeg"`). */
+  /** The MIME type for the desired image format (e.g. `"image/jpeg"`). */
   format: string;
 }
 
