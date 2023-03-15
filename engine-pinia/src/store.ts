@@ -38,6 +38,7 @@ import {
   ApplyTableLayerSettingsOptions,
   applyImageSetLayerSetting,
   applySpreadSheetLayerSetting,
+  CaptureFrameOptions,
   GetCatalogHipsDataInViewOptions,
   GotoTargetOptions,
   ImageSetLayerState as ImageSetLayerSettings,
@@ -1178,8 +1179,15 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot clearAnnotations without linking to WWTInstance');
       this.$wwt.inst.si.clearAnnotations();
-    }
+    },
 
+    // Capturing the current display
+
+    captureFrame(options: CaptureFrameOptions): Promise<Blob | null> {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot captureThumbnail without linking to WWTInstance');
+      return this.$wwt.inst.captureFrame(options);
+    }
   },
 
 });
