@@ -2847,6 +2847,11 @@ namespace wwtlib
 
         public void CaptureThumbnail(BlobReady blobReady)
         {
+            CaptureFrame(blobReady, 96, 45, "image/jpeg");
+        }
+
+        public void CaptureFrame(BlobReady blobReady, int width, int height, string format)
+        {
             RenderOneFrame(); // NB: this used to be Render() but that was almost surely not what we want
 
             ImageElement image = (ImageElement)Document.CreateElement("img");
@@ -2854,10 +2859,10 @@ namespace wwtlib
             {
                 double imageAspect = ((double)image.Width) / (image.Height);
 
-                double clientAspect = 96 / 45;
+                double clientAspect = width / height;
 
-                int cw = 96;
-                int ch = 45;
+                int cw = width;
+                int ch = height;
 
                 if (imageAspect < clientAspect)
                 {
@@ -2868,17 +2873,17 @@ namespace wwtlib
                  cw = (int)((double)ch * imageAspect);
                 }
 
-                int cx = (96 - cw) / 2;
-                int cy = (45 - ch) / 2;
+                int cx = (width - cw) / 2;
+                int cy = (height - ch) / 2;
 
                 CanvasElement temp = (CanvasElement)Document.CreateElement("canvas");
-                temp.Height = 45;
-                temp.Width = 96;
+                temp.Height = height;
+                temp.Width = width;
                 CanvasContext2D ctx = (CanvasContext2D)temp.GetContext(Rendering.Render2D);
                 ctx.DrawImage(image, cx, cy, cw, ch);
                 //Script.Literal("{0}.toBlob({1}, 'image/jpeg')", temp, blobReady);
 
-                Script.Literal("if ( typeof {0}.msToBlob == 'function') {{ var blob = {0}.msToBlob(); {1}(blob); }} else {{ {0}.toBlob({1}, 'image/jpeg'); }}", temp, blobReady);
+                Script.Literal("if ( typeof {0}.msToBlob == 'function') {{ var blob = {0}.msToBlob(); {1}(blob); }} else {{ {0}.toBlob({1}, {2}); }}", temp, blobReady, format);
 
 
               //  thumb.Src = temp.GetDataUrl();

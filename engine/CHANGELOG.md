@@ -1,3 +1,9 @@
+# @wwtelescope/engine 7.22.0 (2023-03-20)
+
+- Add and expose more general frame capture functionality based on the
+  CaptureThumbnail API (#235, @Carifio24).
+
+
 # @wwtelescope/engine 7.21.0 (2023-02-27)
 
 - Add guards for undefined variables allowing the engine to be imported in
