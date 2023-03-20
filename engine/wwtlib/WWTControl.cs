@@ -312,6 +312,17 @@ namespace wwtlib
 
         private Imageset milkyWayBackground = null;
 
+        public bool CapturingVideo = false;
+
+        public void CaptureVideo(double FramesPerSecond, int TotalFrames)
+        {
+            CapturingVideo = true;
+            SpaceTimeController.FrameDumping = true;
+            SpaceTimeController.FramesPerSecond = FramesPerSecond;
+            SpaceTimeController.TotalFrames = TotalFrames;
+            SpaceTimeController.CurrentFrameNumber = 0;
+        }
+
         // To preserve semantic backwards compatibility, this function must requeue itself
         // to be called again in a timeout.
         public void Render()
@@ -373,6 +384,8 @@ namespace wwtlib
             Tile.TilesInView = 0;
             Tile.TilesTouched = 0;
             Tile.deepestLevel = 0;
+
+            SpaceTimeController.MetaNow = Date.Now;
 
             if (Mover != null)
             {
@@ -758,6 +771,8 @@ namespace wwtlib
                 }
             }
 
+            bool tilesAllLoaded = TileCache.QueueCount == 0;
+
             RenderContext.SetupMatricesOverlays();
             FadeFrame();
             //RenderContext.Clear();
@@ -790,6 +805,18 @@ namespace wwtlib
                 frameCount = 0;
                 RenderTriangle.TrianglesRendered = 0;
                 RenderTriangle.TrianglesCulled = 0;
+            }
+
+            if (CapturingVideo && tilesAllLoaded)
+            {
+                // TODO: What do we do with the frame that we've created?
+                SpaceTimeController.NextFrame();
+            }
+            if (SpaceTimeController.DoneDumping)
+            {
+                SpaceTimeController.FrameDumping = false;
+                SpaceTimeController.CancelFrameDump = false;
+                CapturingVideo = false;
             }
         }
 
