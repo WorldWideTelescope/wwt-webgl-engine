@@ -1,4 +1,9 @@
-# rc: micro bump
+# rc: minor bump
+
+- Expose the engine's new frame capture functionality (#235, @Carifio24).
+
+
+# @wwtelescope/engine-helpers 0.11.1 (2023-02-27)
 
 - No code changes; just making Cranko happy.
 

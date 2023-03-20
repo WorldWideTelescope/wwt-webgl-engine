@@ -1,5 +1,11 @@
 # rc: minor bump
 
+- Add and expose more general frame capture functionality based on the
+  CaptureThumbnail API (#235, @Carifio24).
+
+
+# @wwtelescope/engine 7.21.0 (2023-02-27)
+
 - Add guards for undefined variables allowing the engine to be imported in
   headless contexts (#232, @Carifio24). The engine can't run in any meaningful
   way in these contexts, but one may need access to types provided by the

@@ -75,7 +75,7 @@ addBrowsers(environments, BSLOCAL_CAPABILITIES, 'OS X', ['Big Sur'], ['Safari'],
 
 // Code to copy seleniumhost/port into test settings
 for (const i in nightwatch_config.test_settings) {
-  let config = nightwatch_config.test_settings[i];
+  const config = nightwatch_config.test_settings[i];
   if (config === undefined || nightwatch_config.selenium === undefined) {
     continue;
   }

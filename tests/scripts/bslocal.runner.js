@@ -8,7 +8,7 @@ const browserstack = require('browserstack-local');
 let bs_local;
 
 try {
-  require.main.filename = './node_modules/.bin/nightwatch';
+  require.main.filename = '../node_modules/.bin/nightwatch';
   // Code to start browserstack local before start of test
   console.log('Connecting local');
   Nightwatch.bs_local = bs_local = new browserstack.Local();
