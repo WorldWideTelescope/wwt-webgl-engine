@@ -314,9 +314,15 @@ namespace wwtlib
 
         public bool CapturingVideo = false;
 
-        public void CaptureVideo(double FramesPerSecond, int TotalFrames)
+        private BlobReady videoBlobReady = null;
+
+        public VideoOutputType dumpFrameParams = new VideoOutputType();
+
+        public void CaptureVideo(BlobReady VideoBlobReady, string Name, int Width, int Height, double FramesPerSecond, int TotalFrames)
         {
             CapturingVideo = true;
+            videoBlobReady = VideoBlobReady;
+            dumpFrameParams = new VideoOutputType(Name, Width, Height, FramesPerSecond);
             SpaceTimeController.FrameDumping = true;
             SpaceTimeController.FramesPerSecond = FramesPerSecond;
             SpaceTimeController.TotalFrames = TotalFrames;
@@ -807,7 +813,7 @@ namespace wwtlib
                 RenderTriangle.TrianglesCulled = 0;
             }
 
-            if (CapturingVideo && tilesAllLoaded)
+            if (CapturingVideo && (!dumpFrameParams.WaitDownload || tilesAllLoaded))
             {
                 // TODO: What do we do with the frame that we've created?
                 SpaceTimeController.NextFrame();

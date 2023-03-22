@@ -100,9 +100,10 @@ namespace wwtlib
         }
         public static Date last = MetaNow;
 
+        public static double FramesPerSecond = 30;
+
         public static bool FrameDumping = false;
         public static bool CancelFrameDump = false;
-        public static double FramesPerSecond = 30;
 
         public static int CurrentFrameNumber = 0;
         public static int TotalFrames = 0;
