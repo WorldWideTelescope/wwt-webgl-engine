@@ -315,15 +315,13 @@ namespace wwtlib
         public bool CapturingVideo = false;
 
         private BlobReady videoBlobReady = null;
-        private Action onVideoCaptureDone = null;
 
         public VideoOutputType dumpFrameParams = null;
 
-        public void CaptureVideo(BlobReady VideoBlobReady, Action VideoCaptureDone, string Name, int Width, int Height, double FramesPerSecond, int TotalFrames, string Format)
+        public void CaptureVideo(BlobReady VideoBlobReady, string Name, int Width, int Height, double FramesPerSecond, int TotalFrames, string Format)
         {
             CapturingVideo = true;
             videoBlobReady = VideoBlobReady;
-            onVideoCaptureDone = VideoCaptureDone;
             dumpFrameParams = new VideoOutputType(Name, Width, Height, FramesPerSecond, Format, true);
             SpaceTimeController.FrameDumping = true;
             SpaceTimeController.FramesPerSecond = FramesPerSecond;
@@ -828,8 +826,6 @@ namespace wwtlib
                     SpaceTimeController.CancelFrameDump = false;
                     CapturingVideo = false;
                     videoBlobReady = null;
-                    onVideoCaptureDone();
-                    onVideoCaptureDone = null;
                 }
             }
         }

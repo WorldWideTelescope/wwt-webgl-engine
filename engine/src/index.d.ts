@@ -2697,7 +2697,7 @@ export class WWTControl {
   captureFrame(blobReady: BlobCallback, width: number, height: number, format: string): void;
 
   /** Start a video capture */
-  captureVideo(blobReady: BlobCallback, videoCaptureDone: () => void, name: string, width: number, height: number, framesPerSecond: number, totalFrames: number, format: string): void;
+  captureVideo(blobReady: BlobCallback, name: string, width: number, height: number, framesPerSecond: number, totalFrames: number, format: string): void;
 
   /** Set the maximum allowed user zoom level in 3D ("solar system") mode.
    *

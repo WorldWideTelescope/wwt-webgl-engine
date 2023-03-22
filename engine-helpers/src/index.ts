@@ -1048,13 +1048,13 @@ export class WWTInstance {
     const videoStream = new ReadableStream<Blob | null>({
       start(controller: ReadableStreamDefaultController) {
         function stream() {
+          let received = 0;
           wwtControl.captureVideo(blob => {
-              console.log(blob);
+              received++;
               controller.enqueue(blob);
-            },
-            () => {
-              controller.close();
-              console.log("Stream closed!");
+              if (received >= options.totalFrames) {
+                controller.close();
+              }
             },
             options.name,
             options.width,
