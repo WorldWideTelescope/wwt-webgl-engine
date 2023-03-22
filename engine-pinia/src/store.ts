@@ -50,6 +50,7 @@ import {
   StretchFitsLayerOptions,
   UpdateTableLayerOptions,
   WWTInstance,
+  CaptureVideoOptions,
 } from "@wwtelescope/engine-helpers";
 
 interface WWTLinkedCallback {
@@ -1187,6 +1188,13 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot captureThumbnail without linking to WWTInstance');
       return this.$wwt.inst.captureFrame(options);
+    },
+
+    // Capturing a video
+    captureVideo(options: CaptureVideoOptions): ReadableStream<Blob | null> {
+      if (this.$wwt.inst === null)
+        throw new Error("cannot captureVideo without linking to WWTInstance");
+      return this.$wwt.inst.captureVideo(options);
     }
   },
 

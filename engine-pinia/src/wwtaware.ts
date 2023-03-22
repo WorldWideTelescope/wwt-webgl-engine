@@ -622,6 +622,8 @@ export const WWTAwareComponent = defineComponent({
        * The first argument is a callback function to execute on the created `Blob`. */
       'captureFrame',
 
+      'captureVideo',
+
       /** Clear all [Annotations](../../engine/classes/annotation.html) from the view. */
       "clearAnnotations",
 

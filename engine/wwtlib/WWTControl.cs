@@ -315,14 +315,16 @@ namespace wwtlib
         public bool CapturingVideo = false;
 
         private BlobReady videoBlobReady = null;
+        private Action onVideoCaptureDone = null;
 
-        public VideoOutputType dumpFrameParams = new VideoOutputType();
+        public VideoOutputType dumpFrameParams = null;
 
-        public void CaptureVideo(BlobReady VideoBlobReady, string Name, int Width, int Height, double FramesPerSecond, int TotalFrames)
+        public void CaptureVideo(BlobReady VideoBlobReady, Action VideoCaptureDone, string Name, int Width, int Height, double FramesPerSecond, int TotalFrames, string Format)
         {
             CapturingVideo = true;
             videoBlobReady = VideoBlobReady;
-            dumpFrameParams = new VideoOutputType(Name, Width, Height, FramesPerSecond);
+            onVideoCaptureDone = VideoCaptureDone;
+            dumpFrameParams = new VideoOutputType(Name, Width, Height, FramesPerSecond, Format, true);
             SpaceTimeController.FrameDumping = true;
             SpaceTimeController.FramesPerSecond = FramesPerSecond;
             SpaceTimeController.TotalFrames = TotalFrames;
@@ -813,16 +815,22 @@ namespace wwtlib
                 RenderTriangle.TrianglesCulled = 0;
             }
 
-            if (CapturingVideo && (!dumpFrameParams.WaitDownload || tilesAllLoaded))
+            if (CapturingVideo)
             {
-                // TODO: What do we do with the frame that we've created?
-                SpaceTimeController.NextFrame();
-            }
-            if (SpaceTimeController.DoneDumping)
-            {
-                SpaceTimeController.FrameDumping = false;
-                SpaceTimeController.CancelFrameDump = false;
-                CapturingVideo = false;
+                if ((dumpFrameParams != null) && (!dumpFrameParams.WaitDownload || tilesAllLoaded))
+                {
+                    CaptureCurrentFrame(videoBlobReady, dumpFrameParams.Width, dumpFrameParams.Height, dumpFrameParams.Format);
+                    SpaceTimeController.NextFrame();
+                }
+                if (SpaceTimeController.DoneDumping)
+                {
+                    SpaceTimeController.FrameDumping = false;
+                    SpaceTimeController.CancelFrameDump = false;
+                    CapturingVideo = false;
+                    videoBlobReady = null;
+                    onVideoCaptureDone();
+                    onVideoCaptureDone = null;
+                }
             }
         }
 
@@ -2880,12 +2888,20 @@ namespace wwtlib
 
         public void CaptureThumbnail(BlobReady blobReady)
         {
-            CaptureFrame(blobReady, 96, 45, "image/jpeg");
+            CaptureFrame(blobReady, 96, 45, "image/jpeg", true);
         }
 
-        public void CaptureFrame(BlobReady blobReady, int width, int height, string format)
+        public void CaptureCurrentFrame(BlobReady blobReady, int width, int height, string format)
         {
-            RenderOneFrame(); // NB: this used to be Render() but that was almost surely not what we want
+            CaptureFrame(blobReady, width, height, format, false);
+        }
+
+        public void CaptureFrame(BlobReady blobReady, int width, int height, string format, bool needRender)
+        {
+            if (needRender)
+            {
+                RenderOneFrame(); // NB: this used to be Render() but that was almost surely not what we want
+            }
 
             ImageElement image = (ImageElement)Document.CreateElement("img");
             image.AddEventListener("load", delegate (ElementEvent e)
