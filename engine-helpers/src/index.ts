@@ -1042,7 +1042,10 @@ export class WWTInstance {
     });
   }
 
-  /** Capture a video */
+  /** Capture a video as a sequence of frames using the given parameters
+   *
+   * This function returns a readable stream whose values are the exported frames.
+  */
   captureVideo(options: CaptureVideoOptions): ReadableStream<Blob | null> {
     const wwtControl = this.ctl;
     const videoStream = new ReadableStream<Blob | null>({
@@ -1056,7 +1059,6 @@ export class WWTInstance {
                 controller.close();
               }
             },
-            options.name,
             options.width,
             options.height,
             options.framesPerSecond,

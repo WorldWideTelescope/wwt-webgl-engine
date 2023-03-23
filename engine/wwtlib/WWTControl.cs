@@ -318,11 +318,11 @@ namespace wwtlib
 
         public VideoOutputType dumpFrameParams = null;
 
-        public void CaptureVideo(BlobReady VideoBlobReady, string Name, int Width, int Height, double FramesPerSecond, int TotalFrames, string Format)
+        public void CaptureVideo(BlobReady VideoBlobReady, int Width, int Height, double FramesPerSecond, int TotalFrames, string Format)
         {
             CapturingVideo = true;
             videoBlobReady = VideoBlobReady;
-            dumpFrameParams = new VideoOutputType(Name, Width, Height, FramesPerSecond, Format, true);
+            dumpFrameParams = new VideoOutputType(Width, Height, FramesPerSecond, Format, true);
             SpaceTimeController.FrameDumping = true;
             SpaceTimeController.FramesPerSecond = FramesPerSecond;
             SpaceTimeController.TotalFrames = TotalFrames;

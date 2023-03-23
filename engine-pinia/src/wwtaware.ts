@@ -622,6 +622,8 @@ export const WWTAwareComponent = defineComponent({
        * The first argument is a callback function to execute on the created `Blob`. */
       'captureFrame',
 
+      /** Capture a video as a stream of image `Blob`s with the desired width, height and format.
+       * The number of frames per second and total frame count are specified as well. */
       'captureVideo',
 
       /** Clear all [Annotations](../../engine/classes/annotation.html) from the view. */

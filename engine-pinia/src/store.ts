@@ -1190,7 +1190,8 @@ export const engineStore = defineStore('wwt-engine', {
       return this.$wwt.inst.captureFrame(options);
     },
 
-    // Capturing a video
+    // Capturing a video as a readable stream
+
     captureVideo(options: CaptureVideoOptions): ReadableStream<Blob | null> {
       if (this.$wwt.inst === null)
         throw new Error("cannot captureVideo without linking to WWTInstance");
