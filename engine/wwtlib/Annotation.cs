@@ -298,16 +298,22 @@ namespace wwtlib
 
                     if (strokeWidth > 0 && vertexList.Count > 1)
                     {
+                        Color lineColorWithOpacity = lineColor.Clone();
+                        lineColorWithOpacity.A = Math.Round(lineColorWithOpacity.A * Opacity);
+
                         for (int i = 0; i < (vertexList.Count - 1); i++)
                         {
-                            LineList.AddLine(vertexList[i], vertexList[i + 1], lineColor, new Dates(0, 1));
+                            LineList.AddLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                         }
                     }
                     if (fill)
                     {
+                        Color fillColorWithOpacity = fillColor.Clone();
+                        fillColorWithOpacity.A = Math.Round(fillColorWithOpacity.A * Opacity);
+
                         Vector3d pos = Vector3d.Create(center.X, center.Y, center.Z);
                         vertexList.Insert(0, pos);
-                        TriangleFanPointList.AddShape(vertexList, fillColor, new Dates(0, 1));
+                        TriangleFanPointList.AddShape(vertexList, fillColorWithOpacity, new Dates(0, 1));
                     }
                     AnnotationDirty = false;
                 }
@@ -445,22 +451,27 @@ namespace wwtlib
                     //todo can we save this work for later?
                     List<Vector3d> vertexList = points;
 
-
                     if (strokeWidth > 0 && points.Count > 1)
                     {
+                        Color lineColorWithOpacity = lineColor.Clone();
+                        lineColorWithOpacity.A = Math.Round(lineColorWithOpacity.A * Opacity);
+
                         for (int i = 0; i < (points.Count - 1); i++)
                         {
-                            LineList.AddLine(vertexList[i], vertexList[i + 1], lineColor, new Dates(0, 1));
+                            LineList.AddLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                         }
-                        LineList.AddLine(vertexList[points.Count - 1], vertexList[0], lineColor, new Dates(0, 1));
+                        LineList.AddLine(vertexList[points.Count - 1], vertexList[0], lineColorWithOpacity, new Dates(0, 1));
                     }
                     if (fill)
                     {
+                        Color fillColorWithOpacity = fillColor.Clone();
+                        fillColorWithOpacity.A = Math.Round(fillColorWithOpacity.A * Opacity);
+
                         List<int> indexes = Tessellator.TesselateSimplePoly(vertexList);
 
                         for (int i = 0; i < indexes.Count; i += 3)
                         {
-                            TriangleList.AddSubdividedTriangles(vertexList[indexes[i]], vertexList[indexes[i + 1]], vertexList[indexes[i + 2]], fillColor, new Dates(0, 1), 2);
+                            TriangleList.AddSubdividedTriangles(vertexList[indexes[i]], vertexList[indexes[i + 1]], vertexList[indexes[i + 2]], fillColorWithOpacity, new Dates(0, 1), 2);
                         }
                     }
                     AnnotationDirty = false;
@@ -565,12 +576,14 @@ namespace wwtlib
                     //todo can we save this work for later?
                     List<Vector3d> vertexList = points;
 
-
                     if (strokeWidth > 0)
                     {
+                        Color lineColorWithOpacity = lineColor.Clone();
+                        lineColorWithOpacity.A = Math.Round(lineColorWithOpacity.A * Opacity);
+
                         for (int i = 0; i < (points.Count - 1); i++)
                         {
-                            LineList.AddLine(vertexList[i], vertexList[i + 1], lineColor, new Dates(0, 1));
+                            LineList.AddLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                         }
                     }
                    
