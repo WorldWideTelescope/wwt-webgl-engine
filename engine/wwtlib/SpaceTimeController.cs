@@ -11,7 +11,7 @@ namespace wwtlib
         {
             if (syncToClock)
             {
-                Date justNow = Date.Now;
+                Date justNow = MetaNow;
 
                 if (timeRate != 1.0)
                 {
@@ -29,19 +29,19 @@ namespace wwtlib
                 catch
                 {
                     now = new Date(1, 12, 25, 23, 59, 59);
-                    offset = now - Date.Now;
+                    offset = now - MetaNow;
                 }
 
                 if (now.GetFullYear() > 4000)
                 {
                     now = new Date(4000, 12, 31, 23, 59, 59);
-                    offset = now - Date.Now;
+                    offset = now - MetaNow;
                 }
 
                 if (now.GetFullYear() < 1)
                 {
                     now = new Date(0, 12, 25, 23, 59, 59);
-                    offset = now - Date.Now;
+                    offset = now - MetaNow;
                 }
 
             }
@@ -94,11 +94,49 @@ namespace wwtlib
             set
             {
                 now = value;
-                offset = now - Date.Now;
-                last = Date.Now;
+                offset = now - MetaNow;
+                last = MetaNow;
             }
         }
-        public static Date last = Date.Now;
+        public static Date last = MetaNow;
+
+        public static double FramesPerSecond = 30;
+
+        public static bool FrameDumping = false;
+        public static bool CancelFrameDump = false;
+
+        public static int CurrentFrameNumber = 0;
+        public static int TotalFrames = 0;
+
+        static Date metaNow = Date.Now;
+        public static Date MetaNow
+        {
+            get
+            {
+                return metaNow;
+            }
+            set
+            {
+                if (!FrameDumping)
+                {
+                    metaNow = value;
+                }
+            }
+        }
+
+        public static void NextFrame()
+        {
+            metaNow.SetMilliseconds(metaNow.GetMilliseconds() + Math.Round(1000.0 / FramesPerSecond));
+            CurrentFrameNumber += 1;
+        }
+
+        public static bool DoneDumping
+        {
+            get
+            {
+                return !FrameDumping || CancelFrameDump || (CurrentFrameNumber >= TotalFrames);
+            }
+        }
 
 
         public static void SyncTime()
@@ -124,12 +162,12 @@ namespace wwtlib
 
         public static bool SyncToClock
         {
-            get { return SpaceTimeController.syncToClock; }
+            get { return syncToClock; }
             set
             {
-                if (SpaceTimeController.syncToClock != value)
+                if (syncToClock != value)
                 {
-                    SpaceTimeController.syncToClock = value;
+                    syncToClock = value;
                     if (value)
                     {
                         last = Date.Now;
@@ -156,8 +194,8 @@ namespace wwtlib
 
         public static double Altitude
         {
-            get { return SpaceTimeController.altitude; }
-            set { SpaceTimeController.altitude = value; }
+            get { return altitude; }
+            set { altitude = value; }
         }
 
         static public Coordinates Location
