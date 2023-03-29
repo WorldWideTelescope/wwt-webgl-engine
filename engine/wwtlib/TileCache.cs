@@ -7,6 +7,13 @@ namespace wwtlib
     class TileCache
     {
         private static Dictionary<String, Tile> queue = new Dictionary<String, Tile>();
+        public static int QueueCount
+        {
+            get
+            {
+                return queue.Count;
+            }
+        }
         static Dictionary<String, Tile> tiles = new Dictionary<string, Tile>();
         //internal static void AddTileToQueue(Tile tile)
         //{

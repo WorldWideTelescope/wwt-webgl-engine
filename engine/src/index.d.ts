@@ -2692,9 +2692,21 @@ export class WWTControl {
    * the captured image.
    * @param width The desired image width.
    * @param height The desired image height.
-   * @param string The desired image format (e.g. `"image/jpeg"`)
+   * @param format The desired image format (e.g. `"image/jpeg"`)
   */
   captureFrame(blobReady: BlobCallback, width: number, height: number, format: string): void;
+
+  /** Capture a video as a sequence of images
+   *
+   * @param blobReady A callback function to execute on each `Blob` representing
+   * a captured frame.
+   * @param width The desired frame width.
+   * @param height The desired frame height.
+   * @param framesPerSecond The number of frames captured per second.
+   * @param totalFrames The total number of frames to capture.
+   * @param format The desired image format (e.g. `"image/jpeg"`)
+  */
+  captureVideo(blobReady: BlobCallback, width: number, height: number, framesPerSecond: number, totalFrames: number, format: string): void;
 
   /** Set the maximum allowed user zoom level in 3D ("solar system") mode.
    *

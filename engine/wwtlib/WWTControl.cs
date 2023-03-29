@@ -312,6 +312,23 @@ namespace wwtlib
 
         private Imageset milkyWayBackground = null;
 
+        public bool CapturingVideo = false;
+
+        private BlobReady videoBlobReady = null;
+
+        public VideoOutputType dumpFrameParams = null;
+
+        public void CaptureVideo(BlobReady VideoBlobReady, int Width, int Height, double FramesPerSecond, int TotalFrames, string Format)
+        {
+            CapturingVideo = true;
+            videoBlobReady = VideoBlobReady;
+            dumpFrameParams = new VideoOutputType(Width, Height, FramesPerSecond, Format, true);
+            SpaceTimeController.FrameDumping = true;
+            SpaceTimeController.FramesPerSecond = FramesPerSecond;
+            SpaceTimeController.TotalFrames = TotalFrames;
+            SpaceTimeController.CurrentFrameNumber = 0;
+        }
+
         // To preserve semantic backwards compatibility, this function must requeue itself
         // to be called again in a timeout.
         public void Render()
@@ -373,6 +390,8 @@ namespace wwtlib
             Tile.TilesInView = 0;
             Tile.TilesTouched = 0;
             Tile.deepestLevel = 0;
+
+            SpaceTimeController.MetaNow = Date.Now;
 
             if (Mover != null)
             {
@@ -758,6 +777,8 @@ namespace wwtlib
                 }
             }
 
+            bool tilesAllLoaded = TileCache.QueueCount == 0;
+
             RenderContext.SetupMatricesOverlays();
             FadeFrame();
             //RenderContext.Clear();
@@ -790,6 +811,22 @@ namespace wwtlib
                 frameCount = 0;
                 RenderTriangle.TrianglesRendered = 0;
                 RenderTriangle.TrianglesCulled = 0;
+            }
+
+            if (CapturingVideo)
+            {
+                if ((dumpFrameParams != null) && (!dumpFrameParams.WaitDownload || tilesAllLoaded))
+                {
+                    CaptureCurrentFrame(videoBlobReady, dumpFrameParams.Width, dumpFrameParams.Height, dumpFrameParams.Format);
+                    SpaceTimeController.NextFrame();
+                }
+                if (SpaceTimeController.DoneDumping)
+                {
+                    SpaceTimeController.FrameDumping = false;
+                    SpaceTimeController.CancelFrameDump = false;
+                    CapturingVideo = false;
+                    videoBlobReady = null;
+                }
             }
         }
 
@@ -2847,12 +2884,20 @@ namespace wwtlib
 
         public void CaptureThumbnail(BlobReady blobReady)
         {
-            CaptureFrame(blobReady, 96, 45, "image/jpeg");
+            CaptureFrame(blobReady, 96, 45, "image/jpeg", true);
         }
 
-        public void CaptureFrame(BlobReady blobReady, int width, int height, string format)
+        public void CaptureCurrentFrame(BlobReady blobReady, int width, int height, string format)
         {
-            RenderOneFrame(); // NB: this used to be Render() but that was almost surely not what we want
+            CaptureFrame(blobReady, width, height, format, false);
+        }
+
+        public void CaptureFrame(BlobReady blobReady, int width, int height, string format, bool needRender)
+        {
+            if (needRender)
+            {
+                RenderOneFrame(); // NB: this used to be Render() but that was almost surely not what we want
+            }
 
             ImageElement image = (ImageElement)Document.CreateElement("img");
             image.AddEventListener("load", delegate (ElementEvent e)

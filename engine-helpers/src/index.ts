@@ -315,6 +315,26 @@ export interface CaptureFrameOptions {
   format: string;
 }
 
+export interface CaptureVideoOptions {
+  /** The video name */
+  name: string;
+
+  /** The desired image width, in pixels. */
+  width: number;
+
+  /** The desired image height, in pixels. */
+  height: number;
+
+  /** The number of frames per second */
+  framesPerSecond: number;
+
+  /** The total number of frames to capture */
+  totalFrames: number;
+
+  /** The MIME type for the desired image format of output frames (e.g. `"image/jpeg"`). */
+  format: string;
+}
+
 interface ResolveFunction<T> {
   (value: T): void;
 }
@@ -1020,5 +1040,35 @@ export class WWTInstance {
         options.height,
         options.format);
     });
+  }
+
+  /** Capture a video as a sequence of frames using the given parameters
+   *
+   * This function returns a readable stream whose values are the exported frames.
+  */
+  captureVideo(options: CaptureVideoOptions): ReadableStream<Blob | null> {
+    const wwtControl = this.ctl;
+    const videoStream = new ReadableStream<Blob | null>({
+      start(controller: ReadableStreamDefaultController) {
+        function stream() {
+          let received = 0;
+          wwtControl.captureVideo(blob => {
+              received++;
+              controller.enqueue(blob);
+              if (received >= options.totalFrames) {
+                controller.close();
+              }
+            },
+            options.width,
+            options.height,
+            options.framesPerSecond,
+            options.totalFrames,
+            options.format
+          );
+        }
+        return stream();
+      }
+    });
+    return videoStream;
   }
 }

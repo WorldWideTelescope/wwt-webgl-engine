@@ -1,3 +1,9 @@
+# @wwtelescope/engine-helpers 0.13.0 (2023-03-29)
+
+- Expose the new, expanded frame-capture functionality which can capture a
+  sequence of frames (#239, @Carifio24).
+
+
 # @wwtelescope/engine-helpers 0.12.0 (2023-03-20)
 
 - Expose the engine's new frame capture functionality (#235, @Carifio24).
