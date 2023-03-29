@@ -50,7 +50,7 @@ namespace wwtlib
 
             this.from = from.Copy();
             this.to = to.Copy();
-            fromTime = Date.Now;
+            fromTime = SpaceTimeController.MetaNow;
             toTargetTime = time;
 
         }
@@ -70,7 +70,7 @@ namespace wwtlib
         {
             get
             {
-                int elapsed = Date.Now - fromTime;
+                int elapsed = SpaceTimeController.MetaNow - fromTime;
                 double elapsedSeconds = ((double)elapsed) / 1000;
 
                 double alpha = elapsedSeconds / (toTargetTime );
@@ -102,7 +102,7 @@ namespace wwtlib
         {
             get
             {
-                int elapsed = Date.Now - fromTime;
+                int elapsed = SpaceTimeController.MetaNow - fromTime;
                 double elapsedSeconds = ((double)elapsed) / 1000;
 
                 double alpha = elapsedSeconds / (toTargetTime);
@@ -194,7 +194,7 @@ namespace wwtlib
             }
             this.from = from;
             this.to = to;
-            fromTime = Date.Now;
+            fromTime = SpaceTimeController.MetaNow;
             double zoomUpTarget = 360.0;
             double travelTime;
 
@@ -252,7 +252,7 @@ namespace wwtlib
         {
             get
             {
-                int elapsed = Date.Now - fromTime;
+                int elapsed = SpaceTimeController.MetaNow - fromTime;
                 double elapsedSeconds = ((double)elapsed) / 1000;
 
                 if (elapsedSeconds < upTargetTime)
