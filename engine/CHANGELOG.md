@@ -1,5 +1,15 @@
 # rc: minor bump
 
+- Honor opacity settings for geometric annotations that weren't doing
+  so before (#238, @Carifio24)
+- Expand the frame-capture functionality to be able to capture a sequence of
+  frames (#239, @Carifio24). This mode can make sure to wait for tile data to
+  download before advancing the engine clock and emitting the next frame, using
+  an implementation derived from the Windows client.
+  
+
+# @wwtelescope/engine 7.22.0 (2023-03-20)
+
 - Add and expose more general frame capture functionality based on the
   CaptureThumbnail API (#235, @Carifio24).
 
