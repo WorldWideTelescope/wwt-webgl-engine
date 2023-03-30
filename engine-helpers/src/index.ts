@@ -1050,12 +1050,12 @@ export class WWTInstance {
         function stream() {
           let received = 0;
           wwtControl.captureVideo(blob => {
-              received++;
-              controller.enqueue(blob);
-              if (received >= options.totalFrames) {
-                controller.close();
-              }
-            },
+            received++;
+            controller.enqueue(blob);
+            if (received >= options.totalFrames) {
+              controller.close();
+            }
+          },
             options.width,
             options.height,
             options.framesPerSecond,
