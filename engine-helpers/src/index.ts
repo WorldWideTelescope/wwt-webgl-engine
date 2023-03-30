@@ -316,9 +316,6 @@ export interface CaptureFrameOptions {
 }
 
 export interface CaptureVideoOptions {
-  /** The video name */
-  name: string;
-
   /** The desired image width, in pixels. */
   width: number;
 
