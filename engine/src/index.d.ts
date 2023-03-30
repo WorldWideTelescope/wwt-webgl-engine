@@ -1170,6 +1170,8 @@ export class Place implements Thumbnail {
   set_annotation(v: string): string;
   get_backgroundImageset(): Imageset | null;
   set_backgroundImageset(v: Imageset | null): Imageset | null;
+  get_camParams(): CameraParameters;
+  set_camParams(v: CameraParameters): CameraParameters;
   get_children(): Thumbnail[];
   get_classification(): Classification;
   set_classification(v: Classification): Classification;
