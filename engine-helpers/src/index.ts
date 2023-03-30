@@ -544,6 +544,16 @@ export class WWTInstance {
     return this.makeArrivePromise(options.instant);
   }
 
+  /** Add an imageset directly into the engine's database.
+   *
+   * If an imageset with the same URL has already been loaded, this is a no-op.
+   *
+   * @param imgset The imageset to add
+   */
+  addImagesetToRepository(imgset: Imageset) {
+    WWTControl.addImageSetToRepository(imgset);
+  }
+
   // Collection-loaded promises. To simplify the handling, we never load the
   // same URL more than once. Otherwise, all of the timing issues about multiple
   // requests for the same URL get gnarly to handle. And as far as the engine is

@@ -2453,6 +2453,12 @@ export class WcsImage {
  *
  * */
 export class WWTControl {
+  /** Add an imageset directly into the engine's database.
+   *
+   * If another imageset with the same image URL is already loaded,
+   * this is a no-op.
+   */
+  static addImageSetToRepository(img: Imageset): void;
 
   /** The image sets that have been loaded into the engine */
   static getImageSets(): Imageset[];

@@ -935,6 +935,13 @@ export const engineStore = defineStore('wwt-engine', {
       return result;
     },
 
+    addImagesetToRepository(imgset: Imageset): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot addImagesetToRepository without linking to WWTInstance');
+
+      this.$wwt.inst.addImagesetToRepository(imgset);
+    },
+
     // General layers
 
     deleteLayer(id: string | Guid): void {
