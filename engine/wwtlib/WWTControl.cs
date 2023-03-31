@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Html;
+using System.Html.Data.Files;
 using System.Html.Media.Graphics;
 
 
@@ -318,10 +319,19 @@ namespace wwtlib
 
         public VideoOutputType dumpFrameParams = null;
 
+        private Dictionary<int, Blob> videoBlobQueue = new Dictionary<int, Blob>();
+
+        private int videoQueueIndex = 0;
+
+        private List<int> emptyFrames = new List<int>();
+
         public void CaptureVideo(BlobReady VideoBlobReady, int Width, int Height, double FramesPerSecond, int TotalFrames, string Format)
         {
             CapturingVideo = true;
             videoBlobReady = VideoBlobReady;
+            videoBlobQueue.Clear();
+            videoQueueIndex = 0;
+            emptyFrames.Clear();
             dumpFrameParams = new VideoOutputType(Width, Height, FramesPerSecond, Format, true);
             SpaceTimeController.FrameDumping = true;
             SpaceTimeController.FramesPerSecond = FramesPerSecond;
@@ -817,7 +827,7 @@ namespace wwtlib
             {
                 if ((dumpFrameParams != null) && (!dumpFrameParams.WaitDownload || tilesAllLoaded))
                 {
-                    CaptureCurrentFrame(videoBlobReady, dumpFrameParams.Width, dumpFrameParams.Height, dumpFrameParams.Format);
+                    CaptureFrameForVideo(videoBlobReady, dumpFrameParams.Width, dumpFrameParams.Height, dumpFrameParams.Format);
                     SpaceTimeController.NextFrame();
                 }
                 if (SpaceTimeController.DoneDumping)
@@ -825,7 +835,6 @@ namespace wwtlib
                     SpaceTimeController.FrameDumping = false;
                     SpaceTimeController.CancelFrameDump = false;
                     CapturingVideo = false;
-                    videoBlobReady = null;
                 }
             }
         }
@@ -2892,6 +2901,54 @@ namespace wwtlib
             CaptureFrame(blobReady, width, height, format, false);
         }
 
+        public void CaptureFrameForVideo(BlobReady blobReady, int width, int height, string format)
+        {
+            int frameNumber = SpaceTimeController.CurrentFrameNumber;
+            BlobReady forVideo = delegate (Blob blob)
+            {
+                bool containsIndex;
+                if (frameNumber == videoQueueIndex)
+                {
+                    blobReady(blob);
+                    videoQueueIndex += 1;
+
+                    // Keep moving forward until we hit the next index that we're still waiting on
+                    while ((containsIndex = videoBlobQueue.ContainsKey(videoQueueIndex)) || emptyFrames.Contains(videoQueueIndex))
+                    {
+                        if (containsIndex)
+                        {
+                            blobReady(videoBlobQueue[videoQueueIndex]);
+                            videoBlobQueue[videoQueueIndex] = null;
+                        }
+                        else
+                        {
+                            emptyFrames.Remove(videoQueueIndex);
+                        }
+                        videoQueueIndex += 1;
+                    }
+                }
+                else
+                {
+                    if (blob != null)
+                    {
+                        videoBlobQueue[frameNumber] = blob;
+                    }
+                    else
+                    {
+                        emptyFrames.Add(frameNumber);
+                    }
+                }
+                if (videoQueueIndex >= SpaceTimeController.TotalFrames)
+                {
+                    videoBlobReady = null;
+                    videoBlobQueue = null;
+                    videoQueueIndex = 0;
+                    emptyFrames.Clear();
+                }
+            };
+            CaptureCurrentFrame(forVideo, width, height, format);
+        }
+
         public void CaptureFrame(BlobReady blobReady, int width, int height, string format, bool needRender)
         {
             if (needRender)
@@ -2915,7 +2972,7 @@ namespace wwtlib
                 }
                 else
                 {
-                 cw = (int)((double)ch * imageAspect);
+                    cw = (int)((double)ch * imageAspect);
                 }
 
                 int cx = (width - cw) / 2;
@@ -2931,7 +2988,7 @@ namespace wwtlib
                 Script.Literal("if ( typeof {0}.msToBlob == 'function') {{ var blob = {0}.msToBlob(); {1}(blob); }} else {{ {0}.toBlob({1}, {2}); }}", temp, blobReady, format);
 
 
-              //  thumb.Src = temp.GetDataUrl();
+                //  thumb.Src = temp.GetDataUrl();
             }, false);
 
             image.Src = Singleton.Canvas.GetDataUrl();
@@ -3009,7 +3066,9 @@ namespace wwtlib
 
     public delegate void BlobReady(System.Html.Data.Files.Blob blob);
 
-    public class WWTElementEvent
+    //public delegate void BlobFrameReady(System.Html.Data.Files.Blob blob, int FrameNumber);
+
+    public class WWTElementEvent 
     {
         public double OffsetX;
         public double OffsetY;

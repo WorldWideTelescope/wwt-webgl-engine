@@ -564,6 +564,12 @@ export const WWTAwareComponent = defineComponent({
        */
       "loadImageCollection",
 
+      /** Add an imageset directly into the engine's database.
+       *
+       * If an imageset with the same URL has already been loaded, this is a no-op.
+       */
+      "addImagesetToRepository",
+
       /** Deprecated. Use addImageSetLayer instead.
        * Request the creation of a FITS image layer.
        *

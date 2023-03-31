@@ -344,7 +344,7 @@ export interface WWTEnginePiniaState {
 
   /** Settings for all registered WWT spreadsheet layers. */
   spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState };
-  
+
 }
 
 /** The parameters for the [[createTableLayer]] action. */
@@ -490,9 +490,9 @@ export const engineStore = defineStore('wwt-engine', {
   getters: {
     lookupImageset(_state) {
       return (imagesetName: string) => {
-      if (this.$wwt.inst === null)
-        throw new Error('cannot lookupImageset without linking to WWTInstance');
-      return this.$wwt.inst.ctl.getImagesetByName(imagesetName);
+        if (this.$wwt.inst === null)
+          throw new Error('cannot lookupImageset without linking to WWTInstance');
+        return this.$wwt.inst.ctl.getImagesetByName(imagesetName);
       }
     },
 
@@ -520,15 +520,15 @@ export const engineStore = defineStore('wwt-engine', {
     },
 
     activeImagesetLayerStates(): ImageSetLayerState[] {
-        const states: ImageSetLayerState[] = [];
-    
-        for (const guid of this.activeLayers) {
-          const layerState = this.imagesetLayers[guid];
-          if (layerState) {
-            states.push(layerState);
-          }
+      const states: ImageSetLayerState[] = [];
+
+      for (const guid of this.activeLayers) {
+        const layerState = this.imagesetLayers[guid];
+        if (layerState) {
+          states.push(layerState);
         }
-    
+      }
+
       return states;
     },
 
@@ -538,7 +538,7 @@ export const engineStore = defineStore('wwt-engine', {
       }
     },
 
-    imagesetForLayer(_state){
+    imagesetForLayer(_state) {
       return (guidtext: string): Imageset | null => {
         if (this.$wwt.inst === null)
           throw new Error('cannot get imagesetForLayer without linking to WWTInstance');
@@ -612,7 +612,7 @@ export const engineStore = defineStore('wwt-engine', {
         return state.spreadSheetLayers[id] || null;
       }
     },
-  
+
     spreadSheetLayer(_state) {
       return (catalog: CatalogLayerInfo): SpreadSheetLayer | null => {
         if (this.$wwt.inst === null)
@@ -622,7 +622,7 @@ export const engineStore = defineStore('wwt-engine', {
         return this.spreadSheetLayerById(key);
       }
     },
-  
+
     spreadsheetState(state) {
       return (catalog: CatalogLayerInfo): SpreadSheetLayerSettingsInterfaceRO | null => {
         const key = this.catalogLayerKey(catalog);
@@ -644,46 +644,46 @@ export const engineStore = defineStore('wwt-engine', {
     internalUpdate(): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot internalUpdate without linking to WWTInstance');
-  
+
       const wwt = this.$wwt.inst;
-  
+
       const raRad = wwt.si.getRA() * H2R;
       if (this.raRad != raRad)
         this.raRad = raRad;
-  
+
       const decRad = wwt.si.getDec() * D2R;
       if (this.decRad != decRad)
         this.decRad = decRad;
-  
+
       const zoomDeg = wwt.ctl.renderContext.viewCamera.zoom;
       if (this.zoomDeg != zoomDeg)
         this.zoomDeg = zoomDeg;
-  
+
       const rollRad = wwt.ctl.renderContext.viewCamera.rotation;
       if (this.rollRad != rollRad)
         this.rollRad = rollRad;
-  
+
       const bg = wwt.ctl.renderContext.get_backgroundImageset() || null; // TEMP
       if (this.backgroundImageset != bg)
         this.backgroundImageset = bg;
-  
+
       const time = wwt.stc.get_now();
       if (this.currentTime != time)
         this.currentTime = time;
-  
+
       const fg = wwt.ctl.renderContext.get_foregroundImageset() || null; // TEMP
       if (this.foregroundImageset != fg)
         this.foregroundImageset = fg;
-  
+
       if (this.foregroundOpacity != wwt.ctl.renderContext.viewCamera.opacity)
         this.foregroundOpacity = wwt.ctl.renderContext.viewCamera.opacity;
-  
+
       if (this.renderType != wwt.ctl.renderType)
         this.renderType = wwt.ctl.renderType;
-  
+
       const player = wwt.getActiveTourPlayer();
       this.tourTimecode = wwt.getEffectiveTourTimecode();
-  
+
       if (player !== null) {
         this.isTourPlayerActive = true;
         this.isTourPlaying = wwt.getIsTourPlaying(player);
@@ -691,7 +691,7 @@ export const engineStore = defineStore('wwt-engine', {
         this.isTourPlayerActive = false;
         this.isTourPlaying = false;
       }
-  
+
       const showWebGl2Warning = !wwt.si.isUsingWebGl2()
         && (Date.now() - this.timeAtStartup) < 15000;
       if (this.showWebGl2Warning != showWebGl2Warning) {
@@ -751,80 +751,80 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot tilt without linking to WWTInstance');
       this.$wwt.inst.ctl._tilt(args.x, args.y);
     },
-  
+
     setTime(time: Date): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot setTime without linking to WWTInstance');
       this.$wwt.inst.stc.set_now(time);
       this.clockDiscontinuities += 1;
     },
-  
+
     setClockRate(rate: number): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot setClockRate without linking to WWTInstance');
-  
+
       if (this.$wwt.inst.stc.get_timeRate() != rate) {
         this.$wwt.inst.stc.set_timeRate(rate);
         this.clockRate = rate;
         this.clockDiscontinuities += 1;
       }
     },
-  
+
     setClockSync(isSynced: boolean): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot setClockSync without linking to WWTInstance');
-  
+
       if (this.$wwt.inst.stc.get_syncToClock() != isSynced) {
         this.$wwt.inst.stc.set_syncToClock(isSynced);
-  
+
         if (isSynced) {
           this.clockRate = this.$wwt.inst.stc.get_timeRate();
         } else {
           this.clockRate = 0;
         }
-  
+
         this.clockDiscontinuities += 1;
       }
     },
-  
+
     startTour(): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot start tour without linking to WWTInstance');
-  
+
       const player = this.$wwt.inst.getActiveTourPlayer();
       if (player === null)
         throw new Error('no tour to start');
-  
+
       player.play();
     },
-  
+
     toggleTourPlayPauseState(): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot play/pause tour without linking to WWTInstance');
-  
+
       const player = this.$wwt.inst.getActiveTourPlayer();
       if (player === null)
         throw new Error('no tour to play/pause');
-  
+
       // Despite the unclear name, this function does toggle play/pause state.
       player.pauseTour();
     },
-  
+
     setTourPlayerLeaveSettingsWhenStopped(value: boolean): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot setTourPlayerLeaveSettingsWhenStopped without linking to WWTInstance');
-  
+
       const player = this.$wwt.inst.getActiveTourPlayer();
       if (player === null)
         throw new Error('no tour player to control');
-  
+
       player.set_leaveSettingsWhenStopped(value);
     },
-  
+
     seekToTourTimecode(value: number): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot seekToTourTimecode without linking to WWTInstance');
-  
+
       this.$wwt.inst.seekToTourTimecode(value);
     },
 
@@ -839,7 +839,7 @@ export const engineStore = defineStore('wwt-engine', {
       const blob = tour.saveToBlob();
       const reader = new FileReader();
       reader.readAsText(blob);
-  
+
       let tourXml = "";
       return new Promise((resolve, _reject) => {
         reader.onloadend = () => {
@@ -857,7 +857,7 @@ export const engineStore = defineStore('wwt-engine', {
           const waitThenResolve = (): void => {
             (this.$wwt.inst as WWTInstance).waitForReady().then(resolve);
           };
-  
+
           if (this.$wwt.inst !== null) {
             waitThenResolve();
           } else {
@@ -900,28 +900,28 @@ export const engineStore = defineStore('wwt-engine', {
     ) {
       if (this.$wwt.inst === null)
         throw new Error('cannot loadTour without linking to WWTInstance');
-  
+
       if (play)
         await this.$wwt.inst.loadAndPlayTour(url);
       else
         await this.$wwt.inst.loadTour(url);
-  
+
       let tourRunTime: number | null = null;
       const tourStopStartTimes: number[] = [];
-  
+
       const player = this.$wwt.inst.getActiveTourPlayer();
       if (player !== null) {
         const tour = player.get_tour();
         if (tour !== null) {
           tourRunTime = tour.get_runTime() * 0.001; // ms => s
           const nStops = tour.get_tourStops().length;
-  
+
           for (let i = 0; i < nStops; i++) {
             tourStopStartTimes.push(tour.elapsedTimeTillTourstop(i));
           }
         }
       }
-  
+
       return { tourRunTime, tourStopStartTimes };
     },
 
@@ -935,14 +935,21 @@ export const engineStore = defineStore('wwt-engine', {
       return result;
     },
 
+    addImagesetToRepository(imgset: Imageset): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot addImagesetToRepository without linking to WWTInstance');
+
+      this.$wwt.inst.addImagesetToRepository(imgset);
+    },
+
     // General layers
 
     deleteLayer(id: string | Guid): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot deleteLayer without linking to WWTInstance');
-  
+
       let stringId = "";
-  
+
       if (typeof id === "string") {
         stringId = id;
         const guid = Guid.fromString(id);
@@ -951,12 +958,12 @@ export const engineStore = defineStore('wwt-engine', {
         stringId = id.toString();
         this.$wwt.inst.lm.deleteLayerByID(id, true, true);
       }
-  
+
       // Mirror modification in the reactive system. Here we just
       // delete willy-nilly and ignore any missing cases.
       delete this.imagesetLayers[stringId];
       delete this.spreadSheetLayers[stringId];
-  
+
       this.activeLayers = activeLayersList(this.$wwt);
     },
 
@@ -967,12 +974,12 @@ export const engineStore = defineStore('wwt-engine', {
     ): Promise<ImageSetLayer> {
       if (this.$wwt.inst === null)
         throw new Error('cannot addImageSetLayer without linking to WWTInstance');
-  
+
       // Mirror the layer state into the reactivity system.
       const wwtLayer = await this.$wwt.inst.addImageSetLayer(options);
       const guidText = wwtLayer.id.toString();
       this.imagesetLayers[guidText] = new ImageSetLayerState(wwtLayer);
-  
+
       this.activeLayers = activeLayersList(this.$wwt);
       return wwtLayer;
     },
@@ -983,21 +990,21 @@ export const engineStore = defineStore('wwt-engine', {
     ): Promise<ImageSetLayer> {
       if (this.$wwt.inst === null)
         throw new Error('cannot loadFitsLayer without linking to WWTInstance');
-  
+
       const addImageSetLayerOptions: AddImageSetLayerOptions = {
         url: options.url,
         mode: "fits",
         name: options.name,
         goto: options.gotoTarget
       };
-  
+
       return this.$wwt.inst.addImageSetLayer(addImageSetLayerOptions);
     },
 
     setImageSetLayerOrder(options: SetLayerOrderOptions): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot setImageSetLayerOrder without linking to WWTInstance');
-  
+
       this.$wwt.inst.setImageSetLayerOrder(options);
       this.activeLayers = activeLayersList(this.$wwt);
     },
@@ -1005,9 +1012,9 @@ export const engineStore = defineStore('wwt-engine', {
     stretchFitsLayer(options: StretchFitsLayerOptions): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot stretchFitsLayer without linking to WWTInstance');
-  
+
       this.$wwt.inst.stretchFitsLayer(options);
-  
+
       // Update the reactive mirror.
       const state = this.imagesetLayers[options.id];
       if (state) {
@@ -1020,9 +1027,9 @@ export const engineStore = defineStore('wwt-engine', {
     setFitsLayerColormap(options: SetFitsLayerColormapOptions): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot setFitsLayerColormap without linking to WWTInstance');
-  
+
       this.$wwt.inst.setFitsLayerColormap(options);
-  
+
       // Update the reactive mirror.
       const state = this.imagesetLayers[options.id];
       if (state) {
@@ -1033,9 +1040,9 @@ export const engineStore = defineStore('wwt-engine', {
     applyFitsLayerSettings(options: ApplyFitsLayerSettingsOptions): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot applyFitsLayerSettings without linking to WWTInstance');
-  
+
       this.$wwt.inst.applyFitsLayerSettings(options);
-  
+
       // Update the reactive mirror.
       const state = this.imagesetLayers[options.id];
       if (state) {
@@ -1052,13 +1059,13 @@ export const engineStore = defineStore('wwt-engine', {
     ): Promise<SpreadSheetLayer> {
       if (this.$wwt.inst === null)
         throw new Error('cannot createTableLayer without linking to WWTInstance');
-  
+
       const layer = this.$wwt.inst.lm.createSpreadsheetLayer(
         options.referenceFrame,
         options.name,
         options.dataCsv
       );
-  
+
       // Value-add init copied from the pywwt JS component.
       // Override any column guesses:
       layer.set_lngColumn(-1);
@@ -1071,23 +1078,23 @@ export const engineStore = defineStore('wwt-engine', {
       layer.set_xAxisColumn(-1);
       layer.set_yAxisColumn(-1);
       layer.set_zAxisColumn(-1);
-  
+
       layer.set_altUnit(AltUnits.meters);
       layer.set_referenceFrame(options.referenceFrame);
-  
+
       if (options.referenceFrame == 'Sky') {
         layer.set_astronomical(true);
       }
-  
+
       // Currently, table creation is synchronous, but treat it as async
       // in case our API needs to get more sophisticated later.
       const prom = Promise.resolve(layer);
-  
+
       // Mirror the layer state into the reactivity system.
       const wwtLayer = await prom;
       const guidText = wwtLayer.id.toString();
       this.spreadSheetLayers[guidText] = new SpreadSheetLayerState(wwtLayer);
-  
+
       this.activeLayers = activeLayersList(this.$wwt);
       return wwtLayer;
     },
@@ -1095,12 +1102,12 @@ export const engineStore = defineStore('wwt-engine', {
     applyTableLayerSettings(options: ApplyTableLayerSettingsOptions): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot applyTableLayerSettings without linking to WWTInstance');
-  
+
       this.$wwt.inst.applyTableLayerSettings(options);
-  
+
       // Mirror changes in the reactive framework.
       const state = this.spreadSheetLayers[options.id];
-  
+
       if (state !== undefined) {
         for (const s of options.settings) {
           applySpreadSheetLayerSetting(state, s);
@@ -1112,7 +1119,7 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot updateTableLayer without linking to WWTInstance');
       this.$wwt.inst.updateTableLayer(options);
-  
+
       // Nothing to mirror in reactive-land -- this call affects the table data.
     },
 
@@ -1123,13 +1130,13 @@ export const engineStore = defineStore('wwt-engine', {
     async addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
       if (this.$wwt.inst == null)
         throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
-  
+
       const imgset = await this.$wwt.inst.addCatalogHipsByName(options);
-  
+
       // Mirror the spreadsheet layer aspect into the reactivity system.
-  
+
       const hips = imgset.get_hipsProperties();
-  
+
       if (hips !== null) {
         const wwtLayer = hips.get_catalogSpreadSheetLayer();
         const guidText = wwtLayer.id.toString();
@@ -1139,7 +1146,7 @@ export const engineStore = defineStore('wwt-engine', {
           info.id = guidText;
         }
       }
-  
+
       this.activeLayers = activeLayersList(this.$wwt);
       return imgset;
     },
@@ -1153,12 +1160,12 @@ export const engineStore = defineStore('wwt-engine', {
     removeCatalogHipsByName(name: string): void {
       if (this.$wwt.inst == null)
         throw new Error('cannot removeCatalogHipsByName without linking to WWTInstance');
-  
+
       this.$wwt.inst.ctl.removeCatalogHipsByName(name);
 
       const id = Guid.createFrom(name).toString();
       delete this.spreadSheetLayers[id];
-  
+
       this.activeLayers = activeLayersList(this.$wwt);
     },
 
@@ -1198,5 +1205,4 @@ export const engineStore = defineStore('wwt-engine', {
       return this.$wwt.inst.captureVideo(options);
     }
   },
-
 });

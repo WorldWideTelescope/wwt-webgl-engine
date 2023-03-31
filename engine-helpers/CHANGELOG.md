@@ -1,5 +1,11 @@
 # rc: minor bump
 
+- Expose the "addImageSetToRepository" function through the engine stack (#241, @pkgw)
+- Remove unnecessary `name` parameter in the frame export code (#240, @Carifio24)
+
+
+# @wwtelescope/engine-helpers 0.13.0 (2023-03-29)
+
 - Expose the new, expanded frame-capture functionality which can capture a
   sequence of frames (#239, @Carifio24).
 
