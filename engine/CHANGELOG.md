@@ -1,3 +1,11 @@
+# @wwtelescope/engine 7.24.0 (2023-03-31)
+
+- Expose the "addImageSetToRepository" function through the engine stack (#241, @pkgw)
+- expose the Place.camParams property (#241, @pkgw)
+- Ensure video frames are in the correct order (#240, @Carifio24)
+- Make movers aware of SpaceTimeController.MetaNow (#240, @Carifio24)
+
+
 # @wwtelescope/engine 7.23.0 (2023-03-29)
 
 - Honor opacity settings for geometric annotations that weren't doing

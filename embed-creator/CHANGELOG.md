@@ -1,3 +1,9 @@
+# @wwtelescope/embed-creator 0.4.2 (2023-03-31)
+
+- No code changes
+- Bump webpack from 5.75.0 to 5.76.0
+
+
 # @wwtelescope/embed-creator 0.4.1 (2023-02-27)
 
 - Update dependency version specifications (#233, @pkgw)

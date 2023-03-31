@@ -1,3 +1,8 @@
+# @wwtelescope/engine-pinia 0.6.0 (2023-03-31)
+
+- Expose the "addImageSetToRepository" function through the engine stack (#241, @pkgw)
+
+
 # @wwtelescope/engine-pinia 0.5.0 (2023-03-29)
 
 - Expose the new, expanded frame-capture functionality which can capture a

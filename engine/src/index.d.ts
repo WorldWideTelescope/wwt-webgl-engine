@@ -1170,6 +1170,8 @@ export class Place implements Thumbnail {
   set_annotation(v: string): string;
   get_backgroundImageset(): Imageset | null;
   set_backgroundImageset(v: Imageset | null): Imageset | null;
+  get_camParams(): CameraParameters;
+  set_camParams(v: CameraParameters): CameraParameters;
   get_children(): Thumbnail[];
   get_classification(): Classification;
   set_classification(v: Classification): Classification;
@@ -2451,6 +2453,12 @@ export class WcsImage {
  *
  * */
 export class WWTControl {
+  /** Add an imageset directly into the engine's database.
+   *
+   * If another imageset with the same image URL is already loaded,
+   * this is a no-op.
+   */
+  static addImageSetToRepository(img: Imageset): void;
 
   /** The image sets that have been loaded into the engine */
   static getImageSets(): Imageset[];

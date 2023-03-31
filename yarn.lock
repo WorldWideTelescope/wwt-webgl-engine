@@ -1668,14 +1668,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine-helpers@workspace:*, @wwtelescope/engine-helpers@workspace:>=0.13.0, @wwtelescope/engine-helpers@workspace:>=0.8.1, @wwtelescope/engine-helpers@workspace:engine-helpers":
+"@wwtelescope/engine-helpers@workspace:*, @wwtelescope/engine-helpers@workspace:>=0.14.0, @wwtelescope/engine-helpers@workspace:>=0.8.1, @wwtelescope/engine-helpers@workspace:engine-helpers":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine-helpers@workspace:engine-helpers"
   dependencies:
     "@typescript-eslint/eslint-plugin": ^5.38.1
     "@typescript-eslint/parser": ^5.38.1
     "@wwtelescope/astro": "workspace:>=0.1.0"
-    "@wwtelescope/engine": "workspace:^7.23.0"
+    "@wwtelescope/engine": "workspace:^7.24.0"
     "@wwtelescope/engine-types": "workspace:>=0.6.0"
     eslint: ^8.24.0
     rimraf: ^3
@@ -1695,8 +1695,8 @@ __metadata:
     "@vue/cli-service": ^5.0.8
     "@vue/eslint-config-typescript": ^11.0.2
     "@wwtelescope/astro": "workspace:>=0.2.2"
-    "@wwtelescope/engine": "workspace:^7.23.0"
-    "@wwtelescope/engine-helpers": "workspace:>=0.13.0"
+    "@wwtelescope/engine": "workspace:^7.24.0"
+    "@wwtelescope/engine-helpers": "workspace:>=0.14.0"
     "@wwtelescope/engine-types": "workspace:>=0.6.3"
     eslint: ^8.24.0
     eslint-plugin-vue: ^9.5.1
@@ -1722,7 +1722,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine@workspace:*, @wwtelescope/engine@workspace:^7.14.0, @wwtelescope/engine@workspace:^7.16.0, @wwtelescope/engine@workspace:^7.23.0, @wwtelescope/engine@workspace:engine":
+"@wwtelescope/engine@workspace:*, @wwtelescope/engine@workspace:^7.14.0, @wwtelescope/engine@workspace:^7.16.0, @wwtelescope/engine@workspace:^7.24.0, @wwtelescope/engine@workspace:engine":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine@workspace:engine"
   dependencies:

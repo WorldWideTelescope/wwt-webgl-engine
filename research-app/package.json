@@ -69,5 +69,5 @@
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },
-  "version": "0.14.0"
+  "version": "0.14.1"
 }

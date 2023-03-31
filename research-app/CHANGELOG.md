@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.14.1 (2023-03-31)
+
+- No code changes
+- Bump webpack from 5.75.0 to 5.76.0
+
+
 # @wwtelescope/research-app 0.14.0 (2023-02-27)
 
 - Send the roll angle of the camera in view state messages (#231, @Carifio24).

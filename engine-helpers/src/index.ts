@@ -316,9 +316,6 @@ export interface CaptureFrameOptions {
 }
 
 export interface CaptureVideoOptions {
-  /** The video name */
-  name: string;
-
   /** The desired image width, in pixels. */
   width: number;
 
@@ -545,6 +542,16 @@ export class WWTInstance {
       options.trackObject
     );
     return this.makeArrivePromise(options.instant);
+  }
+
+  /** Add an imageset directly into the engine's database.
+   *
+   * If an imageset with the same URL has already been loaded, this is a no-op.
+   *
+   * @param imgset The imageset to add
+   */
+  addImagesetToRepository(imgset: Imageset) {
+    WWTControl.addImageSetToRepository(imgset);
   }
 
   // Collection-loaded promises. To simplify the handling, we never load the
@@ -1053,12 +1060,12 @@ export class WWTInstance {
         function stream() {
           let received = 0;
           wwtControl.captureVideo(blob => {
-              received++;
-              controller.enqueue(blob);
-              if (received >= options.totalFrames) {
-                controller.close();
-              }
-            },
+            received++;
+            controller.enqueue(blob);
+            if (received >= options.totalFrames) {
+              controller.close();
+            }
+          },
             options.width,
             options.height,
             options.framesPerSecond,

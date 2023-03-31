@@ -1,3 +1,9 @@
+# @wwtelescope/embed 1.6.2 (2023-03-31)
+
+- No code changes
+- Bump webpack from 5.75.0 to 5.76.0
+
+
 # @wwtelescope/embed 1.6.1 (2023-02-27)
 
 - Correct missing @fortawesome/vue-fontawesome dependencies (#233, @pkgw)
