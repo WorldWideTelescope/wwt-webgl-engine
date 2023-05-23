@@ -1193,7 +1193,7 @@ const App = defineComponent({
       lastSelectedSource: null as Source | null,
       selectionProximity: 4,
       hideAllChrome: false,
-      hipsUrl: "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips", // Temporary
+      hipsUrl: `${window.location.protocol}//www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips`, // Temporary
       isPointerMoving: false,
       messageQueue: [] as Message[],
       pointerMoveThreshold: 6,
