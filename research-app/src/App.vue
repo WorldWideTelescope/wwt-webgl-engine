@@ -2858,7 +2858,9 @@ const App = defineComponent({
       this.loadImageCollection({
         url: this.hipsUrl,
         loadChildFolders: true,
-      }).then(() => {
+      }).catch((error) => {
+        console.error(error);
+      }).finally(() => {
         // Handle the query script
         // We (potentially) need the catalogs to have finished loading for this
         if (script !== null) {
