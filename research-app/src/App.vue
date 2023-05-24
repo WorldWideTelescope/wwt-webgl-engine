@@ -1193,7 +1193,7 @@ const App = defineComponent({
       lastSelectedSource: null as Source | null,
       selectionProximity: 4,
       hideAllChrome: false,
-      hipsUrl: "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips", // Temporary
+      hipsUrl: `${window.location.protocol}//www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips`, // Temporary
       isPointerMoving: false,
       messageQueue: [] as Message[],
       pointerMoveThreshold: 6,
@@ -2858,7 +2858,9 @@ const App = defineComponent({
       this.loadImageCollection({
         url: this.hipsUrl,
         loadChildFolders: true,
-      }).then(() => {
+      }).catch((error) => {
+        console.error(error);
+      }).finally(() => {
         // Handle the query script
         // We (potentially) need the catalogs to have finished loading for this
         if (script !== null) {
