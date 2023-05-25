@@ -1,5 +1,11 @@
 # rc: micro bump
 
+- Load the HiPS catalog over HTTPS if the app itself is loaded over HTTPS,
+  fixing potential mixed-content security errors (#249, @Carifio24).
+
+
+# @wwtelescope/research-app 0.14.1 (2023-03-31)
+
 - No code changes
 - Bump webpack from 5.75.0 to 5.76.0
 

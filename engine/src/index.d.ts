@@ -1704,6 +1704,13 @@ export namespace SpaceTimeController {
    */
   export function set_now(date: Date): Date;
 
+  /** Get the current internal time of the WWT clock as a JavaScript Date.
+   *
+   * In some situations (such as frame-dumping mode for video capture), this will
+   * not be in sync with the current actual time.
+   */
+  export function get_metaNow(): Date;
+
   /** Get whether the WWT clock moves at the same rate as the system clock.
    *
    * Note that this value may be true but there may still be a constant offset

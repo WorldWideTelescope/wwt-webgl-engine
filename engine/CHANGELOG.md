@@ -1,5 +1,10 @@
 # rc: minor bump
 
+- Add TypeScript declaration for `SpaceTimeController::get_metaNow` (#242, @Carifio24).
+
+
+# @wwtelescope/engine 7.24.0 (2023-03-31)
+
 - Expose the "addImageSetToRepository" function through the engine stack (#241, @pkgw)
 - expose the Place.camParams property (#241, @pkgw)
 - Ensure video frames are in the correct order (#240, @Carifio24)
