@@ -1,5 +1,10 @@
 # rc: minor bump
 
+- Expose URLHelpers framework to TypeScript (#250, @imbasimba).
+
+
+# @wwtelescope/engine 7.25.0 (2023-05-25)
+
 - Add TypeScript declaration for `SpaceTimeController::get_metaNow` (#242, @Carifio24).
 
 
@@ -19,7 +24,7 @@
   frames (#239, @Carifio24). This mode can make sure to wait for tile data to
   download before advancing the engine clock and emitting the next frame, using
   an implementation derived from the Windows client.
-  
+
 
 # @wwtelescope/engine 7.22.0 (2023-03-20)
 
