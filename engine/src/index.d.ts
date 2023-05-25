@@ -2211,6 +2211,23 @@ export class TourStop implements SettingsInterface {
  * */
 export interface UiController { }
 
+/** A helper class for rewriting URLs. We might need to proxy for CORS headers
+ * and/or HTTPS support, *and* we sometimes also want to change the host and/or
+ * path.
+* */
+export namespace URLHelpers {
+    /** Rewrite URL to deal with CORS issues, HTTPS issues, or similar issues.
+   *
+   * @param url The URL to be rewritten.
+   * @param rwmode Either 0 or 1. 0 if the input URL should be treated as an
+   * absolute URL. 1 if the input URL is relative to the browser origin.
+   * @returns The new URL.
+   * */
+  export function rewrite(url: string, rwmode: number): string;
+  export const singleton: URLHelpers;
+}
+
+export type URLHelpers = typeof URLHelpers;
 
 /** A VOTable dataset.
  *
