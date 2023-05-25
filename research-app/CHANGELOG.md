@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.14.2 (2023-05-25)
+
+- Load the HiPS catalog over HTTPS if the app itself is loaded over HTTPS,
+  fixing potential mixed-content security errors (#249, @Carifio24).
+
+
 # @wwtelescope/research-app 0.14.1 (2023-03-31)
 
 - No code changes

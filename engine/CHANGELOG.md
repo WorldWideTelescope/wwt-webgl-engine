@@ -1,3 +1,8 @@
+# @wwtelescope/engine 7.25.0 (2023-05-25)
+
+- Add TypeScript declaration for `SpaceTimeController::get_metaNow` (#242, @Carifio24).
+
+
 # @wwtelescope/engine 7.24.0 (2023-03-31)
 
 - Expose the "addImageSetToRepository" function through the engine stack (#241, @pkgw)
