@@ -2525,8 +2525,9 @@ const App = defineComponent({
         layer = sourceLayer;
       }
 
+      const rawSource = isProxy(source) ? toRaw(source) : source;
       return {
-        ...source,
+        ...rawSource,
         catalogLayer: layer,
       };
     },
@@ -3050,11 +3051,10 @@ const App = defineComponent({
       if (this.$options.statusMessageDestination === null || this.allowedOrigin === null)
         return;
 
-      const rawSource = isProxy(source) ? toRaw(source) : source;
       const msg: selections.SelectionStateMessage = {
         type: "wwt_selection_state",
         sessionId: this.statusMessageSessionId,
-        mostRecentSource: this.prepareForMessaging(rawSource),
+        mostRecentSource: this.prepareForMessaging(source),
       };
 
       this.$options.statusMessageDestination.postMessage(msg, this.allowedOrigin);
