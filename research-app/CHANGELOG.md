@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.14.3 (2023-05-30)
+
+- Make sure not to send proxy objects when sending lists of selected
+  sources over the messaging API (#251, @Carifio24).
+
+
 # @wwtelescope/research-app 0.14.2 (2023-05-25)
 
 - Load the HiPS catalog over HTTPS if the app itself is loaded over HTTPS,
