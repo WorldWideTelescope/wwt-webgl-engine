@@ -2526,9 +2526,10 @@ const App = defineComponent({
       }
 
       const rawSource = isProxy(source) ? toRaw(source) : source;
+      const rawLayer = isProxy(layer) ? toRaw(layer): layer;
       return {
         ...rawSource,
-        catalogLayer: layer,
+        catalogLayer: rawLayer,
       };
     },
 
