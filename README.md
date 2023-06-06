@@ -9,6 +9,7 @@
 [![npm](https://img.shields.io/npm/v/@wwtelescope/engine-pinia?label=@wwtelescope/engine-pinia)](https://www.npmjs.com/package/@wwtelescope/engine-pinia)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/research-app?label=@wwtelescope/research-app)](https://www.npmjs.com/package/@wwtelescope/research-app)
 [![npm](https://img.shields.io/npm/v/@wwtelescope/research-app-messages?label=@wwtelescope/research-app-messages)](https://www.npmjs.com/package/@wwtelescope/research-app-messages)
+[![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](http://numfocus.org)
 
 # The AAS WorldWide Telescope WebGL engine
 
@@ -22,6 +23,22 @@ Learn more about WWT [here][wwt-home].
 [TypeScript]: https://www.typescriptlang.org/
 [wwt-home]: https://worldwidetelescope.org/home/
 [webclient]: https://worldwidetelescope.org/webclient/
+
+[//]: # (numfocus-fiscal-sponsor-attribution)
+
+The WorldWide Telescope project uses an [open governance
+model](https://worldwidetelescope.org/about/governance/) and is fiscally
+sponsored by [NumFOCUS](https://numfocus.org/). Consider making a
+[tax-deductible donation](https://numfocus.org/donate-for-worldwide-telescope)
+to help the project pay for developer time, professional services, travel,
+workshops, and a variety of other needs.
+
+<div align="center">
+  <a href="https://numfocus.org/donate-for-worldwide-telescope">
+    <img height="60px"
+         src="https://raw.githubusercontent.com/numfocus/templates/master/images/numfocus-logo.png">
+  </a>
+</div>
 
 
 ## Developers’ quick start
