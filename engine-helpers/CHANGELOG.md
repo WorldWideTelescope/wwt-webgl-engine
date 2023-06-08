@@ -1,3 +1,8 @@
+# @wwtelescope/engine-helpers 0.15.0 (2023-06-08)
+
+- Have the `addImagesetToRepository` method return an imageset (#256, @pkgw).
+
+
 # @wwtelescope/engine-helpers 0.14.0 (2023-03-31)
 
 - Expose the "addImageSetToRepository" function through the engine stack (#241, @pkgw)

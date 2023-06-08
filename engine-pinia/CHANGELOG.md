@@ -1,3 +1,8 @@
+# @wwtelescope/engine-pinia 0.7.0 (2023-06-08)
+
+- Have the `addImagesetToRepository` method return an imageset (#256, @pkgw).
+
+
 # @wwtelescope/engine-pinia 0.6.0 (2023-03-31)
 
 - Expose the "addImageSetToRepository" function through the engine stack (#241, @pkgw)

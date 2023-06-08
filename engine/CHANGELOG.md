@@ -1,3 +1,8 @@
+# @wwtelescope/engine 7.27.0 (2023-06-08)
+
+- Have the `addImagesetToRepository` method return an imageset (#256, @pkgw).
+
+
 # @wwtelescope/engine 7.26.0 (2023-05-25)
 
 - Expose URLHelpers framework to TypeScript (#250, @imbasimba).

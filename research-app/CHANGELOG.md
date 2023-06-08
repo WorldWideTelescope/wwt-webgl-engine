@@ -1,3 +1,8 @@
+# @wwtelescope/research-app 0.14.4 (2023-06-08)
+
+- Also ensure that catalog layer info is not a proxy (#253, @Carifio24).
+
+
 # @wwtelescope/research-app 0.14.3 (2023-05-30)
 
 - Make sure not to send proxy objects when sending lists of selected

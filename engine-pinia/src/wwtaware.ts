@@ -566,7 +566,12 @@ export const WWTAwareComponent = defineComponent({
 
       /** Add an imageset directly into the engine's database.
        *
-       * If an imageset with the same URL has already been loaded, this is a no-op.
+       * If an imageset with the same URL has already been loaded, this is a
+       * no-op.
+       *
+       * This returns the imageset that ultimately resides in the engine's
+       * database. It could either be the input argument, if it was newly added,
+       * or a pre-existing imageset in the no-op condition.
        */
       "addImagesetToRepository",
 
