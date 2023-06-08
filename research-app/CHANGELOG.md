@@ -1,5 +1,10 @@
 # rc: micro bump
 
+- Also ensure that catalog layer info is not a proxy (#253, @Carifio24).
+
+
+# @wwtelescope/research-app 0.14.3 (2023-05-30)
+
 - Make sure not to send proxy objects when sending lists of selected
   sources over the messaging API (#251, @Carifio24).
 

@@ -2216,14 +2216,14 @@ export interface UiController { }
  * path.
 * */
 export namespace URLHelpers {
-    /** Rewrite URL to deal with CORS issues, HTTPS issues, or similar issues.
-   *
-   * @param url The URL to be rewritten.
-   * @param rwmode URLRewriteMode Either AsIfAbsolute or OriginRelative.
-   * AsIfAbsolute if the input URL should be treated as an absolute URL.
-   * OriginRelative if the input URL is relative to the browser origin.
-   * @returns The new URL.
-   * */
+  /** Rewrite URL to deal with CORS issues, HTTPS issues, or similar issues.
+ *
+ * @param url The URL to be rewritten.
+ * @param rwmode URLRewriteMode Either AsIfAbsolute or OriginRelative.
+ * AsIfAbsolute if the input URL should be treated as an absolute URL.
+ * OriginRelative if the input URL is relative to the browser origin.
+ * @returns The new URL.
+ * */
   export function rewrite(url: string, rwmode: URLRewriteMode): string;
   export const singleton: URLHelpers;
 }
@@ -2485,10 +2485,14 @@ export class WcsImage {
 export class WWTControl {
   /** Add an imageset directly into the engine's database.
    *
-   * If another imageset with the same image URL is already loaded,
-   * this is a no-op.
+   * If another imageset with the same image URL is already loaded, this is a
+   * no-op, and the pre-existing imageset is returned. The difference might
+   * matter for future name-based lookups.
+   *
+   * @returns Either the input imageset, or the pre-existing imageset in
+   * the no-op condition.
    */
-  static addImageSetToRepository(img: Imageset): void;
+  static addImageSetToRepository(img: Imageset): Imageset;
 
   /** The image sets that have been loaded into the engine */
   static getImageSets(): Imageset[];
