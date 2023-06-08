@@ -44,15 +44,17 @@ namespace wwtlib
 
         public IUiController uiController = null;
 
-        public static void AddImageSetToRepository(Imageset imagesetToAdd)
+        public static Imageset AddImageSetToRepository(Imageset imagesetToAdd)
         {
-            foreach(Imageset imageset in ImageSets){
-                if(imageset.ImageSetID == imagesetToAdd.ImageSetID)
+            foreach (Imageset imageset in ImageSets) {
+                if (imageset.ImageSetID == imagesetToAdd.ImageSetID)
                 {
-                    return;
+                    return imageset;
                 }
             }
+
             ImageSets.Add(imagesetToAdd);
+            return imagesetToAdd;
         }
 
         public static List<Imageset> GetImageSets()
@@ -3068,7 +3070,7 @@ namespace wwtlib
 
     //public delegate void BlobFrameReady(System.Html.Data.Files.Blob blob, int FrameNumber);
 
-    public class WWTElementEvent 
+    public class WWTElementEvent
     {
         public double OffsetX;
         public double OffsetY;
