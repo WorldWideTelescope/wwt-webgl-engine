@@ -549,9 +549,12 @@ export class WWTInstance {
    * If an imageset with the same URL has already been loaded, this is a no-op.
    *
    * @param imgset The imageset to add
+   * @returns Either the input argument, if it was added to the engine's
+   *   database, or the pre-existing imageset. The pre-existing imageset will
+   *   have the same URL but might differ in other respects, such as its name.
    */
-  addImagesetToRepository(imgset: Imageset) {
-    WWTControl.addImageSetToRepository(imgset);
+  addImagesetToRepository(imgset: Imageset): Imageset {
+    return WWTControl.addImageSetToRepository(imgset);
   }
 
   // Collection-loaded promises. To simplify the handling, we never load the
