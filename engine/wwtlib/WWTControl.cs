@@ -1437,7 +1437,12 @@ namespace wwtlib
                         double angle2 = Math.Asin(cross2 / (oldCenterDelta2.Length * newCenterDelta2.Length));
                         if (angle1 * angle2 >= 0)
                         {
-                            Roll(angle1 + angle2);
+                            double angle = angle1 + angle2;
+                            if (PlanetLike || SolarSystemMode)
+                            {
+                                angle *= -1;
+                            }
+                            Roll(angle);
                         }
                     }
                 }
