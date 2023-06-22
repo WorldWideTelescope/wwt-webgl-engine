@@ -217,7 +217,7 @@ namespace wwtlib
                 {
                     if (crossFadeTexture != null)
                     {
-                       // crossFadeTexture.Dispose();
+                        // crossFadeTexture.Dispose();
                     }
                     crossFadeTexture = RenderContext.GetScreenTexture();
 
@@ -228,7 +228,7 @@ namespace wwtlib
                 {
                     if (crossFadeTexture != null)
                     {
-                       // crossFadeTexture.Dispose();
+                        // crossFadeTexture.Dispose();
                         crossFadeTexture = null;
                     }
                 }
@@ -271,29 +271,29 @@ namespace wwtlib
                     if (fadePoints == null)
                     {
                         fadePoints = new PositionColoredTextured[4];
-                        for(int i=0; i < 4; i++)
+                        for (int i = 0; i < 4; i++)
                         {
                             fadePoints[i] = new PositionColoredTextured();
                         }
                     }
 
 
-                    fadePoints[0].Position.X = -RenderContext.Width/2;
-                    fadePoints[0].Position.Y = RenderContext.Height/2;
+                    fadePoints[0].Position.X = -RenderContext.Width / 2;
+                    fadePoints[0].Position.Y = RenderContext.Height / 2;
                     fadePoints[0].Position.Z = 1347;
                     fadePoints[0].Tu = 0;
                     fadePoints[0].Tv = 1;
                     fadePoints[0].Color = color;
 
-                    fadePoints[1].Position.X = -RenderContext.Width/2;
+                    fadePoints[1].Position.X = -RenderContext.Width / 2;
                     fadePoints[1].Position.Y = -RenderContext.Height / 2;
                     fadePoints[1].Position.Z = 1347;
                     fadePoints[1].Tu = 0;
                     fadePoints[1].Tv = 0;
                     fadePoints[1].Color = color;
 
-                    fadePoints[2].Position.X = RenderContext.Width/2;
-                    fadePoints[2].Position.Y = RenderContext.Height/2;
+                    fadePoints[2].Position.X = RenderContext.Width / 2;
+                    fadePoints[2].Position.Y = RenderContext.Height / 2;
                     fadePoints[2].Position.Z = 1347;
                     fadePoints[2].Tu = 1;
                     fadePoints[2].Tv = 1;
@@ -694,7 +694,7 @@ namespace wwtlib
                     }
                 }
 
-                if(RenderType == ImageSetType.Sky)
+                if (RenderType == ImageSetType.Sky)
                 {
                     foreach (Imageset imageset in RenderContext.CatalogHipsImagesets)
                     {
@@ -856,7 +856,7 @@ namespace wwtlib
             {
                 return "Earth";
             }
-            if (RenderContext.BackgroundImageset.Name == "Visible Imagery" && RenderContext.BackgroundImageset.Url.ToLowerCase().IndexOf("mars") > -1 )
+            if (RenderContext.BackgroundImageset.Name == "Visible Imagery" && RenderContext.BackgroundImageset.Url.ToLowerCase().IndexOf("mars") > -1)
             {
 
                 RenderContext.BackgroundImageset.ReferenceFrame = "Mars";
@@ -867,7 +867,7 @@ namespace wwtlib
             {
                 foreach (string name in SolarSystemObjectsNames)
                 {
-                    if (RenderContext.BackgroundImageset.Name.ToLowerCase().IndexOf(name.ToLowerCase()) > -1 )
+                    if (RenderContext.BackgroundImageset.Name.ToLowerCase().IndexOf(name.ToLowerCase()) > -1)
                     {
                         RenderContext.BackgroundImageset.ReferenceFrame = name;
                         return name;
@@ -1139,11 +1139,11 @@ namespace wwtlib
                 //else
 
 
-                    //if (!Settings.Current.SmoothPan)
-                    //{
-                    //    this.viewCamera.Lat = this.targetCamera.Lat;
-                    //    this.viewCamera.Lng = this.targetCamera.Lng;
-                    //}
+                //if (!Settings.Current.SmoothPan)
+                //{
+                //    this.viewCamera.Lat = this.targetCamera.Lat;
+                //    this.viewCamera.Lng = this.targetCamera.Lng;
+                //}
                 if (RenderContext.Space && (Settings.Active.LocalHorizonMode || Settings.Active.GalacticMode))
                 {
                     if (((Math.Abs(RenderContext.targetAlt - RenderContext.alt) >= (minDelta)) |
@@ -1315,13 +1315,18 @@ namespace wwtlib
             }
         }
 
+        public void Roll(double angle)
+        {
+            RenderContext.TargetCamera.Rotation += angle;
+        }
+
         // Mouse, touch, gesture controls -- lots of different event listeners for different
         // devices and browser support.
 
         double beginZoom = 1;
         bool dragging = false;
         bool mouseDown = false;
-        bool isPinching = false;
+        bool hasTwoTouches = false;
         double lastX;
         double lastY;
         int[] pointerIds = new int[2];
@@ -1362,7 +1367,7 @@ namespace wwtlib
 
             if (ev.TargetTouches.Length == 2)
             {
-                isPinching = true;
+                hasTwoTouches = true;
                 return;
             }
 
@@ -1385,7 +1390,7 @@ namespace wwtlib
         {
             TouchEvent ev = (TouchEvent)e;
 
-            if (isPinching)
+            if (hasTwoTouches)
             {
                 TouchInfo t0 = ev.Touches[0];
                 TouchInfo t1 = ev.Touches[1];
@@ -1395,10 +1400,51 @@ namespace wwtlib
 
                 if (pinchingZoomRect[0] != null && pinchingZoomRect[1] != null)
                 {
-                    double oldDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
-                    double newDist = GetDistance(newRect[0], newRect[1]);
-                    double ratio = oldDist / newDist;
-                    Zoom(ratio);
+                    Vector2d centerPoint = Vector2d.Create(RenderContext.Width / 2, RenderContext.Height / 2);
+
+                    Vector2d delta1 = Vector2d.Subtract(newRect[0], pinchingZoomRect[0]);
+                    Vector2d delta2 = Vector2d.Subtract(newRect[1], pinchingZoomRect[1]);
+                    Vector2d radialDirection1 = Vector2d.Subtract(pinchingZoomRect[0], centerPoint);
+                    Vector2d radialDirection2 = Vector2d.Subtract(pinchingZoomRect[1], centerPoint);
+                    radialDirection1.Normalize();
+                    radialDirection2.Normalize();
+
+                    double radialDot1 = delta1.X * radialDirection1.X + delta1.Y * radialDirection1.Y;
+                    double radialDot2 = delta2.X * radialDirection2.X + delta2.Y * radialDirection2.Y;
+                    Vector2d radialComponent1 = Vector2d.Create(radialDot1 * radialDirection1.X, radialDot1 * radialDirection1.Y);
+                    Vector2d radialComponent2 = Vector2d.Create(radialDot2 * radialDirection2.X, radialDot2 * radialDirection2.Y);
+                    Vector2d angularComponent1 = Vector2d.Subtract(delta1, radialComponent1);
+                    Vector2d angularComponent2 = Vector2d.Subtract(delta2, radialComponent2);
+                    double radialMagnitude = radialComponent1.Length + radialComponent2.Length;
+                    double angularMagnitude = angularComponent1.Length + angularComponent2.Length;
+
+                    if (radialMagnitude >= angularMagnitude)
+                    {
+                        double oldDist = GetDistance(pinchingZoomRect[0], pinchingZoomRect[1]);
+                        double newDist = GetDistance(newRect[0], newRect[1]);
+                        double ratio = oldDist / newDist;
+                        Zoom(ratio);
+                    }
+                    else
+                    {
+                        Vector2d oldCenterDelta1 = Vector2d.Subtract(pinchingZoomRect[0], centerPoint);
+                        Vector2d oldCenterDelta2 = Vector2d.Subtract(pinchingZoomRect[1], centerPoint);
+                        Vector2d newCenterDelta1 = Vector2d.Subtract(newRect[0], centerPoint);
+                        Vector2d newCenterDelta2 = Vector2d.Subtract(newRect[1], centerPoint);
+                        double cross1 = CrossProductZ(oldCenterDelta1, newCenterDelta1);
+                        double cross2 = CrossProductZ(oldCenterDelta2, newCenterDelta2);
+                        double angle1 = Math.Asin(cross1 / (oldCenterDelta1.Length * newCenterDelta1.Length));
+                        double angle2 = Math.Asin(cross2 / (oldCenterDelta2.Length * newCenterDelta2.Length));
+                        if (angle1 * angle2 >= 0)
+                        {
+                            double angle = angle1 + angle2;
+                            if (PlanetLike || SolarSystemMode)
+                            {
+                                angle *= -1;
+                            }
+                            Roll(angle);
+                        }
+                    }
                 }
 
                 pinchingZoomRect = newRect;
@@ -1445,11 +1491,11 @@ namespace wwtlib
             pinchingZoomRect[0] = null;
             pinchingZoomRect[1] = null;
 
-            if (isPinching)
+            if (hasTwoTouches)
             {
                 if (ev.Touches.Length < 2)
                 {
-                    isPinching = false;
+                    hasTwoTouches = false;
                 }
                 return;
             }
@@ -1721,6 +1767,11 @@ namespace wwtlib
             x = a.X - b.X;
             y = a.Y - b.Y;
             return Math.Sqrt(x * x + y * y);
+        }
+
+        public double CrossProductZ(Vector2d a, Vector2d b)
+        {
+            return a.X * b.Y - a.Y * b.X;
         }
 
         public void OnContextMenu(ElementEvent e)
