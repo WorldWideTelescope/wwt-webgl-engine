@@ -1,5 +1,10 @@
 # rc: minor bump
 
+- Add support for rotating the view with two-finger touch gestures (#257, @Carifio24).
+
+
+# @wwtelescope/engine 7.27.0 (2023-06-08)
+
 - Have the `addImagesetToRepository` method return an imageset (#256, @pkgw).
 
 
