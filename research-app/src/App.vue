@@ -426,6 +426,8 @@ import {
 } from "@wwtelescope/research-app-messages";
 
 import {
+  convertEngineSetting,
+  isResearchAppEngineSetting,
   convertPywwtSpreadSheetLayerSetting,
   convertSpreadSheetLayerSetting,
 } from "./settings";
@@ -1970,9 +1972,10 @@ const App = defineComponent({
 
       const setting: [string, any] = [msg.setting, msg.value];
 
-      if (!isEngineSetting(setting)) return false;
+      if (!isResearchAppEngineSetting(setting)) return false;
+      const convertedSetting = convertEngineSetting(setting);
 
-      this.applySetting(setting);
+      this.applySetting(convertedSetting);
       return true;
     },
 
