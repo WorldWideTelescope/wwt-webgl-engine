@@ -1,3 +1,9 @@
+# @wwtelescope/engine 7.28.1 (2023-07-01)
+
+- Make sure that annotations properly rerender after their opacity is changed
+  (#259, @Carifio24).
+
+
 # @wwtelescope/engine 7.28.0 (2023-06-26)
 
 - Add support for rotating the view with two-finger touch gestures (#257, @Carifio24).

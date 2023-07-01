@@ -1,3 +1,11 @@
+# @wwtelescope/research-app 0.15.0 (2023-07-01)
+
+- Allow some grid overlay colors to be modified through JSON messages (#258,
+  @Carifio24). In particular, `altAzGridColor`, `eclipticColor`,
+  `eclipticGridColor`, `equatorialGridColor`, `galacticGridColor`, and
+  `precessionChartColor` are now handled as engine settings.
+
+
 # @wwtelescope/research-app 0.14.4 (2023-06-08)
 
 - Also ensure that catalog layer info is not a proxy (#253, @Carifio24).

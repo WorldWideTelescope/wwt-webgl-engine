@@ -97,7 +97,11 @@ namespace wwtlib
         public double Opacity
         {
             get { return opacity; }
-            set { opacity = value; }
+            set
+            {
+                Annotation.BatchDirty = true;
+                opacity = value;
+            }
         }
         string id;
         
