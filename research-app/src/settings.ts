@@ -7,7 +7,9 @@
 import {
   AltTypes,
   AltUnits,
+  BaseEngineSetting,
   CoordinatesType,
+  isBaseEngineSetting,
   MarkerScales,
   PlotTypes,
   PointScaleTypes,
@@ -16,6 +18,7 @@ import {
 
 import {
   Color,
+  EngineSetting,
   SpreadSheetLayer,
   SpreadSheetLayerSetting,
 } from "@wwtelescope/engine";
@@ -23,6 +26,31 @@ import {
 import {
   classicPywwt,
 } from "@wwtelescope/research-app-messages";
+
+
+export type ResearchAppEngineSetting = BaseEngineSetting |
+  ["altAzGridColor", string] |
+  ["eclipticColor", string] |
+  ["eclipticGridColor", string] |
+  ["equatorialGridColor", string] |
+  ["galacticGridColor", string] |
+  ["precessionChartColor", string];
+
+const researchAppEngineSettingTypeInfo = {
+  "altAzGridColor/string": true,
+  "eclipticColor/string": true,
+  "eclipticGridColor/string": true,
+  "equatorialGridColor/string": true,
+  "galacticGridColor/string": true,
+  "precessionChartColor/string": true,
+};
+
+export function isResearchAppEngineSetting(obj: [string, any]): obj is ResearchAppEngineSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (isBaseEngineSetting(obj)) return true;
+
+  const key = obj[0] + "/" + typeof obj[1];
+  return (key in researchAppEngineSettingTypeInfo);
+}
 
 function colValToIndex(layer: SpreadSheetLayer, colval: number | string): number {
   if (typeof colval === "number")
@@ -133,6 +161,24 @@ export function convertSpreadSheetLayerSetting(setting: SpreadSheetLayerSetting)
     return enumValueToName(setting[0], typedPlotTypes, setting[1]);
   } else if (setting[0] == "raUnits") {
     return enumValueToName(setting[0], typedRAUnits, setting[1]);
+  }
+
+  return setting;
+}
+
+export function convertEngineSetting(setting: ResearchAppEngineSetting): EngineSetting {
+  if (setting[0] == "altAzGridColor") {
+    return [setting[0], Color.load(setting[1])];
+  } else if (setting[0] == "eclipticColor") {
+    return [setting[0], Color.load(setting[1])];
+  } else if (setting[0] == "eclipticGridColor") {
+    return [setting[0], Color.load(setting[1])];
+  } else if (setting[0] == "equatorialGridColor") {
+    return [setting[0], Color.load(setting[1])];
+  } else if (setting[0] == "galacticGridColor") {
+    return [setting[0], Color.load(setting[1])];
+  } else if (setting[0] == "precessionChartColor") {
+    return [setting[0], Color.load(setting[1])];
   }
 
   return setting;
