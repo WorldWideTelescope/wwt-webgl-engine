@@ -2940,7 +2940,7 @@ namespace wwtlib
                     crossHairs.AddLine(Vector3d.Create(0, -halfHeight, 0), Vector3d.Create(0, halfHeight, 0));
                 }
 
-                crossHairs.DrawLines(context, 1.0f, Colors.White);
+                crossHairs.DrawLines(context, 1.0f, Color.Load(Settings.Current.CrosshairsColor));
             }
         }
 
