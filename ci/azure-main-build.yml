@@ -1,9 +1,7 @@
-# Copyright 2020-2022 the .NET Foundation
+# Copyright 2020-2023 the .NET Foundation
 # Licensed under the MIT License
 
-# Main build stage. The ScriptSharp stage has already run, creating a Cranko
-# release commit bundle and the magic wwtlib.js JavaScript file. With those in
-# hand, these parts of the build can run on any platform (yay!).
+# Main build stage.
 
 parameters:
 - name: 'zolaVersion'
@@ -40,7 +38,6 @@ jobs:
   - bash: |
       set -xeuo pipefail
       mkdir -p $ARTIFACT_STAGING/engine-hosted
-      cp engine/wwtlib/bin/wwtlib.js $ARTIFACT_STAGING/engine-hosted/wwtlib.js
       cp engine/src/index.js $ARTIFACT_STAGING/engine-hosted/wwtsdk.js
       cp engine/src/index.min.js $ARTIFACT_STAGING/engine-hosted/wwtsdk.min.js
       cp engine/src/index.d.ts $ARTIFACT_STAGING/engine-hosted/wwtsdk.d.ts
