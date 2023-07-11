@@ -1,8 +1,4 @@
-"use strict";
-
 define('wwtlib', ['ss'], function (ss) {
-  var $global = this;
-
   // DAY_OF_WEEK
 
   var DAY_OF_WEEK = {
@@ -20233,20 +20229,6 @@ define('wwtlib', ['ss'], function (ss) {
     getBitmap: function () {
       return null;
     }
-  };
-
-
-  // wwtlib.MainView
-
-  function MainView() {
-  }
-  MainView._drawTest = function () {
-    var canvas = document.getElementById('canvas');
-    var ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'rgb(80,0,0)';
-    ctx.fillRect(120, 120, 165, 160);
-    ctx.fillStyle = 'rgba(0, 0, 160, 0.5)';
-    ctx.fillRect(140, 140, 165, 160);
   };
 
 
@@ -46811,6 +46793,7 @@ define('wwtlib', ['ss'], function (ss) {
     }
   };
 
+  // Wrap up module initialization
 
   var $exports = ss.module('wwtlib',
     {
@@ -46818,7 +46801,6 @@ define('wwtlib', ['ss'], function (ss) {
       Sprite2d: [Sprite2d, Sprite2d$, null],
       ViewMoverSlew: [ViewMoverSlew, ViewMoverSlew$, null, IViewMover],
       VertexPosition: [VertexPosition, VertexPosition$, null],
-      MainView: [MainView, null, null],
       MinorPlanets: [MinorPlanets, MinorPlanets$, null],
       TileCache: [TileCache, TileCache$, null],
       DistanceCalc: [DistanceCalc, DistanceCalc$, null],
@@ -47173,24 +47155,23 @@ define('wwtlib', ['ss'], function (ss) {
       AnnotationClickEventArgs: [AnnotationClickEventArgs, AnnotationClickEventArgs$, ss.EventArgs],
       CollectionLoadedEventArgs: [CollectionLoadedEventArgs, CollectionLoadedEventArgs$, ss.EventArgs],
       SkyImageTile: [SkyImageTile, SkyImageTile$, TangentTile]
-    });
+    }
+  );
 
   let pako;
   if (typeof window !== "undefined" && "pako" in window) {
-    ;
     pako = window["pako"];
   } else {
-    ;
     import('pako').then(function (result) { pako = result; });
   };
+
   let uuid;
   if (typeof window !== "undefined" && "uuid" in window) {
-    ;
     uuid = window["uuid"];
   } else {
-    ;
     import('uuid').then(function (result) { uuid = result; });
   };
+
   GFX.g_ACft = [new ACFT(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1719914, -2, -25, 0, 25, -13, 1578089, 156, 10, 32, 684185, -358), new ACFT(0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6434, 141, 28007, -107, 25697, -95, -5904, -130, 11141, -48, -2559, -55), new ACFT(0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 715, 0, 0, 0, 6, 0, -657, 0, -15, 0, -282, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 715, 0, 0, 0, 0, 0, -656, 0, 0, 0, -285, 0), new ACFT(0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 486, -5, -236, -4, -216, -4, -446, 5, -94, 0, -193, 0), new ACFT(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 159, 0, 0, 0, 2, 0, -147, 0, -6, 0, -61, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, -59, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 39, 0, 0, 0, 0, 0, -36, 0, 0, 0, -16, 0), new ACFT(0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 33, 0, -10, 0, -9, 0, -30, 0, -5, 0, -13, 0), new ACFT(0, 2, 0, -1, 0, 0, 0, 0, 0, 0, 0, 31, 0, 1, 0, 1, 0, -28, 0, 0, 0, -12, 0), new ACFT(0, 3, -8, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, -28, 0, 25, 0, 8, 0, 11, 0, 3, 0), new ACFT(0, 5, -8, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, -28, 0, -25, 0, -8, 0, -11, 0, -3, 0), new ACFT(2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, -19, 0, 0, 0, -8, 0), new ACFT(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -19, 0, 0, 0, 0, 0, 17, 0, 0, 0, 8, 0), new ACFT(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, -16, 0, 0, 0, -7, 0), new ACFT(0, 1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 15, 0, 1, 0, 7, 0), new ACFT(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 16, 0, 0, 0, 1, 0, -15, 0, -3, 0, -6, 0), new ACFT(0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 11, 0, -1, 0, -1, 0, -10, 0, -1, 0, -5, 0), new ACFT(2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11, 0, -10, 0, 0, 0, -4, 0, 0, 0), new ACFT(0, 1, 0, -1, 0, 0, 0, 0, 0, 0, 0, -11, 0, -2, 0, -2, 0, 9, 0, -1, 0, 4, 0), new ACFT(0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, 0, -8, 0, -8, 0, 6, 0, -3, 0, 3, 0), new ACFT(0, 3, 0, -2, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, 9, 0, 0, 0, 4, 0), new ACFT(1, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, -9, 0, 0, 0, -4, 0), new ACFT(2, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, -8, 0, 0, 0, -4, 0), new ACFT(0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, -8, 0, 0, 0, -3, 0, 0, 0), new ACFT(2, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, 8, 0, 0, 0, 3, 0, 0, 0), new ACFT(0, 3, -2, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, -8, 0, 0, 0, -3, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 1, 2, -1, 0, 8, 0, 0, 0, 0, 0, -7, 0, 0, 0, -3, 0), new ACFT(8, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, -7, 0, -6, 0, 4, 0, -3, 0, 2, 0), new ACFT(8, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, -7, 0, 6, 0, -4, 0, 3, 0, -2, 0), new ACFT(0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, -5, 0, -4, 0, 5, 0, -2, 0, 2, 0), new ACFT(3, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, -2, 0, -7, 0, 1, 0, -4, 0), new ACFT(0, 2, 0, -2, 0, 0, 0, 0, 0, 0, 0, 4, 0, -6, 0, -5, 0, -4, 0, -2, 0, -2, 0), new ACFT(3, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, 0, -6, 0, 0, 0, -3, 0, 0, 0), new ACFT(0, 2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, -5, 0, -4, 0, -5, 0, -2, 0, -2, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 0, 5, 0, 0, 0, 0, 0, -5, 0, 0, 0, -2, 0)];
   GFX.deltaTTable = [121, 112, 103, 95, 88, 82, 77, 72, 68, 63, 60, 56, 53, 51, 48, 46, 44, 42, 40, 38, 35, 33, 31, 29, 26, 24, 22, 20, 18, 16, 14, 12, 11, 10, 9, 8, 7, 7, 7, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 14, 14, 14, 14, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 14, 13, 13.1, 12.5, 12.2, 12, 12, 12, 12, 12, 12, 11.9, 11.6, 11, 10.2, 9.2, 8.2, 7.1, 6.2, 5.6, 5.4, 5.3, 5.4, 5.6, 5.9, 6.2, 6.5, 6.8, 7.1, 7.3, 7.5, 7.6, 7.7, 7.3, 6.2, 5.2, 2.7, 1.4, -1.2, -2.8, -3.8, -4.8, -5.5, -5.3, -5.6, -5.7, -5.9, -6, -6.3, -6.5, -6.2, -4.7, -2.8, -0.1, 2.6, 5.3, 7.7, 10.4, 13.3, 16, 18.2, 20.2, 21.2, 22.4, 23.5, 23.8, 24.3, 24, 23.9, 23.9, 23.7, 24, 24.3, 25.3, 26.2, 27.3, 28.2, 29.1, 30, 30.7, 31.4, 32.2, 33.1, 34, 35, 36.5, 38.3, 40.18, 42.2, 44.5, 46.5, 48.5, 50.54, 52.2, 53.8, 54.9, 55.8, 56.86, 58.31, 59.99, 61.63, 62.97];
   GFX.g_L0EarthCoefficients = [new VSC(175347046, 0, 0), new VSC(3341656, 4.6692568, 6283.07585), new VSC(34894, 4.6261, 12566.1517), new VSC(3497, 2.7441, 5753.3849), new VSC(3418, 2.8289, 3.5231), new VSC(3136, 3.6277, 77713.7715), new VSC(2676, 4.4181, 7860.4194), new VSC(2343, 6.1352, 3930.2097), new VSC(1324, 0.7425, 11506.7698), new VSC(1273, 2.0371, 529.691), new VSC(1199, 1.1096, 1577.3435), new VSC(990, 5.233, 5884.927), new VSC(902, 2.045, 26.298), new VSC(857, 3.508, 398.149), new VSC(780, 1.179, 5223.694), new VSC(753, 2.533, 5507.553), new VSC(505, 4.583, 18849.228), new VSC(492, 4.205, 775.523), new VSC(357, 2.92, 0.067), new VSC(317, 5.849, 11790.629), new VSC(284, 1.899, 796.288), new VSC(271, 0.315, 10977.079), new VSC(243, 0.345, 5486.778), new VSC(206, 4.806, 2544.314), new VSC(205, 1.869, 5573.143), new VSC(202, 2.458, 6069.777), new VSC(156, 0.833, 213.299), new VSC(132, 3.411, 2942.463), new VSC(126, 1.083, 20.775), new VSC(115, 0.645, 0.98), new VSC(103, 0.636, 4694.003), new VSC(102, 0.976, 15720.839), new VSC(102, 4.267, 7.114), new VSC(99, 6.21, 2146.17), new VSC(98, 0.68, 155.42), new VSC(86, 5.98, 161000.69), new VSC(85, 1.3, 6275.96), new VSC(85, 3.67, 71430.7), new VSC(80, 1.81, 17260.15), new VSC(79, 3.04, 12036.46), new VSC(75, 1.76, 5088.63), new VSC(74, 3.5, 3154.69), new VSC(74, 4.68, 801.82), new VSC(70, 0.83, 9437.76), new VSC(62, 3.98, 8827.39), new VSC(61, 1.82, 7084.9), new VSC(57, 2.78, 6286.6), new VSC(56, 4.39, 14143.5), new VSC(56, 3.47, 6279.55), new VSC(52, 0.19, 12139.55), new VSC(52, 1.33, 1748.02), new VSC(51, 0.28, 5856.48), new VSC(49, 0.49, 1194.45), new VSC(41, 5.37, 8429.24), new VSC(41, 2.4, 19651.05), new VSC(39, 6.17, 10447.39), new VSC(37, 6.04, 10213.29), new VSC(37, 2.57, 1059.38), new VSC(36, 1.71, 2352.87), new VSC(36, 1.78, 6812.77), new VSC(33, 0.59, 17789.85), new VSC(30, 0.44, 83996.85), new VSC(30, 2.74, 1349.87), new VSC(25, 3.16, 4690.48)];
@@ -47532,10 +47513,6 @@ define('wwtlib', ['ss'], function (ss) {
   Orbit._initBegun = false;
   PushPin._pinTextureCache = {};
   PushPin._pins = null;
-  (function () {
-    if (typeof document === "undefined") { canvas = null; return; };
-    var canvas = document.getElementById('canvas');
-  })();
   MinorPlanets.mpcList = [];
   MinorPlanets._initBegun = false;
   MinorPlanets._mpcBlendStates = new Array(7);
