@@ -838,12 +838,6 @@ export function ISettings() { }
 export function IUndoStep() { }
 
 
-// Imports
-
-export function Imports() {
-}
-
-
 // GFX
 
 export function GFX() {
@@ -46837,7 +46831,6 @@ registerType("IViewMover", [IViewMover]);
 registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
 registerType("ISettings", [ISettings]);
 registerType("IUndoStep", [IUndoStep]);
-registerType("Imports", [Imports, null, null]);
 registerType("GFX", [GFX, null, null]);
 registerType("ABR", [ABR, ABR$, null]);
 registerType("ACFT", [ACFT, ACFT$, null]);
