@@ -1,4 +1,6 @@
 /src/index.js
+/src/index.js.map
 /src/index.min.js
+/src/index.min.js.LICENSE.txt
 /tests/results.xml
 /tsconfig.tsbuildinfo
