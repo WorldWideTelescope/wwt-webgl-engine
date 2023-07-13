@@ -10,7 +10,12 @@
 export { ss } from "./ss";
 
 export {
+    CalD,
     DAY_OF_WEEK,
+    DT,
+} from "./astrocalc/date.js";
+
+export {
     EO,
     ScaleTypes,
     URLRewriteMode,
@@ -69,8 +74,6 @@ export {
     COR,
     C3D,
     CT,
-    CalD,
-    DT,
     DYT,
     CAAEarth,
     VSC,
