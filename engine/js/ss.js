@@ -1,8 +1,13 @@
+// This file is part of WorldWide Telescope and derived from:
+
 /*! Script# Runtime
  * Designed and licensed for use and distribution with Script#-generated scripts.
  * Copyright (c) 2012, Nikhil Kothari, and the Script# Project.
  * More information at http://scriptsharp.com
  */
+
+// It has been customized to adapt to the particulars of the WWT JavaScript
+// build system.
 
 function _ss() {
   "use strict";
@@ -1434,6 +1439,11 @@ function _ss() {
     return api;
   }
 
+  function createRegistry(name) {
+    var registry = _modules[name] = { $name: name };
+    return registry;
+  }
+
   return extend(ss_module('ss', null, {
     IDisposable: [IDisposable],
     IEnumerable: [IEnumerable],
@@ -1497,6 +1507,8 @@ function _ss() {
 
     module: ss_module,
     modules: _modules,
+    createRegistry: createRegistry,
+    createType: createType,
 
     isClass: isClass,
     isInterface: isInterface,
