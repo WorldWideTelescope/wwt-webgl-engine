@@ -1,6 +1,10 @@
+import { ss } from "./ss.js";
+import { registerType, registerEnum, Enums } from "./typesystem.js";
+
+
 // DAY_OF_WEEK
 
-var DAY_OF_WEEK = {
+export var DAY_OF_WEEK = {
   SUNDAY: 0,
   MONDAY: 1,
   TUESDAY: 2,
@@ -13,7 +17,7 @@ var DAY_OF_WEEK = {
 
 // EO
 
-var EO = {
+export var EO = {
   SUN: 0,
   MERCURY: 1,
   VENUS: 2,
@@ -28,7 +32,7 @@ var EO = {
 
 // wwtlib.ScaleTypes
 
-var ScaleTypes = {
+export var ScaleTypes = {
   linear: 0,
   log: 1,
   power: 2,
@@ -39,7 +43,7 @@ var ScaleTypes = {
 
 // wwtlib.URLRewriteMode
 
-var URLRewriteMode = {
+export var URLRewriteMode = {
   asIfAbsolute: 0,
   originRelative: 1
 };
@@ -47,7 +51,7 @@ var URLRewriteMode = {
 
 // wwtlib.SolarSystemObjects
 
-var SolarSystemObjects = {
+export var SolarSystemObjects = {
   sun: 0,
   mercury: 1,
   venus: 2,
@@ -75,7 +79,7 @@ var SolarSystemObjects = {
 
 // wwtlib.InterpolationType
 
-var InterpolationType = {
+export var InterpolationType = {
   linear: 0,
   easeIn: 1,
   easeOut: 2,
@@ -87,7 +91,7 @@ var InterpolationType = {
 
 // wwtlib.PointType
 
-var PointType = {
+export var PointType = {
   move: 0,
   line: 1,
   dash: 2,
@@ -97,7 +101,7 @@ var PointType = {
 
 // wwtlib.LocationHint
 
-var LocationHint = {
+export var LocationHint = {
   slash: 0,
   backslash: 1,
   top: 2
@@ -106,7 +110,7 @@ var LocationHint = {
 
 // wwtlib.FolderGroup
 
-var FolderGroup = {
+export var FolderGroup = {
   explorer: 0,
   tour: 1,
   search: 2,
@@ -122,7 +126,7 @@ var FolderGroup = {
 
 // wwtlib.FolderRefreshType
 
-var FolderRefreshType = {
+export var FolderRefreshType = {
   interval: 0,
   conditionalGet: 1,
   viewChange: 2
@@ -131,7 +135,7 @@ var FolderRefreshType = {
 
 // wwtlib.FolderType
 
-var FolderType = {
+export var FolderType = {
   earth: 0,
   planet: 1,
   sky: 2,
@@ -141,7 +145,7 @@ var FolderType = {
 
 // wwtlib.ThumbnailSize
 
-var ThumbnailSize = {
+export var ThumbnailSize = {
   small: 0,
   big: 1
 };
@@ -149,7 +153,7 @@ var ThumbnailSize = {
 
 // wwtlib.CullMode
 
-var CullMode = {
+export var CullMode = {
   none: 0,
   counterClockwise: 2,
   clockwise: 1
@@ -158,7 +162,7 @@ var CullMode = {
 
 // wwtlib.PointScaleTypes
 
-var PointScaleTypes = {
+export var PointScaleTypes = {
   linear: 0,
   power: 1,
   log: 2,
@@ -169,7 +173,7 @@ var PointScaleTypes = {
 
 // wwtlib.ProjectionType
 
-var ProjectionType = {
+export var ProjectionType = {
   mercator: 0,
   equirectangular: 1,
   tangent: 2,
@@ -184,7 +188,7 @@ var ProjectionType = {
 
 // wwtlib.ImageSetType
 
-var ImageSetType = {
+export var ImageSetType = {
   earth: 0,
   planet: 1,
   sky: 2,
@@ -196,7 +200,7 @@ var ImageSetType = {
 
 // wwtlib.BandPass
 
-var BandPass = {
+export var BandPass = {
   gamma: 0,
   xRay: 1,
   ultraviolet: 2,
@@ -211,7 +215,7 @@ var BandPass = {
 
 // wwtlib.Classification
 
-var Classification = {
+export var Classification = {
   star: 1,
   supernova: 2,
   blackHole: 4,
@@ -253,7 +257,7 @@ var Classification = {
 
 // wwtlib.DataTypes
 
-var DataTypes = {
+export var DataTypes = {
   byteT: 0,
   int16T: 1,
   int32T: 2,
@@ -265,7 +269,7 @@ var DataTypes = {
 
 // wwtlib.AltUnits
 
-var AltUnits = {
+export var AltUnits = {
   meters: 1,
   feet: 2,
   inches: 3,
@@ -281,7 +285,7 @@ var AltUnits = {
 
 // wwtlib.FadeType
 
-var FadeType = {
+export var FadeType = {
   fadeIn: 1,
   fadeOut: 2,
   both: 3,
@@ -291,7 +295,7 @@ var FadeType = {
 
 // wwtlib.ReferenceFrames
 
-var ReferenceFrames = {
+export var ReferenceFrames = {
   sky: 0,
   ecliptic: 1,
   galactic: 2,
@@ -318,7 +322,7 @@ var ReferenceFrames = {
 
 // wwtlib.ReferenceFrameTypes
 
-var ReferenceFrameTypes = {
+export var ReferenceFrameTypes = {
   fixedSherical: 0,
   orbital: 1,
   trajectory: 2,
@@ -328,7 +332,7 @@ var ReferenceFrameTypes = {
 
 // wwtlib.CoordinatesTypes
 
-var CoordinatesTypes = {
+export var CoordinatesTypes = {
   spherical: 0,
   rectangular: 1,
   orbital: 2
@@ -337,7 +341,7 @@ var CoordinatesTypes = {
 
 // wwtlib.AltTypes
 
-var AltTypes = {
+export var AltTypes = {
   depth: 0,
   altitude: 1,
   distance: 2,
@@ -348,14 +352,14 @@ var AltTypes = {
 
 // wwtlib.MarkerMixes
 
-var MarkerMixes = {
+export var MarkerMixes = {
   same_For_All: 0
 };
 
 
 // wwtlib.ColorMaps
 
-var ColorMaps = {
+export var ColorMaps = {
   same_For_All: 0,
   group_by_Values: 2,
   per_Column_Literal: 3
@@ -364,7 +368,7 @@ var ColorMaps = {
 
 // wwtlib.PlotTypes
 
-var PlotTypes = {
+export var PlotTypes = {
   gaussian: 0,
   point: 1,
   circle: 2,
@@ -376,7 +380,7 @@ var PlotTypes = {
 
 // wwtlib.MarkerScales
 
-var MarkerScales = {
+export var MarkerScales = {
   screen: 0,
   world: 1
 };
@@ -384,7 +388,7 @@ var MarkerScales = {
 
 // wwtlib.RAUnits
 
-var RAUnits = {
+export var RAUnits = {
   hours: 0,
   degrees: 1
 };
@@ -392,7 +396,7 @@ var RAUnits = {
 
 // wwtlib.Primitives
 
-var Primitives = {
+export var Primitives = {
   voBoolean: 1,
   voBit: 2,
   voUnsignedByte: 3,
@@ -411,7 +415,7 @@ var Primitives = {
 
 // wwtlib.Alignment
 
-var Alignment = {
+export var Alignment = {
   center: 0,
   left: 1
 };
@@ -419,7 +423,7 @@ var Alignment = {
 
 // wwtlib.StockSkyOverlayTypes
 
-var StockSkyOverlayTypes = {
+export var StockSkyOverlayTypes = {
   empty: 0,
   equatorialGrid: 1,
   equatorialGridText: 2,
@@ -476,7 +480,7 @@ var StockSkyOverlayTypes = {
 
 // wwtlib.OverlayAnchor
 
-var OverlayAnchor = {
+export var OverlayAnchor = {
   sky: 0,
   screen: 1
 };
@@ -484,7 +488,7 @@ var OverlayAnchor = {
 
 // wwtlib.AudioType
 
-var AudioType = {
+export var AudioType = {
   music: 0,
   voice: 1
 };
@@ -492,7 +496,7 @@ var AudioType = {
 
 // wwtlib.ShapeType
 
-var ShapeType = {
+export var ShapeType = {
   circle: 0,
   rectagle: 1,
   star: 2,
@@ -505,7 +509,7 @@ var ShapeType = {
 
 // wwtlib.LoopTypes
 
-var LoopTypes = {
+export var LoopTypes = {
   loop: 0,
   upDown: 1,
   down: 2,
@@ -518,7 +522,7 @@ var LoopTypes = {
 
 // wwtlib.SelectionAnchor
 
-var SelectionAnchor = {
+export var SelectionAnchor = {
   topLeft: 0,
   top: 1,
   topRight: 2,
@@ -536,7 +540,7 @@ var SelectionAnchor = {
 
 // wwtlib.TextBorderStyle
 
-var TextBorderStyle = {
+export var TextBorderStyle = {
   none: 0,
   tight: 1,
   small: 2,
@@ -547,7 +551,7 @@ var TextBorderStyle = {
 
 // wwtlib.UserLevel
 
-var UserLevel = {
+export var UserLevel = {
   beginner: 0,
   intermediate: 1,
   advanced: 2,
@@ -558,7 +562,7 @@ var UserLevel = {
 
 // wwtlib.TransitionType
 
-var TransitionType = {
+export var TransitionType = {
   slew: 0,
   crossFade: 1,
   crossCut: 2,
@@ -570,7 +574,7 @@ var TransitionType = {
 
 // wwtlib.Keys
 
-var Keys = {
+export var Keys = {
   modifiers: -65536,
   none: 0,
   lButton: 1,
@@ -770,21 +774,21 @@ var Keys = {
 
 // wwtlib.DialogResult
 
-var DialogResult = {
+export var DialogResult = {
   OK: 1
 };
 
 
 // wwtlib.Formatting
 
-var Formatting = {
+export var Formatting = {
   indented: 1
 };
 
 
 // wwtlib.StateType
 
-var StateType = {
+export var StateType = {
   pending: 0,
   received: 1,
   error: 2
@@ -793,59 +797,59 @@ var StateType = {
 
 // wwtlib.IFolder
 
-function IFolder() { }
+/*internal*/ function IFolder() { }
 
 
 // wwtlib.IThumbnail
 
-function IThumbnail() { }
+export function IThumbnail() { }
 
 
 // wwtlib.IPlace
 
-function IPlace() { }
+export function IPlace() { }
 
 
 // wwtlib.IUiController
 
-function IUiController() { }
+export function IUiController() { }
 
 
 // wwtlib.IViewMover
 
-function IViewMover() { }
+export function IViewMover() { }
 
 
 // wwtlib.IUIServicesCallbacks
 
-function IUIServicesCallbacks() { }
+export function IUIServicesCallbacks() { }
 
 
 // wwtlib.ISettings
 
-function ISettings() { }
+export function ISettings() { }
 
 
 // wwtlib.IUndoStep
 
-function IUndoStep() { }
+export function IUndoStep() { }
 
 
 // Imports
 
-function Imports() {
+export function Imports() {
 }
 
 
 // GFX
 
-function GFX() {
+export function GFX() {
 }
 
 
 // ABR
 
-function ABR() {
+export function ABR() {
 }
 ABR.earthVelocity = function (JD) {
   var T = (JD - 2451545) / 36525;
@@ -909,7 +913,7 @@ var ABR$ = {
 
 // ACFT
 
-function ACFT(L2, L3, L4, L5, L6, L7, L8, Ldash, D, Mdash, F, xsin, xsint, xcos, xcost, ysin, ysint, ycos, ycost, zsin, zsint, zcos, zcost) {
+export function ACFT(L2, L3, L4, L5, L6, L7, L8, Ldash, D, Mdash, F, xsin, xsint, xcos, xcost, ysin, ysint, ycos, ycost, zsin, zsint, zcos, zcost) {
   this.l2 = 0;
   this.l3 = 0;
   this.l4 = 0;
@@ -964,7 +968,7 @@ var ACFT$ = {
 
 // ASEP
 
-function ASEP() {
+export function ASEP() {
 }
 ASEP.separation = function (Alpha1, Delta1, Alpha2, Delta2) {
   Delta1 = CT.d2R(Delta1);
@@ -1029,7 +1033,7 @@ var ASEP$ = {
 
 // COR
 
-function COR() {
+export function COR() {
   this.x = 0;
   this.y = 0;
   this.x = 0;
@@ -1048,7 +1052,7 @@ var COR$ = {
 
 // C3D
 
-function C3D() {
+export function C3D() {
   this.x = 0;
   this.y = 0;
   this.z = 0;
@@ -1070,7 +1074,7 @@ var C3D$ = {
 
 // CT
 
-function CT() {
+export function CT() {
 }
 CT.eq2Ec = function (Alpha, Delta, Epsilon) {
   Alpha = CT.h2R(Alpha);
@@ -1197,7 +1201,7 @@ var CT$ = {
 
 // CalD
 
-function CalD() {
+export function CalD() {
   this.year = 0;
   this.month = 0;
   this.day = 0;
@@ -1219,7 +1223,7 @@ var CalD$ = {
 
 // DT
 
-function DT() {
+export function DT() {
   this.m_dblJulian = 0;
   this.m_bGregorianCalendar = false;
   this.m_dblJulian = 0;
@@ -1428,7 +1432,7 @@ var DT$ = {
 
 // DYT
 
-function DYT() {
+export function DYT() {
 }
 DYT.deltaT = function (JD) {
   var date = DT.createJD(JD, DT.afterPapalReformJD(JD));
@@ -1466,7 +1470,7 @@ var DYT$ = {
 
 // CAAEarth
 
-function CAAEarth() {
+export function CAAEarth() {
 }
 CAAEarth.eclipticLongitude = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -1665,7 +1669,7 @@ var CAAEarth$ = {
 
 // VSC
 
-function VSC(a, b, c) {
+export function VSC(a, b, c) {
   this.a = 0;
   this.b = 0;
   this.c = 0;
@@ -1680,7 +1684,7 @@ var VSC$ = {
 
 // CAAEclipticalElementDetails
 
-function CAAEclipticalElementDetails() {
+export function CAAEclipticalElementDetails() {
   this.i = 0;
   this.w = 0;
   this.omega = 0;
@@ -1695,7 +1699,7 @@ var CAAEclipticalElementDetails$ = {
 
 // CAAEclipticalElements
 
-function CAAEclipticalElements() {
+export function CAAEclipticalElements() {
 }
 CAAEclipticalElements.calculate = function (i0, w0, omega0, JD0, JD) {
   var T = (JD0 - 2451545) / 36525;
@@ -1765,7 +1769,7 @@ var CAAEclipticalElements$ = {
 
 // EPO
 
-function EPO() {
+export function EPO() {
 }
 EPO.mercuryMeanLongitude = function (JD) {
   var T = (JD - 2451545) / 36525;
@@ -2225,7 +2229,7 @@ var EPO$ = {
 
 // EOE
 
-function EOE() {
+export function EOE() {
   this.a = 0;
   this.e = 0;
   this.i = 0;
@@ -2261,7 +2265,7 @@ var EOE$ = {
 
 // EPD
 
-function EPD() {
+export function EPD() {
   this.apparentGeocentricLongitude = 0;
   this.apparentGeocentricLatitude = 0;
   this.apparentGeocentricDistance = 0;
@@ -2282,7 +2286,7 @@ var EPD$ = {
 
 // EOD
 
-function EOD() {
+export function EOD() {
   this.heliocentricRectangularEquatorial = new C3D();
   this.heliocentricRectangularEcliptical = new C3D();
   this.heliocentricEclipticLongitude = 0;
@@ -2317,7 +2321,7 @@ var EOD$ = {
 
 // ELL
 
-function ELL() {
+export function ELL() {
 }
 ELL.distanceToLightTime = function (Distance) {
   return Distance * 0.0057755183;
@@ -2642,7 +2646,7 @@ var ELL$ = {
 
 // EOT
 
-function EOT() {
+export function EOT() {
 }
 EOT.calculate = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -2670,7 +2674,7 @@ var EOT$ = {
 
 // CAAFK5
 
-function CAAFK5() {
+export function CAAFK5() {
 }
 CAAFK5.correctionInLongitude = function (Longitude, Latitude, JD) {
   var T = (JD - 2451545) / 36525;
@@ -2741,7 +2745,7 @@ var CAAFK5$ = {
 
 // GMD
 
-function GMD() {
+export function GMD() {
   this.meanLongitude = 0;
   this.trueLongitude = 0;
   this.tropicalLongitude = 0;
@@ -2772,7 +2776,7 @@ var GMD$ = {
 
 // GMDS
 
-function GMDS() {
+export function GMDS() {
   this.satellite1 = new GMD();
   this.satellite2 = new GMD();
   this.satellite3 = new GMD();
@@ -2785,7 +2789,7 @@ var GMDS$ = {
 
 // GM
 
-function GM() {
+export function GM() {
 }
 GM.calculate = function (JD) {
   var sunlong = CAASun.geometricEclipticLongitude(JD);
@@ -3095,7 +3099,7 @@ var GM$ = {
 
 // CAAGlobe
 
-function CAAGlobe() {
+export function CAAGlobe() {
 }
 CAAGlobe.rhoSinThetaPrime = function (GeographicalLatitude, Height) {
   GeographicalLatitude = CT.d2R(GeographicalLatitude);
@@ -3148,7 +3152,7 @@ var CAAGlobe$ = {
 
 // IFR
 
-function IFR() {
+export function IFR() {
 }
 IFR.phaseAngle = function (r, R, Delta) {
   return CT.m360(CT.r2D(Math.acos((r * r + Delta * Delta - R * R) / (2 * r * Delta))));
@@ -3233,7 +3237,7 @@ var IFR$ = {
 
 // INTP
 
-function INTP() {
+export function INTP() {
 }
 INTP.interpolate = function (n, Y1, Y2, Y3) {
   var a = Y2 - Y1;
@@ -3370,7 +3374,7 @@ var INTP$ = {
 
 // CAAJupiter
 
-function CAAJupiter() {
+export function CAAJupiter() {
 }
 CAAJupiter.eclipticLongitude = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -3500,7 +3504,7 @@ var CAAJupiter$ = {
 
 // CAAKepler
 
-function CAAKepler() {
+export function CAAKepler() {
 }
 CAAKepler.calculate = function (M, e) {
   return CAAKepler.calculateIter(M, e, 53);
@@ -3545,7 +3549,7 @@ var CAAKepler$ = {
 
 // CAAMars
 
-function CAAMars() {
+export function CAAMars() {
 }
 CAAMars.eclipticLongitude = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -3663,7 +3667,7 @@ var CAAMars$ = {
 
 // CAAMercury
 
-function CAAMercury() {
+export function CAAMercury() {
 }
 CAAMercury.eclipticLongitude = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -3775,7 +3779,7 @@ var CAAMercury$ = {
 
 // CAAMoon
 
-function CAAMoon() {
+export function CAAMoon() {
 }
 CAAMoon.meanLongitude = function (JD) {
   var T = (JD - 2451545) / 36525;
@@ -3953,7 +3957,7 @@ var CAAMoon$ = {
 
 // MoonCoefficient1
 
-function MoonCoefficient1(d, m, mdash, f) {
+export function MoonCoefficient1(d, m, mdash, f) {
   this.d = 0;
   this.m = 0;
   this.mdash = 0;
@@ -3970,7 +3974,7 @@ var MoonCoefficient1$ = {
 
 // MoonCoefficient2
 
-function MoonCoefficient2(a, b) {
+export function MoonCoefficient2(a, b) {
   this.a = 0;
   this.b = 0;
   this.a = a;
@@ -3983,7 +3987,7 @@ var MoonCoefficient2$ = {
 
 // MIFR
 
-function MIFR() {
+export function MIFR() {
 }
 MIFR.geocentricElongation = function (ObjectAlpha, ObjectDelta, SunAlpha, SunDelta) {
   ObjectAlpha = CT.d2R(ObjectAlpha * 15);
@@ -4014,7 +4018,7 @@ var MIFR$ = {
 
 // CAAMoonNodes
 
-function CAAMoonNodes() {
+export function CAAMoonNodes() {
 }
 CAAMoonNodes.k = function (Year) {
   return 13.4223 * (Year - 2000.05);
@@ -4050,7 +4054,7 @@ var CAAMoonNodes$ = {
 
 // CAAMoonPerigeeApogee
 
-function CAAMoonPerigeeApogee() {
+export function CAAMoonPerigeeApogee() {
 }
 CAAMoonPerigeeApogee.k = function (Year) {
   return 13.2555 * (Year - 1999.97);
@@ -4146,7 +4150,7 @@ var CAAMoonPerigeeApogee$ = {
 
 // MPAC
 
-function MPAC(D, M, F, C, T) {
+export function MPAC(D, M, F, C, T) {
   this.d = 0;
   this.m = 0;
   this.f = 0;
@@ -4165,7 +4169,7 @@ var MPAC$ = {
 
 // CAAMoonPhases
 
-function CAAMoonPhases() {
+export function CAAMoonPhases() {
 }
 CAAMoonPhases.k = function (Year) {
   return 12.3685 * (Year - 2000);
@@ -4259,7 +4263,7 @@ var CAAMoonPhases$ = {
 
 // CAANeptune
 
-function CAANeptune() {
+export function CAANeptune() {
 }
 CAANeptune.eclipticLongitude = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -4365,7 +4369,7 @@ var CAANeptune$ = {
 
 // CAANutation
 
-function CAANutation() {
+export function CAANutation() {
 }
 CAANutation.nutationInLongitude = function (JD) {
   var T = (JD - 2451545) / 36525;
@@ -4448,7 +4452,7 @@ var CAANutation$ = {
 
 // NUC
 
-function NUC(D, M, Mprime, F, omega, sincoeff1, sincoeff2, coscoeff1, coscoeff2) {
+export function NUC(D, M, Mprime, F, omega, sincoeff1, sincoeff2, coscoeff1, coscoeff2) {
   this.d = 0;
   this.m = 0;
   this.mprime = 0;
@@ -4475,7 +4479,7 @@ var NUC$ = {
 
 // CAATopocentricEclipticDetails
 
-function CAATopocentricEclipticDetails() {
+export function CAATopocentricEclipticDetails() {
   this.lambda = 0;
   this.beta = 0;
   this.semidiameter = 0;
@@ -4490,7 +4494,7 @@ var CAATopocentricEclipticDetails$ = {
 
 // CAAParallax
 
-function CAAParallax() {
+export function CAAParallax() {
 }
 CAAParallax.equatorial2TopocentricDelta = function (Alpha, Delta, Distance, Longitude, Latitude, Height, JD) {
   var RhoSinThetaPrime = CAAGlobe.rhoSinThetaPrime(Latitude, Height);
@@ -4567,7 +4571,7 @@ var CAAParallax$ = {
 
 // CAAPhysicalJupiterDetails
 
-function CAAPhysicalJupiterDetails() {
+export function CAAPhysicalJupiterDetails() {
   this.DE = 0;
   this.DS = 0;
   this.geometricw1 = 0;
@@ -4590,7 +4594,7 @@ var CAAPhysicalJupiterDetails$ = {
 
 // CAAPhysicalJupiter
 
-function CAAPhysicalJupiter() {
+export function CAAPhysicalJupiter() {
 }
 CAAPhysicalJupiter.calculate = function (JD) {
   var details = new CAAPhysicalJupiterDetails();
@@ -4677,7 +4681,7 @@ var CAAPhysicalJupiter$ = {
 
 // CAAPhysicalMarsDetails
 
-function CAAPhysicalMarsDetails() {
+export function CAAPhysicalMarsDetails() {
   this.DE = 0;
   this.DS = 0;
   this.w = 0;
@@ -4702,7 +4706,7 @@ var CAAPhysicalMarsDetails$ = {
 
 // CAAPhysicalMars
 
-function CAAPhysicalMars() {
+export function CAAPhysicalMars() {
 }
 CAAPhysicalMars.calculate = function (JD) {
   var details = new CAAPhysicalMarsDetails();
@@ -4804,7 +4808,7 @@ var CAAPhysicalMars$ = {
 
 // CAAPhysicalSunDetails
 
-function CAAPhysicalSunDetails() {
+export function CAAPhysicalSunDetails() {
   this.p = 0;
   this.b0 = 0;
   this.l0 = 0;
@@ -4819,7 +4823,7 @@ var CAAPhysicalSunDetails$ = {
 
 // CAAPhysicalSun
 
-function CAAPhysicalSun() {
+export function CAAPhysicalSun() {
 }
 CAAPhysicalSun.calculate = function (JD) {
   var theta = CT.m360((JD - 2398220) * 360 / 25.38);
@@ -4859,7 +4863,7 @@ var CAAPhysicalSun$ = {
 
 // CAAPluto
 
-function CAAPluto() {
+export function CAAPluto() {
 }
 CAAPluto.eclipticLongitude = function (JD) {
   var T = (JD - 2451545) / 36525;
@@ -4917,7 +4921,7 @@ var CAAPluto$ = {
 
 // PlutoCoefficient1
 
-function PlutoCoefficient1(j, s, p) {
+export function PlutoCoefficient1(j, s, p) {
   this.j = 0;
   this.s = 0;
   this.p = 0;
@@ -4932,7 +4936,7 @@ var PlutoCoefficient1$ = {
 
 // PlutoCoefficient2
 
-function PlutoCoefficient2(a, b) {
+export function PlutoCoefficient2(a, b) {
   this.a = 0;
   this.b = 0;
   this.a = a;
@@ -4945,7 +4949,7 @@ var PlutoCoefficient2$ = {
 
 // CAAPrecession
 
-function CAAPrecession() {
+export function CAAPrecession() {
 }
 CAAPrecession.precessEquatorial = function (Alpha, Delta, JD0, JD) {
   var T = (JD0 - 2451545) / 36525;
@@ -5070,7 +5074,7 @@ var CAAPrecession$ = {
 
 // CAARiseTransitSetDetails
 
-function CAARiseTransitSetDetails() {
+export function CAARiseTransitSetDetails() {
   this.bValid = false;
   this.rise = 0;
   this.transit = 0;
@@ -5087,7 +5091,7 @@ var CAARiseTransitSetDetails$ = {
 
 // CAARiseTransitSet
 
-function CAARiseTransitSet() {
+export function CAARiseTransitSet() {
 }
 CAARiseTransitSet.rise = function (JD, Alpha1, Delta1, Alpha2, Delta2, Alpha3, Delta3, Longitude, Latitude, h0) {
   var details = new CAARiseTransitSetDetails();
@@ -5168,7 +5172,7 @@ var CAARiseTransitSet$ = {
 
 // CAASaturn
 
-function CAASaturn() {
+export function CAASaturn() {
 }
 CAASaturn.eclipticLongitude = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -5298,7 +5302,7 @@ var CAASaturn$ = {
 
 // CAASaturnRingDetails
 
-function CAASaturnRingDetails() {
+export function CAASaturnRingDetails() {
   this.b = 0;
   this.bdash = 0;
   this.p = 0;
@@ -5319,7 +5323,7 @@ var CAASaturnRingDetails$ = {
 
 // CAASaturnRings
 
-function CAASaturnRings() {
+export function CAASaturnRings() {
 }
 CAASaturnRings.calculate = function (JD) {
   var details = new CAASaturnRingDetails();
@@ -5410,7 +5414,7 @@ var CAASaturnRings$ = {
 
 // CAASidereal
 
-function CAASidereal() {
+export function CAASidereal() {
 }
 CAASidereal.meanGreenwichSiderealTime = function (JD) {
   var date = new DT();
@@ -5446,7 +5450,7 @@ var CAASidereal$ = {
 
 // CAAStellarMagnitudes
 
-function CAAStellarMagnitudes() {
+export function CAAStellarMagnitudes() {
 }
 CAAStellarMagnitudes.combinedMagnitude = function (m1, m2) {
   var x = 0.4 * (m2 - m1);
@@ -5473,7 +5477,7 @@ var CAAStellarMagnitudes$ = {
 
 // CAASun
 
-function CAASun() {
+export function CAASun() {
 }
 CAASun.geometricEclipticLongitude = function (JD) {
   return CT.m360(CAAEarth.eclipticLongitude(JD) + 180);
@@ -5556,7 +5560,7 @@ var CAASun$ = {
 
 // CAAUranus
 
-function CAAUranus() {
+export function CAAUranus() {
 }
 CAAUranus.eclipticLongitude = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -5668,7 +5672,7 @@ var CAAUranus$ = {
 
 // CAAVenus
 
-function CAAVenus() {
+export function CAAVenus() {
 }
 CAAVenus.eclipticLongitude = function (JD) {
   var rho = (JD - 2451545) / 365250;
@@ -5786,7 +5790,7 @@ var CAAVenus$ = {
 
 // wwtlib.VideoOutputType
 
-function VideoOutputType(width, height, fps, format, waitDownload) {
+export function VideoOutputType(width, height, fps, format, waitDownload) {
   this.fps = 0;
   this.width = 0;
   this.height = 0;
@@ -5806,7 +5810,7 @@ var VideoOutputType$ = {
 
 // wwtlib.FitsProperties
 
-function FitsProperties() {
+export function FitsProperties() {
   this.bZero = 0;
   this.bScale = 1;
   this.containsBlanks = false;
@@ -5833,7 +5837,7 @@ var FitsProperties$ = {
 
 // wwtlib.HipsProperties
 
-function HipsProperties(dataset) {
+export function HipsProperties(dataset) {
   this._properties = {};
   this._catalogColumnInfo = null;
   this._catalogSpreadSheetLayer = new CatalogSpreadSheetLayer();
@@ -5938,7 +5942,7 @@ var HipsProperties$ = {
 
 // wwtlib.FastMath
 
-function FastMath() {
+export function FastMath() {
 }
 FastMath._mulsign = function (x, y) {
   return FastMath._sign(y) * x;
@@ -6075,7 +6079,7 @@ var FastMath$ = {
 
 // wwtlib.HealpixTables
 
-function HealpixTables() {
+export function HealpixTables() {
 }
 var HealpixTables$ = {
 
@@ -6084,7 +6088,7 @@ var HealpixTables$ = {
 
 // wwtlib.Xyf
 
-function Xyf() {
+export function Xyf() {
   this.ix = 0;
   this.iy = 0;
   this.face = 0;
@@ -6103,7 +6107,7 @@ var Xyf$ = {
 
 // wwtlib.HealpixUtils
 
-function HealpixUtils() {
+export function HealpixUtils() {
 }
 HealpixUtils.check = function (cond, errtxt) {
   if (!cond) {
@@ -6140,7 +6144,7 @@ var HealpixUtils$ = {
 
 // wwtlib.Hploc
 
-function Hploc() {
+export function Hploc() {
   this.z = 0;
   this.phi = 0;
   this.sth = 0;
@@ -6175,7 +6179,7 @@ var Hploc$ = {
 
 // wwtlib.Pointing
 
-function Pointing() {
+export function Pointing() {
   this.theta = 0;
   this.phi = 0;
 }
@@ -6211,7 +6215,7 @@ var Pointing$ = {
 
 // wwtlib.URLHelpers
 
-function URLHelpers() {
+export function URLHelpers() {
   this._force_https = false;
   this._origin_protocol = typeof window === "undefined" ? "https:" : window.location.protocol;
   this._origin_domain = typeof window === "undefined" ? "" : window.location.hostname;
@@ -6461,7 +6465,7 @@ var URLHelpers$ = {
 
 // wwtlib.Annotation
 
-function Annotation() {
+export function Annotation() {
   this.addedToPrimitives = false;
   this.annotationDirty = true;
   this._opacity = 1;
@@ -6570,7 +6574,7 @@ var Annotation$ = {
 
 // wwtlib.AstroRaDec
 
-function AstroRaDec(ra, dec, dist, shadow, eclipsed) {
+export function AstroRaDec(ra, dec, dist, shadow, eclipsed) {
   this.RA = 0;
   this.dec = 0;
   this.distance = 0;
@@ -6589,7 +6593,7 @@ var AstroRaDec$ = {
 
 // wwtlib.RiseSetDetails
 
-function RiseSetDetails(bValid, Rise, Transit, Set, neverRises) {
+export function RiseSetDetails(bValid, Rise, Transit, Set, neverRises) {
   this.bValid = false;
   this.rise = 0;
   this.transit = 0;
@@ -6608,7 +6612,7 @@ var RiseSetDetails$ = {
 
 // wwtlib.AstroCalc
 
-function AstroCalc() {
+export function AstroCalc() {
 }
 AstroCalc.getPlanet = function (jDate, planetIn, locLat, locLong, locHeight) {
   var planet = planetIn;
@@ -6751,7 +6755,7 @@ var AstroCalc$ = {
 
 // wwtlib.BlendState
 
-function BlendState() {
+export function BlendState() {
   this._state = false;
   this._targetState = false;
   this._delayTime = 0;
@@ -6819,7 +6823,7 @@ var BlendState$ = {
 
 // wwtlib.CameraParameters
 
-function CameraParameters() {
+export function CameraParameters() {
   this.lat = 0;
   this.lng = 0;
   this.zoom = 0;
@@ -6971,7 +6975,7 @@ var CameraParameters$ = {
 
 // wwtlib.Color
 
-function Color() {
+export function Color() {
   this.a = 255;
   this.b = 255;
   this.g = 255;
@@ -7436,7 +7440,7 @@ var Color$ = {
 
 // wwtlib.Colors
 
-function Colors() {
+export function Colors() {
 }
 Colors.get_black = function () {
   return Color.fromArgb(255, 0, 0, 0);
@@ -7490,7 +7494,7 @@ var Colors$ = {
 
 // wwtlib.Constellations
 
-function Constellations() {
+export function Constellations() {
   this._pointCount = 0;
   this._boundry = false;
   this._noInterpollation = false;
@@ -7882,7 +7886,7 @@ var Constellations$ = {
 
 // wwtlib.Lineset
 
-function Lineset(name) {
+export function Lineset(name) {
   this._name = name;
   this.points = [];
 }
@@ -7902,7 +7906,7 @@ var Lineset$ = {
 
 // wwtlib.Linepoint
 
-function Linepoint(ra, dec, type, name) {
+export function Linepoint(ra, dec, type, name) {
   this.RA = 0;
   this.dec = 0;
   this.pointType = 0;
@@ -7926,7 +7930,7 @@ var Linepoint$ = {
 
 // wwtlib.ConstellationFilter
 
-function ConstellationFilter() {
+export function ConstellationFilter() {
   this.bits = new Array(3);
   this.oldBits = new Array(3);
   this.blendState = BlendState.create(false, 1000);
@@ -8223,7 +8227,7 @@ var ConstellationFilter$ = {
 
 // wwtlib.PositionTexture
 
-function PositionTexture() {
+export function PositionTexture() {
   this.tu = 0;
   this.tv = 0;
   this.position = new Vector3d();
@@ -8272,7 +8276,7 @@ var PositionTexture$ = {
 
 // wwtlib.PositionColoredTextured
 
-function PositionColoredTextured() {
+export function PositionColoredTextured() {
   this.tu = 0;
   this.tv = 0;
   this.color = new Color();
@@ -8322,7 +8326,7 @@ var PositionColoredTextured$ = {
 
 // wwtlib.PositionColored
 
-function PositionColored(pos, color) {
+export function PositionColored(pos, color) {
   this.color = new Color();
   this.color = color._clone();
   this.position = pos.copy();
@@ -8340,7 +8344,7 @@ var PositionColored$ = {
 
 // wwtlib.PositionNormalTexturedTangent
 
-function PositionNormalTexturedTangent(position, normal, texCoord, tangent) {
+export function PositionNormalTexturedTangent(position, normal, texCoord, tangent) {
   this.x = 0;
   this.y = 0;
   this.z = 0;
@@ -8408,7 +8412,7 @@ var PositionNormalTexturedTangent$ = {
 
 // wwtlib.Vector3d
 
-function Vector3d() {
+export function Vector3d() {
   this.x = 0;
   this.y = 0;
   this.z = 0;
@@ -8631,7 +8635,7 @@ var Vector3d$ = {
 
 // wwtlib.Vector2d
 
-function Vector2d() {
+export function Vector2d() {
   this.x = 0;
   this.y = 0;
 }
@@ -8687,7 +8691,7 @@ var Vector2d$ = {
 
 // wwtlib.Matrix3d
 
-function Matrix3d() {
+export function Matrix3d() {
   this._m11 = 0;
   this._m12 = 0;
   this._m13 = 0;
@@ -9557,7 +9561,7 @@ var Matrix3d$ = {
 
 // wwtlib.Matrix2d
 
-function Matrix2d() {
+export function Matrix2d() {
   this.m11 = 1;
   this.m12 = 0;
   this.m13 = 0;
@@ -9629,7 +9633,7 @@ var Matrix2d$ = {
 
 // wwtlib.DoubleUtilities
 
-function DoubleUtilities() {
+export function DoubleUtilities() {
 }
 DoubleUtilities.isZero = function (value) {
   return (Math.abs(value) < 2.22044604925031E-50);
@@ -9650,7 +9654,7 @@ DoubleUtilities.clamp = function (x, min, max) {
 
 // wwtlib.PlaneD
 
-function PlaneD(valuePointA, valuePointB, valuePointC, valuePointD) {
+export function PlaneD(valuePointA, valuePointB, valuePointC, valuePointD) {
   this.a = 0;
   this.b = 0;
   this.c = 0;
@@ -9676,7 +9680,7 @@ var PlaneD$ = {
 
 // wwtlib.Vector4d
 
-function Vector4d(valueX, valueY, valueZ, valueW) {
+export function Vector4d(valueX, valueY, valueZ, valueW) {
   this.x = 0;
   this.y = 0;
   this.z = 0;
@@ -9693,7 +9697,7 @@ var Vector4d$ = {
 
 // wwtlib.PositionNormalTexturedX2
 
-function PositionNormalTexturedX2() {
+export function PositionNormalTexturedX2() {
   this.x = 0;
   this.y = 0;
   this.z = 0;
@@ -9807,7 +9811,7 @@ var PositionNormalTexturedX2$ = {
 
 // wwtlib.PositionNormalTextured
 
-function PositionNormalTextured() {
+export function PositionNormalTextured() {
   this.x = 0;
   this.y = 0;
   this.z = 0;
@@ -9892,7 +9896,7 @@ var PositionNormalTextured$ = {
 
 // wwtlib.SphereHull
 
-function SphereHull() {
+export function SphereHull() {
   this.radius = 0;
 }
 SphereHull._create = function (Center, Radius) {
@@ -9908,7 +9912,7 @@ var SphereHull$ = {
 
 // wwtlib.ConvexHull
 
-function ConvexHull() {
+export function ConvexHull() {
 }
 ConvexHull.findEnclosingSphereFast = function (points) {
   var result = new SphereHull();
@@ -10034,7 +10038,7 @@ var ConvexHull$ = {
 
 // wwtlib.Folder
 
-function Folder() {
+export function Folder() {
   this.parent = null;
   this.isProxy = false;
   this._versionDependent = false;
@@ -10422,7 +10426,7 @@ var Folder$ = {
 
 // wwtlib.FolderBrowser
 
-function FolderBrowser() {
+export function FolderBrowser() {
   this._items = [];
   this.top = 10;
   this.left = 10;
@@ -10850,7 +10854,7 @@ var FolderBrowser$ = {
 
 // wwtlib.FolderUp
 
-function FolderUp() {
+export function FolderUp() {
   this.parent = null;
   this._bounds = new Rectangle();
 }
@@ -10906,7 +10910,7 @@ var FolderUp$ = {
 
 // wwtlib.ShortIndexBuffer
 
-function ShortIndexBuffer(indexes) {
+export function ShortIndexBuffer(indexes) {
   this.buffer = Tile.prepDevice.createBuffer();
   Tile.prepDevice.bindBuffer(34963, this.buffer);
   Tile.prepDevice.bufferData(34963, indexes, 35044);
@@ -10918,7 +10922,7 @@ var ShortIndexBuffer$ = {
 
 // wwtlib.IndexBuffer
 
-function IndexBuffer(indexes) {
+export function IndexBuffer(indexes) {
   this.buffer = Tile.prepDevice.createBuffer();
   Tile.prepDevice.bindBuffer(34963, this.buffer);
   Tile.prepDevice.bufferData(34963, indexes, 35044);
@@ -10934,7 +10938,7 @@ var IndexBuffer$ = {
 
 // wwtlib.VertexBufferBase
 
-function VertexBufferBase() {
+export function VertexBufferBase() {
 }
 var VertexBufferBase$ = {
   dispose: function () {
@@ -10947,7 +10951,7 @@ var VertexBufferBase$ = {
 
 // wwtlib.Dates
 
-function Dates(start, end) {
+export function Dates(start, end) {
   this.startDate = 0;
   this.endDate = 0;
   this.startDate = start;
@@ -10965,7 +10969,7 @@ var Dates$ = {
 
 // wwtlib.SimpleLineList
 
-function SimpleLineList() {
+export function SimpleLineList() {
   this._zBuffer = true;
   this._linePoints = [];
   this._usingLocalCenter = false;
@@ -11094,7 +11098,7 @@ var SimpleLineList$ = {
 
 // wwtlib.OrbitLineList
 
-function OrbitLineList() {
+export function OrbitLineList() {
   this._zBuffer = true;
   this._linePoints = [];
   this._lineColors = [];
@@ -11202,7 +11206,7 @@ var OrbitLineList$ = {
 
 // wwtlib.LineList
 
-function LineList() {
+export function LineList() {
   this._zBuffer = true;
   this.timeSeries = false;
   this.showFarSide = true;
@@ -11307,7 +11311,7 @@ var LineList$ = {
 
 // wwtlib.TriangleList
 
-function TriangleList() {
+export function TriangleList() {
   this._trianglePoints = [];
   this._triangleColors = [];
   this._triangleDates = [];
@@ -11434,7 +11438,7 @@ var TriangleList$ = {
 
 // wwtlib.TriangleFanList
 
-function TriangleFanList() {
+export function TriangleFanList() {
   this._zBuffer = true;
   this.timeSeries = false;
   this.decay = 0;
@@ -11506,7 +11510,7 @@ var TriangleFanList$ = {
 
 // wwtlib.PointList
 
-function PointList(device) {
+export function PointList(device) {
   this._points = [];
   this._colors = [];
   this._dates = [];
@@ -11685,7 +11689,7 @@ var PointList$ = {
 
 // wwtlib.TimeSeriesLineVertex
 
-function TimeSeriesLineVertex() {
+export function TimeSeriesLineVertex() {
   this.position = new Vector3d();
   this.normal = new Vector3d();
   this.tu = 0;
@@ -11713,7 +11717,7 @@ var TimeSeriesLineVertex$ = {
 
 // wwtlib.TimeSeriesPointVertex
 
-function TimeSeriesPointVertex() {
+export function TimeSeriesPointVertex() {
   this.pointSize = 0;
   this.tu = 0;
   this.tv = 0;
@@ -11740,7 +11744,7 @@ var TimeSeriesPointVertex$ = {
 
 // wwtlib.SimpleLineShader
 
-function SimpleLineShader() {
+export function SimpleLineShader() {
 }
 SimpleLineShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -11805,7 +11809,7 @@ var SimpleLineShader$ = {
 
 // wwtlib.SimpleLineShader2D
 
-function SimpleLineShader2D() {
+export function SimpleLineShader2D() {
 }
 SimpleLineShader2D.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -11866,7 +11870,7 @@ var SimpleLineShader2D$ = {
 
 // wwtlib.OrbitLineShader
 
-function OrbitLineShader() {
+export function OrbitLineShader() {
 }
 OrbitLineShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -11934,7 +11938,7 @@ var OrbitLineShader$ = {
 
 // wwtlib.LineShaderNormalDates
 
-function LineShaderNormalDates() {
+export function LineShaderNormalDates() {
 }
 LineShaderNormalDates.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12008,7 +12012,7 @@ var LineShaderNormalDates$ = {
 
 // wwtlib.TimeSeriesPointSpriteShader
 
-function TimeSeriesPointSpriteShader() {
+export function TimeSeriesPointSpriteShader() {
 }
 TimeSeriesPointSpriteShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12103,7 +12107,7 @@ var TimeSeriesPointSpriteShader$ = {
 
 // wwtlib.KeplerPointSpriteShader
 
-function KeplerPointSpriteShader() {
+export function KeplerPointSpriteShader() {
 }
 KeplerPointSpriteShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12208,7 +12212,7 @@ var KeplerPointSpriteShader$ = {
 
 // wwtlib.EllipseShader
 
-function EllipseShader() {
+export function EllipseShader() {
 }
 EllipseShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12275,7 +12279,7 @@ var EllipseShader$ = {
 
 // wwtlib.ModelShader
 
-function ModelShader() {
+export function ModelShader() {
 }
 ModelShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12384,7 +12388,7 @@ var ModelShader$ = {
 
 // wwtlib.ModelShaderTan
 
-function ModelShaderTan() {
+export function ModelShaderTan() {
 }
 ModelShaderTan.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12493,7 +12497,7 @@ var ModelShaderTan$ = {
 
 // wwtlib.TileShader
 
-function TileShader() {
+export function TileShader() {
 }
 TileShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12610,7 +12614,7 @@ var TileShader$ = {
 
 // wwtlib.FitsShader
 
-function FitsShader() {
+export function FitsShader() {
 }
 FitsShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12726,7 +12730,7 @@ var FitsShader$ = {
 
 // wwtlib.ImageShader
 
-function ImageShader() {
+export function ImageShader() {
 }
 ImageShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12813,7 +12817,7 @@ var ImageShader$ = {
 
 // wwtlib.ImageShader2
 
-function ImageShader2() {
+export function ImageShader2() {
 }
 ImageShader2.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12900,7 +12904,7 @@ var ImageShader2$ = {
 
 // wwtlib.SpriteShader
 
-function SpriteShader() {
+export function SpriteShader() {
 }
 SpriteShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -12972,7 +12976,7 @@ var SpriteShader$ = {
 
 // wwtlib.ShapeSpriteShader
 
-function ShapeSpriteShader() {
+export function ShapeSpriteShader() {
 }
 ShapeSpriteShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -13035,7 +13039,7 @@ var ShapeSpriteShader$ = {
 
 // wwtlib.TextShader
 
-function TextShader() {
+export function TextShader() {
 }
 TextShader.init = function (renderContext) {
   var gl = renderContext.gl;
@@ -13108,7 +13112,7 @@ var TextShader$ = {
 
 // wwtlib.Sprite2d
 
-function Sprite2d() {
+/*internal*/ function Sprite2d() {
   this.vertCount = 0;
 }
 var Sprite2d$ = {
@@ -13179,7 +13183,7 @@ var Sprite2d$ = {
 
 // wwtlib.Tessellator
 
-function Tessellator() {
+export function Tessellator() {
 }
 Tessellator.tesselateSimplePoly = function (inputList) {
   var results = [];
@@ -13281,7 +13285,7 @@ var Tessellator$ = {
 
 // wwtlib.Texture
 
-function Texture() {
+export function Texture() {
   this.imageElement = null;
   this.texture2d = null;
   this._downloading = false;
@@ -13384,7 +13388,7 @@ var Texture$ = {
 
 // wwtlib.Grids
 
-function Grids() {
+export function Grids() {
 }
 Grids._createGalaxyImage = function (renderContext) {
   if (Grids._milkyWayImage == null) {
@@ -14275,7 +14279,7 @@ var Grids$ = {
 
 // wwtlib.Imageset
 
-function Imageset() {
+export function Imageset() {
   this._projection = 0;
   this._imageSetID = 0;
   this._baseTileDegrees = 0;
@@ -14969,7 +14973,7 @@ var Imageset$ = {
 
 // wwtlib.ViewMoverKenBurnsStyle
 
-function ViewMoverKenBurnsStyle(from, to, time, fromDateTime, toDateTime, type) {
+export function ViewMoverKenBurnsStyle(from, to, time, fromDateTime, toDateTime, type) {
   this.interpolationType = 0;
   this.fastDirectionMove = false;
   this._toTargetTime = 0;
@@ -15040,7 +15044,7 @@ var ViewMoverKenBurnsStyle$ = {
 
 // wwtlib.ViewMoverSlew
 
-function ViewMoverSlew() {
+/*internal*/ function ViewMoverSlew() {
   this._upTargetTime = 0;
   this._downTargetTime = 0;
   this._toTargetTime = 0;
@@ -15160,7 +15164,7 @@ var ViewMoverSlew$ = {
 
 // wwtlib.KeplerVertex
 
-function KeplerVertex() {
+export function KeplerVertex() {
   this.ABC = new Vector3d();
   this.abc1 = new Vector3d();
   this.pointSize = 0;
@@ -15235,7 +15239,7 @@ var KeplerVertex$ = {
 
 // wwtlib.ScaleMap
 
-function ScaleMap() {
+export function ScaleMap() {
 }
 var ScaleMap$ = {
 
@@ -15244,7 +15248,7 @@ var ScaleMap$ = {
 
 // wwtlib.ColorMapContainer
 
-function ColorMapContainer() {
+export function ColorMapContainer() {
   this.colors = [];
 }
 ColorMapContainer.fromArgbList = function (color_list) {
@@ -15361,7 +15365,7 @@ var ColorMapContainer$ = {
 
 // wwtlib.Layer
 
-function Layer() {
+export function Layer() {
   this.id = Guid.newGuid();
   this.loadedFromTour = false;
   this.tourDocument = null;
@@ -15689,7 +15693,7 @@ var Layer$ = {
 
 // wwtlib.DomainValue
 
-function DomainValue(text, markerIndex) {
+export function DomainValue(text, markerIndex) {
   this.markerIndex = 4;
   this.customMarker = null;
   this.text = text;
@@ -15702,7 +15706,7 @@ var DomainValue$ = {
 
 // wwtlib.LayerManager
 
-function LayerManager() {
+export function LayerManager() {
 }
 LayerManager.get_version = function () {
   return LayerManager._version;
@@ -17108,7 +17112,7 @@ var LayerManager$ = {
 
 // wwtlib.LayerMap
 
-function LayerMap(name, reference) {
+export function LayerMap(name, reference) {
   this.childMaps = {};
   this.parent = null;
   this.layers = [];
@@ -17205,7 +17209,7 @@ var LayerMap$ = {
 
 // wwtlib.SkyOverlays
 
-function SkyOverlays() {
+export function SkyOverlays() {
 }
 var SkyOverlays$ = {
 
@@ -17214,7 +17218,7 @@ var SkyOverlays$ = {
 
 // wwtlib.GroundOverlayLayer
 
-function GroundOverlayLayer() {
+export function GroundOverlayLayer() {
 }
 var GroundOverlayLayer$ = {
 
@@ -17223,7 +17227,7 @@ var GroundOverlayLayer$ = {
 
 // wwtlib.FrameTarget
 
-function FrameTarget() {
+export function FrameTarget() {
 }
 var FrameTarget$ = {
 
@@ -17232,7 +17236,7 @@ var FrameTarget$ = {
 
 // wwtlib.LayerUI
 
-function LayerUI() {
+export function LayerUI() {
 }
 var LayerUI$ = {
   get_hasTreeViewNodes: function () {
@@ -17251,7 +17255,7 @@ var LayerUI$ = {
 
 // wwtlib.LayerUIMenuItem
 
-function LayerUIMenuItem() {
+export function LayerUIMenuItem() {
   this._tag = null;
   this._isChecked = false;
   this._isEnabled = true;
@@ -17308,7 +17312,7 @@ var LayerUIMenuItem$ = {
 
 // wwtlib.LayerUITreeNode
 
-function LayerUITreeNode() {
+export function LayerUITreeNode() {
   this._parent = null;
   this._level = 0;
   this._open = false;
@@ -17459,7 +17463,7 @@ var LayerUITreeNode$ = {
 
 // wwtlib.Group
 
-function Group() {
+export function Group() {
   this.startIndex = 0;
   this.indexCount = 0;
   this.materialIndex = 0;
@@ -17471,7 +17475,7 @@ var Group$ = {
 
 // wwtlib.Mesh
 
-function Mesh() {
+export function Mesh() {
   this.boundingSphere = new SphereHull();
 }
 Mesh.create = function (vertices, indices) {
@@ -17571,7 +17575,7 @@ var Mesh$ = {
 
 // wwtlib.VertexPosition
 
-function VertexPosition() {
+/*internal*/ function VertexPosition() {
   this.index = 0;
 }
 var VertexPosition$ = {
@@ -17581,7 +17585,7 @@ var VertexPosition$ = {
 
 // wwtlib.Object3d
 
-function Object3d(tourDoc, filename, flipV, flipHandedness, smooth, color) {
+export function Object3d(tourDoc, filename, flipV, flipHandedness, smooth, color) {
   this.flipHandedness = false;
   this.flipV = true;
   this.smooth = true;
@@ -18932,7 +18936,7 @@ var Object3d$ = {
 
 // wwtlib.ObjectNode
 
-function ObjectNode() {
+export function ObjectNode() {
   this.level = -1;
   this.children = [];
   this.enabled = true;
@@ -18947,7 +18951,7 @@ var ObjectNode$ = {
 
 // wwtlib.Orbit
 
-function Orbit(elements, segments, color, thickness, scale) {
+export function Orbit(elements, segments, color, thickness, scale) {
   this._elements = null;
   this._orbitColor = Colors.get_white();
   this._scale = 0;
@@ -18992,7 +18996,7 @@ var Orbit$ = {
 
 // wwtlib.EllipseRenderer
 
-function EllipseRenderer() {
+export function EllipseRenderer() {
 }
 EllipseRenderer.drawEllipseWithPosition = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix, positionNow) {
   if (EllipseRenderer._ellipseShader == null) {
@@ -19054,7 +19058,7 @@ var EllipseRenderer$ = {
 
 // wwtlib.ReferenceFrame
 
-function ReferenceFrame() {
+export function ReferenceFrame() {
   this._systemGenerated = false;
   this.meanAnomoly = 0;
   this.orbitalYears = 0;
@@ -19469,7 +19473,7 @@ var ReferenceFrame$ = {
 
 // wwtlib.KmlCoordinate
 
-function KmlCoordinate() {
+export function KmlCoordinate() {
   this.lat = 0;
   this.lng = 0;
   this.alt = 0;
@@ -19481,7 +19485,7 @@ var KmlCoordinate$ = {
 
 // wwtlib.KmlLineList
 
-function KmlLineList() {
+export function KmlLineList() {
   this.extrude = false;
   this.astronomical = false;
   this.meanRadius = 6371000;
@@ -19534,7 +19538,7 @@ var KmlLineList$ = {
 
 // wwtlib.PushPin
 
-function PushPin() {
+export function PushPin() {
 }
 PushPin.triggerLoadSprite = function () {
   if (PushPin._pins == null) {
@@ -19576,7 +19580,7 @@ var PushPin$ = {
 
 // wwtlib.Table
 
-function Table() {
+export function Table() {
   this.guid = new Guid();
   this.header = [];
   this.rows = [];
@@ -19693,7 +19697,7 @@ var Table$ = {
 
 // wwtlib.VoTable
 
-function VoTable() {
+export function VoTable() {
   this.columns = {};
   this.column = [];
   this.rows = [];
@@ -19893,7 +19897,7 @@ var VoTable$ = {
 
 // wwtlib.VoRow
 
-function VoRow(owner) {
+export function VoRow(owner) {
   this.selected = false;
   this.owner = owner;
 }
@@ -19915,7 +19919,7 @@ var VoRow$ = {
 
 // wwtlib.VoColumn
 
-function VoColumn(node, index) {
+export function VoColumn(node, index) {
   this.id = '';
   this.type = 0;
   this.precision = 0;
@@ -20027,7 +20031,7 @@ var VoColumn$ = {
 
 // wwtlib.WcsImage
 
-function WcsImage() {
+export function WcsImage() {
   this.copyright = '';
   this.creditsUrl = '';
   this._validWcs = false;
@@ -20233,7 +20237,7 @@ var WcsImage$ = {
 
 // wwtlib.MinorPlanets
 
-function MinorPlanets() {
+/*internal*/ function MinorPlanets() {
 }
 MinorPlanets.getMpcFile = function (url) {
   MinorPlanets._webMpcFile = new WebFile(url);
@@ -20363,7 +20367,7 @@ var MinorPlanets$ = {
 
 // wwtlib.Place
 
-function Place() {
+export function Place() {
   this._camParams = CameraParameters.create(0, 0, -1, 0, 0, 100);
   this._location3d = Vector3d.create(0, 0, 0);
   this.htmlDescription = '';
@@ -20770,7 +20774,7 @@ var Place$ = {
 
 // wwtlib.KeplerianElements
 
-function KeplerianElements() {
+export function KeplerianElements() {
   this.a = 0;
   this.e = 0;
   this.ea = 0;
@@ -20782,7 +20786,7 @@ var KeplerianElements$ = {
 
 // wwtlib.BodyAngles
 
-function BodyAngles(poleRa, poleDec, primeMeridian, rotationRate) {
+export function BodyAngles(poleRa, poleDec, primeMeridian, rotationRate) {
   this.poleDec = 0;
   this.poleRa = 0;
   this.primeMeridian = 0;
@@ -20799,7 +20803,7 @@ var BodyAngles$ = {
 
 // wwtlib.Planets
 
-function Planets() {
+export function Planets() {
 }
 Planets.loadPlanetTexture = function (url) {
   var texture = new Texture();
@@ -22118,7 +22122,7 @@ var Planets$ = {
 
 // wwtlib.Material
 
-function Material() {
+export function Material() {
   this.specularSharpness = 0;
   this.opacity = 0;
   this.isDefault = false;
@@ -22130,7 +22134,7 @@ var Material$ = {
 
 // wwtlib.InViewReturnMessage
 
-function InViewReturnMessage() {
+export function InViewReturnMessage() {
   this.aborted = false;
 }
 var InViewReturnMessage$ = {
@@ -22140,7 +22144,7 @@ var InViewReturnMessage$ = {
 
 // wwtlib.RenderContext
 
-function RenderContext() {
+export function RenderContext() {
   this.height = 0;
   this.width = 0;
   this.lighting = false;
@@ -22985,7 +22989,7 @@ var RenderContext$ = {
 
 // wwtlib.RenderTriangle
 
-function RenderTriangle() {
+export function RenderTriangle() {
   this.a = new PositionTexture();
   this.b = new PositionTexture();
   this.c = new PositionTexture();
@@ -23227,7 +23231,7 @@ var RenderTriangle$ = {
 
 // wwtlib.ScriptInterface
 
-function ScriptInterface() {
+export function ScriptInterface() {
   this._missedReady = false;
   this.hideTourFeedback = false;
   this._smoothAnimation = false;
@@ -23692,7 +23696,7 @@ var ScriptInterface$ = {
 
 // wwtlib.Settings
 
-function Settings() {
+export function Settings() {
   this.autoRepeatTour = false;
   this._localHorizonMode = false;
   this._galacticMode = false;
@@ -24292,7 +24296,7 @@ var Settings$ = {
 
 // wwtlib.Text3dBatch
 
-function Text3dBatch(height) {
+export function Text3dBatch(height) {
   this.height = 128;
   this.items = [];
   this._glyphVersion = -1;
@@ -24405,7 +24409,7 @@ var Text3dBatch$ = {
 
 // wwtlib.GlyphItem
 
-function GlyphItem(glyph) {
+export function GlyphItem(glyph) {
   this.referenceCount = 0;
   this.glyph = glyph;
   this.uvRect = new Rectangle();
@@ -24441,7 +24445,7 @@ var GlyphItem$ = {
 
 // wwtlib.GlyphCache
 
-function GlyphCache(height) {
+export function GlyphCache(height) {
   this._cellHeight = 128;
   this._gridSize = 8;
   this.ready = false;
@@ -24546,7 +24550,7 @@ var GlyphCache$ = {
 
 // wwtlib.Text3d
 
-function Text3d(center, up, text, fontsize, scale) {
+export function Text3d(center, up, text, fontsize, scale) {
   this.rotation = 0;
   this.tilt = 0;
   this.bank = 0;
@@ -24666,7 +24670,7 @@ var Text3d$ = {
 
 // wwtlib.SpaceTimeController
 
-function SpaceTimeController() {
+export function SpaceTimeController() {
 }
 SpaceTimeController.updateClock = function () {
   if (SpaceTimeController._syncToClock) {
@@ -24871,7 +24875,7 @@ var SpaceTimeController$ = {
 
 // wwtlib.Star
 
-function Star(input) {
+export function Star(input) {
   this.magnitude = 0;
   this.RA = 0;
   this.dec = 0;
@@ -25067,7 +25071,7 @@ var Star$ = {
 
 // wwtlib.Galaxy
 
-function Galaxy(br) {
+export function Galaxy(br) {
   this.RA = 0;
   this.dec = 0;
   this.distance = 0;
@@ -25103,7 +25107,7 @@ var Galaxy$ = {
 
 // wwtlib.LatLngEdges
 
-function LatLngEdges() {
+export function LatLngEdges() {
   this.latMin = 0;
   this.latMax = 0;
   this.lngMin = 0;
@@ -25116,7 +25120,7 @@ var LatLngEdges$ = {
 
 // wwtlib.Tile
 
-function Tile() {
+export function Tile() {
   this._renderTriangleLists = new Array(4);
   this._indexBuffers = new Array(4);
   this.level = 0;
@@ -25825,7 +25829,7 @@ var Tile$ = {
 
 // wwtlib.TileCache
 
-function TileCache() {
+/*internal*/ function TileCache() {
 }
 TileCache.get_queueCount = function () {
   return ss.keyCount(TileCache._queue);
@@ -26069,7 +26073,7 @@ var TileCache$ = {
 
 // wwtlib.DistanceCalc
 
-function DistanceCalc() {
+/*internal*/ function DistanceCalc() {
 }
 DistanceCalc.lineToPoint = function (l0, l1, p) {
   var v = Vector3d.subtractVectors(l1, l0);
@@ -26098,7 +26102,7 @@ var DistanceCalc$ = {
 
 // wwtlib.Tour
 
-function Tour() {
+export function Tour() {
   this.userLevel = 0;
   this.classification = 0;
   this.averageRating = 0;
@@ -26223,7 +26227,7 @@ var Tour$ = {
 
 // wwtlib.FileEntry
 
-function FileEntry(filename, size) {
+export function FileEntry(filename, size) {
   this.size = 0;
   this.offset = 0;
   this.filename = filename;
@@ -26238,7 +26242,7 @@ var FileEntry$ = {
 
 // wwtlib.FileCabinet
 
-function FileCabinet() {
+export function FileCabinet() {
   this.tempDirectory = '';
   this._currentOffset = 0;
   this._packageID = '';
@@ -26427,7 +26431,7 @@ var FileCabinet$ = {
 
 // wwtlib.SettingParameter
 
-function SettingParameter(edgeTrigger, opacity, targetState, filter) {
+export function SettingParameter(edgeTrigger, opacity, targetState, filter) {
   this.targetState = false;
   this.edgeTrigger = false;
   this.opacity = 0;
@@ -26443,7 +26447,7 @@ var SettingParameter$ = {
 
 // wwtlib.Overlay
 
-function Overlay() {
+export function Overlay() {
   this.isDynamic = false;
   this.isDesignTimeOnly = false;
   this._name = '';
@@ -26911,7 +26915,7 @@ var Overlay$ = {
 
 // wwtlib.Selection
 
-function Selection() {
+export function Selection() {
   this._singleSelectHandles = null;
   this._multiSelectHandles = null;
   this._focusHandles = null;
@@ -27105,7 +27109,7 @@ var Selection$ = {
 
 // wwtlib.TextObject
 
-function TextObject() {
+export function TextObject() {
   this.bold = false;
   this.italic = false;
   this.underline = false;
@@ -27163,7 +27167,7 @@ var TextObject$ = {
 
 // wwtlib.TourDocument
 
-function TourDocument() {
+export function TourDocument() {
   this._tourDirty = 0;
   this._workingDirectory = '';
   this.url = '';
@@ -27920,7 +27924,7 @@ var TourDocument$ = {
 
 // wwtlib.TourEditTab
 
-function TourEditTab() {
+export function TourEditTab() {
   this.musicTrack = new SoundEditor();
   this.voiceTrack = new SoundEditor();
   this._tour = null;
@@ -28698,7 +28702,7 @@ var TourEditTab$ = {
 
 // wwtlib.TourEditor
 
-function TourEditor() {
+export function TourEditor() {
   this.selection = new Selection();
   this._contextMenu = new ContextMenuStrip();
   this._tour = null;
@@ -30073,7 +30077,7 @@ var TourEditor$ = {
 
 // wwtlib.OverlayList
 
-function OverlayList() {
+export function OverlayList() {
 }
 OverlayList._updateOverlayList = function (currentTourStop, selection) {
 };
@@ -30086,7 +30090,7 @@ var OverlayList$ = {
 
 // wwtlib.TourEdit
 
-function TourEdit() {
+export function TourEdit() {
 }
 TourEdit._ensureSelectedVisible = function () {
 };
@@ -30109,7 +30113,7 @@ var TourEdit$ = {
 
 // wwtlib.SoundEditor
 
-function SoundEditor() {
+export function SoundEditor() {
   this.target = null;
 }
 var SoundEditor$ = {
@@ -30119,7 +30123,7 @@ var SoundEditor$ = {
 
 // wwtlib.TourStopList
 
-function TourStopList() {
+export function TourStopList() {
   this.tour = null;
   this.showAddButton = false;
   this.selectedItems = null;
@@ -30152,7 +30156,7 @@ var TourStopList$ = {
 
 // wwtlib.TimeLine
 
-function TimeLine() {
+export function TimeLine() {
 }
 TimeLine.refreshUi = function () {
 };
@@ -30163,7 +30167,7 @@ var TimeLine$ = {
 
 // wwtlib.TourPlayer
 
-function TourPlayer() {
+export function TourPlayer() {
   this._overlayBlend = BlendState.create(false, 1000);
   this._tour = null;
   this._onTarget = false;
@@ -30724,7 +30728,7 @@ var TourPlayer$ = {
 
 // wwtlib.MasterTime
 
-function MasterTime(master, duration) {
+export function MasterTime(master, duration) {
   this.duration = 0;
   this.master = master;
   this.duration = duration;
@@ -30736,7 +30740,7 @@ var MasterTime$ = {
 
 // wwtlib.TourStop
 
-function TourStop() {
+export function TourStop() {
   this._tourStopType = 0;
   this._keyFramed = false;
   this._tweenPosition = 0;
@@ -32269,7 +32273,7 @@ var TourStop$ = {
 
 // wwtlib.LayerInfo
 
-function LayerInfo() {
+export function LayerInfo() {
   this.id = Guid.newGuid();
   this.startOpacity = 1;
   this.endOpacity = 1;
@@ -32285,7 +32289,7 @@ var LayerInfo$ = {
 
 // wwtlib.UndoTourStopChange
 
-function UndoTourStopChange(text, tour) {
+export function UndoTourStopChange(text, tour) {
   this._undoXml = '';
   this._redoXml = '';
   this._currentIndex = 0;
@@ -32333,7 +32337,7 @@ var UndoTourStopChange$ = {
 
 // wwtlib.Undo
 
-function Undo() {
+export function Undo() {
 }
 Undo.clear = function () {
   Undo._undoStack = new ss.Stack();
@@ -32382,7 +32386,7 @@ var Undo$ = {
 
 // wwtlib.UndoStep
 
-function UndoStep() {
+export function UndoStep() {
 }
 var UndoStep$ = {
   undo: function () {
@@ -32397,7 +32401,7 @@ var UndoStep$ = {
 
 // wwtlib.UndoTourSlidelistChange
 
-function UndoTourSlidelistChange(text, tour) {
+export function UndoTourSlidelistChange(text, tour) {
   this._currentIndex = 0;
   this._actionText = '';
   this._targetTour = null;
@@ -32438,7 +32442,7 @@ var UndoTourSlidelistChange$ = {
 
 // wwtlib.UndoTourPropertiesChange
 
-function UndoTourPropertiesChange(text, tour) {
+export function UndoTourPropertiesChange(text, tour) {
   this._actionText = '';
   this._targetTour = null;
   this._undoDomeMode = false;
@@ -32511,7 +32515,7 @@ var UndoTourPropertiesChange$ = {
 
 // wwtlib.Triangle
 
-function Triangle() {
+/*internal*/ function Triangle() {
   this.a = 0;
   this.b = 0;
   this.c = 0;
@@ -32571,7 +32575,7 @@ var Triangle$ = {
 
 // wwtlib.UiTools
 
-function UiTools() {
+export function UiTools() {
 }
 UiTools.gamma = function (val, gamma) {
   return Math.min(255, ss.truncate(((255 * Math.pow(val / 255, 1 / gamma)) + 0.5)));
@@ -32720,7 +32724,7 @@ var UiTools$ = {
 
 // wwtlib.Util
 
-function Util() {
+export function Util() {
 }
 Util.splitString = function (target, split) {
   var parts = [];
@@ -32902,7 +32906,7 @@ var Util$ = {
 
 // wwtlib.Rectangle
 
-function Rectangle() {
+export function Rectangle() {
   this.x = 0;
   this.y = 0;
   this.width = 0;
@@ -32953,7 +32957,7 @@ var Rectangle$ = {
 
 // wwtlib.Guid
 
-function Guid() {
+export function Guid() {
   this._guid = Guid.create();
 }
 Guid.newGuid = function () {
@@ -32980,7 +32984,7 @@ var Guid$ = {
 
 // wwtlib.Mouse
 
-function Mouse() {
+export function Mouse() {
 }
 Mouse.offsetX = function (canvas, e) {
   var x = 0;
@@ -33008,7 +33012,7 @@ Mouse.offsetY = function (canvas, e) {
 
 // wwtlib.Language
 
-function Language() {
+export function Language() {
 }
 Language.getLocalizedText = function (id, text) {
   return text;
@@ -33020,7 +33024,7 @@ var Language$ = {
 
 // wwtlib.Cursor
 
-function Cursor() {
+export function Cursor() {
 }
 Cursor.get_position = function () {
   return new Vector2d();
@@ -33039,7 +33043,7 @@ var Cursor$ = {
 
 // wwtlib.Cursors
 
-function Cursors() {
+export function Cursors() {
 }
 Cursors.get_arrow = function () {
   return 'default';
@@ -33096,7 +33100,7 @@ var Cursors$ = {
 
 // wwtlib.SelectLink
 
-function SelectLink(id) {
+export function SelectLink(id) {
   this._return = false;
   this._next = true;
   this._linkSlide = false;
@@ -33162,7 +33166,7 @@ var SelectLink$ = {
 
 // wwtlib.PopupVolume
 
-function PopupVolume() {
+export function PopupVolume() {
   this.volume = 0;
 }
 var PopupVolume$ = {
@@ -33174,7 +33178,7 @@ var PopupVolume$ = {
 
 // wwtlib.PopupColorPicker
 
-function PopupColorPicker() {
+export function PopupColorPicker() {
   this.volume = 0;
   this.location = new Vector2d();
   this.color = new Color();
@@ -33188,7 +33192,7 @@ var PopupColorPicker$ = {
 
 // wwtlib.OverlayProperties
 
-function OverlayProperties() {
+export function OverlayProperties() {
   this.volume = 0;
   this.location = new Vector2d();
   this.overlay = null;
@@ -33202,7 +33206,7 @@ var OverlayProperties$ = {
 
 // wwtlib.BinaryReader
 
-function BinaryReader(arraybuf) {
+export function BinaryReader(arraybuf) {
   this.position = 0;
   this._data = null;
   this._data = arraybuf;
@@ -33308,7 +33312,7 @@ var BinaryReader$ = {
 
 // wwtlib.Bitmap
 
-function Bitmap() {
+export function Bitmap() {
   this.width = 0;
   this.height = 0;
 }
@@ -33345,7 +33349,7 @@ var Bitmap$ = {
 
 // wwtlib.ColorPicker
 
-function ColorPicker() {
+export function ColorPicker() {
   this.callBack = null;
   this.color = Colors.get_white();
 }
@@ -33374,7 +33378,7 @@ var ColorPicker$ = {
 
 // wwtlib.ContextMenuStrip
 
-function ContextMenuStrip() {
+export function ContextMenuStrip() {
   this.items = [];
 }
 var ContextMenuStrip$ = {
@@ -33469,7 +33473,7 @@ var ContextMenuStrip$ = {
 
 // wwtlib.ToolStripMenuItem
 
-function ToolStripMenuItem() {
+export function ToolStripMenuItem() {
   this.tag = null;
   this.dropDownItems = [];
   this.checked = false;
@@ -33488,7 +33492,7 @@ var ToolStripMenuItem$ = {
 
 // wwtlib.TagMe
 
-function TagMe() {
+export function TagMe() {
 }
 var TagMe$ = {
 
@@ -33497,7 +33501,7 @@ var TagMe$ = {
 
 // wwtlib.Dialog
 
-function Dialog() {
+export function Dialog() {
 }
 var Dialog$ = {
   add_showDialogHook: function (value) {
@@ -33516,7 +33520,7 @@ var Dialog$ = {
 
 // wwtlib.Histogram
 
-function Histogram() {
+export function Histogram() {
   this.image = null;
   this.layer = null;
   this.tile = null;
@@ -33769,7 +33773,7 @@ var Histogram$ = {
 
 // wwtlib.SimpleInput
 
-function SimpleInput(title, label, text, v3) {
+export function SimpleInput(title, label, text, v3) {
   this.title = 'Tile';
   this.label = 'Enter Text Below';
   this.text = '';
@@ -33840,7 +33844,7 @@ var SimpleInput$ = {
 
 // wwtlib.XmlTextWriter
 
-function XmlTextWriter() {
+export function XmlTextWriter() {
   this.body = "<?xml version='1.0' encoding='UTF-8'?>\r\n";
   this.formatting = 1;
   this._elementStack = new ss.Stack();
@@ -33946,7 +33950,7 @@ var XmlTextWriter$ = {
 
 // wwtlib.VizLayer
 
-function VizLayer() {
+export function VizLayer() {
   this.table = [];
   this.items = [];
   this._imageReady = false;
@@ -34030,7 +34034,7 @@ var VizLayer$ = {
 
 // wwtlib.DataItem
 
-function DataItem() {
+export function DataItem() {
   this.size = 0;
 }
 var DataItem$ = {
@@ -34042,7 +34046,7 @@ var DataItem$ = {
 
 // wwtlib.WebFile
 
-function WebFile(url) {
+export function WebFile(url) {
   this._state = 0;
   this.responseType = '';
   this._triedOnce = false;
@@ -34166,7 +34170,7 @@ var WebFile$ = {
 
 // wwtlib.FolderDownloadAction
 
-function FolderDownloadAction(action, loadChildFolders) {
+export function FolderDownloadAction(action, loadChildFolders) {
   this.loadChildFolders = false;
   this._numLoadingFolders = 0;
   this._onComplete = action;
@@ -34193,7 +34197,7 @@ var FolderDownloadAction$ = {
 
 // wwtlib.Wtml
 
-function Wtml() {
+export function Wtml() {
 }
 Wtml.getWtmlFile = function (url, complete, loadChildFolders) {
   if (loadChildFolders == null) {
@@ -34245,7 +34249,7 @@ var Wtml$ = {
 
 // wwtlib.WWTControl
 
-function WWTControl() {
+export function WWTControl() {
   this.freestandingMode = false;
   this.uiController = null;
   this._annotations = [];
@@ -36082,7 +36086,7 @@ var WWTControl$ = {
 
 // wwtlib.WWTControlBuilder
 
-function WWTControlBuilder(divId) {
+export function WWTControlBuilder(divId) {
   this._divId = null;
   this._startRenderLoop = false;
   this._startLat = 0;
@@ -36130,7 +36134,7 @@ var WWTControlBuilder$ = {
 
 // wwtlib.WWTElementEvent
 
-function WWTElementEvent(x, y) {
+export function WWTElementEvent(x, y) {
   this.offsetX = 0;
   this.offsetY = 0;
   this.offsetX = x;
@@ -36143,7 +36147,7 @@ var WWTElementEvent$ = {
 
 // wwtlib.Coordinates
 
-function Coordinates(ascention, declination) {
+export function Coordinates(ascention, declination) {
   this._ascention = 0;
   this._declination = 0;
   this._ascention = ascention + (Math.PI * 80) % (Math.PI * 2);
@@ -36646,7 +36650,7 @@ var Coordinates$ = {
 
 // wwtlib.Fxyf
 
-function Fxyf() {
+export function Fxyf() {
   this.fx = 0;
   this.fy = 0;
   this.face = 0;
@@ -36756,7 +36760,7 @@ var Fxyf$ = {
 
 // wwtlib.HealpixTile
 
-function HealpixTile(level, x, y, dataset, parent) {
+export function HealpixTile(level, x, y, dataset, parent) {
   this.ipix = 0;
   this.indexBuffer = new Array(4);
   this._vertexList$1 = null;
@@ -37310,7 +37314,7 @@ var HealpixTile$ = {
 
 // wwtlib.FitsImage
 
-function FitsImage(dataset, file, blob, callMeBack) {
+export function FitsImage(dataset, file, blob, callMeBack) {
   this.errored = false;
   this.numAxis = 0;
   this.histogramMaxCount = 0;
@@ -37693,7 +37697,7 @@ var FitsImage$ = {
 
 // wwtlib.Circle
 
-function Circle() {
+export function Circle() {
   this._fill$1 = false;
   this._skyRelative$1 = false;
   this._strokeWidth$1 = 1;
@@ -37837,7 +37841,7 @@ var Circle$ = {
 
 // wwtlib.Poly
 
-function Poly() {
+export function Poly() {
   this._points$1 = [];
   this._fill$1 = false;
   this._strokeWidth$1 = 1;
@@ -37948,7 +37952,7 @@ var Poly$ = {
 
 // wwtlib.PolyLine
 
-function PolyLine() {
+export function PolyLine() {
   this._points$1 = [];
   this._strokeWidth$1 = 1;
   this._lineColor$1 = Colors.get_white();
@@ -38026,7 +38030,7 @@ var PolyLine$ = {
 
 // wwtlib.EquirectangularTile
 
-function EquirectangularTile() {
+export function EquirectangularTile() {
   this._tileDegrees$1 = 0;
   this._topDown$1 = true;
   this._subDivisionLevel$1 = 1;
@@ -38298,7 +38302,7 @@ var EquirectangularTile$ = {
 
 // wwtlib.PositionVertexBuffer
 
-function PositionVertexBuffer(count) {
+export function PositionVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38329,7 +38333,7 @@ var PositionVertexBuffer$ = {
 
 // wwtlib.PositionTextureVertexBuffer
 
-function PositionTextureVertexBuffer(count) {
+/*internal*/ function PositionTextureVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38368,7 +38372,7 @@ var PositionTextureVertexBuffer$ = {
 
 // wwtlib.PositionNormalTexturedVertexBuffer
 
-function PositionNormalTexturedVertexBuffer(count) {
+export function PositionNormalTexturedVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38410,7 +38414,7 @@ var PositionNormalTexturedVertexBuffer$ = {
 
 // wwtlib.PositionNormalTexturedTangentVertexBuffer
 
-function PositionNormalTexturedTangentVertexBuffer(count) {
+export function PositionNormalTexturedTangentVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38455,7 +38459,7 @@ var PositionNormalTexturedTangentVertexBuffer$ = {
 
 // wwtlib.KeplerVertexBuffer
 
-function KeplerVertexBuffer(count) {
+/*internal*/ function KeplerVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38507,7 +38511,7 @@ var KeplerVertexBuffer$ = {
 
 // wwtlib.TimeSeriesLineVertexBuffer
 
-function TimeSeriesLineVertexBuffer(count) {
+/*internal*/ function TimeSeriesLineVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38544,7 +38548,7 @@ var TimeSeriesLineVertexBuffer$ = {
 
 // wwtlib.TimeSeriesPointVertexBuffer
 
-function TimeSeriesPointVertexBuffer(count) {
+/*internal*/ function TimeSeriesPointVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38587,7 +38591,7 @@ var TimeSeriesPointVertexBuffer$ = {
 
 // wwtlib.PositionColoredVertexBuffer
 
-function PositionColoredVertexBuffer(count) {
+/*internal*/ function PositionColoredVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38622,7 +38626,7 @@ var PositionColoredVertexBuffer$ = {
 
 // wwtlib.PositionColoredTexturedVertexBuffer
 
-function PositionColoredTexturedVertexBuffer(count) {
+/*internal*/ function PositionColoredTexturedVertexBuffer(count) {
   this.count = 0;
   this._verts$1 = null;
   VertexBufferBase.call(this);
@@ -38659,7 +38663,7 @@ var PositionColoredTexturedVertexBuffer$ = {
 
 // wwtlib.ScaleLinear
 
-function ScaleLinear(min, max) {
+export function ScaleLinear(min, max) {
   this._min$1 = 0;
   this._max$1 = 0;
   this._factor$1 = 0;
@@ -38678,7 +38682,7 @@ var ScaleLinear$ = {
 
 // wwtlib.ScaleLog
 
-function ScaleLog(min, max) {
+export function ScaleLog(min, max) {
   this._min$1 = 0;
   this._max$1 = 0;
   this._factor$1 = 0;
@@ -38698,7 +38702,7 @@ var ScaleLog$ = {
 
 // wwtlib.ScalePow
 
-function ScalePow(min, max) {
+export function ScalePow(min, max) {
   this._min$1 = 0;
   this._max$1 = 0;
   this._factor$1 = 0;
@@ -38718,7 +38722,7 @@ var ScalePow$ = {
 
 // wwtlib.ScaleSqrt
 
-function ScaleSqrt(min, max) {
+export function ScaleSqrt(min, max) {
   this._min$1 = 0;
   this._max$1 = 0;
   this._factor$1 = 0;
@@ -38738,7 +38742,7 @@ var ScaleSqrt$ = {
 
 // wwtlib.HistogramEqualization
 
-function HistogramEqualization(image, min, max) {
+export function HistogramEqualization(image, min, max) {
   this._min$1 = 0;
   this._max$1 = 0;
   this._factor$1 = 0;
@@ -38766,7 +38770,7 @@ var HistogramEqualization$ = {
 
 // wwtlib.GreatCirlceRouteLayer
 
-function GreatCirlceRouteLayer() {
+export function GreatCirlceRouteLayer() {
   this._triangleList$1 = null;
   this._latStart$1 = 0;
   this._lngStart$1 = 0;
@@ -38927,7 +38931,7 @@ var GreatCirlceRouteLayer$ = {
 
 // wwtlib.GridLayer
 
-function GridLayer() {
+export function GridLayer() {
   Layer.call(this);
 }
 var GridLayer$ = {
@@ -38941,7 +38945,7 @@ var GridLayer$ = {
 
 // wwtlib.ImageSetLayer
 
-function ImageSetLayer() {
+export function ImageSetLayer() {
   this._imageSet$1 = null;
   this._extension$1 = '.txt';
   this._overrideDefaultLayer$1 = false;
@@ -39131,7 +39135,7 @@ var ImageSetLayer$ = {
 
 // wwtlib.LayerCollection
 
-function LayerCollection() {
+/*internal*/ function LayerCollection() {
   Layer.call(this);
 }
 var LayerCollection$ = {
@@ -39143,7 +39147,7 @@ var LayerCollection$ = {
 
 // wwtlib.Object3dLayer
 
-function Object3dLayer() {
+export function Object3dLayer() {
   this._primaryUI$1 = null;
   this._heading$1 = 0;
   this._flipV$1 = true;
@@ -39803,7 +39807,7 @@ var Object3dLayer$ = {
 
 // wwtlib.Object3dLayerUI
 
-function Object3dLayerUI(layer) {
+export function Object3dLayerUI(layer) {
   this._layer$1 = null;
   this._opened$1 = true;
   this._callbacks$1 = null;
@@ -39863,7 +39867,7 @@ var Object3dLayerUI$ = {
 
 // wwtlib.OrbitLayer
 
-function OrbitLayer() {
+export function OrbitLayer() {
   this._frames$1 = [];
   this._primaryUI$1 = null;
   this._pointOpacity$1 = 1;
@@ -40022,7 +40026,7 @@ var OrbitLayer$ = {
 
 // wwtlib.OrbitLayerUI
 
-function OrbitLayerUI(layer) {
+export function OrbitLayerUI(layer) {
   this._layer$1 = null;
   this._opened$1 = true;
   this._callbacks$1 = null;
@@ -40082,7 +40086,7 @@ var OrbitLayerUI$ = {
 
 // wwtlib.SpreadSheetLayer
 
-function SpreadSheetLayer() {
+export function SpreadSheetLayer() {
   this._dataDirty$1 = false;
   this._lastNormalizeSizeColumnIndex$1 = -1;
   this._lastDynamicColorColumnIndex$1 = -1;
@@ -41769,7 +41773,7 @@ var SpreadSheetLayer$ = {
 
 // wwtlib.TimeSeriesLayer
 
-function TimeSeriesLayer() {
+export function TimeSeriesLayer() {
   this.isLongIndex = false;
   this.shapeVertexCount = 0;
   this.lines = false;
@@ -42504,7 +42508,7 @@ var TimeSeriesLayer$ = {
 
 // wwtlib.VoTableLayer
 
-function VoTableLayer() {
+export function VoTableLayer() {
   this.isLongIndex = false;
   this.shapeVertexCount = 0;
   this.lines = false;
@@ -43502,7 +43506,7 @@ var VoTableLayer$ = {
 
 // wwtlib.MercatorTile
 
-function MercatorTile() {
+export function MercatorTile() {
   this._tileDegrees$1 = 0;
   this._latMin$1 = 0;
   this._latMax$1 = 0;
@@ -43859,7 +43863,7 @@ var MercatorTile$ = {
 
 // wwtlib.PlotTile
 
-function PlotTile() {
+export function PlotTile() {
   this._topDown$1 = true;
   this.backslash = false;
   this._vertexList$1 = null;
@@ -44097,7 +44101,7 @@ var PlotTile$ = {
 
 // wwtlib.TangentTile
 
-function TangentTile(level, x, y, dataset, parent) {
+export function TangentTile(level, x, y, dataset, parent) {
   this._topDown$1 = true;
   Tile.call(this);
   this.parent = parent;
@@ -44275,7 +44279,7 @@ var TangentTile$ = {
 
 // wwtlib.ToastTile
 
-function ToastTile() {
+export function ToastTile() {
   this._topDown$1 = true;
   this.backslash = false;
   this._vertexList$1 = null;
@@ -44836,7 +44840,7 @@ var ToastTile$ = {
 
 // wwtlib.BitmapOverlay
 
-function BitmapOverlay() {
+export function BitmapOverlay() {
   this._textureReady$1 = false;
   this._sprite$1 = new Sprite2d();
   Overlay.call(this);
@@ -44943,7 +44947,7 @@ var BitmapOverlay$ = {
 
 // wwtlib.TextOverlay
 
-function TextOverlay() {
+export function TextOverlay() {
   this._sprite$1 = new Sprite2d();
   this._ctx$1 = null;
   this._ce$1 = null;
@@ -45106,7 +45110,7 @@ var TextOverlay$ = {
 
 // wwtlib.ShapeOverlay
 
-function ShapeOverlay() {
+export function ShapeOverlay() {
   this._shapeType$1 = 1;
   this._sprite$1 = new Sprite2d();
   this._triangleStrip$1 = true;
@@ -45579,7 +45583,7 @@ var ShapeOverlay$ = {
 
 // wwtlib.AudioOverlay
 
-function AudioOverlay() {
+export function AudioOverlay() {
   this._audio$1 = null;
   this._audioReady$1 = false;
   this._wantPlaying$1 = false;
@@ -45725,7 +45729,7 @@ var AudioOverlay$ = {
 
 // wwtlib.FlipbookOverlay
 
-function FlipbookOverlay() {
+export function FlipbookOverlay() {
   this._loopType$1 = 1;
   this._startFrame$1 = 0;
   this._framesList$1 = [];
@@ -45935,7 +45939,7 @@ var FlipbookOverlay$ = {
 
 // wwtlib.ToolStripSeparator
 
-function ToolStripSeparator() {
+export function ToolStripSeparator() {
   ToolStripMenuItem.call(this);
   this.name = '--------------------------------------';
 }
@@ -45946,7 +45950,7 @@ var ToolStripSeparator$ = {
 
 // wwtlib.FrameWizard
 
-function FrameWizard() {
+export function FrameWizard() {
   Dialog.call(this);
 }
 var FrameWizard$ = {
@@ -45958,7 +45962,7 @@ var FrameWizard$ = {
 
 // wwtlib.ReferenceFrameProps
 
-function ReferenceFrameProps() {
+export function ReferenceFrameProps() {
   Dialog.call(this);
 }
 var ReferenceFrameProps$ = {
@@ -45970,7 +45974,7 @@ var ReferenceFrameProps$ = {
 
 // wwtlib.GreatCircleDialog
 
-function GreatCircleDialog() {
+export function GreatCircleDialog() {
   Dialog.call(this);
 }
 var GreatCircleDialog$ = {
@@ -45981,7 +45985,7 @@ var GreatCircleDialog$ = {
 
 // wwtlib.DataVizWizard
 
-function DataVizWizard() {
+export function DataVizWizard() {
   Dialog.call(this);
 }
 var DataVizWizard$ = {
@@ -45992,7 +45996,7 @@ var DataVizWizard$ = {
 
 // wwtlib.FitsImageTile
 
-function FitsImageTile(dataset, file, callMeBack) {
+export function FitsImageTile(dataset, file, callMeBack) {
   FitsImage.call(this, dataset, file, null, callMeBack);
 }
 var FitsImageTile$ = {
@@ -46043,7 +46047,7 @@ var FitsImageTile$ = {
 
 // wwtlib.FitsImageJs
 
-function FitsImageJs(dataset, file, blob, callMeBack) {
+export function FitsImageJs(dataset, file, blob, callMeBack) {
   this.dataType = 5;
   this._color$2 = false;
   this.isTiledFits = false;
@@ -46504,7 +46508,7 @@ var FitsImageJs$ = {
 
 // wwtlib.ISSLayer
 
-function ISSLayer() {
+export function ISSLayer() {
   Object3dLayer.call(this);
   this.id = ISSLayer.issGuid;
 }
@@ -46567,7 +46571,7 @@ var ISSLayer$ = {
 
 // wwtlib.CatalogSpreadSheetLayer
 
-function CatalogSpreadSheetLayer() {
+export function CatalogSpreadSheetLayer() {
   this._addedTiles$2 = {};
   SpreadSheetLayer.call(this);
 }
@@ -46604,7 +46608,7 @@ var CatalogSpreadSheetLayer$ = {
 
 // wwtlib.SlideChangedEventArgs
 
-function SlideChangedEventArgs(caption) {
+export function SlideChangedEventArgs(caption) {
   ss.EventArgs.call(this);
   this.set_caption(caption);
 }
@@ -46621,7 +46625,7 @@ var SlideChangedEventArgs$ = {
 
 // wwtlib.ArrivedEventArgs
 
-function ArrivedEventArgs(ra, dec, zoom) {
+export function ArrivedEventArgs(ra, dec, zoom) {
   this._ra$2 = 0;
   this._dec$2 = 0;
   this._zoom$2 = 0;
@@ -46657,7 +46661,7 @@ var ArrivedEventArgs$ = {
 
 // wwtlib.AnnotationClickEventArgs
 
-function AnnotationClickEventArgs(ra, dec, id) {
+export function AnnotationClickEventArgs(ra, dec, id) {
   this._ra$2 = 0;
   this._dec$2 = 0;
   ss.EventArgs.call(this);
@@ -46692,7 +46696,7 @@ var AnnotationClickEventArgs$ = {
 
 // wwtlib.CollectionLoadedEventArgs
 
-function CollectionLoadedEventArgs(url) {
+export function CollectionLoadedEventArgs(url) {
   ss.EventArgs.call(this);
   this._url$2 = url;
 }
@@ -46709,7 +46713,7 @@ var CollectionLoadedEventArgs$ = {
 
 // wwtlib.SkyImageTile
 
-function SkyImageTile(level, x, y, dataset, parent) {
+export function SkyImageTile(level, x, y, dataset, parent) {
   this.pixelCenterX = 0;
   this.pixelCenterY = 0;
   this.scaleX = 0.01;
@@ -46762,367 +46766,385 @@ var SkyImageTile$ = {
 
 // Wrap up module initialization
 
-var $exports = ss.module('wwtlib',
-  {
-    IFolder: [IFolder],
-    Sprite2d: [Sprite2d, Sprite2d$, null],
-    ViewMoverSlew: [ViewMoverSlew, ViewMoverSlew$, null, IViewMover],
-    VertexPosition: [VertexPosition, VertexPosition$, null],
-    MinorPlanets: [MinorPlanets, MinorPlanets$, null],
-    TileCache: [TileCache, TileCache$, null],
-    DistanceCalc: [DistanceCalc, DistanceCalc$, null],
-    Triangle: [Triangle, Triangle$, null],
-    PositionTextureVertexBuffer: [PositionTextureVertexBuffer, PositionTextureVertexBuffer$, VertexBufferBase],
-    KeplerVertexBuffer: [KeplerVertexBuffer, KeplerVertexBuffer$, VertexBufferBase],
-    TimeSeriesLineVertexBuffer: [TimeSeriesLineVertexBuffer, TimeSeriesLineVertexBuffer$, VertexBufferBase],
-    TimeSeriesPointVertexBuffer: [TimeSeriesPointVertexBuffer, TimeSeriesPointVertexBuffer$, VertexBufferBase],
-    PositionColoredVertexBuffer: [PositionColoredVertexBuffer, PositionColoredVertexBuffer$, VertexBufferBase],
-    PositionColoredTexturedVertexBuffer: [PositionColoredTexturedVertexBuffer, PositionColoredTexturedVertexBuffer$, VertexBufferBase],
-    LayerCollection: [LayerCollection, LayerCollection$, Layer]
-  },
-  {
-    DAY_OF_WEEK: DAY_OF_WEEK,
-    EO: EO,
-    ScaleTypes: ScaleTypes,
-    URLRewriteMode: URLRewriteMode,
-    SolarSystemObjects: SolarSystemObjects,
-    InterpolationType: InterpolationType,
-    PointType: PointType,
-    LocationHint: LocationHint,
-    FolderGroup: FolderGroup,
-    FolderRefreshType: FolderRefreshType,
-    FolderType: FolderType,
-    ThumbnailSize: ThumbnailSize,
-    CullMode: CullMode,
-    PointScaleTypes: PointScaleTypes,
-    ProjectionType: ProjectionType,
-    ImageSetType: ImageSetType,
-    BandPass: BandPass,
-    Classification: Classification,
-    DataTypes: DataTypes,
-    AltUnits: AltUnits,
-    FadeType: FadeType,
-    ReferenceFrames: ReferenceFrames,
-    ReferenceFrameTypes: ReferenceFrameTypes,
-    CoordinatesTypes: CoordinatesTypes,
-    AltTypes: AltTypes,
-    MarkerMixes: MarkerMixes,
-    ColorMaps: ColorMaps,
-    PlotTypes: PlotTypes,
-    MarkerScales: MarkerScales,
-    RAUnits: RAUnits,
-    Primitives: Primitives,
-    Alignment: Alignment,
-    StockSkyOverlayTypes: StockSkyOverlayTypes,
-    OverlayAnchor: OverlayAnchor,
-    AudioType: AudioType,
-    ShapeType: ShapeType,
-    LoopTypes: LoopTypes,
-    SelectionAnchor: SelectionAnchor,
-    TextBorderStyle: TextBorderStyle,
-    UserLevel: UserLevel,
-    TransitionType: TransitionType,
-    Keys: Keys,
-    DialogResult: DialogResult,
-    Formatting: Formatting,
-    StateType: StateType,
-    IThumbnail: [IThumbnail],
-    IPlace: [IPlace],
-    IUiController: [IUiController],
-    IViewMover: [IViewMover],
-    IUIServicesCallbacks: [IUIServicesCallbacks],
-    ISettings: [ISettings],
-    IUndoStep: [IUndoStep],
-    Imports: [Imports, null, null],
-    GFX: [GFX, null, null],
-    ABR: [ABR, ABR$, null],
-    ACFT: [ACFT, ACFT$, null],
-    ASEP: [ASEP, ASEP$, null],
-    COR: [COR, COR$, null],
-    C3D: [C3D, C3D$, null],
-    CT: [CT, CT$, null],
-    CalD: [CalD, CalD$, null],
-    DT: [DT, DT$, null],
-    DYT: [DYT, DYT$, null],
-    CAAEarth: [CAAEarth, CAAEarth$, null],
-    VSC: [VSC, VSC$, null],
-    CAAEclipticalElementDetails: [CAAEclipticalElementDetails, CAAEclipticalElementDetails$, null],
-    CAAEclipticalElements: [CAAEclipticalElements, CAAEclipticalElements$, null],
-    EPO: [EPO, EPO$, null],
-    EOE: [EOE, EOE$, null],
-    EPD: [EPD, EPD$, null],
-    EOD: [EOD, EOD$, null],
-    ELL: [ELL, ELL$, null],
-    EOT: [EOT, EOT$, null],
-    CAAFK5: [CAAFK5, CAAFK5$, null],
-    GMD: [GMD, GMD$, null],
-    GMDS: [GMDS, GMDS$, null],
-    GM: [GM, GM$, null],
-    CAAGlobe: [CAAGlobe, CAAGlobe$, null],
-    IFR: [IFR, IFR$, null],
-    INTP: [INTP, INTP$, null],
-    CAAJupiter: [CAAJupiter, CAAJupiter$, null],
-    CAAKepler: [CAAKepler, CAAKepler$, null],
-    CAAMars: [CAAMars, CAAMars$, null],
-    CAAMercury: [CAAMercury, CAAMercury$, null],
-    CAAMoon: [CAAMoon, CAAMoon$, null],
-    MoonCoefficient1: [MoonCoefficient1, MoonCoefficient1$, null],
-    MoonCoefficient2: [MoonCoefficient2, MoonCoefficient2$, null],
-    MIFR: [MIFR, MIFR$, null],
-    CAAMoonNodes: [CAAMoonNodes, CAAMoonNodes$, null],
-    CAAMoonPerigeeApogee: [CAAMoonPerigeeApogee, CAAMoonPerigeeApogee$, null],
-    MPAC: [MPAC, MPAC$, null],
-    CAAMoonPhases: [CAAMoonPhases, CAAMoonPhases$, null],
-    CAANeptune: [CAANeptune, CAANeptune$, null],
-    CAANutation: [CAANutation, CAANutation$, null],
-    NUC: [NUC, NUC$, null],
-    CAATopocentricEclipticDetails: [CAATopocentricEclipticDetails, CAATopocentricEclipticDetails$, null],
-    CAAParallax: [CAAParallax, CAAParallax$, null],
-    CAAPhysicalJupiterDetails: [CAAPhysicalJupiterDetails, CAAPhysicalJupiterDetails$, null],
-    CAAPhysicalJupiter: [CAAPhysicalJupiter, CAAPhysicalJupiter$, null],
-    CAAPhysicalMarsDetails: [CAAPhysicalMarsDetails, CAAPhysicalMarsDetails$, null],
-    CAAPhysicalMars: [CAAPhysicalMars, CAAPhysicalMars$, null],
-    CAAPhysicalSunDetails: [CAAPhysicalSunDetails, CAAPhysicalSunDetails$, null],
-    CAAPhysicalSun: [CAAPhysicalSun, CAAPhysicalSun$, null],
-    CAAPluto: [CAAPluto, CAAPluto$, null],
-    PlutoCoefficient1: [PlutoCoefficient1, PlutoCoefficient1$, null],
-    PlutoCoefficient2: [PlutoCoefficient2, PlutoCoefficient2$, null],
-    CAAPrecession: [CAAPrecession, CAAPrecession$, null],
-    CAARiseTransitSetDetails: [CAARiseTransitSetDetails, CAARiseTransitSetDetails$, null],
-    CAARiseTransitSet: [CAARiseTransitSet, CAARiseTransitSet$, null],
-    CAASaturn: [CAASaturn, CAASaturn$, null],
-    CAASaturnRingDetails: [CAASaturnRingDetails, CAASaturnRingDetails$, null],
-    CAASaturnRings: [CAASaturnRings, CAASaturnRings$, null],
-    CAASidereal: [CAASidereal, CAASidereal$, null],
-    CAAStellarMagnitudes: [CAAStellarMagnitudes, CAAStellarMagnitudes$, null],
-    CAASun: [CAASun, CAASun$, null],
-    CAAUranus: [CAAUranus, CAAUranus$, null],
-    CAAVenus: [CAAVenus, CAAVenus$, null],
-    VideoOutputType: [VideoOutputType, VideoOutputType$, null],
-    FitsProperties: [FitsProperties, FitsProperties$, null],
-    HipsProperties: [HipsProperties, HipsProperties$, null],
-    FastMath: [FastMath, FastMath$, null],
-    HealpixTables: [HealpixTables, HealpixTables$, null],
-    Xyf: [Xyf, Xyf$, null],
-    HealpixUtils: [HealpixUtils, HealpixUtils$, null],
-    Hploc: [Hploc, Hploc$, null],
-    Pointing: [Pointing, Pointing$, null],
-    URLHelpers: [URLHelpers, URLHelpers$, null],
-    Annotation: [Annotation, Annotation$, null],
-    AstroRaDec: [AstroRaDec, AstroRaDec$, null],
-    RiseSetDetails: [RiseSetDetails, RiseSetDetails$, null],
-    AstroCalc: [AstroCalc, AstroCalc$, null],
-    BlendState: [BlendState, BlendState$, null],
-    CameraParameters: [CameraParameters, CameraParameters$, null],
-    Color: [Color, Color$, null],
-    Colors: [Colors, Colors$, null],
-    Constellations: [Constellations, Constellations$, null],
-    Lineset: [Lineset, Lineset$, null],
-    Linepoint: [Linepoint, Linepoint$, null],
-    ConstellationFilter: [ConstellationFilter, ConstellationFilter$, null],
-    PositionTexture: [PositionTexture, PositionTexture$, null],
-    PositionColoredTextured: [PositionColoredTextured, PositionColoredTextured$, null],
-    PositionColored: [PositionColored, PositionColored$, null],
-    PositionNormalTexturedTangent: [PositionNormalTexturedTangent, PositionNormalTexturedTangent$, null],
-    Vector3d: [Vector3d, Vector3d$, null],
-    Vector2d: [Vector2d, Vector2d$, null],
-    Matrix3d: [Matrix3d, Matrix3d$, null],
-    Matrix2d: [Matrix2d, Matrix2d$, null],
-    DoubleUtilities: [DoubleUtilities, null, null],
-    PlaneD: [PlaneD, PlaneD$, null],
-    Vector4d: [Vector4d, Vector4d$, null],
-    PositionNormalTexturedX2: [PositionNormalTexturedX2, PositionNormalTexturedX2$, null],
-    PositionNormalTextured: [PositionNormalTextured, PositionNormalTextured$, null],
-    SphereHull: [SphereHull, SphereHull$, null],
-    ConvexHull: [ConvexHull, ConvexHull$, null],
-    Folder: [Folder, Folder$, null, IThumbnail],
-    FolderBrowser: [FolderBrowser, FolderBrowser$, null],
-    FolderUp: [FolderUp, FolderUp$, null, IThumbnail],
-    ShortIndexBuffer: [ShortIndexBuffer, ShortIndexBuffer$, null],
-    IndexBuffer: [IndexBuffer, IndexBuffer$, null, ss.IDisposable],
-    VertexBufferBase: [VertexBufferBase, VertexBufferBase$, null, ss.IDisposable],
-    Dates: [Dates, Dates$, null],
-    SimpleLineList: [SimpleLineList, SimpleLineList$, null],
-    OrbitLineList: [OrbitLineList, OrbitLineList$, null],
-    LineList: [LineList, LineList$, null],
-    TriangleList: [TriangleList, TriangleList$, null],
-    TriangleFanList: [TriangleFanList, TriangleFanList$, null],
-    PointList: [PointList, PointList$, null],
-    TimeSeriesLineVertex: [TimeSeriesLineVertex, TimeSeriesLineVertex$, null],
-    TimeSeriesPointVertex: [TimeSeriesPointVertex, TimeSeriesPointVertex$, null],
-    SimpleLineShader: [SimpleLineShader, SimpleLineShader$, null],
-    SimpleLineShader2D: [SimpleLineShader2D, SimpleLineShader2D$, null],
-    OrbitLineShader: [OrbitLineShader, OrbitLineShader$, null],
-    LineShaderNormalDates: [LineShaderNormalDates, LineShaderNormalDates$, null],
-    TimeSeriesPointSpriteShader: [TimeSeriesPointSpriteShader, TimeSeriesPointSpriteShader$, null],
-    KeplerPointSpriteShader: [KeplerPointSpriteShader, KeplerPointSpriteShader$, null],
-    EllipseShader: [EllipseShader, EllipseShader$, null],
-    ModelShader: [ModelShader, ModelShader$, null],
-    ModelShaderTan: [ModelShaderTan, ModelShaderTan$, null],
-    TileShader: [TileShader, TileShader$, null],
-    FitsShader: [FitsShader, FitsShader$, null],
-    ImageShader: [ImageShader, ImageShader$, null],
-    ImageShader2: [ImageShader2, ImageShader2$, null],
-    SpriteShader: [SpriteShader, SpriteShader$, null],
-    ShapeSpriteShader: [ShapeSpriteShader, ShapeSpriteShader$, null],
-    TextShader: [TextShader, TextShader$, null],
-    Tessellator: [Tessellator, Tessellator$, null],
-    Texture: [Texture, Texture$, null, ss.IDisposable],
-    Grids: [Grids, Grids$, null],
-    Imageset: [Imageset, Imageset$, null, IThumbnail],
-    ViewMoverKenBurnsStyle: [ViewMoverKenBurnsStyle, ViewMoverKenBurnsStyle$, null, IViewMover],
-    KeplerVertex: [KeplerVertex, KeplerVertex$, null],
-    ScaleMap: [ScaleMap, ScaleMap$, null],
-    ColorMapContainer: [ColorMapContainer, ColorMapContainer$, null],
-    Layer: [Layer, Layer$, null],
-    DomainValue: [DomainValue, DomainValue$, null],
-    LayerManager: [LayerManager, LayerManager$, null],
-    LayerMap: [LayerMap, LayerMap$, null],
-    SkyOverlays: [SkyOverlays, SkyOverlays$, null],
-    GroundOverlayLayer: [GroundOverlayLayer, GroundOverlayLayer$, null],
-    FrameTarget: [FrameTarget, FrameTarget$, null],
-    LayerUI: [LayerUI, LayerUI$, null],
-    LayerUIMenuItem: [LayerUIMenuItem, LayerUIMenuItem$, null],
-    LayerUITreeNode: [LayerUITreeNode, LayerUITreeNode$, null],
-    Group: [Group, Group$, null],
-    Mesh: [Mesh, Mesh$, null, ss.IDisposable],
-    Object3d: [Object3d, Object3d$, null],
-    ObjectNode: [ObjectNode, ObjectNode$, null],
-    Orbit: [Orbit, Orbit$, null],
-    EllipseRenderer: [EllipseRenderer, EllipseRenderer$, null],
-    ReferenceFrame: [ReferenceFrame, ReferenceFrame$, null],
-    KmlCoordinate: [KmlCoordinate, KmlCoordinate$, null],
-    KmlLineList: [KmlLineList, KmlLineList$, null],
-    PushPin: [PushPin, PushPin$, null],
-    Table: [Table, Table$, null],
-    VoTable: [VoTable, VoTable$, null],
-    VoRow: [VoRow, VoRow$, null],
-    VoColumn: [VoColumn, VoColumn$, null],
-    WcsImage: [WcsImage, WcsImage$, null],
-    Place: [Place, Place$, null, IThumbnail, IPlace],
-    KeplerianElements: [KeplerianElements, KeplerianElements$, null],
-    BodyAngles: [BodyAngles, BodyAngles$, null],
-    Planets: [Planets, Planets$, null],
-    Material: [Material, Material$, null],
-    InViewReturnMessage: [InViewReturnMessage, InViewReturnMessage$, null],
-    RenderContext: [RenderContext, RenderContext$, null],
-    RenderTriangle: [RenderTriangle, RenderTriangle$, null],
-    ScriptInterface: [ScriptInterface, ScriptInterface$, null],
-    Settings: [Settings, Settings$, null, ISettings],
-    Text3dBatch: [Text3dBatch, Text3dBatch$, null],
-    GlyphItem: [GlyphItem, GlyphItem$, null],
-    GlyphCache: [GlyphCache, GlyphCache$, null, ss.IDisposable],
-    Text3d: [Text3d, Text3d$, null],
-    SpaceTimeController: [SpaceTimeController, SpaceTimeController$, null],
-    Star: [Star, Star$, null],
-    Galaxy: [Galaxy, Galaxy$, null],
-    LatLngEdges: [LatLngEdges, LatLngEdges$, null],
-    Tile: [Tile, Tile$, null],
-    Tour: [Tour, Tour$, null, IThumbnail],
-    FileEntry: [FileEntry, FileEntry$, null],
-    FileCabinet: [FileCabinet, FileCabinet$, null],
-    SettingParameter: [SettingParameter, SettingParameter$, null],
-    Overlay: [Overlay, Overlay$, null],
-    Selection: [Selection, Selection$, null],
-    TextObject: [TextObject, TextObject$, null],
-    TourDocument: [TourDocument, TourDocument$, null],
-    TourEditTab: [TourEditTab, TourEditTab$, null],
-    TourEditor: [TourEditor, TourEditor$, null, IUiController],
-    OverlayList: [OverlayList, OverlayList$, null],
-    TourEdit: [TourEdit, TourEdit$, null],
-    SoundEditor: [SoundEditor, SoundEditor$, null],
-    TourStopList: [TourStopList, TourStopList$, null],
-    TimeLine: [TimeLine, TimeLine$, null],
-    TourPlayer: [TourPlayer, TourPlayer$, null, IUiController],
-    MasterTime: [MasterTime, MasterTime$, null],
-    TourStop: [TourStop, TourStop$, null, ISettings],
-    LayerInfo: [LayerInfo, LayerInfo$, null],
-    UndoTourStopChange: [UndoTourStopChange, UndoTourStopChange$, null, IUndoStep],
-    Undo: [Undo, Undo$, null],
-    UndoStep: [UndoStep, UndoStep$, null, IUndoStep],
-    UndoTourSlidelistChange: [UndoTourSlidelistChange, UndoTourSlidelistChange$, null, IUndoStep],
-    UndoTourPropertiesChange: [UndoTourPropertiesChange, UndoTourPropertiesChange$, null, IUndoStep],
-    UiTools: [UiTools, UiTools$, null],
-    Util: [Util, Util$, null],
-    Rectangle: [Rectangle, Rectangle$, null],
-    Guid: [Guid, Guid$, null],
-    Mouse: [Mouse, null, null],
-    Language: [Language, Language$, null],
-    Cursor: [Cursor, Cursor$, null],
-    Cursors: [Cursors, Cursors$, null],
-    SelectLink: [SelectLink, SelectLink$, null],
-    PopupVolume: [PopupVolume, PopupVolume$, null],
-    PopupColorPicker: [PopupColorPicker, PopupColorPicker$, null],
-    OverlayProperties: [OverlayProperties, OverlayProperties$, null],
-    BinaryReader: [BinaryReader, BinaryReader$, null],
-    Bitmap: [Bitmap, Bitmap$, null],
-    ColorPicker: [ColorPicker, ColorPicker$, null],
-    ContextMenuStrip: [ContextMenuStrip, ContextMenuStrip$, null],
-    ToolStripMenuItem: [ToolStripMenuItem, ToolStripMenuItem$, null],
-    TagMe: [TagMe, TagMe$, null],
-    Dialog: [Dialog, Dialog$, null],
-    Histogram: [Histogram, Histogram$, null],
-    SimpleInput: [SimpleInput, SimpleInput$, null],
-    XmlTextWriter: [XmlTextWriter, XmlTextWriter$, null],
-    VizLayer: [VizLayer, VizLayer$, null],
-    DataItem: [DataItem, DataItem$, null],
-    WebFile: [WebFile, WebFile$, null],
-    FolderDownloadAction: [FolderDownloadAction, FolderDownloadAction$, null],
-    Wtml: [Wtml, Wtml$, null],
-    WWTControl: [WWTControl, WWTControl$, null],
-    WWTControlBuilder: [WWTControlBuilder, WWTControlBuilder$, null],
-    WWTElementEvent: [WWTElementEvent, WWTElementEvent$, null],
-    Coordinates: [Coordinates, Coordinates$, null],
-    Fxyf: [Fxyf, Fxyf$, HealpixTables],
-    HealpixTile: [HealpixTile, HealpixTile$, Tile],
-    FitsImage: [FitsImage, FitsImage$, WcsImage],
-    Circle: [Circle, Circle$, Annotation],
-    Poly: [Poly, Poly$, Annotation],
-    PolyLine: [PolyLine, PolyLine$, Annotation],
-    EquirectangularTile: [EquirectangularTile, EquirectangularTile$, Tile],
-    PositionVertexBuffer: [PositionVertexBuffer, PositionVertexBuffer$, VertexBufferBase],
-    PositionNormalTexturedVertexBuffer: [PositionNormalTexturedVertexBuffer, PositionNormalTexturedVertexBuffer$, VertexBufferBase],
-    PositionNormalTexturedTangentVertexBuffer: [PositionNormalTexturedTangentVertexBuffer, PositionNormalTexturedTangentVertexBuffer$, VertexBufferBase],
-    ScaleLinear: [ScaleLinear, ScaleLinear$, ScaleMap],
-    ScaleLog: [ScaleLog, ScaleLog$, ScaleMap],
-    ScalePow: [ScalePow, ScalePow$, ScaleMap],
-    ScaleSqrt: [ScaleSqrt, ScaleSqrt$, ScaleMap],
-    HistogramEqualization: [HistogramEqualization, HistogramEqualization$, ScaleMap],
-    GreatCirlceRouteLayer: [GreatCirlceRouteLayer, GreatCirlceRouteLayer$, Layer],
-    GridLayer: [GridLayer, GridLayer$, Layer],
-    ImageSetLayer: [ImageSetLayer, ImageSetLayer$, Layer],
-    Object3dLayer: [Object3dLayer, Object3dLayer$, Layer, IUiController],
-    Object3dLayerUI: [Object3dLayerUI, Object3dLayerUI$, LayerUI],
-    OrbitLayer: [OrbitLayer, OrbitLayer$, Layer],
-    OrbitLayerUI: [OrbitLayerUI, OrbitLayerUI$, LayerUI],
-    SpreadSheetLayer: [SpreadSheetLayer, SpreadSheetLayer$, Layer],
-    TimeSeriesLayer: [TimeSeriesLayer, TimeSeriesLayer$, Layer],
-    VoTableLayer: [VoTableLayer, VoTableLayer$, Layer],
-    MercatorTile: [MercatorTile, MercatorTile$, Tile],
-    PlotTile: [PlotTile, PlotTile$, Tile],
-    TangentTile: [TangentTile, TangentTile$, Tile],
-    ToastTile: [ToastTile, ToastTile$, Tile],
-    BitmapOverlay: [BitmapOverlay, BitmapOverlay$, Overlay],
-    TextOverlay: [TextOverlay, TextOverlay$, Overlay],
-    ShapeOverlay: [ShapeOverlay, ShapeOverlay$, Overlay],
-    AudioOverlay: [AudioOverlay, AudioOverlay$, Overlay],
-    FlipbookOverlay: [FlipbookOverlay, FlipbookOverlay$, Overlay],
-    ToolStripSeparator: [ToolStripSeparator, ToolStripSeparator$, ToolStripMenuItem],
-    FrameWizard: [FrameWizard, FrameWizard$, Dialog],
-    ReferenceFrameProps: [ReferenceFrameProps, ReferenceFrameProps$, Dialog],
-    GreatCircleDialog: [GreatCircleDialog, GreatCircleDialog$, Dialog],
-    DataVizWizard: [DataVizWizard, DataVizWizard$, Dialog],
-    FitsImageTile: [FitsImageTile, FitsImageTile$, FitsImage],
-    FitsImageJs: [FitsImageJs, FitsImageJs$, FitsImage],
-    ISSLayer: [ISSLayer, ISSLayer$, Object3dLayer],
-    CatalogSpreadSheetLayer: [CatalogSpreadSheetLayer, CatalogSpreadSheetLayer$, SpreadSheetLayer],
-    SlideChangedEventArgs: [SlideChangedEventArgs, SlideChangedEventArgs$, ss.EventArgs],
-    ArrivedEventArgs: [ArrivedEventArgs, ArrivedEventArgs$, ss.EventArgs],
-    AnnotationClickEventArgs: [AnnotationClickEventArgs, AnnotationClickEventArgs$, ss.EventArgs],
-    CollectionLoadedEventArgs: [CollectionLoadedEventArgs, CollectionLoadedEventArgs$, ss.EventArgs],
-    SkyImageTile: [SkyImageTile, SkyImageTile$, TangentTile]
-  }
-);
+registerType("IFolder", [IFolder]);
+registerType("Sprite2d", [Sprite2d, Sprite2d$, null]);
+registerType("ViewMoverSlew", [ViewMoverSlew, ViewMoverSlew$, null, IViewMover]);
+registerType("VertexPosition", [VertexPosition, VertexPosition$, null]);
+registerType("MinorPlanets", [MinorPlanets, MinorPlanets$, null]);
+registerType("TileCache", [TileCache, TileCache$, null]);
+registerType("DistanceCalc", [DistanceCalc, DistanceCalc$, null]);
+registerType("Triangle", [Triangle, Triangle$, null]);
+registerType("PositionTextureVertexBuffer", [PositionTextureVertexBuffer, PositionTextureVertexBuffer$, VertexBufferBase]);
+registerType("KeplerVertexBuffer", [KeplerVertexBuffer, KeplerVertexBuffer$, VertexBufferBase]);
+registerType("TimeSeriesLineVertexBuffer", [TimeSeriesLineVertexBuffer, TimeSeriesLineVertexBuffer$, VertexBufferBase]);
+registerType("TimeSeriesPointVertexBuffer", [TimeSeriesPointVertexBuffer, TimeSeriesPointVertexBuffer$, VertexBufferBase]);
+registerType("PositionColoredVertexBuffer", [PositionColoredVertexBuffer, PositionColoredVertexBuffer$, VertexBufferBase]);
+registerType("PositionColoredTexturedVertexBuffer", [PositionColoredTexturedVertexBuffer, PositionColoredTexturedVertexBuffer$, VertexBufferBase]);
+registerType("LayerCollection", [LayerCollection, LayerCollection$, Layer]);
+
+registerType("DAY_OF_WEEK", DAY_OF_WEEK);
+registerType("EO", EO);
+registerType("ScaleTypes", ScaleTypes);
+registerType("URLRewriteMode", URLRewriteMode);
+registerType("SolarSystemObjects", SolarSystemObjects);
+registerType("InterpolationType", InterpolationType);
+registerType("PointType", PointType);
+registerType("LocationHint", LocationHint);
+registerType("FolderGroup", FolderGroup);
+registerType("FolderRefreshType", FolderRefreshType);
+registerType("FolderType", FolderType);
+registerType("ThumbnailSize", ThumbnailSize);
+registerType("CullMode", CullMode);
+registerType("PointScaleTypes", PointScaleTypes);
+registerType("ProjectionType", ProjectionType);
+registerType("ImageSetType", ImageSetType);
+registerType("BandPass", BandPass);
+registerType("Classification", Classification);
+registerType("DataTypes", DataTypes);
+registerType("AltUnits", AltUnits);
+registerType("FadeType", FadeType);
+registerType("ReferenceFrames", ReferenceFrames);
+registerType("ReferenceFrameTypes", ReferenceFrameTypes);
+registerType("CoordinatesTypes", CoordinatesTypes);
+registerType("AltTypes", AltTypes);
+registerType("MarkerMixes", MarkerMixes);
+registerType("ColorMaps", ColorMaps);
+registerType("PlotTypes", PlotTypes);
+registerType("MarkerScales", MarkerScales);
+registerType("RAUnits", RAUnits);
+registerType("Primitives", Primitives);
+registerType("Alignment", Alignment);
+registerType("StockSkyOverlayTypes", StockSkyOverlayTypes);
+registerType("OverlayAnchor", OverlayAnchor);
+registerType("AudioType", AudioType);
+registerType("ShapeType", ShapeType);
+registerType("LoopTypes", LoopTypes);
+registerType("SelectionAnchor", SelectionAnchor);
+registerType("TextBorderStyle", TextBorderStyle);
+registerType("UserLevel", UserLevel);
+registerType("TransitionType", TransitionType);
+registerType("Keys", Keys);
+registerType("DialogResult", DialogResult);
+registerType("Formatting", Formatting);
+registerType("StateType", StateType);
+registerType("IThumbnail", [IThumbnail]);
+registerType("IPlace", [IPlace]);
+registerType("IUiController", [IUiController]);
+registerType("IViewMover", [IViewMover]);
+registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
+registerType("ISettings", [ISettings]);
+registerType("IUndoStep", [IUndoStep]);
+registerType("Imports", [Imports, null, null]);
+registerType("GFX", [GFX, null, null]);
+registerType("ABR", [ABR, ABR$, null]);
+registerType("ACFT", [ACFT, ACFT$, null]);
+registerType("ASEP", [ASEP, ASEP$, null]);
+registerType("COR", [COR, COR$, null]);
+registerType("C3D", [C3D, C3D$, null]);
+registerType("CT", [CT, CT$, null]);
+registerType("CalD", [CalD, CalD$, null]);
+registerType("DT", [DT, DT$, null]);
+registerType("DYT", [DYT, DYT$, null]);
+registerType("CAAEarth", [CAAEarth, CAAEarth$, null]);
+registerType("VSC", [VSC, VSC$, null]);
+registerType("CAAEclipticalElementDetails", [CAAEclipticalElementDetails, CAAEclipticalElementDetails$, null]);
+registerType("CAAEclipticalElements", [CAAEclipticalElements, CAAEclipticalElements$, null]);
+registerType("EPO", [EPO, EPO$, null]);
+registerType("EOE", [EOE, EOE$, null]);
+registerType("EPD", [EPD, EPD$, null]);
+registerType("EOD", [EOD, EOD$, null]);
+registerType("ELL", [ELL, ELL$, null]);
+registerType("EOT", [EOT, EOT$, null]);
+registerType("CAAFK5", [CAAFK5, CAAFK5$, null]);
+registerType("GMD", [GMD, GMD$, null]);
+registerType("GMDS", [GMDS, GMDS$, null]);
+registerType("GM", [GM, GM$, null]);
+registerType("CAAGlobe", [CAAGlobe, CAAGlobe$, null]);
+registerType("IFR", [IFR, IFR$, null]);
+registerType("INTP", [INTP, INTP$, null]);
+registerType("CAAJupiter", [CAAJupiter, CAAJupiter$, null]);
+registerType("CAAKepler", [CAAKepler, CAAKepler$, null]);
+registerType("CAAMars", [CAAMars, CAAMars$, null]);
+registerType("CAAMercury", [CAAMercury, CAAMercury$, null]);
+registerType("CAAMoon", [CAAMoon, CAAMoon$, null]);
+registerType("MoonCoefficient1", [MoonCoefficient1, MoonCoefficient1$, null]);
+registerType("MoonCoefficient2", [MoonCoefficient2, MoonCoefficient2$, null]);
+registerType("MIFR", [MIFR, MIFR$, null]);
+registerType("CAAMoonNodes", [CAAMoonNodes, CAAMoonNodes$, null]);
+registerType("CAAMoonPerigeeApogee", [CAAMoonPerigeeApogee, CAAMoonPerigeeApogee$, null]);
+registerType("MPAC", [MPAC, MPAC$, null]);
+registerType("CAAMoonPhases", [CAAMoonPhases, CAAMoonPhases$, null]);
+registerType("CAANeptune", [CAANeptune, CAANeptune$, null]);
+registerType("CAANutation", [CAANutation, CAANutation$, null]);
+registerType("NUC", [NUC, NUC$, null]);
+registerType("CAATopocentricEclipticDetails", [CAATopocentricEclipticDetails, CAATopocentricEclipticDetails$, null]);
+registerType("CAAParallax", [CAAParallax, CAAParallax$, null]);
+registerType("CAAPhysicalJupiterDetails", [CAAPhysicalJupiterDetails, CAAPhysicalJupiterDetails$, null]);
+registerType("CAAPhysicalJupiter", [CAAPhysicalJupiter, CAAPhysicalJupiter$, null]);
+registerType("CAAPhysicalMarsDetails", [CAAPhysicalMarsDetails, CAAPhysicalMarsDetails$, null]);
+registerType("CAAPhysicalMars", [CAAPhysicalMars, CAAPhysicalMars$, null]);
+registerType("CAAPhysicalSunDetails", [CAAPhysicalSunDetails, CAAPhysicalSunDetails$, null]);
+registerType("CAAPhysicalSun", [CAAPhysicalSun, CAAPhysicalSun$, null]);
+registerType("CAAPluto", [CAAPluto, CAAPluto$, null]);
+registerType("PlutoCoefficient1", [PlutoCoefficient1, PlutoCoefficient1$, null]);
+registerType("PlutoCoefficient2", [PlutoCoefficient2, PlutoCoefficient2$, null]);
+registerType("CAAPrecession", [CAAPrecession, CAAPrecession$, null]);
+registerType("CAARiseTransitSetDetails", [CAARiseTransitSetDetails, CAARiseTransitSetDetails$, null]);
+registerType("CAARiseTransitSet", [CAARiseTransitSet, CAARiseTransitSet$, null]);
+registerType("CAASaturn", [CAASaturn, CAASaturn$, null]);
+registerType("CAASaturnRingDetails", [CAASaturnRingDetails, CAASaturnRingDetails$, null]);
+registerType("CAASaturnRings", [CAASaturnRings, CAASaturnRings$, null]);
+registerType("CAASidereal", [CAASidereal, CAASidereal$, null]);
+registerType("CAAStellarMagnitudes", [CAAStellarMagnitudes, CAAStellarMagnitudes$, null]);
+registerType("CAASun", [CAASun, CAASun$, null]);
+registerType("CAAUranus", [CAAUranus, CAAUranus$, null]);
+registerType("CAAVenus", [CAAVenus, CAAVenus$, null]);
+registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
+registerType("FitsProperties", [FitsProperties, FitsProperties$, null]);
+registerType("HipsProperties", [HipsProperties, HipsProperties$, null]);
+registerType("FastMath", [FastMath, FastMath$, null]);
+registerType("HealpixTables", [HealpixTables, HealpixTables$, null]);
+registerType("Xyf", [Xyf, Xyf$, null]);
+registerType("HealpixUtils", [HealpixUtils, HealpixUtils$, null]);
+registerType("Hploc", [Hploc, Hploc$, null]);
+registerType("Pointing", [Pointing, Pointing$, null]);
+registerType("URLHelpers", [URLHelpers, URLHelpers$, null]);
+registerType("Annotation", [Annotation, Annotation$, null]);
+registerType("AstroRaDec", [AstroRaDec, AstroRaDec$, null]);
+registerType("RiseSetDetails", [RiseSetDetails, RiseSetDetails$, null]);
+registerType("AstroCalc", [AstroCalc, AstroCalc$, null]);
+registerType("BlendState", [BlendState, BlendState$, null]);
+registerType("CameraParameters", [CameraParameters, CameraParameters$, null]);
+registerType("Color", [Color, Color$, null]);
+registerType("Colors", [Colors, Colors$, null]);
+registerType("Constellations", [Constellations, Constellations$, null]);
+registerType("Lineset", [Lineset, Lineset$, null]);
+registerType("Linepoint", [Linepoint, Linepoint$, null]);
+registerType("ConstellationFilter", [ConstellationFilter, ConstellationFilter$, null]);
+registerType("PositionTexture", [PositionTexture, PositionTexture$, null]);
+registerType("PositionColoredTextured", [PositionColoredTextured, PositionColoredTextured$, null]);
+registerType("PositionColored", [PositionColored, PositionColored$, null]);
+registerType("PositionNormalTexturedTangent", [PositionNormalTexturedTangent, PositionNormalTexturedTangent$, null]);
+registerType("Vector3d", [Vector3d, Vector3d$, null]);
+registerType("Vector2d", [Vector2d, Vector2d$, null]);
+registerType("Matrix3d", [Matrix3d, Matrix3d$, null]);
+registerType("Matrix2d", [Matrix2d, Matrix2d$, null]);
+registerType("DoubleUtilities", [DoubleUtilities, null, null]);
+registerType("PlaneD", [PlaneD, PlaneD$, null]);
+registerType("Vector4d", [Vector4d, Vector4d$, null]);
+registerType("PositionNormalTexturedX2", [PositionNormalTexturedX2, PositionNormalTexturedX2$, null]);
+registerType("PositionNormalTextured", [PositionNormalTextured, PositionNormalTextured$, null]);
+registerType("SphereHull", [SphereHull, SphereHull$, null]);
+registerType("ConvexHull", [ConvexHull, ConvexHull$, null]);
+registerType("Folder", [Folder, Folder$, null, IThumbnail]);
+registerType("FolderBrowser", [FolderBrowser, FolderBrowser$, null]);
+registerType("FolderUp", [FolderUp, FolderUp$, null, IThumbnail]);
+registerType("ShortIndexBuffer", [ShortIndexBuffer, ShortIndexBuffer$, null]);
+registerType("IndexBuffer", [IndexBuffer, IndexBuffer$, null, ss.IDisposable]);
+registerType("VertexBufferBase", [VertexBufferBase, VertexBufferBase$, null, ss.IDisposable]);
+registerType("Dates", [Dates, Dates$, null]);
+registerType("SimpleLineList", [SimpleLineList, SimpleLineList$, null]);
+registerType("OrbitLineList", [OrbitLineList, OrbitLineList$, null]);
+registerType("LineList", [LineList, LineList$, null]);
+registerType("TriangleList", [TriangleList, TriangleList$, null]);
+registerType("TriangleFanList", [TriangleFanList, TriangleFanList$, null]);
+registerType("PointList", [PointList, PointList$, null]);
+registerType("TimeSeriesLineVertex", [TimeSeriesLineVertex, TimeSeriesLineVertex$, null]);
+registerType("TimeSeriesPointVertex", [TimeSeriesPointVertex, TimeSeriesPointVertex$, null]);
+registerType("SimpleLineShader", [SimpleLineShader, SimpleLineShader$, null]);
+registerType("SimpleLineShader2D", [SimpleLineShader2D, SimpleLineShader2D$, null]);
+registerType("OrbitLineShader", [OrbitLineShader, OrbitLineShader$, null]);
+registerType("LineShaderNormalDates", [LineShaderNormalDates, LineShaderNormalDates$, null]);
+registerType("TimeSeriesPointSpriteShader", [TimeSeriesPointSpriteShader, TimeSeriesPointSpriteShader$, null]);
+registerType("KeplerPointSpriteShader", [KeplerPointSpriteShader, KeplerPointSpriteShader$, null]);
+registerType("EllipseShader", [EllipseShader, EllipseShader$, null]);
+registerType("ModelShader", [ModelShader, ModelShader$, null]);
+registerType("ModelShaderTan", [ModelShaderTan, ModelShaderTan$, null]);
+registerType("TileShader", [TileShader, TileShader$, null]);
+registerType("FitsShader", [FitsShader, FitsShader$, null]);
+registerType("ImageShader", [ImageShader, ImageShader$, null]);
+registerType("ImageShader2", [ImageShader2, ImageShader2$, null]);
+registerType("SpriteShader", [SpriteShader, SpriteShader$, null]);
+registerType("ShapeSpriteShader", [ShapeSpriteShader, ShapeSpriteShader$, null]);
+registerType("TextShader", [TextShader, TextShader$, null]);
+registerType("Tessellator", [Tessellator, Tessellator$, null]);
+registerType("Texture", [Texture, Texture$, null, ss.IDisposable]);
+registerType("Grids", [Grids, Grids$, null]);
+registerType("Imageset", [Imageset, Imageset$, null, IThumbnail]);
+registerType("ViewMoverKenBurnsStyle", [ViewMoverKenBurnsStyle, ViewMoverKenBurnsStyle$, null, IViewMover]);
+registerType("KeplerVertex", [KeplerVertex, KeplerVertex$, null]);
+registerType("ScaleMap", [ScaleMap, ScaleMap$, null]);
+registerType("ColorMapContainer", [ColorMapContainer, ColorMapContainer$, null]);
+registerType("Layer", [Layer, Layer$, null]);
+registerType("DomainValue", [DomainValue, DomainValue$, null]);
+registerType("LayerManager", [LayerManager, LayerManager$, null]);
+registerType("LayerMap", [LayerMap, LayerMap$, null]);
+registerType("SkyOverlays", [SkyOverlays, SkyOverlays$, null]);
+registerType("GroundOverlayLayer", [GroundOverlayLayer, GroundOverlayLayer$, null]);
+registerType("FrameTarget", [FrameTarget, FrameTarget$, null]);
+registerType("LayerUI", [LayerUI, LayerUI$, null]);
+registerType("LayerUIMenuItem", [LayerUIMenuItem, LayerUIMenuItem$, null]);
+registerType("LayerUITreeNode", [LayerUITreeNode, LayerUITreeNode$, null]);
+registerType("Group", [Group, Group$, null]);
+registerType("Mesh", [Mesh, Mesh$, null, ss.IDisposable]);
+registerType("Object3d", [Object3d, Object3d$, null]);
+registerType("ObjectNode", [ObjectNode, ObjectNode$, null]);
+registerType("Orbit", [Orbit, Orbit$, null]);
+registerType("EllipseRenderer", [EllipseRenderer, EllipseRenderer$, null]);
+registerType("ReferenceFrame", [ReferenceFrame, ReferenceFrame$, null]);
+registerType("KmlCoordinate", [KmlCoordinate, KmlCoordinate$, null]);
+registerType("KmlLineList", [KmlLineList, KmlLineList$, null]);
+registerType("PushPin", [PushPin, PushPin$, null]);
+registerType("Table", [Table, Table$, null]);
+registerType("VoTable", [VoTable, VoTable$, null]);
+registerType("VoRow", [VoRow, VoRow$, null]);
+registerType("VoColumn", [VoColumn, VoColumn$, null]);
+registerType("WcsImage", [WcsImage, WcsImage$, null]);
+registerType("Place", [Place, Place$, null, IThumbnail, IPlace]);
+registerType("KeplerianElements", [KeplerianElements, KeplerianElements$, null]);
+registerType("BodyAngles", [BodyAngles, BodyAngles$, null]);
+registerType("Planets", [Planets, Planets$, null]);
+registerType("Material", [Material, Material$, null]);
+registerType("InViewReturnMessage", [InViewReturnMessage, InViewReturnMessage$, null]);
+registerType("RenderContext", [RenderContext, RenderContext$, null]);
+registerType("RenderTriangle", [RenderTriangle, RenderTriangle$, null]);
+registerType("ScriptInterface", [ScriptInterface, ScriptInterface$, null]);
+registerType("Settings", [Settings, Settings$, null, ISettings]);
+registerType("Text3dBatch", [Text3dBatch, Text3dBatch$, null]);
+registerType("GlyphItem", [GlyphItem, GlyphItem$, null]);
+registerType("GlyphCache", [GlyphCache, GlyphCache$, null, ss.IDisposable]);
+registerType("Text3d", [Text3d, Text3d$, null]);
+registerType("SpaceTimeController", [SpaceTimeController, SpaceTimeController$, null]);
+registerType("Star", [Star, Star$, null]);
+registerType("Galaxy", [Galaxy, Galaxy$, null]);
+registerType("LatLngEdges", [LatLngEdges, LatLngEdges$, null]);
+registerType("Tile", [Tile, Tile$, null]);
+registerType("Tour", [Tour, Tour$, null, IThumbnail]);
+registerType("FileEntry", [FileEntry, FileEntry$, null]);
+registerType("FileCabinet", [FileCabinet, FileCabinet$, null]);
+registerType("SettingParameter", [SettingParameter, SettingParameter$, null]);
+registerType("Overlay", [Overlay, Overlay$, null]);
+registerType("Selection", [Selection, Selection$, null]);
+registerType("TextObject", [TextObject, TextObject$, null]);
+registerType("TourDocument", [TourDocument, TourDocument$, null]);
+registerType("TourEditTab", [TourEditTab, TourEditTab$, null]);
+registerType("TourEditor", [TourEditor, TourEditor$, null, IUiController]);
+registerType("OverlayList", [OverlayList, OverlayList$, null]);
+registerType("TourEdit", [TourEdit, TourEdit$, null]);
+registerType("SoundEditor", [SoundEditor, SoundEditor$, null]);
+registerType("TourStopList", [TourStopList, TourStopList$, null]);
+registerType("TimeLine", [TimeLine, TimeLine$, null]);
+registerType("TourPlayer", [TourPlayer, TourPlayer$, null, IUiController]);
+registerType("MasterTime", [MasterTime, MasterTime$, null]);
+registerType("TourStop", [TourStop, TourStop$, null, ISettings]);
+registerType("LayerInfo", [LayerInfo, LayerInfo$, null]);
+registerType("UndoTourStopChange", [UndoTourStopChange, UndoTourStopChange$, null, IUndoStep]);
+registerType("Undo", [Undo, Undo$, null]);
+registerType("UndoStep", [UndoStep, UndoStep$, null, IUndoStep]);
+registerType("UndoTourSlidelistChange", [UndoTourSlidelistChange, UndoTourSlidelistChange$, null, IUndoStep]);
+registerType("UndoTourPropertiesChange", [UndoTourPropertiesChange, UndoTourPropertiesChange$, null, IUndoStep]);
+registerType("UiTools", [UiTools, UiTools$, null]);
+registerType("Util", [Util, Util$, null]);
+registerType("Rectangle", [Rectangle, Rectangle$, null]);
+registerType("Guid", [Guid, Guid$, null]);
+registerType("Mouse", [Mouse, null, null]);
+registerType("Language", [Language, Language$, null]);
+registerType("Cursor", [Cursor, Cursor$, null]);
+registerType("Cursors", [Cursors, Cursors$, null]);
+registerType("SelectLink", [SelectLink, SelectLink$, null]);
+registerType("PopupVolume", [PopupVolume, PopupVolume$, null]);
+registerType("PopupColorPicker", [PopupColorPicker, PopupColorPicker$, null]);
+registerType("OverlayProperties", [OverlayProperties, OverlayProperties$, null]);
+registerType("BinaryReader", [BinaryReader, BinaryReader$, null]);
+registerType("Bitmap", [Bitmap, Bitmap$, null]);
+registerType("ColorPicker", [ColorPicker, ColorPicker$, null]);
+registerType("ContextMenuStrip", [ContextMenuStrip, ContextMenuStrip$, null]);
+registerType("ToolStripMenuItem", [ToolStripMenuItem, ToolStripMenuItem$, null]);
+registerType("TagMe", [TagMe, TagMe$, null]);
+registerType("Dialog", [Dialog, Dialog$, null]);
+registerType("Histogram", [Histogram, Histogram$, null]);
+registerType("SimpleInput", [SimpleInput, SimpleInput$, null]);
+registerType("XmlTextWriter", [XmlTextWriter, XmlTextWriter$, null]);
+registerType("VizLayer", [VizLayer, VizLayer$, null]);
+registerType("DataItem", [DataItem, DataItem$, null]);
+registerType("WebFile", [WebFile, WebFile$, null]);
+registerType("FolderDownloadAction", [FolderDownloadAction, FolderDownloadAction$, null]);
+registerType("Wtml", [Wtml, Wtml$, null]);
+registerType("WWTControl", [WWTControl, WWTControl$, null]);
+registerType("WWTControlBuilder", [WWTControlBuilder, WWTControlBuilder$, null]);
+registerType("WWTElementEvent", [WWTElementEvent, WWTElementEvent$, null]);
+registerType("Coordinates", [Coordinates, Coordinates$, null]);
+registerType("Fxyf", [Fxyf, Fxyf$, HealpixTables]);
+registerType("HealpixTile", [HealpixTile, HealpixTile$, Tile]);
+registerType("FitsImage", [FitsImage, FitsImage$, WcsImage]);
+registerType("Circle", [Circle, Circle$, Annotation]);
+registerType("Poly", [Poly, Poly$, Annotation]);
+registerType("PolyLine", [PolyLine, PolyLine$, Annotation]);
+registerType("EquirectangularTile", [EquirectangularTile, EquirectangularTile$, Tile]);
+registerType("PositionVertexBuffer", [PositionVertexBuffer, PositionVertexBuffer$, VertexBufferBase]);
+registerType("PositionNormalTexturedVertexBuffer", [PositionNormalTexturedVertexBuffer, PositionNormalTexturedVertexBuffer$, VertexBufferBase]);
+registerType("PositionNormalTexturedTangentVertexBuffer", [PositionNormalTexturedTangentVertexBuffer, PositionNormalTexturedTangentVertexBuffer$, VertexBufferBase]);
+registerType("ScaleLinear", [ScaleLinear, ScaleLinear$, ScaleMap]);
+registerType("ScaleLog", [ScaleLog, ScaleLog$, ScaleMap]);
+registerType("ScalePow", [ScalePow, ScalePow$, ScaleMap]);
+registerType("ScaleSqrt", [ScaleSqrt, ScaleSqrt$, ScaleMap]);
+registerType("HistogramEqualization", [HistogramEqualization, HistogramEqualization$, ScaleMap]);
+registerType("GreatCirlceRouteLayer", [GreatCirlceRouteLayer, GreatCirlceRouteLayer$, Layer]);
+registerType("GridLayer", [GridLayer, GridLayer$, Layer]);
+registerType("ImageSetLayer", [ImageSetLayer, ImageSetLayer$, Layer]);
+registerType("Object3dLayer", [Object3dLayer, Object3dLayer$, Layer, IUiController]);
+registerType("Object3dLayerUI", [Object3dLayerUI, Object3dLayerUI$, LayerUI]);
+registerType("OrbitLayer", [OrbitLayer, OrbitLayer$, Layer]);
+registerType("OrbitLayerUI", [OrbitLayerUI, OrbitLayerUI$, LayerUI]);
+registerType("SpreadSheetLayer", [SpreadSheetLayer, SpreadSheetLayer$, Layer]);
+registerType("TimeSeriesLayer", [TimeSeriesLayer, TimeSeriesLayer$, Layer]);
+registerType("VoTableLayer", [VoTableLayer, VoTableLayer$, Layer]);
+registerType("MercatorTile", [MercatorTile, MercatorTile$, Tile]);
+registerType("PlotTile", [PlotTile, PlotTile$, Tile]);
+registerType("TangentTile", [TangentTile, TangentTile$, Tile]);
+registerType("ToastTile", [ToastTile, ToastTile$, Tile]);
+registerType("BitmapOverlay", [BitmapOverlay, BitmapOverlay$, Overlay]);
+registerType("TextOverlay", [TextOverlay, TextOverlay$, Overlay]);
+registerType("ShapeOverlay", [ShapeOverlay, ShapeOverlay$, Overlay]);
+registerType("AudioOverlay", [AudioOverlay, AudioOverlay$, Overlay]);
+registerType("FlipbookOverlay", [FlipbookOverlay, FlipbookOverlay$, Overlay]);
+registerType("ToolStripSeparator", [ToolStripSeparator, ToolStripSeparator$, ToolStripMenuItem]);
+registerType("FrameWizard", [FrameWizard, FrameWizard$, Dialog]);
+registerType("ReferenceFrameProps", [ReferenceFrameProps, ReferenceFrameProps$, Dialog]);
+registerType("GreatCircleDialog", [GreatCircleDialog, GreatCircleDialog$, Dialog]);
+registerType("DataVizWizard", [DataVizWizard, DataVizWizard$, Dialog]);
+registerType("FitsImageTile", [FitsImageTile, FitsImageTile$, FitsImage]);
+registerType("FitsImageJs", [FitsImageJs, FitsImageJs$, FitsImage]);
+registerType("ISSLayer", [ISSLayer, ISSLayer$, Object3dLayer]);
+registerType("CatalogSpreadSheetLayer", [CatalogSpreadSheetLayer, CatalogSpreadSheetLayer$, SpreadSheetLayer]);
+registerType("SlideChangedEventArgs", [SlideChangedEventArgs, SlideChangedEventArgs$, ss.EventArgs]);
+registerType("ArrivedEventArgs", [ArrivedEventArgs, ArrivedEventArgs$, ss.EventArgs]);
+registerType("AnnotationClickEventArgs", [AnnotationClickEventArgs, AnnotationClickEventArgs$, ss.EventArgs]);
+registerType("CollectionLoadedEventArgs", [CollectionLoadedEventArgs, CollectionLoadedEventArgs$, ss.EventArgs]);
+registerType("SkyImageTile", [SkyImageTile, SkyImageTile$, TangentTile]);
+
+registerEnum("AltUnits", AltUnits);
+registerEnum("AudioType", AudioType);
+registerEnum("BandPass", BandPass);
+registerEnum("Classification", Classification);
+registerEnum("ColorMaps", ColorMaps);
+registerEnum("CoordinatesTypes", CoordinatesTypes);
+registerEnum("ImageSetType", ImageSetType);
+registerEnum("InterpolationType", InterpolationType);
+registerEnum("LoopTypes", LoopTypes);
+registerEnum("MarkerScales", MarkerScales);
+registerEnum("PlotTypes", PlotTypes);
+registerEnum("PointScaleTypes", PointScaleTypes);
+registerEnum("ProjectionType", ProjectionType);
+registerEnum("RAUnits", RAUnits);
+registerEnum("ReferenceFrames", ReferenceFrames);
+registerEnum("ReferenceFrameTypes", ReferenceFrameTypes);
+registerEnum("ScaleTypes", ScaleTypes);
+registerEnum("ShapeType", ShapeType);
+registerEnum("SolarSystemObjects", SolarSystemObjects);
+registerEnum("TextBorderStyle", TextBorderStyle);
+registerEnum("TransitionType", TransitionType);
+registerEnum("UserLevel", UserLevel);
 
 let pako;
 if (typeof window !== "undefined" && "pako" in window) {
@@ -47137,6 +47159,8 @@ if (typeof window !== "undefined" && "uuid" in window) {
 } else {
   import('uuid').then(function (result) { uuid = result; });
 };
+
+// Initialize statics
 
 GFX.g_ACft = [new ACFT(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1719914, -2, -25, 0, 25, -13, 1578089, 156, 10, 32, 684185, -358), new ACFT(0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6434, 141, 28007, -107, 25697, -95, -5904, -130, 11141, -48, -2559, -55), new ACFT(0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 715, 0, 0, 0, 6, 0, -657, 0, -15, 0, -282, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 715, 0, 0, 0, 0, 0, -656, 0, 0, 0, -285, 0), new ACFT(0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 486, -5, -236, -4, -216, -4, -446, 5, -94, 0, -193, 0), new ACFT(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 159, 0, 0, 0, 2, 0, -147, 0, -6, 0, -61, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, -59, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 39, 0, 0, 0, 0, 0, -36, 0, 0, 0, -16, 0), new ACFT(0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 33, 0, -10, 0, -9, 0, -30, 0, -5, 0, -13, 0), new ACFT(0, 2, 0, -1, 0, 0, 0, 0, 0, 0, 0, 31, 0, 1, 0, 1, 0, -28, 0, 0, 0, -12, 0), new ACFT(0, 3, -8, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, -28, 0, 25, 0, 8, 0, 11, 0, 3, 0), new ACFT(0, 5, -8, 3, 0, 0, 0, 0, 0, 0, 0, 8, 0, -28, 0, -25, 0, -8, 0, -11, 0, -3, 0), new ACFT(2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, -19, 0, 0, 0, -8, 0), new ACFT(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -19, 0, 0, 0, 0, 0, 17, 0, 0, 0, 8, 0), new ACFT(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, -16, 0, 0, 0, -7, 0), new ACFT(0, 1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 15, 0, 1, 0, 7, 0), new ACFT(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 16, 0, 0, 0, 1, 0, -15, 0, -3, 0, -6, 0), new ACFT(0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 11, 0, -1, 0, -1, 0, -10, 0, -1, 0, -5, 0), new ACFT(2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11, 0, -10, 0, 0, 0, -4, 0, 0, 0), new ACFT(0, 1, 0, -1, 0, 0, 0, 0, 0, 0, 0, -11, 0, -2, 0, -2, 0, 9, 0, -1, 0, 4, 0), new ACFT(0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, 0, -8, 0, -8, 0, 6, 0, -3, 0, 3, 0), new ACFT(0, 3, 0, -2, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, 9, 0, 0, 0, 4, 0), new ACFT(1, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, -9, 0, 0, 0, -4, 0), new ACFT(2, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, -8, 0, 0, 0, -4, 0), new ACFT(0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, -8, 0, 0, 0, -3, 0, 0, 0), new ACFT(2, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, 8, 0, 0, 0, 3, 0, 0, 0), new ACFT(0, 3, -2, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, -8, 0, 0, 0, -3, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 1, 2, -1, 0, 8, 0, 0, 0, 0, 0, -7, 0, 0, 0, -3, 0), new ACFT(8, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, -7, 0, -6, 0, 4, 0, -3, 0, 2, 0), new ACFT(8, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, -7, 0, 6, 0, -4, 0, 3, 0, -2, 0), new ACFT(0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, -5, 0, -4, 0, 5, 0, -2, 0, 2, 0), new ACFT(3, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, -2, 0, -7, 0, 1, 0, -4, 0), new ACFT(0, 2, 0, -2, 0, 0, 0, 0, 0, 0, 0, 4, 0, -6, 0, -5, 0, -4, 0, -2, 0, -2, 0), new ACFT(3, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, 0, -6, 0, 0, 0, -3, 0, 0, 0), new ACFT(0, 2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, -5, 0, -4, 0, -5, 0, -2, 0, -2, 0), new ACFT(0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 0, 5, 0, 0, 0, 0, 0, -5, 0, 0, 0, -2, 0)];
 GFX.deltaTTable = [121, 112, 103, 95, 88, 82, 77, 72, 68, 63, 60, 56, 53, 51, 48, 46, 44, 42, 40, 38, 35, 33, 31, 29, 26, 24, 22, 20, 18, 16, 14, 12, 11, 10, 9, 8, 7, 7, 7, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 14, 14, 14, 14, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 14, 13, 13.1, 12.5, 12.2, 12, 12, 12, 12, 12, 12, 11.9, 11.6, 11, 10.2, 9.2, 8.2, 7.1, 6.2, 5.6, 5.4, 5.3, 5.4, 5.6, 5.9, 6.2, 6.5, 6.8, 7.1, 7.3, 7.5, 7.6, 7.7, 7.3, 6.2, 5.2, 2.7, 1.4, -1.2, -2.8, -3.8, -4.8, -5.5, -5.3, -5.6, -5.7, -5.9, -6, -6.3, -6.5, -6.2, -4.7, -2.8, -0.1, 2.6, 5.3, 7.7, 10.4, 13.3, 16, 18.2, 20.2, 21.2, 22.4, 23.5, 23.8, 24.3, 24, 23.9, 23.9, 23.7, 24, 24.3, 25.3, 26.2, 27.3, 28.2, 29.1, 30, 30.7, 31.4, 32.2, 33.1, 34, 35, 36.5, 38.3, 40.18, 42.2, 44.5, 46.5, 48.5, 50.54, 52.2, 53.8, 54.9, 55.8, 56.86, 58.31, 59.99, 61.63, 62.97];
@@ -47616,5 +47640,3 @@ ISSLayer.issGuid = Guid.fromString('00000001-0002-0003-0405-060708090a0b');
 ISSLayer._loading$2 = false;
 ISSLayer._issmodel$2 = null;
 ISSLayer._doc$2 = null;
-
-return $exports;
