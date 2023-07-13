@@ -1,3 +1,6 @@
+import pako from "pako";
+import * as uuid from "uuid";
+
 import { ss } from "./ss.js";
 import { registerType, registerEnum, Enums } from "./typesystem.js";
 
@@ -47145,20 +47148,6 @@ registerEnum("SolarSystemObjects", SolarSystemObjects);
 registerEnum("TextBorderStyle", TextBorderStyle);
 registerEnum("TransitionType", TransitionType);
 registerEnum("UserLevel", UserLevel);
-
-let pako;
-if (typeof window !== "undefined" && "pako" in window) {
-  pako = window["pako"];
-} else {
-  import('pako').then(function (result) { pako = result; });
-};
-
-let uuid;
-if (typeof window !== "undefined" && "uuid" in window) {
-  uuid = window["uuid"];
-} else {
-  import('uuid').then(function (result) { uuid = result; });
-};
 
 // Initialize statics
 
