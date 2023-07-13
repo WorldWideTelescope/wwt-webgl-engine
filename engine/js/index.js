@@ -16,7 +16,14 @@ export {
 } from "./astrocalc/date.js";
 
 export {
+    EOE,
+    EPD,
+    EOD,
     EO,
+    ELL,
+} from "./astrocalc/elliptical.js";
+
+export {
     ScaleTypes,
     URLRewriteMode,
     SolarSystemObjects,
@@ -80,10 +87,6 @@ export {
     CAAEclipticalElementDetails,
     CAAEclipticalElements,
     EPO,
-    EOE,
-    EPD,
-    EOD,
-    ELL,
     EOT,
     CAAFK5,
     GMD,
