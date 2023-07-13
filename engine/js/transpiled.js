@@ -32978,38 +32978,6 @@ var Guid$ = {
 };
 
 
-// wwtlib.Enums
-
-function Enums() {
-}
-Enums.parse = function (enumType, value) {
-  if (value === 'Default') {
-    value = 'DefaultV';
-  }
-  if (value === '0') {
-    return 0;
-  }
-  var val = value.substr(0, 1).toLowerCase() + value.substr(1);
-  return this._wwtlib[enumType][val];
-};
-Enums.toXml = function (enumType, value) {
-  var x = "0"; var p = Object.keys(this._wwtlib[enumType]); for (var i in p) {
-    if (this._wwtlib[enumType][p[i]] == value) {
-      x = p[i]; break;
-    }
-  };
-  var val = x;
-  var enumString = val.substr(0, 1).toUpperCase() + val.substr(1);
-  if (enumString === 'DefaultV') {
-    enumString = 'Default';
-  }
-  return enumString;
-};
-var Enums$ = {
-
-};
-
-
 // wwtlib.Mouse
 
 function Mouse() {
@@ -47078,7 +47046,6 @@ var $exports = ss.module('wwtlib',
     Util: [Util, Util$, null],
     Rectangle: [Rectangle, Rectangle$, null],
     Guid: [Guid, Guid$, null],
-    Enums: [Enums, Enums$, null],
     Mouse: [Mouse, null, null],
     Language: [Language, Language$, null],
     Cursor: [Cursor, Cursor$, null],
