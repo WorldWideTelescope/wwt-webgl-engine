@@ -1,3 +1,9 @@
+# @wwtelescope/astro 0.2.3 (2023-07-21)
+
+- Add a `type: module` field to the `package.json` file (#264, @pkgw). This more
+  accurately reflects the files that we're distributing.
+
+
 # @wwtelescope/astro 0.2.2 (2022-11-30)
 
 - No code changes.

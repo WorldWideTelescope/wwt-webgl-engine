@@ -30,6 +30,7 @@
     "doc": "typedoc src/index.ts",
     "lint": "eslint -c ../.eslintrc.js src --ext .js,.ts"
   },
+  "type": "module",
   "types": "./dist/src/index.d.ts",
-  "version": "0.2.2"
+  "version": "0.2.3"
 }
