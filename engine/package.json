@@ -58,5 +58,5 @@
     "uglify": "uglifyjs src/index.js -c -o src/index.min.js"
   },
   "types": "./src/index.d.ts",
-  "version": "7.28.1"
+  "version": "7.28.2"
 }

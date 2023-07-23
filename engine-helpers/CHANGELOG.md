@@ -1,3 +1,9 @@
+# @wwtelescope/engine-helpers 0.15.1 (2023-07-23)
+
+- Add a `type: module` field to the `package.json` file (#264, @pkgw). This more
+  accurately reflects the files that we're distributing.
+
+
 # @wwtelescope/engine-helpers 0.15.0 (2023-06-08)
 
 - Have the `addImagesetToRepository` method return an imageset (#256, @pkgw).

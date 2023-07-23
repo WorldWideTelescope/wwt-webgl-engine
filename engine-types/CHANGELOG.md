@@ -1,3 +1,9 @@
+# @wwtelescope/engine-types 0.6.5 (2023-07-23)
+
+- Add a `type: module` field to the `package.json` file (#264, @pkgw). This more
+  accurately reflects the files that we're distributing.
+
+
 # @wwtelescope/engine-types 0.6.4 (2022-11-30)
 
 - No code changes. Make another release because the package of the previous

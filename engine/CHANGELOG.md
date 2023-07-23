@@ -1,3 +1,8 @@
+# @wwtelescope/engine 7.28.2 (2023-07-23)
+
+- Actually use the crosshairs color setting (#260, @Carifio24).
+
+
 # @wwtelescope/engine 7.28.1 (2023-07-01)
 
 - Make sure that annotations properly rerender after their opacity is changed

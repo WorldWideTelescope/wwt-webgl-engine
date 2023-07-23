@@ -1,3 +1,9 @@
+# @wwtelescope/embed-common 0.3.4 (2023-07-23)
+
+- Add a `type: module` field to the `package.json` file (#264, @pkgw). This more
+  accurately reflects the files that we're distributing.
+
+
 # @wwtelescope/embed-common 0.3.3 (2022-11-30)
 
 - No code changes.

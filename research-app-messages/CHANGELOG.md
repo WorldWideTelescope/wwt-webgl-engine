@@ -1,3 +1,9 @@
+# @wwtelescope/research-app-messages 0.17.1 (2023-07-23)
+
+- Add a `type: module` field to the `package.json` file (#264, @pkgw). This more
+  accurately reflects the files that we're distributing.
+
+
 # @wwtelescope/research-app-messages 0.17.0 (2023-02-27)
 
 - Add the camera roll angle to the view state message definition (#231, @Carifio24).
