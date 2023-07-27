@@ -28,6 +28,7 @@ export { CAANeptune } from "./astrocalc/neptune.js";
 export { CAAPluto, PlutoCoefficient1, PlutoCoefficient2 } from "./astrocalc/pluto.js";
 export { CAAKepler } from "./astrocalc/kepler.js";
 export { ABR, ACFT } from "./astrocalc/aberration.js";
+export { DYT } from "./astrocalc/dynamical_time.js";
 
 export {
     EOE,
@@ -122,7 +123,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    DYT,
     CAAEclipticalElementDetails,
     CAAEclipticalElements,
     EPO,
