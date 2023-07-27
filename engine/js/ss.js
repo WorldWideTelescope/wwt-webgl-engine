@@ -139,7 +139,7 @@ function _ss() {
 
   function fail(message) {
     console.assert(false, message);
-    if (global.navigator) {
+    if (globalThis.navigator) {
       eval('debugger;');
     }
   }
@@ -328,7 +328,7 @@ function _ss() {
     return (s1 === s2) ? 0 : (s1 < s2) ? -1 : 1;
   }
 
-  var _formatPlaceHolderRE = /(\{[^\}^\{]+\})/g;
+  var _formatPlaceHolderRE = /(\{[^}^{]+\})/g;
   var _formatters = {};
 
   function format(cultureOrFormat) {
@@ -512,7 +512,7 @@ function _ss() {
 
     // If unspecified, exported bindings go on the global object
     // (so they are callable using a simple identifier).
-    root = root || global;
+    root = root || globalThis;
 
     var exp = {
       name: name,
@@ -1334,7 +1334,7 @@ function _ss() {
 
   function type(s) {
     var nsIndex = s.indexOf('.');
-    var ns = nsIndex > 0 ? _modules[s.substr(0, nsIndex)] : global;
+    var ns = nsIndex > 0 ? _modules[s.substr(0, nsIndex)] : globalThis;
     var name = nsIndex > 0 ? s.substr(nsIndex + 1) : s;
 
     return ns ? ns[name] : null;

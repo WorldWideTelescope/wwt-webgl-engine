@@ -56,7 +56,7 @@ Enums.toXml = function (enumType, value) {
             x = p[i];
             break;
         }
-    };
+    }
 
     var val = x;
     var enumString = val.substr(0, 1).toUpperCase() + val.substr(1);

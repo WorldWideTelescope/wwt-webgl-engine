@@ -10035,7 +10035,6 @@ var FolderBrowser$ = {
   refresh: function () {
     if (this.width !== window.innerWidth) {
       this.width = window.innerWidth;
-      this.canvas.width = this.canvas.width;
     }
     this.paint();
   },
@@ -12653,7 +12652,7 @@ var Texture$ = {
     var $this = this;
 
     this.URL = url;
-    if (typeof document === "undefined") { return; };
+    if (typeof document === "undefined") { return; }
     if (!this._downloading) {
       this._downloading = true;
       this.imageElement = document.createElement('img');
@@ -14997,12 +14996,7 @@ var Layer$ = {
       catch (err) {
         var errString = err.toString();
         if (errString === 'incorrect header check' || errString === 'unknown compression method') {
-          try {
-            result = String.fromCharCode.apply(null, new Uint8Array(e.target.result));
-          }
-          catch (error) {
-            throw error;
-          }
+          result = String.fromCharCode.apply(null, new Uint8Array(e.target.result));
         }
         else {
           throw err;
@@ -24283,9 +24277,10 @@ var Star$ = {
     else if (bmv <= -0.3) {
       c = 4288985855;
     }
-    else if (bmv <= -0.3) {
-      c = 4289051391;
-    }
+    // mistake in original source. Should this be "<= -0.29" or something?
+    // else if (bmv <= -0.3) {
+    //   c = 4289051391;
+    // }
     else if (bmv <= -0.28) {
       c = 4289182975;
     }
@@ -25646,7 +25641,7 @@ var FileCabinet$ = {
       var entry = $enum2.current;
       blobs.push(entry.blob);
     }
-    var cabBlob = new Blob(blobs, { type: 'application/x-wtt' });;
+    var cabBlob = new Blob(blobs, { type: 'application/x-wtt' });
     return cabBlob;
   },
   _loadCabinet: function () {
@@ -26672,7 +26667,7 @@ var TourDocument$ = {
     this._tourDirty = 0;
   },
   saveToDataUrl: function () {
-    return URL.createObjectURL(this.saveToBlob());;
+    return URL.createObjectURL(this.saveToBlob());
   },
   saveToBlob: function () {
     var excludeAudio = false;
@@ -27205,7 +27200,7 @@ var TourDocument$ = {
     if (blob == null) {
       return null;
     }
-    return URL.createObjectURL(blob);;
+    return URL.createObjectURL(blob);
   },
   getFileBlob: function (filename) {
     if (ss.keyExists(this._fileCache, filename)) {
@@ -32293,7 +32288,7 @@ Guid.fromString = function (id) {
   return temp;
 };
 Guid.create = function () {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); });;
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); });
 };
 Guid.createFrom = function (value) {
   var str = uuid.v5(value, '1420736a-a637-40a7-813a-ba692e72204e');
@@ -33378,14 +33373,8 @@ export function WebFile(url) {
 }
 var WebFile$ = {
   send: function () {
-    if (typeof navigator === "undefined") { return; };
-    var version = navigator.appVersion;
-    if (version.indexOf('MSIE 8') > -1 || version.indexOf('MSIE 9') > -1) {
-      this._ieCrossDomain();
-    }
-    else {
-      this._CORS();
-    }
+    if (typeof navigator === "undefined") { return; }
+    this._CORS();
     this.set_state(0);
   },
   get_message: function () {
@@ -33416,18 +33405,6 @@ var WebFile$ = {
   _timeOut: function () {
     this._message = ss.format('Timeout encountered loading {0}', this._url);
     this.set_state(2);
-  },
-  _ieCrossDomain: function () {
-    var $this = this;
-
-    this._xdr = new XDomainRequest();
-    this._xdr.onload = function () {
-      $this._loadData($this._xdr.responseText);
-    };
-    this._xdr.onTimeout = ss.bind('_error', this);
-    this._xdr.onError = ss.bind('_timeOut', this);
-    this._xdr.open('get', this._url);
-    this._xdr.send();
   },
   _CORS: function () {
     var $this = this;
@@ -34545,7 +34522,7 @@ var WWTControl$ = {
   onPointerDown: function (e) {
     var pe = e;
     var index = 0;
-    var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); };
+    var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }
     if (this._pointerIds[0] === pe.pointerId) {
       index = 0;
     }
@@ -35397,7 +35374,7 @@ var WWTControl$ = {
       temp.width = width;
       var ctx = temp.getContext('2d');
       ctx.drawImage(image, cx, cy, cw, ch);
-      if (typeof temp.msToBlob == 'function') { var blob = temp.msToBlob(); blobReady(blob); } else { temp.toBlob(blobReady, format); };
+      if (typeof temp.msToBlob == 'function') { var blob = temp.msToBlob(); blobReady(blob); } else { temp.toBlob(blobReady, format); }
     }, false);
     image.src = WWTControl.singleton.canvas.toDataURL();
   },
@@ -45780,7 +45757,7 @@ var FitsImageJs$ = {
     var $enum1 = ss.enumerate(buf);
     while ($enum1.moveNext()) {
       var val = $enum1.current;
-      if (!(val === Number.NaN)) {
+      if (!Number.isNaN(val)) {
         histogram[Math.min(buckets - 1, ss.truncate(((val - this.fitsProperties.minVal) / factor)))]++;
       }
     }
