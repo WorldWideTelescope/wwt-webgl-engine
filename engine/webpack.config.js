@@ -1,7 +1,7 @@
 const path = require("path");
 
 var config = {
-    entry: "./js/index.js",
+    entry: "./esm/index.js",
     output: {
         path: path.resolve(__dirname, "src"),
         library: {
