@@ -656,34 +656,6 @@ export function GFX() {
 }
 
 
-// EOT
-
-export function EOT() {
-}
-EOT.calculate = function (JD) {
-  var rho = (JD - 2451545) / 365250;
-  var rhosquared = rho * rho;
-  var rhocubed = rhosquared * rho;
-  var rho4 = rhocubed * rho;
-  var rho5 = rho4 * rho;
-  var L0 = CT.m360(280.4664567 + 360007.6982779 * rho + 0.03032028 * rhosquared + rhocubed / 49931 - rho4 / 15300 - rho5 / 2000000);
-  var SunLong = CAASun.apparentEclipticLongitude(JD);
-  var SunLat = CAASun.apparentEclipticLatitude(JD);
-  var epsilon = CAANutation.trueObliquityOfEcliptic(JD);
-  var Equatorial = CT.ec2Eq(SunLong, SunLat, epsilon);
-  epsilon = CT.d2R(epsilon);
-  var E = L0 - 0.0057183 - Equatorial.x * 15 + CT.dmS2D(0, 0, CAANutation.nutationInLongitude(JD)) * Math.cos(epsilon);
-  if (E > 180) {
-    E = -(360 - E);
-  }
-  E *= 4;
-  return E;
-};
-var EOT$ = {
-
-};
-
-
 // GMD
 
 export function GMD() {
@@ -40787,7 +40759,6 @@ registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
 registerType("ISettings", [ISettings]);
 registerType("IUndoStep", [IUndoStep]);
 registerType("GFX", [GFX, null, null]);
-registerType("EOT", [EOT, EOT$, null]);
 registerType("GMD", [GMD, GMD$, null]);
 registerType("GMDS", [GMDS, GMDS$, null]);
 registerType("GM", [GM, GM$, null]);

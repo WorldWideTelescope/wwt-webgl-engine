@@ -31,6 +31,7 @@ export { ABR, ACFT } from "./astrocalc/aberration.js";
 export { DYT } from "./astrocalc/dynamical_time.js";
 export { CAAEclipticalElementDetails, CAAEclipticalElements } from "./astrocalc/ecliptical_elements.js";
 export { EPO } from "./astrocalc/elements_planetary_orbit.js";
+export { EOT } from "./astrocalc/equation_of_time.js";
 
 export {
     EOE,
@@ -125,7 +126,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    EOT,
     GMD,
     GMDS,
     GM,
