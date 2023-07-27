@@ -26,6 +26,12 @@ export {
     VSC,
 } from "./astrocalc/earth.js";
 
+export { CAAFK5 } from "./astrocalc/fk5.js";
+
+export { NUC, CAANutation } from "./astrocalc/fk5.js";
+
+export { CAASun } from "./astrocalc/sun.js";
+
 export {
     EOE,
     EPD,
@@ -94,7 +100,6 @@ export {
     CAAEclipticalElements,
     EPO,
     EOT,
-    CAAFK5,
     GMD,
     GMDS,
     GM,
@@ -114,8 +119,6 @@ export {
     MPAC,
     CAAMoonPhases,
     CAANeptune,
-    CAANutation,
-    NUC,
     CAATopocentricEclipticDetails,
     CAAParallax,
     CAAPhysicalJupiterDetails,
@@ -135,7 +138,6 @@ export {
     CAASaturnRings,
     CAASidereal,
     CAAStellarMagnitudes,
-    CAASun,
     CAAUranus,
     CAAVenus,
     VideoOutputType,

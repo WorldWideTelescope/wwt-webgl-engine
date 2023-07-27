@@ -7,6 +7,9 @@ import { registerType, registerEnum, Enums } from "./typesystem.js";
 import { DT } from "./astrocalc/date.js";
 import { COR, C3D, CT } from "./astrocalc/coordinate_transformation.js";
 import { CAAEarth, VSC } from "./astrocalc/earth.js";
+import { CAAFK5 } from "./astrocalc/fk5.js";
+import { CAANutation } from "./astrocalc/fk5.js";
+import { CAASun } from "./astrocalc/sun.js";
 import { EOE, EPD, ELL } from "./astrocalc/elliptical.js";
 
 
@@ -1612,77 +1615,6 @@ EOT.calculate = function (JD) {
   return E;
 };
 var EOT$ = {
-
-};
-
-
-// CAAFK5
-
-export function CAAFK5() {
-}
-CAAFK5.correctionInLongitude = function (Longitude, Latitude, JD) {
-  var T = (JD - 2451545) / 36525;
-  var Ldash = Longitude - 1.397 * T - 0.00031 * T * T;
-  Ldash = CT.d2R(Ldash);
-  Longitude = CT.d2R(Longitude);
-  Latitude = CT.d2R(Latitude);
-  var vvalue = -0.09033 + 0.03916 * (Math.cos(Ldash) + Math.sin(Ldash)) * Math.tan(Latitude);
-  return CT.dmS2D(0, 0, vvalue);
-};
-CAAFK5.correctionInLatitude = function (Longitude, JD) {
-  var T = (JD - 2451545) / 36525;
-  var Ldash = Longitude - 1.397 * T - 0.00031 * T * T;
-  Ldash = CT.d2R(Ldash);
-  Longitude = CT.d2R(Longitude);
-  var vvalue = 0.03916 * (Math.cos(Ldash) - Math.sin(Ldash));
-  return CT.dmS2D(0, 0, vvalue);
-};
-CAAFK5.convertVSOPToFK5J2000 = function (vvalue) {
-  var result = new C3D();
-  result.x = vvalue.x + 4.4036E-07 * vvalue.y - 1.90919E-07 * vvalue.z;
-  result.y = -4.79966E-07 * vvalue.x + 0.917482137087 * vvalue.y - 0.397776982902 * vvalue.z;
-  result.z = 0.397776982902 * vvalue.y + 0.917482137087 * vvalue.z;
-  return result;
-};
-CAAFK5.convertVSOPToFK5B1950 = function (vvalue) {
-  var result = new C3D();
-  result.x = 0.999925702634 * vvalue.x + 0.012189716217 * vvalue.y + 1.1134016E-05 * vvalue.z;
-  result.y = -0.011179418036 * vvalue.x + 0.917413998946 * vvalue.y - 0.397777041885 * vvalue.z;
-  result.z = -0.004859003787 * vvalue.x + 0.397747363646 * vvalue.y + 0.917482111428 * vvalue.z;
-  return result;
-};
-CAAFK5.convertVSOPToFK5AnyEquinox = function (vvalue, JDEquinox) {
-  var t = (JDEquinox - 2451545) / 36525;
-  var tsquared = t * t;
-  var tcubed = tsquared * t;
-  var sigma = 2306.2181 * t + 0.30188 * tsquared + 0.017988 * tcubed;
-  sigma = CT.d2R(CT.dmS2D(0, 0, sigma));
-  var zeta = 2306.2181 * t + 1.09468 * tsquared + 0.018203 * tcubed;
-  zeta = CT.d2R(CT.dmS2D(0, 0, zeta));
-  var phi = 2004.3109 * t - 0.42665 * tsquared - 0.041833 * tcubed;
-  phi = CT.d2R(CT.dmS2D(0, 0, phi));
-  var cossigma = Math.cos(sigma);
-  var coszeta = Math.cos(zeta);
-  var cosphi = Math.cos(phi);
-  var sinsigma = Math.sin(sigma);
-  var sinzeta = Math.sin(zeta);
-  var sinphi = Math.sin(phi);
-  var xx = cossigma * coszeta * cosphi - sinsigma * sinzeta;
-  var xy = sinsigma * coszeta + cossigma * sinzeta * cosphi;
-  var xz = cossigma * sinphi;
-  var yx = -cossigma * sinzeta - sinsigma * coszeta * cosphi;
-  var yy = cossigma * coszeta - sinsigma * sinzeta * cosphi;
-  var yz = -sinsigma * sinphi;
-  var zx = -coszeta * sinphi;
-  var zy = -sinzeta * sinphi;
-  var zz = cosphi;
-  var result = new C3D();
-  result.x = xx * vvalue.x + yx * vvalue.y + zx * vvalue.z;
-  result.y = xy * vvalue.x + yy * vvalue.y + zy * vvalue.z;
-  result.z = xz * vvalue.x + yz * vvalue.y + zz * vvalue.z;
-  return result;
-};
-var CAAFK5$ = {
 
 };
 
@@ -3311,116 +3243,6 @@ var CAANeptune$ = {
 };
 
 
-// CAANutation
-
-export function CAANutation() {
-}
-CAANutation.nutationInLongitude = function (JD) {
-  var T = (JD - 2451545) / 36525;
-  var Tsquared = T * T;
-  var Tcubed = Tsquared * T;
-  var D = 297.85036 + 445267.11148 * T - 0.0019142 * Tsquared + Tcubed / 189474;
-  D = CT.m360(D);
-  var M = 357.52772 + 35999.05034 * T - 0.0001603 * Tsquared - Tcubed / 300000;
-  M = CT.m360(M);
-  var Mprime = 134.96298 + 477198.867398 * T + 0.0086972 * Tsquared + Tcubed / 56250;
-  Mprime = CT.m360(Mprime);
-  var F = 93.27191 + 483202.017538 * T - 0.0036825 * Tsquared + Tcubed / 327270;
-  F = CT.m360(F);
-  var omega = 125.04452 - 1934.136261 * T + 0.0020708 * Tsquared + Tcubed / 450000;
-  omega = CT.m360(omega);
-  var nCoefficients = GFX.g_NuC.length;
-  var vvalue = 0;
-  for (var i = 0; i < nCoefficients; i++) {
-    var argument = GFX.g_NuC[i].d * D + GFX.g_NuC[i].m * M + GFX.g_NuC[i].mprime * Mprime + GFX.g_NuC[i].f * F + GFX.g_NuC[i].omega * omega;
-    var radargument = CT.d2R(argument);
-    vvalue += (GFX.g_NuC[i].sincoeff1 + GFX.g_NuC[i].sincoeff2 * T) * Math.sin(radargument) * 0.0001;
-  }
-  return vvalue;
-};
-CAANutation.nutationInObliquity = function (JD) {
-  var T = (JD - 2451545) / 36525;
-  var Tsquared = T * T;
-  var Tcubed = Tsquared * T;
-  var D = 297.85036 + 445267.11148 * T - 0.0019142 * Tsquared + Tcubed / 189474;
-  D = CT.m360(D);
-  var M = 357.52772 + 35999.05034 * T - 0.0001603 * Tsquared - Tcubed / 300000;
-  M = CT.m360(M);
-  var Mprime = 134.96298 + 477198.867398 * T + 0.0086972 * Tsquared + Tcubed / 56250;
-  Mprime = CT.m360(Mprime);
-  var F = 93.27191 + 483202.017538 * T - 0.0036825 * Tsquared + Tcubed / 327270;
-  F = CT.m360(F);
-  var omega = 125.04452 - 1934.136261 * T + 0.0020708 * Tsquared + Tcubed / 450000;
-  omega = CT.m360(omega);
-  var nCoefficients = GFX.g_NuC.length;
-  var vvalue = 0;
-  for (var i = 0; i < nCoefficients; i++) {
-    var argument = GFX.g_NuC[i].d * D + GFX.g_NuC[i].m * M + GFX.g_NuC[i].mprime * Mprime + GFX.g_NuC[i].f * F + GFX.g_NuC[i].omega * omega;
-    var radargument = CT.d2R(argument);
-    vvalue += (GFX.g_NuC[i].coscoeff1 + GFX.g_NuC[i].coscoeff2 * T) * Math.cos(radargument) * 0.0001;
-  }
-  return vvalue;
-};
-CAANutation.nutationInRightAscension = function (Alpha, Delta, Obliquity, NutationInLongitude, NutationInObliquity) {
-  Alpha = CT.h2R(Alpha);
-  Delta = CT.d2R(Delta);
-  Obliquity = CT.d2R(Obliquity);
-  return (Math.cos(Obliquity) + Math.sin(Obliquity) * Math.sin(Alpha) * Math.tan(Delta)) * NutationInLongitude - Math.cos(Alpha) * Math.tan(Delta) * NutationInObliquity;
-};
-CAANutation.nutationInDeclination = function (Alpha, Delta, Obliquity, NutationInLongitude, NutationInObliquity) {
-  Alpha = CT.h2R(Alpha);
-  Delta = CT.d2R(Delta);
-  Obliquity = CT.d2R(Obliquity);
-  return Math.sin(Obliquity) * Math.cos(Alpha) * NutationInLongitude + Math.sin(Alpha) * NutationInObliquity;
-};
-CAANutation.meanObliquityOfEcliptic = function (JD) {
-  var U = (JD - 2451545) / 3652500;
-  var Usquared = U * U;
-  var Ucubed = Usquared * U;
-  var U4 = Ucubed * U;
-  var U5 = U4 * U;
-  var U6 = U5 * U;
-  var U7 = U6 * U;
-  var U8 = U7 * U;
-  var U9 = U8 * U;
-  var U10 = U9 * U;
-  return CT.dmS2D(23, 26, 21.448) - CT.dmS2D(0, 0, 4680.93) * U - CT.dmS2D(0, 0, 1.55) * Usquared + CT.dmS2D(0, 0, 1999.25) * Ucubed - CT.dmS2D(0, 0, 51.38) * U4 - CT.dmS2D(0, 0, 249.67) * U5 - CT.dmS2D(0, 0, 39.05) * U6 + CT.dmS2D(0, 0, 7.12) * U7 + CT.dmS2D(0, 0, 27.87) * U8 + CT.dmS2D(0, 0, 5.79) * U9 + CT.dmS2D(0, 0, 2.45) * U10;
-};
-CAANutation.trueObliquityOfEcliptic = function (JD) {
-  return CAANutation.meanObliquityOfEcliptic(JD) + CT.dmS2D(0, 0, CAANutation.nutationInObliquity(JD));
-};
-var CAANutation$ = {
-
-};
-
-
-// NUC
-
-export function NUC(D, M, Mprime, F, omega, sincoeff1, sincoeff2, coscoeff1, coscoeff2) {
-  this.d = 0;
-  this.m = 0;
-  this.mprime = 0;
-  this.f = 0;
-  this.omega = 0;
-  this.sincoeff1 = 0;
-  this.sincoeff2 = 0;
-  this.coscoeff1 = 0;
-  this.coscoeff2 = 0;
-  this.d = D;
-  this.m = M;
-  this.mprime = Mprime;
-  this.f = F;
-  this.omega = omega;
-  this.sincoeff1 = sincoeff1;
-  this.sincoeff2 = sincoeff2;
-  this.coscoeff1 = coscoeff1;
-  this.coscoeff2 = coscoeff2;
-}
-var NUC$ = {
-
-};
-
-
 // CAATopocentricEclipticDetails
 
 export function CAATopocentricEclipticDetails() {
@@ -4415,89 +4237,6 @@ CAAStellarMagnitudes.magnitudeDifference = function (brightnessRatio) {
   return 2.5 * Util.log10(brightnessRatio);
 };
 var CAAStellarMagnitudes$ = {
-
-};
-
-
-// CAASun
-
-export function CAASun() {
-}
-CAASun.geometricEclipticLongitude = function (JD) {
-  return CT.m360(CAAEarth.eclipticLongitude(JD) + 180);
-};
-CAASun.geometricEclipticLatitude = function (JD) {
-  return -CAAEarth.eclipticLatitude(JD);
-};
-CAASun.geometricEclipticLongitudeJ2000 = function (JD) {
-  return CT.m360(CAAEarth.eclipticLongitudeJ2000(JD) + 180);
-};
-CAASun.geometricEclipticLatitudeJ2000 = function (JD) {
-  return -CAAEarth.eclipticLatitudeJ2000(JD);
-};
-CAASun.geometricFK5EclipticLongitude = function (JD) {
-  var Longitude = CAASun.geometricEclipticLongitude(JD);
-  var Latitude = CAASun.geometricEclipticLatitude(JD);
-  Longitude += CAAFK5.correctionInLongitude(Longitude, Latitude, JD);
-  return Longitude;
-};
-CAASun.geometricFK5EclipticLatitude = function (JD) {
-  var Longitude = CAASun.geometricEclipticLongitude(JD);
-  var Latitude = CAASun.geometricEclipticLatitude(JD);
-  var SunLatCorrection = CAAFK5.correctionInLatitude(Longitude, JD);
-  Latitude += SunLatCorrection;
-  return Latitude;
-};
-CAASun.apparentEclipticLongitude = function (JD) {
-  var Longitude = CAASun.geometricFK5EclipticLongitude(JD);
-  Longitude += CT.dmS2D(0, 0, CAANutation.nutationInLongitude(JD));
-  var R = CAAEarth.radiusVector(JD);
-  Longitude -= CT.dmS2D(0, 0, 20.4898 / R);
-  return Longitude;
-};
-CAASun.apparentEclipticLatitude = function (JD) {
-  return CAASun.geometricFK5EclipticLatitude(JD);
-};
-CAASun.eclipticRectangularCoordinatesMeanEquinox = function (JD) {
-  var Longitude = CT.d2R(CAASun.geometricFK5EclipticLongitude(JD));
-  var Latitude = CT.d2R(CAASun.geometricFK5EclipticLatitude(JD));
-  var R = CAAEarth.radiusVector(JD);
-  var epsilon = CT.d2R(CAANutation.meanObliquityOfEcliptic(JD));
-  var vvalue = new C3D();
-  vvalue.x = R * Math.cos(Latitude) * Math.cos(Longitude);
-  vvalue.y = R * (Math.cos(Latitude) * Math.sin(Longitude) * Math.cos(epsilon) - Math.sin(Latitude) * Math.sin(epsilon));
-  vvalue.z = R * (Math.cos(Latitude) * Math.sin(Longitude) * Math.sin(epsilon) + Math.sin(Latitude) * Math.cos(epsilon));
-  return vvalue;
-};
-CAASun.eclipticRectangularCoordinatesJ2000 = function (JD) {
-  var Longitude = CAASun.geometricEclipticLongitudeJ2000(JD);
-  Longitude = CT.d2R(Longitude);
-  var Latitude = CAASun.geometricEclipticLatitudeJ2000(JD);
-  Latitude = CT.d2R(Latitude);
-  var R = CAAEarth.radiusVector(JD);
-  var vvalue = new C3D();
-  var coslatitude = Math.cos(Latitude);
-  vvalue.x = R * coslatitude * Math.cos(Longitude);
-  vvalue.y = R * coslatitude * Math.sin(Longitude);
-  vvalue.z = R * Math.sin(Latitude);
-  return vvalue;
-};
-CAASun.equatorialRectangularCoordinatesJ2000 = function (JD) {
-  var vvalue = CAASun.eclipticRectangularCoordinatesJ2000(JD);
-  vvalue = CAAFK5.convertVSOPToFK5J2000(vvalue);
-  return vvalue;
-};
-CAASun.equatorialRectangularCoordinatesB1950 = function (JD) {
-  var vvalue = CAASun.eclipticRectangularCoordinatesJ2000(JD);
-  vvalue = CAAFK5.convertVSOPToFK5B1950(vvalue);
-  return vvalue;
-};
-CAASun.equatorialRectangularCoordinatesAnyEquinox = function (JD, JDEquinox) {
-  var vvalue = CAASun.equatorialRectangularCoordinatesJ2000(JD);
-  vvalue = CAAFK5.convertVSOPToFK5AnyEquinox(vvalue, JDEquinox);
-  return vvalue;
-};
-var CAASun$ = {
 
 };
 
@@ -45762,7 +45501,6 @@ registerType("CAAEclipticalElementDetails", [CAAEclipticalElementDetails, CAAEcl
 registerType("CAAEclipticalElements", [CAAEclipticalElements, CAAEclipticalElements$, null]);
 registerType("EPO", [EPO, EPO$, null]);
 registerType("EOT", [EOT, EOT$, null]);
-registerType("CAAFK5", [CAAFK5, CAAFK5$, null]);
 registerType("GMD", [GMD, GMD$, null]);
 registerType("GMDS", [GMDS, GMDS$, null]);
 registerType("GM", [GM, GM$, null]);
@@ -45782,8 +45520,6 @@ registerType("CAAMoonPerigeeApogee", [CAAMoonPerigeeApogee, CAAMoonPerigeeApogee
 registerType("MPAC", [MPAC, MPAC$, null]);
 registerType("CAAMoonPhases", [CAAMoonPhases, CAAMoonPhases$, null]);
 registerType("CAANeptune", [CAANeptune, CAANeptune$, null]);
-registerType("CAANutation", [CAANutation, CAANutation$, null]);
-registerType("NUC", [NUC, NUC$, null]);
 registerType("CAATopocentricEclipticDetails", [CAATopocentricEclipticDetails, CAATopocentricEclipticDetails$, null]);
 registerType("CAAParallax", [CAAParallax, CAAParallax$, null]);
 registerType("CAAPhysicalJupiterDetails", [CAAPhysicalJupiterDetails, CAAPhysicalJupiterDetails$, null]);
@@ -45803,7 +45539,6 @@ registerType("CAASaturnRingDetails", [CAASaturnRingDetails, CAASaturnRingDetails
 registerType("CAASaturnRings", [CAASaturnRings, CAASaturnRings$, null]);
 registerType("CAASidereal", [CAASidereal, CAASidereal$, null]);
 registerType("CAAStellarMagnitudes", [CAAStellarMagnitudes, CAAStellarMagnitudes$, null]);
-registerType("CAASun", [CAASun, CAASun$, null]);
 registerType("CAAUranus", [CAAUranus, CAAUranus$, null]);
 registerType("CAAVenus", [CAAVenus, CAAVenus$, null]);
 registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
@@ -46128,7 +45863,6 @@ GFX.g_R0NC = [new VSC(3007013206, 0, 0), new VSC(27062259, 1.32999459, 38.133035
 GFX.g_R1NC = [new VSC(236339, 0.70498, 38.133036), new VSC(13220, 3.32015, 1.48447), new VSC(8622, 6.2163, 35.1641), new VSC(2702, 1.8814, 39.6175), new VSC(2155, 2.0943, 2.9689), new VSC(2153, 5.1687, 76.2661), new VSC(1603, 0, 0), new VSC(1464, 1.1842, 33.6796), new VSC(1136, 3.9189, 36.6486), new VSC(898, 5.241, 388.465), new VSC(790, 0.533, 168.053), new VSC(760, 0.021, 182.28), new VSC(607, 1.077, 1021.249), new VSC(572, 3.401, 484.444), new VSC(561, 2.887, 498.671)];
 GFX.g_R2NC = [new VSC(4247, 5.8991, 38.133), new VSC(218, 0.346, 1.484), new VSC(163, 2.239, 168.053), new VSC(156, 4.594, 182.28), new VSC(127, 2.848, 35.164)];
 GFX.g_R3NC = [new VSC(166, 4.552, 38.133)];
-GFX.g_NuC = [new NUC(0, 0, 0, 0, 1, -171996, -174.2, 92025, 8.9), new NUC(-2, 0, 0, 2, 2, -13187, -1.6, 5736, -3.1), new NUC(0, 0, 0, 2, 2, -2274, -0.2, 977, -0.5), new NUC(0, 0, 0, 0, 2, 2062, 0.2, -895, 0.5), new NUC(0, 1, 0, 0, 0, 1426, -3.4, 54, -0.1), new NUC(0, 0, 1, 0, 0, 712, 0.1, -7, 0), new NUC(-2, 1, 0, 2, 2, -517, 1.2, 224, -0.6), new NUC(0, 0, 0, 2, 1, -386, -0.4, 200, 0), new NUC(0, 0, 1, 2, 2, -301, 0, 129, -0.1), new NUC(-2, -1, 0, 2, 2, 217, -0.5, -95, 0.3), new NUC(-2, 0, 1, 0, 0, -158, 0, 0, 0), new NUC(-2, 0, 0, 2, 1, 129, 0.1, -70, 0), new NUC(0, 0, -1, 2, 2, 123, 0, -53, 0), new NUC(2, 0, 0, 0, 0, 63, 0, 0, 0), new NUC(0, 0, 1, 0, 1, 63, 0.1, -33, 0), new NUC(2, 0, -1, 2, 2, -59, 0, 26, 0), new NUC(0, 0, -1, 0, 1, -58, -0.1, 32, 0), new NUC(0, 0, 1, 2, 1, -51, 0, 27, 0), new NUC(-2, 0, 2, 0, 0, 48, 0, 0, 0), new NUC(0, 0, -2, 2, 1, 46, 0, -24, 0), new NUC(2, 0, 0, 2, 2, -38, 0, 16, 0), new NUC(0, 0, 2, 2, 2, -31, 0, 13, 0), new NUC(0, 0, 2, 0, 0, 29, 0, 0, 0), new NUC(-2, 0, 1, 2, 2, 29, 0, -12, 0), new NUC(0, 0, 0, 2, 0, 26, 0, 0, 0), new NUC(-2, 0, 0, 2, 0, -22, 0, 0, 0), new NUC(0, 0, -1, 2, 1, 21, 0, -10, 0), new NUC(0, 2, 0, 0, 0, 17, -0.1, 0, 0), new NUC(2, 0, -1, 0, 1, 16, 0, -8, 0), new NUC(-2, 2, 0, 2, 2, -16, 0.1, 7, 0), new NUC(0, 1, 0, 0, 1, -15, 0, 9, 0), new NUC(-2, 0, 1, 0, 1, -13, 0, 7, 0), new NUC(0, -1, 0, 0, 1, -12, 0, 6, 0), new NUC(0, 0, 2, -2, 0, 11, 0, 0, 0), new NUC(2, 0, -1, 2, 1, -10, 0, 5, 0), new NUC(2, 0, 1, 2, 2, -8, 0, 3, 0), new NUC(0, 1, 0, 2, 2, 7, 0, -3, 0), new NUC(-2, 1, 1, 0, 0, -7, 0, 0, 0), new NUC(0, -1, 0, 2, 2, -7, 0, 3, 0), new NUC(2, 0, 0, 2, 1, -7, 0, 3, 0), new NUC(2, 0, 1, 0, 0, 6, 0, 0, 0), new NUC(-2, 0, 2, 2, 2, 6, 0, -3, 0), new NUC(-2, 0, 1, 2, 1, 6, 0, -3, 0), new NUC(2, 0, -2, 0, 1, -6, 0, 3, 0), new NUC(2, 0, 0, 0, 1, -6, 0, 3, 0), new NUC(0, -1, 1, 0, 0, 5, 0, 0, 0), new NUC(-2, -1, 0, 2, 1, -5, 0, 3, 0), new NUC(-2, 0, 0, 0, 1, -5, 0, 3, 0), new NUC(0, 0, 2, 2, 1, -5, 0, 3, 0), new NUC(-2, 0, 2, 0, 1, 4, 0, 0, 0), new NUC(-2, 1, 0, 2, 1, 4, 0, 0, 0), new NUC(0, 0, 1, -2, 0, 4, 0, 0, 0), new NUC(-1, 0, 1, 0, 0, -4, 0, 0, 0), new NUC(-2, 1, 0, 0, 0, -4, 0, 0, 0), new NUC(1, 0, 0, 0, 0, -4, 0, 0, 0), new NUC(0, 0, 1, 2, 0, 3, 0, 0, 0), new NUC(0, 0, -2, 2, 2, -3, 0, 0, 0), new NUC(-1, -1, 1, 0, 0, -3, 0, 0, 0), new NUC(0, 1, 1, 0, 0, -3, 0, 0, 0), new NUC(0, -1, 1, 2, 2, -3, 0, 0, 0), new NUC(2, -1, -1, 2, 2, -3, 0, 0, 0), new NUC(0, 0, 3, 2, 2, -3, 0, 0, 0), new NUC(2, -1, 0, 2, 2, -3, 0, 0, 0)];
 GFX.g_AAParallax_C1 = Math.sin(CT.d2R(CT.dmS2D(0, 0, 8.794)));
 GFX.g_PlutoArgumentCoefficients = [new PlutoCoefficient1(0, 0, 1), new PlutoCoefficient1(0, 0, 2), new PlutoCoefficient1(0, 0, 3), new PlutoCoefficient1(0, 0, 4), new PlutoCoefficient1(0, 0, 5), new PlutoCoefficient1(0, 0, 6), new PlutoCoefficient1(0, 1, -1), new PlutoCoefficient1(0, 1, 0), new PlutoCoefficient1(0, 1, 1), new PlutoCoefficient1(0, 1, 2), new PlutoCoefficient1(0, 1, 3), new PlutoCoefficient1(0, 2, -2), new PlutoCoefficient1(0, 2, -1), new PlutoCoefficient1(0, 2, 0), new PlutoCoefficient1(1, -1, 0), new PlutoCoefficient1(1, -1, 1), new PlutoCoefficient1(1, 0, -3), new PlutoCoefficient1(1, 0, -2), new PlutoCoefficient1(1, 0, -1), new PlutoCoefficient1(1, 0, 0), new PlutoCoefficient1(1, 0, 1), new PlutoCoefficient1(1, 0, 2), new PlutoCoefficient1(1, 0, 3), new PlutoCoefficient1(1, 0, 4), new PlutoCoefficient1(1, 1, -3), new PlutoCoefficient1(1, 1, -2), new PlutoCoefficient1(1, 1, -1), new PlutoCoefficient1(1, 1, 0), new PlutoCoefficient1(1, 1, 1), new PlutoCoefficient1(1, 1, 3), new PlutoCoefficient1(2, 0, -6), new PlutoCoefficient1(2, 0, -5), new PlutoCoefficient1(2, 0, -4), new PlutoCoefficient1(2, 0, -3), new PlutoCoefficient1(2, 0, -2), new PlutoCoefficient1(2, 0, -1), new PlutoCoefficient1(2, 0, 0), new PlutoCoefficient1(2, 0, 1), new PlutoCoefficient1(2, 0, 2), new PlutoCoefficient1(2, 0, 3), new PlutoCoefficient1(3, 0, -2), new PlutoCoefficient1(3, 0, -1), new PlutoCoefficient1(3, 0, 0)];
 GFX.g_PlutoLongitudeCoefficients = [new PlutoCoefficient2(-19799805, 19850055), new PlutoCoefficient2(897144, -4954829), new PlutoCoefficient2(611149, 1211027), new PlutoCoefficient2(-341243, -189585), new PlutoCoefficient2(129287, -34992), new PlutoCoefficient2(-38164, 30893), new PlutoCoefficient2(20442, -9987), new PlutoCoefficient2(-4063, -5071), new PlutoCoefficient2(-6016, -3336), new PlutoCoefficient2(-3956, 3039), new PlutoCoefficient2(-667, 3572), new PlutoCoefficient2(1276, 501), new PlutoCoefficient2(1152, -917), new PlutoCoefficient2(630, -1277), new PlutoCoefficient2(2571, -459), new PlutoCoefficient2(899, -1449), new PlutoCoefficient2(-1016, 1043), new PlutoCoefficient2(-2343, -1012), new PlutoCoefficient2(7042, 788), new PlutoCoefficient2(1199, -338), new PlutoCoefficient2(418, -67), new PlutoCoefficient2(120, -274), new PlutoCoefficient2(-60, -159), new PlutoCoefficient2(-82, -29), new PlutoCoefficient2(-36, -29), new PlutoCoefficient2(-40, 7), new PlutoCoefficient2(-14, 22), new PlutoCoefficient2(4, 13), new PlutoCoefficient2(5, 2), new PlutoCoefficient2(-1, 0), new PlutoCoefficient2(2, 0), new PlutoCoefficient2(-4, 5), new PlutoCoefficient2(4, -7), new PlutoCoefficient2(14, 24), new PlutoCoefficient2(-49, -34), new PlutoCoefficient2(163, -48), new PlutoCoefficient2(9, -24), new PlutoCoefficient2(-4, 1), new PlutoCoefficient2(-3, 1), new PlutoCoefficient2(1, 3), new PlutoCoefficient2(-3, -1), new PlutoCoefficient2(5, -3), new PlutoCoefficient2(0, 0)];

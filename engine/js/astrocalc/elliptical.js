@@ -21,6 +21,9 @@
 import { registerType } from "../typesystem.js";
 import { C3D, CT } from "./coordinate_transformation.js";
 import { CAAEarth } from "./earth.js";
+import { CAAFK5 } from "./fk5.js";
+import { CAANutation } from "./fk5.js";
+import { CAASun } from "./sun.js";
 
 // EOE - was CAAEllipticalObjectElements
 
