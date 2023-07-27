@@ -41665,6 +41665,7 @@ registerType("AnnotationClickEventArgs", [AnnotationClickEventArgs, AnnotationCl
 registerType("CollectionLoadedEventArgs", [CollectionLoadedEventArgs, CollectionLoadedEventArgs$, ss.EventArgs]);
 registerType("SkyImageTile", [SkyImageTile, SkyImageTile$, TangentTile]);
 
+registerEnum("AltTypes", AltTypes);
 registerEnum("AltUnits", AltUnits);
 registerEnum("AudioType", AudioType);
 registerEnum("BandPass", BandPass);
@@ -41674,7 +41675,9 @@ registerEnum("CoordinatesTypes", CoordinatesTypes);
 registerEnum("ImageSetType", ImageSetType);
 registerEnum("InterpolationType", InterpolationType);
 registerEnum("LoopTypes", LoopTypes);
+registerEnum("MarkerMixes", MarkerMixes);
 registerEnum("MarkerScales", MarkerScales);
+registerEnum("OverlayAnchdor", OverlayAnchor);
 registerEnum("PlotTypes", PlotTypes);
 registerEnum("PointScaleTypes", PointScaleTypes);
 registerEnum("ProjectionType", ProjectionType);
