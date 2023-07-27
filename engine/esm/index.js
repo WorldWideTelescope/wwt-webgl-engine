@@ -36,6 +36,7 @@ export { GMD, GMDS, GM } from "./astrocalc/galilean_moons.js";
 export { CAAGlobe } from "./astrocalc/globe.js";
 export { IFR } from "./astrocalc/illuminated_fraction.js";
 export { INTP } from "./astrocalc/interpolate.js";
+export { CAAMoon, MoonCoefficient1, MoonCoefficient2 } from "./astrocalc/moon.js";
 
 export {
     EOE,
@@ -130,9 +131,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    CAAMoon,
-    MoonCoefficient1,
-    MoonCoefficient2,
     MIFR,
     CAAMoonNodes,
     CAAMoonPerigeeApogee,
