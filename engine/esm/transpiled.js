@@ -35,6 +35,7 @@ import { DYT } from "./astrocalc/dynamical_time.js";
 import { GMDS, GM } from "./astrocalc/galilean_moons.js";
 import { CAAGlobe } from "./astrocalc/globe.js";
 import { IFR } from "./astrocalc/illuminated_fraction.js";
+import { INTP } from "./astrocalc/interpolate.js";
 
 import { Color, Colors } from "./color.js";
 
@@ -656,143 +657,6 @@ export function IUndoStep() { }
 
 export function GFX() {
 }
-
-
-// INTP
-
-export function INTP() {
-}
-INTP.interpolate = function (n, Y1, Y2, Y3) {
-  var a = Y2 - Y1;
-  var b = Y3 - Y2;
-  var c = Y1 + Y3 - 2 * Y2;
-  return Y2 + n / 2 * (a + b + n * c);
-};
-INTP.interpolate2 = function (n, Y1, Y2, Y3, Y4, Y5) {
-  var A = Y2 - Y1;
-  var B = Y3 - Y2;
-  var C = Y4 - Y3;
-  var D = Y5 - Y4;
-  var E = B - A;
-  var F = C - B;
-  var G = D - C;
-  var H = F - E;
-  var J = G - F;
-  var K = J - H;
-  var N2 = n * n;
-  var N3 = N2 * n;
-  var N4 = N3 * n;
-  return Y3 + n * ((B + C) / 2 - (H + J) / 12) + N2 * (F / 2 - K / 24) + N3 * ((H + J) / 12) + N4 * (K / 24);
-};
-INTP.interpolateToHalves = function (Y1, Y2, Y3, Y4) {
-  return (9 * (Y2 + Y3) - Y1 - Y4) / 16;
-};
-INTP.lagrangeInterpolate = function (X, n, pX, pY) {
-  var V = 0;
-  for (var i = 1; i <= n; i++) {
-    var C = 1;
-    for (var j = 1; j <= n; j++) {
-      if (j !== i) {
-        C = C * (X - pX[j - 1]) / (pX[i - 1] - pX[j - 1]);
-      }
-    }
-    V += C * pY[i - 1];
-  }
-  return V;
-};
-INTP.zero = function (Y1, Y2, Y3) {
-  var a = Y2 - Y1;
-  var b = Y3 - Y2;
-  var c = Y1 + Y3 - 2 * Y2;
-  var bRecalc = true;
-  var n0prev = 0;
-  var n0 = n0prev;
-  while (bRecalc) {
-    n0 = -2 * Y2 / (a + b + c * n0prev);
-    bRecalc = (Math.abs(n0 - n0prev) > 1E-12);
-    if (bRecalc) {
-      n0prev = n0;
-    }
-  }
-  return n0;
-};
-INTP.zeroB = function (Y1, Y2, Y3, Y4, Y5) {
-  var A = Y2 - Y1;
-  var B = Y3 - Y2;
-  var C = Y4 - Y3;
-  var D = Y5 - Y4;
-  var E = B - A;
-  var F = C - B;
-  var G = D - C;
-  var H = F - E;
-  var J = G - F;
-  var K = J - H;
-  var bRecalc = true;
-  var n0prev = 0;
-  var n0 = n0prev;
-  while (bRecalc) {
-    var n0prev2 = n0prev * n0prev;
-    var n0prev3 = n0prev2 * n0prev;
-    var n0prev4 = n0prev3 * n0prev;
-    n0 = (-24 * Y3 + n0prev2 * (K - 12 * F) - 2 * n0prev3 * (H + J) - n0prev4 * K) / (2 * (6 * B + 6 * C - H - J));
-    bRecalc = (Math.abs(n0 - n0prev) > 1E-12);
-    if (bRecalc) {
-      n0prev = n0;
-    }
-  }
-  return n0;
-};
-INTP.zero2 = function (Y1, Y2, Y3) {
-  var a = Y2 - Y1;
-  var b = Y3 - Y2;
-  var c = Y1 + Y3 - 2 * Y2;
-  var bRecalc = true;
-  var n0prev = 0;
-  var n0 = n0prev;
-  while (bRecalc) {
-    var deltan0 = -(2 * Y2 + n0prev * (a + b + c * n0prev)) / (a + b + 2 * c * n0prev);
-    n0 = n0prev + deltan0;
-    bRecalc = (Math.abs(deltan0) > 1E-12);
-    if (bRecalc) {
-      n0prev = n0;
-    }
-  }
-  return n0;
-};
-INTP.zero2B = function (Y1, Y2, Y3, Y4, Y5) {
-  var A = Y2 - Y1;
-  var B = Y3 - Y2;
-  var C = Y4 - Y3;
-  var D = Y5 - Y4;
-  var E = B - A;
-  var F = C - B;
-  var G = D - C;
-  var H = F - E;
-  var J = G - F;
-  var K = J - H;
-  var M = K / 24;
-  var N = (H + J) / 12;
-  var P = F / 2 - M;
-  var Q = (B + C) / 2 - N;
-  var bRecalc = true;
-  var n0prev = 0;
-  var n0 = n0prev;
-  while (bRecalc) {
-    var n0prev2 = n0prev * n0prev;
-    var n0prev3 = n0prev2 * n0prev;
-    var n0prev4 = n0prev3 * n0prev;
-    var deltan0 = -(M * n0prev4 + N * n0prev3 + P * n0prev2 + Q * n0prev + Y3) / (4 * M * n0prev3 + 3 * N * n0prev2 + 2 * P * n0prev + Q);
-    n0 = n0prev + deltan0;
-    bRecalc = (Math.abs(deltan0) > 1E-12);
-    if (bRecalc) {
-      n0prev = n0;
-    }
-  }
-  return n0;
-};
-var INTP$ = {
-
-};
 
 
 // CAAMoon
@@ -40269,7 +40133,6 @@ registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
 registerType("ISettings", [ISettings]);
 registerType("IUndoStep", [IUndoStep]);
 registerType("GFX", [GFX, null, null]);
-registerType("INTP", [INTP, INTP$, null]);
 registerType("CAAMoon", [CAAMoon, CAAMoon$, null]);
 registerType("MoonCoefficient1", [MoonCoefficient1, MoonCoefficient1$, null]);
 registerType("MoonCoefficient2", [MoonCoefficient2, MoonCoefficient2$, null]);
