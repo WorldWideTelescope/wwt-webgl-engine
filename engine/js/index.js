@@ -32,6 +32,7 @@ export { CAAJupiter } from "./astrocalc/jupiter.js";
 export { CAASaturn } from "./astrocalc/saturn.js";
 export { CAAUranus } from "./astrocalc/uranus.js";
 export { CAANeptune } from "./astrocalc/neptune.js";
+export { CAAPluto, PlutoCoefficient1, PlutoCoefficient2 } from "./astrocalc/pluto.js";
 
 export {
     EOE,
@@ -124,9 +125,6 @@ export {
     CAAPhysicalMars,
     CAAPhysicalSunDetails,
     CAAPhysicalSun,
-    CAAPluto,
-    PlutoCoefficient1,
-    PlutoCoefficient2,
     CAAPrecession,
     CAARiseTransitSetDetails,
     CAARiseTransitSet,

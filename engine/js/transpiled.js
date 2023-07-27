@@ -17,6 +17,7 @@ import { CAAJupiter } from "./astrocalc/jupiter.js";
 import { CAASaturn } from "./astrocalc/saturn.js";
 import { CAAUranus } from "./astrocalc/uranus.js";
 import { CAANeptune } from "./astrocalc/neptune.js";
+import { CAAPluto } from "./astrocalc/pluto.js";
 import { EOE, EPD, ELL } from "./astrocalc/elliptical.js";
 
 
@@ -3164,92 +3165,6 @@ CAAPhysicalSun.timeOfStartOfRotation = function (C) {
   return JED;
 };
 var CAAPhysicalSun$ = {
-
-};
-
-
-// CAAPluto
-
-export function CAAPluto() {
-}
-CAAPluto.eclipticLongitude = function (JD) {
-  var T = (JD - 2451545) / 36525;
-  var J = 34.35 + 3034.9057 * T;
-  var S = 50.08 + 1222.1138 * T;
-  var P = 238.96 + 144.96 * T;
-  var L = 0;
-  var nPlutoCoefficients = GFX.g_PlutoArgumentCoefficients.length;
-  for (var i = 0; i < nPlutoCoefficients; i++) {
-    var Alpha = GFX.g_PlutoArgumentCoefficients[i].j * J + GFX.g_PlutoArgumentCoefficients[i].s * S + GFX.g_PlutoArgumentCoefficients[i].p * P;
-    Alpha = CT.d2R(Alpha);
-    L += ((GFX.g_PlutoLongitudeCoefficients[i].a * Math.sin(Alpha)) + (GFX.g_PlutoLongitudeCoefficients[i].b * Math.cos(Alpha)));
-  }
-  L = L / 1000000;
-  L += (238.958116 + 144.96 * T);
-  L = CT.m360(L);
-  return L;
-};
-CAAPluto.eclipticLatitude = function (JD) {
-  var T = (JD - 2451545) / 36525;
-  var J = 34.35 + 3034.9057 * T;
-  var S = 50.08 + 1222.1138 * T;
-  var P = 238.96 + 144.96 * T;
-  var L = 0;
-  var nPlutoCoefficients = GFX.g_PlutoArgumentCoefficients.length;
-  for (var i = 0; i < nPlutoCoefficients; i++) {
-    var Alpha = GFX.g_PlutoArgumentCoefficients[i].j * J + GFX.g_PlutoArgumentCoefficients[i].s * S + GFX.g_PlutoArgumentCoefficients[i].p * P;
-    Alpha = CT.d2R(Alpha);
-    L += ((GFX.g_PlutoLatitudeCoefficients[i].a * Math.sin(Alpha)) + (GFX.g_PlutoLatitudeCoefficients[i].b * Math.cos(Alpha)));
-  }
-  L = L / 1000000;
-  L += -3.908239;
-  return L;
-};
-CAAPluto.radiusVector = function (JD) {
-  var T = (JD - 2451545) / 36525;
-  var J = 34.35 + 3034.9057 * T;
-  var S = 50.08 + 1222.1138 * T;
-  var P = 238.96 + 144.96 * T;
-  var R = 0;
-  var nPlutoCoefficients = GFX.g_PlutoArgumentCoefficients.length;
-  for (var i = 0; i < nPlutoCoefficients; i++) {
-    var Alpha = GFX.g_PlutoArgumentCoefficients[i].j * J + GFX.g_PlutoArgumentCoefficients[i].s * S + GFX.g_PlutoArgumentCoefficients[i].p * P;
-    Alpha = CT.d2R(Alpha);
-    R += ((GFX.g_PlutoRadiusCoefficients[i].a * Math.sin(Alpha)) + (GFX.g_PlutoRadiusCoefficients[i].b * Math.cos(Alpha)));
-  }
-  R = R / 10000000;
-  R += 40.7241346;
-  return R;
-};
-var CAAPluto$ = {
-
-};
-
-
-// PlutoCoefficient1
-
-export function PlutoCoefficient1(j, s, p) {
-  this.j = 0;
-  this.s = 0;
-  this.p = 0;
-  this.j = j;
-  this.s = s;
-  this.p = p;
-}
-var PlutoCoefficient1$ = {
-
-};
-
-
-// PlutoCoefficient2
-
-export function PlutoCoefficient2(a, b) {
-  this.a = 0;
-  this.b = 0;
-  this.a = a;
-  this.b = b;
-}
-var PlutoCoefficient2$ = {
 
 };
 
@@ -44705,9 +44620,6 @@ registerType("CAAPhysicalMarsDetails", [CAAPhysicalMarsDetails, CAAPhysicalMarsD
 registerType("CAAPhysicalMars", [CAAPhysicalMars, CAAPhysicalMars$, null]);
 registerType("CAAPhysicalSunDetails", [CAAPhysicalSunDetails, CAAPhysicalSunDetails$, null]);
 registerType("CAAPhysicalSun", [CAAPhysicalSun, CAAPhysicalSun$, null]);
-registerType("CAAPluto", [CAAPluto, CAAPluto$, null]);
-registerType("PlutoCoefficient1", [PlutoCoefficient1, PlutoCoefficient1$, null]);
-registerType("PlutoCoefficient2", [PlutoCoefficient2, PlutoCoefficient2$, null]);
 registerType("CAAPrecession", [CAAPrecession, CAAPrecession$, null]);
 registerType("CAARiseTransitSetDetails", [CAARiseTransitSetDetails, CAARiseTransitSetDetails$, null]);
 registerType("CAARiseTransitSet", [CAARiseTransitSet, CAARiseTransitSet$, null]);
@@ -44975,10 +44887,6 @@ GFX.g_MoonPerigeeApogeeCoefficients2 = [new MPAC(2, 0, 0, 0.4392, 0), new MPAC(4
 GFX.g_MoonPerigeeApogeeCoefficients3 = [new MPAC(2, 0, 0, 63.224, 0), new MPAC(4, 0, 0, -6.99, 0), new MPAC(2, -1, 0, 2.834, 0), new MPAC(2, -1, 0, 0, -0.0071), new MPAC(6, 0, 0, 1.927, 0), new MPAC(1, 0, 0, -1.263, 0), new MPAC(8, 0, 0, -0.702, 0), new MPAC(0, 1, 0, 0.696, 0), new MPAC(0, 1, 0, 0, -0.0017), new MPAC(0, 0, 2, -0.69, 0), new MPAC(4, -1, 0, -0.629, 0), new MPAC(4, -1, 0, 0, 0.0016), new MPAC(2, 0, -2, -0.392, 0), new MPAC(10, 0, 0, 0.297, 0), new MPAC(6, -1, 0, 0.26, 0), new MPAC(3, 0, 0, 0.201, 0), new MPAC(2, 1, 0, -0.161, 0), new MPAC(1, 1, 0, 0.157, 0), new MPAC(12, 0, 0, -0.138, 0), new MPAC(8, -1, 0, -0.127, 0), new MPAC(2, 0, 2, 0.104, 0), new MPAC(2, -2, 0, 0.104, 0), new MPAC(5, 0, 0, -0.079, 0), new MPAC(14, 0, 0, 0.068, 0), new MPAC(10, -1, 0, 0.067, 0), new MPAC(4, 1, 0, 0.054, 0), new MPAC(12, -1, 0, -0.038, 0), new MPAC(4, -2, 0, -0.038, 0), new MPAC(7, 0, 0, 0.037, 0), new MPAC(4, 0, 2, -0.037, 0), new MPAC(16, 0, 0, -0.035, 0), new MPAC(3, 1, 0, -0.03, 0), new MPAC(1, -1, 0, 0.029, 0), new MPAC(6, 1, 0, -0.025, 0), new MPAC(0, 2, 0, 0.023, 0), new MPAC(14, -1, 0, 0.023, 0), new MPAC(2, 2, 0, -0.023, 0), new MPAC(6, -2, 0, 0.022, 0), new MPAC(2, -1, -2, -0.021, 0), new MPAC(9, 0, 0, -0.02, 0), new MPAC(18, 0, 0, 0.019, 0), new MPAC(6, 0, 2, 0.017, 0), new MPAC(0, -1, 2, 0.014, 0), new MPAC(16, -1, 0, -0.014, 0), new MPAC(4, 0, -20, 0.013, 0), new MPAC(8, 1, 0, 0.012, 0), new MPAC(11, 0, 0, 0.011, 0), new MPAC(5, 1, 0, 0.01, 0), new MPAC(20, 0, 0, -0.01, 0)];
 GFX.g_MoonPerigeeApogeeCoefficients4 = [new MPAC(2, 0, 0, -9.147, 0), new MPAC(1, 0, 0, -0.841, 0), new MPAC(0, 0, 2, 0.697, 0), new MPAC(0, 1, 0, -0.656, 0.0016), new MPAC(4, 0, 0, 0.355, 0), new MPAC(2, -1, 0, 0.159, 0), new MPAC(1, 1, 0, 0.127, 0), new MPAC(4, -1, 0, 0.065, 0), new MPAC(6, 0, 0, 0.052, 0), new MPAC(2, 1, 0, 0.043, 0), new MPAC(2, 0, 2, 0.031, 0), new MPAC(2, 0, -2, -0.023, 0), new MPAC(2, -2, 0, 0.022, 0), new MPAC(2, 2, 0, 0.019, 0), new MPAC(0, 2, 0, -0.016, 0), new MPAC(6, -1, 0, 0.014, 0), new MPAC(8, 0, 0, 0.01, 0)];
 GFX.g_AAParallax_C1 = Math.sin(CT.d2R(CT.dmS2D(0, 0, 8.794)));
-GFX.g_PlutoArgumentCoefficients = [new PlutoCoefficient1(0, 0, 1), new PlutoCoefficient1(0, 0, 2), new PlutoCoefficient1(0, 0, 3), new PlutoCoefficient1(0, 0, 4), new PlutoCoefficient1(0, 0, 5), new PlutoCoefficient1(0, 0, 6), new PlutoCoefficient1(0, 1, -1), new PlutoCoefficient1(0, 1, 0), new PlutoCoefficient1(0, 1, 1), new PlutoCoefficient1(0, 1, 2), new PlutoCoefficient1(0, 1, 3), new PlutoCoefficient1(0, 2, -2), new PlutoCoefficient1(0, 2, -1), new PlutoCoefficient1(0, 2, 0), new PlutoCoefficient1(1, -1, 0), new PlutoCoefficient1(1, -1, 1), new PlutoCoefficient1(1, 0, -3), new PlutoCoefficient1(1, 0, -2), new PlutoCoefficient1(1, 0, -1), new PlutoCoefficient1(1, 0, 0), new PlutoCoefficient1(1, 0, 1), new PlutoCoefficient1(1, 0, 2), new PlutoCoefficient1(1, 0, 3), new PlutoCoefficient1(1, 0, 4), new PlutoCoefficient1(1, 1, -3), new PlutoCoefficient1(1, 1, -2), new PlutoCoefficient1(1, 1, -1), new PlutoCoefficient1(1, 1, 0), new PlutoCoefficient1(1, 1, 1), new PlutoCoefficient1(1, 1, 3), new PlutoCoefficient1(2, 0, -6), new PlutoCoefficient1(2, 0, -5), new PlutoCoefficient1(2, 0, -4), new PlutoCoefficient1(2, 0, -3), new PlutoCoefficient1(2, 0, -2), new PlutoCoefficient1(2, 0, -1), new PlutoCoefficient1(2, 0, 0), new PlutoCoefficient1(2, 0, 1), new PlutoCoefficient1(2, 0, 2), new PlutoCoefficient1(2, 0, 3), new PlutoCoefficient1(3, 0, -2), new PlutoCoefficient1(3, 0, -1), new PlutoCoefficient1(3, 0, 0)];
-GFX.g_PlutoLongitudeCoefficients = [new PlutoCoefficient2(-19799805, 19850055), new PlutoCoefficient2(897144, -4954829), new PlutoCoefficient2(611149, 1211027), new PlutoCoefficient2(-341243, -189585), new PlutoCoefficient2(129287, -34992), new PlutoCoefficient2(-38164, 30893), new PlutoCoefficient2(20442, -9987), new PlutoCoefficient2(-4063, -5071), new PlutoCoefficient2(-6016, -3336), new PlutoCoefficient2(-3956, 3039), new PlutoCoefficient2(-667, 3572), new PlutoCoefficient2(1276, 501), new PlutoCoefficient2(1152, -917), new PlutoCoefficient2(630, -1277), new PlutoCoefficient2(2571, -459), new PlutoCoefficient2(899, -1449), new PlutoCoefficient2(-1016, 1043), new PlutoCoefficient2(-2343, -1012), new PlutoCoefficient2(7042, 788), new PlutoCoefficient2(1199, -338), new PlutoCoefficient2(418, -67), new PlutoCoefficient2(120, -274), new PlutoCoefficient2(-60, -159), new PlutoCoefficient2(-82, -29), new PlutoCoefficient2(-36, -29), new PlutoCoefficient2(-40, 7), new PlutoCoefficient2(-14, 22), new PlutoCoefficient2(4, 13), new PlutoCoefficient2(5, 2), new PlutoCoefficient2(-1, 0), new PlutoCoefficient2(2, 0), new PlutoCoefficient2(-4, 5), new PlutoCoefficient2(4, -7), new PlutoCoefficient2(14, 24), new PlutoCoefficient2(-49, -34), new PlutoCoefficient2(163, -48), new PlutoCoefficient2(9, -24), new PlutoCoefficient2(-4, 1), new PlutoCoefficient2(-3, 1), new PlutoCoefficient2(1, 3), new PlutoCoefficient2(-3, -1), new PlutoCoefficient2(5, -3), new PlutoCoefficient2(0, 0)];
-GFX.g_PlutoLatitudeCoefficients = [new PlutoCoefficient2(-5452852, -14974862), new PlutoCoefficient2(3527812, 1672790), new PlutoCoefficient2(-1050748, 327647), new PlutoCoefficient2(178690, -292153), new PlutoCoefficient2(18650, 100340), new PlutoCoefficient2(-30697, -25823), new PlutoCoefficient2(4878, 11248), new PlutoCoefficient2(226, -64), new PlutoCoefficient2(2030, -836), new PlutoCoefficient2(69, -604), new PlutoCoefficient2(-247, -567), new PlutoCoefficient2(-57, 1), new PlutoCoefficient2(-122, 175), new PlutoCoefficient2(-49, -164), new PlutoCoefficient2(-197, 199), new PlutoCoefficient2(-25, 217), new PlutoCoefficient2(589, -248), new PlutoCoefficient2(-269, 711), new PlutoCoefficient2(185, 193), new PlutoCoefficient2(315, 807), new PlutoCoefficient2(-130, -43), new PlutoCoefficient2(5, 3), new PlutoCoefficient2(2, 17), new PlutoCoefficient2(2, 5), new PlutoCoefficient2(2, 3), new PlutoCoefficient2(3, 1), new PlutoCoefficient2(2, -1), new PlutoCoefficient2(1, -1), new PlutoCoefficient2(0, -1), new PlutoCoefficient2(0, 0), new PlutoCoefficient2(0, -2), new PlutoCoefficient2(2, 2), new PlutoCoefficient2(-7, 0), new PlutoCoefficient2(10, -8), new PlutoCoefficient2(-3, 20), new PlutoCoefficient2(6, 5), new PlutoCoefficient2(14, 17), new PlutoCoefficient2(-2, 0), new PlutoCoefficient2(0, 0), new PlutoCoefficient2(0, 0), new PlutoCoefficient2(0, 1), new PlutoCoefficient2(0, 0), new PlutoCoefficient2(1, 0)];
-GFX.g_PlutoRadiusCoefficients = [new PlutoCoefficient2(66865439, 68951812), new PlutoCoefficient2(-11827535, -332538), new PlutoCoefficient2(1593179, -1438890), new PlutoCoefficient2(-18444, 483220), new PlutoCoefficient2(-65977, -85431), new PlutoCoefficient2(31174, -6032), new PlutoCoefficient2(-5794, 22161), new PlutoCoefficient2(4601, 4032), new PlutoCoefficient2(-1729, 234), new PlutoCoefficient2(-415, 702), new PlutoCoefficient2(239, 723), new PlutoCoefficient2(67, -67), new PlutoCoefficient2(1034, -451), new PlutoCoefficient2(-129, 504), new PlutoCoefficient2(480, -231), new PlutoCoefficient2(2, -441), new PlutoCoefficient2(-3359, 265), new PlutoCoefficient2(7856, -7832), new PlutoCoefficient2(36, 45763), new PlutoCoefficient2(8663, 8547), new PlutoCoefficient2(-809, -769), new PlutoCoefficient2(263, -144), new PlutoCoefficient2(-126, 32), new PlutoCoefficient2(-35, -16), new PlutoCoefficient2(-19, -4), new PlutoCoefficient2(-15, 8), new PlutoCoefficient2(-4, 12), new PlutoCoefficient2(5, 6), new PlutoCoefficient2(3, 1), new PlutoCoefficient2(6, -2), new PlutoCoefficient2(2, 2), new PlutoCoefficient2(-2, -2), new PlutoCoefficient2(14, 13), new PlutoCoefficient2(-63, 13), new PlutoCoefficient2(136, -236), new PlutoCoefficient2(273, 1065), new PlutoCoefficient2(251, 149), new PlutoCoefficient2(-25, -9), new PlutoCoefficient2(9, -2), new PlutoCoefficient2(-8, 7), new PlutoCoefficient2(2, -10), new PlutoCoefficient2(19, 35), new PlutoCoefficient2(10, 3)];
 FastMath._pI4_A = 0.785398155450821;
 FastMath._pI4_B = 7.94662735614793E-09;
 FastMath._pI4_C = 3.06161699786838E-17;
