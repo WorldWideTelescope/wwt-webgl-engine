@@ -20,6 +20,7 @@
 // to maintain a single distribution point for the source code.
 
 import { registerType } from "../typesystem.js";
+import { Util } from "../baseutil.js";
 import { C3D, CT } from "./coordinate_transformation.js";
 import { CAAEarth } from "./earth.js";
 import { CAAFK5 } from "./fk5.js";
@@ -35,6 +36,7 @@ import { CAANeptune } from "./neptune.js";
 import { CAAPluto } from "./pluto.js";
 import { ABR } from "./aberration.js";
 import { CAAKepler } from "./kepler.js";
+import { Vector3d } from "../double3d.js";
 
 
 // EOE - was CAAEllipticalObjectElements

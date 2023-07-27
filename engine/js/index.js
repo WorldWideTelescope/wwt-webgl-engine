@@ -7,8 +7,9 @@
 // types and interfaces than we would if we were starting from scratch. So it
 // goes.
 
-export { ss } from "./ss";
+export { ss } from "./ss.js";
 
+export { Util } from "./baseutil.js";
 export {
     CalD,
     DAY_OF_WEEK,
@@ -44,13 +45,47 @@ export {
     ELL,
 } from "./astrocalc/elliptical.js";
 
+export { Color, Colors } from "./color.js";
+
+export {
+    LocationHint,
+    PositionTexture,
+    PositionColoredTextured,
+    PositionColored,
+    PositionNormalTexturedTangent,
+    Vector3d,
+    Vector2d,
+    Matrix3d,
+    Matrix2d,
+    DoubleUtilities,
+    PlaneD,
+    Vector4d,
+    PositionNormalTexturedX2,
+    PositionNormalTextured,
+    SphereHull,
+    ConvexHull
+} from "./double3d.js";
+
+export {
+    Rectangle,
+    Guid,
+    Mouse,
+    Language,
+    Cursor,
+    Cursors,
+    Keys,
+    SelectLink,
+    PopupVolume,
+    PopupColorPicker,
+    OverlayProperties,
+} from "./util.js";
+
 export {
     ScaleTypes,
     URLRewriteMode,
     SolarSystemObjects,
     InterpolationType,
     PointType,
-    LocationHint,
     FolderGroup,
     FolderRefreshType,
     FolderType,
@@ -84,7 +119,6 @@ export {
     TextBorderStyle,
     UserLevel,
     TransitionType,
-    Keys,
     DialogResult,
     Formatting,
     StateType,
@@ -147,27 +181,10 @@ export {
     AstroCalc,
     BlendState,
     CameraParameters,
-    Color,
-    Colors,
     Constellations,
     Lineset,
     Linepoint,
     ConstellationFilter,
-    PositionTexture,
-    PositionColoredTextured,
-    PositionColored,
-    PositionNormalTexturedTangent,
-    Vector3d,
-    Vector2d,
-    Matrix3d,
-    Matrix2d,
-    DoubleUtilities,
-    PlaneD,
-    Vector4d,
-    PositionNormalTexturedX2,
-    PositionNormalTextured,
-    SphereHull,
-    ConvexHull,
     Folder,
     FolderBrowser,
     FolderUp,
@@ -276,17 +293,6 @@ export {
     UndoTourSlidelistChange,
     UndoTourPropertiesChange,
     UiTools,
-    Util,
-    Rectangle,
-    Guid,
-    Mouse,
-    Language,
-    Cursor,
-    Cursors,
-    SelectLink,
-    PopupVolume,
-    PopupColorPicker,
-    OverlayProperties,
     BinaryReader,
     Bitmap,
     ColorPicker,
