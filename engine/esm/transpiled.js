@@ -657,33 +657,6 @@ export function GFX() {
 }
 
 
-// CAAStellarMagnitudes
-
-export function CAAStellarMagnitudes() {
-}
-CAAStellarMagnitudes.combinedMagnitude = function (m1, m2) {
-  var x = 0.4 * (m2 - m1);
-  return m2 - 2.5 * Util.log10(Math.pow(10, x) + 1);
-};
-CAAStellarMagnitudes.combinedMagnitude2 = function (Magnitudes, pMagnitudes) {
-  var vvalue = 0;
-  for (var i = 0; i < Magnitudes; i++) {
-    vvalue += Math.pow(10, -0.4 * pMagnitudes[i]);
-  }
-  return -2.5 * Util.log10(vvalue);
-};
-CAAStellarMagnitudes.brightnessRatio = function (m1, m2) {
-  var x = 0.4 * (m2 - m1);
-  return Math.pow(10, x);
-};
-CAAStellarMagnitudes.magnitudeDifference = function (brightnessRatio) {
-  return 2.5 * Util.log10(brightnessRatio);
-};
-var CAAStellarMagnitudes$ = {
-
-};
-
-
 // wwtlib.VideoOutputType
 
 export function VideoOutputType(width, height, fps, format, waitDownload) {
@@ -38892,7 +38865,6 @@ registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
 registerType("ISettings", [ISettings]);
 registerType("IUndoStep", [IUndoStep]);
 registerType("GFX", [GFX, null, null]);
-registerType("CAAStellarMagnitudes", [CAAStellarMagnitudes, CAAStellarMagnitudes$, null]);
 registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
 registerType("FitsProperties", [FitsProperties, FitsProperties$, null]);
 registerType("HipsProperties", [HipsProperties, HipsProperties$, null]);
