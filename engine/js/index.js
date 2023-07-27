@@ -33,6 +33,7 @@ export { CAASaturn } from "./astrocalc/saturn.js";
 export { CAAUranus } from "./astrocalc/uranus.js";
 export { CAANeptune } from "./astrocalc/neptune.js";
 export { CAAPluto, PlutoCoefficient1, PlutoCoefficient2 } from "./astrocalc/pluto.js";
+export { ABR, ACFT } from "./astrocalc/aberration.js";
 
 export {
     EOE,
@@ -94,8 +95,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    ABR,
-    ACFT,
     ASEP,
     DYT,
     CAAEclipticalElementDetails,
