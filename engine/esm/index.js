@@ -44,6 +44,7 @@ export { CAAMoonPerigeeApogee, MPAC } from "./astrocalc/moon_perigee_apogee.js";
 export { CAAMoonPhases } from "./astrocalc/moon_phases.js";
 export { CAAParallax, CAATopocentricEclipticDetails } from "./astrocalc/parallax.js";
 export { CAASidereal } from "./astrocalc/sidereal.js";
+export { CAAPhysicalJupiterDetails, CAAPhysicalJupiter } from "./astrocalc/physical_jupiter.js";
 
 export { Color, Colors } from "./color.js";
 
@@ -130,8 +131,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    CAAPhysicalJupiterDetails,
-    CAAPhysicalJupiter,
     CAAPhysicalMarsDetails,
     CAAPhysicalMars,
     CAAPhysicalSunDetails,
