@@ -51,7 +51,7 @@
     "build-prod": "webpack --mode production",
     "clean": "rimraf src/index.js src/index.js.map src/index.min.js tests/results.xml tsconfig.tsbuildinfo",
     "doc": "typedoc src/index.d.ts",
-    "lint": "tsc",
+    "lint": "eslint js",
     "test": "mocha-headless-chrome -f tests/tests.html -r xunit >tests/results.xml",
     "tscheck": "tsc"
   },
