@@ -33,6 +33,7 @@ export { CAAEclipticalElementDetails, CAAEclipticalElements } from "./astrocalc/
 export { EPO } from "./astrocalc/elements_planetary_orbit.js";
 export { EOT } from "./astrocalc/equation_of_time.js";
 export { GMD, GMDS, GM } from "./astrocalc/galilean_moons.js";
+export { CAAGlobe } from "./astrocalc/globe.js";
 
 export {
     EOE,
@@ -127,7 +128,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    CAAGlobe,
     IFR,
     INTP,
     CAAMoon,
