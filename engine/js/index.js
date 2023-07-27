@@ -34,6 +34,8 @@ export { CAASun } from "./astrocalc/sun.js";
 
 export { CAAMercury } from "./astrocalc/mercury.js";
 
+export { CAAVenus } from "./astrocalc/venus.js";
+
 export {
     EOE,
     EPD,
@@ -140,7 +142,6 @@ export {
     CAASidereal,
     CAAStellarMagnitudes,
     CAAUranus,
-    CAAVenus,
     VideoOutputType,
     FitsProperties,
     HipsProperties,

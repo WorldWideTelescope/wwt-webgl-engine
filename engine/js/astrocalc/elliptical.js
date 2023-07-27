@@ -1,5 +1,6 @@
 // Originally `AAELLIPTICAL.CPP`
 // "Purpose: Implementation for the algorithms for an elliptical orbit"
+// Last update of original: PJN / 05-06-2006
 //
 // Translated into C# and released by Microsoft, then transpiled into JavaScript
 // by ScriptSharp, for the WorldWide Telescope project.
@@ -25,6 +26,7 @@ import { CAAFK5 } from "./fk5.js";
 import { CAANutation } from "./fk5.js";
 import { CAASun } from "./sun.js";
 import { CAAMercury } from "./mercury.js";
+import { CAAVenus } from "./venus.js";
 
 
 // EOE - was CAAEllipticalObjectElements
