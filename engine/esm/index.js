@@ -38,6 +38,7 @@ export { IFR } from "./astrocalc/illuminated_fraction.js";
 export { INTP } from "./astrocalc/interpolate.js";
 export { CAAMoon, MoonCoefficient1, MoonCoefficient2 } from "./astrocalc/moon.js";
 export { MIFR } from "./astrocalc/moon_illuminated_fraction.js";
+export { CAAMoonNodes } from "./astrocalc/moon_nodes.js";
 
 export {
     EOE,
@@ -132,7 +133,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    CAAMoonNodes,
     CAAMoonPerigeeApogee,
     MPAC,
     CAAMoonPhases,
