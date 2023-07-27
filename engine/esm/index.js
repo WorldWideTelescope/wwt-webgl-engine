@@ -10,18 +10,10 @@
 export { ss } from "./ss.js";
 
 export { Util } from "./baseutil.js";
-export {
-    CalD,
-    DAY_OF_WEEK,
-    DT,
-} from "./astrocalc/date.js";
 
-export {
-    COR,
-    C3D,
-    CT,
-} from "./astrocalc/coordinate_transformation.js";
-
+export { CalD, DAY_OF_WEEK, DT } from "./astrocalc/date.js";
+export { COR, C3D, CT } from "./astrocalc/coordinate_transformation.js";
+export { ASEP } from "./astrocalc/angular_separation.js";
 export { CAAEarth, VSC, } from "./astrocalc/earth.js";
 export { CAAFK5 } from "./astrocalc/fk5.js";
 export { NUC, CAANutation } from "./astrocalc/nutation.js";
@@ -130,7 +122,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    ASEP,
     DYT,
     CAAEclipticalElementDetails,
     CAAEclipticalElements,
