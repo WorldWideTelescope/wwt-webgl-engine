@@ -48,6 +48,7 @@ export { CAAPhysicalJupiterDetails, CAAPhysicalJupiter } from "./astrocalc/physi
 export { CAAPhysicalMarsDetails, CAAPhysicalMars } from "./astrocalc/physical_mars.js";
 export { CAAPhysicalSunDetails, CAAPhysicalSun } from "./astrocalc/physical_sun.js";
 export { CAAPrecession } from "./astrocalc/precession.js";
+export { CAARiseTransitSetDetails, CAARiseTransitSet } from "./astrocalc/rise_transit_set.js";
 
 export { Color, Colors } from "./color.js";
 
@@ -134,8 +135,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    CAARiseTransitSetDetails,
-    CAARiseTransitSet,
     CAASaturnRingDetails,
     CAASaturnRings,
     CAAStellarMagnitudes,

@@ -30,13 +30,11 @@ import { CAAUranus } from "./astrocalc/uranus.js";
 import { CAANeptune } from "./astrocalc/neptune.js";
 import { CAAPluto } from "./astrocalc/pluto.js";
 import { EOE, EPD, ELL } from "./astrocalc/elliptical.js";
-import { DYT } from "./astrocalc/dynamical_time.js";
 import { GMDS, GM } from "./astrocalc/galilean_moons.js";
-import { INTP } from "./astrocalc/interpolate.js";
 import { CAAMoon } from "./astrocalc/moon.js";
 import { CAAParallax } from "./astrocalc/parallax.js";
-import { CAASidereal } from "./astrocalc/sidereal.js";
 import { CAAPhysicalJupiter, CAAPhysicalJupiterDetails } from "./astrocalc/physical_jupiter.js";
+import { CAARiseTransitSet } from "./astrocalc/rise_transit_set.js";
 
 import { Color, Colors } from "./color.js";
 
@@ -658,104 +656,6 @@ export function IUndoStep() { }
 
 export function GFX() {
 }
-
-
-// CAARiseTransitSetDetails
-
-export function CAARiseTransitSetDetails() {
-  this.bValid = false;
-  this.rise = 0;
-  this.transit = 0;
-  this.set = 0;
-  this.bValid = false;
-  this.rise = 0;
-  this.transit = 0;
-  this.set = 0;
-}
-var CAARiseTransitSetDetails$ = {
-
-};
-
-
-// CAARiseTransitSet
-
-export function CAARiseTransitSet() {
-}
-CAARiseTransitSet.rise = function (JD, Alpha1, Delta1, Alpha2, Delta2, Alpha3, Delta3, Longitude, Latitude, h0) {
-  var details = new CAARiseTransitSetDetails();
-  details.bValid = false;
-  var theta0 = CAASidereal.apparentGreenwichSiderealTime(JD);
-  theta0 *= 15;
-  var deltaT = DYT.deltaT(JD);
-  var Delta2Rad = CT.d2R(Delta2);
-  var LatitudeRad = CT.d2R(Latitude);
-  var h0Rad = CT.d2R(h0);
-  var cosH0 = (Math.sin(h0Rad) - Math.sin(LatitudeRad) * Math.sin(Delta2Rad)) / (Math.cos(LatitudeRad) * Math.cos(Delta2Rad));
-  if ((cosH0 > 1) || (cosH0 < -1)) {
-    return details;
-  }
-  var H0 = Math.acos(cosH0);
-  H0 = CT.r2D(H0);
-  var M0 = (Alpha2 * 15 + Longitude - theta0) / 360;
-  var M1 = M0 - H0 / 360;
-  var M2 = M0 + H0 / 360;
-  if (M0 > 1) {
-    M0 -= 1;
-  }
-  else if (M0 < 0) {
-    M0 += 1;
-  }
-  if (M1 > 1) {
-    M1 -= 1;
-  }
-  else if (M1 < 0) {
-    M1 += 1;
-  }
-  if (M2 > 1) {
-    M2 -= 1;
-  }
-  else if (M2 < 0) {
-    M2 += 1;
-  }
-  for (var i = 0; i < 2; i++) {
-    var theta1 = theta0 + 360.985647 * M1;
-    theta1 = CT.m360(theta1);
-    var n = M1 + deltaT / 86400;
-    var Alpha = INTP.interpolate(n, Alpha1, Alpha2, Alpha3);
-    var Delta = INTP.interpolate(n, Delta1, Delta2, Delta3);
-    var H = theta1 - Longitude - Alpha * 15;
-    var Horizontal = CT.eq2H(H / 15, Delta, Latitude);
-    var DeltaM = (Horizontal.y - h0) / (360 * Math.cos(CT.d2R(Delta)) * Math.cos(LatitudeRad) * Math.sin(CT.d2R(H)));
-    M1 += DeltaM;
-    theta1 = theta0 + 360.985647 * M0;
-    theta1 = CT.m360(theta1);
-    n = M0 + deltaT / 86400;
-    Alpha = INTP.interpolate(n, Alpha1, Alpha2, Alpha3);
-    H = theta1 - Longitude - Alpha * 15;
-    if (H < -180) {
-      H += 360;
-    }
-    DeltaM = -H / 360;
-    M0 += DeltaM;
-    theta1 = theta0 + 360.985647 * M2;
-    theta1 = CT.m360(theta1);
-    n = M2 + deltaT / 86400;
-    Alpha = INTP.interpolate(n, Alpha1, Alpha2, Alpha3);
-    Delta = INTP.interpolate(n, Delta1, Delta2, Delta3);
-    H = theta1 - Longitude - Alpha * 15;
-    Horizontal = CT.eq2H(H / 15, Delta, Latitude);
-    DeltaM = (Horizontal.y - h0) / (360 * Math.cos(CT.d2R(Delta)) * Math.cos(LatitudeRad) * Math.sin(CT.d2R(H)));
-    M2 += DeltaM;
-  }
-  details.bValid = true;
-  details.rise = M1 * 24;
-  details.set = M2 * 24;
-  details.transit = M0 * 24;
-  return details;
-};
-var CAARiseTransitSet$ = {
-
-};
 
 
 // CAASaturnRingDetails
@@ -39105,8 +39005,6 @@ registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
 registerType("ISettings", [ISettings]);
 registerType("IUndoStep", [IUndoStep]);
 registerType("GFX", [GFX, null, null]);
-registerType("CAARiseTransitSetDetails", [CAARiseTransitSetDetails, CAARiseTransitSetDetails$, null]);
-registerType("CAARiseTransitSet", [CAARiseTransitSet, CAARiseTransitSet$, null]);
 registerType("CAASaturnRingDetails", [CAASaturnRingDetails, CAASaturnRingDetails$, null]);
 registerType("CAASaturnRings", [CAASaturnRings, CAASaturnRings$, null]);
 registerType("CAAStellarMagnitudes", [CAAStellarMagnitudes, CAAStellarMagnitudes$, null]);
