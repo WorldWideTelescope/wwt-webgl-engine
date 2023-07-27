@@ -30,6 +30,7 @@ export { CAAVenus } from "./astrocalc/venus.js";
 export { CAAMars } from "./astrocalc/mars.js";
 export { CAAJupiter } from "./astrocalc/jupiter.js";
 export { CAASaturn } from "./astrocalc/saturn.js";
+export { CAAUranus } from "./astrocalc/uranus.js";
 
 export {
     EOE,
@@ -133,7 +134,6 @@ export {
     CAASaturnRings,
     CAASidereal,
     CAAStellarMagnitudes,
-    CAAUranus,
     VideoOutputType,
     FitsProperties,
     HipsProperties,
