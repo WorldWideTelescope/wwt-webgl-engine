@@ -24,6 +24,8 @@ import { CAAEarth } from "./earth.js";
 import { CAAFK5 } from "./fk5.js";
 import { CAANutation } from "./fk5.js";
 import { CAASun } from "./sun.js";
+import { CAAMercury } from "./mercury.js";
+
 
 // EOE - was CAAEllipticalObjectElements
 

@@ -32,6 +32,8 @@ export { NUC, CAANutation } from "./astrocalc/fk5.js";
 
 export { CAASun } from "./astrocalc/sun.js";
 
+export { CAAMercury } from "./astrocalc/mercury.js";
+
 export {
     EOE,
     EPD,
@@ -109,7 +111,6 @@ export {
     CAAJupiter,
     CAAKepler,
     CAAMars,
-    CAAMercury,
     CAAMoon,
     MoonCoefficient1,
     MoonCoefficient2,
