@@ -21,7 +21,7 @@
 
 import { registerType } from "../typesystem.js";
 import { CT } from "./coordinate_transformation.js";
-import { VSC } from "./astrocalc/earth.js";
+import { VSC } from "./earth.js";
 
 
 // Coefficients

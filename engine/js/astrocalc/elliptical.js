@@ -24,7 +24,7 @@ import { Util } from "../baseutil.js";
 import { C3D, CT } from "./coordinate_transformation.js";
 import { CAAEarth } from "./earth.js";
 import { CAAFK5 } from "./fk5.js";
-import { CAANutation } from "./fk5.js";
+import { CAANutation } from "./nutation.js";
 import { CAASun } from "./sun.js";
 import { CAAMercury } from "./mercury.js";
 import { CAAVenus } from "./venus.js";

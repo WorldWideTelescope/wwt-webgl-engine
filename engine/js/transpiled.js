@@ -21,7 +21,7 @@ import { DT } from "./astrocalc/date.js";
 import { COR, C3D, CT } from "./astrocalc/coordinate_transformation.js";
 import { CAAEarth } from "./astrocalc/earth.js";
 import { CAAFK5 } from "./astrocalc/fk5.js";
-import { CAANutation } from "./astrocalc/fk5.js";
+import { CAANutation } from "./astrocalc/nutation.js";
 import { CAASun } from "./astrocalc/sun.js";
 import { CAAMercury } from "./astrocalc/mercury.js";
 import { CAAVenus } from "./astrocalc/venus.js";
