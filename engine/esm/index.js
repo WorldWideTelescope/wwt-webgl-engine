@@ -46,6 +46,7 @@ export { CAAParallax, CAATopocentricEclipticDetails } from "./astrocalc/parallax
 export { CAASidereal } from "./astrocalc/sidereal.js";
 export { CAAPhysicalJupiterDetails, CAAPhysicalJupiter } from "./astrocalc/physical_jupiter.js";
 export { CAAPhysicalMarsDetails, CAAPhysicalMars } from "./astrocalc/physical_mars.js";
+export { CAAPhysicalSunDetails, CAAPhysicalSun } from "./astrocalc/physical_sun.js";
 
 export { Color, Colors } from "./color.js";
 
@@ -132,8 +133,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    CAAPhysicalSunDetails,
-    CAAPhysicalSun,
     CAAPrecession,
     CAARiseTransitSetDetails,
     CAARiseTransitSet,
