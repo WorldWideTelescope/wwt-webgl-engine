@@ -31,6 +31,7 @@ export { CAAMars } from "./astrocalc/mars.js";
 export { CAAJupiter } from "./astrocalc/jupiter.js";
 export { CAASaturn } from "./astrocalc/saturn.js";
 export { CAAUranus } from "./astrocalc/uranus.js";
+export { CAANeptune } from "./astrocalc/neptune.js";
 
 export {
     EOE,
@@ -115,7 +116,6 @@ export {
     CAAMoonPerigeeApogee,
     MPAC,
     CAAMoonPhases,
-    CAANeptune,
     CAATopocentricEclipticDetails,
     CAAParallax,
     CAAPhysicalJupiterDetails,
