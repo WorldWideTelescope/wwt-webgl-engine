@@ -33,11 +33,12 @@ import { CAAPluto } from "./astrocalc/pluto.js";
 import { EOE, EPD, ELL } from "./astrocalc/elliptical.js";
 import { DYT } from "./astrocalc/dynamical_time.js";
 import { GMDS, GM } from "./astrocalc/galilean_moons.js";
-import { CAAGlobe } from "./astrocalc/globe.js";
 import { IFR } from "./astrocalc/illuminated_fraction.js";
 import { INTP } from "./astrocalc/interpolate.js";
 import { CAAMoon } from "./astrocalc/moon.js";
 import { MIFR } from "./astrocalc/moon_illuminated_fraction.js";
+import { CAAParallax } from "./astrocalc/parallax.js";
+import { CAASidereal } from "./astrocalc/sidereal.js";
 
 import { Color, Colors } from "./color.js";
 
@@ -659,98 +660,6 @@ export function IUndoStep() { }
 
 export function GFX() {
 }
-
-
-// CAATopocentricEclipticDetails
-
-export function CAATopocentricEclipticDetails() {
-  this.lambda = 0;
-  this.beta = 0;
-  this.semidiameter = 0;
-  this.lambda = 0;
-  this.beta = 0;
-  this.semidiameter = 0;
-}
-var CAATopocentricEclipticDetails$ = {
-
-};
-
-
-// CAAParallax
-
-export function CAAParallax() {
-}
-CAAParallax.equatorial2TopocentricDelta = function (Alpha, Delta, Distance, Longitude, Latitude, Height, JD) {
-  var RhoSinThetaPrime = CAAGlobe.rhoSinThetaPrime(Latitude, Height);
-  var RhoCosThetaPrime = CAAGlobe.rhoCosThetaPrime(Latitude, Height);
-  var theta = CAASidereal.apparentGreenwichSiderealTime(JD);
-  Delta = CT.d2R(Delta);
-  var cosDelta = Math.cos(Delta);
-  var pi = Math.asin(GFX.g_AAParallax_C1 / Distance);
-  var H = CT.h2R(theta - Longitude / 15 - Alpha);
-  var cosH = Math.cos(H);
-  var sinH = Math.sin(H);
-  var DeltaTopocentric = new COR();
-  DeltaTopocentric.x = CT.r2H(-pi * RhoCosThetaPrime * sinH / cosDelta);
-  DeltaTopocentric.y = CT.r2D(-pi * (RhoSinThetaPrime * cosDelta - RhoCosThetaPrime * cosH * Math.sin(Delta)));
-  return DeltaTopocentric;
-};
-CAAParallax.equatorial2Topocentric = function (Alpha, Delta, Distance, Longitude, Latitude, Height, JD) {
-  var RhoSinThetaPrime = CAAGlobe.rhoSinThetaPrime(Latitude, Height);
-  var RhoCosThetaPrime = CAAGlobe.rhoCosThetaPrime(Latitude, Height);
-  var theta = CAASidereal.apparentGreenwichSiderealTime(JD);
-  Delta = CT.d2R(Delta);
-  var cosDelta = Math.cos(Delta);
-  var pi = Math.asin(GFX.g_AAParallax_C1 / Distance);
-  var sinpi = Math.sin(pi);
-  var H = CT.h2R(theta - Longitude / 15 - Alpha);
-  var cosH = Math.cos(H);
-  var sinH = Math.sin(H);
-  var DeltaAlpha = Math.atan2(-RhoCosThetaPrime * sinpi * sinH, cosDelta - RhoCosThetaPrime * sinpi * cosH);
-  var Topocentric = new COR();
-  Topocentric.x = CT.m24(Alpha + CT.r2H(DeltaAlpha));
-  Topocentric.y = CT.r2D(Math.atan2((Math.sin(Delta) - RhoSinThetaPrime * sinpi) * Math.cos(DeltaAlpha), cosDelta - RhoCosThetaPrime * sinpi * cosH));
-  return Topocentric;
-};
-CAAParallax.ecliptic2Topocentric = function (Lambda, Beta, Semidiameter, Distance, Epsilon, Longitude, Latitude, Height, JD) {
-  var S = CAAGlobe.rhoSinThetaPrime(Latitude, Height);
-  var C = CAAGlobe.rhoCosThetaPrime(Latitude, Height);
-  Lambda = CT.d2R(Lambda);
-  Beta = CT.d2R(Beta);
-  Epsilon = CT.d2R(Epsilon);
-  Longitude = CT.d2R(Longitude);
-  Latitude = CT.d2R(Latitude);
-  Semidiameter = CT.d2R(Semidiameter);
-  var sine = Math.sin(Epsilon);
-  var cose = Math.cos(Epsilon);
-  var cosBeta = Math.cos(Beta);
-  var sinBeta = Math.sin(Beta);
-  var theta = CAASidereal.apparentGreenwichSiderealTime(JD);
-  theta = CT.h2R(theta);
-  var sintheta = Math.sin(theta);
-  var pi = Math.asin(GFX.g_AAParallax_C1 / Distance);
-  var sinpi = Math.sin(pi);
-  var N = Math.cos(Lambda) * cosBeta - C * sinpi * Math.cos(theta);
-  var Topocentric = new CAATopocentricEclipticDetails();
-  Topocentric.lambda = Math.atan2(Math.sin(Lambda) * cosBeta - sinpi * (S * sine + C * cose * sintheta), N);
-  var cosTopocentricLambda = Math.cos(Topocentric.lambda);
-  Topocentric.beta = Math.atan(cosTopocentricLambda * (sinBeta - sinpi * (S * cose - C * sine * sintheta)) / N);
-  Topocentric.semidiameter = Math.asin(cosTopocentricLambda * Math.cos(Topocentric.beta) * Math.sin(Semidiameter) / N);
-  Topocentric.semidiameter = CT.r2D(Topocentric.semidiameter);
-  Topocentric.lambda = CT.m360(CT.r2D(Topocentric.lambda));
-  Topocentric.beta = CT.r2D(Topocentric.beta);
-  return Topocentric;
-};
-CAAParallax.parallaxToDistance = function (Parallax) {
-  return GFX.g_AAParallax_C1 / Math.sin(CT.d2R(Parallax));
-};
-CAAParallax.distanceToParallax = function (Distance) {
-  var pi = Math.asin(GFX.g_AAParallax_C1 / Distance);
-  return CT.r2D(pi);
-};
-var CAAParallax$ = {
-
-};
 
 
 // CAAPhysicalJupiterDetails
@@ -1376,42 +1285,6 @@ CAASaturnRings.calculate = function (JD) {
   return details;
 };
 var CAASaturnRings$ = {
-
-};
-
-
-// CAASidereal
-
-export function CAASidereal() {
-}
-CAASidereal.meanGreenwichSiderealTime = function (JD) {
-  var date = new DT();
-  date.setJD(JD, DT.afterPapalReformJD(JD));
-  var D = date.get();
-  var Year = ss.truncate(D[0]);
-  var Month = ss.truncate(D[1]);
-  var Day = ss.truncate(D[2]);
-  var Hour = ss.truncate(D[3]);
-  var Minute = ss.truncate(D[4]);
-  var Second = D[5];
-  date.set(Year, Month, Day, 0, 0, 0, date.inGregorianCalendar());
-  var JDMidnight = date.julian();
-  var T = (JDMidnight - 2451545) / 36525;
-  var TSquared = T * T;
-  var TCubed = TSquared * T;
-  var Value = 100.46061837 + (36000.770053608 * T) + (0.000387933 * TSquared) - (TCubed / 38710000);
-  Value += (((Hour * 15) + (Minute * 0.25) + (Second * 0.00416666666666667)) * 1.00273790935);
-  Value = CT.d2H(Value);
-  return CT.m24(Value);
-};
-CAASidereal.apparentGreenwichSiderealTime = function (JD) {
-  var MeanObliquity = CAANutation.meanObliquityOfEcliptic(JD);
-  var TrueObliquity = MeanObliquity + CAANutation.nutationInObliquity(JD) / 3600;
-  var NutationInLongitude = CAANutation.nutationInLongitude(JD);
-  var Value = CAASidereal.meanGreenwichSiderealTime(JD) + (NutationInLongitude * Math.cos(CT.d2R(TrueObliquity)) / 54000);
-  return CT.m24(Value);
-};
-var CAASidereal$ = {
 
 };
 
@@ -39651,8 +39524,6 @@ registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
 registerType("ISettings", [ISettings]);
 registerType("IUndoStep", [IUndoStep]);
 registerType("GFX", [GFX, null, null]);
-registerType("CAATopocentricEclipticDetails", [CAATopocentricEclipticDetails, CAATopocentricEclipticDetails$, null]);
-registerType("CAAParallax", [CAAParallax, CAAParallax$, null]);
 registerType("CAAPhysicalJupiterDetails", [CAAPhysicalJupiterDetails, CAAPhysicalJupiterDetails$, null]);
 registerType("CAAPhysicalJupiter", [CAAPhysicalJupiter, CAAPhysicalJupiter$, null]);
 registerType("CAAPhysicalMarsDetails", [CAAPhysicalMarsDetails, CAAPhysicalMarsDetails$, null]);
@@ -39664,7 +39535,6 @@ registerType("CAARiseTransitSetDetails", [CAARiseTransitSetDetails, CAARiseTrans
 registerType("CAARiseTransitSet", [CAARiseTransitSet, CAARiseTransitSet$, null]);
 registerType("CAASaturnRingDetails", [CAASaturnRingDetails, CAASaturnRingDetails$, null]);
 registerType("CAASaturnRings", [CAASaturnRings, CAASaturnRings$, null]);
-registerType("CAASidereal", [CAASidereal, CAASidereal$, null]);
 registerType("CAAStellarMagnitudes", [CAAStellarMagnitudes, CAAStellarMagnitudes$, null]);
 registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
 registerType("FitsProperties", [FitsProperties, FitsProperties$, null]);
@@ -39890,7 +39760,6 @@ registerEnum("UserLevel", UserLevel);
 
 // Initialize statics
 
-GFX.g_AAParallax_C1 = Math.sin(CT.d2R(CT.dmS2D(0, 0, 8.794)));
 FastMath._pI4_A = 0.785398155450821;
 FastMath._pI4_B = 7.94662735614793E-09;
 FastMath._pI4_C = 3.06161699786838E-17;

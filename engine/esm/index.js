@@ -31,6 +31,7 @@ export { ABR, ACFT } from "./astrocalc/aberration.js";
 export { DYT } from "./astrocalc/dynamical_time.js";
 export { CAAEclipticalElementDetails, CAAEclipticalElements } from "./astrocalc/ecliptical_elements.js";
 export { EPO } from "./astrocalc/elements_planetary_orbit.js";
+export { EOE, EPD, EOD, EO, ELL } from "./astrocalc/elliptical.js";
 export { EOT } from "./astrocalc/equation_of_time.js";
 export { GMD, GMDS, GM } from "./astrocalc/galilean_moons.js";
 export { CAAGlobe } from "./astrocalc/globe.js";
@@ -41,14 +42,8 @@ export { MIFR } from "./astrocalc/moon_illuminated_fraction.js";
 export { CAAMoonNodes } from "./astrocalc/moon_nodes.js";
 export { CAAMoonPerigeeApogee, MPAC } from "./astrocalc/moon_perigee_apogee.js";
 export { CAAMoonPhases } from "./astrocalc/moon_phases.js";
-
-export {
-    EOE,
-    EPD,
-    EOD,
-    EO,
-    ELL,
-} from "./astrocalc/elliptical.js";
+export { CAAParallax, CAATopocentricEclipticDetails } from "./astrocalc/parallax.js";
+export { CAASidereal } from "./astrocalc/sidereal.js";
 
 export { Color, Colors } from "./color.js";
 
@@ -135,8 +130,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    CAATopocentricEclipticDetails,
-    CAAParallax,
     CAAPhysicalJupiterDetails,
     CAAPhysicalJupiter,
     CAAPhysicalMarsDetails,
@@ -148,7 +141,6 @@ export {
     CAARiseTransitSet,
     CAASaturnRingDetails,
     CAASaturnRings,
-    CAASidereal,
     CAAStellarMagnitudes,
     VideoOutputType,
     FitsProperties,
