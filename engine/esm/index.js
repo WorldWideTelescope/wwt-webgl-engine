@@ -34,6 +34,7 @@ export { EPO } from "./astrocalc/elements_planetary_orbit.js";
 export { EOT } from "./astrocalc/equation_of_time.js";
 export { GMD, GMDS, GM } from "./astrocalc/galilean_moons.js";
 export { CAAGlobe } from "./astrocalc/globe.js";
+export { IFR } from "./astrocalc/illuminated_fraction.js";
 
 export {
     EOE,
@@ -128,7 +129,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    IFR,
     INTP,
     CAAMoon,
     MoonCoefficient1,
