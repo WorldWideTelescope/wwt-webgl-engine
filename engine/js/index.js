@@ -29,6 +29,7 @@ export { CAAMercury } from "./astrocalc/mercury.js";
 export { CAAVenus } from "./astrocalc/venus.js";
 export { CAAMars } from "./astrocalc/mars.js";
 export { CAAJupiter } from "./astrocalc/jupiter.js";
+export { CAASaturn } from "./astrocalc/saturn.js";
 
 export {
     EOE,
@@ -128,7 +129,6 @@ export {
     CAAPrecession,
     CAARiseTransitSetDetails,
     CAARiseTransitSet,
-    CAASaturn,
     CAASaturnRingDetails,
     CAASaturnRings,
     CAASidereal,
