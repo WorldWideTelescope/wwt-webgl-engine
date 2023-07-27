@@ -33,6 +33,7 @@ export { CAASaturn } from "./astrocalc/saturn.js";
 export { CAAUranus } from "./astrocalc/uranus.js";
 export { CAANeptune } from "./astrocalc/neptune.js";
 export { CAAPluto, PlutoCoefficient1, PlutoCoefficient2 } from "./astrocalc/pluto.js";
+export { CAAKepler } from "./astrocalc/kepler.js";
 export { ABR, ACFT } from "./astrocalc/aberration.js";
 
 export {
@@ -107,7 +108,6 @@ export {
     CAAGlobe,
     IFR,
     INTP,
-    CAAKepler,
     CAAMoon,
     MoonCoefficient1,
     MoonCoefficient2,

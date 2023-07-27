@@ -2137,51 +2137,6 @@ var INTP$ = {
 };
 
 
-// CAAKepler
-
-export function CAAKepler() {
-}
-CAAKepler.calculate = function (M, e) {
-  return CAAKepler.calculateIter(M, e, 53);
-};
-CAAKepler.calculateIter = function (M, e, nIterations) {
-  M = CT.d2R(M);
-  var PI = CT.PI();
-  var F = 1;
-  if (M < 0) {
-    F = -1;
-  }
-  M = Math.abs(M) / (2 * PI);
-  M = (M - ss.truncate(M)) * 2 * PI * F;
-  if (M < 0) {
-    M += 2 * PI;
-  }
-  F = 1;
-  if (M > PI) {
-    F = -1;
-  }
-  if (M > PI) {
-    M = 2 * PI - M;
-  }
-  var E = PI / 2;
-  var scale = PI / 4;
-  for (var i = 0; i < nIterations; i++) {
-    var R = E - e * Math.sin(E);
-    if (M > R) {
-      E += scale;
-    }
-    else {
-      E -= scale;
-    }
-    scale /= 2;
-  }
-  return CT.r2D(E) * F;
-};
-var CAAKepler$ = {
-
-};
-
-
 // CAAMoon
 
 export function CAAMoon() {
@@ -44482,7 +44437,6 @@ registerType("GM", [GM, GM$, null]);
 registerType("CAAGlobe", [CAAGlobe, CAAGlobe$, null]);
 registerType("IFR", [IFR, IFR$, null]);
 registerType("INTP", [INTP, INTP$, null]);
-registerType("CAAKepler", [CAAKepler, CAAKepler$, null]);
 registerType("CAAMoon", [CAAMoon, CAAMoon$, null]);
 registerType("MoonCoefficient1", [MoonCoefficient1, MoonCoefficient1$, null]);
 registerType("MoonCoefficient2", [MoonCoefficient2, MoonCoefficient2$, null]);
