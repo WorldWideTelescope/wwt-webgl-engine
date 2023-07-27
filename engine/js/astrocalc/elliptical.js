@@ -28,6 +28,7 @@ import { CAASun } from "./sun.js";
 import { CAAMercury } from "./mercury.js";
 import { CAAVenus } from "./venus.js";
 import { CAAMars } from "./mars.js";
+import { CAAJupiter } from "./jupiter.js";
 
 
 // EOE - was CAAEllipticalObjectElements

@@ -21,22 +21,14 @@ export {
     CT,
 } from "./astrocalc/coordinate_transformation.js";
 
-export {
-    CAAEarth,
-    VSC,
-} from "./astrocalc/earth.js";
-
+export { CAAEarth, VSC, } from "./astrocalc/earth.js";
 export { CAAFK5 } from "./astrocalc/fk5.js";
-
 export { NUC, CAANutation } from "./astrocalc/fk5.js";
-
 export { CAASun } from "./astrocalc/sun.js";
-
 export { CAAMercury } from "./astrocalc/mercury.js";
-
 export { CAAVenus } from "./astrocalc/venus.js";
-
 export { CAAMars } from "./astrocalc/mars.js";
+export { CAAJupiter } from "./astrocalc/jupiter.js";
 
 export {
     EOE,
@@ -112,7 +104,6 @@ export {
     CAAGlobe,
     IFR,
     INTP,
-    CAAJupiter,
     CAAKepler,
     CAAMoon,
     MoonCoefficient1,
