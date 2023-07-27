@@ -16,6 +16,17 @@ export {
 } from "./astrocalc/date.js";
 
 export {
+    COR,
+    C3D,
+    CT,
+} from "./astrocalc/coordinate_transformation.js";
+
+export {
+    CAAEarth,
+    VSC,
+} from "./astrocalc/earth.js";
+
+export {
     EOE,
     EPD,
     EOD,
@@ -78,12 +89,7 @@ export {
     ABR,
     ACFT,
     ASEP,
-    COR,
-    C3D,
-    CT,
     DYT,
-    CAAEarth,
-    VSC,
     CAAEclipticalElementDetails,
     CAAEclipticalElements,
     EPO,

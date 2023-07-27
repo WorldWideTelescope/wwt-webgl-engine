@@ -19,7 +19,8 @@
 // to maintain a single distribution point for the source code.
 
 import { registerType } from "../typesystem.js";
-
+import { C3D, CT } from "./coordinate_transformation.js";
+import { CAAEarth } from "./earth.js";
 
 // EOE - was CAAEllipticalObjectElements
 
