@@ -15,8 +15,13 @@ import { Color } from "./color.js";
 // degrees rather than radians, and the Coordinates class applies some
 // transformations in various places. Out of an abundance of caution we
 // reproduce its calculations rotely.
+//
+// In the web engine, the variable `Tile.uvMultiple` is a global that is
+// initialized to 256, but then overwritten to 1 almost immediately. It must be
+// intended to be a per-tile property, but (probably due to some ScriptSharp
+// limitation) is a static in practice.
 
-const TILE_UV_MULTIPLE = 256;
+const TILE_UV_MULTIPLE = 1;
 const RC = (3.1415927 / 180); // not thrilled about the low precision!
 
 function geoTo3dDouble(lat, lng) {
