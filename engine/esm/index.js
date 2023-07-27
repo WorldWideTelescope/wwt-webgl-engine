@@ -4,8 +4,8 @@
 // The toplevel WorldWide Telescope WebGL engine API module.
 //
 // To maintain compatibility with a *lot* of legacy code, we export way more
-// types and interfaces than we would if we were starting from scratch. So it
-// goes.
+// types and interfaces than we would if we were starting from scratch, often
+// with confusing or misspelled names. So it goes.
 
 export { ss } from "./ss.js";
 
@@ -40,6 +40,7 @@ export { CAAMoon, MoonCoefficient1, MoonCoefficient2 } from "./astrocalc/moon.js
 export { MIFR } from "./astrocalc/moon_illuminated_fraction.js";
 export { CAAMoonNodes } from "./astrocalc/moon_nodes.js";
 export { CAAMoonPerigeeApogee, MPAC } from "./astrocalc/moon_perigee_apogee.js";
+export { CAAMoonPhases } from "./astrocalc/moon_phases.js";
 
 export {
     EOE,
@@ -134,7 +135,6 @@ export {
     ISettings,
     IUndoStep,
     GFX,
-    CAAMoonPhases,
     CAATopocentricEclipticDetails,
     CAAParallax,
     CAAPhysicalJupiterDetails,
