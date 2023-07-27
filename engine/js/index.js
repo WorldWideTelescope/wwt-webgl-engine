@@ -36,6 +36,8 @@ export { CAAMercury } from "./astrocalc/mercury.js";
 
 export { CAAVenus } from "./astrocalc/venus.js";
 
+export { CAAMars } from "./astrocalc/mars.js";
+
 export {
     EOE,
     EPD,
@@ -112,7 +114,6 @@ export {
     INTP,
     CAAJupiter,
     CAAKepler,
-    CAAMars,
     CAAMoon,
     MoonCoefficient1,
     MoonCoefficient2,
