@@ -87,6 +87,8 @@ export {
     OverlayProperties,
 } from "./util.js";
 
+export { AstroRaDec, RiseSetDetails, AstroCalc } from "./astrocalc.js";
+
 export {
     ScaleTypes,
     URLRewriteMode,
@@ -148,9 +150,6 @@ export {
     Pointing,
     URLHelpers,
     Annotation,
-    AstroRaDec,
-    RiseSetDetails,
-    AstroCalc,
     BlendState,
     CameraParameters,
     Constellations,
