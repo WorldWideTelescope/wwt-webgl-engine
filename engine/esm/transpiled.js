@@ -7581,12 +7581,12 @@ ColorMapContainer.bindColorMapTexture = function (gl, colorMapName) {
   if (texture == null) {
     texture = ColorMapContainer._getTextureFromName(gl, 'gray');
   }
-  gl.activeTexture(33985);
+  gl.activeTexture(WEBGL.TEXTURE1);
   gl.bindTexture(3553, texture);
 };
 ColorMapContainer._initColorTexture = function (gl, colorMapContainer) {
   var colorTexture = gl.createTexture();
-  gl.activeTexture(33985);
+  gl.activeTexture(WEBGL.TEXTURE1);
   gl.bindTexture(3553, colorTexture);
   gl.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
   gl.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
