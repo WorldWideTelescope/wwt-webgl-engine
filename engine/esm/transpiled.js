@@ -4016,7 +4016,7 @@ SimpleLineShader.init = function (renderContext) {
   gl.shaderSource(SimpleLineShader._frag, fragShaderText);
   gl.compileShader(SimpleLineShader._frag);
   var stat = gl.getShaderParameter(SimpleLineShader._frag, WEBGL.COMPILE_STATUS);
-  SimpleLineShader._vert = gl.createShader(35633);
+  SimpleLineShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(SimpleLineShader._vert, vertexShaderText);
   gl.compileShader(SimpleLineShader._vert);
   var stat1 = gl.getShaderParameter(SimpleLineShader._vert, WEBGL.COMPILE_STATUS);
@@ -4081,7 +4081,7 @@ SimpleLineShader2D.init = function (renderContext) {
   gl.shaderSource(SimpleLineShader2D._frag, fragShaderText);
   gl.compileShader(SimpleLineShader2D._frag);
   var stat = gl.getShaderParameter(SimpleLineShader2D._frag, WEBGL.COMPILE_STATUS);
-  SimpleLineShader2D._vert = gl.createShader(35633);
+  SimpleLineShader2D._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(SimpleLineShader2D._vert, vertexShaderText);
   gl.compileShader(SimpleLineShader2D._vert);
   var stat1 = gl.getShaderParameter(SimpleLineShader2D._vert, WEBGL.COMPILE_STATUS);
@@ -4142,7 +4142,7 @@ OrbitLineShader.init = function (renderContext) {
   gl.shaderSource(OrbitLineShader._frag, fragShaderText);
   gl.compileShader(OrbitLineShader._frag);
   var stat = gl.getShaderParameter(OrbitLineShader._frag, WEBGL.COMPILE_STATUS);
-  OrbitLineShader._vert = gl.createShader(35633);
+  OrbitLineShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(OrbitLineShader._vert, vertexShaderText);
   gl.compileShader(OrbitLineShader._vert);
   var stat1 = gl.getShaderParameter(OrbitLineShader._vert, WEBGL.COMPILE_STATUS);
@@ -4210,7 +4210,7 @@ LineShaderNormalDates.init = function (renderContext) {
   gl.shaderSource(LineShaderNormalDates._frag, fragShaderText);
   gl.compileShader(LineShaderNormalDates._frag);
   var stat = gl.getShaderParameter(LineShaderNormalDates._frag, WEBGL.COMPILE_STATUS);
-  LineShaderNormalDates._vert = gl.createShader(35633);
+  LineShaderNormalDates._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(LineShaderNormalDates._vert, vertexShaderText);
   gl.compileShader(LineShaderNormalDates._vert);
   var stat1 = gl.getShaderParameter(LineShaderNormalDates._vert, WEBGL.COMPILE_STATUS);
@@ -4284,7 +4284,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
   gl.shaderSource(TimeSeriesPointSpriteShader._frag, fragShaderText);
   gl.compileShader(TimeSeriesPointSpriteShader._frag);
   var stat = gl.getShaderParameter(TimeSeriesPointSpriteShader._frag, WEBGL.COMPILE_STATUS);
-  TimeSeriesPointSpriteShader._vert = gl.createShader(35633);
+  TimeSeriesPointSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(TimeSeriesPointSpriteShader._vert, vertexShaderText);
   gl.compileShader(TimeSeriesPointSpriteShader._vert);
   var stat1 = gl.getShaderParameter(TimeSeriesPointSpriteShader._vert, WEBGL.COMPILE_STATUS);
@@ -4379,7 +4379,7 @@ KeplerPointSpriteShader.init = function (renderContext) {
   gl.shaderSource(KeplerPointSpriteShader._frag, fragShaderText);
   gl.compileShader(KeplerPointSpriteShader._frag);
   var stat = gl.getShaderParameter(KeplerPointSpriteShader._frag, WEBGL.COMPILE_STATUS);
-  KeplerPointSpriteShader._vert = gl.createShader(35633);
+  KeplerPointSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(KeplerPointSpriteShader._vert, vertexShaderText);
   gl.compileShader(KeplerPointSpriteShader._vert);
   var stat1 = gl.getShaderParameter(KeplerPointSpriteShader._vert, WEBGL.COMPILE_STATUS);
@@ -4484,7 +4484,7 @@ EllipseShader.init = function (renderContext) {
   gl.shaderSource(EllipseShader._frag, fragShaderText);
   gl.compileShader(EllipseShader._frag);
   var stat = gl.getShaderParameter(EllipseShader._frag, WEBGL.COMPILE_STATUS);
-  EllipseShader._vert = gl.createShader(35633);
+  EllipseShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(EllipseShader._vert, vertexShaderText);
   gl.compileShader(EllipseShader._vert);
   var stat1 = gl.getShaderParameter(EllipseShader._vert, WEBGL.COMPILE_STATUS);
@@ -4554,7 +4554,7 @@ ModelShader.init = function (renderContext) {
   if (!stat) {
     var errorF = gl.getShaderInfoLog(ModelShader._frag);
   }
-  ModelShader._vert = gl.createShader(35633);
+  ModelShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(ModelShader._vert, vertexShaderText);
   gl.compileShader(ModelShader._vert);
   var stat1 = gl.getShaderParameter(ModelShader._vert, WEBGL.COMPILE_STATUS);
@@ -4663,7 +4663,7 @@ ModelShaderTan.init = function (renderContext) {
   if (!stat) {
     var errorF = gl.getShaderInfoLog(ModelShaderTan._frag);
   }
-  ModelShaderTan._vert = gl.createShader(35633);
+  ModelShaderTan._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(ModelShaderTan._vert, vertexShaderText);
   gl.compileShader(ModelShaderTan._vert);
   var stat1 = gl.getShaderParameter(ModelShaderTan._vert, WEBGL.COMPILE_STATUS);
@@ -4772,7 +4772,7 @@ TileShader.init = function (renderContext) {
   if (!stat) {
     var errorF = gl.getShaderInfoLog(TileShader._frag);
   }
-  TileShader._vert = gl.createShader(35633);
+  TileShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(TileShader._vert, vertexShaderText);
   gl.compileShader(TileShader._vert);
   var stat1 = gl.getShaderParameter(TileShader._vert, WEBGL.COMPILE_STATUS);
@@ -4890,7 +4890,7 @@ FitsShader.init = function (renderContext) {
     var errorF = gl.getShaderInfoLog(FitsShader._frag);
     console.log(errorF);
   }
-  FitsShader._vert = gl.createShader(35633);
+  FitsShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(FitsShader._vert, vertexShaderText);
   gl.compileShader(FitsShader._vert);
   var stat1 = gl.getShaderParameter(FitsShader._vert, WEBGL.COMPILE_STATUS);
@@ -5005,7 +5005,7 @@ ImageShader.init = function (renderContext) {
   if (!stat) {
     var errorF = gl.getShaderInfoLog(ImageShader._frag);
   }
-  ImageShader._vert = gl.createShader(35633);
+  ImageShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(ImageShader._vert, vertexShaderText);
   gl.compileShader(ImageShader._vert);
   var stat1 = gl.getShaderParameter(ImageShader._vert, WEBGL.COMPILE_STATUS);
@@ -5092,7 +5092,7 @@ ImageShader2.init = function (renderContext) {
   if (!stat) {
     var errorF = gl.getShaderInfoLog(ImageShader2._frag);
   }
-  ImageShader2._vert = gl.createShader(35633);
+  ImageShader2._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(ImageShader2._vert, vertexShaderText);
   gl.compileShader(ImageShader2._vert);
   var stat1 = gl.getShaderParameter(ImageShader2._vert, WEBGL.COMPILE_STATUS);
@@ -5176,7 +5176,7 @@ SpriteShader.init = function (renderContext) {
   gl.shaderSource(SpriteShader._frag, fragShaderText);
   gl.compileShader(SpriteShader._frag);
   var stat = gl.getShaderParameter(SpriteShader._frag, WEBGL.COMPILE_STATUS);
-  SpriteShader._vert = gl.createShader(35633);
+  SpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(SpriteShader._vert, vertexShaderText);
   gl.compileShader(SpriteShader._vert);
   var stat1 = gl.getShaderParameter(SpriteShader._vert, WEBGL.COMPILE_STATUS);
@@ -5248,7 +5248,7 @@ ShapeSpriteShader.init = function (renderContext) {
   gl.shaderSource(ShapeSpriteShader._frag, fragShaderText);
   gl.compileShader(ShapeSpriteShader._frag);
   var stat = gl.getShaderParameter(ShapeSpriteShader._frag, WEBGL.COMPILE_STATUS);
-  ShapeSpriteShader._vert = gl.createShader(35633);
+  ShapeSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(ShapeSpriteShader._vert, vertexShaderText);
   gl.compileShader(ShapeSpriteShader._vert);
   var stat1 = gl.getShaderParameter(ShapeSpriteShader._vert, WEBGL.COMPILE_STATUS);
@@ -5311,7 +5311,7 @@ TextShader.init = function (renderContext) {
   gl.shaderSource(TextShader._frag, fragShaderText);
   gl.compileShader(TextShader._frag);
   var stat = gl.getShaderParameter(TextShader._frag, WEBGL.COMPILE_STATUS);
-  TextShader._vert = gl.createShader(35633);
+  TextShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
   gl.shaderSource(TextShader._vert, vertexShaderText);
   gl.compileShader(TextShader._vert);
   var stat1 = gl.getShaderParameter(TextShader._vert, WEBGL.COMPILE_STATUS);
