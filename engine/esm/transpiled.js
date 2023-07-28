@@ -9813,7 +9813,7 @@ var Mesh$ = {
         while ($enum2.moveNext()) {
           var group = $enum2.current;
           if (group.materialIndex === materialIndex) {
-            renderContext.gl.drawElements(WEBGL.TRIANGLES, group.indexCount, 5125, group.startIndex * 4);
+            renderContext.gl.drawElements(WEBGL.TRIANGLES, group.indexCount, WEBGL.UNSIGNED_INT, group.startIndex * 4);
           }
         }
       }
