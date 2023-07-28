@@ -1185,8 +1185,7 @@ var Hploc$ = {
     var st;
     if (this.have_sth) {
       st = this.sth;
-    }
-    else {
+    } else {
       st = Math.sqrt((1 - this.z) * (1 + this.z));
     }
     var x = st * FastMath.cos(this.phi);
@@ -1352,19 +1351,15 @@ var URLHelpers$ = {
     if (ss.startsWith(lc, 'http://')) {
       lcproto = 'http:';
       url_no_protocol = url.substring(7);
-    }
-    else if (ss.startsWith(lc, 'https://')) {
+    } else if (ss.startsWith(lc, 'https://')) {
       lcproto = 'https:';
       url_no_protocol = url.substring(8);
-    }
-    else if (ss.startsWith(lc, '//')) {
+    } else if (ss.startsWith(lc, '//')) {
       lcproto = '';
       url_no_protocol = url.substring(2);
-    }
-    else if (ss.startsWith(lc, 'blob:')) {
+    } else if (ss.startsWith(lc, 'blob:')) {
       return url;
-    }
-    else {
+    } else {
       switch (rwmode) {
         case 0:
         default:
@@ -1385,8 +1380,7 @@ var URLHelpers$ = {
     if (slash_index < 0) {
       domain = url_no_protocol;
       rest = '/';
-    }
-    else {
+    } else {
       domain = url_no_protocol.substring(0, slash_index);
       rest = url_no_protocol.substring(slash_index);
     }
@@ -1446,22 +1440,18 @@ var URLHelpers$ = {
     var url_no_protocol;
     if (ss.startsWith(lc, 'http://')) {
       url_no_protocol = url.substring(7);
-    }
-    else if (ss.startsWith(lc, 'https://')) {
+    } else if (ss.startsWith(lc, 'https://')) {
       url_no_protocol = url.substring(8);
-    }
-    else if (ss.startsWith(lc, '//')) {
+    } else if (ss.startsWith(lc, '//')) {
       url_no_protocol = url.substring(2);
-    }
-    else {
+    } else {
       url_no_protocol = url;
     }
     var lcdomain;
     var slash_index = url_no_protocol.indexOf('/');
     if (slash_index < 0) {
       lcdomain = url_no_protocol;
-    }
-    else {
+    } else {
       lcdomain = url_no_protocol.substring(0, slash_index).toLowerCase();
     }
     if (!ss.keyExists(this._domain_handling, lcdomain)) {
@@ -1786,8 +1776,7 @@ var CameraParameters$ = {
         return false;
       }
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -1979,8 +1968,7 @@ var Constellations$ = {
   fileStateChange: function () {
     if (this._webFile.get_state() === 2) {
       alert(this._webFile.get_message());
-    }
-    else if (this._webFile.get_state() === 1) {
+    } else if (this._webFile.get_state() === 1) {
       this._loadConstellationData(this._webFile.getText());
     }
   },
@@ -2121,8 +2109,7 @@ var Constellations$ = {
       else {
         col = Settings.get_globalSettings().get_constellationSelectionColor();
       }
-    }
-    else {
+    } else {
       col = Settings.get_globalSettings().get_constellationFigureColor();
     }
     this._constellationVertexBuffers[ls.get_name()].drawLines(renderContext, opacity, Color.load(col));
@@ -2146,8 +2133,7 @@ var Constellations$ = {
       else {
         col = Settings.get_globalSettings().get_constellationSelectionColor();
       }
-    }
-    else {
+    } else {
       col = Settings.get_globalSettings().get_constellationFigureColor();
     }
     if (renderContext.gl == null) {
@@ -2179,8 +2165,7 @@ var Constellations$ = {
       }
       ctx.stroke();
       ctx.restore();
-    }
-    else {
+    } else {
     }
   },
 
@@ -2260,8 +2245,7 @@ var Linepoint$ = {
   toString: function () {
     if (ss.emptyString(this.name)) {
       return Coordinates.formatDMS((((this.RA / 360) * 24 + 12) % 24)) + ', ' + Coordinates.formatDMS(this.dec) + ', ' + this.pointType.toString();
-    }
-    else {
+    } else {
       return this.name + ', ' + this.pointType.toString();
     }
   }
@@ -2511,8 +2495,7 @@ var ConstellationFilter$ = {
     bitID = bitID % 32;
     if (state) {
       this.bits[index] = this.bits[index] | (1 << bitID);
-    }
-    else {
+    } else {
       this.bits[index] = this.bits[index] ^ (1 << bitID);
     }
     this._checkChanged();
@@ -2679,8 +2662,7 @@ var Folder$ = {
       if (this._onError != null) {
         this._onError();
       }
-    }
-    else if (this._webFile.get_state() === 1) {
+    } else if (this._webFile.get_state() === 1) {
       var node = Util.selectSingleNode(this._webFile.getXml(), 'Folder');
       if (node == null) {
         var doc = this._webFile.getXml();
@@ -2708,8 +2690,7 @@ var Folder$ = {
   _parseXML: function (node) {
     if (node.attributes.getNamedItem('Name') != null) {
       this._nameField = node.attributes.getNamedItem('Name').nodeValue;
-    }
-    else {
+    } else {
       this._nameField = '';
     }
     if (node.attributes.getNamedItem('Url') != null) {
@@ -2850,8 +2831,7 @@ var Folder$ = {
         }
       }
       return this._childList;
-    }
-    else {
+    } else {
       var ts = (this._lastUpdate - ss.now()) / 1000;
       if (this.get_refreshType() === 1 || this._proxyFolder == null || (!this.get_refreshType() && (parseInt(this._refreshIntervalField) < ts))) {
         this.refresh();
@@ -2931,8 +2911,7 @@ var Folder$ = {
   get_name: function () {
     if (this._nameField == null) {
       return '';
-    }
-    else {
+    } else {
       return this._nameField;
     }
   },
@@ -3155,8 +3134,7 @@ var FolderBrowser$ = {
     if (this._dragging) {
       this._dragging = false;
       this._ignoreClick = true;
-    }
-    else if (this._indexTouchDown > -1 && this._mouseDown) {
+    } else if (this._indexTouchDown > -1 && this._mouseDown) {
       this._handleClick(this._indexTouchDown);
     }
     this._startOffset = 0;
@@ -3168,8 +3146,7 @@ var FolderBrowser$ = {
     if (!this._ignoreClick) {
       var index = this._getItemIndexFromCursor(Vector2d.create(e.offsetX, e.offsetY));
       this._handleClick(index);
-    }
-    else {
+    } else {
       this._ignoreClick = false;
     }
   },
@@ -3242,8 +3219,7 @@ var FolderBrowser$ = {
       if (this._hoverItem !== newHover) {
         this._hoverItem = newHover;
       }
-    }
-    else {
+    } else {
       var tiles = Math.round(((Mouse.offsetX(this.canvas, e) - this._lastX) + this._startOffset) / this._horzSpacing);
       var offset = Math.round(((Mouse.offsetX(this.canvas, e) - this._lastX) + this._startOffset) - (tiles * this._horzSpacing));
       this._startOffset = offset;
@@ -3487,8 +3463,7 @@ var FolderBrowser$ = {
     index = this._startIndex + ypos * this._colCount + xpos;
     if (index === this._items.length) {
       this._addButtonHover = true;
-    }
-    else {
+    } else {
       this._addButtonHover = false;
     }
     if (index > this._items.length - 1) {
@@ -3568,8 +3543,7 @@ var FolderUp$ = {
   get_children: function () {
     if (this.parent == null) {
       return [];
-    }
-    else {
+    } else {
       return this.parent.get_children();
     }
   }
@@ -3660,8 +3634,7 @@ var SimpleLineList$ = {
         }
       }
       ctx.restore();
-    }
-    else {
+    } else {
       var $enum1 = ss.enumerate(this._lineBuffers);
       while ($enum1.moveNext()) {
         var lineBuffer = $enum1.current;
@@ -3905,8 +3878,7 @@ var LineList$ = {
       return;
     }
     if (renderContext.gl == null) {
-    }
-    else {
+    } else {
       this._initLineBuffer();
       var $enum1 = ss.enumerate(this._lineBuffers);
       while ($enum1.moveNext()) {
@@ -3996,8 +3968,7 @@ var TriangleList$ = {
     subdivisions--;
     if (subdivisions < 0) {
       this.addTriangle(v1, v2, v3, color, date);
-    }
-    else {
+    } else {
       var v12;
       var v23;
       var v31;
@@ -4082,8 +4053,7 @@ var TriangleList$ = {
       return;
     }
     if (renderContext.gl == null) {
-    }
-    else {
+    } else {
       this._initTriangleBuffer();
       var $enum1 = ss.enumerate(this._triangleBuffers);
       while ($enum1.moveNext()) {
@@ -4331,8 +4301,7 @@ var PointList$ = {
         }
       }
       renderContext.device.restore();
-    }
-    else {
+    } else {
       var zero = new Vector3d();
       var matInv = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
       matInv.invert();
@@ -4474,8 +4443,7 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.uniform4f(SimpleLineShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
     if (renderContext.space || !useDepth) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -4540,8 +4508,7 @@ SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.uniform4f(SimpleLineShader2D.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
     if (renderContext.space || !useDepth) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -4612,8 +4579,7 @@ OrbitLineShader.use = function (renderContext, vertex, lineColor) {
     gl.uniform4f(OrbitLineShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
     if (renderContext.space) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -4692,8 +4658,7 @@ LineShaderNormalDates.use = function (renderContext, vertex, lineColor, zBuffer,
     gl.uniform1f(LineShaderNormalDates.decayLoc, decay);
     if (zBuffer) {
       gl.enable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.disable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -4790,8 +4755,7 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
     gl.uniform1f(TimeSeriesPointSpriteShader.skyLoc, (sky) ? -1 : 1);
     if (zBuffer) {
       gl.enable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.disable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -4898,8 +4862,7 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
     gl.uniform1f(KeplerPointSpriteShader.minSizeLoc, minSize);
     if (zBuffer) {
       gl.enable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.disable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -5079,8 +5042,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.uniform1f(ModelShader.minBrightnessLoc, (renderContext.lighting) ? ModelShader.minLightingBrightness : 1);
     if (renderContext.lighting) {
       gl.uniform3f(ModelShader.atmosphereColorLoc, ModelShader.atmosphereColor.r / 255, ModelShader.atmosphereColor.g / 255, ModelShader.atmosphereColor.b / 255);
-    }
-    else {
+    } else {
       gl.uniform3f(ModelShader.atmosphereColorLoc, 0, 0, 0);
     }
     gl.uniformMatrix4fv(ModelShader.mvMatLoc, false, mvMat.floatArray());
@@ -5097,8 +5059,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.uniform1i(ModelShader.sampLoc, 0);
     if (renderContext.space || noDepth) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -5118,8 +5079,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
-    }
-    else {
+    } else {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     }
   }
@@ -5198,8 +5158,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.uniform1f(ModelShaderTan.minBrightnessLoc, (renderContext.lighting) ? ModelShaderTan.minLightingBrightness : 1);
     if (renderContext.lighting) {
       gl.uniform3f(ModelShaderTan.atmosphereColorLoc, ModelShaderTan.atmosphereColor.r / 255, ModelShaderTan.atmosphereColor.g / 255, ModelShaderTan.atmosphereColor.b / 255);
-    }
-    else {
+    } else {
       gl.uniform3f(ModelShaderTan.atmosphereColorLoc, 0, 0, 0);
     }
     gl.uniformMatrix4fv(ModelShaderTan.mvMatLoc, false, mvMat.floatArray());
@@ -5216,8 +5175,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.uniform1i(ModelShaderTan.sampLoc, 0);
     if (renderContext.space || noDepth) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -5237,8 +5195,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
-    }
-    else {
+    } else {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     }
   }
@@ -5318,8 +5275,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.uniform1f(TileShader.minBrightnessLoc, (renderContext.lighting) ? TileShader.minLightingBrightness : 1);
     if (renderContext.lighting) {
       gl.uniform3f(TileShader.atmosphereColorLoc, TileShader.atmosphereColor.r / 255, TileShader.atmosphereColor.g / 255, TileShader.atmosphereColor.b / 255);
-    }
-    else {
+    } else {
       gl.uniform3f(TileShader.atmosphereColorLoc, 0, 0, 0);
     }
     gl.uniform3f(TileShader.centerWorldLoc, centerWorld.x, centerWorld.y, centerWorld.z);
@@ -5327,8 +5283,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
       var wvp = Matrix3d.multiplyMatrix(mvMat, renderContext.get_projection());
       var centerScreen = wvp.transform(centerWorld);
       gl.uniform3f(TileShader.centerScreenLoc, centerScreen.x, centerScreen.y, centerScreen.z);
-    }
-    else {
+    } else {
       gl.uniform3f(TileShader.centerScreenLoc, 0, 0, 0);
     }
     gl.uniformMatrix4fv(TileShader.mvMatLoc, false, mvMat.floatArray());
@@ -5345,8 +5300,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.uniform1i(TileShader.sampLoc, 0);
     if (renderContext.space || noDepth) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -5364,8 +5318,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
-    }
-    else {
+    } else {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     }
   }
@@ -5460,8 +5413,7 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
       var wvp = Matrix3d.multiplyMatrix(mvMat, renderContext.get_projection());
       var centerScreen = wvp.transform(centerWorld);
       gl.uniform3f(FitsShader.centerScreenLoc, centerScreen.x, centerScreen.y, centerScreen.z);
-    }
-    else {
+    } else {
       gl.uniform3f(FitsShader.centerScreenLoc, 0, 0, 0);
     }
     gl.uniform1i(FitsShader.sampLoc, 0);
@@ -5476,8 +5428,7 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.uniform1i(FitsShader.scalingLocation, FitsShader.scaleType);
     if (renderContext.space || noDepth) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -5495,8 +5446,7 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
-    }
-    else {
+    } else {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     }
   }
@@ -5570,8 +5520,7 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.uniform1i(ImageShader.sampLoc, 0);
     if (renderContext.space || noDepth) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -5589,8 +5538,7 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
-    }
-    else {
+    } else {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     }
   }
@@ -5663,8 +5611,7 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     gl.uniform1i(ImageShader2.sampLoc, 0);
     if (renderContext.space || noDepth) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -5682,8 +5629,7 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
-    }
-    else {
+    } else {
       gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     }
   }
@@ -5897,8 +5843,7 @@ TextShader.use = function (renderContext, vertex, texture) {
     gl.uniform1i(TextShader.sampLoc, 0);
     if (renderContext.space) {
       gl.disable(WEBGL.DEPTH_TEST);
-    }
-    else {
+    } else {
       gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
@@ -5932,15 +5877,13 @@ var Sprite2d$ = {
   draw: function (renderContext, points, count, texture, triangleStrips, opacity) {
     if (this.vertexBuffer == null) {
       this.create(points);
-    }
-    else {
+    } else {
       this.update(points);
     }
     if (texture == null) {
       ShapeSpriteShader.use(renderContext, this.vertexBuffer);
       renderContext.gl.drawArrays(triangleStrips ? WEBGL.TRIANGLE_STRIP : WEBGL.TRIANGLES, 0, points.length);
-    }
-    else {
+    } else {
       SpriteShader.use(renderContext, this.vertexBuffer, (texture != null) ? texture.texture2d : null);
       renderContext.gl.drawArrays(triangleStrips ? WEBGL.TRIANGLE_STRIP : WEBGL.TRIANGLES, 0, points.length);
     }
@@ -6268,8 +6211,7 @@ Grids._createGalaxyImage = function (renderContext) {
   for (y1 = 0; y1 <= subdivs; y1++) {
     if (y1 !== subdivs) {
       lat = latMax - (textureStepY * latDegrees * y1);
-    }
-    else {
+    } else {
       lat = latMin;
     }
     for (x1 = 0; x1 <= subdivs; x1++) {
@@ -6625,8 +6567,7 @@ Grids.drawEcliptic = function (renderContext, opacity, drawColor) {
     if (DT.isLeap(year, true)) {
       Grids._monthDays[1] = 29;
       daysPerYear = 366;
-    }
-    else {
+    } else {
       Grids._monthDays[1] = 28;
       daysPerYear = 365;
     }
@@ -6676,8 +6617,7 @@ Grids._makeEclipticText = function () {
     if (DT.isLeap(year, true)) {
       Grids._monthDays[1] = 29;
       daysPerYear = 366;
-    }
-    else {
+    } else {
       Grids._monthDays[1] = 28;
       daysPerYear = 365;
     }
@@ -7352,8 +7292,7 @@ Imageset.fromXMLNode = function (node) {
         sparse = ss.boolean(node.attributes.getNamedItem('Sparse').nodeValue);
       }
       return Imageset.create(name, url, type, bandPass, projection, Math.abs(Util.getHashCode(url)), baseTileLevel, tileLevels, 256, baseDegreesPerTile, fileType, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, stockSet, elevationModel, wf, offsetX, offsetY, creditText, creditsUrl, demUrl, alturl, meanRadius, referenceFrame);
-    }
-    else {
+    } else {
       return Imageset.createGeneric(type, bandPass);
     }
   }
@@ -7371,8 +7310,7 @@ Imageset.saveToXml = function (xmlWriter, imageset, alternateUrl) {
     xmlWriter._writeAttributeString('Name', imageset.get_name());
     if (ss.emptyString(alternateUrl)) {
       xmlWriter._writeAttributeString('Url', imageset.get_url());
-    }
-    else {
+    } else {
       xmlWriter._writeAttributeString('Url', alternateUrl);
     }
     xmlWriter._writeAttributeString('DemUrl', imageset.get_demUrl());
@@ -7396,8 +7334,7 @@ Imageset.saveToXml = function (xmlWriter, imageset, alternateUrl) {
     xmlWriter._writeAttributeString('ReferenceFrame', imageset.get_referenceFrame());
     if (ss.emptyString(alternateUrl)) {
       xmlWriter._writeElementString('ThumbnailUrl', imageset.get_thumbnailUrl());
-    }
-    else {
+    } else {
       xmlWriter._writeElementString('ThumbnailUrl', imageset.get_url());
     }
   }
@@ -7674,8 +7611,7 @@ var Imageset$ = {
   toString: function () {
     if (this.get_defaultSet()) {
       return this._name + ' *';
-    }
-    else {
+    } else {
       return this._name;
     }
   },
@@ -7683,8 +7619,7 @@ var Imageset$ = {
   get_stockImageSet: function () {
     if (this._generic || !this._defaultSet) {
       return this;
-    }
-    else {
+    } else {
       return Imageset.createGeneric(this.get_dataSetType(), this.get_bandPass());
     }
   },
@@ -7822,8 +7757,7 @@ var Imageset$ = {
     if (this.get_levels() > 0) {
       dx = -this._offsetX;
       dy = this._offsetY;
-    }
-    else {
+    } else {
       var effWidth = 800;
       var effHeight = 800;
       dx = (this._offsetX - effWidth / 2) * this._baseTileDegrees;
@@ -7834,8 +7768,7 @@ var Imageset$ = {
     }
     if (isX) {
       return this._centerX + dx * crot + dy * srot;
-    }
-    else {
+    } else {
       return this._centerY - dx * srot + dy * crot;
     }
   },
@@ -7843,8 +7776,7 @@ var Imageset$ = {
   get_viewCenterX: function () {
     if (this.get_wcsImage() != null) {
       return (this.get_wcsImage()).get_viewCenterX();
-    }
-    else {
+    } else {
       return this._calcViewCenterCoordinate(true);
     }
   },
@@ -7852,8 +7784,7 @@ var Imageset$ = {
   get_viewCenterY: function () {
     if (this.get_wcsImage() != null) {
       return (this.get_wcsImage()).get_viewCenterY();
-    }
-    else {
+    } else {
       return this._calcViewCenterCoordinate(false);
     }
   },
@@ -7898,11 +7829,9 @@ var Imageset$ = {
       if (aswcs != null) {
         zoom = this.get_baseTileDegrees() * aswcs.get_sizeY() * 6 * 1.7;
       }
-    }
-    else if (aswcs != null) {
+    } else if (aswcs != null) {
       zoom = aswcs.get_scaleY() * aswcs.get_sizeY() * 6 * 1.7;
-    }
-    else {
+    } else {
       zoom = this.get_baseTileDegrees() * 6 * 1.7;
     }
     if (zoom > currentZoom) {
@@ -7969,8 +7898,7 @@ export function ViewMoverKenBurnsStyle(from, to, time, fromDateTime, toDateTime,
   if (Math.abs(from.lng - to.lng) > 180) {
     if (from.lng > to.lng) {
       from.lng -= 360;
-    }
-    else {
+    } else {
       from.lng += 360;
     }
   }
@@ -8117,15 +8045,13 @@ var ViewMoverSlew$ = {
     var elapsedSeconds = (elapsed) / 1000;
     if (elapsedSeconds < this._upTargetTime) {
       return CameraParameters.interpolate(this._from, this._fromTop, elapsedSeconds / this._upTargetTime, 3, false);
-    }
-    else if (elapsedSeconds < this._downTargetTime) {
+    } else if (elapsedSeconds < this._downTargetTime) {
       elapsedSeconds -= this._upTargetTime;
       if (Settings.get_active().get_galacticMode() && WWTControl.singleton.renderContext.space) {
         return CameraParameters.interpolateGreatCircle(this._fromTop, this._toTop, elapsedSeconds / (this._downTargetTime - this._upTargetTime), 3, false);
       }
       return CameraParameters.interpolate(this._fromTop, this._toTop, elapsedSeconds / (this._downTargetTime - this._upTargetTime), 3, false);
-    }
-    else {
+    } else {
       if (!this._midpointFired) {
         this._midpointFired = true;
         if (this._midpoint != null) {
@@ -8207,24 +8133,18 @@ var KeplerVertex$ = {
     this.pointSize = 0.1;
     if (ee.a < 2.5) {
       this.color = Colors.get_white();
-    }
-    else if (ee.a < 2.83) {
+    } else if (ee.a < 2.83) {
       this.color = Colors.get_red();
-    }
-    else if (ee.a < 2.96) {
+    } else if (ee.a < 2.96) {
       this.color = Colors.get_green();
-    }
-    else if (ee.a < 3.3) {
+    } else if (ee.a < 3.3) {
       this.color = Colors.get_magenta();
-    }
-    else if (ee.a < 5) {
+    } else if (ee.a < 5) {
       this.color = Colors.get_cyan();
-    }
-    else if (ee.a < 10) {
+    } else if (ee.a < 10) {
       this.color = Colors.get_yellow();
       this.pointSize = 0.9;
-    }
-    else {
+    } else {
       this.color = Colors.get_white();
       this.pointSize = 8;
     }
@@ -8232,8 +8152,7 @@ var KeplerVertex$ = {
     this.e = ee.e;
     if (!ee.n) {
       this.n = (0.9856076686 / (ee.a * Math.sqrt(ee.a)));
-    }
-    else {
+    } else {
       this.n = ee.n;
     }
     this.t = (ee.t - KeplerVertex.baseDate);
@@ -8369,11 +8288,9 @@ var ColorMapContainer$ = {
     var index;
     if (value <= 0) {
       return this.colors[0];
-    }
-    else if (value >= 1) {
+    } else if (value >= 1) {
       return this.colors[this.colors.length - 1];
-    }
-    else {
+    } else {
       index = ss.truncate((value * this.colors.length));
       return this.colors[index];
     }
@@ -9212,8 +9129,7 @@ LayerManager.purgeLayerMapDeep = function (target, topLevel) {
       if (ss.keyExists(LayerManager.get_allMaps(), target.frame.parent)) {
         delete LayerManager.get_allMaps()[target.frame.parent].childMaps[target.get_name()];
       }
-    }
-    else {
+    } else {
       if (ss.keyExists(LayerManager.get_layerMaps(), target.get_name())) {
         delete LayerManager.get_layerMaps()[target.get_name()];
       }
@@ -9268,8 +9184,7 @@ LayerManager.mergeToursLayers = function () {
         LayerManager.get_layerList()[layer.id] = layer;
         LayerManager.get_allMaps()[layer.get_referenceFrame()].layers.push(layer);
       }
-    }
-    else {
+    } else {
       layer.cleanUp();
     }
   }
@@ -9286,8 +9201,7 @@ LayerManager.connectAllChildren = function () {
     var map = LayerManager.get_allMaps()[key];
     if (ss.emptyString(map.frame.parent) && !ss.keyExists(LayerManager.get_layerMaps(), map.frame.name)) {
       LayerManager.get_layerMaps()[map.get_name()] = map;
-    }
-    else if (!ss.emptyString(map.frame.parent) && ss.keyExists(LayerManager.get_allMaps(), map.frame.parent)) {
+    } else if (!ss.emptyString(map.frame.parent) && ss.keyExists(LayerManager.get_allMaps(), map.frame.parent)) {
       if (!ss.keyExists(LayerManager.get_allMaps()[map.frame.parent].childMaps, map.frame.name)) {
         LayerManager.get_allMaps()[map.frame.parent].childMaps[map.frame.name] = map;
         map.parent = LayerManager.get_allMaps()[map.frame.parent];
@@ -9339,8 +9253,7 @@ LayerManager._getFrameTarget = function (renderContext, TrackingFrame) {
     var map = $enum1.current;
     if (map.frame.reference !== 18 && map.frame.reference !== 20) {
       Planets.setupPlanetMatrix(renderContext, Enums.parse('SolarSystemObjects', map.frame.name), Vector3d.get_empty(), false);
-    }
-    else {
+    } else {
       map.computeFrame(renderContext);
       if (map.frame.useRotatingParentFrame()) {
         renderContext.set_world(Matrix3d.multiplyMatrix(map.frame.worldMatrix, renderContext.get_world()));
@@ -9425,8 +9338,7 @@ LayerManager._draw = function (renderContext, opacity, astronomical, referenceFr
     thisMap.computeFrame(renderContext);
     if (thisMap.frame.referenceFrameType !== 1 && thisMap.frame.referenceFrameType !== 2) {
       renderContext.set_world(Matrix3d.multiplyMatrix(thisMap.frame.worldMatrix, renderContext.get_world()));
-    }
-    else {
+    } else {
       renderContext.set_world(Matrix3d.multiplyMatrix(thisMap.frame.worldMatrix, renderContext.get_worldBaseNonRotating()));
     }
     renderContext.set_nominalRadius(thisMap.frame.meanRadius);
@@ -9573,8 +9485,7 @@ LayerManager._preDraw = function (renderContext, opacity, astronomical, referenc
     thisMap.computeFrame(renderContext);
     if (thisMap.frame.referenceFrameType !== 1) {
       renderContext.set_world(Matrix3d.multiplyMatrix(thisMap.frame.worldMatrix, renderContext.get_world()));
-    }
-    else {
+    } else {
       renderContext.set_world(Matrix3d.multiplyMatrix(thisMap.frame.worldMatrix, renderContext.get_worldBaseNonRotating()));
     }
     renderContext.set_nominalRadius(thisMap.frame.meanRadius);
@@ -9642,8 +9553,7 @@ LayerManager.layerSelectionChanged = function (selected) {
       if (map != null) {
         LayerManager.set_currentMap(map.get_name());
       }
-    }
-    else {
+    } else {
       var layer = ss.safeCast(LayerManager._selectedLayer, ImageSetLayer);
       if (layer != null && ss.canCast(layer.get_imageSet().get_wcsImage(), FitsImage)) {
         return;
@@ -10113,8 +10023,7 @@ LayerManager._showOrbitPlanet_Click = function (sender, e) {
     var bit = parseInt((sender).tag.toString());
     if (!(Settings.get_globalSettings().get_planetOrbitsFilter() & bit)) {
       Settings.get_globalSettings().set_planetOrbitsFilter(Settings.get_globalSettings().get_planetOrbitsFilter() | bit);
-    }
-    else {
+    } else {
       Settings.get_globalSettings().set_planetOrbitsFilter(Settings.get_globalSettings().get_planetOrbitsFilter() & ~bit);
     }
   }
@@ -10148,8 +10057,7 @@ LayerManager._addMpc_Click = function (sender, e) {
           retry = true;
         }
       }
-    }
-    else {
+    } else {
       retry = false;
     }
   } while (retry);
@@ -10161,8 +10069,7 @@ LayerManager._asOrbitalLines_Click = function (sender, e) {
   var input = new SimpleInput(Language.getLocalizedText(1302, 'Minor planet name or designation'), Language.getLocalizedText(238, 'Name'), '', 32);
   input.show(Cursor.get_position(), function () {
     if (ss.keyExists(target.childMaps, input.text)) {
-    }
-    else {
+    } else {
       LayerManager._getMpcAsTLE(input.text, target);
     }
   });
@@ -10752,8 +10659,7 @@ var Mesh$ = {
   commitToDevice: function () {
     if (this.vertices != null) {
       this.vertexBuffer = PositionNormalTexturedVertexBuffer.create(this.vertices);
-    }
-    else if (this.tangentVertices != null) {
+    } else if (this.tangentVertices != null) {
       this.tangentVertexBuffer = PositionNormalTexturedTangentVertexBuffer.create(this.tangentVertices);
     }
     this.indexBuffer = new IndexBuffer(new Uint32Array(this.indices));
@@ -10762,8 +10668,7 @@ var Mesh$ = {
   beginDrawing: function (renderContext) {
     if (this.vertexBuffer != null) {
       renderContext._setVertexBuffer(this.vertexBuffer);
-    }
-    else if (this.tangentVertexBuffer != null) {
+    } else if (this.tangentVertexBuffer != null) {
       renderContext._setVertexBuffer(this.tangentVertexBuffer);
     }
     if (this.indexBuffer != null) {
@@ -11196,11 +11101,9 @@ var Object3d$ = {
       var g = Math.max(0, Math.min(1, br.readSingle()));
       var b = Math.max(0, Math.min(1, br.readSingle()));
       color = Color.fromArgb(255, ss.truncate((255 * r)), ss.truncate((255 * g)), ss.truncate((255 * b)));
-    }
-    else if ((chunkID === 17 || chunkID === 18) && chunkLength === 9) {
+    } else if ((chunkID === 17 || chunkID === 18) && chunkLength === 9) {
       color = Color.fromArgb(255, br.readByte(), br.readByte(), br.readByte());
-    }
-    else {
+    } else {
       br.readBytes(chunkLength - 6);
     }
     return color;
@@ -11212,11 +11115,9 @@ var Object3d$ = {
     var percentage = 0;
     if (chunkID === 48 && chunkLength === 8) {
       percentage = br.readUInt16();
-    }
-    else if (chunkID === 49 && chunkLength === 10) {
+    } else if (chunkID === 49 && chunkLength === 10) {
       percentage = br.readSingle();
-    }
-    else {
+    } else {
       br.readBytes(chunkLength - 6);
     }
     return percentage;
@@ -11478,8 +11379,7 @@ var Object3d$ = {
         $this._loadMatLib(data);
       };
       chunck.readAsText(blob);
-    }
-    else {
+    } else {
       this._readObjFromBin(data);
     }
   },
@@ -12003,8 +11903,7 @@ var Object3d$ = {
         ++vertexIndex;
       }
       this._mesh = Mesh.createTangent(vertices, newIndexList);
-    }
-    else {
+    } else {
       this._mesh = Mesh.create(newVertexList, newIndexList);
     }
     this.objects = nodeTreeRoot;
@@ -12117,8 +12016,7 @@ var Object3d$ = {
       if (!this.useCurrentAmbient) {
         renderContext.set_ambientLightColor(Color.fromArgb(255, 11, 11, 11));
       }
-    }
-    else {
+    } else {
       renderContext.set_sunlightColor(Colors.get_black());
       renderContext.set_reflectedLightColor(Colors.get_black());
       renderContext.set_hemisphereLightColor(Colors.get_black());
@@ -12148,8 +12046,7 @@ var Object3d$ = {
         renderContext.preDraw();
         this._mesh.drawSubset(renderContext, i);
       }
-    }
-    else {
+    } else {
       renderContext.preDraw();
       for (var i = 0; i < this._meshTextures.length; i++) {
         if (this._meshTextures[i] != null) {
@@ -12233,8 +12130,7 @@ var Orbit$ = {
   get_boundingRadius: function () {
     if (this._elements != null) {
       return (this._elements.a * (1 + this._elements.e)) / this._scale;
-    }
-    else {
+    } else {
       return 0;
     }
   },
@@ -12630,8 +12526,7 @@ var ReferenceFrame$ = {
     this._elements.jdEquinox = this.epoch;
     if (!this.meanDailyMotion) {
       this._elements.n = ELL.meanMotionFromSemiMajorAxis(this._elements.a);
-    }
-    else {
+    } else {
       this._elements.n = this.meanDailyMotion;
     }
     this._elements.t = this.epoch - (this.meanAnomolyAtEpoch / this._elements.n);
@@ -13034,8 +12929,7 @@ var VoTable$ = {
   _loadData: function () {
     if (this._webFile.get_state() === 2) {
       alert(this._webFile.get_message());
-    }
-    else if (this._webFile.get_state() === 1) {
+    } else if (this._webFile.get_state() === 1) {
       this.loadFromXML(this._webFile.getXml());
       if (this._onComplete != null) {
         this._onComplete();
@@ -14141,8 +14035,7 @@ var Place$ = {
     if (this.get_type() === 2) {
       xmlWriter._writeAttributeString('RA', this._camParams.get_RA().toString());
       xmlWriter._writeAttributeString('Dec', this._camParams.get_dec().toString());
-    }
-    else {
+    } else {
       xmlWriter._writeAttributeString('Lat', this.get_lat().toString());
       xmlWriter._writeAttributeString('Lng', this.get_lng().toString());
     }
@@ -14313,8 +14206,7 @@ Planets.getPlanet3dLocationJD = function (target, jNow) {
     var center = Coordinates.raDecTo3dAu(centerRaDec.RA, centerRaDec.dec, centerRaDec.distance);
     if (target === 19) {
       result = Vector3d.create(-center.x, -center.y, -center.z);
-    }
-    else {
+    } else {
       var planet = AstroCalc.getPlanet(jNow, target, 0, 0, -6378149);
       result = Coordinates.raDecTo3dAu(planet.RA, planet.dec, planet.distance);
       result.subtract(center);
@@ -15021,8 +14913,7 @@ Planets._drawSingleOrbit = function (renderContext, eclipticColor, id, centerPoi
       }
       list.drawLines(renderContext, 1, Colors.get_white());
       list.clear();
-    }
-    else {
+    } else {
       var mu = 0;
       switch (id) {
         case 9:
@@ -15205,8 +15096,7 @@ Planets._drawPlanet3d = function (renderContext, planetID, centerPoint) {
     TileShader.minLightingBrightness = 0.025;
     if (planetID === 19) {
       TileShader.atmosphereColor = Color.fromArgb(255, 65, 157, 217);
-    }
-    else {
+    } else {
       TileShader.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
     }
   }
@@ -15242,17 +15132,13 @@ Planets._drawPlanet3d = function (renderContext, planetID, centerPoint) {
     var sizeIndex = 0;
     if (sizeIndexParam > 10.5) {
       sizeIndex = 0;
-    }
-    else if (sizeIndexParam > 3.9) {
+    } else if (sizeIndexParam > 3.9) {
       sizeIndex = 1;
-    }
-    else if (sizeIndexParam > 0.72) {
+    } else if (sizeIndexParam > 0.72) {
       sizeIndex = 2;
-    }
-    else if (sizeIndexParam > 0.05) {
+    } else if (sizeIndexParam > 0.05) {
       sizeIndex = 3;
-    }
-    else {
+    } else {
       sizeIndex = 4;
     }
     if (planetID === 19 && sizeIndex < 2) {
@@ -15283,8 +15169,7 @@ Planets._drawPlanet3d = function (renderContext, planetID, centerPoint) {
         }
       }
       renderContext.lighting = oldLighting;
-    }
-    else {
+    } else {
       if (!planetID) {
         Planets.drawPointPlanet(renderContext, new Vector3d(), (10 * Planets._planetDiameters[planetID]), Planets.planetColors[planetID], true);
       }
@@ -15506,8 +15391,7 @@ Planets._drawPlanet = function (renderContext, planetID, opacity) {
   else if (planetID < 14) {
     if (Planets._planetLocations[planetID].eclipsed) {
       brush = Planets._planetTextures[15];
-    }
-    else {
+    } else {
       if (Settings.get_active().get_showMoonsAsPointSource()) {
         brush = Planets._planetTextures[14];
       }
@@ -15769,16 +15653,14 @@ RenderContext.getTilesXForLevel = function (layer, level) {
 var RenderContext$ = {
   save: function () {
     if (this.gl != null) {
-    }
-    else {
+    } else {
       this.device.save();
     }
   },
 
   restore: function () {
     if (this.gl != null) {
-    }
-    else {
+    } else {
       this.device.restore();
     }
   },
@@ -15787,8 +15669,7 @@ var RenderContext$ = {
     if (this.gl != null) {
       this.gl.viewport(0, 0, ss.truncate(this.width), ss.truncate(this.height));
       this.gl.clear(WEBGL.COLOR_BUFFER_BIT | WEBGL.DEPTH_BUFFER_BIT);
-    }
-    else {
+    } else {
       this.device.save();
       this.device.fillStyle = 'black';
       this.device.fillRect(0, 0, this.width, this.height);
@@ -15952,11 +15833,9 @@ var RenderContext$ = {
     if (imageset.get_hipsProperties() == null) {
       imageset.set_hipsProperties(new HipsProperties(imageset));
       imageset.get_hipsProperties().setDownloadCompleteListener(onHeaderInfoLoad);
-    }
-    else if (imageset.get_hipsProperties() != null && imageset.get_hipsProperties().get_downloadComplete()) {
+    } else if (imageset.get_hipsProperties() != null && imageset.get_hipsProperties().get_downloadComplete()) {
       onHeaderInfoLoad();
-    }
-    else {
+    } else {
       imageset.get_hipsProperties().setDownloadCompleteListener(onHeaderInfoLoad);
     }
   },
@@ -16000,8 +15879,7 @@ var RenderContext$ = {
         }
         i++;
       }
-    }
-    else {
+    } else {
       var count = catalogSpreadSheetLayer.get__table().rows.length;
       console.log('Done!');
       console.log(count);
@@ -16020,8 +15898,7 @@ var RenderContext$ = {
     if (imageset.get_hipsProperties() == null) {
       imageset.set_hipsProperties(new HipsProperties(imageset));
       imageset.get_hipsProperties().setDownloadCompleteListener(onLoad);
-    }
-    else if (imageset.get_hipsProperties() != null && imageset.get_hipsProperties().get_downloadComplete()) {
+    } else if (imageset.get_hipsProperties() != null && imageset.get_hipsProperties().get_downloadComplete()) {
       LayerManager.addSpreadsheetLayer(imageset.get_hipsProperties().get_catalogSpreadSheetLayer(), 'Sky');
       if (onLoad != null) {
         onLoad();
@@ -16075,11 +15952,9 @@ var RenderContext$ = {
       pnt.normalize();
       var point = Coordinates.cartesianToLatLng(pnt);
       return this.getAltitudeForLatLongForPlanet(this.viewCamera.target, point.y, point.x);
-    }
-    else if (!this.get_backgroundImageset().get_dataSetType()) {
+    } else if (!this.get_backgroundImageset().get_dataSetType()) {
       return (meters) ? this.getMetersAltitudeForLatLong(ViewLat, ViewLong) : this.getScaledAltitudeForLatLong(ViewLat, ViewLong);
-    }
-    else {
+    } else {
       return 0;
     }
   },
@@ -16145,8 +16020,7 @@ var RenderContext$ = {
     var distance = 0;
     if (this._backgroundImageset.get_isMandelbrot()) {
       distance = (4 * (this.viewCamera.zoom / 180)) + 1E-41;
-    }
-    else {
+    } else {
       distance = (4 * (this.viewCamera.zoom / 180)) + 1E-06;
     }
     this._fovAngle = (this.viewCamera.zoom / 343.774) / Math.PI * 180;
@@ -16161,8 +16035,7 @@ var RenderContext$ = {
       else {
         this._targetHeight = (((this._targetHeight * 9) + heightNow) / 10);
       }
-    }
-    else {
+    } else {
       this.targetAltitude = 0;
       this._targetHeight = 1;
     }
@@ -16204,8 +16077,7 @@ var RenderContext$ = {
       this.targetCamera.lat = gPoint[1];
       this.viewCamera.lat = this.targetCamera.lat;
       this.viewCamera.lng = this.targetCamera.lng;
-    }
-    else {
+    } else {
       WorldMatrix._multiply(Matrix3d._rotationY(-(this.viewCamera.lng - 90) / 180 * Math.PI));
       WorldMatrix._multiply(Matrix3d._rotationX(-this.viewCamera.lat / 180 * Math.PI));
       this._viewPoint = Coordinates.raDecTo3dAu(this.get_RA(), this.get_dec(), 1);
@@ -16319,8 +16191,7 @@ var RenderContext$ = {
       var target = LayerManager._getFrameTarget(this, this.get_trackingFrame());
       this.viewCamera.viewTarget = target.target;
       trackingMatrix = target.matrix;
-    }
-    else if (!ss.emptyString(this.get_trackingFrame())) {
+    } else if (!ss.emptyString(this.get_trackingFrame())) {
       this.set_trackingFrame('');
     }
     var center = this.viewCamera.viewTarget;
@@ -16343,8 +16214,7 @@ var RenderContext$ = {
       }
       this.cameraPosition = Vector3d.create((Math.sin(-this.viewCamera.rotation) * Math.sin(angle) * cameraDistance), (Math.cos(-this.viewCamera.rotation) * Math.sin(angle) * cameraDistance), (Math.cos(angle) * cameraDistance));
       lookUp = Vector3d.create(Math.sin(-this.viewCamera.rotation), Math.cos(-this.viewCamera.rotation), 1E-05);
-    }
-    else {
+    } else {
       this.cameraPosition = Vector3d.create(0, 0, cameraDistance);
       lookUp = Vector3d.create(Math.sin(-this.viewCamera.rotation), Math.cos(-this.viewCamera.rotation), 0.0001);
     }
@@ -16369,8 +16239,7 @@ var RenderContext$ = {
       this.nearPlane = cameraDistance * 0.03;
       this.nearPlane = Math.max(this.nearPlane, 1E-11);
       RenderContext.back = 1900;
-    }
-    else {
+    } else {
       if (forStars) {
         RenderContext.back = 900056;
         RenderContext.back = (cameraDistance > 900056) ? cameraDistance * 3 : 900056;
@@ -16814,16 +16683,14 @@ var RenderTriangle$ = {
     if (m > 0) {
       top_intersection = (m * l + c);
       bottom_intersection = (m * r + c);
-    }
-    else {
+    } else {
       top_intersection = (m * r + c);
       bottom_intersection = (m * l + c);
     }
     if (y0 < y1) {
       toptrianglepoint = y0;
       bottomtrianglepoint = y1;
-    }
-    else {
+    } else {
       toptrianglepoint = y1;
       bottomtrianglepoint = y0;
     }
@@ -16911,8 +16778,7 @@ var ScriptInterface$ = {
   _fireReady: function () {
     if (this.__ready != null) {
       this.__ready(this, new ss.EventArgs());
-    }
-    else {
+    } else {
       this._missedReady = true;
     }
   },
@@ -17237,14 +17103,12 @@ var ScriptInterface$ = {
   addImageSetLayer: function (url, mode, name, gotoTarget, loaded) {
     if (mode != null && mode.toLowerCase() === 'fits') {
       return ScriptInterface._addFitsLayer(url, name, gotoTarget, loaded);
-    }
-    else if (mode != null && mode.toLowerCase() === 'preloaded') {
+    } else if (mode != null && mode.toLowerCase() === 'preloaded') {
       var imageset = WWTControl.singleton.getImageSetByUrl(url);
       if (imageset != null) {
         return ScriptInterface._addImageSet(name, gotoTarget, loaded, imageset);
       }
-    }
-    else {
+    } else {
       var imageset = WWTControl.singleton.getImageSetByUrl(url);
       if (imageset != null) {
         return ScriptInterface._addImageSet(name, gotoTarget, loaded, imageset);
@@ -18190,8 +18054,7 @@ var Text3dBatch$ = {
         ctx.fillText(t3d.text, -tm.width / 2, -drawHeight / 2);
         ctx.restore();
       }
-    }
-    else {
+    } else {
       if (this._glyphCache == null || this._glyphCache.get_version() > this._glyphVersion) {
         this.prepareBatch();
       }
@@ -18344,8 +18207,7 @@ var GlyphCache$ = {
   _glyphXmlReady: function () {
     if (this._webFile.get_state() === 2) {
       alert(this._webFile.get_message());
-    }
-    else if (this._webFile.get_state() === 1) {
+    } else if (this._webFile.get_state() === 1) {
       this._loadXmlGlyph(this._webFile.getXml());
     }
   },
@@ -18402,8 +18264,7 @@ var GlyphCache$ = {
       this._textureDirty = true;
       this._version++;
       GlyphCache._allGlyphs = GlyphCache._allGlyphs + glyph;
-    }
-    else {
+    } else {
       this._glyphItems[glyph].addRef();
     }
   },
@@ -18470,8 +18331,7 @@ var Text3d$ = {
     if (!this.alignment) {
       left.multiply(this.width - position.get_left() * 2);
       right.multiply(this.width - ((this.width * 2) - position.get_right() * 2));
-    }
-    else if (this.alignment === 1) {
+    } else if (this.alignment === 1) {
       left.multiply(-position.get_left() * 2);
       right.multiply(position.get_right() * 2);
     }
@@ -18483,31 +18343,27 @@ var Text3d$ = {
     ul.add(top);
     if (this.sky) {
       ul.add(left);
-    }
-    else {
+    } else {
       ul.subtract(left);
     }
     var ur = this.center.copy();
     ur.add(top);
     if (this.sky) {
       ur.add(right);
-    }
-    else {
+    } else {
       ur.subtract(right);
     }
     var ll = this.center.copy();
     if (this.sky) {
       ll.add(left);
-    }
-    else {
+    } else {
       ll.subtract(left);
     }
     ll.add(bottom);
     var lr = this.center.copy();
     if (this.sky) {
       lr.add(right);
-    }
-    else {
+    } else {
       lr.subtract(right);
     }
     lr.add(bottom);
@@ -18597,8 +18453,7 @@ SpaceTimeController.getTimeForFutureTime = function (delta) {
     if (SpaceTimeController._syncToClock) {
       var future = new Date((SpaceTimeController.get_now().getTime() + (delta * 1000) * SpaceTimeController._timeRate));
       return future;
-    }
-    else {
+    } else {
       return SpaceTimeController.get_now();
     }
   }
@@ -18612,8 +18467,7 @@ SpaceTimeController.getJNowForFutureTime = function (delta) {
     if (SpaceTimeController._syncToClock) {
       var future = new Date(SpaceTimeController.get_now().getTime() + ss.truncate((delta * 1000 * SpaceTimeController._timeRate)));
       return SpaceTimeController.utcToJulian(future);
-    }
-    else {
+    } else {
       return SpaceTimeController.utcToJulian(SpaceTimeController.get_now());
     }
   }
@@ -18673,8 +18527,7 @@ SpaceTimeController.set_syncToClock = function (value) {
     if (value) {
       SpaceTimeController.last = ss.now();
       SpaceTimeController._offset = SpaceTimeController._now - ss.now();
-    }
-    else {
+    } else {
       SpaceTimeController._now = new Date(ss.now().getTime() + SpaceTimeController._offset);
     }
   }
@@ -18876,11 +18729,9 @@ var Star$ = {
     var c = 4294967295;
     if (bmv <= -0.32) {
       c = 4288854271;
-    }
-    else if (bmv <= -0.31) {
+    } else if (bmv <= -0.31) {
       c = 4288919807;
-    }
-    else if (bmv <= -0.3) {
+    } else if (bmv <= -0.3) {
       c = 4288985855;
     }
     // mistake in original source. Should this be "<= -0.29" or something?
@@ -18889,104 +18740,71 @@ var Star$ = {
     // }
     else if (bmv <= -0.28) {
       c = 4289182975;
-    }
-    else if (bmv <= -0.26) {
+    } else if (bmv <= -0.26) {
       c = 4289314303;
-    }
-    else if (bmv <= -0.24) {
+    } else if (bmv <= -0.24) {
       c = 4289445887;
-    }
-    else if (bmv <= -0.2) {
+    } else if (bmv <= -0.2) {
       c = 4289708799;
-    }
-    else if (bmv <= -0.16) {
+    } else if (bmv <= -0.16) {
       c = 4290037503;
-    }
-    else if (bmv <= -0.14) {
+    } else if (bmv <= -0.14) {
       c = 4290169087;
-    }
-    else if (bmv <= -0.12) {
+    } else if (bmv <= -0.12) {
       c = 4290366207;
-    }
-    else if (bmv <= -0.09) {
+    } else if (bmv <= -0.09) {
       c = 4290563583;
-    }
-    else if (bmv <= -0.06) {
+    } else if (bmv <= -0.06) {
       c = 4290892031;
-    }
-    else if (bmv <= 0) {
+    } else if (bmv <= 0) {
       c = 4291483391;
-    }
-    else if (bmv <= 0.06) {
+    } else if (bmv <= 0.06) {
       c = 4292009215;
-    }
-    else if (bmv <= 0.14) {
+    } else if (bmv <= 0.14) {
       c = 4292732159;
-    }
-    else if (bmv <= 0.19) {
+    } else if (bmv <= 0.19) {
       c = 4293126399;
-    }
-    else if (bmv <= 0.31) {
+    } else if (bmv <= 0.31) {
       c = 4294111999;
-    }
-    else if (bmv <= 0.36) {
+    } else if (bmv <= 0.36) {
       c = 4294571775;
-    }
-    else if (bmv <= 0.43) {
+    } else if (bmv <= 0.43) {
       c = 4294965756;
-    }
-    else if (bmv <= 0.54) {
+    } else if (bmv <= 0.54) {
       c = 4294964979;
-    }
-    else if (bmv <= 0.59) {
+    } else if (bmv <= 0.59) {
       c = 4294964203;
-    }
-    else if (bmv <= 0.63) {
+    } else if (bmv <= 0.63) {
       c = 4294963687;
-    }
-    else if (bmv <= 0.66) {
+    } else if (bmv <= 0.66) {
       c = 4294963169;
-    }
-    else if (bmv <= 0.74) {
+    } else if (bmv <= 0.74) {
       c = 4294962909;
-    }
-    else if (bmv <= 0.82) {
+    } else if (bmv <= 0.82) {
       c = 4294961877;
-    }
-    else if (bmv <= 0.92) {
+    } else if (bmv <= 0.92) {
       c = 4294960324;
-    }
-    else if (bmv <= 1.15) {
+    } else if (bmv <= 1.15) {
       c = 4294959032;
-    }
-    else if (bmv <= 1.3) {
+    } else if (bmv <= 1.3) {
       c = 4294958516;
-    }
-    else if (bmv <= 1.41) {
+    } else if (bmv <= 1.41) {
       c = 4294955933;
-    }
-    else if (bmv <= 1.48) {
+    } else if (bmv <= 1.48) {
       c = 4294954385;
-    }
-    else if (bmv <= 1.52) {
+    } else if (bmv <= 1.52) {
       c = 4294953351;
-    }
-    else if (bmv <= 1.55) {
+    } else if (bmv <= 1.55) {
       c = 4294952319;
-    }
-    else if (bmv <= 1.56) {
+    } else if (bmv <= 1.56) {
       c = 4294951287;
-    }
-    else if (bmv <= 1.61) {
+    } else if (bmv <= 1.61) {
       c = 4294950257;
-    }
-    else if (bmv <= 1.72) {
+    } else if (bmv <= 1.72) {
       c = 4294948966;
-    }
-    else if (bmv <= 1.84) {
+    } else if (bmv <= 1.84) {
       c = 4294947419;
-    }
-    else if (bmv <= 2) {
+    } else if (bmv <= 2) {
       c = 4294946129;
     }
     this.col = Color.fromInt(c);
@@ -19022,8 +18840,7 @@ Galaxy.getEType = function (value) {
     var m = (a + b) / 2;
     if (value > Galaxy._eTypeBuckets[m]) {
       a = m;
-    }
-    else {
+    } else {
       b = m;
     }
   }
@@ -19258,8 +19075,7 @@ var Tile$ = {
           });
         }
       }
-    }
-    else {
+    } else {
       if (this.get_dataset().get_wcsImage() != null) {
         this.texReady = true;
         this.downloading = false;
@@ -19486,8 +19302,7 @@ var Tile$ = {
         }
         tri.draw(renderContext.device, renderContext.WVP);
       }
-    }
-    else {
+    } else {
       if (RenderContext.useGlVersion2 && this.fitsImage != null) {
         ColorMapContainer.bindColorMapTexture(tilePrepDevice, this.dataset.get_fitsProperties().colorMapName);
         FitsShader.min = this.dataset.get_fitsProperties().lowerCut;
@@ -19631,8 +19446,7 @@ var Tile$ = {
     if (this.dataset.get_dataSetType() === 3) {
       var retVal = Vector3d.create(-(Math.cos(lng * Tile.RC) * Math.cos(lat * Tile.RC) * this.radius), (Math.sin(lat * Tile.RC) * this.radius), (Math.sin(lng * Tile.RC) * Math.cos(lat * Tile.RC) * this.radius));
       return retVal;
-    }
-    else {
+    } else {
       lng -= 180;
       var retVal = Vector3d.create((Math.cos(lng * Tile.RC) * Math.cos(lat * Tile.RC) * this.radius), (Math.sin(lat * Tile.RC) * this.radius), (Math.sin(lng * Tile.RC) * Math.cos(lat * Tile.RC) * this.radius));
       return retVal;
@@ -19705,8 +19519,7 @@ var Tile$ = {
     var server = '';
     if (!id.length) {
       server = hash.toString();
-    }
-    else {
+    } else {
       server = id.substr(id.length - 1, 1);
     }
     returnUrl = ss.replaceString(returnUrl, '{Q}', id);
@@ -19753,8 +19566,7 @@ var Tile$ = {
     var server = '';
     if (!id.length) {
       server = hash.toString();
-    }
-    else {
+    } else {
       server = id.substr(id.length - 1, 1);
     }
     returnUrl = ss.replaceString(returnUrl, '{Q}', id);
@@ -19793,8 +19605,7 @@ var Tile$ = {
       }
       this._tileId = sb.toString();
       return this._tileId;
-    }
-    else {
+    } else {
       this._tileId = '0';
       return this._tileId;
     }
@@ -19854,8 +19665,7 @@ TileCache.getCachedTile = function (level, x, y, dataset, parent) {
   try {
     if (!ss.keyExists(TileCache._tiles, tileKey)) {
       return null;
-    }
-    else {
+    } else {
       retTile = TileCache._tiles[tileKey];
     }
   }
@@ -19931,8 +19741,7 @@ TileCache.processQueue = function (renderContext) {
       if (workTile.get_dataset().get_elevationModel()) {
         workTile.requestDem();
       }
-    }
-    else {
+    } else {
       return;
     }
   }
@@ -19944,8 +19753,7 @@ TileCache.addTileToQueue = function (tile) {
   if (!tile.downloading && !tile.readyToRender) {
     if (ss.keyExists(TileCache._queue, tile.get_key())) {
       TileCache._queue[tile.get_key()].requestHits += hitValue;
-    }
-    else {
+    } else {
       tile.requestHits = hitValue;
       TileCache._queue[tile.get_key()] = tile;
     }
@@ -20184,8 +19992,7 @@ var Tour$ = {
   get_thumbnailUrl: function () {
     if (!ss.emptyString(this._thumbnailUrlField)) {
       return this._thumbnailUrlField;
-    }
-    else if (WWTControl.singleton.freestandingMode) {
+    } else if (WWTControl.singleton.freestandingMode) {
       return URLHelpers.singleton.engineAssetUrl('thumb_star.jpg');
     }
     return ss.format(URLHelpers.singleton.coreStaticUrl('wwtweb/GetTourThumbnail.aspx?GUID={0}'), this.id);
@@ -20199,8 +20006,7 @@ var Tour$ = {
   get_tourUrl: function () {
     if (ss.emptyString(this._tourUrl) && !WWTControl.singleton.freestandingMode) {
       return ss.format(URLHelpers.singleton.coreStaticUrl('wwtweb/GetTour.aspx?GUID={0}'), this.id);
-    }
-    else {
+    } else {
       return this._tourUrl;
     }
   },
@@ -20360,8 +20166,7 @@ var FileCabinet$ = {
 
     if (this._webFile.get_state() === 2) {
       alert(this._webFile.get_message());
-    }
-    else if (this._webFile.get_state() === 1) {
+    } else if (this._webFile.get_state() === 1) {
       this._mainBlob = this._webFile.getBlob();
       var chunck = new FileReader();
       chunck.onloadend = function (e) {
@@ -20450,8 +20255,7 @@ var FileCabinet$ = {
   get_masterFile: function () {
     if (this.fileList.length > 0) {
       return this.fileList[0].filename;
-    }
-    else {
+    } else {
       return null;
     }
   },
@@ -20641,8 +20445,7 @@ var Overlay$ = {
         this.initializeGeometry();
         this.updateRotation();
       }
-    }
-    else {
+    } else {
     }
   },
 
@@ -20728,8 +20531,7 @@ var Overlay$ = {
   set_tweenFactor: function (value) {
     if (!this._animate) {
       this._tweenFactor = 0;
-    }
-    else {
+    } else {
       if (this._tweenFactor !== value) {
         this._tweenFactor = value;
         this.cleanUpGeometry();
@@ -20767,8 +20569,7 @@ var Overlay$ = {
         this._x = value;
         this.cleanUpGeometry();
       }
-    }
-    else {
+    } else {
       if (this._endX !== value) {
         this._endX = value;
         this.cleanUpGeometry();
@@ -20787,8 +20588,7 @@ var Overlay$ = {
         this._y = value;
         this.cleanUpGeometry();
       }
-    }
-    else {
+    } else {
       if (this._endY !== value) {
         this._endY = value;
         this.cleanUpGeometry();
@@ -20810,8 +20610,7 @@ var Overlay$ = {
         this._width = value;
         this.cleanUpGeometry();
       }
-    }
-    else {
+    } else {
       if (this._endWidth !== value) {
         this._endWidth = value;
         this.cleanUpGeometry();
@@ -20833,8 +20632,7 @@ var Overlay$ = {
         this._height = value;
         this.cleanUpGeometry();
       }
-    }
-    else {
+    } else {
       if (this._endHeight !== value) {
         this._endHeight = value;
         this.cleanUpGeometry();
@@ -20857,8 +20655,7 @@ var Overlay$ = {
         this._color = value;
         this.cleanUpGeometry();
       }
-    }
-    else {
+    } else {
       if (this._endColor !== value) {
         this._endColor = value;
         this.cleanUpGeometry();
@@ -20888,8 +20685,7 @@ var Overlay$ = {
         this._rotationAngle = value;
         this.cleanUpGeometry();
       }
-    }
-    else {
+    } else {
       if (this._endRotationAngle !== value) {
         this._endRotationAngle = value;
         this.cleanUpGeometry();
@@ -21094,8 +20890,7 @@ var Selection$ = {
           this._drawSelectionHandles(renderContext, overlay, this._multiSelectHandles);
         }
       }
-    }
-    else {
+    } else {
       var $enum2 = ss.enumerate(this.selectionSet);
       while ($enum2.moveNext()) {
         var overlay = $enum2.current;
@@ -21147,8 +20942,7 @@ var Selection$ = {
     }
     if (this.get_multiSelect()) {
       this._sprite.draw(renderContext, Selection._points, Selection._points.length - 6, handleTexture, false, 1);
-    }
-    else {
+    } else {
       this._sprite.draw(renderContext, Selection._points, Selection._points.length, handleTexture, false, 1);
     }
   },
@@ -21348,8 +21142,7 @@ var TourDocument$ = {
   set_tourDirty: function (value) {
     if (value) {
       this._tourDirty++;
-    }
-    else {
+    } else {
       this._tourDirty = 0;
     }
     return value;
@@ -21612,8 +21405,7 @@ var TourDocument$ = {
   get_tourThumbnailFilename: function () {
     if (this._representativeThumbnailTourstop < this._tourStops.length) {
       return this._tourStops[this._representativeThumbnailTourstop].get_tourStopThumbnailFilename();
-    }
-    else {
+    } else {
       return null;
     }
   },
@@ -21872,8 +21664,7 @@ var TourDocument$ = {
     ts.set_owner(this);
     if (this._currentTourstopIndex > -1) {
       this.get_tourStops().splice(this._currentTourstopIndex, 0, ts);
-    }
-    else {
+    } else {
       this.get_tourStops().push(ts);
       this._currentTourstopIndex = this._tourStops.length - 1;
     }
@@ -21884,8 +21675,7 @@ var TourDocument$ = {
     ts.set_owner(this);
     if (this._currentTourstopIndex > -1 || this._currentTourstopIndex < this.get_tourStops().length) {
       this.get_tourStops().splice(this._currentTourstopIndex + 1, 0, ts);
-    }
-    else {
+    } else {
       this.get_tourStops().push(ts);
       this._currentTourstopIndex = this._tourStops.length - 1;
     }
@@ -22040,8 +21830,7 @@ var TourDocument$ = {
       }, false);
       this._textureList[filename] = texture;
       return texture;
-    }
-    else {
+    } else {
       return null;
     }
   },
@@ -22080,11 +21869,9 @@ var TourDocument$ = {
   getFileBlob: function (filename) {
     if (ss.keyExists(this._fileCache, filename)) {
       return this._fileCache[filename];
-    }
-    else if (this._cabinet != null) {
+    } else if (this._cabinet != null) {
       return this._cabinet.getFileBlob(this.get_workingDirectory() + filename);
-    }
-    else {
+    } else {
       return null;
     }
   },
@@ -22092,8 +21879,7 @@ var TourDocument$ = {
   get_currentTourStop: function () {
     if (this._currentTourstopIndex > -1) {
       return this.get_tourStops()[this._currentTourstopIndex];
-    }
-    else {
+    } else {
       return null;
     }
   },
@@ -22220,8 +22006,7 @@ var TourEditTab$ = {
     if (ts != null) {
       this.musicTrack.target = this._tour.get_currentTourStop();
       this.voiceTrack.target = this._tour.get_currentTourStop();
-    }
-    else {
+    } else {
       this.musicTrack.target = null;
       this.voiceTrack.target = null;
     }
@@ -22264,8 +22049,7 @@ var TourEditTab$ = {
       this._contextMenu.items.push(pasteMenu);
       this._contextMenu.items.push(deleteMenu);
       this._contextMenu._show(Cursor.get_position());
-    }
-    else if (this._tour.get_currentTourStop() == null) {
+    } else if (this._tour.get_currentTourStop() == null) {
       if (this._contextMenu != null) {
         this._contextMenu._dispose();
       }
@@ -22285,8 +22069,7 @@ var TourEditTab$ = {
       this._contextMenu.items.push(sep2);
       this._contextMenu.items.push(insertSlide);
       this._contextMenu._show(Cursor.get_position());
-    }
-    else {
+    } else {
       if (this._contextMenu != null) {
         this._contextMenu._dispose();
       }
@@ -22634,15 +22417,13 @@ var TourEditTab$ = {
     var newTourStop = TourStop.create(newPlace);
     if (insert) {
       this._tour.insertTourStop(newTourStop);
-    }
-    else {
+    } else {
       this._tour.addTourStop(newTourStop);
     }
     if (this._tour.get_currentTourStop() != null) {
       this.musicTrack.target = this._tour.get_currentTourStop();
       this.voiceTrack.target = this._tour.get_currentTourStop();
-    }
-    else {
+    } else {
       this.musicTrack.target = null;
       this.voiceTrack.target = null;
     }
@@ -22764,8 +22545,7 @@ var TourEditTab$ = {
         WWTControl.singleton.set__mover(null);
         this.tourStopList.showAddButton = this._tour.get_editMode();
       }
-    }
-    else {
+    } else {
       if (this.playing) {
         if (this._player == null) {
           this._player = new TourPlayer();
@@ -22864,8 +22644,7 @@ var TourEditTab$ = {
 
   preview_EnabledChanged: function (sender, e) {
     if (this.playing) {
-    }
-    else {
+    } else {
     }
   },
 
@@ -23340,8 +23119,7 @@ var TourEditor$ = {
         undoFrame.set_actionText(actionText);
         Undo.push(undoFrame);
       }
-    }
-    else {
+    } else {
       if (this.get_focus() != null) {
         if (this.get_focus().hitTest(location)) {
           Cursor.set_current(Cursors.get_sizeAll());
@@ -23599,8 +23377,7 @@ var TourEditor$ = {
       flipbookProperties.visible = false;
       bringForward.visible = false;
       sendBackward.visible = false;
-    }
-    else {
+    } else {
       Align.visible = false;
     }
     this._contextMenu.items.push(properties);
@@ -23872,8 +23649,7 @@ var TourEditor$ = {
       sorted.sort(function (p1, p2) {
         return -Util.compare(p1.get_zOrder(), p2.get_zOrder());
       });
-    }
-    else {
+    } else {
       sorted.sort(function (p1, p2) {
         return Util.compare(p1.get_zOrder(), p2.get_zOrder());
       });
@@ -24257,8 +24033,7 @@ var TourEditor$ = {
     audio.set_y(600);
     if (music) {
       this._tour.get_currentTourStop().set_musicTrack(audio);
-    }
-    else {
+    } else {
       this._tour.get_currentTourStop().set_voiceTrack(audio);
     }
     return true;
@@ -24299,8 +24074,7 @@ var TourEditor$ = {
         this._tour.get_currentTourStop().addOverlay(shape);
         return shape;
       }
-    }
-    else if (ss.typeOf(ol) === TextOverlay) {
+    } else if (ss.typeOf(ol) === TextOverlay) {
       var srcTxtOverlay = ol;
       if (srcTxtOverlay != null) {
         var text = TextOverlay.create(srcTxtOverlay.textObject);
@@ -24310,8 +24084,7 @@ var TourEditor$ = {
         this._tour.get_currentTourStop().addOverlay(text);
         return text;
       }
-    }
-    else if (ss.typeOf(ol) === BitmapOverlay) {
+    } else if (ss.typeOf(ol) === BitmapOverlay) {
       var srcBmpOverlay = ol;
       if (srcBmpOverlay != null) {
         var bitmap = srcBmpOverlay.copy(this._tour.get_currentTourStop());
@@ -24320,8 +24093,7 @@ var TourEditor$ = {
         this._tour.get_currentTourStop().addOverlay(bitmap);
         return bitmap;
       }
-    }
-    else if (ss.typeOf(ol) === FlipbookOverlay) {
+    } else if (ss.typeOf(ol) === FlipbookOverlay) {
       var srcFlipbookOverlay = ol;
       if (srcFlipbookOverlay != null) {
         var bitmap = srcFlipbookOverlay.copy(this._tour.get_currentTourStop());
@@ -24363,8 +24135,7 @@ var TourEditor$ = {
     }
     if (this.get_focus() != null) {
       return this.get_focus().get_color();
-    }
-    else {
+    } else {
       return this._defaultColor;
     }
   },
@@ -24589,8 +24360,7 @@ var TourPlayer$ = {
         }
       }
       renderContext.restore();
-    }
-    else {
+    } else {
       renderContext.device.scale(renderContext.height / 1116, renderContext.height / 1116);
       var aspectOrig = 1920 / 1116;
       var aspectNow = renderContext.width / renderContext.height;
@@ -24709,8 +24479,7 @@ var TourPlayer$ = {
       Settings.tourSettings = this._tour.get_currentTourStop();
       SpaceTimeController.set_now(this._tour.get_currentTourStop().get_startTime());
       SpaceTimeController.set_syncToClock(false);
-    }
-    else {
+    } else {
       this._stopCurrentMaster();
       TourPlayer._playing = false;
       if (Settings.get_current().autoRepeatTour) {
@@ -24760,8 +24529,7 @@ var TourPlayer$ = {
     }
     if (TourPlayer._playing) {
       this.stop(true);
-    }
-    else {
+    } else {
       TourPlayer._playing = true;
     }
     WWTControl.singleton._hideUI(true);
@@ -24930,8 +24698,7 @@ var TourPlayer$ = {
     var slideElapsedTime = ss.now() - this._slideStartTime;
     if (tween > -1) {
       return this._tour.get_currentTourStop().set_tweenPosition(Math.min(1, tween));
-    }
-    else {
+    } else {
       return this._tour.get_currentTourStop().set_tweenPosition(Math.min(1, (slideElapsedTime / this._tour.get_currentTourStop().get_duration())));
     }
   },
@@ -25058,8 +24825,7 @@ var TourPlayer$ = {
       this.stop(TourPlayer._switchedToFullScreen);
       WWTControl.singleton._freezeView();
       WWTControl.scriptInterface._fireTourPaused();
-    }
-    else {
+    } else {
       this.play();
       WWTControl.scriptInterface._fireTourResume();
     }
@@ -25412,26 +25178,22 @@ TourStop._fromXml = function (owner, tourStop) {
     }
     if (tourStop.attributes.getNamedItem('ShowSkyOverlays') != null) {
       newTourStop._showSkyOverlays = ss.boolean(tourStop.attributes.getNamedItem('ShowSkyOverlays').nodeValue);
-    }
-    else {
+    } else {
       newTourStop._showSkyOverlays = true;
     }
     if (tourStop.attributes.getNamedItem('ShowConstellations') != null) {
       newTourStop._showConstellations = ss.boolean(tourStop.attributes.getNamedItem('ShowConstellations').nodeValue);
-    }
-    else {
+    } else {
       newTourStop._showConstellations = true;
     }
     if (tourStop.attributes.getNamedItem('ShowSkyNode') != null) {
       newTourStop._showSkyNode = ss.boolean(tourStop.attributes.getNamedItem('ShowSkyNode').nodeValue);
-    }
-    else {
+    } else {
       newTourStop._showSkyNode = true;
     }
     if (tourStop.attributes.getNamedItem('ShowSkyGrids') != null) {
       newTourStop._showSkyGrids = ss.boolean(tourStop.attributes.getNamedItem('ShowSkyGrids').nodeValue);
-    }
-    else {
+    } else {
       newTourStop._showSkyGrids = true;
     }
     if (tourStop.attributes.getNamedItem('ShowSkyOverlaysIn3d') != null) {
@@ -25448,26 +25210,22 @@ TourStop._fromXml = function (owner, tourStop) {
     }
     if (tourStop.attributes.getNamedItem('ConstellationBoundariesFilter') != null) {
       newTourStop._constellationBoundariesFilter = ConstellationFilter.parse(tourStop.attributes.getNamedItem('ConstellationBoundariesFilter').nodeValue);
-    }
-    else {
+    } else {
       newTourStop._constellationBoundariesFilter = ConstellationFilter.get_allConstellation();
     }
     if (tourStop.attributes.getNamedItem('ConstellationBoundariesFilter') != null) {
       newTourStop._constellationFiguresFilter = ConstellationFilter.parse(tourStop.attributes.getNamedItem('ConstellationBoundariesFilter').nodeValue);
-    }
-    else {
+    } else {
       newTourStop._constellationFiguresFilter = new ConstellationFilter();
     }
     if (tourStop.attributes.getNamedItem('ConstellationNamesFilter') != null) {
       newTourStop._constellationNamesFilter = ConstellationFilter.parse(tourStop.attributes.getNamedItem('ConstellationNamesFilter').nodeValue);
-    }
-    else {
+    } else {
       newTourStop._constellationNamesFilter = new ConstellationFilter();
     }
     if (tourStop.attributes.getNamedItem('ConstellationArtFilter') != null) {
       newTourStop._constellationArtFilter = ConstellationFilter.parse(tourStop.attributes.getNamedItem('ConstellationArtFilter').nodeValue);
-    }
-    else {
+    } else {
       newTourStop._constellationArtFilter = new ConstellationFilter();
     }
     if (tourStop.attributes.getNamedItem('MinorPlanetsFilter') != null) {
@@ -25521,8 +25279,7 @@ var TourStop$ = {
   get_tourStopType: function () {
     if (this._target.get_backgroundImageset() != null) {
       return this._target.get_backgroundImageset().get_dataSetType();
-    }
-    else {
+    } else {
       return this._tourStopType;
     }
   },
@@ -25690,8 +25447,7 @@ var TourStop$ = {
   toString: function () {
     if (this._target != null) {
       return this.get_target().get_name();
-    }
-    else {
+    } else {
       return this._description;
     }
   },
@@ -26001,8 +25757,7 @@ var TourStop$ = {
   get_locationAltitude: function () {
     if (this._hasLocation) {
       return this._locationAltitude;
-    }
-    else {
+    } else {
       return Settings.get_current().get_locationAltitude();
     }
   },
@@ -26010,8 +25765,7 @@ var TourStop$ = {
   get_locationLat: function () {
     if (this._hasLocation) {
       return this._locationLat;
-    }
-    else {
+    } else {
       return Settings.get_current().get_locationLat();
     }
   },
@@ -26019,8 +25773,7 @@ var TourStop$ = {
   get_locationLng: function () {
     if (this._hasLocation) {
       return this._locationLng;
-    }
-    else {
+    } else {
       return Settings.get_current().get_locationLng();
     }
   },
@@ -26210,8 +25963,7 @@ var TourStop$ = {
     var index = this._overlays.indexOf(current);
     if (index < this._overlays.length - 1) {
       return this._overlays[index + 1];
-    }
-    else {
+    } else {
       return this._overlays[0];
     }
   },
@@ -26228,8 +25980,7 @@ var TourStop$ = {
     var index = this._overlays.indexOf(current);
     if (index > 0) {
       return this._overlays[index - 1];
-    }
-    else {
+    } else {
       return this._overlays[this._overlays.length - 1];
     }
   },
@@ -26460,8 +26211,7 @@ var TourStop$ = {
 
   _updateLayerOpacity: function () {
     if (!this.get_keyFramed()) {
-    }
-    else {
+    } else {
       this.updateTweenPosition();
     }
   },
@@ -27198,8 +26948,7 @@ UiTools.formatDistance = function (distance) {
     if (km < 10) {
       var m = ss.truncate((km * 1000));
       return ss.format('{0} m', m);
-    }
-    else {
+    } else {
       km = ss.truncate(km);
       return ss.format('{0} km', km);
     }
@@ -27278,8 +27027,7 @@ UiTools.splitString = function (data, delimiter) {
       output.push(data.substr(start, count));
       start = current + 1;
       count = 0;
-    }
-    else {
+    } else {
       count++;
     }
     current++;
@@ -27301,8 +27049,7 @@ UiTools.split = function (data, delimiters) {
       output.push(data.substr(start, count));
       start = current + 1;
       count = 0;
-    }
-    else {
+    } else {
       count++;
     }
     current++;
@@ -27763,14 +27510,11 @@ var Histogram$ = {
     canvas.setPointerCapture(e.pointerId);
     if ((Math.abs(x - this._center) < 10) && Math.abs(y - 75) < 10) {
       this._dragType = 3;
-    }
-    else if (Math.abs(x - this._lowPosition) < 10) {
+    } else if (Math.abs(x - this._lowPosition) < 10) {
       this._dragType = 0;
-    }
-    else if (Math.abs(x - this._highPosition) < 10) {
+    } else if (Math.abs(x - this._highPosition) < 10) {
       this._dragType = 1;
-    }
-    else {
+    } else {
       this._dragType = 2;
       this._downPosition = Math.min(255, Math.max(0, x));
       this.draw();
@@ -28081,8 +27825,7 @@ var XmlTextWriter$ = {
   _writeAttributeString: function (key, value) {
     if (value != null) {
       this._attributes[key] = ss.replaceString(value.toString(), '&', '&amp;');
-    }
-    else {
+    } else {
       this._attributes[key] = '';
     }
   },
@@ -28093,8 +27836,7 @@ var XmlTextWriter$ = {
         this.body += '  ';
       }
       this.body += ss.format('</{0}>\r\n', this._elementStack.pop());
-    }
-    else {
+    } else {
       this._elementStack.pop();
     }
   },
@@ -28541,8 +28283,7 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
     var gl = canvas.getContext('webgl2');
     if (gl != null) {
       RenderContext.useGlVersion2 = true;
-    }
-    else {
+    } else {
       console.warn('This browser does not support WebGL 2.0. Some features will work suboptimally. To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge. In case you would like to use Safari, we recommend that you enable WebGL 2.0');
       gl = canvas.getContext('webgl');
     }
@@ -28552,8 +28293,7 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
     if (gl == null) {
       var ctx = canvas.getContext('2d');
       WWTControl.singleton.renderContext.device = ctx;
-    }
-    else {
+    } else {
       set_tilePrepDevice(gl);
       WWTControl.singleton.renderContext.gl = gl;
       RenderContext.useGl = true;
@@ -28566,11 +28306,9 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
     LayerManager.oneTimeInitialization();
     if (startMode === 'earth') {
       WWTControl.singleton.renderContext.set_backgroundImageset(Imageset.create('Blue Marble', URLHelpers.singleton.coreStaticUrl('wwtweb/tiles.aspx?q={1},{2},{3},bm200407'), 0, 3, 3, 101, 0, 7, 256, 180, '.png', false, '', 0, 0, 0, false, URLHelpers.singleton.coreStaticUrl('wwtweb/thumbnail.aspx?name=bm200407'), true, false, 0, 0, 0, '', '', '', '', 6371000, 'Earth'));
-    }
-    else if (startMode === 'black') {
+    } else if (startMode === 'black') {
       WWTControl.singleton.renderContext.set_backgroundImageset(Imageset.create('Black Sky Background', '', 2, 3, 3, 102, 0, 0, 256, 180, '.png', false, '0123', 0, 0, 0, false, '', false, false, 2, 0, 0, '', '', '', '', 1, 'Sky'));
-    }
-    else {
+    } else {
       WWTControl.singleton.renderContext.set_backgroundImageset(Imageset.create('DSS', URLHelpers.singleton.coreStaticUrl('wwtweb/dss.aspx?q={1},{2},{3}'), 2, 3, 3, 100, 0, 12, 256, 180, '.png', false, '', 0, 0, 0, false, URLHelpers.singleton.coreStaticUrl('thumbnails/DSS.png'), true, false, 0, 0, 0, '', '', '', '', 1, 'Sky'));
     }
   }
@@ -28678,8 +28416,7 @@ var WWTControl$ = {
   get_zoomMax: function () {
     if (this.renderContext.get_backgroundImageset() != null && this.renderContext.get_backgroundImageset().get_dataSetType() === 4) {
       return this._zoomMaxSolarSystem;
-    }
-    else {
+    } else {
       return this._zoomMax;
     }
   },
@@ -28696,8 +28433,7 @@ var WWTControl$ = {
   get_zoomMin: function () {
     if (this.renderContext.get_backgroundImageset() != null && this.renderContext.get_backgroundImageset().get_dataSetType() === 4) {
       return this._zoomMinSolarSystem;
-    }
-    else {
+    } else {
       return this._zoomMin;
     }
   },
@@ -28808,8 +28544,7 @@ var WWTControl$ = {
   renderOneFrame: function () {
     if (this.renderContext.get_backgroundImageset() != null) {
       this.renderType = this.renderContext.get_backgroundImageset().get_dataSetType();
-    }
-    else {
+    } else {
       this.renderType = 2;
     }
     var sizeChange = false;
@@ -28860,8 +28595,7 @@ var WWTControl$ = {
           this._notifyMoveComplete();
         }
       }
-    }
-    else {
+    } else {
       SpaceTimeController.updateClock();
       Planets.updatePlanetLocations(this.get_solarSystemMode());
       this._updateViewParameters();
@@ -28944,8 +28678,7 @@ var WWTControl$ = {
           Planets.drawPlanets3D(this.renderContext, 1, this.renderContext.viewCamera.viewTarget);
         }
       }
-    }
-    else {
+    } else {
       if (!this.renderType || this.renderType === 1) {
         this.renderContext._setupMatricesLand3d();
       }
@@ -29018,8 +28751,7 @@ var WWTControl$ = {
     }
     if (this.uiController != null) {
       this.uiController.render(this.renderContext);
-    }
-    else {
+    } else {
       var index = 0;
       Annotation.prepBatch(this.renderContext);
       var $enum2 = ss.enumerate(this._annotations);
@@ -29105,8 +28837,7 @@ var WWTControl$ = {
   get_planetLike: function () {
     if (this.renderContext.get_backgroundImageset() != null) {
       return !this.renderContext.get_backgroundImageset().get_dataSetType() || this.renderContext.get_backgroundImageset().get_dataSetType() === 1;
-    }
-    else {
+    } else {
       return true;
     }
   },
@@ -29114,8 +28845,7 @@ var WWTControl$ = {
   get_space: function () {
     if (this.renderContext.get_backgroundImageset() != null) {
       return this.renderContext.get_backgroundImageset().get_dataSetType() === 2;
-    }
-    else {
+    } else {
       return true;
     }
   },
@@ -29205,8 +28935,7 @@ var WWTControl$ = {
         this.renderContext.viewCamera.lng = this.renderContext.targetCamera.lng = this.rAtoViewLng(this._trackingObject.get_RA());
         this.renderContext.viewCamera.lat = this.renderContext.targetCamera.lat = this._trackingObject.get_dec();
       }
-    }
-    else if (!this.get_solarSystemMode()) {
+    } else if (!this.get_solarSystemMode()) {
       this._tracking = false;
       this._trackingObject = null;
     }
@@ -29269,8 +28998,7 @@ var WWTControl$ = {
     if (this.get_solarSystemMode() || this.get_planetLike()) {
       x = Math.cos(angle + this.renderContext.viewCamera.rotation) * distance;
       y = Math.sin(angle + this.renderContext.viewCamera.rotation) * distance;
-    }
-    else {
+    } else {
       x = Math.cos(angle - this.renderContext.viewCamera.rotation) * distance;
       y = Math.sin(angle - this.renderContext.viewCamera.rotation) * distance;
     }
@@ -29294,8 +29022,7 @@ var WWTControl$ = {
       if (this.renderContext.targetAlt < -90) {
         this.renderContext.targetAlt = -90;
       }
-    }
-    else {
+    } else {
       this.renderContext.targetCamera.lng -= x * scaleX;
       this.renderContext.targetCamera.lng = ((this.renderContext.targetCamera.lng + 720) % 360);
       this.renderContext.targetCamera.lat += y * scaleY;
@@ -29428,8 +29155,7 @@ var WWTControl$ = {
       this.move(curX, curY);
       this._lastX = ev.targetTouches[0].pageX;
       this._lastY = ev.targetTouches[0].pageY;
-    }
-    else {
+    } else {
       if (this.uiController != null) {
         if (this.uiController.mouseMove(this, e)) {
           e.preventDefault();
@@ -29470,17 +29196,13 @@ var WWTControl$ = {
     var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }
     if (this._pointerIds[0] === pe.pointerId) {
       index = 0;
-    }
-    else if (this._pointerIds[1] === pe.pointerId) {
+    } else if (this._pointerIds[1] === pe.pointerId) {
       index = 1;
-    }
-    else if (!this._pointerIds[0]) {
+    } else if (!this._pointerIds[0]) {
       index = 0;
-    }
-    else if (!this._pointerIds[1]) {
+    } else if (!this._pointerIds[1]) {
       index = 1;
-    }
-    else {
+    } else {
       return;
     }
     this._pointerIds[index] = pe.pointerId;
@@ -29492,11 +29214,9 @@ var WWTControl$ = {
     var index = 0;
     if (this._pointerIds[0] === pe.pointerId) {
       index = 0;
-    }
-    else if (this._pointerIds[1] === pe.pointerId) {
+    } else if (this._pointerIds[1] === pe.pointerId) {
       index = 1;
-    }
-    else {
+    } else {
       return;
     }
     if (this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null) {
@@ -29522,8 +29242,7 @@ var WWTControl$ = {
         this._pinchingZoomRect[1] = newRect;
         this.zoom(ratio0);
       }
-    }
-    else {
+    } else {
       this._pinchingZoomRect[index] = Vector2d.create(e.offsetX, e.offsetY);
     }
     e.stopPropagation();
@@ -29571,8 +29290,7 @@ var WWTControl$ = {
       }
       this._lastX = Mouse.offsetX(this.canvas, e);
       this._lastY = Mouse.offsetY(this.canvas, e);
-    }
-    else {
+    } else {
       if (this.uiController != null) {
         if (this.uiController.mouseMove(this, e)) {
           e.preventDefault();
@@ -29608,17 +29326,14 @@ var WWTControl$ = {
     var delta;
     if (!!ev.deltaY) {
       delta = -ev.deltaY;
-    }
-    else if (!!ev.detail) {
+    } else if (!!ev.detail) {
       delta = ev.detail * -1;
-    }
-    else {
+    } else {
       delta = ev.wheelDelta;
     }
     if (delta > 0) {
       this.zoom(0.9);
-    }
-    else {
+    } else {
       this.zoom(1.1);
     }
     e.stopPropagation();
@@ -29738,8 +29453,7 @@ var WWTControl$ = {
       setTimeout(function () {
         $this._setupComplete();
       }, 0);
-    }
-    else {
+    } else {
       Wtml.getWtmlFile(URLHelpers.singleton.coreDynamicUrl('wwtweb/catalog.aspx?X=ImageSets6'), ss.bind('_setupComplete', this), true);
     }
   },
@@ -29933,8 +29647,7 @@ var WWTControl$ = {
       this.renderContext.viewCamera = this.renderContext.targetCamera.copy();
       this.renderContext.set_backgroundImageset(this.getDefaultImageset(place.get_type(), 3));
       instant = true;
-    }
-    else if (this.get_solarSystemMode() && place.get_target() !== this._solarSystemTrack) {
+    } else if (this.get_solarSystemMode() && place.get_target() !== this._solarSystemTrack) {
       this.renderContext.targetCamera = place.get_camParams().copy();
       this.renderContext.viewCamera = this.renderContext.targetCamera.copy();
       this._solarSystemTrack = place.get_target();
@@ -29943,8 +29656,7 @@ var WWTControl$ = {
     if (place.get_classification() === 128) {
       camParams.zoom = this.get_zoomMax();
       this.gotoTargetFull(false, instant, camParams, null, null);
-    }
-    else {
+    } else {
       this._solarSystemTrack = place.get_target();
       this.gotoTargetFull(noZoom, instant, camParams, place.get_studyImageset(), place.get_backgroundImageset());
       if (trackObject) {
@@ -29974,8 +29686,7 @@ var WWTControl$ = {
       cameraParams.zoom = this.renderContext.viewCamera.zoom;
       cameraParams.angle = this.renderContext.viewCamera.angle;
       cameraParams.rotation = this.renderContext.viewCamera.rotation;
-    }
-    else {
+    } else {
       if (cameraParams.zoom === -1 || !cameraParams.zoom) {
         if (this.renderContext.space) {
           cameraParams.zoom = 1.40625;
@@ -30000,8 +29711,7 @@ var WWTControl$ = {
         this.renderContext.targetAz = this.renderContext.az = currentAltAz.get_az();
       }
       this._mover_Midpoint();
-    }
-    else {
+    } else {
       this.set__mover(ViewMoverSlew.create(this.renderContext.viewCamera, cameraParams));
       WWTControl.set_renderNeeded(true);
       this.get__mover().set_midpoint(ss.bind('_mover_Midpoint', this));
@@ -30254,8 +29964,7 @@ var WWTControl$ = {
     if (imageset != null && imageset.get_fitsProperties() != null) {
       imageset.get_fitsProperties().lowerCut = min;
       imageset.get_fitsProperties().upperCut = max;
-    }
-    else {
+    } else {
       console.log(imagesetName + ' not found');
     }
   },
@@ -30264,8 +29973,7 @@ var WWTControl$ = {
     var imageset = this.getImagesetByName(imagesetName);
     if (imageset != null && imageset.get_fitsProperties() != null) {
       imageset.get_fitsProperties().colorMapName = colorMapName;
-    }
-    else {
+    } else {
       console.log(imagesetName + ' not found');
     }
   },
@@ -30274,8 +29982,7 @@ var WWTControl$ = {
     var imageset = this.getImagesetByName(imagesetName);
     if (imageset != null && imageset.get_fitsProperties() != null) {
       imageset.get_fitsProperties().scaleType = scaleType;
-    }
-    else {
+    } else {
       console.log(imagesetName + ' not found');
     }
   },
@@ -30295,8 +30002,7 @@ var WWTControl$ = {
       ctx.lineTo(x - halfLength, y);
       ctx.stroke();
       ctx.restore();
-    }
-    else {
+    } else {
       if (this._crossHairs == null) {
         var halfHeight = 0.03;
         var halfWidth = halfHeight * context.height / context.width;
@@ -30429,11 +30135,9 @@ var WWTControlBuilder$ = {
     var trueStartMode;
     if (!!this._startMode) {
       trueStartMode = this._startMode;
-    }
-    else if (freestandingMode) {
+    } else if (freestandingMode) {
       trueStartMode = 'black';
-    }
-    else {
+    } else {
       trueStartMode = 'sky';
     }
     WWTControl.singleton.freestandingMode = freestandingMode;
@@ -30513,8 +30217,7 @@ Coordinates.sterographicTo3d = function (x, y, radius, standardLat, meridean, fa
     var c1 = 180 / Math.PI;
     if (!x) {
       lng = (90 * y < 0) ? -1 : 1;
-    }
-    else {
+    } else {
       lng = Math.atan2(y, x) * c1;
     }
     var len = (x * x) + (y * y);
@@ -30683,8 +30386,7 @@ Coordinates.formatDMSSign = function (angle, sign) {
     if (sign) {
       var signString = (angle > 0) ? '+' : '-';
       return ss.format('{3}{0:00;00}:{1:00}:{2:00}', degrees, Math.abs(ss.truncate(minutes)), Math.abs(ss.truncate(seconds)), signString);
-    }
-    else {
+    } else {
       return ss.format('{0:00}:{1:00}:{2:00}', degrees, Math.abs(ss.truncate(minutes)), Math.abs(ss.truncate(seconds)));
     }
   }
@@ -30792,8 +30494,7 @@ Coordinates.parse = function (data) {
         sign = 1;
       }
       return sign * (hours + minutes / 60 + seconds / 3600);
-    }
-    else {
+    } else {
       var val = 0;
       try {
         val = parseFloat(data);
@@ -30991,8 +30692,7 @@ var Coordinates$ = {
     var lng = this._ascention / Coordinates.RC;
     if (lng <= 180) {
       return lng;
-    }
-    else {
+    } else {
       return (-180 + (180 - lng));
     }
   },
@@ -31071,8 +30771,7 @@ Fxyf._fromHploc$1 = function (loc) {
     var tmp;
     if ((za < 0.99) || (!loc.have_sth)) {
       tmp = Math.sqrt(3 * (1 - za));
-    }
-    else {
+    } else {
       tmp = loc.sth / Math.sqrt((1 + za) / 3);
     }
     var jp = tp * tmp;
@@ -31087,8 +30786,7 @@ Fxyf._fromHploc$1 = function (loc) {
       temp.fx = 1 - jm;
       temp.fy = 1 - jp;
       temp.face = ntt;
-    }
-    else {
+    } else {
       temp.fx = jp;
       temp.fy = jm;
       temp.face = ntt + 8;
@@ -31115,8 +30813,7 @@ var Fxyf$ = {
         loc.sth = Math.sqrt(tmp * (2 - tmp));
         loc.have_sth = true;
       }
-    }
-    else if (jr > 3) {
+    } else if (jr > 3) {
       nr = 4 - jr;
       tmp = nr * nr / 3;
       loc.z = tmp - 1;
@@ -31124,8 +30821,7 @@ var Fxyf$ = {
         loc.sth = Math.sqrt(tmp * (2 - tmp));
         loc.have_sth = true;
       }
-    }
-    else {
+    } else {
       nr = 1;
       loc.z = (2 - jr) * 2 / 3;
     }
@@ -31197,8 +30893,7 @@ var HealpixTile$ = {
     if (this._url$1 == null) {
       this._url$1 = this._getUrl$1(this.dataset, this.level, this.tileX, this.tileY);
       return this._url$1;
-    }
-    else {
+    } else {
       return this._url$1;
     }
   },
@@ -31274,8 +30969,7 @@ var HealpixTile$ = {
     var tileTextureIndex = -1;
     if (!level) {
       tileTextureIndex = this._face$1;
-    }
-    else {
+    } else {
       tileTextureIndex = this._face$1 * this._nside$1 * this._nside$1 / 4 + this._tileIndex$1;
     }
     var sb = new ss.StringBuilder();
@@ -31302,8 +30996,7 @@ var HealpixTile$ = {
     if (this.dataset.get_dataSetType() === 1) {
       var arcPixels = (180 / (Math.pow(2, this.level) * 4));
       return (renderContext.get_fovScale() < arcPixels);
-    }
-    else {
+    } else {
       var arcPixels = (3600 / (Math.pow(2, this.level) * 4));
       return (renderContext.get_fovScale() < arcPixels);
     }
@@ -31457,8 +31150,7 @@ var HealpixTile$ = {
     }
     if (!this.level && !anyChildInFrustum && !onlyDrawChildren) {
       this.removeCatalogTile();
-    }
-    else if (anyChildInFrustum) {
+    } else if (anyChildInFrustum) {
       Tile.tilesInView++;
       this._addCatalogTile$1();
     }
@@ -31523,8 +31215,7 @@ var HealpixTile$ = {
   _setStep$1: function () {
     if (this.isCatalogTile) {
       this._step$1 = 2;
-    }
-    else {
+    } else {
       switch (this.level) {
         case 0:
         case 1:
@@ -31554,8 +31245,7 @@ var HealpixTile$ = {
         this._catalogData$1.onStateChange = ss.bind('_loadCatalogData$1', this);
         this._catalogData$1.send();
       }
-    }
-    else {
+    } else {
       Tile.prototype.requestImage.call(this);
     }
   },
@@ -31565,8 +31255,7 @@ var HealpixTile$ = {
       this.downloading = false;
       this.errored = true;
       TileCache.removeFromQueue(this.get_key(), true);
-    }
-    else if (this._catalogData$1.get_state() === 1) {
+    } else if (this._catalogData$1.get_state() === 1) {
       this._extractCatalogTileRows$1();
       this.texReady = true;
       this.downloading = false;
@@ -31756,8 +31445,7 @@ var FitsImage$ = {
       if (this._callBack$1 != null) {
         this._callBack$1(this);
       }
-    }
-    else if (this._webFile$1.get_state() === 1) {
+    } else if (this._webFile$1.get_state() === 1) {
       var mainBlob = this._webFile$1.getBlob();
       this._readFromBlob$1(mainBlob);
     }
@@ -32241,8 +31929,7 @@ var Circle$ = {
         }
         this.annotationDirty = false;
       }
-    }
-    else {
+    } else {
       if (onScreen) {
         var ctx = renderContext.device;
         ctx.save();
@@ -32355,8 +32042,7 @@ var Poly$ = {
         }
         this.annotationDirty = false;
       }
-    }
-    else {
+    } else {
       var ctx = renderContext.device;
       ctx.save();
       ctx.globalAlpha = this.get_opacity();
@@ -32446,8 +32132,7 @@ var PolyLine$ = {
         }
         this.annotationDirty = false;
       }
-    }
-    else {
+    } else {
       var ctx = renderContext.device;
       ctx.save();
       ctx.globalAlpha = this.get_opacity();
@@ -32553,8 +32238,7 @@ var EquirectangularTile$ = {
       if (!this.dataset.get_dataSetType() || this.dataset.get_dataSetType() === 1) {
         this._subDivisionLevel$1 = Math.max(2, (4 - this.level) * 2);
       }
-    }
-    else {
+    } else {
       this._subDivisionLevel$1 = 32;
     }
     try {
@@ -32719,8 +32403,7 @@ var EquirectangularTile$ = {
           part++;
         }
       }
-    }
-    else {
+    } else {
       this._vertexBuffer = tilePrepDevice.createBuffer();
       tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
       var f32array = new Float32Array(verts.length * 5);
@@ -33260,8 +32943,7 @@ var ImageSetLayer$ = {
   get_colorMapper: function () {
     if (this.get_imageSet().get_fitsProperties().colorMapName == null) {
       return null;
-    }
-    else {
+    } else {
       return ColorMapContainer.fromNamedColormap(this.get_imageSet().get_fitsProperties().colorMapName);
     }
   },
@@ -33277,8 +32959,7 @@ var ImageSetLayer$ = {
         fi = new FitsImageJs(this._imageSet$1, 'image.fit', blob, ss.bind('doneLoading', this));
       }
       this._imageSet$1.set_wcsImage(fi);
-    }
-    else {
+    } else {
       this._loaded$1 = true;
     }
   },
@@ -33720,26 +33401,22 @@ var Object3dLayer$ = {
     this.set_flipV(ss.boolean(node.attributes.getNamedItem('FlipV').nodeValue));
     if (node.attributes.getNamedItem('FlipHandedness') != null) {
       this.set_flipHandedness(ss.boolean(node.attributes.getNamedItem('FlipHandedness').nodeValue));
-    }
-    else {
+    } else {
       this.set_flipHandedness(false);
     }
     if (node.attributes.getNamedItem('Smooth') != null) {
       this.set_smooth(ss.boolean(node.attributes.getNamedItem('Smooth').nodeValue));
-    }
-    else {
+    } else {
       this.set_smooth(true);
     }
     if (node.attributes.getNamedItem('TwoSidedGeometry') != null) {
       this.set_twoSidedGeometry(ss.boolean(node.attributes.getNamedItem('TwoSidedGeometry').nodeValue));
-    }
-    else {
+    } else {
       this.set_twoSidedGeometry(false);
     }
     if (node.attributes.getNamedItem('Obj') != null) {
       this.objType = ss.boolean(node.attributes.getNamedItem('Obj').nodeValue);
-    }
-    else {
+    } else {
       this.objType = false;
     }
     this.set_heading(parseFloat(node.attributes.getNamedItem('Heading').nodeValue));
@@ -33759,8 +33436,7 @@ var Object3dLayer$ = {
     renderContext.set_twoSidedLighting(this.get_twoSidedGeometry());
     Planets.drawPointPlanet(renderContext, new Vector3d(), 1, Colors.get_red(), false);
     if (this._lightID$1 > 0) {
-    }
-    else {
+    } else {
       if (this.object3d != null) {
         this.object3d.color = this.get_color();
         this.object3d.render(renderContext, opacity * this.get_opacity());
@@ -33826,8 +33502,7 @@ var Object3dLayer$ = {
         this._valueOnDown$1 = this._scale$1.z;
         return true;
       }
-    }
-    else {
+    } else {
       if (Vector2d.subtract(pnt, this._xHandle$1).get_length() < this._hitDist$1) {
         this._dragMode$1 = 1;
         this._valueOnDown$1 = this._translate$1.x;
@@ -33969,8 +33644,7 @@ var Object3dLayer$ = {
       }
       this.fireChanged();
       return true;
-    }
-    else {
+    } else {
       var pnt = location;
       if (Vector2d.subtract(pnt, this._xHandle$1).get_length() < this._hitDist$1) {
         Cursor.set_current(Cursors.get_sizeAll());
@@ -34505,8 +34179,7 @@ var SpreadSheetLayer$ = {
     var data = '';
     if (this._table_backcompat$1 == null) {
       data = this._table$1.save();
-    }
-    else {
+    } else {
       data = this._table_backcompat$1.save();
     }
     var blob = new Blob([data]);
@@ -34529,8 +34202,7 @@ var SpreadSheetLayer$ = {
       }
       this._table_backcompat$1.addColumn(this._normalizeSizeColumnName$1, normalizedPointSize);
       this._lastNormalizeSizeColumnIndex$1 = this._table_backcompat$1.header.length - 1;
-    }
-    else {
+    } else {
       this._lastNormalizeSizeColumnIndex$1 = -1;
     }
     if (this.colorMapColumn > -1 && this.get_dynamicColor()) {
@@ -34542,8 +34214,7 @@ var SpreadSheetLayer$ = {
       }
       this._table_backcompat$1.addColumn(this._dynamicColorColumnName$1, pointColors);
       this._lastDynamicColorColumnIndex$1 = this._table_backcompat$1.header.length - 1;
-    }
-    else {
+    } else {
       this._lastDynamicColorColumnIndex$1 = -1;
     }
   },
@@ -35334,8 +35005,7 @@ var SpreadSheetLayer$ = {
     if (this._lastNormalizeSizeColumnIndex$1 > -1) {
       xmlWriter._writeAttributeString('SizeColumn', this._lastNormalizeSizeColumnIndex$1);
       xmlWriter._writeAttributeString('NormalizeSizeColumn', this.sizeColumn.toString());
-    }
-    else {
+    } else {
       xmlWriter._writeAttributeString('SizeColumn', this.get_sizeColumn().toString());
     }
     xmlWriter._writeAttributeString('NormalizeSize', this.get_normalizeSize().toString());
@@ -35345,8 +35015,7 @@ var SpreadSheetLayer$ = {
     if (this._lastDynamicColorColumnIndex$1 > -1) {
       xmlWriter._writeAttributeString('ColorMapColumn', this._lastDynamicColorColumnIndex$1);
       xmlWriter._writeAttributeString('DynamicColorColumn', this.get_colorMapColumn().toString());
-    }
-    else {
+    } else {
       xmlWriter._writeAttributeString('ColorMapColumn', this.get_colorMapColumn().toString());
     }
     xmlWriter._writeAttributeString('DynamicColor', this.get_dynamicColor().toString());
@@ -35465,8 +35134,7 @@ var SpreadSheetLayer$ = {
     this.set_endDateColumn(parseInt(node.attributes.getNamedItem('EndDateColumn').nodeValue));
     if (node.attributes.getNamedItem('NormalizeSizeColumn') != null) {
       this.set_sizeColumn(parseInt(node.attributes.getNamedItem('NormalizeSizeColumn').nodeValue));
-    }
-    else {
+    } else {
       this.set_sizeColumn(parseInt(node.attributes.getNamedItem('SizeColumn').nodeValue));
     }
     if (node.attributes.getNamedItem('NormalizeSize') != null) {
@@ -35477,8 +35145,7 @@ var SpreadSheetLayer$ = {
     }
     if (node.attributes.getNamedItem('DynamicColorColumn') != null) {
       this.set_colorMapColumn(parseInt(node.attributes.getNamedItem('DynamicColorColumn').nodeValue));
-    }
-    else {
+    } else {
       this.set_colorMapColumn(parseInt(node.attributes.getNamedItem('ColorMapColumn').nodeValue));
     }
     if (node.attributes.getNamedItem('DynamicColor') != null) {
@@ -35762,8 +35429,7 @@ var SpreadSheetLayer$ = {
     var new_value = (value - this.get_normalizeColorMapMin()) / (this.get_normalizeColorMapMax() - this.get_normalizeColorMapMin());
     if (new_value < 0) {
       new_value = 0;
-    }
-    else if (new_value > 1) {
+    } else if (new_value > 1) {
       new_value = 1;
     }
     return new_value;
@@ -37914,8 +37580,7 @@ var VoTableLayer$ = {
     }
     if (!this.get_plotType()) {
       this.set_markerScale(1);
-    }
-    else {
+    } else {
       this.set_markerScale(0);
     }
     var vertList = [];
@@ -38367,8 +38032,7 @@ var MercatorTile$ = {
           part++;
         }
       }
-    }
-    else {
+    } else {
       this._vertexBuffer = tilePrepDevice.createBuffer();
       tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
       var f32array = new Float32Array(verts.length * 5);
@@ -38476,8 +38140,7 @@ PlotTile.create = function (level, xc, yc, dataset, parent) {
   else {
     if (!dataset.get_dataSetType()) {
       temp.set__demScaleFactor(6371000);
-    }
-    else {
+    } else {
       temp.set__demScaleFactor(3396010);
     }
   }
@@ -38497,8 +38160,7 @@ var PlotTile$ = {
 
   renderPart: function (renderContext, part, opacity, combine) {
     if (renderContext.gl != null) {
-    }
-    else {
+    } else {
       if (!part) {
         var $enum1 = ss.enumerate(this._stars$1);
         while ($enum1.moveNext()) {
@@ -38526,8 +38188,7 @@ var PlotTile$ = {
       this.errored = true;
       this.requestPending = false;
       TileCache.removeFromQueue(this.get_key(), true);
-    }
-    else if (this._webFile$1.get_state() === 1) {
+    } else if (this._webFile$1.get_state() === 1) {
       this.texReady = true;
       this.downloading = false;
       this.errored = false;
@@ -38649,8 +38310,7 @@ var PlotTile$ = {
       this.bounds[1 + 3 * 2].tv = 1 * Tile.uvMultiple;
       this.bounds[2 + 3 * 2].tu = 1 * Tile.uvMultiple;
       this.bounds[2 + 3 * 2].tv = 1 * Tile.uvMultiple;
-    }
-    else {
+    } else {
       this.bounds[0 + 3 * 0] = PositionTexture.create(0, -1, 0, 0, 0);
       this.bounds[1 + 3 * 0] = PositionTexture.create(0, 0, 1, 0.5, 0);
       this.bounds[2 + 3 * 0] = PositionTexture.create(0, -1, 0, 1, 0);
@@ -38776,8 +38436,7 @@ var TangentTile$ = {
         this.texture2d = this.bmp.getTexture();
         this.readyToRender = true;
       }
-    }
-    else {
+    } else {
       Tile.prototype.requestImage.call(this);
     }
   },
@@ -38811,8 +38470,7 @@ var TangentTile$ = {
       this._renderTriangleLists[3].push(RenderTriangle.create(PositionTexture.createPos(center, 0.5, 0.5), PositionTexture.createPos(this.bottomRight, 1, 1), PositionTexture.createPos(rightCenter, 1, 0.5), this.texture, this.level));
       this._renderTriangleLists[3].push(RenderTriangle.create(PositionTexture.createPos(center, 0.5, 0.5), PositionTexture.createPos(bottomCenter, 0.5, 1), PositionTexture.createPos(this.bottomRight, 1, 1), this.texture, this.level));
       this.readyToRender = true;
-    }
-    else {
+    } else {
       this._vertexBuffer = tilePrepDevice.createBuffer();
       tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
       var f32array = new Float32Array(9 * 5);
@@ -38921,8 +38579,7 @@ ToastTile.create = function (level, xc, yc, dataset, parent) {
   else {
     if (!dataset.get_dataSetType()) {
       temp.set__demScaleFactor(6371000);
-    }
-    else {
+    } else {
       temp.set__demScaleFactor(3396010);
     }
   }
@@ -38946,8 +38603,7 @@ var ToastTile$ = {
     }
     if (this.backslash) {
       return ToastTile.backSlashIndexBuffer[index * 16 + accomidation];
-    }
-    else {
+    } else {
       return ToastTile.slashIndexBuffer[index * 16 + accomidation];
     }
   },
@@ -39207,8 +38863,7 @@ var ToastTile$ = {
         this._childTriangleList$1[3].push(Triangle.create(7, 5, 4));
         this._childTriangleList$1[3].push(Triangle.create(8, 5, 7));
       }
-    }
-    else {
+    } else {
       this.bounds[0 + 3 * 0] = PositionTexture.create(0, -1, 0, 0, 0);
       this.bounds[1 + 3 * 0] = PositionTexture.create(0, 0, 1, 0.5, 0);
       this.bounds[2 + 3 * 0] = PositionTexture.create(0, -1, 0, 1, 0);
@@ -39532,8 +39187,7 @@ var BitmapOverlay$ = {
       this.initializeGeometry();
       this.updateRotation();
       this._sprite$1.draw(renderContext, this.points, this.points.length, this.texture2d, true, 1);
-    }
-    else {
+    } else {
       if (this.texture == null) {
         this.initializeTexture();
       }
@@ -39612,8 +39266,7 @@ var TextOverlay$ = {
       this.initializeGeometry();
       this.updateRotation();
       this._sprite$1.draw(renderContext, this.points, this.points.length, this.texture2d, true, 1);
-    }
-    else {
+    } else {
       var ctx = renderContext.device;
       ctx.save();
       ctx.translate(this.get_x(), this.get_y());
@@ -39780,8 +39433,7 @@ var ShapeOverlay$ = {
     if (RenderContext.useGl) {
       this.initializeGeometry();
       this._sprite$1.draw(renderContext, this.points, this.points.length, null, this._triangleStrip$1, this.get_opacity());
-    }
-    else {
+    } else {
       switch (this._shapeType$1) {
         case 0:
           this._drawCircleGeometry$1(renderContext);
@@ -41496,12 +41148,10 @@ var SkyImageTile$ = {
           this.pixelCenterY += this.bmp.height - wcsImage.get_sizeY();
         }
       }
-    }
-    else if (this.texture != null) {
+    } else if (this.texture != null) {
       this.height = this.texture.naturalHeight;
       this.width = this.texture.naturalWidth;
-    }
-    else {
+    } else {
       this.height = 256;
       this.width = 256;
     }
