@@ -52,6 +52,7 @@ export { CAARiseTransitSetDetails, CAARiseTransitSet } from "./astrocalc/rise_tr
 export { CAASaturnRingDetails, CAASaturnRings } from "./astrocalc/saturn_rings.js";
 export { CAAStellarMagnitudes } from "./astrocalc/stellar_magnitudes.js";
 
+export { BlendState } from "./blend_state.js";
 export { Color, Colors } from "./color.js";
 
 export {
@@ -150,7 +151,6 @@ export {
     Pointing,
     URLHelpers,
     Annotation,
-    BlendState,
     CameraParameters,
     Constellations,
     Lineset,
