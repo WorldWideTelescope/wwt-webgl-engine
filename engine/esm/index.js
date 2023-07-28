@@ -91,6 +91,15 @@ export {
 export { AstroRaDec, RiseSetDetails, AstroCalc } from "./astrocalc.js";
 
 export {
+    ShortIndexBuffer,
+    IndexBuffer,
+    VertexBufferBase,
+    PositionVertexBuffer,
+    PositionNormalTexturedVertexBuffer,
+    PositionNormalTexturedTangentVertexBuffer,
+} from "./graphics/gl_buffers.js"
+
+export {
     ScaleTypes,
     URLRewriteMode,
     SolarSystemObjects,
@@ -159,9 +168,6 @@ export {
     Folder,
     FolderBrowser,
     FolderUp,
-    ShortIndexBuffer,
-    IndexBuffer,
-    VertexBufferBase,
     Dates,
     SimpleLineList,
     OrbitLineList,
@@ -290,9 +296,6 @@ export {
     Poly,
     PolyLine,
     EquirectangularTile,
-    PositionVertexBuffer,
-    PositionNormalTexturedVertexBuffer,
-    PositionNormalTexturedTangentVertexBuffer,
     ScaleLinear,
     ScaleLog,
     ScalePow,

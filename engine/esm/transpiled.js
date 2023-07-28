@@ -54,6 +54,20 @@ import {
   ConvexHull
 } from "./double3d.js";
 
+import { WEBGL } from "./graphics/webgl_constants.js";
+
+import {
+  IndexBuffer,
+  PositionVertexBuffer,
+  PositionNormalTexturedVertexBuffer,
+  PositionNormalTexturedTangentVertexBuffer,
+  PositionTextureVertexBuffer,
+  KeplerVertexBuffer,
+  TimeSeriesLineVertexBuffer,
+  TimeSeriesPointVertexBuffer,
+  PositionColoredVertexBuffer,
+} from "./graphics/gl_buffers.js"
+
 
 // wwtlib.ScaleTypes
 
@@ -3197,47 +3211,6 @@ var FolderUp$ = {
 };
 
 
-// wwtlib.ShortIndexBuffer
-
-export function ShortIndexBuffer(indexes) {
-  this.buffer = tilePrepDevice.createBuffer();
-  tilePrepDevice.bindBuffer(34963, this.buffer);
-  tilePrepDevice.bufferData(34963, indexes, 35044);
-}
-var ShortIndexBuffer$ = {
-
-};
-
-
-// wwtlib.IndexBuffer
-
-export function IndexBuffer(indexes) {
-  this.buffer = tilePrepDevice.createBuffer();
-  tilePrepDevice.bindBuffer(34963, this.buffer);
-  tilePrepDevice.bufferData(34963, indexes, 35044);
-}
-var IndexBuffer$ = {
-  dispose: function () {
-    tilePrepDevice.bindBuffer(34963, null);
-    tilePrepDevice.deleteBuffer(this.buffer);
-    this.buffer = null;
-  }
-};
-
-
-// wwtlib.VertexBufferBase
-
-export function VertexBufferBase() {
-}
-var VertexBufferBase$ = {
-  dispose: function () {
-    tilePrepDevice.bindBuffer(34962, null);
-    tilePrepDevice.deleteBuffer(this.vertexBuffer);
-    this.vertexBuffer = null;
-  }
-};
-
-
 // wwtlib.Dates
 
 export function Dates(start, end) {
@@ -4083,8 +4056,8 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
     gl.enableVertexAttribArray(SimpleLineShader.vertLoc);
-    gl.bindBuffer(34962, vertex);
-    gl.bindBuffer(34963, null);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.vertexAttribPointer(SimpleLineShader.vertLoc, 3, 5126, false, 0, 0);
     gl.lineWidth(1);
     gl.enable(3042);
@@ -4144,8 +4117,8 @@ SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
     gl.enableVertexAttribArray(SimpleLineShader2D.vertLoc);
-    gl.bindBuffer(34962, vertex);
-    gl.bindBuffer(34963, null);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.vertexAttribPointer(SimpleLineShader2D.vertLoc, 3, 5126, false, 0, 0);
     gl.lineWidth(1);
     gl.enable(3042);
@@ -4209,8 +4182,8 @@ OrbitLineShader.use = function (renderContext, vertex, lineColor) {
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
-    gl.bindBuffer(34963, null);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enableVertexAttribArray(OrbitLineShader.vertLoc);
     gl.enableVertexAttribArray(OrbitLineShader.colorLoc);
     gl.vertexAttribPointer(OrbitLineShader.vertLoc, 3, 5126, false, 28, 0);
@@ -4282,8 +4255,8 @@ LineShaderNormalDates.use = function (renderContext, vertex, lineColor, zBuffer,
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
-    gl.bindBuffer(34963, null);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enableVertexAttribArray(LineShaderNormalDates.vertLoc);
     gl.enableVertexAttribArray(LineShaderNormalDates.colorLoc);
     gl.vertexAttribPointer(LineShaderNormalDates.vertLoc, 3, 5126, false, 36, 0);
@@ -4372,8 +4345,8 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
-    gl.bindBuffer(34963, null);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enableVertexAttribArray(TimeSeriesPointSpriteShader.vertLoc);
     gl.enableVertexAttribArray(TimeSeriesPointSpriteShader.colorLoc);
     gl.enableVertexAttribArray(TimeSeriesPointSpriteShader.pointSizeLoc);
@@ -4468,8 +4441,8 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
-    gl.bindBuffer(34963, null);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enableVertexAttribArray(KeplerPointSpriteShader.abcLoc);
     gl.enableVertexAttribArray(KeplerPointSpriteShader.abcLoc1);
     gl.enableVertexAttribArray(KeplerPointSpriteShader.colorLoc);
@@ -4651,7 +4624,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(ModelShader.vertLoc);
     gl.enableVertexAttribArray(ModelShader.normalLoc);
     gl.enableVertexAttribArray(ModelShader.textureLoc);
@@ -4660,7 +4633,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.vertexAttribPointer(ModelShader.textureLoc, 2, 5126, false, stride, stride - 8);
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
-    gl.bindBuffer(34963, index);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(3042);
     if (noDepth) {
       gl.blendFunc(770, 1);
@@ -4760,7 +4733,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(ModelShaderTan.vertLoc);
     gl.enableVertexAttribArray(ModelShaderTan.normalLoc);
     gl.enableVertexAttribArray(ModelShaderTan.textureLoc);
@@ -4769,7 +4742,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.vertexAttribPointer(ModelShaderTan.textureLoc, 2, 5126, false, stride, stride - 8);
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
-    gl.bindBuffer(34963, index);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(3042);
     if (noDepth) {
       gl.blendFunc(770, 1);
@@ -4879,14 +4852,14 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(TileShader.vertLoc);
     gl.enableVertexAttribArray(TileShader.textureLoc);
     gl.vertexAttribPointer(TileShader.vertLoc, 3, 5126, false, 20, 0);
     gl.vertexAttribPointer(TileShader.textureLoc, 2, 5126, false, 20, 12);
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
-    gl.bindBuffer(34963, index);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(3042);
     if (noDepth) {
       gl.blendFunc(770, 1);
@@ -4995,14 +4968,14 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(FitsShader.vertLoc);
     gl.enableVertexAttribArray(FitsShader.textureLoc);
     gl.vertexAttribPointer(FitsShader.vertLoc, 3, 5126, false, 20, 0);
     gl.vertexAttribPointer(FitsShader.textureLoc, 2, 5126, false, 20, 12);
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
-    gl.bindBuffer(34963, index);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(3042);
     if (noDepth) {
       gl.blendFunc(770, 1);
@@ -5082,14 +5055,14 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(ImageShader.vertLoc);
     gl.enableVertexAttribArray(ImageShader.textureLoc);
     gl.vertexAttribPointer(ImageShader.vertLoc, 3, 5126, false, 20, 0);
     gl.vertexAttribPointer(ImageShader.textureLoc, 2, 5126, false, 20, 12);
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
-    gl.bindBuffer(34963, index);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(3042);
     if (noDepth) {
       gl.blendFunc(770, 1);
@@ -5169,14 +5142,14 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(ImageShader2.vertLoc);
     gl.enableVertexAttribArray(ImageShader2.textureLoc);
     gl.vertexAttribPointer(ImageShader2.vertLoc, 3, 5126, false, 32, 0);
     gl.vertexAttribPointer(ImageShader2.textureLoc, 2, 5126, false, 32, 24);
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
-    gl.bindBuffer(34963, index);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(3042);
     if (noDepth) {
       gl.blendFunc(770, 1);
@@ -5244,7 +5217,7 @@ SpriteShader.use = function (renderContext, vertex, texture) {
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(SpriteShader.vertLoc);
     gl.enableVertexAttribArray(SpriteShader.textureLoc);
     gl.enableVertexAttribArray(SpriteShader.colorLoc);
@@ -5253,7 +5226,7 @@ SpriteShader.use = function (renderContext, vertex, texture) {
     gl.vertexAttribPointer(SpriteShader.textureLoc, 2, 5126, false, 36, 28);
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
-    gl.bindBuffer(34963, null);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enable(3042);
     gl.blendFunc(770, 771);
   }
@@ -5310,13 +5283,13 @@ ShapeSpriteShader.use = function (renderContext, vertex) {
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(ShapeSpriteShader.vertLoc);
     gl.enableVertexAttribArray(ShapeSpriteShader.textureLoc);
     gl.enableVertexAttribArray(ShapeSpriteShader.colorLoc);
     gl.vertexAttribPointer(ShapeSpriteShader.vertLoc, 3, 5126, false, 36, 0);
     gl.vertexAttribPointer(ShapeSpriteShader.colorLoc, 4, 5126, false, 36, 12);
-    gl.bindBuffer(34963, null);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enable(3042);
     gl.blendFunc(770, 771);
   }
@@ -5383,7 +5356,7 @@ TextShader.use = function (renderContext, vertex, texture) {
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
-    gl.bindBuffer(34962, vertex);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.enableVertexAttribArray(TextShader.vertLoc);
     gl.enableVertexAttribArray(TextShader.textureLoc);
     gl.vertexAttribPointer(TextShader.vertLoc, 3, 5126, false, 20, 0);
@@ -5423,7 +5396,7 @@ var Sprite2d$ = {
   },
   create: function (verts) {
     this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
+    tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.vertexBuffer);
     var f32array = new Float32Array(verts.length * 9);
     var buffer = f32array;
     var index = 0;
@@ -5440,7 +5413,7 @@ var Sprite2d$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    tilePrepDevice.bufferData(34962, f32array, 35048);
+    tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, 35048);
   },
   update: function (verts) {
     if (this.vertCount < verts.length) {
@@ -5448,7 +5421,7 @@ var Sprite2d$ = {
       this.create(verts);
       return;
     }
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
+    tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.vertexBuffer);
     var f32array = new Float32Array(verts.length * 9);
     var buffer = f32array;
     var index = 0;
@@ -5465,7 +5438,7 @@ var Sprite2d$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    tilePrepDevice.bufferSubData(34962, 0, f32array);
+    tilePrepDevice.bufferSubData(WEBGL.ARRAY_BUFFER, 0, f32array);
   }
 };
 
@@ -5739,8 +5712,8 @@ Grids._createGalaxyImage = function (renderContext) {
     }
   }
   Grids._galaxyImageIndexBuffer = tilePrepDevice.createBuffer();
-  tilePrepDevice.bindBuffer(34963, Grids._galaxyImageIndexBuffer);
-  tilePrepDevice.bufferData(34963, ui16array, 35044);
+  tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, Grids._galaxyImageIndexBuffer);
+  tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, ui16array, WEBGL.STATIC_DRAW);
 };
 Grids.drawGalaxyImage = function (renderContext, opacity) {
   if (Grids._galaxyImageIndexBuffer == null) {
@@ -11291,8 +11264,8 @@ EllipseRenderer.drawEllipseWithPosition = function (renderContext, semiMajorAxis
   }
   var savedWorld = renderContext.get_world();
   renderContext.set_world(worldMatrix);
-  renderContext.gl.bindBuffer(34962, EllipseRenderer._ellipseVertexBuffer.vertexBuffer);
-  renderContext.gl.bindBuffer(34963, null);
+  renderContext.gl.bindBuffer(WEBGL.ARRAY_BUFFER, EllipseRenderer._ellipseVertexBuffer.vertexBuffer);
+  renderContext.gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
   EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, 1, savedWorld, positionNow);
   renderContext.gl.drawArrays(3, 0, EllipseRenderer._ellipseVertexBuffer.count);
   renderContext.set_world(savedWorld);
@@ -11306,8 +11279,8 @@ EllipseRenderer.drawEllipse = function (renderContext, semiMajorAxis, eccentrici
   }
   var savedWorld = renderContext.get_world();
   renderContext.set_world(worldMatrix);
-  renderContext.gl.bindBuffer(34962, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.vertexBuffer);
-  renderContext.gl.bindBuffer(34963, null);
+  renderContext.gl.bindBuffer(WEBGL.ARRAY_BUFFER, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.vertexBuffer);
+  renderContext.gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
   EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, 1, savedWorld, Vector3d.create(0, 0, 0));
   renderContext.gl.drawArrays(3, 0, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.count - 1);
   renderContext.set_world(savedWorld);
@@ -28623,7 +28596,7 @@ var HealpixTile$ = {
     if (!this._subDivided$1) {
       try {
         this._vertexBuffer = tilePrepDevice.createBuffer();
-        tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
         var f32array = new Float32Array(this._vertexList$1.length * 5);
         var buffer = f32array;
         var index = 0;
@@ -28632,7 +28605,7 @@ var HealpixTile$ = {
           var vert = $enum1.current;
           index = this.addVertex(buffer, index, vert);
         }
-        tilePrepDevice.bufferData(34962, f32array, 35044);
+        tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
         index = 0;
         var offset = this._vertexList$1.length / (4 * this._step$1);
         this._setIndexBufferForQuadrant$1(indexArray, 0, 1);
@@ -29048,8 +29021,8 @@ var HealpixTile$ = {
   },
   _processIndexBuffer$1: function (indexArray, part) {
     this.indexBuffer[part] = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34963, this.indexBuffer[part]);
-    tilePrepDevice.bufferData(34963, indexArray, 35044);
+    tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, this.indexBuffer[part]);
+    tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, indexArray, WEBGL.STATIC_DRAW);
   },
   cleanUp: function (removeFromParent) {
     Tile.prototype.cleanUp.call(this, removeFromParent);
@@ -29952,7 +29925,7 @@ var EquirectangularTile$ = {
       }
       else {
         this._vertexBuffer = tilePrepDevice.createBuffer();
-        tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
         var f32array = new Float32Array(verts.length * 5);
         var buffer = f32array;
         index = 0;
@@ -29961,7 +29934,7 @@ var EquirectangularTile$ = {
           var pt = $enum1.current;
           index = this.addVertex(buffer, index, pt);
         }
-        tilePrepDevice.bufferData(34962, f32array, 35044);
+        tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
         for (var y2 = 0; y2 < 2; y2++) {
           for (var x2 = 0; x2 < 2; x2++) {
             var ui16array = new Uint16Array(this.triangleCount * 3);
@@ -29978,8 +29951,8 @@ var EquirectangularTile$ = {
               }
             }
             this._indexBuffers[part] = tilePrepDevice.createBuffer();
-            tilePrepDevice.bindBuffer(34963, this._indexBuffers[part]);
-            tilePrepDevice.bufferData(34963, ui16array, 35044);
+            tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, this._indexBuffers[part]);
+            tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, ui16array, WEBGL.STATIC_DRAW);
             part++;
           }
         }
@@ -30048,7 +30021,7 @@ var EquirectangularTile$ = {
     }
     else {
       this._vertexBuffer = tilePrepDevice.createBuffer();
-      tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
+      tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
       var f32array = new Float32Array(verts.length * 5);
       var buffer = f32array;
       index = 0;
@@ -30057,7 +30030,7 @@ var EquirectangularTile$ = {
         var pt = $enum1.current;
         index = this.addVertex(buffer, index, pt);
       }
-      tilePrepDevice.bufferData(34962, f32array, 35044);
+      tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
       for (var y2 = 0; y2 < 2; y2++) {
         for (var x2 = 0; x2 < 2; x2++) {
           var ui16array = new Uint16Array(this.triangleCount * 3);
@@ -30074,374 +30047,13 @@ var EquirectangularTile$ = {
             }
           }
           this._indexBuffers[part] = tilePrepDevice.createBuffer();
-          tilePrepDevice.bindBuffer(34963, this._indexBuffers[part]);
-          tilePrepDevice.bufferData(34963, ui16array, 35044);
+          tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, this._indexBuffers[part]);
+          tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, ui16array, WEBGL.STATIC_DRAW);
           part++;
         }
       }
     }
     return true;
-  }
-};
-
-
-// wwtlib.PositionVertexBuffer
-
-export function PositionVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-var PositionVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 3);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.x;
-      buffer[index++] = pt.y;
-      buffer[index++] = pt.z;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
-  }
-};
-
-
-// wwtlib.PositionTextureVertexBuffer
-
-/*internal*/ function PositionTextureVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-PositionTextureVertexBuffer.create = function (data) {
-  var buffer = new PositionTextureVertexBuffer(data.length);
-  buffer._verts$1 = data;
-  buffer.unlock();
-  return buffer;
-};
-var PositionTextureVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 5);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.position.x;
-      buffer[index++] = pt.position.y;
-      buffer[index++] = pt.position.z;
-      buffer[index++] = pt.tu;
-      buffer[index++] = pt.tv;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
-  }
-};
-
-
-// wwtlib.PositionNormalTexturedVertexBuffer
-
-export function PositionNormalTexturedVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-PositionNormalTexturedVertexBuffer.create = function (data) {
-  var buffer = new PositionNormalTexturedVertexBuffer(data.length);
-  buffer._verts$1 = data;
-  buffer.unlock();
-  return buffer;
-};
-var PositionNormalTexturedVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 8);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.x;
-      buffer[index++] = pt.y;
-      buffer[index++] = pt.z;
-      buffer[index++] = pt.nx;
-      buffer[index++] = pt.ny;
-      buffer[index++] = pt.nz;
-      buffer[index++] = pt.tu;
-      buffer[index++] = pt.tv;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
-  }
-};
-
-
-// wwtlib.PositionNormalTexturedTangentVertexBuffer
-
-export function PositionNormalTexturedTangentVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-PositionNormalTexturedTangentVertexBuffer.create = function (data) {
-  var buffer = new PositionNormalTexturedTangentVertexBuffer(data.length);
-  buffer._verts$1 = data;
-  buffer.unlock();
-  return buffer;
-};
-var PositionNormalTexturedTangentVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 11);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.x;
-      buffer[index++] = pt.y;
-      buffer[index++] = pt.z;
-      buffer[index++] = pt.nx;
-      buffer[index++] = pt.ny;
-      buffer[index++] = pt.nz;
-      buffer[index++] = pt.tanx;
-      buffer[index++] = pt.tany;
-      buffer[index++] = pt.tanz;
-      buffer[index++] = pt.tu;
-      buffer[index++] = pt.tv;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
-  }
-};
-
-
-// wwtlib.KeplerVertexBuffer
-
-/*internal*/ function KeplerVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-KeplerVertexBuffer.create = function (items) {
-  var tmp = new KeplerVertexBuffer(items.length);
-  tmp._verts$1 = items;
-  return tmp;
-};
-var KeplerVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 19);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.ABC.x;
-      buffer[index++] = pt.ABC.y;
-      buffer[index++] = pt.ABC.z;
-      buffer[index++] = pt.abc1.x;
-      buffer[index++] = pt.abc1.y;
-      buffer[index++] = pt.abc1.z;
-      buffer[index++] = pt.pointSize;
-      buffer[index++] = pt.color.r / 255;
-      buffer[index++] = pt.color.g / 255;
-      buffer[index++] = pt.color.b / 255;
-      buffer[index++] = pt.color.a / 255;
-      buffer[index++] = pt.w;
-      buffer[index++] = pt.e;
-      buffer[index++] = pt.n;
-      buffer[index++] = pt.t;
-      buffer[index++] = pt.a;
-      buffer[index++] = pt.z;
-      buffer[index++] = pt.orbitPos;
-      buffer[index++] = pt.orbits;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
-  }
-};
-
-
-// wwtlib.TimeSeriesLineVertexBuffer
-
-/*internal*/ function TimeSeriesLineVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-var TimeSeriesLineVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 9);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.position.x;
-      buffer[index++] = pt.position.y;
-      buffer[index++] = pt.position.z;
-      buffer[index++] = pt.get_color().r / 255;
-      buffer[index++] = pt.get_color().g / 255;
-      buffer[index++] = pt.get_color().b / 255;
-      buffer[index++] = pt.get_color().a / 255;
-      buffer[index++] = pt.tu;
-      buffer[index++] = pt.tv;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
-  }
-};
-
-
-// wwtlib.TimeSeriesPointVertexBuffer
-
-/*internal*/ function TimeSeriesPointVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-var TimeSeriesPointVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 10);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.position.x;
-      buffer[index++] = pt.position.y;
-      buffer[index++] = pt.position.z;
-      buffer[index++] = pt.get_color().r / 255;
-      buffer[index++] = pt.get_color().g / 255;
-      buffer[index++] = pt.get_color().b / 255;
-      buffer[index++] = pt.get_color().a / 255;
-      buffer[index++] = pt.tu;
-      buffer[index++] = pt.tv;
-      buffer[index++] = pt.pointSize;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
-  },
-  dispose: function () {
-    tilePrepDevice.bindBuffer(34962, null);
-    tilePrepDevice.deleteBuffer(this.vertexBuffer);
-    this.vertexBuffer = null;
-  }
-};
-
-
-// wwtlib.PositionColoredVertexBuffer
-
-/*internal*/ function PositionColoredVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-var PositionColoredVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 7);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.position.x;
-      buffer[index++] = pt.position.y;
-      buffer[index++] = pt.position.z;
-      buffer[index++] = pt.color.r / 255;
-      buffer[index++] = pt.color.g / 255;
-      buffer[index++] = pt.color.b / 255;
-      buffer[index++] = pt.color.a / 255;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
-  }
-};
-
-
-// wwtlib.PositionColoredTexturedVertexBuffer
-
-/*internal*/ function PositionColoredTexturedVertexBuffer(count) {
-  this.count = 0;
-  this._verts$1 = null;
-  VertexBufferBase.call(this);
-  this.count = count;
-}
-var PositionColoredTexturedVertexBuffer$ = {
-  lock: function () {
-    this._verts$1 = new Array(this.count);
-    return this._verts$1;
-  },
-  unlock: function () {
-    this.vertexBuffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
-    var f32array = new Float32Array(this.count * 9);
-    var buffer = f32array;
-    var index = 0;
-    var $enum1 = ss.enumerate(this._verts$1);
-    while ($enum1.moveNext()) {
-      var pt = $enum1.current;
-      buffer[index++] = pt.position.x;
-      buffer[index++] = pt.position.y;
-      buffer[index++] = pt.position.z;
-      buffer[index++] = pt.color.r / 255;
-      buffer[index++] = pt.color.g / 255;
-      buffer[index++] = pt.color.b / 255;
-      buffer[index++] = pt.color.a / 255;
-      buffer[index++] = pt.tu;
-      buffer[index++] = pt.tv;
-    }
-    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -35572,7 +35184,7 @@ var MercatorTile$ = {
     }
     else {
       this._vertexBuffer = tilePrepDevice.createBuffer();
-      tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
+      tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
       var f32array = new Float32Array(verts.length * 5);
       var buffer = f32array;
       index = 0;
@@ -35581,7 +35193,7 @@ var MercatorTile$ = {
         var pt = $enum1.current;
         index = this.addVertex(buffer, index, pt);
       }
-      tilePrepDevice.bufferData(34962, f32array, 35044);
+      tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
       for (var y2 = 0; y2 < 2; y2++) {
         for (var x2 = 0; x2 < 2; x2++) {
           var ui16array = new Uint16Array(this.triangleCount * 3);
@@ -35598,8 +35210,8 @@ var MercatorTile$ = {
             }
           }
           this._indexBuffers[part] = tilePrepDevice.createBuffer();
-          tilePrepDevice.bindBuffer(34963, this._indexBuffers[part]);
-          tilePrepDevice.bufferData(34963, ui16array, 35044);
+          tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, this._indexBuffers[part]);
+          tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, ui16array, WEBGL.STATIC_DRAW);
           part++;
         }
       }
@@ -35999,7 +35611,7 @@ var TangentTile$ = {
     }
     else {
       this._vertexBuffer = tilePrepDevice.createBuffer();
-      tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
+      tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
       var f32array = new Float32Array(9 * 5);
       var buffer = f32array;
       var index = 0;
@@ -36012,7 +35624,7 @@ var TangentTile$ = {
       index = this.addVertex(buffer, index, PositionTexture.createPos(topCenter, 0.5, 0));
       index = this.addVertex(buffer, index, PositionTexture.createPos(this.topLeft, 0, 0));
       index = this.addVertex(buffer, index, PositionTexture.createPos(this.topRight, 1, 0));
-      tilePrepDevice.bufferData(34962, f32array, 35044);
+      tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
       for (var i = 0; i < 4; i++) {
         index = 0;
         this.triangleCount = 2;
@@ -36053,8 +35665,8 @@ var TangentTile$ = {
             break;
         }
         this._indexBuffers[i] = tilePrepDevice.createBuffer();
-        tilePrepDevice.bindBuffer(34963, this._indexBuffers[i]);
-        tilePrepDevice.bufferData(34963, ui16array, 35044);
+        tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, this._indexBuffers[i]);
+        tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, ui16array, WEBGL.STATIC_DRAW);
       }
     }
     return true;
@@ -36130,8 +35742,8 @@ var ToastTile$ = {
   _processIndexBuffer$1: function (indexArray, part) {
     if (!this.level) {
       ToastTile.rootIndexBuffer[part] = tilePrepDevice.createBuffer();
-      tilePrepDevice.bindBuffer(34963, ToastTile.rootIndexBuffer[part]);
-      tilePrepDevice.bufferData(34963, indexArray, 35044);
+      tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, ToastTile.rootIndexBuffer[part]);
+      tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, indexArray, WEBGL.STATIC_DRAW);
       return;
     }
     for (var a = 0; a < 16; a++) {
@@ -36139,13 +35751,13 @@ var ToastTile$ = {
       this._processAccomindations$1(partArray, a);
       if (this.backslash) {
         ToastTile.backSlashIndexBuffer[part * 16 + a] = tilePrepDevice.createBuffer();
-        tilePrepDevice.bindBuffer(34963, ToastTile.backSlashIndexBuffer[part * 16 + a]);
-        tilePrepDevice.bufferData(34963, partArray, 35044);
+        tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, ToastTile.backSlashIndexBuffer[part * 16 + a]);
+        tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, partArray, WEBGL.STATIC_DRAW);
       }
       else {
         ToastTile.slashIndexBuffer[part * 16 + a] = tilePrepDevice.createBuffer();
-        tilePrepDevice.bindBuffer(34963, ToastTile.slashIndexBuffer[part * 16 + a]);
-        tilePrepDevice.bufferData(34963, partArray, 35044);
+        tilePrepDevice.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, ToastTile.slashIndexBuffer[part * 16 + a]);
+        tilePrepDevice.bufferData(WEBGL.ELEMENT_ARRAY_BUFFER, partArray, WEBGL.STATIC_DRAW);
       }
     }
   },
@@ -36479,7 +36091,7 @@ var ToastTile$ = {
       }
       else {
         this._vertexBuffer = tilePrepDevice.createBuffer();
-        tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this._vertexBuffer);
         var f32array = new Float32Array(this._vertexList$1.length * 5);
         var buffer = f32array;
         var index = 0;
@@ -36512,7 +36124,7 @@ var ToastTile$ = {
             }
           }
         }
-        tilePrepDevice.bufferData(34962, f32array, 35044);
+        tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
         for (var i = 0; i < 4; i++) {
           this.triangleCount = this._childTriangleList$1[i].length;
           if (this.getIndexBuffer(i, 0) == null) {
@@ -38559,12 +38171,6 @@ registerType("MinorPlanets", [MinorPlanets, MinorPlanets$, null]);
 registerType("TileCache", [TileCache, TileCache$, null]);
 registerType("DistanceCalc", [DistanceCalc, DistanceCalc$, null]);
 registerType("Triangle", [Triangle, Triangle$, null]);
-registerType("PositionTextureVertexBuffer", [PositionTextureVertexBuffer, PositionTextureVertexBuffer$, VertexBufferBase]);
-registerType("KeplerVertexBuffer", [KeplerVertexBuffer, KeplerVertexBuffer$, VertexBufferBase]);
-registerType("TimeSeriesLineVertexBuffer", [TimeSeriesLineVertexBuffer, TimeSeriesLineVertexBuffer$, VertexBufferBase]);
-registerType("TimeSeriesPointVertexBuffer", [TimeSeriesPointVertexBuffer, TimeSeriesPointVertexBuffer$, VertexBufferBase]);
-registerType("PositionColoredVertexBuffer", [PositionColoredVertexBuffer, PositionColoredVertexBuffer$, VertexBufferBase]);
-registerType("PositionColoredTexturedVertexBuffer", [PositionColoredTexturedVertexBuffer, PositionColoredTexturedVertexBuffer$, VertexBufferBase]);
 registerType("LayerCollection", [LayerCollection, LayerCollection$, Layer]);
 
 registerType("ScaleTypes", ScaleTypes);
@@ -38635,9 +38241,6 @@ registerType("ConstellationFilter", [ConstellationFilter, ConstellationFilter$, 
 registerType("Folder", [Folder, Folder$, null, IThumbnail]);
 registerType("FolderBrowser", [FolderBrowser, FolderBrowser$, null]);
 registerType("FolderUp", [FolderUp, FolderUp$, null, IThumbnail]);
-registerType("ShortIndexBuffer", [ShortIndexBuffer, ShortIndexBuffer$, null]);
-registerType("IndexBuffer", [IndexBuffer, IndexBuffer$, null, ss.IDisposable]);
-registerType("VertexBufferBase", [VertexBufferBase, VertexBufferBase$, null, ss.IDisposable]);
 registerType("Dates", [Dates, Dates$, null]);
 registerType("SimpleLineList", [SimpleLineList, SimpleLineList$, null]);
 registerType("OrbitLineList", [OrbitLineList, OrbitLineList$, null]);
@@ -38766,9 +38369,6 @@ registerType("Circle", [Circle, Circle$, Annotation]);
 registerType("Poly", [Poly, Poly$, Annotation]);
 registerType("PolyLine", [PolyLine, PolyLine$, Annotation]);
 registerType("EquirectangularTile", [EquirectangularTile, EquirectangularTile$, Tile]);
-registerType("PositionVertexBuffer", [PositionVertexBuffer, PositionVertexBuffer$, VertexBufferBase]);
-registerType("PositionNormalTexturedVertexBuffer", [PositionNormalTexturedVertexBuffer, PositionNormalTexturedVertexBuffer$, VertexBufferBase]);
-registerType("PositionNormalTexturedTangentVertexBuffer", [PositionNormalTexturedTangentVertexBuffer, PositionNormalTexturedTangentVertexBuffer$, VertexBufferBase]);
 registerType("ScaleLinear", [ScaleLinear, ScaleLinear$, ScaleMap]);
 registerType("ScaleLog", [ScaleLog, ScaleLog$, ScaleMap]);
 registerType("ScalePow", [ScalePow, ScalePow$, ScaleMap]);
