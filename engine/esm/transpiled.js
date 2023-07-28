@@ -32,6 +32,8 @@ import { GM } from "./astrocalc/galilean_moons.js";
 import { CAAMoon } from "./astrocalc/moon.js";
 import { AstroCalc } from "./astrocalc.js";
 
+import { tilePrepDevice, set_tilePrepDevice } from "./render_globals.js";
+
 import { BlendState } from "./blend_state.js";
 import { Color, Colors } from "./color.js";
 
@@ -3198,9 +3200,9 @@ var FolderUp$ = {
 // wwtlib.ShortIndexBuffer
 
 export function ShortIndexBuffer(indexes) {
-  this.buffer = Tile.prepDevice.createBuffer();
-  Tile.prepDevice.bindBuffer(34963, this.buffer);
-  Tile.prepDevice.bufferData(34963, indexes, 35044);
+  this.buffer = tilePrepDevice.createBuffer();
+  tilePrepDevice.bindBuffer(34963, this.buffer);
+  tilePrepDevice.bufferData(34963, indexes, 35044);
 }
 var ShortIndexBuffer$ = {
 
@@ -3210,14 +3212,14 @@ var ShortIndexBuffer$ = {
 // wwtlib.IndexBuffer
 
 export function IndexBuffer(indexes) {
-  this.buffer = Tile.prepDevice.createBuffer();
-  Tile.prepDevice.bindBuffer(34963, this.buffer);
-  Tile.prepDevice.bufferData(34963, indexes, 35044);
+  this.buffer = tilePrepDevice.createBuffer();
+  tilePrepDevice.bindBuffer(34963, this.buffer);
+  tilePrepDevice.bufferData(34963, indexes, 35044);
 }
 var IndexBuffer$ = {
   dispose: function () {
-    Tile.prepDevice.bindBuffer(34963, null);
-    Tile.prepDevice.deleteBuffer(this.buffer);
+    tilePrepDevice.bindBuffer(34963, null);
+    tilePrepDevice.deleteBuffer(this.buffer);
     this.buffer = null;
   }
 };
@@ -3229,8 +3231,8 @@ export function VertexBufferBase() {
 }
 var VertexBufferBase$ = {
   dispose: function () {
-    Tile.prepDevice.bindBuffer(34962, null);
-    Tile.prepDevice.deleteBuffer(this.vertexBuffer);
+    tilePrepDevice.bindBuffer(34962, null);
+    tilePrepDevice.deleteBuffer(this.vertexBuffer);
     this.vertexBuffer = null;
   }
 };
@@ -5420,8 +5422,8 @@ var Sprite2d$ = {
     }
   },
   create: function (verts) {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(verts.length * 9);
     var buffer = f32array;
     var index = 0;
@@ -5438,15 +5440,15 @@ var Sprite2d$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35048);
+    tilePrepDevice.bufferData(34962, f32array, 35048);
   },
   update: function (verts) {
     if (this.vertCount < verts.length) {
-      Tile.prepDevice.deleteBuffer(this.vertexBuffer);
+      tilePrepDevice.deleteBuffer(this.vertexBuffer);
       this.create(verts);
       return;
     }
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(verts.length * 9);
     var buffer = f32array;
     var index = 0;
@@ -5463,7 +5465,7 @@ var Sprite2d$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    Tile.prepDevice.bufferSubData(34962, 0, f32array);
+    tilePrepDevice.bufferSubData(34962, 0, f32array);
   }
 };
 
@@ -5582,10 +5584,10 @@ export function Texture() {
 }
 Texture.getEmpty = function () {
   if (Texture.empty == null) {
-    Texture.empty = Tile.prepDevice.createTexture();
-    Tile.prepDevice.bindTexture(3553, Texture.empty);
-    Tile.prepDevice.texImage2D(3553, 0, 6408, 1, 1, 0, 6408, 5121, new Uint8Array([0, 0, 0, 0]));
-    Tile.prepDevice.bindTexture(3553, null);
+    Texture.empty = tilePrepDevice.createTexture();
+    tilePrepDevice.bindTexture(3553, Texture.empty);
+    tilePrepDevice.texImage2D(3553, 0, 6408, 1, 1, 0, 6408, 5121, new Uint8Array([0, 0, 0, 0]));
+    tilePrepDevice.bindTexture(3553, null);
   }
   return Texture.empty;
 };
@@ -5607,7 +5609,7 @@ Texture.fitPowerOfTwo = function (val) {
 var Texture$ = {
   cleanUp: function () {
     this.imageElement = null;
-    Tile.prepDevice.deleteTexture(this.texture2d);
+    tilePrepDevice.deleteTexture(this.texture2d);
   },
   dispose: function () {
     this.cleanUp();
@@ -5645,10 +5647,10 @@ var Texture$ = {
     }
   },
   makeTexture: function () {
-    if (Tile.prepDevice != null) {
+    if (tilePrepDevice != null) {
       try {
-        this.texture2d = Tile.prepDevice.createTexture();
-        Tile.prepDevice.bindTexture(3553, this.texture2d);
+        this.texture2d = tilePrepDevice.createTexture();
+        tilePrepDevice.bindTexture(3553, this.texture2d);
         var image = this.imageElement;
         if ((!Texture.isPowerOfTwo(this.imageElement.height) | !Texture.isPowerOfTwo(this.imageElement.width)) === 1) {
           var temp = document.createElement('canvas');
@@ -5658,12 +5660,12 @@ var Texture$ = {
           ctx.drawImage(image, 0, 0, temp.width, temp.height);
           image = temp;
         }
-        Tile.prepDevice.texParameteri(3553, 10242, 33071);
-        Tile.prepDevice.texParameteri(3553, 10243, 33071);
-        Tile.prepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
-        Tile.prepDevice.texParameteri(3553, 10241, 9985);
-        Tile.prepDevice.generateMipmap(3553);
-        Tile.prepDevice.bindTexture(3553, null);
+        tilePrepDevice.texParameteri(3553, 10242, 33071);
+        tilePrepDevice.texParameteri(3553, 10243, 33071);
+        tilePrepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
+        tilePrepDevice.texParameteri(3553, 10241, 9985);
+        tilePrepDevice.generateMipmap(3553);
+        tilePrepDevice.bindTexture(3553, null);
       }
       catch ($e1) {
         this._errored = true;
@@ -5736,9 +5738,9 @@ Grids._createGalaxyImage = function (renderContext) {
       indexArray[index + 4] = ((y1 + 1) * (subdivs + 1) + (x1 + 1));
     }
   }
-  Grids._galaxyImageIndexBuffer = Tile.prepDevice.createBuffer();
-  Tile.prepDevice.bindBuffer(34963, Grids._galaxyImageIndexBuffer);
-  Tile.prepDevice.bufferData(34963, ui16array, 35044);
+  Grids._galaxyImageIndexBuffer = tilePrepDevice.createBuffer();
+  tilePrepDevice.bindBuffer(34963, Grids._galaxyImageIndexBuffer);
+  tilePrepDevice.bufferData(34963, ui16array, 35044);
 };
 Grids.drawGalaxyImage = function (renderContext, opacity) {
   if (Grids._galaxyImageIndexBuffer == null) {
@@ -5877,7 +5879,7 @@ Grids.initCosmosVertexBuffer = function () {
   }
 };
 Grids._createCosmosVertexBuffer = function (renderContext) {
-  var device = Tile.prepDevice;
+  var device = tilePrepDevice;
   var bucketCount = 256;
   if (Grids._cosmosSprites != null) {
     for (var ij = 0; ij < bucketCount; ij++) {
@@ -11833,8 +11835,8 @@ PushPin.getPushPinTexture = function (pinId) {
     return PushPin._pinTextureCache[pinId];
   }
   try {
-    texture = Tile.prepDevice.createTexture();
-    Tile.prepDevice.bindTexture(3553, texture);
+    texture = tilePrepDevice.createTexture();
+    tilePrepDevice.bindTexture(3553, texture);
     var row = Math.floor(pinId / 16);
     var col = pinId % 16;
     var temp = document.createElement('canvas');
@@ -11843,12 +11845,12 @@ PushPin.getPushPinTexture = function (pinId) {
     var ctx = temp.getContext('2d');
     ctx.drawImage(PushPin._pins.imageElement, (col * 32), (row * 32), 32, 32, 0, 0, 32, 32);
     var image = temp;
-    Tile.prepDevice.texParameteri(3553, 10242, 33071);
-    Tile.prepDevice.texParameteri(3553, 10243, 33071);
-    Tile.prepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
-    Tile.prepDevice.texParameteri(3553, 10241, 9985);
-    Tile.prepDevice.generateMipmap(3553);
-    Tile.prepDevice.bindTexture(3553, null);
+    tilePrepDevice.texParameteri(3553, 10242, 33071);
+    tilePrepDevice.texParameteri(3553, 10243, 33071);
+    tilePrepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
+    tilePrepDevice.texParameteri(3553, 10241, 9985);
+    tilePrepDevice.generateMipmap(3553);
+    tilePrepDevice.bindTexture(3553, null);
     PushPin._pinTextureCache[pinId] = texture;
   }
   catch ($e1) {
@@ -17475,16 +17477,16 @@ var Tile$ = {
     return 0;
   },
   makeTexture: function () {
-    if (Tile.prepDevice != null) {
+    if (tilePrepDevice != null) {
       try {
-        this.texture2d = Tile.prepDevice.createTexture();
-        Tile.prepDevice.bindTexture(3553, this.texture2d);
-        Tile.prepDevice.texParameteri(3553, 10242, 33071);
-        Tile.prepDevice.texParameteri(3553, 10243, 33071);
+        this.texture2d = tilePrepDevice.createTexture();
+        tilePrepDevice.bindTexture(3553, this.texture2d);
+        tilePrepDevice.texParameteri(3553, 10242, 33071);
+        tilePrepDevice.texParameteri(3553, 10243, 33071);
         if (this.dataset.get_extension().toLowerCase().indexOf('fits') > -1 && RenderContext.useGlVersion2) {
-          Tile.prepDevice.texImage2D(3553, 0, 33326, ss.truncate(this.fitsImage.get_sizeX()), ss.truncate(this.fitsImage.get_sizeY()), 0, 6403, 5126, this.fitsImage.dataUnit);
-          Tile.prepDevice.texParameteri(3553, 10241, 9728);
-          Tile.prepDevice.texParameteri(3553, 10240, 9728);
+          tilePrepDevice.texImage2D(3553, 0, 33326, ss.truncate(this.fitsImage.get_sizeX()), ss.truncate(this.fitsImage.get_sizeY()), 0, 6403, 5126, this.fitsImage.dataUnit);
+          tilePrepDevice.texParameteri(3553, 10241, 9728);
+          tilePrepDevice.texParameteri(3553, 10240, 9728);
         }
         else {
           var image = this.texture;
@@ -17496,11 +17498,11 @@ var Tile$ = {
             ctx.drawImage(image, 0, 0, temp.width, temp.height);
             image = temp;
           }
-          Tile.prepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
-          Tile.prepDevice.texParameteri(3553, 10241, 9985);
-          Tile.prepDevice.generateMipmap(3553);
+          tilePrepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
+          tilePrepDevice.texParameteri(3553, 10241, 9985);
+          tilePrepDevice.generateMipmap(3553);
         }
-        Tile.prepDevice.bindTexture(3553, null);
+        tilePrepDevice.bindTexture(3553, null);
       }
       catch ($e1) {
         this.errored = true;
@@ -17779,7 +17781,7 @@ var Tile$ = {
     return accVal;
   },
   renderPart: function (renderContext, part, opacity, combine) {
-    if (Tile.prepDevice == null) {
+    if (tilePrepDevice == null) {
       var lighting = renderContext.lighting && renderContext.get_sunPosition() != null;
       var $enum1 = ss.enumerate(this._renderTriangleLists[part]);
       while ($enum1.moveNext()) {
@@ -17806,7 +17808,7 @@ var Tile$ = {
     }
     else {
       if (RenderContext.useGlVersion2 && this.fitsImage != null) {
-        ColorMapContainer.bindColorMapTexture(Tile.prepDevice, this.dataset.get_fitsProperties().colorMapName);
+        ColorMapContainer.bindColorMapTexture(tilePrepDevice, this.dataset.get_fitsProperties().colorMapName);
         FitsShader.min = this.dataset.get_fitsProperties().lowerCut;
         FitsShader.max = this.dataset.get_fitsProperties().upperCut;
         FitsShader.containsBlanks = this.dataset.get_fitsProperties().containsBlanks;
@@ -17840,19 +17842,19 @@ var Tile$ = {
       this.parent.removeChild(this);
       this.parent = null;
     }
-    if (Tile.prepDevice != null) {
+    if (tilePrepDevice != null) {
       var $enum1 = ss.enumerate(this._indexBuffers);
       while ($enum1.moveNext()) {
         var buf = $enum1.current;
-        Tile.prepDevice.deleteBuffer(buf);
+        tilePrepDevice.deleteBuffer(buf);
       }
       this._indexBuffers = new Array(4);
       if (this._vertexBuffer != null) {
-        Tile.prepDevice.deleteBuffer(this._vertexBuffer);
+        tilePrepDevice.deleteBuffer(this._vertexBuffer);
         this._vertexBuffer = null;
       }
       if (this.texture2d != null) {
-        Tile.prepDevice.deleteTexture(this.texture2d);
+        tilePrepDevice.deleteTexture(this.texture2d);
         this.texture2d = null;
       }
     }
@@ -25135,14 +25137,14 @@ var Bitmap$ = {
     this._buffer[index++] = a;
   },
   getTexture: function () {
-    var tex = Tile.prepDevice.createTexture();
-    Tile.prepDevice.bindTexture(3553, tex);
-    Tile.prepDevice.texParameteri(3553, 10242, 33071);
-    Tile.prepDevice.texParameteri(3553, 10243, 33071);
-    Tile.prepDevice.texImage2D(3553, 0, 6408, this.width, this.height, 0, 6408, 5121, this._buffer);
-    Tile.prepDevice.texParameteri(3553, 10241, 9985);
-    Tile.prepDevice.generateMipmap(3553);
-    Tile.prepDevice.bindTexture(3553, null);
+    var tex = tilePrepDevice.createTexture();
+    tilePrepDevice.bindTexture(3553, tex);
+    tilePrepDevice.texParameteri(3553, 10242, 33071);
+    tilePrepDevice.texParameteri(3553, 10243, 33071);
+    tilePrepDevice.texImage2D(3553, 0, 6408, this.width, this.height, 0, 6408, 5121, this._buffer);
+    tilePrepDevice.texParameteri(3553, 10241, 9985);
+    tilePrepDevice.generateMipmap(3553);
+    tilePrepDevice.bindTexture(3553, null);
     return tex;
   }
 };
@@ -26132,7 +26134,7 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
       WWTControl.singleton.renderContext.device = ctx;
     }
     else {
-      Tile.prepDevice = gl;
+      set_tilePrepDevice(gl);
       WWTControl.singleton.renderContext.gl = gl;
       RenderContext.useGl = true;
     }
@@ -28620,8 +28622,8 @@ var HealpixTile$ = {
     var indexArray = ui16array;
     if (!this._subDivided$1) {
       try {
-        this._vertexBuffer = Tile.prepDevice.createBuffer();
-        Tile.prepDevice.bindBuffer(34962, this._vertexBuffer);
+        this._vertexBuffer = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
         var f32array = new Float32Array(this._vertexList$1.length * 5);
         var buffer = f32array;
         var index = 0;
@@ -28630,7 +28632,7 @@ var HealpixTile$ = {
           var vert = $enum1.current;
           index = this.addVertex(buffer, index, vert);
         }
-        Tile.prepDevice.bufferData(34962, f32array, 35044);
+        tilePrepDevice.bufferData(34962, f32array, 35044);
         index = 0;
         var offset = this._vertexList$1.length / (4 * this._step$1);
         this._setIndexBufferForQuadrant$1(indexArray, 0, 1);
@@ -29045,9 +29047,9 @@ var HealpixTile$ = {
     return this.demAverage / ((meters) ? 1 : this.get__demScaleFactor());
   },
   _processIndexBuffer$1: function (indexArray, part) {
-    this.indexBuffer[part] = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34963, this.indexBuffer[part]);
-    Tile.prepDevice.bufferData(34963, indexArray, 35044);
+    this.indexBuffer[part] = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34963, this.indexBuffer[part]);
+    tilePrepDevice.bufferData(34963, indexArray, 35044);
   },
   cleanUp: function (removeFromParent) {
     Tile.prototype.cleanUp.call(this, removeFromParent);
@@ -29949,8 +29951,8 @@ var EquirectangularTile$ = {
         }
       }
       else {
-        this._vertexBuffer = Tile.prepDevice.createBuffer();
-        Tile.prepDevice.bindBuffer(34962, this._vertexBuffer);
+        this._vertexBuffer = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
         var f32array = new Float32Array(verts.length * 5);
         var buffer = f32array;
         index = 0;
@@ -29959,7 +29961,7 @@ var EquirectangularTile$ = {
           var pt = $enum1.current;
           index = this.addVertex(buffer, index, pt);
         }
-        Tile.prepDevice.bufferData(34962, f32array, 35044);
+        tilePrepDevice.bufferData(34962, f32array, 35044);
         for (var y2 = 0; y2 < 2; y2++) {
           for (var x2 = 0; x2 < 2; x2++) {
             var ui16array = new Uint16Array(this.triangleCount * 3);
@@ -29975,9 +29977,9 @@ var EquirectangularTile$ = {
                 indexArray[index++] = ((y1 + 1) * (this._subDivisionLevel$1 + 1) + (x1 + 1));
               }
             }
-            this._indexBuffers[part] = Tile.prepDevice.createBuffer();
-            Tile.prepDevice.bindBuffer(34963, this._indexBuffers[part]);
-            Tile.prepDevice.bufferData(34963, ui16array, 35044);
+            this._indexBuffers[part] = tilePrepDevice.createBuffer();
+            tilePrepDevice.bindBuffer(34963, this._indexBuffers[part]);
+            tilePrepDevice.bufferData(34963, ui16array, 35044);
             part++;
           }
         }
@@ -30045,8 +30047,8 @@ var EquirectangularTile$ = {
       }
     }
     else {
-      this._vertexBuffer = Tile.prepDevice.createBuffer();
-      Tile.prepDevice.bindBuffer(34962, this._vertexBuffer);
+      this._vertexBuffer = tilePrepDevice.createBuffer();
+      tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
       var f32array = new Float32Array(verts.length * 5);
       var buffer = f32array;
       index = 0;
@@ -30055,7 +30057,7 @@ var EquirectangularTile$ = {
         var pt = $enum1.current;
         index = this.addVertex(buffer, index, pt);
       }
-      Tile.prepDevice.bufferData(34962, f32array, 35044);
+      tilePrepDevice.bufferData(34962, f32array, 35044);
       for (var y2 = 0; y2 < 2; y2++) {
         for (var x2 = 0; x2 < 2; x2++) {
           var ui16array = new Uint16Array(this.triangleCount * 3);
@@ -30071,9 +30073,9 @@ var EquirectangularTile$ = {
               indexArray[index++] = ((y1 + 1) * (this._subDivisionLevel$1 + 1) + (x1 + 1));
             }
           }
-          this._indexBuffers[part] = Tile.prepDevice.createBuffer();
-          Tile.prepDevice.bindBuffer(34963, this._indexBuffers[part]);
-          Tile.prepDevice.bufferData(34963, ui16array, 35044);
+          this._indexBuffers[part] = tilePrepDevice.createBuffer();
+          tilePrepDevice.bindBuffer(34963, this._indexBuffers[part]);
+          tilePrepDevice.bufferData(34963, ui16array, 35044);
           part++;
         }
       }
@@ -30097,8 +30099,8 @@ var PositionVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 3);
     var buffer = f32array;
     var index = 0;
@@ -30109,7 +30111,7 @@ var PositionVertexBuffer$ = {
       buffer[index++] = pt.y;
       buffer[index++] = pt.z;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -30134,8 +30136,8 @@ var PositionTextureVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 5);
     var buffer = f32array;
     var index = 0;
@@ -30148,7 +30150,7 @@ var PositionTextureVertexBuffer$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -30173,8 +30175,8 @@ var PositionNormalTexturedVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 8);
     var buffer = f32array;
     var index = 0;
@@ -30190,7 +30192,7 @@ var PositionNormalTexturedVertexBuffer$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -30215,8 +30217,8 @@ var PositionNormalTexturedTangentVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 11);
     var buffer = f32array;
     var index = 0;
@@ -30235,7 +30237,7 @@ var PositionNormalTexturedTangentVertexBuffer$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -30259,8 +30261,8 @@ var KeplerVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 19);
     var buffer = f32array;
     var index = 0;
@@ -30287,7 +30289,7 @@ var KeplerVertexBuffer$ = {
       buffer[index++] = pt.orbitPos;
       buffer[index++] = pt.orbits;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -30306,8 +30308,8 @@ var TimeSeriesLineVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 9);
     var buffer = f32array;
     var index = 0;
@@ -30324,7 +30326,7 @@ var TimeSeriesLineVertexBuffer$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -30343,8 +30345,8 @@ var TimeSeriesPointVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 10);
     var buffer = f32array;
     var index = 0;
@@ -30362,11 +30364,11 @@ var TimeSeriesPointVertexBuffer$ = {
       buffer[index++] = pt.tv;
       buffer[index++] = pt.pointSize;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   },
   dispose: function () {
-    Tile.prepDevice.bindBuffer(34962, null);
-    Tile.prepDevice.deleteBuffer(this.vertexBuffer);
+    tilePrepDevice.bindBuffer(34962, null);
+    tilePrepDevice.deleteBuffer(this.vertexBuffer);
     this.vertexBuffer = null;
   }
 };
@@ -30386,8 +30388,8 @@ var PositionColoredVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 7);
     var buffer = f32array;
     var index = 0;
@@ -30402,7 +30404,7 @@ var PositionColoredVertexBuffer$ = {
       buffer[index++] = pt.color.b / 255;
       buffer[index++] = pt.color.a / 255;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -30421,8 +30423,8 @@ var PositionColoredTexturedVertexBuffer$ = {
     return this._verts$1;
   },
   unlock: function () {
-    this.vertexBuffer = Tile.prepDevice.createBuffer();
-    Tile.prepDevice.bindBuffer(34962, this.vertexBuffer);
+    this.vertexBuffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(34962, this.vertexBuffer);
     var f32array = new Float32Array(this.count * 9);
     var buffer = f32array;
     var index = 0;
@@ -30439,7 +30441,7 @@ var PositionColoredTexturedVertexBuffer$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    Tile.prepDevice.bufferData(34962, f32array, 35044);
+    tilePrepDevice.bufferData(34962, f32array, 35044);
   }
 };
 
@@ -35569,8 +35571,8 @@ var MercatorTile$ = {
       }
     }
     else {
-      this._vertexBuffer = Tile.prepDevice.createBuffer();
-      Tile.prepDevice.bindBuffer(34962, this._vertexBuffer);
+      this._vertexBuffer = tilePrepDevice.createBuffer();
+      tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
       var f32array = new Float32Array(verts.length * 5);
       var buffer = f32array;
       index = 0;
@@ -35579,7 +35581,7 @@ var MercatorTile$ = {
         var pt = $enum1.current;
         index = this.addVertex(buffer, index, pt);
       }
-      Tile.prepDevice.bufferData(34962, f32array, 35044);
+      tilePrepDevice.bufferData(34962, f32array, 35044);
       for (var y2 = 0; y2 < 2; y2++) {
         for (var x2 = 0; x2 < 2; x2++) {
           var ui16array = new Uint16Array(this.triangleCount * 3);
@@ -35595,9 +35597,9 @@ var MercatorTile$ = {
               indexArray[index++] = ((y1 + 1) * (this._subDivisionLevel$1 + 1) + (x1 + 1));
             }
           }
-          this._indexBuffers[part] = Tile.prepDevice.createBuffer();
-          Tile.prepDevice.bindBuffer(34963, this._indexBuffers[part]);
-          Tile.prepDevice.bufferData(34963, ui16array, 35044);
+          this._indexBuffers[part] = tilePrepDevice.createBuffer();
+          tilePrepDevice.bindBuffer(34963, this._indexBuffers[part]);
+          tilePrepDevice.bufferData(34963, ui16array, 35044);
           part++;
         }
       }
@@ -35996,8 +35998,8 @@ var TangentTile$ = {
       this.readyToRender = true;
     }
     else {
-      this._vertexBuffer = Tile.prepDevice.createBuffer();
-      Tile.prepDevice.bindBuffer(34962, this._vertexBuffer);
+      this._vertexBuffer = tilePrepDevice.createBuffer();
+      tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
       var f32array = new Float32Array(9 * 5);
       var buffer = f32array;
       var index = 0;
@@ -36010,7 +36012,7 @@ var TangentTile$ = {
       index = this.addVertex(buffer, index, PositionTexture.createPos(topCenter, 0.5, 0));
       index = this.addVertex(buffer, index, PositionTexture.createPos(this.topLeft, 0, 0));
       index = this.addVertex(buffer, index, PositionTexture.createPos(this.topRight, 1, 0));
-      Tile.prepDevice.bufferData(34962, f32array, 35044);
+      tilePrepDevice.bufferData(34962, f32array, 35044);
       for (var i = 0; i < 4; i++) {
         index = 0;
         this.triangleCount = 2;
@@ -36050,9 +36052,9 @@ var TangentTile$ = {
             indexArray[index++] = 2;
             break;
         }
-        this._indexBuffers[i] = Tile.prepDevice.createBuffer();
-        Tile.prepDevice.bindBuffer(34963, this._indexBuffers[i]);
-        Tile.prepDevice.bufferData(34963, ui16array, 35044);
+        this._indexBuffers[i] = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(34963, this._indexBuffers[i]);
+        tilePrepDevice.bufferData(34963, ui16array, 35044);
       }
     }
     return true;
@@ -36127,23 +36129,23 @@ var ToastTile$ = {
   },
   _processIndexBuffer$1: function (indexArray, part) {
     if (!this.level) {
-      ToastTile.rootIndexBuffer[part] = Tile.prepDevice.createBuffer();
-      Tile.prepDevice.bindBuffer(34963, ToastTile.rootIndexBuffer[part]);
-      Tile.prepDevice.bufferData(34963, indexArray, 35044);
+      ToastTile.rootIndexBuffer[part] = tilePrepDevice.createBuffer();
+      tilePrepDevice.bindBuffer(34963, ToastTile.rootIndexBuffer[part]);
+      tilePrepDevice.bufferData(34963, indexArray, 35044);
       return;
     }
     for (var a = 0; a < 16; a++) {
       var partArray = ToastTile._cloneArray$1(indexArray);
       this._processAccomindations$1(partArray, a);
       if (this.backslash) {
-        ToastTile.backSlashIndexBuffer[part * 16 + a] = Tile.prepDevice.createBuffer();
-        Tile.prepDevice.bindBuffer(34963, ToastTile.backSlashIndexBuffer[part * 16 + a]);
-        Tile.prepDevice.bufferData(34963, partArray, 35044);
+        ToastTile.backSlashIndexBuffer[part * 16 + a] = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(34963, ToastTile.backSlashIndexBuffer[part * 16 + a]);
+        tilePrepDevice.bufferData(34963, partArray, 35044);
       }
       else {
-        ToastTile.slashIndexBuffer[part * 16 + a] = Tile.prepDevice.createBuffer();
-        Tile.prepDevice.bindBuffer(34963, ToastTile.slashIndexBuffer[part * 16 + a]);
-        Tile.prepDevice.bufferData(34963, partArray, 35044);
+        ToastTile.slashIndexBuffer[part * 16 + a] = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(34963, ToastTile.slashIndexBuffer[part * 16 + a]);
+        tilePrepDevice.bufferData(34963, partArray, 35044);
       }
     }
   },
@@ -36476,8 +36478,8 @@ var ToastTile$ = {
         }
       }
       else {
-        this._vertexBuffer = Tile.prepDevice.createBuffer();
-        Tile.prepDevice.bindBuffer(34962, this._vertexBuffer);
+        this._vertexBuffer = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(34962, this._vertexBuffer);
         var f32array = new Float32Array(this._vertexList$1.length * 5);
         var buffer = f32array;
         var index = 0;
@@ -36510,7 +36512,7 @@ var ToastTile$ = {
             }
           }
         }
-        Tile.prepDevice.bufferData(34962, f32array, 35044);
+        tilePrepDevice.bufferData(34962, f32array, 35044);
         for (var i = 0; i < 4; i++) {
           this.triangleCount = this._childTriangleList$1[i].length;
           if (this.getIndexBuffer(i, 0) == null) {
@@ -39083,7 +39085,6 @@ Tile.tilesInView = 0;
 Tile.trianglesRendered = 0;
 Tile.tilesTouched = 0;
 Tile.frustumList = null;
-Tile.prepDevice = null;
 Tile.uvMultiple = 256;
 Tile.callCount = 0;
 Tile.useAccomidation = true;
