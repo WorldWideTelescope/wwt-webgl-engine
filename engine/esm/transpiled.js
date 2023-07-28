@@ -1105,6 +1105,7 @@ export function Xyf() {
   this.iy = 0;
   this.face = 0;
 }
+
 Xyf.create = function (x, y, f) {
   var temp = new Xyf();
   temp.ix = x;
@@ -1119,6 +1120,7 @@ registerType("Xyf", [Xyf, Xyf$, null]);
 // wwtlib.HealpixUtils
 
 export function HealpixUtils() { }
+
 HealpixUtils.check = function (cond, errtxt) {
   if (!cond) {
     throw new Error(errtxt);
@@ -1162,6 +1164,7 @@ export function Hploc() {
   this.sth = 0;
   this.have_sth = false;
 }
+
 Hploc.create = function (v) {
   var temp = new Hploc();
   var xl = 1 / v.length();
@@ -1196,6 +1199,7 @@ export function Pointing() {
   this.theta = 0;
   this.phi = 0;
 }
+
 Pointing.create = function (theta, phi) {
   var temp = new Pointing();
   temp.theta = theta;
@@ -1635,6 +1639,7 @@ export function CameraParameters() {
   this.zoom = 360;
   this.viewTarget = new Vector3d();
 }
+
 CameraParameters.create = function (lat, lng, zoom, rotation, angle, opactity) {
   var temp = new CameraParameters();
   temp.lat = lat;
@@ -3573,6 +3578,7 @@ export function Dates(start, end) {
   this.startDate = start;
   this.endDate = end;
 }
+
 Dates.empty = function () {
   return new Dates(0, 0);
 };
@@ -4360,6 +4366,7 @@ export function TimeSeriesLineVertex() {
   this.tu = 0;
   this.tv = 0;
 }
+
 TimeSeriesLineVertex.create = function (position, normal, time, color) {
   var temp = new TimeSeriesLineVertex();
   temp.position = position;
@@ -4389,6 +4396,7 @@ export function TimeSeriesPointVertex() {
   this.tu = 0;
   this.tv = 0;
 }
+
 TimeSeriesPointVertex.create = function (position, size, time, color) {
   var tmp = new TimeSeriesPointVertex();
   tmp.position = position;
@@ -5970,6 +5978,7 @@ registerType("Sprite2d", [Sprite2d, Sprite2d$, null]);
 // wwtlib.Tessellator
 
 export function Tessellator() { }
+
 Tessellator.tesselateSimplePoly = function (inputList) {
   var results = [];
   var tess = new Tessellator();
@@ -7161,6 +7170,7 @@ export function Imageset() {
   this._offsetX = 0;
   this._offsetY = 0;
 }
+
 Imageset.getTileKey = function (imageset, level, x, y, parent) {
   if (imageset.get_projection() === 7 && parent != null) {
     var ipix = (parent).ipix * 4 + y * 2 + x;
@@ -8009,6 +8019,7 @@ registerType("ViewMoverKenBurnsStyle", [ViewMoverKenBurnsStyle, ViewMoverKenBurn
   this._midpointFired = false;
   this._complete = false;
 }
+
 ViewMoverSlew.create = function (from, to) {
   var temp = new ViewMoverSlew();
   temp.init(from, to);
@@ -8373,6 +8384,7 @@ export function Layer() {
   this.enabled = true;
   this.astronomical = false;
 }
+
 Layer.fromXml = function (layerNode, someFlag) {
   var layerClassName = layerNode.attributes.getNamedItem('Type').nodeValue;
   var overLayType = ss.replaceString(layerClassName, 'TerraViewer.', '');
@@ -10668,6 +10680,7 @@ registerType("Group", [Group, Group$, null]);
 export function Mesh() {
   this.boundingSphere = new SphereHull();
 }
+
 Mesh.create = function (vertices, indices) {
   var mesh = new Mesh();
   mesh.vertices = vertices;
@@ -12227,6 +12240,7 @@ registerType("Orbit", [Orbit, Orbit$, null]);
 // wwtlib.EllipseRenderer
 
 export function EllipseRenderer() { }
+
 EllipseRenderer.drawEllipseWithPosition = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix, positionNow) {
   if (EllipseRenderer._ellipseShader == null) {
     EllipseRenderer._ellipseShader = new EllipseShader();
@@ -12328,6 +12342,7 @@ export function ReferenceFrame() {
   this.worldMatrix = new Matrix3d();
   this.worldMatrix = Matrix3d.get_identity();
 }
+
 ReferenceFrame.isTLECheckSumGood = function (line) {
   if (line.length !== 69) {
     return false;
@@ -12973,6 +12988,7 @@ export function VoTable() {
   this.error = false;
   this.errorText = '';
 }
+
 VoTable.loadFromUrl = function (url, complete) {
   var temp = new VoTable();
   temp._onComplete = complete;
@@ -13256,6 +13272,7 @@ export function VoColumn(node, index) {
     }
   }
 }
+
 VoColumn.getType = function (type) {
   var Type = 13;
   switch (type) {
@@ -13723,6 +13740,7 @@ export function Place() {
   this._searchDistance = 0;
   this._elevation = 50;
 }
+
 Place.create = function (name, lat, lng, classification, constellation, type, zoomFactor) {
   var temp = new Place();
   temp.set_zoomLevel(zoomFactor);
@@ -16807,6 +16825,7 @@ export function ScriptInterface() {
   this._smoothAnimation = false;
   this._showCaptions = true;
 }
+
 ScriptInterface._containsFitsLikeExtentsion = function (url) {
   var lowerCaseUrl = url.toLowerCase();
   return (ss.endsWith(lowerCaseUrl, 'fits') || ss.endsWith(lowerCaseUrl, 'ftz') || ss.endsWith(lowerCaseUrl, 'fit') || ss.endsWith(lowerCaseUrl, 'fts'));
@@ -18233,6 +18252,7 @@ export function GlyphItem(glyph) {
   this.size = new Vector2d();
   this.referenceCount = 1;
 }
+
 GlyphItem.create = function (glyph, uv, size, extents) {
   var temp = new GlyphItem(glyph);
   temp.glyph = glyph;
@@ -20035,6 +20055,7 @@ registerType("TileCache", [TileCache, TileCache$, null]);
 // wwtlib.DistanceCalc
 
 /*internal*/ function DistanceCalc() { }
+
 DistanceCalc.lineToPoint = function (l0, l1, p) {
   var v = Vector3d.subtractVectors(l1, l0);
   var w = Vector3d.subtractVectors(p, l0);
@@ -20070,6 +20091,7 @@ export function Tour() {
   this.lengthInSecs = 0;
   this._thumbnailUrlField = '';
 }
+
 Tour._fromXml = function (child) {
   var temp = new Tour();
   if (child.attributes.getNamedItem('ID') != null) {
@@ -20227,6 +20249,7 @@ export function FileCabinet() {
   this.url = '';
   this.clearFileList();
 }
+
 FileCabinet.fromUrl = function (url, callMe) {
   var temp = new FileCabinet();
   temp.url = url;
@@ -21185,6 +21208,7 @@ export function TextObject() {
   this.fontSize = 0;
   this.borderStyle = 0;
 }
+
 TextObject.create = function (text, bold, italic, underline, fontSize, fontName, forgroundColor, backgroundColor, borderStyle) {
   var temp = new TextObject();
   temp.text = text;
@@ -21279,6 +21303,7 @@ export function TourDocument() {
   this.dontCleanUpTempFiles = false;
   this._id = Guid.newGuid().toString();
 }
+
 TourDocument.get_baseWorkingDirectory = function () {
   return '';
 };
@@ -24385,6 +24410,7 @@ registerType("TourEditor", [TourEditor, TourEditor$, null, IUiController]);
 // wwtlib.OverlayList
 
 export function OverlayList() { }
+
 OverlayList._updateOverlayList = function (currentTourStop, selection) { };
 
 OverlayList._updateOverlayListSelection = function (selection) { };
@@ -24395,6 +24421,7 @@ registerType("OverlayList", [OverlayList, OverlayList$, null]);
 // wwtlib.TourEdit
 
 export function TourEdit() { }
+
 TourEdit._ensureSelectedVisible = function () { };
 
 TourEdit._selectCurrent = function () { };
@@ -24466,6 +24493,7 @@ registerType("TourStopList", [TourStopList, TourStopList$, null]);
 // wwtlib.TimeLine
 
 export function TimeLine() { }
+
 TimeLine.refreshUi = function () { };
 var TimeLine$ = {};
 
@@ -27078,6 +27106,7 @@ registerType("UndoTourPropertiesChange", [UndoTourPropertiesChange, UndoTourProp
   this.b = -1;
   this.c = -1;
 }
+
 Triangle.create = function (a, b, c) {
   var temp = new Triangle();
   temp.a = a;
@@ -27425,6 +27454,7 @@ export function Bitmap() {
   this.width = 0;
   this.height = 0;
 }
+
 Bitmap.create = function (width, height) {
   height = Texture.fitPowerOfTwo(height);
   width = Texture.fitPowerOfTwo(width);
@@ -27602,6 +27632,7 @@ export function ToolStripMenuItem() {
   this.enabled = true;
   this.visible = true;
 }
+
 ToolStripMenuItem.create = function (name) {
   var tsmi = new ToolStripMenuItem();
   tsmi.name = name;
@@ -27657,6 +27688,7 @@ export function Histogram() {
   this._updated = false;
   this.selectedCurveStyle = 0;
 }
+
 Histogram.updateImage = function (isl, z) {
   if (!RenderContext.useGlVersion2) {
     var image = ss.safeCast(isl.get_imageSet().get_wcsImage(), FitsImageJs);
@@ -28361,6 +28393,7 @@ registerType("FolderDownloadAction", [FolderDownloadAction, FolderDownloadAction
 // wwtlib.Wtml
 
 export function Wtml() { }
+
 Wtml.getWtmlFile = function (url, complete, loadChildFolders) {
   if (loadChildFolders == null) {
     loadChildFolders = false;
@@ -32463,6 +32496,7 @@ export function EquirectangularTile() {
   this._subDivisionLevel$1 = 1;
   Tile.call(this);
 }
+
 EquirectangularTile.create = function (level, x, y, dataset, parent) {
   var temp = new EquirectangularTile();
   temp.parent = parent;
@@ -33054,6 +33088,7 @@ export function ImageSetLayer() {
   this._loaded$1 = false;
   Layer.call(this);
 }
+
 ImageSetLayer.create = function (set) {
   var isl = new ImageSetLayer();
   isl._imageSet$1 = set;
@@ -38044,6 +38079,7 @@ export function MercatorTile() {
   this._subDivisionLevel$1 = 32;
   Tile.call(this);
 }
+
 MercatorTile.create = function (level, X, Y, dataset, parent) {
   var temp = new MercatorTile();
   temp.parent = parent;
@@ -38418,6 +38454,7 @@ export function PlotTile() {
   this._subDivided$1 = false;
   Tile.call(this);
 }
+
 PlotTile.create = function (level, xc, yc, dataset, parent) {
   var temp = new PlotTile();
   temp.parent = parent;
@@ -39419,6 +39456,7 @@ export function BitmapOverlay() {
   this._sprite$1 = new Sprite2d();
   Overlay.call(this);
 }
+
 BitmapOverlay.create = function (owner, file) {
   var temp = new BitmapOverlay();
   temp.set_owner(owner);
@@ -39535,6 +39573,7 @@ export function TextOverlay() {
   this._ce$1 = null;
   Overlay.call(this);
 }
+
 TextOverlay.create = function (textObject) {
   var to = new TextOverlay();
   to.textObject = textObject;
@@ -39706,6 +39745,7 @@ export function ShapeOverlay() {
   this._triangleStrip$1 = true;
   Overlay.call(this);
 }
+
 ShapeOverlay._create = function (currentTourStop, shapeType) {
   var overlay = new ShapeOverlay();
   overlay._shapeType$1 = shapeType;
@@ -40193,6 +40233,7 @@ export function AudioOverlay() {
   Overlay.call(this);
   this.isDesignTimeOnly = true;
 }
+
 AudioOverlay.create = function (currentTourStop, file) {
   var ao = new AudioOverlay();
   ao.set_owner(currentTourStop);
@@ -40708,6 +40749,7 @@ export function FitsImageJs(dataset, file, blob, callMeBack) {
   this.isTiledFits = false;
   FitsImage.call(this, dataset, file, blob, callMeBack);
 }
+
 FitsImageJs.createTiledFits = function (dataset, file, callMeBack) {
   var fits = new FitsImageJs(dataset, file, null, callMeBack);
   fits.isTiledFits = true;
