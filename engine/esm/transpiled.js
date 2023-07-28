@@ -760,8 +760,7 @@ registerType("IUndoStep", [IUndoStep]);
 
 // GFX
 
-export function GFX() {
-}
+export function GFX() { }
 
 registerType("GFX", [GFX, null, null]);
 
@@ -781,9 +780,7 @@ export function VideoOutputType(width, height, fps, format, waitDownload) {
   this.waitDownload = waitDownload;
 }
 
-var VideoOutputType$ = {
-
-};
+var VideoOutputType$ = {};
 
 registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
 
@@ -925,8 +922,7 @@ registerType("HipsProperties", [HipsProperties, HipsProperties$, null]);
 
 // wwtlib.FastMath
 
-export function FastMath() {
-}
+export function FastMath() { }
 
 FastMath._pI4_A = 0.785398155450821;
 FastMath._pI4_B = 7.94662735614793E-09;
@@ -1061,16 +1057,13 @@ FastMath.cos = function (d) {
   }
   return FastMath._sincoshelper(d);
 };
-var FastMath$ = {
-
-};
+var FastMath$ = {};
 
 registerType("FastMath", [FastMath, FastMath$, null]);
 
 // wwtlib.HealpixTables
 
-export function HealpixTables() {
-}
+export function HealpixTables() { }
 
 HealpixTables.ctab = [0, 1, 256, 257, 2, 3, 258, 259, 512, 513, 768, 769, 514, 515, 770, 771, 4, 5, 260, 261, 6, 7, 262, 263, 516, 517, 772, 773, 518, 519, 774, 775, 1024, 1025, 1280, 1281, 1026, 1027, 1282, 1283, 1536, 1537, 1792, 1793, 1538, 1539, 1794, 1795, 1028, 1029, 1284, 1285, 1030, 1031, 1286, 1287, 1540, 1541, 1796, 1797, 1542, 1543, 1798, 1799, 8, 9, 264, 265, 10, 11, 266, 267, 520, 521, 776, 777, 522, 523, 778, 779, 12, 13, 268, 269, 14, 15, 270, 271, 524, 525, 780, 781, 526, 527, 782, 783, 1032, 1033, 1288, 1289, 1034, 1035, 1290, 1291, 1544, 1545, 1800, 1801, 1546, 1547, 1802, 1803, 1036, 1037, 1292, 1293, 1038, 1039, 1294, 1295, 1548, 1549, 1804, 1805, 1550, 1551, 1806, 1807, 2048, 2049, 2304, 2305, 2050, 2051, 2306, 2307, 2560, 2561, 2816, 2817, 2562, 2563, 2818, 2819, 2052, 2053, 2308, 2309, 2054, 2055, 2310, 2311, 2564, 2565, 2820, 2821, 2566, 2567, 2822, 2823, 3072, 3073, 3328, 3329, 3074, 3075, 3330, 3331, 3584, 3585, 3840, 3841, 3586, 3587, 3842, 3843, 3076, 3077, 3332, 3333, 3078, 3079, 3334, 3335, 3588, 3589, 3844, 3845, 3590, 3591, 3846, 3847, 2056, 2057, 2312, 2313, 2058, 2059, 2314, 2315, 2568, 2569, 2824, 2825, 2570, 2571, 2826, 2827, 2060, 2061, 2316, 2317, 2062, 2063, 2318, 2319, 2572, 2573, 2828, 2829, 2574, 2575, 2830, 2831, 3080, 3081, 3336, 3337, 3082, 3083, 3338, 3339, 3592, 3593, 3848, 3849, 3594, 3595, 3850, 3851, 3084, 3085, 3340, 3341, 3086, 3087, 3342, 3343, 3596, 3597, 3852, 3853, 3598, 3599, 3854, 3855];
 HealpixTables.utab = [0, 1, 4, 5, 16, 17, 20, 21, 64, 65, 68, 69, 80, 81, 84, 85, 256, 257, 260, 261, 272, 273, 276, 277, 320, 321, 324, 325, 336, 337, 340, 341, 1024, 1025, 1028, 1029, 1040, 1041, 1044, 1045, 1088, 1089, 1092, 1093, 1104, 1105, 1108, 1109, 1280, 1281, 1284, 1285, 1296, 1297, 1300, 1301, 1344, 1345, 1348, 1349, 1360, 1361, 1364, 1365, 4096, 4097, 4100, 4101, 4112, 4113, 4116, 4117, 4160, 4161, 4164, 4165, 4176, 4177, 4180, 4181, 4352, 4353, 4356, 4357, 4368, 4369, 4372, 4373, 4416, 4417, 4420, 4421, 4432, 4433, 4436, 4437, 5120, 5121, 5124, 5125, 5136, 5137, 5140, 5141, 5184, 5185, 5188, 5189, 5200, 5201, 5204, 5205, 5376, 5377, 5380, 5381, 5392, 5393, 5396, 5397, 5440, 5441, 5444, 5445, 5456, 5457, 5460, 5461, 16384, 16385, 16388, 16389, 16400, 16401, 16404, 16405, 16448, 16449, 16452, 16453, 16464, 16465, 16468, 16469, 16640, 16641, 16644, 16645, 16656, 16657, 16660, 16661, 16704, 16705, 16708, 16709, 16720, 16721, 16724, 16725, 17408, 17409, 17412, 17413, 17424, 17425, 17428, 17429, 17472, 17473, 17476, 17477, 17488, 17489, 17492, 17493, 17664, 17665, 17668, 17669, 17680, 17681, 17684, 17685, 17728, 17729, 17732, 17733, 17744, 17745, 17748, 17749, 20480, 20481, 20484, 20485, 20496, 20497, 20500, 20501, 20544, 20545, 20548, 20549, 20560, 20561, 20564, 20565, 20736, 20737, 20740, 20741, 20752, 20753, 20756, 20757, 20800, 20801, 20804, 20805, 20816, 20817, 20820, 20821, 21504, 21505, 21508, 21509, 21520, 21521, 21524, 21525, 21568, 21569, 21572, 21573, 21584, 21585, 21588, 21589, 21760, 21761, 21764, 21765, 21776, 21777, 21780, 21781, 21824, 21825, 21828, 21829, 21840, 21841, 21844, 21845];
@@ -1079,9 +1072,7 @@ HealpixTables.jpll = [1, 3, 5, 7, 0, 2, 4, 6, 1, 3, 5, 7];
 HealpixTables.xoffset = [-1, -1, 0, 1, 1, 1, 0, -1];
 HealpixTables.yoffset = [0, 1, 1, 1, 0, -1, -1, -1];
 
-var HealpixTables$ = {
-
-};
+var HealpixTables$ = {};
 
 registerType("HealpixTables", [HealpixTables, HealpixTables$, null]);
 
@@ -1099,16 +1090,13 @@ Xyf.create = function (x, y, f) {
   temp.face = f;
   return temp;
 };
-var Xyf$ = {
-
-};
+var Xyf$ = {};
 
 registerType("Xyf", [Xyf, Xyf$, null]);
 
 // wwtlib.HealpixUtils
 
-export function HealpixUtils() {
-}
+export function HealpixUtils() { }
 HealpixUtils.check = function (cond, errtxt) {
   if (!cond) {
     throw new Error(errtxt);
@@ -1137,9 +1125,7 @@ HealpixUtils.fmodulo = function (v1, v2) {
   var tmp = v1 % v2 + v2;
   return (tmp === v2) ? 0 : tmp;
 };
-var HealpixUtils$ = {
-
-};
+var HealpixUtils$ = {};
 
 registerType("HealpixUtils", [HealpixUtils, HealpixUtils$, null]);
 
@@ -4185,8 +4171,7 @@ registerType("TimeSeriesPointVertex", [TimeSeriesPointVertex, TimeSeriesPointVer
 
 // wwtlib.SimpleLineShader
 
-export function SimpleLineShader() {
-}
+export function SimpleLineShader() { }
 
 SimpleLineShader.vertLoc = 0;
 SimpleLineShader.initialized = false;
@@ -4248,16 +4233,13 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
-var SimpleLineShader$ = {
-
-};
+var SimpleLineShader$ = {};
 
 registerType("SimpleLineShader", [SimpleLineShader, SimpleLineShader$, null]);
 
 // wwtlib.SimpleLineShader2D
 
-export function SimpleLineShader2D() {
-}
+export function SimpleLineShader2D() { }
 
 SimpleLineShader2D.vertLoc = 0;
 SimpleLineShader2D.initialized = false;
@@ -4315,16 +4297,13 @@ SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
-var SimpleLineShader2D$ = {
-
-};
+var SimpleLineShader2D$ = {};
 
 registerType("SimpleLineShader2D", [SimpleLineShader2D, SimpleLineShader2D$, null]);
 
 // wwtlib.OrbitLineShader
 
-export function OrbitLineShader() {
-}
+export function OrbitLineShader() { }
 
 OrbitLineShader.vertLoc = 0;
 OrbitLineShader.colorLoc = 0;
@@ -4390,16 +4369,13 @@ OrbitLineShader.use = function (renderContext, vertex, lineColor) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
-var OrbitLineShader$ = {
-
-};
+var OrbitLineShader$ = {};
 
 registerType("OrbitLineShader", [OrbitLineShader, OrbitLineShader$, null]);
 
 // wwtlib.LineShaderNormalDates
 
-export function LineShaderNormalDates() {
-}
+export function LineShaderNormalDates() { }
 
 LineShaderNormalDates.vertLoc = 0;
 LineShaderNormalDates.colorLoc = 0;
@@ -4472,16 +4448,13 @@ LineShaderNormalDates.use = function (renderContext, vertex, lineColor, zBuffer,
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
-var LineShaderNormalDates$ = {
-
-};
+var LineShaderNormalDates$ = {};
 
 registerType("LineShaderNormalDates", [LineShaderNormalDates, LineShaderNormalDates$, null]);
 
 // wwtlib.TimeSeriesPointSpriteShader
 
-export function TimeSeriesPointSpriteShader() {
-}
+export function TimeSeriesPointSpriteShader() { }
 
 TimeSeriesPointSpriteShader.vertLoc = 0;
 TimeSeriesPointSpriteShader.colorLoc = 0;
@@ -4576,16 +4549,13 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
   }
 };
-var TimeSeriesPointSpriteShader$ = {
-
-};
+var TimeSeriesPointSpriteShader$ = {};
 
 registerType("TimeSeriesPointSpriteShader", [TimeSeriesPointSpriteShader, TimeSeriesPointSpriteShader$, null]);
 
 // wwtlib.KeplerPointSpriteShader
 
-export function KeplerPointSpriteShader() {
-}
+export function KeplerPointSpriteShader() { }
 
 KeplerPointSpriteShader.abcLoc = 0;
 KeplerPointSpriteShader.abcLoc1 = 0;
@@ -4694,16 +4664,13 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
   }
 };
-var KeplerPointSpriteShader$ = {
-
-};
+var KeplerPointSpriteShader$ = {};
 
 registerType("KeplerPointSpriteShader", [KeplerPointSpriteShader, KeplerPointSpriteShader$, null]);
 
 // wwtlib.EllipseShader
 
-export function EllipseShader() {
-}
+export function EllipseShader() { }
 
 EllipseShader.angleLoc = 0;
 EllipseShader.initialized = false;
@@ -4767,17 +4734,14 @@ EllipseShader.use = function (renderContext, semiMajorAxis, eccentricity, eccent
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
   }
 };
-var EllipseShader$ = {
-
-};
+var EllipseShader$ = {};
 
 registerType("EllipseShader", [EllipseShader, EllipseShader$, null]);
 
 
 // wwtlib.ModelShader
 
-export function ModelShader() {
-}
+export function ModelShader() { }
 
 ModelShader.vertLoc = 0;
 ModelShader.normalLoc = 0;
@@ -4888,16 +4852,13 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     }
   }
 };
-var ModelShader$ = {
-
-};
+var ModelShader$ = {};
 
 registerType("ModelShader", [ModelShader, ModelShader$, null]);
 
 // wwtlib.ModelShaderTan
 
-export function ModelShaderTan() {
-}
+export function ModelShaderTan() { }
 
 ModelShaderTan.vertLoc = 0;
 ModelShaderTan.normalLoc = 0;
@@ -5008,17 +4969,14 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     }
   }
 };
-var ModelShaderTan$ = {
-
-};
+var ModelShaderTan$ = {};
 
 registerType("ModelShaderTan", [ModelShaderTan, ModelShaderTan$, null]);
 
 
 // wwtlib.TileShader
 
-export function TileShader() {
-}
+export function TileShader() { }
 
 TileShader.vertLoc = 0;
 TileShader.textureLoc = 0;
@@ -5136,17 +5094,14 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     }
   }
 };
-var TileShader$ = {
-
-};
+var TileShader$ = {};
 
 registerType("TileShader", [TileShader, TileShader$, null]);
 
 
 // wwtlib.FitsShader
 
-export function FitsShader() {
-}
+export function FitsShader() { }
 
 FitsShader.vertLoc = 0;
 FitsShader.textureLoc = 0;
@@ -5268,17 +5223,14 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     }
   }
 };
-var FitsShader$ = {
-
-};
+var FitsShader$ = {};
 
 registerType("FitsShader", [FitsShader, FitsShader$, null]);
 
 
 // wwtlib.ImageShader
 
-export function ImageShader() {
-}
+export function ImageShader() { }
 
 ImageShader.vertLoc = 0;
 ImageShader.textureLoc = 0;
@@ -5363,16 +5315,13 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     }
   }
 };
-var ImageShader$ = {
-
-};
+var ImageShader$ = {};
 
 registerType("ImageShader", [ImageShader, ImageShader$, null]);
 
 // wwtlib.ImageShader2
 
-export function ImageShader2() {
-}
+export function ImageShader2() { }
 
 ImageShader2.vertLoc = 0;
 ImageShader2.textureLoc = 0;
@@ -5457,16 +5406,13 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     }
   }
 };
-var ImageShader2$ = {
-
-};
+var ImageShader2$ = {};
 
 registerType("ImageShader2", [ImageShader2, ImageShader2$, null]);
 
 // wwtlib.SpriteShader
 
-export function SpriteShader() {
-}
+export function SpriteShader() { }
 
 SpriteShader.vertLoc = 0;
 SpriteShader.textureLoc = 0;
@@ -5537,16 +5483,13 @@ SpriteShader.use = function (renderContext, vertex, texture) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
-var SpriteShader$ = {
-
-};
+var SpriteShader$ = {};
 
 registerType("SpriteShader", [SpriteShader, SpriteShader$, null]);
 
 // wwtlib.ShapeSpriteShader
 
-export function ShapeSpriteShader() {
-}
+export function ShapeSpriteShader() { }
 
 ShapeSpriteShader.vertLoc = 0;
 ShapeSpriteShader.textureLoc = 0;
@@ -5608,16 +5551,13 @@ ShapeSpriteShader.use = function (renderContext, vertex) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
-var ShapeSpriteShader$ = {
-
-};
+var ShapeSpriteShader$ = {};
 
 registerType("ShapeSpriteShader", [ShapeSpriteShader, ShapeSpriteShader$, null]);
 
 // wwtlib.TextShader
 
-export function TextShader() {
-}
+export function TextShader() { }
 
 TextShader.vertLoc = 0;
 TextShader.textureLoc = 0;
@@ -5688,9 +5628,7 @@ TextShader.use = function (renderContext, vertex, texture) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
-var TextShader$ = {
-
-};
+var TextShader$ = {};
 
 registerType("TextShader", [TextShader, TextShader$, null]);
 
@@ -5771,8 +5709,7 @@ registerType("Sprite2d", [Sprite2d, Sprite2d$, null]);
 
 // wwtlib.Tessellator
 
-export function Tessellator() {
-}
+export function Tessellator() { }
 Tessellator.tesselateSimplePoly = function (inputList) {
   var results = [];
   var tess = new Tessellator();
@@ -5981,8 +5918,7 @@ registerType("Texture", [Texture, Texture$, null, ss.IDisposable]);
 
 // wwtlib.Grids
 
-export function Grids() {
-}
+export function Grids() { }
 
 Grids._galaxyImageIndexBuffer = null;
 Grids._galaxyImageTriangleCount = 0;
@@ -6887,9 +6823,7 @@ Grids._makePlanetGridText = function () {
     }
   }
 };
-var Grids$ = {
-
-};
+var Grids$ = {};
 
 registerType("Grids", [Grids, Grids$, null]);
 
@@ -7866,12 +7800,9 @@ registerType("KeplerVertex", [KeplerVertex, KeplerVertex$, null]);
 
 // wwtlib.ScaleMap
 
-export function ScaleMap() {
-}
+export function ScaleMap() { }
 
-var ScaleMap$ = {
-
-};
+var ScaleMap$ = {};
 
 registerType("ScaleMap", [ScaleMap, ScaleMap$, null]);
 
@@ -8343,16 +8274,13 @@ export function DomainValue(text, markerIndex) {
   this.markerIndex = markerIndex;
 }
 
-var DomainValue$ = {
-
-};
+var DomainValue$ = {};
 
 registerType("DomainValue", [DomainValue, DomainValue$, null]);
 
 // wwtlib.LayerManager
 
-export function LayerManager() {
-}
+export function LayerManager() { }
 
 LayerManager._version = 0;
 LayerManager._tourLayers = false;
@@ -9381,8 +9309,7 @@ LayerManager.showLayerMenu = function (selected, x, y) {
     LayerManager._contextMenu._show(Vector2d.create(x, y));
   }
 };
-LayerManager._publishMenu_Click = function (sender, e) {
-};
+LayerManager._publishMenu_Click = function (sender, e) { };
 LayerManager._addGirdLayer_Click = function (sender, e) {
   var layer = new GridLayer();
   layer.enabled = true;
@@ -9400,24 +9327,18 @@ LayerManager._trackFrame_Click = function (sender, e) {
   WWTControl.singleton.renderContext.set_trackingFrame(target.get_name());
   WWTControl.singleton.renderContext.viewCamera.zoom = WWTControl.singleton.renderContext.targetCamera.zoom = 1E-09;
 };
-LayerManager._goTo_Click = function (sender, e) {
-};
-LayerManager._saveMenu_Click = function (sender, e) {
-};
-LayerManager._expand_Click = function (sender, e) {
-};
-LayerManager._collapse_Click = function (sender, e) {
-};
+LayerManager._goTo_Click = function (sender, e) { };
+LayerManager._saveMenu_Click = function (sender, e) { };
+LayerManager._expand_Click = function (sender, e) { };
+LayerManager._collapse_Click = function (sender, e) { };
 LayerManager._copyMenu_Click = function (sender, e) {
   if (LayerManager._selectedLayer != null && ss.canCast(LayerManager._selectedLayer, Layer)) {
     var node = LayerManager._selectedLayer;
     node.copyToClipboard();
   }
 };
-LayerManager._newLayerGroupMenu_Click = function (sender, e) {
-};
-LayerManager._importTLEFile = function (filename) {
-};
+LayerManager._newLayerGroupMenu_Click = function (sender, e) { };
+LayerManager._importTLEFile = function (filename) { };
 LayerManager._makeLayerGroupNow = function (name) {
   var target = LayerManager._selectedLayer;
   LayerManager._makeLayerGroup(name, target);
@@ -9434,10 +9355,8 @@ LayerManager._makeLayerGroup = function (name, target) {
   LayerManager.get_allMaps()[frame.name] = newMap;
   LayerManager._version++;
 };
-LayerManager._lifeTimeMenu_Click = function (sender, e) {
-};
-LayerManager._deleteFrameMenu_Click = function (sender, e) {
-};
+LayerManager._lifeTimeMenu_Click = function (sender, e) { };
+LayerManager._deleteFrameMenu_Click = function (sender, e) { };
 LayerManager._framePropertiesMenu_Click = function (sender, e) {
   var target = LayerManager._selectedLayer;
   LayerManager.get_referenceFramePropsDialog().show(target.frame, e);
@@ -9478,8 +9397,7 @@ LayerManager.pasteFromTle = function (lines, frame) {
   }
   return false;
 };
-LayerManager._opacityMenu_Click = function (sender, e) {
-};
+LayerManager._opacityMenu_Click = function (sender, e) { };
 LayerManager._defaultImageset_Click = function (sender, e) {
   var isl = ss.safeCast(LayerManager._selectedLayer, ImageSetLayer);
   isl.set_overrideDefaultLayer(!isl.get_overrideDefaultLayer());
@@ -9515,8 +9433,7 @@ LayerManager._colorMenu_Click = function (sender, e) {
   };
   picker.show(e);
 };
-LayerManager._addMenu_Click = function (sender, e) {
-};
+LayerManager._addMenu_Click = function (sender, e) { };
 LayerManager._deleteMenu_Click = function (sender, e) {
   LayerManager._deleteSelectedLayer();
 };
@@ -9764,9 +9681,7 @@ LayerManager._loadOrbitsFile = function (name, data, currentMap) {
   LayerManager.loadTree();
   return layer;
 };
-var LayerManager$ = {
-
-};
+var LayerManager$ = {};
 
 registerType("LayerManager", [LayerManager, LayerManager$, null]);
 
@@ -9871,41 +9786,31 @@ registerType("LayerMap", [LayerMap, LayerMap$, null]);
 
 // wwtlib.SkyOverlays
 
-export function SkyOverlays() {
-}
+export function SkyOverlays() { }
 
-var SkyOverlays$ = {
-
-};
+var SkyOverlays$ = {};
 
 registerType("SkyOverlays", [SkyOverlays, SkyOverlays$, null]);
 
 // wwtlib.GroundOverlayLayer
 
-export function GroundOverlayLayer() {
-}
+export function GroundOverlayLayer() { }
 
-var GroundOverlayLayer$ = {
-
-};
+var GroundOverlayLayer$ = {};
 
 registerType("GroundOverlayLayer", [GroundOverlayLayer, GroundOverlayLayer$, null]);
 
 // wwtlib.FrameTarget
 
-export function FrameTarget() {
-}
+export function FrameTarget() { }
 
-var FrameTarget$ = {
-
-};
+var FrameTarget$ = {};
 
 registerType("FrameTarget", [FrameTarget, FrameTarget$, null]);
 
 // wwtlib.LayerUI
 
-export function LayerUI() {
-}
+export function LayerUI() { }
 
 LayerUI._type = null;
 
@@ -10145,9 +10050,7 @@ export function Group() {
   this.materialIndex = 0;
 }
 
-var Group$ = {
-
-};
+var Group$ = {};
 
 registerType("Group", [Group, Group$, null]);
 
@@ -10258,9 +10161,7 @@ registerType("Mesh", [Mesh, Mesh$, null, ss.IDisposable]);
   this.index = 0;
 }
 
-var VertexPosition$ = {
-
-};
+var VertexPosition$ = {};
 
 registerType("VertexPosition", [VertexPosition, VertexPosition$, null]);
 
@@ -11629,9 +11530,7 @@ export function ObjectNode() {
   this.applyListsIndex = [];
 }
 
-var ObjectNode$ = {
-
-};
+var ObjectNode$ = {};
 
 registerType("ObjectNode", [ObjectNode, ObjectNode$, null]);
 
@@ -11687,8 +11586,7 @@ registerType("Orbit", [Orbit, Orbit$, null]);
 
 // wwtlib.EllipseRenderer
 
-export function EllipseRenderer() {
-}
+export function EllipseRenderer() { }
 EllipseRenderer.drawEllipseWithPosition = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix, positionNow) {
   if (EllipseRenderer._ellipseShader == null) {
     EllipseRenderer._ellipseShader = new EllipseShader();
@@ -11742,9 +11640,7 @@ EllipseRenderer.createEllipseVertexBufferWithoutStartPoint = function (vertexCou
   vb.unlock();
   return vb;
 };
-var EllipseRenderer$ = {
-
-};
+var EllipseRenderer$ = {};
 
 registerType("EllipseRenderer", [EllipseRenderer, EllipseRenderer$, null]);
 
@@ -12172,9 +12068,7 @@ export function KmlCoordinate() {
   this.alt = 0;
 }
 
-var KmlCoordinate$ = {
-
-};
+var KmlCoordinate$ = {};
 
 registerType("KmlCoordinate", [KmlCoordinate, KmlCoordinate$, null]);
 
@@ -12235,8 +12129,7 @@ registerType("KmlLineList", [KmlLineList, KmlLineList$, null]);
 
 // wwtlib.PushPin
 
-export function PushPin() {
-}
+export function PushPin() { }
 
 PushPin._pinTextureCache = {};
 PushPin._pins = null;
@@ -12274,9 +12167,7 @@ PushPin.getPushPinTexture = function (pinId) {
   }
   return texture;
 };
-var PushPin$ = {
-
-};
+var PushPin$ = {};
 
 registerType("PushPin", [PushPin, PushPin$, null]);
 
@@ -12947,8 +12838,7 @@ registerType("WcsImage", [WcsImage, WcsImage$, null]);
 
 // wwtlib.MinorPlanets
 
-/*internal*/ function MinorPlanets() {
-}
+/*internal*/ function MinorPlanets() { }
 
 MinorPlanets.mpcList = [];
 MinorPlanets._initBegun = false;
@@ -13078,9 +12968,7 @@ MinorPlanets.initMPCVertexBuffer = function () {
   finally {
   }
 };
-var MinorPlanets$ = {
-
-};
+var MinorPlanets$ = {};
 
 registerType("MinorPlanets", [MinorPlanets, MinorPlanets$, null]);
 
@@ -13501,9 +13389,7 @@ export function KeplerianElements() {
   this.ea = 0;
 }
 
-var KeplerianElements$ = {
-
-};
+var KeplerianElements$ = {};
 
 registerType("KeplerianElements", [KeplerianElements, KeplerianElements$, null]);
 
@@ -13520,16 +13406,13 @@ export function BodyAngles(poleRa, poleDec, primeMeridian, rotationRate) {
   this.rotationRate = rotationRate;
 }
 
-var BodyAngles$ = {
-
-};
+var BodyAngles$ = {};
 
 registerType("BodyAngles", [BodyAngles, BodyAngles$, null]);
 
 // wwtlib.Planets
 
-export function Planets() {
-}
+export function Planets() { }
 
 Planets.highPercision = true;
 Planets.RC = (Math.PI / 180);
@@ -13954,8 +13837,7 @@ Planets.updatePlanetLocations = function (threeDee) {
   Planets._planetScales[5] = Planets._planetScales[5] * 2;
   Planets._lastUpdate = SpaceTimeController.get_now();
 };
-Planets.planetsReady = function () {
-};
+Planets.planetsReady = function () { };
 Planets.updateOrbits = function (planetCenter) {
   try {
     Planets._obliquity = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow()) * Planets.RC;
@@ -14031,8 +13913,7 @@ Planets.updateOrbits = function (planetCenter) {
 Planets.readOrbits = function () {
   return false;
 };
-Planets.dumpOrbitsFile = function () {
-};
+Planets.dumpOrbitsFile = function () { };
 Planets.drawPlanets = function (renderContext, opacity) {
   if (Planets._planetTextures == null) {
     Planets._loadPlanetTextures();
@@ -14196,8 +14077,7 @@ Planets._setupMatrixForPlanetGeometry = function (renderContext, planetID, cente
   renderContext.set_worldBaseNonRotating(matNonRotating);
   return rotationCurrent;
 };
-Planets.initPlanetResources = function (renderContext) {
-};
+Planets.initPlanetResources = function (renderContext) { };
 Planets._drawSingleOrbit = function (renderContext, eclipticColor, id, centerPoint, startAngle, planetNow, opacity) {
   if (opacity < 0.01) {
     return;
@@ -14826,8 +14706,7 @@ Planets._drawPlanet = function (renderContext, planetID, opacity) {
     ctx.restore();
   }
 };
-Planets._drawPlanetPhase = function (renderContext, planetID, phase, angle, dark) {
-};
+Planets._drawPlanetPhase = function (renderContext, planetID, phase, angle, dark) { };
 Planets._geocentricElongation = function (ObjectAlpha, ObjectDelta, SunAlpha, SunDelta) {
   ObjectAlpha = Coordinates.degreesToRadians(ObjectAlpha * 15);
   SunAlpha = Coordinates.degreesToRadians(SunAlpha * 15);
@@ -14859,9 +14738,7 @@ Planets._drawSphere = function (renderContext, planetID) {
     return;
   }
 };
-var Planets$ = {
-
-};
+var Planets$ = {};
 
 registerType("Planets", [Planets, Planets$, null]);
 
@@ -14873,9 +14750,7 @@ export function Material() {
   this.isDefault = false;
 }
 
-var Material$ = {
-
-};
+var Material$ = {};
 
 registerType("Material", [Material, Material$, null]);
 
@@ -14885,9 +14760,7 @@ export function InViewReturnMessage() {
   this.aborted = false;
 }
 
-var InViewReturnMessage$ = {
-
-};
+var InViewReturnMessage$ = {};
 
 registerType("InViewReturnMessage", [InViewReturnMessage, InViewReturnMessage$, null]);
 
@@ -17456,8 +17329,7 @@ registerType("Text3d", [Text3d, Text3d$, null]);
 
 // wwtlib.SpaceTimeController
 
-export function SpaceTimeController() {
-}
+export function SpaceTimeController() { }
 
 SpaceTimeController.framesPerSecond = 30;
 SpaceTimeController.frameDumping = false;
@@ -17665,9 +17537,7 @@ SpaceTimeController.dateToJD = function (Year, Month, Day, bGregorianCalendar) {
   }
   return ss.truncate((365.25 * (Y + 4716))) + ss.truncate((30.6001 * (M + 1))) + Day + B - 1524.5;
 };
-var SpaceTimeController$ = {
-
-};
+var SpaceTimeController$ = {};
 
 registerType("SpaceTimeController", [SpaceTimeController, SpaceTimeController$, null]);
 
@@ -17904,9 +17774,7 @@ Galaxy.getEType = function (value) {
   }
   return a;
 };
-var Galaxy$ = {
-
-};
+var Galaxy$ = {};
 
 registerType("Galaxy", [Galaxy, Galaxy$, null]);
 
@@ -17919,9 +17787,7 @@ export function LatLngEdges() {
   this.lngMax = 0;
 }
 
-var LatLngEdges$ = {
-
-};
+var LatLngEdges$ = {};
 
 registerType("LatLngEdges", [LatLngEdges, LatLngEdges$, null]);
 
@@ -18657,8 +18523,7 @@ registerType("Tile", [Tile, Tile$, null]);
 
 // wwtlib.TileCache
 
-/*internal*/ function TileCache() {
-}
+/*internal*/ function TileCache() { }
 
 TileCache._queue = {};
 TileCache._tiles = {};
@@ -18904,17 +18769,14 @@ TileCache.decimateQueue = function () {
     delete TileCache._queue[t.get_key()];
   }
 };
-var TileCache$ = {
-
-};
+var TileCache$ = {};
 
 registerType("TileCache", [TileCache, TileCache$, null]);
 
 
 // wwtlib.DistanceCalc
 
-/*internal*/ function DistanceCalc() {
-}
+/*internal*/ function DistanceCalc() { }
 DistanceCalc.lineToPoint = function (l0, l1, p) {
   var v = Vector3d.subtractVectors(l1, l0);
   var w = Vector3d.subtractVectors(p, l0);
@@ -18935,9 +18797,7 @@ DistanceCalc.getUVFromInnerPoint = function (ul, ur, ll, lr, pnt) {
   var dHoriz = dRight + dLeft;
   return Vector2d.create(dLeft / dHoriz, dUpper / dVert);
 };
-var DistanceCalc$ = {
-
-};
+var DistanceCalc$ = {};
 
 registerType("DistanceCalc", [DistanceCalc, DistanceCalc$, null]);
 
@@ -19287,9 +19147,7 @@ export function SettingParameter(edgeTrigger, opacity, targetState, filter) {
   this.filter = filter;
 }
 
-var SettingParameter$ = {
-
-};
+var SettingParameter$ = {};
 
 registerType("SettingParameter", [SettingParameter, SettingParameter$, null]);
 
@@ -22945,26 +22803,18 @@ registerType("TourEditor", [TourEditor, TourEditor$, null, IUiController]);
 
 // wwtlib.OverlayList
 
-export function OverlayList() {
-}
-OverlayList._updateOverlayList = function (currentTourStop, selection) {
-};
-OverlayList._updateOverlayListSelection = function (selection) {
-};
-var OverlayList$ = {
-
-};
+export function OverlayList() { }
+OverlayList._updateOverlayList = function (currentTourStop, selection) { };
+OverlayList._updateOverlayListSelection = function (selection) { };
+var OverlayList$ = {};
 
 registerType("OverlayList", [OverlayList, OverlayList$, null]);
 
 // wwtlib.TourEdit
 
-export function TourEdit() {
-}
-TourEdit._ensureSelectedVisible = function () {
-};
-TourEdit._selectCurrent = function () {
-};
+export function TourEdit() { }
+TourEdit._ensureSelectedVisible = function () { };
+TourEdit._selectCurrent = function () { };
 TourEdit._undoStep = function () {
   if (Undo.peekAction()) {
     Undo.stepBack();
@@ -22975,9 +22825,7 @@ TourEdit._redoStep = function () {
     Undo.stepForward();
   }
 };
-var TourEdit$ = {
-
-};
+var TourEdit$ = {};
 
 registerType("TourEdit", [TourEdit, TourEdit$, null]);
 
@@ -22987,9 +22835,7 @@ export function SoundEditor() {
   this.target = null;
 }
 
-var SoundEditor$ = {
-
-};
+var SoundEditor$ = {};
 
 registerType("SoundEditor", [SoundEditor, SoundEditor$, null]);
 
@@ -23030,13 +22876,9 @@ registerType("TourStopList", [TourStopList, TourStopList$, null]);
 
 // wwtlib.TimeLine
 
-export function TimeLine() {
-}
-TimeLine.refreshUi = function () {
-};
-var TimeLine$ = {
-
-};
+export function TimeLine() { }
+TimeLine.refreshUi = function () { };
+var TimeLine$ = {};
 
 registerType("TimeLine", [TimeLine, TimeLine$, null]);
 
@@ -23615,9 +23457,7 @@ export function MasterTime(master, duration) {
   this.duration = duration;
 }
 
-var MasterTime$ = {
-
-};
+var MasterTime$ = {};
 
 registerType("MasterTime", [MasterTime, MasterTime$, null]);
 
@@ -25170,9 +25010,7 @@ export function LayerInfo() {
   this.frameParams = new Array(0);
 }
 
-var LayerInfo$ = {
-
-};
+var LayerInfo$ = {};
 
 registerType("LayerInfo", [LayerInfo, LayerInfo$, null]);
 
@@ -25228,8 +25066,7 @@ registerType("UndoTourStopChange", [UndoTourStopChange, UndoTourStopChange$, nul
 
 // wwtlib.Undo
 
-export function Undo() {
-}
+export function Undo() { }
 
 Undo._undoStack = new ss.Stack();
 Undo._redoStack = new ss.Stack();
@@ -25274,16 +25111,13 @@ Undo.stepForward = function () {
   step.redo();
   Undo._undoStack.push(step);
 };
-var Undo$ = {
-
-};
+var Undo$ = {};
 
 registerType("Undo", [Undo, Undo$, null]);
 
 // wwtlib.UndoStep
 
-export function UndoStep() {
-}
+export function UndoStep() { }
 
 var UndoStep$ = {
   undo: function () {
@@ -25479,8 +25313,7 @@ registerType("Triangle", [Triangle, Triangle$, null]);
 
 // wwtlib.UiTools
 
-export function UiTools() {
-}
+export function UiTools() { }
 
 UiTools.kilometersPerAu = 149598000;
 UiTools.auPerParsec = 206264.806;
@@ -25625,11 +25458,8 @@ UiTools.split = function (data, delimiters) {
   }
   return output;
 };
-UiTools._beep = function () {
-};
-var UiTools$ = {
-
-};
+UiTools._beep = function () { };
+var UiTools$ = {};
 
 registerType("UiTools", [UiTools, UiTools$, null]);
 
@@ -25923,27 +25753,21 @@ ToolStripMenuItem.create = function (name) {
   tsmi.name = name;
   return tsmi;
 };
-var ToolStripMenuItem$ = {
-
-};
+var ToolStripMenuItem$ = {};
 
 registerType("ToolStripMenuItem", [ToolStripMenuItem, ToolStripMenuItem$, null]);
 
 // wwtlib.TagMe
 
-export function TagMe() {
-}
+export function TagMe() { }
 
-var TagMe$ = {
-
-};
+var TagMe$ = {};
 
 registerType("TagMe", [TagMe, TagMe$, null]);
 
 // wwtlib.Dialog
 
-export function Dialog() {
-}
+export function Dialog() { }
 
 var Dialog$ = {
   add_showDialogHook: function (value) {
@@ -26637,8 +26461,7 @@ registerType("FolderDownloadAction", [FolderDownloadAction, FolderDownloadAction
 
 // wwtlib.Wtml
 
-export function Wtml() {
-}
+export function Wtml() { }
 Wtml.getWtmlFile = function (url, complete, loadChildFolders) {
   if (loadChildFolders == null) {
     loadChildFolders = false;
@@ -26682,9 +26505,7 @@ Wtml.loadImagesets = function (folder, folderDownloadAction) {
     }
   }
 };
-var Wtml$ = {
-
-};
+var Wtml$ = {};
 
 registerType("Wtml", [Wtml, Wtml$, null]);
 
@@ -28594,9 +28415,7 @@ export function WWTElementEvent(x, y) {
   this.offsetY = y;
 }
 
-var WWTElementEvent$ = {
-
-};
+var WWTElementEvent$ = {};
 
 registerType("WWTElementEvent", [WWTElementEvent, WWTElementEvent$, null]);
 
@@ -38125,9 +37944,7 @@ export function ToolStripSeparator() {
   this.name = '--------------------------------------';
 }
 
-var ToolStripSeparator$ = {
-
-};
+var ToolStripSeparator$ = {};
 
 registerType("ToolStripSeparator", [ToolStripSeparator, ToolStripSeparator$, ToolStripMenuItem]);
 
