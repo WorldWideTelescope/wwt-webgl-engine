@@ -636,6 +636,8 @@ var Vector3d$ = {
 
 registerType("Vector3d", [Vector3d, Vector3d$, null]);
 
+Vector3d.zero = new Vector3d();
+
 
 // wwtlib.Vector2d
 
@@ -1664,6 +1666,8 @@ var Matrix3d$ = {
 };
 
 registerType("Matrix3d", [Matrix3d, Matrix3d$, null]);
+
+Matrix3d._s_identity = Matrix3d._createIdentity();
 
 
 // wwtlib.Matrix2d
