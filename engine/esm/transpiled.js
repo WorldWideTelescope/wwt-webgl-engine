@@ -5724,7 +5724,7 @@ Grids.drawGalaxyImage = function (renderContext, opacity) {
   var distAlpha = (log - 14) * 128;
   var alpha = (Math.min(255, Math.max(0, distAlpha)) * opacity);
   ImageShader.use(renderContext, Grids._galaxyImageVertexBuffer.vertexBuffer, Grids._galaxyImageIndexBuffer, Grids._milkyWayImage.texture2d, opacity, true);
-  renderContext.gl.drawElements(WEBGL.TRIANGLES, Grids._galaxyImageTriangleCount * 3, 5123, 0);
+  renderContext.gl.drawElements(WEBGL.TRIANGLES, Grids._galaxyImageTriangleCount * 3, WEBGL.UNSIGNED_SHORT, 0);
 };
 Grids.drawStars3D = function (renderContext, opacity) {
   var zoom = renderContext.viewCamera.zoom;
@@ -17795,7 +17795,7 @@ var Tile$ = {
       else {
         TileShader.use(renderContext, this._vertexBuffer, this.getIndexBuffer(part, this.accomidation), this.texture2d, opacity, false, this.globalCenter);
       }
-      renderContext.gl.drawElements(WEBGL.TRIANGLES, this.triangleCount * 3, 5123, 0);
+      renderContext.gl.drawElements(WEBGL.TRIANGLES, this.triangleCount * 3, WEBGL.UNSIGNED_SHORT, 0);
     }
   },
   cleanUp: function (removeFromParent) {
