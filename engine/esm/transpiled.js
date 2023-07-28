@@ -11267,7 +11267,7 @@ EllipseRenderer.drawEllipseWithPosition = function (renderContext, semiMajorAxis
   renderContext.gl.bindBuffer(WEBGL.ARRAY_BUFFER, EllipseRenderer._ellipseVertexBuffer.vertexBuffer);
   renderContext.gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
   EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, 1, savedWorld, positionNow);
-  renderContext.gl.drawArrays(3, 0, EllipseRenderer._ellipseVertexBuffer.count);
+  renderContext.gl.drawArrays(WEBGL.LINE_STRIP, 0, EllipseRenderer._ellipseVertexBuffer.count);
   renderContext.set_world(savedWorld);
 };
 EllipseRenderer.drawEllipse = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix) {
@@ -11282,7 +11282,7 @@ EllipseRenderer.drawEllipse = function (renderContext, semiMajorAxis, eccentrici
   renderContext.gl.bindBuffer(WEBGL.ARRAY_BUFFER, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.vertexBuffer);
   renderContext.gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
   EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, 1, savedWorld, Vector3d.create(0, 0, 0));
-  renderContext.gl.drawArrays(3, 0, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.count - 1);
+  renderContext.gl.drawArrays(WEBGL.LINE_STRIP, 0, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.count - 1);
   renderContext.set_world(savedWorld);
 };
 EllipseRenderer.createEllipseVertexBuffer = function (vertexCount) {
