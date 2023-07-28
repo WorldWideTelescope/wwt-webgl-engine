@@ -10,11 +10,19 @@ import { CT } from "./astrocalc/coordinate_transformation.js";
 import { DT } from "./astrocalc/date.js";
 import { CAANutation } from "./astrocalc/nutation.js";
 import { CAAParallax } from "./astrocalc/parallax.js";
-import { CAAPhysicalJupiter } from "./astrocalc/physical_jupiter.js";
+import { CAAPhysicalJupiter, CAAPhysicalJupiterDetails } from "./astrocalc/physical_jupiter.js";
 import { CAARiseTransitSet } from "./astrocalc/rise_transit_set.js";
-import { ELL } from "./astrocalc/elliptical.js";
-import { GM } from "./astrocalc/galilean_moons.js";
+import { ELL, EPD } from "./astrocalc/elliptical.js";
+import { GM, GMDS } from "./astrocalc/galilean_moons.js";
 import { CAAMoon } from "./astrocalc/moon.js";
+
+
+// Global state
+
+var galDetails = new GMDS();
+var jupDetails = new EPD();
+var jupPhisical = new CAAPhysicalJupiterDetails();
+var jDateLast = 0;
 
 
 // wwtlib.AstroRaDec
@@ -80,18 +88,18 @@ AstroCalc.getPlanet = function (jDate, planetIn, locLat, locLong, locHeight) {
         return new AstroRaDec(corrected.x, corrected.y, dis, false, false);
     }
     else {
-        if (jDate !== AstroCalc._jDateLast) {
-            AstroCalc._jupDetails = ELL.calculate(jDate, 4);
-            AstroCalc._jupPhisical = CAAPhysicalJupiter.calculate(jDate);
-            var corrected = CAAParallax.equatorial2Topocentric(AstroCalc._jupDetails.apparentGeocentricRA, AstroCalc._jupDetails.apparentGeocentricDeclination, AstroCalc._jupDetails.apparentGeocentricDistance, locLong, locLat, locHeight, jDate);
-            AstroCalc._jupDetails.apparentGeocentricRA = corrected.x;
-            AstroCalc._jupDetails.apparentGeocentricDeclination = corrected.y;
-            AstroCalc._galDetails = GM.calculate(jDate);
-            AstroCalc._jDateLast = jDate;
+        if (jDate !== jDateLast) {
+            jupDetails = ELL.calculate(jDate, 4);
+            jupPhisical = CAAPhysicalJupiter.calculate(jDate);
+            var corrected = CAAParallax.equatorial2Topocentric(jupDetails.apparentGeocentricRA, jupDetails.apparentGeocentricDeclination, jupDetails.apparentGeocentricDistance, locLong, locLat, locHeight, jDate);
+            jupDetails.apparentGeocentricRA = corrected.x;
+            jupDetails.apparentGeocentricDeclination = corrected.y;
+            galDetails = GM.calculate(jDate);
+            jDateLast = jDate;
         }
         var jupiterDiameter = 0.000954501;
-        var scale = Math.atan(0.5 * (jupiterDiameter / AstroCalc._jupDetails.apparentGeocentricDistance)) / 3.1415927 * 180;
-        var raScale = (scale / Math.cos(AstroCalc._jupDetails.apparentGeocentricDeclination / 180 * 3.1415927)) / 15;
+        var scale = Math.atan(0.5 * (jupiterDiameter / jupDetails.apparentGeocentricDistance)) / 3.1415927 * 180;
+        var raScale = (scale / Math.cos(jupDetails.apparentGeocentricDeclination / 180 * 3.1415927)) / 15;
         var xMoon = 0;
         var yMoon = 0;
         var zMoon = 0;
@@ -99,66 +107,66 @@ AstroCalc.getPlanet = function (jDate, planetIn, locLat, locLong, locHeight) {
         var eclipsed = false;
         switch (planet) {
             case 10: // IO
-                xMoon = AstroCalc._galDetails.satellite1.apparentRectangularCoordinates.x;
-                yMoon = AstroCalc._galDetails.satellite1.apparentRectangularCoordinates.y;
-                zMoon = AstroCalc._galDetails.satellite1.apparentRectangularCoordinates.z;
-                eclipsed = AstroCalc._galDetails.satellite1.bInEclipse;
-                shadow = AstroCalc._galDetails.satellite1.bInShadowTransit;
+                xMoon = galDetails.satellite1.apparentRectangularCoordinates.x;
+                yMoon = galDetails.satellite1.apparentRectangularCoordinates.y;
+                zMoon = galDetails.satellite1.apparentRectangularCoordinates.z;
+                eclipsed = galDetails.satellite1.bInEclipse;
+                shadow = galDetails.satellite1.bInShadowTransit;
                 break;
             case 11: // Europa
-                xMoon = AstroCalc._galDetails.satellite2.apparentRectangularCoordinates.x;
-                yMoon = AstroCalc._galDetails.satellite2.apparentRectangularCoordinates.y;
-                zMoon = AstroCalc._galDetails.satellite2.apparentRectangularCoordinates.z;
-                eclipsed = AstroCalc._galDetails.satellite2.bInEclipse;
-                shadow = AstroCalc._galDetails.satellite2.bInShadowTransit;
+                xMoon = galDetails.satellite2.apparentRectangularCoordinates.x;
+                yMoon = galDetails.satellite2.apparentRectangularCoordinates.y;
+                zMoon = galDetails.satellite2.apparentRectangularCoordinates.z;
+                eclipsed = galDetails.satellite2.bInEclipse;
+                shadow = galDetails.satellite2.bInShadowTransit;
                 break;
             case 12: // Ganymede
-                xMoon = AstroCalc._galDetails.satellite3.apparentRectangularCoordinates.x;
-                yMoon = AstroCalc._galDetails.satellite3.apparentRectangularCoordinates.y;
-                zMoon = AstroCalc._galDetails.satellite3.apparentRectangularCoordinates.z;
-                eclipsed = AstroCalc._galDetails.satellite3.bInEclipse;
-                shadow = AstroCalc._galDetails.satellite3.bInShadowTransit;
+                xMoon = galDetails.satellite3.apparentRectangularCoordinates.x;
+                yMoon = galDetails.satellite3.apparentRectangularCoordinates.y;
+                zMoon = galDetails.satellite3.apparentRectangularCoordinates.z;
+                eclipsed = galDetails.satellite3.bInEclipse;
+                shadow = galDetails.satellite3.bInShadowTransit;
                 break;
             case 13: // Callisto
-                xMoon = AstroCalc._galDetails.satellite4.apparentRectangularCoordinates.x;
-                yMoon = AstroCalc._galDetails.satellite4.apparentRectangularCoordinates.y;
-                zMoon = AstroCalc._galDetails.satellite4.apparentRectangularCoordinates.z;
-                eclipsed = AstroCalc._galDetails.satellite4.bInEclipse;
-                shadow = AstroCalc._galDetails.satellite4.bInShadowTransit;
+                xMoon = galDetails.satellite4.apparentRectangularCoordinates.x;
+                yMoon = galDetails.satellite4.apparentRectangularCoordinates.y;
+                zMoon = galDetails.satellite4.apparentRectangularCoordinates.z;
+                eclipsed = galDetails.satellite4.bInEclipse;
+                shadow = galDetails.satellite4.bInShadowTransit;
                 break;
             case 14: // Io shadow
-                xMoon = AstroCalc._galDetails.satellite1.apparentShadowRectangularCoordinates.x;
-                yMoon = AstroCalc._galDetails.satellite1.apparentShadowRectangularCoordinates.y;
-                zMoon = AstroCalc._galDetails.satellite1.apparentShadowRectangularCoordinates.z * 0.9;
-                shadow = AstroCalc._galDetails.satellite1.bInShadowTransit;
+                xMoon = galDetails.satellite1.apparentShadowRectangularCoordinates.x;
+                yMoon = galDetails.satellite1.apparentShadowRectangularCoordinates.y;
+                zMoon = galDetails.satellite1.apparentShadowRectangularCoordinates.z * 0.9;
+                shadow = galDetails.satellite1.bInShadowTransit;
                 break;
             case 15: // Europa shadow
-                xMoon = AstroCalc._galDetails.satellite2.apparentShadowRectangularCoordinates.x;
-                yMoon = AstroCalc._galDetails.satellite2.apparentShadowRectangularCoordinates.y;
-                zMoon = AstroCalc._galDetails.satellite2.apparentShadowRectangularCoordinates.z * 0.9;
-                shadow = AstroCalc._galDetails.satellite2.bInShadowTransit;
+                xMoon = galDetails.satellite2.apparentShadowRectangularCoordinates.x;
+                yMoon = galDetails.satellite2.apparentShadowRectangularCoordinates.y;
+                zMoon = galDetails.satellite2.apparentShadowRectangularCoordinates.z * 0.9;
+                shadow = galDetails.satellite2.bInShadowTransit;
                 break;
             case 16: // Ganymede shadow
-                xMoon = AstroCalc._galDetails.satellite3.apparentShadowRectangularCoordinates.x;
-                yMoon = AstroCalc._galDetails.satellite3.apparentShadowRectangularCoordinates.y;
-                zMoon = AstroCalc._galDetails.satellite3.apparentShadowRectangularCoordinates.z * 0.9;
-                shadow = AstroCalc._galDetails.satellite3.bInShadowTransit;
+                xMoon = galDetails.satellite3.apparentShadowRectangularCoordinates.x;
+                yMoon = galDetails.satellite3.apparentShadowRectangularCoordinates.y;
+                zMoon = galDetails.satellite3.apparentShadowRectangularCoordinates.z * 0.9;
+                shadow = galDetails.satellite3.bInShadowTransit;
                 break;
             case 17: // Callisto shadow
-                xMoon = AstroCalc._galDetails.satellite4.apparentShadowRectangularCoordinates.x;
-                yMoon = AstroCalc._galDetails.satellite4.apparentShadowRectangularCoordinates.y;
-                zMoon = AstroCalc._galDetails.satellite4.apparentShadowRectangularCoordinates.z * 0.9;
-                shadow = AstroCalc._galDetails.satellite4.bInShadowTransit;
+                xMoon = galDetails.satellite4.apparentShadowRectangularCoordinates.x;
+                yMoon = galDetails.satellite4.apparentShadowRectangularCoordinates.y;
+                zMoon = galDetails.satellite4.apparentShadowRectangularCoordinates.z * 0.9;
+                shadow = galDetails.satellite4.bInShadowTransit;
                 break;
         }
         var xTemp;
         var yTemp;
-        var radians = AstroCalc._jupPhisical.p / 180 * 3.1415927;
+        var radians = jupPhisical.p / 180 * 3.1415927;
         xTemp = xMoon * Math.cos(radians) - yMoon * Math.sin(radians);
         yTemp = xMoon * Math.sin(radians) + yMoon * Math.cos(radians);
         xMoon = xTemp;
         yMoon = yTemp;
-        return new AstroRaDec(AstroCalc._jupDetails.apparentGeocentricRA - (xMoon * raScale), AstroCalc._jupDetails.apparentGeocentricDeclination + yMoon * scale, AstroCalc._jupDetails.apparentGeocentricDistance + (zMoon * jupiterDiameter / 2), shadow, eclipsed);
+        return new AstroRaDec(jupDetails.apparentGeocentricRA - (xMoon * raScale), jupDetails.apparentGeocentricDeclination + yMoon * scale, jupDetails.apparentGeocentricDistance + (zMoon * jupiterDiameter / 2), shadow, eclipsed);
     }
 };
 
