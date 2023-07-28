@@ -80,6 +80,7 @@ export var ScaleTypes = {
 };
 
 registerType("ScaleTypes", ScaleTypes);
+registerEnum("ScaleTypes", ScaleTypes);
 
 // wwtlib.URLRewriteMode
 
@@ -89,6 +90,7 @@ export var URLRewriteMode = {
 };
 
 registerType("URLRewriteMode", URLRewriteMode);
+registerEnum("URLRewriteMode", URLRewriteMode);
 
 // wwtlib.SolarSystemObjects
 
@@ -118,6 +120,7 @@ export var SolarSystemObjects = {
 };
 
 registerType("SolarSystemObjects", SolarSystemObjects);
+registerEnum("SolarSystemObjects", SolarSystemObjects);
 
 // wwtlib.InterpolationType
 
@@ -131,6 +134,7 @@ export var InterpolationType = {
 };
 
 registerType("InterpolationType", InterpolationType);
+registerEnum("InterpolationType", InterpolationType);
 
 // wwtlib.PointType
 
@@ -142,6 +146,7 @@ export var PointType = {
 };
 
 registerType("PointType", PointType);
+registerEnum("PointType", PointType);
 
 // wwtlib.FolderGroup
 
@@ -159,6 +164,7 @@ export var FolderGroup = {
 };
 
 registerType("FolderGroup", FolderGroup);
+registerEnum("FolderGroup", FolderGroup);
 
 // wwtlib.FolderRefreshType
 
@@ -169,6 +175,7 @@ export var FolderRefreshType = {
 };
 
 registerType("FolderRefreshType", FolderRefreshType);
+registerEnum("FolderRefreshType", FolderRefreshType);
 
 // wwtlib.FolderType
 
@@ -180,6 +187,7 @@ export var FolderType = {
 };
 
 registerType("FolderType", FolderType);
+registerEnum("FolderType", FolderType);
 
 // wwtlib.ThumbnailSize
 
@@ -189,6 +197,7 @@ export var ThumbnailSize = {
 };
 
 registerType("ThumbnailSize", ThumbnailSize);
+registerEnum("ThumbnailSize", ThumbnailSize);
 
 // wwtlib.CullMode
 
@@ -199,6 +208,7 @@ export var CullMode = {
 };
 
 registerType("CullMode", CullMode);
+registerEnum("CullMode", CullMode);
 
 // wwtlib.PointScaleTypes
 
@@ -211,6 +221,7 @@ export var PointScaleTypes = {
 };
 
 registerType("PointScaleTypes", PointScaleTypes);
+registerEnum("PointScaleTypes", PointScaleTypes);
 
 // wwtlib.ProjectionType
 
@@ -227,6 +238,7 @@ export var ProjectionType = {
 };
 
 registerType("ProjectionType", ProjectionType);
+registerEnum("ProjectionType", ProjectionType);
 
 // wwtlib.ImageSetType
 
@@ -240,6 +252,7 @@ export var ImageSetType = {
 };
 
 registerType("ImageSetType", ImageSetType);
+registerEnum("ImageSetType", ImageSetType);
 
 // wwtlib.BandPass
 
@@ -256,6 +269,7 @@ export var BandPass = {
 };
 
 registerType("BandPass", BandPass);
+registerEnum("BandPass", BandPass);
 
 // wwtlib.Classification
 
@@ -299,6 +313,7 @@ export var Classification = {
 };
 
 registerType("Classification", Classification);
+registerEnum("Classification", Classification);
 
 
 // wwtlib.DataTypes
@@ -313,6 +328,7 @@ export var DataTypes = {
 };
 
 registerType("DataTypes", DataTypes);
+registerEnum("DataTypes", DataTypes);
 
 // wwtlib.AltUnits
 
@@ -330,6 +346,7 @@ export var AltUnits = {
 };
 
 registerType("AltUnits", AltUnits);
+registerEnum("AltUnits", AltUnits);
 
 // wwtlib.FadeType
 
@@ -341,6 +358,7 @@ export var FadeType = {
 };
 
 registerType("FadeType", FadeType);
+registerEnum("FadeType", FadeType);
 
 // wwtlib.ReferenceFrames
 
@@ -369,6 +387,7 @@ export var ReferenceFrames = {
 };
 
 registerType("ReferenceFrames", ReferenceFrames);
+registerEnum("ReferenceFrames", ReferenceFrames);
 
 
 // wwtlib.ReferenceFrameTypes
@@ -381,6 +400,7 @@ export var ReferenceFrameTypes = {
 };
 
 registerType("ReferenceFrameTypes", ReferenceFrameTypes);
+registerEnum("ReferenceFrameTypes", ReferenceFrameTypes);
 
 // wwtlib.CoordinatesTypes
 
@@ -391,6 +411,7 @@ export var CoordinatesTypes = {
 };
 
 registerType("CoordinatesTypes", CoordinatesTypes);
+registerEnum("CoordinatesTypes", CoordinatesTypes);
 
 // wwtlib.AltTypes
 
@@ -403,6 +424,7 @@ export var AltTypes = {
 };
 
 registerType("AltTypes", AltTypes);
+registerEnum("AltTypes", AltTypes);
 
 // wwtlib.MarkerMixes
 
@@ -411,6 +433,7 @@ export var MarkerMixes = {
 };
 
 registerType("MarkerMixes", MarkerMixes);
+registerEnum("MarkerMixes", MarkerMixes);
 
 // wwtlib.ColorMaps
 
@@ -421,6 +444,7 @@ export var ColorMaps = {
 };
 
 registerType("ColorMaps", ColorMaps);
+registerEnum("ColorMaps", ColorMaps);
 
 // wwtlib.PlotTypes
 
@@ -434,6 +458,7 @@ export var PlotTypes = {
 };
 
 registerType("PlotTypes", PlotTypes);
+registerEnum("PlotTypes", PlotTypes);
 
 // wwtlib.MarkerScales
 
@@ -443,6 +468,7 @@ export var MarkerScales = {
 };
 
 registerType("MarkerScales", MarkerScales);
+registerEnum("MarkerScales", MarkerScales);
 
 // wwtlib.RAUnits
 
@@ -452,6 +478,7 @@ export var RAUnits = {
 };
 
 registerType("RAUnits", RAUnits);
+registerEnum("RAUnits", RAUnits);
 
 // wwtlib.Primitives
 
@@ -472,6 +499,7 @@ export var Primitives = {
 };
 
 registerType("Primitives", Primitives);
+registerEnum("Primitives", Primitives);
 
 // wwtlib.Alignment
 
@@ -481,6 +509,7 @@ export var Alignment = {
 };
 
 registerType("Alignment", Alignment);
+registerEnum("Alignment", Alignment);
 
 // wwtlib.StockSkyOverlayTypes
 
@@ -539,6 +568,7 @@ export var StockSkyOverlayTypes = {
 };
 
 registerType("StockSkyOverlayTypes", StockSkyOverlayTypes);
+registerEnum("StockSkyOverlayTypes", StockSkyOverlayTypes);
 
 // wwtlib.OverlayAnchor
 
@@ -548,6 +578,7 @@ export var OverlayAnchor = {
 };
 
 registerType("OverlayAnchor", OverlayAnchor);
+registerEnum("OverlayAnchdor", OverlayAnchor);
 
 // wwtlib.AudioType
 
@@ -557,6 +588,7 @@ export var AudioType = {
 };
 
 registerType("AudioType", AudioType);
+registerEnum("AudioType", AudioType);
 
 // wwtlib.ShapeType
 
@@ -571,6 +603,7 @@ export var ShapeType = {
 };
 
 registerType("ShapeType", ShapeType);
+registerEnum("ShapeType", ShapeType);
 
 // wwtlib.LoopTypes
 
@@ -585,6 +618,7 @@ export var LoopTypes = {
 };
 
 registerType("LoopTypes", LoopTypes);
+registerEnum("LoopTypes", LoopTypes);
 
 // wwtlib.SelectionAnchor
 
@@ -604,6 +638,7 @@ export var SelectionAnchor = {
 };
 
 registerType("SelectionAnchor", SelectionAnchor);
+registerEnum("SelectionAnchor", SelectionAnchor);
 
 // wwtlib.TextBorderStyle
 
@@ -616,6 +651,7 @@ export var TextBorderStyle = {
 };
 
 registerType("TextBorderStyle", TextBorderStyle);
+registerEnum("TextBorderStyle", TextBorderStyle);
 
 // wwtlib.UserLevel
 
@@ -628,6 +664,7 @@ export var UserLevel = {
 };
 
 registerType("UserLevel", UserLevel);
+registerEnum("UserLevel", UserLevel);
 
 // wwtlib.TransitionType
 
@@ -641,6 +678,7 @@ export var TransitionType = {
 };
 
 registerType("TransitionType", TransitionType);
+registerEnum("TransitionType", TransitionType);
 
 // wwtlib.DialogResult
 
@@ -649,6 +687,7 @@ export var DialogResult = {
 };
 
 registerType("DialogResult", DialogResult);
+registerEnum("DialogResult", DialogResult);
 
 // wwtlib.Formatting
 
@@ -657,6 +696,7 @@ export var Formatting = {
 };
 
 registerType("Formatting", Formatting);
+registerEnum("Formatting", Formatting);
 
 // wwtlib.StateType
 
@@ -667,6 +707,7 @@ export var StateType = {
 };
 
 registerType("StateType", StateType);
+registerEnum("StateType", StateType);
 
 // wwtlib.IFolder
 
@@ -38420,34 +38461,6 @@ var SkyImageTile$ = {
 };
 
 registerType("SkyImageTile", [SkyImageTile, SkyImageTile$, TangentTile]);
-
-// Wrap up module initialization
-
-registerEnum("AltTypes", AltTypes);
-registerEnum("AltUnits", AltUnits);
-registerEnum("AudioType", AudioType);
-registerEnum("BandPass", BandPass);
-registerEnum("Classification", Classification);
-registerEnum("ColorMaps", ColorMaps);
-registerEnum("CoordinatesTypes", CoordinatesTypes);
-registerEnum("ImageSetType", ImageSetType);
-registerEnum("InterpolationType", InterpolationType);
-registerEnum("LoopTypes", LoopTypes);
-registerEnum("MarkerMixes", MarkerMixes);
-registerEnum("MarkerScales", MarkerScales);
-registerEnum("OverlayAnchdor", OverlayAnchor);
-registerEnum("PlotTypes", PlotTypes);
-registerEnum("PointScaleTypes", PointScaleTypes);
-registerEnum("ProjectionType", ProjectionType);
-registerEnum("RAUnits", RAUnits);
-registerEnum("ReferenceFrames", ReferenceFrames);
-registerEnum("ReferenceFrameTypes", ReferenceFrameTypes);
-registerEnum("ScaleTypes", ScaleTypes);
-registerEnum("ShapeType", ShapeType);
-registerEnum("SolarSystemObjects", SolarSystemObjects);
-registerEnum("TextBorderStyle", TextBorderStyle);
-registerEnum("TransitionType", TransitionType);
-registerEnum("UserLevel", UserLevel);
 
 // Initialize statics
 
