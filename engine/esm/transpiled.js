@@ -5559,7 +5559,7 @@ Texture.getEmpty = function () {
   if (Texture.empty == null) {
     Texture.empty = tilePrepDevice.createTexture();
     tilePrepDevice.bindTexture(3553, Texture.empty);
-    tilePrepDevice.texImage2D(3553, 0, 6408, 1, 1, 0, 6408, 5121, new Uint8Array([0, 0, 0, 0]));
+    tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, 5121, new Uint8Array([0, 0, 0, 0]));
     tilePrepDevice.bindTexture(3553, null);
   }
   return Texture.empty;
@@ -5635,7 +5635,7 @@ var Texture$ = {
         }
         tilePrepDevice.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
         tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
-        tilePrepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
+        tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
         tilePrepDevice.texParameteri(3553, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
         tilePrepDevice.generateMipmap(3553);
         tilePrepDevice.bindTexture(3553, null);
@@ -11820,7 +11820,7 @@ PushPin.getPushPinTexture = function (pinId) {
     var image = temp;
     tilePrepDevice.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
     tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
-    tilePrepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
+    tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
     tilePrepDevice.texParameteri(3553, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
     tilePrepDevice.generateMipmap(3553);
     tilePrepDevice.bindTexture(3553, null);
@@ -17471,7 +17471,7 @@ var Tile$ = {
             ctx.drawImage(image, 0, 0, temp.width, temp.height);
             image = temp;
           }
-          tilePrepDevice.texImage2D(3553, 0, 6408, 6408, 5121, image);
+          tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
           tilePrepDevice.texParameteri(3553, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
           tilePrepDevice.generateMipmap(3553);
         }
@@ -25114,7 +25114,7 @@ var Bitmap$ = {
     tilePrepDevice.bindTexture(3553, tex);
     tilePrepDevice.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
     tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
-    tilePrepDevice.texImage2D(3553, 0, 6408, this.width, this.height, 0, 6408, 5121, this._buffer);
+    tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, this.width, this.height, 0, WEBGL.RGBA, 5121, this._buffer);
     tilePrepDevice.texParameteri(3553, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
     tilePrepDevice.generateMipmap(3553);
     tilePrepDevice.bindTexture(3553, null);
