@@ -5413,7 +5413,7 @@ var Sprite2d$ = {
       buffer[index++] = pt.tu;
       buffer[index++] = pt.tv;
     }
-    tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, 35048);
+    tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.DYNAMIC_DRAW);
   },
   update: function (verts) {
     if (this.vertCount < verts.length) {
