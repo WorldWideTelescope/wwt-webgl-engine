@@ -7592,8 +7592,8 @@ ColorMapContainer._initColorTexture = function (gl, colorMapContainer) {
   gl.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
   var colorBuffer = ColorMapContainer._extractColorArray(colorMapContainer.colors);
   gl.texImage2D(3553, 0, 32849, colorBuffer.length / 3, 1, 0, 6407, 5121, colorBuffer);
-  gl.texParameteri(3553, 10241, 9728);
-  gl.texParameteri(3553, 10240, 9728);
+  gl.texParameteri(3553, 10241, WEBGL.NEAREST);
+  gl.texParameteri(3553, 10240, WEBGL.NEAREST);
   return colorTexture;
 };
 ColorMapContainer._extractColorArray = function (colors) {
@@ -17458,8 +17458,8 @@ var Tile$ = {
         tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
         if (this.dataset.get_extension().toLowerCase().indexOf('fits') > -1 && RenderContext.useGlVersion2) {
           tilePrepDevice.texImage2D(3553, 0, 33326, ss.truncate(this.fitsImage.get_sizeX()), ss.truncate(this.fitsImage.get_sizeY()), 0, 6403, WEBGL.FLOAT, this.fitsImage.dataUnit);
-          tilePrepDevice.texParameteri(3553, 10241, 9728);
-          tilePrepDevice.texParameteri(3553, 10240, 9728);
+          tilePrepDevice.texParameteri(3553, 10241, WEBGL.NEAREST);
+          tilePrepDevice.texParameteri(3553, 10240, WEBGL.NEAREST);
         }
         else {
           var image = this.texture;
