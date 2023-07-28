@@ -31131,6 +31131,7 @@ Fxyf.create = function (x, y, f) {
   temp.face = f;
   return temp;
 };
+
 Fxyf._fromHploc$1 = function (loc) {
   var temp = new Fxyf();
   var z = loc.z, phi = loc.phi;
@@ -33479,6 +33480,7 @@ Object3dLayer._initTranslateUI$1 = function () {
   Object3dLayer._initRotateUI$1();
   Object3dLayer._initScaleUI$1();
 };
+
 Object3dLayer._initScaleUI$1 = function () {
   Object3dLayer._scaleUI$1 = new TriangleList();
   Object3dLayer._scaleUI$1.depthBuffered = false;
@@ -33491,6 +33493,7 @@ Object3dLayer._initScaleUI$1 = function () {
   Object3dLayer._makeCube$1(Object3dLayer._scaleUI$1, Vector3d.create(0, 1 - rad * 2, 0), rad * 2, Colors.get_green());
   Object3dLayer._makeCube$1(Object3dLayer._scaleUI$1, Vector3d.create(0, 0, 1 - rad * 2), rad * 2, Colors.get_blue());
 };
+
 Object3dLayer._makeCube$1 = function (tl, center, size, color) {
   var dark = Color.fromArgb(255, ss.truncate((color.r * 0.6)), color.g, ss.truncate((color.b * 0.6)));
   var med = Color.fromArgb(255, ss.truncate((color.r * 0.8)), ss.truncate((color.g * 0.8)), ss.truncate((color.b * 0.8)));
@@ -33501,6 +33504,7 @@ Object3dLayer._makeCube$1 = function (tl, center, size, color) {
   tl.addQuad(Vector3d.create(center.x + size, center.y + size, center.z + size), Vector3d.create(center.x - size, center.y + size, center.z + size), Vector3d.create(center.x + size, center.y - size, center.z + size), Vector3d.create(center.x - size, center.y - size, center.z + size), med, Dates.empty());
   tl.addQuad(Vector3d.create(center.x + size, center.y + size, center.z - size), Vector3d.create(center.x + size, center.y - size, center.z - size), Vector3d.create(center.x - size, center.y + size, center.z - size), Vector3d.create(center.x - size, center.y - size, center.z - size), med, Dates.empty());
 };
+
 Object3dLayer._initRotateUI$1 = function () {
   Object3dLayer._rotateUi$1 = new TriangleList();
   Object3dLayer._rotateUi$1.depthBuffered = false;
@@ -34489,6 +34493,7 @@ SpreadSheetLayer._circleTexture$1 = null;
 SpreadSheetLayer._getDatafromFeed$1 = function (url) {
   return '';
 };
+
 SpreadSheetLayer._executeQuery$1 = function (url) {
   return '';
 };
@@ -34518,6 +34523,7 @@ SpreadSheetLayer.execlToDateTime = function (excelDate) {
   var es = new Date(1899, 12, 31);
   return new Date(es.getDate() + ss.truncate((excelDate * 24 * 60 * 60 * 1000)));
 };
+
 SpreadSheetLayer.get__circleTexture$1 = function () {
   if (SpreadSheetLayer._circleTexture$1 == null) {
     var url = URLHelpers.singleton.engineAssetUrl('circle.png');
@@ -38238,6 +38244,7 @@ MercatorTile.absoluteMetersToLonAtZoomByTileY = function (X, zoom, tileY) {
   var metersX = X * metersPerPixel - 20037508;
   return MercatorTile._radToDeg$1(metersX / 6378137);
 };
+
 MercatorTile._degToRad$1 = function (deg) {
   return (deg * Math.PI / 180);
 };
@@ -38245,6 +38252,7 @@ MercatorTile._degToRad$1 = function (deg) {
 MercatorTile.metersPerPixel2 = function (zoom) {
   return (156543 / (1 << zoom));
 };
+
 MercatorTile._radToDeg$1 = function (rad) {
   return (rad * 180 / Math.PI);
 };
