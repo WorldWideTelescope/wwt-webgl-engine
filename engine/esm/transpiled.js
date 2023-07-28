@@ -3929,7 +3929,7 @@ var PointList$ = {
       while ($enum2.moveNext()) {
         var pointBuffer = $enum2.current;
         TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, PointList.starTexture.texture2d, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky);
-        renderContext.gl.drawArrays(0, 0, pointBuffer.count);
+        renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
       }
     }
   },
@@ -3943,7 +3943,7 @@ var PointList$ = {
     while ($enum1.moveNext()) {
       var pointBuffer = $enum1.current;
       TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, texture, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, this.decay, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky);
-      renderContext.gl.drawArrays(0, 0, pointBuffer.count);
+      renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
     }
   }
 };
@@ -12559,7 +12559,7 @@ MinorPlanets.drawMPC3D = function (renderContext, opacity, centerPoint) {
       MinorPlanets._mpcBlendStates[i].set_targetState(true);
       if (MinorPlanets._mpcBlendStates[i].get_state()) {
         KeplerPointSpriteShader.use(renderContext, matrixWV, MinorPlanets._mpcVertexBuffer[i].vertexBuffer, MinorPlanets.starTexture.texture2d, Colors.get_white(), opacity * MinorPlanets._mpcBlendStates[i].get_opacity(), false, (SpaceTimeController.get_jNow() - KeplerVertex.baseDate), 0, renderContext.cameraPosition, 200, 0.1);
-        renderContext.gl.drawArrays(0, 0, MinorPlanets._mpcVertexBuffer[i].count);
+        renderContext.gl.drawArrays(WEBGL.POINTS, 0, MinorPlanets._mpcVertexBuffer[i].count);
       }
     }
   }
