@@ -5633,7 +5633,7 @@ var Texture$ = {
           ctx.drawImage(image, 0, 0, temp.width, temp.height);
           image = temp;
         }
-        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
         tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
         tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
         tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
@@ -7588,7 +7588,7 @@ ColorMapContainer._initColorTexture = function (gl, colorMapContainer) {
   var colorTexture = gl.createTexture();
   gl.activeTexture(WEBGL.TEXTURE1);
   gl.bindTexture(WEBGL.TEXTURE_2D, colorTexture);
-  gl.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+  gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
   gl.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
   var colorBuffer = ColorMapContainer._extractColorArray(colorMapContainer.colors);
   gl.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGB8, colorBuffer.length / 3, 1, 0, WEBGL.RGB, 5121, colorBuffer);
@@ -11818,7 +11818,7 @@ PushPin.getPushPinTexture = function (pinId) {
     var ctx = temp.getContext('2d');
     ctx.drawImage(PushPin._pins.imageElement, (col * 32), (row * 32), 32, 32, 0, 0, 32, 32);
     var image = temp;
-    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
     tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
     tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
     tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
@@ -17454,7 +17454,7 @@ var Tile$ = {
       try {
         this.texture2d = tilePrepDevice.createTexture();
         tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, this.texture2d);
-        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
         tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
         if (this.dataset.get_extension().toLowerCase().indexOf('fits') > -1 && RenderContext.useGlVersion2) {
           tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.R32F, ss.truncate(this.fitsImage.get_sizeX()), ss.truncate(this.fitsImage.get_sizeY()), 0, WEBGL.RED, WEBGL.FLOAT, this.fitsImage.dataUnit);
@@ -25112,7 +25112,7 @@ var Bitmap$ = {
   getTexture: function () {
     var tex = tilePrepDevice.createTexture();
     tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, tex);
-    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
     tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
     tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, this.width, this.height, 0, WEBGL.RGBA, 5121, this._buffer);
     tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
