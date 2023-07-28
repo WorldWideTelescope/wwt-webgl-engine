@@ -4030,7 +4030,7 @@ SimpleLineShader.init = function (renderContext) {
   SimpleLineShader.lineColorLoc = gl.getUniformLocation(SimpleLineShader._prog, 'lineColor');
   SimpleLineShader.projMatLoc = gl.getUniformLocation(SimpleLineShader._prog, 'uPMatrix');
   SimpleLineShader.mvMatLoc = gl.getUniformLocation(SimpleLineShader._prog, 'uMVMatrix');
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   SimpleLineShader.initialized = true;
 };
@@ -4060,7 +4060,7 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.vertexAttribPointer(SimpleLineShader.vertLoc, 3, 5126, false, 0, 0);
     gl.lineWidth(1);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 771);
   }
 };
@@ -4093,7 +4093,7 @@ SimpleLineShader2D.init = function (renderContext) {
   gl.useProgram(SimpleLineShader2D._prog);
   SimpleLineShader2D.vertLoc = gl.getAttribLocation(SimpleLineShader2D._prog, 'aVertexPosition');
   SimpleLineShader2D.lineColorLoc = gl.getUniformLocation(SimpleLineShader2D._prog, 'lineColor');
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   SimpleLineShader2D.initialized = true;
 };
@@ -4121,7 +4121,7 @@ SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.vertexAttribPointer(SimpleLineShader2D.vertLoc, 3, 5126, false, 0, 0);
     gl.lineWidth(1);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 771);
   }
 };
@@ -4157,7 +4157,7 @@ OrbitLineShader.init = function (renderContext) {
   OrbitLineShader.lineColorLoc = gl.getUniformLocation(OrbitLineShader._prog, 'lineColor');
   OrbitLineShader.projMatLoc = gl.getUniformLocation(OrbitLineShader._prog, 'uPMatrix');
   OrbitLineShader.mvMatLoc = gl.getUniformLocation(OrbitLineShader._prog, 'uMVMatrix');
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   OrbitLineShader.initialized = true;
 };
@@ -4189,7 +4189,7 @@ OrbitLineShader.use = function (renderContext, vertex, lineColor) {
     gl.vertexAttribPointer(OrbitLineShader.vertLoc, 3, 5126, false, 28, 0);
     gl.vertexAttribPointer(OrbitLineShader.colorLoc, 4, 5126, false, 28, 12);
     gl.lineWidth(1);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 771);
   }
 };
@@ -4228,7 +4228,7 @@ LineShaderNormalDates.init = function (renderContext) {
   LineShaderNormalDates.mvMatLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'uMVMatrix');
   LineShaderNormalDates.jNowLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'jNow');
   LineShaderNormalDates.decayLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'decay');
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   LineShaderNormalDates.initialized = true;
 };
@@ -4263,7 +4263,7 @@ LineShaderNormalDates.use = function (renderContext, vertex, lineColor, zBuffer,
     gl.vertexAttribPointer(LineShaderNormalDates.colorLoc, 4, 5126, false, 36, 12);
     gl.vertexAttribPointer(LineShaderNormalDates.timeLoc, 2, 5126, false, 36, 28);
     gl.lineWidth(1);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 771);
   }
 };
@@ -4310,7 +4310,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
   TimeSeriesPointSpriteShader.skyLoc = gl.getUniformLocation(TimeSeriesPointSpriteShader._prog, 'sky');
   TimeSeriesPointSpriteShader.showFarSideLoc = gl.getUniformLocation(TimeSeriesPointSpriteShader._prog, 'showFarSide');
   TimeSeriesPointSpriteShader.minSizeLoc = gl.getUniformLocation(TimeSeriesPointSpriteShader._prog, 'minSize');
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   TimeSeriesPointSpriteShader.initialized = true;
 };
 TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, lineColor, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky) {
@@ -4358,7 +4358,7 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.lineWidth(1);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 1);
   }
 };
@@ -4408,7 +4408,7 @@ KeplerPointSpriteShader.init = function (renderContext) {
   KeplerPointSpriteShader.lineColorLoc = gl.getUniformLocation(KeplerPointSpriteShader._prog, 'lineColor');
   KeplerPointSpriteShader.opacityLoc = gl.getUniformLocation(KeplerPointSpriteShader._prog, 'opacity');
   KeplerPointSpriteShader.sampLoc = gl.getUniformLocation(KeplerPointSpriteShader._prog, 'uSampler');
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   KeplerPointSpriteShader.initialized = true;
 };
 KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, texture, lineColor, opacity, zBuffer, jNow, MM, camera, scale, minSize) {
@@ -4463,7 +4463,7 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.lineWidth(1);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 1);
   }
 };
@@ -4503,7 +4503,7 @@ EllipseShader.init = function (renderContext) {
   EllipseShader.semiMajorAxisLoc = gl.getUniformLocation(EllipseShader._prog, 'semiMajorAxis');
   EllipseShader.eccentricityLoc = gl.getUniformLocation(EllipseShader._prog, 'eccentricity');
   EllipseShader.eccentricAnomalyLoc = gl.getUniformLocation(EllipseShader._prog, 'eccentricAnomaly');
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   EllipseShader.initialized = true;
 };
 EllipseShader.use = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, lineColor, opacity, world, positionNow) {
@@ -4530,7 +4530,7 @@ EllipseShader.use = function (renderContext, semiMajorAxis, eccentricity, eccent
     gl.enableVertexAttribArray(EllipseShader.angleLoc);
     gl.vertexAttribPointer(EllipseShader.angleLoc, 3, 5126, false, 0, 0);
     gl.lineWidth(1);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 1);
   }
 };
@@ -4579,7 +4579,7 @@ ModelShader.init = function (renderContext) {
   ModelShader.atmosphereColorLoc = gl.getUniformLocation(ModelShader._prog, 'uAtmosphereColor');
   Tile.uvMultiple = 1;
   Tile.demEnabled = true;
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   ModelShader.initialized = true;
 };
@@ -4634,7 +4634,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(770, 1);
     }
@@ -4688,7 +4688,7 @@ ModelShaderTan.init = function (renderContext) {
   ModelShaderTan.atmosphereColorLoc = gl.getUniformLocation(ModelShaderTan._prog, 'uAtmosphereColor');
   Tile.uvMultiple = 1;
   Tile.demEnabled = true;
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   ModelShaderTan.initialized = true;
 };
@@ -4743,7 +4743,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(770, 1);
     }
@@ -4798,7 +4798,7 @@ TileShader.init = function (renderContext) {
   TileShader.atmosphereColorLoc = gl.getUniformLocation(TileShader._prog, 'uAtmosphereColor');
   Tile.uvMultiple = 1;
   Tile.demEnabled = true;
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   TileShader.initialized = true;
 };
@@ -4860,7 +4860,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(770, 1);
     }
@@ -4922,7 +4922,7 @@ FitsShader.init = function (renderContext) {
   FitsShader.opacityLoc = gl.getUniformLocation(FitsShader._prog, 'opacity');
   Tile.uvMultiple = 1;
   Tile.demEnabled = true;
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   FitsShader.initialized = true;
 };
@@ -4976,7 +4976,7 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(770, 1);
     }
@@ -5026,7 +5026,7 @@ ImageShader.init = function (renderContext) {
   ImageShader.opacityLoc = gl.getUniformLocation(ImageShader._prog, 'opacity');
   Tile.uvMultiple = 1;
   Tile.demEnabled = true;
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   ImageShader.initialized = true;
 };
@@ -5063,7 +5063,7 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(770, 1);
     }
@@ -5113,7 +5113,7 @@ ImageShader2.init = function (renderContext) {
   ImageShader2.opacityLoc = gl.getUniformLocation(ImageShader2._prog, 'opacity');
   Tile.uvMultiple = 1;
   Tile.demEnabled = true;
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   ImageShader2.initialized = true;
 };
@@ -5150,7 +5150,7 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     if (noDepth) {
       gl.blendFunc(770, 1);
     }
@@ -5194,7 +5194,7 @@ SpriteShader.init = function (renderContext) {
   SpriteShader.sampLoc = gl.getUniformLocation(SpriteShader._prog, 'uSampler');
   Tile.uvMultiple = 1;
   Tile.demEnabled = true;
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   SpriteShader.initialized = true;
 };
@@ -5227,7 +5227,7 @@ SpriteShader.use = function (renderContext, vertex, texture) {
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 771);
   }
 };
@@ -5263,7 +5263,7 @@ ShapeSpriteShader.init = function (renderContext) {
   ShapeSpriteShader.projMatLoc = gl.getUniformLocation(ShapeSpriteShader._prog, 'uPMatrix');
   ShapeSpriteShader.mvMatLoc = gl.getUniformLocation(ShapeSpriteShader._prog, 'uMVMatrix');
   gl.disable(2929);
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   ShapeSpriteShader.initialized = true;
 };
@@ -5290,7 +5290,7 @@ ShapeSpriteShader.use = function (renderContext, vertex) {
     gl.vertexAttribPointer(ShapeSpriteShader.vertLoc, 3, 5126, false, 36, 0);
     gl.vertexAttribPointer(ShapeSpriteShader.colorLoc, 4, 5126, false, 36, 12);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 771);
   }
 };
@@ -5328,7 +5328,7 @@ TextShader.init = function (renderContext) {
   TextShader.sampLoc = gl.getUniformLocation(TextShader._prog, 'uSampler');
   Tile.uvMultiple = 1;
   Tile.demEnabled = true;
-  gl.enable(3042);
+  gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   TextShader.initialized = true;
 };
@@ -5363,7 +5363,7 @@ TextShader.use = function (renderContext, vertex, texture) {
     gl.vertexAttribPointer(TextShader.textureLoc, 2, 5126, false, 20, 12);
     gl.activeTexture(33984);
     gl.bindTexture(3553, texture);
-    gl.enable(3042);
+    gl.enable(WEBGL.BLEND);
     gl.blendFunc(770, 771);
   }
 };
