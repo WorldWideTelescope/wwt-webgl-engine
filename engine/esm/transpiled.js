@@ -4355,7 +4355,7 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
     gl.vertexAttribPointer(TimeSeriesPointSpriteShader.colorLoc, 4, WEBGL.FLOAT, false, 40, 12);
     gl.vertexAttribPointer(TimeSeriesPointSpriteShader.pointSizeLoc, 1, WEBGL.FLOAT, false, 40, 36);
     gl.vertexAttribPointer(TimeSeriesPointSpriteShader.timeLoc, 2, WEBGL.FLOAT, false, 40, 28);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.lineWidth(1);
     gl.enable(WEBGL.BLEND);
@@ -4460,7 +4460,7 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
     gl.vertexAttribPointer(KeplerPointSpriteShader.nTLoc, 2, WEBGL.FLOAT, false, 76, 52);
     gl.vertexAttribPointer(KeplerPointSpriteShader.azLoc, 2, WEBGL.FLOAT, false, 76, 60);
     gl.vertexAttribPointer(KeplerPointSpriteShader.orbitLoc, 2, WEBGL.FLOAT, false, 76, 68);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.lineWidth(1);
     gl.enable(WEBGL.BLEND);
@@ -4631,7 +4631,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.vertexAttribPointer(ModelShader.vertLoc, 3, WEBGL.FLOAT, false, stride, 0);
     gl.vertexAttribPointer(ModelShader.normalLoc, 3, WEBGL.FLOAT, false, stride, 12);
     gl.vertexAttribPointer(ModelShader.textureLoc, 2, WEBGL.FLOAT, false, stride, stride - 8);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
@@ -4740,7 +4740,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.vertexAttribPointer(ModelShaderTan.vertLoc, 3, WEBGL.FLOAT, false, stride, 0);
     gl.vertexAttribPointer(ModelShaderTan.normalLoc, 3, WEBGL.FLOAT, false, stride, 12);
     gl.vertexAttribPointer(ModelShaderTan.textureLoc, 2, WEBGL.FLOAT, false, stride, stride - 8);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
@@ -4857,7 +4857,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.enableVertexAttribArray(TileShader.textureLoc);
     gl.vertexAttribPointer(TileShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(TileShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
@@ -4973,7 +4973,7 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.enableVertexAttribArray(FitsShader.textureLoc);
     gl.vertexAttribPointer(FitsShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(FitsShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
@@ -5060,7 +5060,7 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.enableVertexAttribArray(ImageShader.textureLoc);
     gl.vertexAttribPointer(ImageShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(ImageShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
@@ -5147,7 +5147,7 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     gl.enableVertexAttribArray(ImageShader2.textureLoc);
     gl.vertexAttribPointer(ImageShader2.vertLoc, 3, WEBGL.FLOAT, false, 32, 0);
     gl.vertexAttribPointer(ImageShader2.textureLoc, 2, WEBGL.FLOAT, false, 32, 24);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
@@ -5224,7 +5224,7 @@ SpriteShader.use = function (renderContext, vertex, texture) {
     gl.vertexAttribPointer(SpriteShader.vertLoc, 3, WEBGL.FLOAT, false, 36, 0);
     gl.vertexAttribPointer(SpriteShader.colorLoc, 4, WEBGL.FLOAT, false, 36, 12);
     gl.vertexAttribPointer(SpriteShader.textureLoc, 2, WEBGL.FLOAT, false, 36, 28);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enable(WEBGL.BLEND);
@@ -5361,7 +5361,7 @@ TextShader.use = function (renderContext, vertex, texture) {
     gl.enableVertexAttribArray(TextShader.textureLoc);
     gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
-    gl.activeTexture(33984);
+    gl.activeTexture(WEBGL.TEXTURE0);
     gl.bindTexture(3553, texture);
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
