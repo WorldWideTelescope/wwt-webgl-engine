@@ -79,6 +79,7 @@ export var ScaleTypes = {
   histogramEqualization: 4
 };
 
+registerType("ScaleTypes", ScaleTypes);
 
 // wwtlib.URLRewriteMode
 
@@ -87,6 +88,7 @@ export var URLRewriteMode = {
   originRelative: 1
 };
 
+registerType("URLRewriteMode", URLRewriteMode);
 
 // wwtlib.SolarSystemObjects
 
@@ -115,6 +117,7 @@ export var SolarSystemObjects = {
   undefined: 65536
 };
 
+registerType("SolarSystemObjects", SolarSystemObjects);
 
 // wwtlib.InterpolationType
 
@@ -127,6 +130,7 @@ export var InterpolationType = {
   defaultV: 5
 };
 
+registerType("InterpolationType", InterpolationType);
 
 // wwtlib.PointType
 
@@ -137,6 +141,7 @@ export var PointType = {
   start: 3
 };
 
+registerType("PointType", PointType);
 
 // wwtlib.FolderGroup
 
@@ -153,6 +158,7 @@ export var FolderGroup = {
   imageStack: 9
 };
 
+registerType("FolderGroup", FolderGroup);
 
 // wwtlib.FolderRefreshType
 
@@ -162,6 +168,7 @@ export var FolderRefreshType = {
   viewChange: 2
 };
 
+registerType("FolderRefreshType", FolderRefreshType);
 
 // wwtlib.FolderType
 
@@ -172,6 +179,7 @@ export var FolderType = {
   panorama: 3
 };
 
+registerType("FolderType", FolderType);
 
 // wwtlib.ThumbnailSize
 
@@ -180,6 +188,7 @@ export var ThumbnailSize = {
   big: 1
 };
 
+registerType("ThumbnailSize", ThumbnailSize);
 
 // wwtlib.CullMode
 
@@ -189,6 +198,7 @@ export var CullMode = {
   clockwise: 1
 };
 
+registerType("CullMode", CullMode);
 
 // wwtlib.PointScaleTypes
 
@@ -200,6 +210,7 @@ export var PointScaleTypes = {
   stellarMagnitude: 4
 };
 
+registerType("PointScaleTypes", PointScaleTypes);
 
 // wwtlib.ProjectionType
 
@@ -215,6 +226,7 @@ export var ProjectionType = {
   healpix: 7
 };
 
+registerType("ProjectionType", ProjectionType);
 
 // wwtlib.ImageSetType
 
@@ -227,6 +239,7 @@ export var ImageSetType = {
   sandbox: 5
 };
 
+registerType("ImageSetType", ImageSetType);
 
 // wwtlib.BandPass
 
@@ -242,6 +255,7 @@ export var BandPass = {
   visibleNight: 6
 };
 
+registerType("BandPass", BandPass);
 
 // wwtlib.Classification
 
@@ -284,6 +298,8 @@ export var Classification = {
   other: 436207616
 };
 
+registerType("Classification", Classification);
+
 
 // wwtlib.DataTypes
 
@@ -296,6 +312,7 @@ export var DataTypes = {
   none: 5
 };
 
+registerType("DataTypes", DataTypes);
 
 // wwtlib.AltUnits
 
@@ -312,6 +329,7 @@ export var AltUnits = {
   custom: 10
 };
 
+registerType("AltUnits", AltUnits);
 
 // wwtlib.FadeType
 
@@ -322,6 +340,7 @@ export var FadeType = {
   none: 4
 };
 
+registerType("FadeType", FadeType);
 
 // wwtlib.ReferenceFrames
 
@@ -349,6 +368,8 @@ export var ReferenceFrames = {
   sandbox: 20
 };
 
+registerType("ReferenceFrames", ReferenceFrames);
+
 
 // wwtlib.ReferenceFrameTypes
 
@@ -359,6 +380,7 @@ export var ReferenceFrameTypes = {
   synodic: 3
 };
 
+registerType("ReferenceFrameTypes", ReferenceFrameTypes);
 
 // wwtlib.CoordinatesTypes
 
@@ -368,6 +390,7 @@ export var CoordinatesTypes = {
   orbital: 2
 };
 
+registerType("CoordinatesTypes", CoordinatesTypes);
 
 // wwtlib.AltTypes
 
@@ -379,6 +402,7 @@ export var AltTypes = {
   terrain: 4
 };
 
+registerType("AltTypes", AltTypes);
 
 // wwtlib.MarkerMixes
 
@@ -386,6 +410,7 @@ export var MarkerMixes = {
   same_For_All: 0
 };
 
+registerType("MarkerMixes", MarkerMixes);
 
 // wwtlib.ColorMaps
 
@@ -395,6 +420,7 @@ export var ColorMaps = {
   per_Column_Literal: 3
 };
 
+registerType("ColorMaps", ColorMaps);
 
 // wwtlib.PlotTypes
 
@@ -407,6 +433,7 @@ export var PlotTypes = {
   custom: 5
 };
 
+registerType("PlotTypes", PlotTypes);
 
 // wwtlib.MarkerScales
 
@@ -415,6 +442,7 @@ export var MarkerScales = {
   world: 1
 };
 
+registerType("MarkerScales", MarkerScales);
 
 // wwtlib.RAUnits
 
@@ -423,6 +451,7 @@ export var RAUnits = {
   degrees: 1
 };
 
+registerType("RAUnits", RAUnits);
 
 // wwtlib.Primitives
 
@@ -442,6 +471,7 @@ export var Primitives = {
   voUndefined: 13
 };
 
+registerType("Primitives", Primitives);
 
 // wwtlib.Alignment
 
@@ -450,6 +480,7 @@ export var Alignment = {
   left: 1
 };
 
+registerType("Alignment", Alignment);
 
 // wwtlib.StockSkyOverlayTypes
 
@@ -507,6 +538,7 @@ export var StockSkyOverlayTypes = {
   orbitFilters: 50
 };
 
+registerType("StockSkyOverlayTypes", StockSkyOverlayTypes);
 
 // wwtlib.OverlayAnchor
 
@@ -515,6 +547,7 @@ export var OverlayAnchor = {
   screen: 1
 };
 
+registerType("OverlayAnchor", OverlayAnchor);
 
 // wwtlib.AudioType
 
@@ -523,6 +556,7 @@ export var AudioType = {
   voice: 1
 };
 
+registerType("AudioType", AudioType);
 
 // wwtlib.ShapeType
 
@@ -536,6 +570,7 @@ export var ShapeType = {
   openRectagle: 6
 };
 
+registerType("ShapeType", ShapeType);
 
 // wwtlib.LoopTypes
 
@@ -549,6 +584,7 @@ export var LoopTypes = {
   end: 6
 };
 
+registerType("LoopTypes", LoopTypes);
 
 // wwtlib.SelectionAnchor
 
@@ -567,6 +603,7 @@ export var SelectionAnchor = {
   none: 11
 };
 
+registerType("SelectionAnchor", SelectionAnchor);
 
 // wwtlib.TextBorderStyle
 
@@ -578,6 +615,7 @@ export var TextBorderStyle = {
   large: 4
 };
 
+registerType("TextBorderStyle", TextBorderStyle);
 
 // wwtlib.UserLevel
 
@@ -589,6 +627,7 @@ export var UserLevel = {
   professional: 4
 };
 
+registerType("UserLevel", UserLevel);
 
 // wwtlib.TransitionType
 
@@ -601,6 +640,7 @@ export var TransitionType = {
   fadeOut: 5
 };
 
+registerType("TransitionType", TransitionType);
 
 // wwtlib.DialogResult
 
@@ -608,6 +648,7 @@ export var DialogResult = {
   OK: 1
 };
 
+registerType("DialogResult", DialogResult);
 
 // wwtlib.Formatting
 
@@ -615,6 +656,7 @@ export var Formatting = {
   indented: 1
 };
 
+registerType("Formatting", Formatting);
 
 // wwtlib.StateType
 
@@ -624,52 +666,63 @@ export var StateType = {
   error: 2
 };
 
+registerType("StateType", StateType);
 
 // wwtlib.IFolder
 
 /*internal*/ function IFolder() { }
+
+registerType("IFolder", [IFolder]);
 
 
 // wwtlib.IThumbnail
 
 export function IThumbnail() { }
 
+registerType("IThumbnail", [IThumbnail]);
 
 // wwtlib.IPlace
 
 export function IPlace() { }
 
+registerType("IPlace", [IPlace]);
 
 // wwtlib.IUiController
 
 export function IUiController() { }
 
+registerType("IUiController", [IUiController]);
 
 // wwtlib.IViewMover
 
 export function IViewMover() { }
 
+registerType("IViewMover", [IViewMover]);
 
 // wwtlib.IUIServicesCallbacks
 
 export function IUIServicesCallbacks() { }
 
+registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
 
 // wwtlib.ISettings
 
 export function ISettings() { }
 
+registerType("ISettings", [ISettings]);
 
 // wwtlib.IUndoStep
 
 export function IUndoStep() { }
 
+registerType("IUndoStep", [IUndoStep]);
 
 // GFX
 
 export function GFX() {
 }
 
+registerType("GFX", [GFX, null, null]);
 
 // wwtlib.VideoOutputType
 
@@ -690,6 +743,7 @@ var VideoOutputType$ = {
 
 };
 
+registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
 
 // wwtlib.FitsProperties
 
@@ -717,6 +771,7 @@ var FitsProperties$ = {
   }
 };
 
+registerType("FitsProperties", [FitsProperties, FitsProperties$, null]);
 
 // wwtlib.HipsProperties
 
@@ -822,6 +877,7 @@ var HipsProperties$ = {
   }
 };
 
+registerType("HipsProperties", [HipsProperties, HipsProperties$, null]);
 
 // wwtlib.FastMath
 
@@ -959,6 +1015,7 @@ var FastMath$ = {
 
 };
 
+registerType("FastMath", [FastMath, FastMath$, null]);
 
 // wwtlib.HealpixTables
 
@@ -968,6 +1025,7 @@ var HealpixTables$ = {
 
 };
 
+registerType("HealpixTables", [HealpixTables, HealpixTables$, null]);
 
 // wwtlib.Xyf
 
@@ -987,6 +1045,7 @@ var Xyf$ = {
 
 };
 
+registerType("Xyf", [Xyf, Xyf$, null]);
 
 // wwtlib.HealpixUtils
 
@@ -1024,6 +1083,7 @@ var HealpixUtils$ = {
 
 };
 
+registerType("HealpixUtils", [HealpixUtils, HealpixUtils$, null]);
 
 // wwtlib.Hploc
 
@@ -1059,6 +1119,7 @@ var Hploc$ = {
   }
 };
 
+registerType("Hploc", [Hploc, Hploc$, null]);
 
 // wwtlib.Pointing
 
@@ -1095,6 +1156,7 @@ var Pointing$ = {
   }
 };
 
+registerType("Pointing", [Pointing, Pointing$, null]);
 
 // wwtlib.URLHelpers
 
@@ -1345,6 +1407,7 @@ var URLHelpers$ = {
   }
 };
 
+registerType("URLHelpers", [URLHelpers, URLHelpers$, null]);
 
 // wwtlib.Annotation
 
@@ -1454,6 +1517,7 @@ var Annotation$ = {
   }
 };
 
+registerType("Annotation", [Annotation, Annotation$, null]);
 
 // wwtlib.CameraParameters
 
@@ -1606,6 +1670,7 @@ var CameraParameters$ = {
   }
 };
 
+registerType("CameraParameters", [CameraParameters, CameraParameters$, null]);
 
 // wwtlib.Constellations
 
@@ -1998,6 +2063,7 @@ var Constellations$ = {
   }
 };
 
+registerType("Constellations", [Constellations, Constellations$, null]);
 
 // wwtlib.Lineset
 
@@ -2018,6 +2084,7 @@ var Lineset$ = {
   }
 };
 
+registerType("Lineset", [Lineset, Lineset$, null]);
 
 // wwtlib.Linepoint
 
@@ -2042,6 +2109,7 @@ var Linepoint$ = {
   }
 };
 
+registerType("Linepoint", [Linepoint, Linepoint$, null]);
 
 // wwtlib.ConstellationFilter
 
@@ -2339,6 +2407,7 @@ var ConstellationFilter$ = {
   }
 };
 
+registerType("ConstellationFilter", [ConstellationFilter, ConstellationFilter$, null]);
 
 // wwtlib.Folder
 
@@ -2727,6 +2796,7 @@ var Folder$ = {
   }
 };
 
+registerType("Folder", [Folder, Folder$, null, IThumbnail]);
 
 // wwtlib.FolderBrowser
 
@@ -3154,6 +3224,7 @@ var FolderBrowser$ = {
   }
 };
 
+registerType("FolderBrowser", [FolderBrowser, FolderBrowser$, null]);
 
 // wwtlib.FolderUp
 
@@ -3210,6 +3281,7 @@ var FolderUp$ = {
   }
 };
 
+registerType("FolderUp", [FolderUp, FolderUp$, null, IThumbnail]);
 
 // wwtlib.Dates
 
@@ -3228,6 +3300,7 @@ var Dates$ = {
   }
 };
 
+registerType("Dates", [Dates, Dates$, null]);
 
 // wwtlib.SimpleLineList
 
@@ -3357,6 +3430,7 @@ var SimpleLineList$ = {
   }
 };
 
+registerType("SimpleLineList", [SimpleLineList, SimpleLineList$, null]);
 
 // wwtlib.OrbitLineList
 
@@ -3465,6 +3539,7 @@ var OrbitLineList$ = {
   }
 };
 
+registerType("OrbitLineList", [OrbitLineList, OrbitLineList$, null]);
 
 // wwtlib.LineList
 
@@ -3570,6 +3645,7 @@ var LineList$ = {
   }
 };
 
+registerType("LineList", [LineList, LineList$, null]);
 
 // wwtlib.TriangleList
 
@@ -3697,6 +3773,7 @@ var TriangleList$ = {
   }
 };
 
+registerType("TriangleList", [TriangleList, TriangleList$, null]);
 
 // wwtlib.TriangleFanList
 
@@ -3769,6 +3846,7 @@ var TriangleFanList$ = {
   }
 };
 
+registerType("TriangleFanList", [TriangleFanList, TriangleFanList$, null]);
 
 // wwtlib.PointList
 
@@ -3948,6 +4026,7 @@ var PointList$ = {
   }
 };
 
+registerType("PointList", [PointList, PointList$, null]);
 
 // wwtlib.TimeSeriesLineVertex
 
@@ -3976,6 +4055,7 @@ var TimeSeriesLineVertex$ = {
   }
 };
 
+registerType("TimeSeriesLineVertex", [TimeSeriesLineVertex, TimeSeriesLineVertex$, null]);
 
 // wwtlib.TimeSeriesPointVertex
 
@@ -4003,6 +4083,7 @@ var TimeSeriesPointVertex$ = {
   }
 };
 
+registerType("TimeSeriesPointVertex", [TimeSeriesPointVertex, TimeSeriesPointVertex$, null]);
 
 // wwtlib.SimpleLineShader
 
@@ -4068,6 +4149,7 @@ var SimpleLineShader$ = {
 
 };
 
+registerType("SimpleLineShader", [SimpleLineShader, SimpleLineShader$, null]);
 
 // wwtlib.SimpleLineShader2D
 
@@ -4129,6 +4211,7 @@ var SimpleLineShader2D$ = {
 
 };
 
+registerType("SimpleLineShader2D", [SimpleLineShader2D, SimpleLineShader2D$, null]);
 
 // wwtlib.OrbitLineShader
 
@@ -4197,6 +4280,7 @@ var OrbitLineShader$ = {
 
 };
 
+registerType("OrbitLineShader", [OrbitLineShader, OrbitLineShader$, null]);
 
 // wwtlib.LineShaderNormalDates
 
@@ -4271,6 +4355,7 @@ var LineShaderNormalDates$ = {
 
 };
 
+registerType("LineShaderNormalDates", [LineShaderNormalDates, LineShaderNormalDates$, null]);
 
 // wwtlib.TimeSeriesPointSpriteShader
 
@@ -4366,6 +4451,7 @@ var TimeSeriesPointSpriteShader$ = {
 
 };
 
+registerType("TimeSeriesPointSpriteShader", [TimeSeriesPointSpriteShader, TimeSeriesPointSpriteShader$, null]);
 
 // wwtlib.KeplerPointSpriteShader
 
@@ -4471,6 +4557,7 @@ var KeplerPointSpriteShader$ = {
 
 };
 
+registerType("KeplerPointSpriteShader", [KeplerPointSpriteShader, KeplerPointSpriteShader$, null]);
 
 // wwtlib.EllipseShader
 
@@ -4537,6 +4624,8 @@ EllipseShader.use = function (renderContext, semiMajorAxis, eccentricity, eccent
 var EllipseShader$ = {
 
 };
+
+registerType("EllipseShader", [EllipseShader, EllipseShader$, null]);
 
 
 // wwtlib.ModelShader
@@ -4647,6 +4736,7 @@ var ModelShader$ = {
 
 };
 
+registerType("ModelShader", [ModelShader, ModelShader$, null]);
 
 // wwtlib.ModelShaderTan
 
@@ -4755,6 +4845,8 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
 var ModelShaderTan$ = {
 
 };
+
+registerType("ModelShaderTan", [ModelShaderTan, ModelShaderTan$, null]);
 
 
 // wwtlib.TileShader
@@ -4873,6 +4965,8 @@ var TileShader$ = {
 
 };
 
+registerType("TileShader", [TileShader, TileShader$, null]);
+
 
 // wwtlib.FitsShader
 
@@ -4989,6 +5083,8 @@ var FitsShader$ = {
 
 };
 
+registerType("FitsShader", [FitsShader, FitsShader$, null]);
+
 
 // wwtlib.ImageShader
 
@@ -5076,6 +5172,7 @@ var ImageShader$ = {
 
 };
 
+registerType("ImageShader", [ImageShader, ImageShader$, null]);
 
 // wwtlib.ImageShader2
 
@@ -5163,6 +5260,7 @@ var ImageShader2$ = {
 
 };
 
+registerType("ImageShader2", [ImageShader2, ImageShader2$, null]);
 
 // wwtlib.SpriteShader
 
@@ -5235,6 +5333,7 @@ var SpriteShader$ = {
 
 };
 
+registerType("SpriteShader", [SpriteShader, SpriteShader$, null]);
 
 // wwtlib.ShapeSpriteShader
 
@@ -5298,6 +5397,7 @@ var ShapeSpriteShader$ = {
 
 };
 
+registerType("ShapeSpriteShader", [ShapeSpriteShader, ShapeSpriteShader$, null]);
 
 // wwtlib.TextShader
 
@@ -5371,6 +5471,8 @@ var TextShader$ = {
 
 };
 
+registerType("TextShader", [TextShader, TextShader$, null]);
+
 
 // wwtlib.Sprite2d
 
@@ -5441,6 +5543,8 @@ var Sprite2d$ = {
     tilePrepDevice.bufferSubData(WEBGL.ARRAY_BUFFER, 0, f32array);
   }
 };
+
+registerType("Sprite2d", [Sprite2d, Sprite2d$, null]);
 
 
 // wwtlib.Tessellator
@@ -5544,6 +5648,7 @@ var Tessellator$ = {
   }
 };
 
+registerType("Tessellator", [Tessellator, Tessellator$, null]);
 
 // wwtlib.Texture
 
@@ -5647,6 +5752,7 @@ var Texture$ = {
   }
 };
 
+registerType("Texture", [Texture, Texture$, null, ss.IDisposable]);
 
 // wwtlib.Grids
 
@@ -6538,6 +6644,7 @@ var Grids$ = {
 
 };
 
+registerType("Grids", [Grids, Grids$, null]);
 
 // wwtlib.Imageset
 
@@ -7232,6 +7339,7 @@ var Imageset$ = {
   }
 };
 
+registerType("Imageset", [Imageset, Imageset$, null, IThumbnail]);
 
 // wwtlib.ViewMoverKenBurnsStyle
 
@@ -7303,6 +7411,7 @@ var ViewMoverKenBurnsStyle$ = {
   }
 };
 
+registerType("ViewMoverKenBurnsStyle", [ViewMoverKenBurnsStyle, ViewMoverKenBurnsStyle$, null, IViewMover]);
 
 // wwtlib.ViewMoverSlew
 
@@ -7423,6 +7532,8 @@ var ViewMoverSlew$ = {
   }
 };
 
+registerType("ViewMoverSlew", [ViewMoverSlew, ViewMoverSlew$, null, IViewMover]);
+
 
 // wwtlib.KeplerVertex
 
@@ -7498,6 +7609,7 @@ var KeplerVertex$ = {
   }
 };
 
+registerType("KeplerVertex", [KeplerVertex, KeplerVertex$, null]);
 
 // wwtlib.ScaleMap
 
@@ -7507,6 +7619,7 @@ var ScaleMap$ = {
 
 };
 
+registerType("ScaleMap", [ScaleMap, ScaleMap$, null]);
 
 // wwtlib.ColorMapContainer
 
@@ -7624,6 +7737,7 @@ var ColorMapContainer$ = {
   }
 };
 
+registerType("ColorMapContainer", [ColorMapContainer, ColorMapContainer$, null]);
 
 // wwtlib.Layer
 
@@ -7947,6 +8061,7 @@ var Layer$ = {
   }
 };
 
+registerType("Layer", [Layer, Layer$, null]);
 
 // wwtlib.DomainValue
 
@@ -7960,6 +8075,7 @@ var DomainValue$ = {
 
 };
 
+registerType("DomainValue", [DomainValue, DomainValue$, null]);
 
 // wwtlib.LayerManager
 
@@ -9366,6 +9482,7 @@ var LayerManager$ = {
 
 };
 
+registerType("LayerManager", [LayerManager, LayerManager$, null]);
 
 // wwtlib.LayerMap
 
@@ -9463,6 +9580,7 @@ var LayerMap$ = {
   }
 };
 
+registerType("LayerMap", [LayerMap, LayerMap$, null]);
 
 // wwtlib.SkyOverlays
 
@@ -9472,6 +9590,7 @@ var SkyOverlays$ = {
 
 };
 
+registerType("SkyOverlays", [SkyOverlays, SkyOverlays$, null]);
 
 // wwtlib.GroundOverlayLayer
 
@@ -9481,6 +9600,7 @@ var GroundOverlayLayer$ = {
 
 };
 
+registerType("GroundOverlayLayer", [GroundOverlayLayer, GroundOverlayLayer$, null]);
 
 // wwtlib.FrameTarget
 
@@ -9490,6 +9610,7 @@ var FrameTarget$ = {
 
 };
 
+registerType("FrameTarget", [FrameTarget, FrameTarget$, null]);
 
 // wwtlib.LayerUI
 
@@ -9509,6 +9630,7 @@ var LayerUI$ = {
   }
 };
 
+registerType("LayerUI", [LayerUI, LayerUI$, null]);
 
 // wwtlib.LayerUIMenuItem
 
@@ -9566,6 +9688,7 @@ var LayerUIMenuItem$ = {
   }
 };
 
+registerType("LayerUIMenuItem", [LayerUIMenuItem, LayerUIMenuItem$, null]);
 
 // wwtlib.LayerUITreeNode
 
@@ -9717,6 +9840,7 @@ var LayerUITreeNode$ = {
   }
 };
 
+registerType("LayerUITreeNode", [LayerUITreeNode, LayerUITreeNode$, null]);
 
 // wwtlib.Group
 
@@ -9729,6 +9853,7 @@ var Group$ = {
 
 };
 
+registerType("Group", [Group, Group$, null]);
 
 // wwtlib.Mesh
 
@@ -9829,6 +9954,7 @@ var Mesh$ = {
   }
 };
 
+registerType("Mesh", [Mesh, Mesh$, null, ss.IDisposable]);
 
 // wwtlib.VertexPosition
 
@@ -9838,6 +9964,8 @@ var Mesh$ = {
 var VertexPosition$ = {
 
 };
+
+registerType("VertexPosition", [VertexPosition, VertexPosition$, null]);
 
 
 // wwtlib.Object3d
@@ -11190,6 +11318,7 @@ var Object3d$ = {
   }
 };
 
+registerType("Object3d", [Object3d, Object3d$, null]);
 
 // wwtlib.ObjectNode
 
@@ -11205,6 +11334,7 @@ var ObjectNode$ = {
 
 };
 
+registerType("ObjectNode", [ObjectNode, ObjectNode$, null]);
 
 // wwtlib.Orbit
 
@@ -11250,6 +11380,7 @@ var Orbit$ = {
   }
 };
 
+registerType("Orbit", [Orbit, Orbit$, null]);
 
 // wwtlib.EllipseRenderer
 
@@ -11312,6 +11443,7 @@ var EllipseRenderer$ = {
 
 };
 
+registerType("EllipseRenderer", [EllipseRenderer, EllipseRenderer$, null]);
 
 // wwtlib.ReferenceFrame
 
@@ -11727,6 +11859,7 @@ var ReferenceFrame$ = {
   }
 };
 
+registerType("ReferenceFrame", [ReferenceFrame, ReferenceFrame$, null]);
 
 // wwtlib.KmlCoordinate
 
@@ -11739,6 +11872,7 @@ var KmlCoordinate$ = {
 
 };
 
+registerType("KmlCoordinate", [KmlCoordinate, KmlCoordinate$, null]);
 
 // wwtlib.KmlLineList
 
@@ -11792,6 +11926,7 @@ var KmlLineList$ = {
   }
 };
 
+registerType("KmlLineList", [KmlLineList, KmlLineList$, null]);
 
 // wwtlib.PushPin
 
@@ -11834,6 +11969,7 @@ var PushPin$ = {
 
 };
 
+registerType("PushPin", [PushPin, PushPin$, null]);
 
 // wwtlib.Table
 
@@ -11951,6 +12087,7 @@ var Table$ = {
   }
 };
 
+registerType("Table", [Table, Table$, null]);
 
 // wwtlib.VoTable
 
@@ -12151,6 +12288,7 @@ var VoTable$ = {
   }
 };
 
+registerType("VoTable", [VoTable, VoTable$, null]);
 
 // wwtlib.VoRow
 
@@ -12173,6 +12311,7 @@ var VoRow$ = {
   }
 };
 
+registerType("VoRow", [VoRow, VoRow$, null]);
 
 // wwtlib.VoColumn
 
@@ -12285,6 +12424,7 @@ var VoColumn$ = {
   }
 };
 
+registerType("VoColumn", [VoColumn, VoColumn$, null]);
 
 // wwtlib.WcsImage
 
@@ -12491,6 +12631,7 @@ var WcsImage$ = {
   }
 };
 
+registerType("WcsImage", [WcsImage, WcsImage$, null]);
 
 // wwtlib.MinorPlanets
 
@@ -12620,6 +12761,8 @@ MinorPlanets.initMPCVertexBuffer = function () {
 var MinorPlanets$ = {
 
 };
+
+registerType("MinorPlanets", [MinorPlanets, MinorPlanets$, null]);
 
 
 // wwtlib.Place
@@ -13028,6 +13171,7 @@ var Place$ = {
   }
 };
 
+registerType("Place", [Place, Place$, null, IThumbnail, IPlace]);
 
 // wwtlib.KeplerianElements
 
@@ -13040,6 +13184,7 @@ var KeplerianElements$ = {
 
 };
 
+registerType("KeplerianElements", [KeplerianElements, KeplerianElements$, null]);
 
 // wwtlib.BodyAngles
 
@@ -13057,6 +13202,7 @@ var BodyAngles$ = {
 
 };
 
+registerType("BodyAngles", [BodyAngles, BodyAngles$, null]);
 
 // wwtlib.Planets
 
@@ -14376,6 +14522,7 @@ var Planets$ = {
 
 };
 
+registerType("Planets", [Planets, Planets$, null]);
 
 // wwtlib.Material
 
@@ -14388,6 +14535,7 @@ var Material$ = {
 
 };
 
+registerType("Material", [Material, Material$, null]);
 
 // wwtlib.InViewReturnMessage
 
@@ -14398,6 +14546,7 @@ var InViewReturnMessage$ = {
 
 };
 
+registerType("InViewReturnMessage", [InViewReturnMessage, InViewReturnMessage$, null]);
 
 // wwtlib.RenderContext
 
@@ -15243,6 +15392,7 @@ var RenderContext$ = {
   }
 };
 
+registerType("RenderContext", [RenderContext, RenderContext$, null]);
 
 // wwtlib.RenderTriangle
 
@@ -15485,6 +15635,7 @@ var RenderTriangle$ = {
   }
 };
 
+registerType("RenderTriangle", [RenderTriangle, RenderTriangle$, null]);
 
 // wwtlib.ScriptInterface
 
@@ -15950,6 +16101,7 @@ var ScriptInterface$ = {
   }
 };
 
+registerType("ScriptInterface", [ScriptInterface, ScriptInterface$, null]);
 
 // wwtlib.Settings
 
@@ -16550,6 +16702,7 @@ var Settings$ = {
   }
 };
 
+registerType("Settings", [Settings, Settings$, null, ISettings]);
 
 // wwtlib.Text3dBatch
 
@@ -16663,6 +16816,7 @@ var Text3dBatch$ = {
   }
 };
 
+registerType("Text3dBatch", [Text3dBatch, Text3dBatch$, null]);
 
 // wwtlib.GlyphItem
 
@@ -16699,6 +16853,7 @@ var GlyphItem$ = {
   }
 };
 
+registerType("GlyphItem", [GlyphItem, GlyphItem$, null]);
 
 // wwtlib.GlyphCache
 
@@ -16804,6 +16959,7 @@ var GlyphCache$ = {
   }
 };
 
+registerType("GlyphCache", [GlyphCache, GlyphCache$, null, ss.IDisposable]);
 
 // wwtlib.Text3d
 
@@ -16924,6 +17080,7 @@ var Text3d$ = {
   }
 };
 
+registerType("Text3d", [Text3d, Text3d$, null]);
 
 // wwtlib.SpaceTimeController
 
@@ -17129,6 +17286,7 @@ var SpaceTimeController$ = {
 
 };
 
+registerType("SpaceTimeController", [SpaceTimeController, SpaceTimeController$, null]);
 
 // wwtlib.Star
 
@@ -17326,6 +17484,7 @@ var Star$ = {
   }
 };
 
+registerType("Star", [Star, Star$, null]);
 
 // wwtlib.Galaxy
 
@@ -17362,6 +17521,7 @@ var Galaxy$ = {
 
 };
 
+registerType("Galaxy", [Galaxy, Galaxy$, null]);
 
 // wwtlib.LatLngEdges
 
@@ -17375,6 +17535,7 @@ var LatLngEdges$ = {
 
 };
 
+registerType("LatLngEdges", [LatLngEdges, LatLngEdges$, null]);
 
 // wwtlib.Tile
 
@@ -18084,6 +18245,7 @@ var Tile$ = {
   }
 };
 
+registerType("Tile", [Tile, Tile$, null]);
 
 // wwtlib.TileCache
 
@@ -18328,6 +18490,8 @@ var TileCache$ = {
 
 };
 
+registerType("TileCache", [TileCache, TileCache$, null]);
+
 
 // wwtlib.DistanceCalc
 
@@ -18356,6 +18520,8 @@ DistanceCalc.getUVFromInnerPoint = function (ul, ur, ll, lr, pnt) {
 var DistanceCalc$ = {
 
 };
+
+registerType("DistanceCalc", [DistanceCalc, DistanceCalc$, null]);
 
 
 // wwtlib.Tour
@@ -18482,6 +18648,7 @@ var Tour$ = {
   }
 };
 
+registerType("Tour", [Tour, Tour$, null, IThumbnail]);
 
 // wwtlib.FileEntry
 
@@ -18497,6 +18664,7 @@ var FileEntry$ = {
   }
 };
 
+registerType("FileEntry", [FileEntry, FileEntry$, null]);
 
 // wwtlib.FileCabinet
 
@@ -18686,6 +18854,7 @@ var FileCabinet$ = {
   }
 };
 
+registerType("FileCabinet", [FileCabinet, FileCabinet$, null]);
 
 // wwtlib.SettingParameter
 
@@ -18702,6 +18871,7 @@ var SettingParameter$ = {
 
 };
 
+registerType("SettingParameter", [SettingParameter, SettingParameter$, null]);
 
 // wwtlib.Overlay
 
@@ -19170,6 +19340,7 @@ var Overlay$ = {
   }
 };
 
+registerType("Overlay", [Overlay, Overlay$, null]);
 
 // wwtlib.Selection
 
@@ -19364,6 +19535,7 @@ var Selection$ = {
   }
 };
 
+registerType("Selection", [Selection, Selection$, null]);
 
 // wwtlib.TextObject
 
@@ -19422,6 +19594,7 @@ var TextObject$ = {
   }
 };
 
+registerType("TextObject", [TextObject, TextObject$, null]);
 
 // wwtlib.TourDocument
 
@@ -20179,6 +20352,7 @@ var TourDocument$ = {
   }
 };
 
+registerType("TourDocument", [TourDocument, TourDocument$, null]);
 
 // wwtlib.TourEditTab
 
@@ -20957,6 +21131,7 @@ var TourEditTab$ = {
   }
 };
 
+registerType("TourEditTab", [TourEditTab, TourEditTab$, null]);
 
 // wwtlib.TourEditor
 
@@ -22332,6 +22507,7 @@ var TourEditor$ = {
   }
 };
 
+registerType("TourEditor", [TourEditor, TourEditor$, null, IUiController]);
 
 // wwtlib.OverlayList
 
@@ -22345,6 +22521,7 @@ var OverlayList$ = {
 
 };
 
+registerType("OverlayList", [OverlayList, OverlayList$, null]);
 
 // wwtlib.TourEdit
 
@@ -22368,6 +22545,7 @@ var TourEdit$ = {
 
 };
 
+registerType("TourEdit", [TourEdit, TourEdit$, null]);
 
 // wwtlib.SoundEditor
 
@@ -22378,6 +22556,7 @@ var SoundEditor$ = {
 
 };
 
+registerType("SoundEditor", [SoundEditor, SoundEditor$, null]);
 
 // wwtlib.TourStopList
 
@@ -22411,6 +22590,7 @@ var TourStopList$ = {
   }
 };
 
+registerType("TourStopList", [TourStopList, TourStopList$, null]);
 
 // wwtlib.TimeLine
 
@@ -22422,6 +22602,7 @@ var TimeLine$ = {
 
 };
 
+registerType("TimeLine", [TimeLine, TimeLine$, null]);
 
 // wwtlib.TourPlayer
 
@@ -22983,6 +23164,7 @@ var TourPlayer$ = {
   }
 };
 
+registerType("TourPlayer", [TourPlayer, TourPlayer$, null, IUiController]);
 
 // wwtlib.MasterTime
 
@@ -22995,6 +23177,7 @@ var MasterTime$ = {
 
 };
 
+registerType("MasterTime", [MasterTime, MasterTime$, null]);
 
 // wwtlib.TourStop
 
@@ -24528,6 +24711,7 @@ var TourStop$ = {
   }
 };
 
+registerType("TourStop", [TourStop, TourStop$, null, ISettings]);
 
 // wwtlib.LayerInfo
 
@@ -24544,6 +24728,7 @@ var LayerInfo$ = {
 
 };
 
+registerType("LayerInfo", [LayerInfo, LayerInfo$, null]);
 
 // wwtlib.UndoTourStopChange
 
@@ -24592,6 +24777,7 @@ var UndoTourStopChange$ = {
   }
 };
 
+registerType("UndoTourStopChange", [UndoTourStopChange, UndoTourStopChange$, null, IUndoStep]);
 
 // wwtlib.Undo
 
@@ -24641,6 +24827,7 @@ var Undo$ = {
 
 };
 
+registerType("Undo", [Undo, Undo$, null]);
 
 // wwtlib.UndoStep
 
@@ -24656,6 +24843,7 @@ var UndoStep$ = {
   }
 };
 
+registerType("UndoStep", [UndoStep, UndoStep$, null, IUndoStep]);
 
 // wwtlib.UndoTourSlidelistChange
 
@@ -24697,6 +24885,7 @@ var UndoTourSlidelistChange$ = {
   }
 };
 
+registerType("UndoTourSlidelistChange", [UndoTourSlidelistChange, UndoTourSlidelistChange$, null, IUndoStep]);
 
 // wwtlib.UndoTourPropertiesChange
 
@@ -24770,6 +24959,7 @@ var UndoTourPropertiesChange$ = {
   }
 };
 
+registerType("UndoTourPropertiesChange", [UndoTourPropertiesChange, UndoTourPropertiesChange$, null, IUndoStep]);
 
 // wwtlib.Triangle
 
@@ -24829,6 +25019,8 @@ var Triangle$ = {
     triList.push(Triangle.create(aIndex, bIndex, cIndex));
   }
 };
+
+registerType("Triangle", [Triangle, Triangle$, null]);
 
 
 // wwtlib.UiTools
@@ -24979,6 +25171,7 @@ var UiTools$ = {
 
 };
 
+registerType("UiTools", [UiTools, UiTools$, null]);
 
 // wwtlib.BinaryReader
 
@@ -25085,6 +25278,7 @@ var BinaryReader$ = {
   }
 };
 
+registerType("BinaryReader", [BinaryReader, BinaryReader$, null]);
 
 // wwtlib.Bitmap
 
@@ -25122,6 +25316,7 @@ var Bitmap$ = {
   }
 };
 
+registerType("Bitmap", [Bitmap, Bitmap$, null]);
 
 // wwtlib.ColorPicker
 
@@ -25151,6 +25346,7 @@ var ColorPicker$ = {
   }
 };
 
+registerType("ColorPicker", [ColorPicker, ColorPicker$, null]);
 
 // wwtlib.ContextMenuStrip
 
@@ -25246,6 +25442,7 @@ var ContextMenuStrip$ = {
   }
 };
 
+registerType("ContextMenuStrip", [ContextMenuStrip, ContextMenuStrip$, null]);
 
 // wwtlib.ToolStripMenuItem
 
@@ -25265,6 +25462,7 @@ var ToolStripMenuItem$ = {
 
 };
 
+registerType("ToolStripMenuItem", [ToolStripMenuItem, ToolStripMenuItem$, null]);
 
 // wwtlib.TagMe
 
@@ -25274,6 +25472,7 @@ var TagMe$ = {
 
 };
 
+registerType("TagMe", [TagMe, TagMe$, null]);
 
 // wwtlib.Dialog
 
@@ -25293,6 +25492,7 @@ var Dialog$ = {
   }
 };
 
+registerType("Dialog", [Dialog, Dialog$, null]);
 
 // wwtlib.Histogram
 
@@ -25546,6 +25746,7 @@ var Histogram$ = {
   }
 };
 
+registerType("Histogram", [Histogram, Histogram$, null]);
 
 // wwtlib.SimpleInput
 
@@ -25617,6 +25818,7 @@ var SimpleInput$ = {
   }
 };
 
+registerType("SimpleInput", [SimpleInput, SimpleInput$, null]);
 
 // wwtlib.XmlTextWriter
 
@@ -25723,6 +25925,7 @@ var XmlTextWriter$ = {
   }
 };
 
+registerType("XmlTextWriter", [XmlTextWriter, XmlTextWriter$, null]);
 
 // wwtlib.VizLayer
 
@@ -25807,6 +26010,7 @@ var VizLayer$ = {
   }
 };
 
+registerType("VizLayer", [VizLayer, VizLayer$, null]);
 
 // wwtlib.DataItem
 
@@ -25819,6 +26023,7 @@ var DataItem$ = {
   }
 };
 
+registerType("DataItem", [DataItem, DataItem$, null]);
 
 // wwtlib.WebFile
 
@@ -25925,6 +26130,7 @@ var WebFile$ = {
   }
 };
 
+registerType("WebFile", [WebFile, WebFile$, null]);
 
 // wwtlib.FolderDownloadAction
 
@@ -25952,6 +26158,7 @@ var FolderDownloadAction$ = {
   }
 };
 
+registerType("FolderDownloadAction", [FolderDownloadAction, FolderDownloadAction$, null]);
 
 // wwtlib.Wtml
 
@@ -26004,6 +26211,7 @@ var Wtml$ = {
 
 };
 
+registerType("Wtml", [Wtml, Wtml$, null]);
 
 // wwtlib.WWTControl
 
@@ -27841,6 +28049,7 @@ var WWTControl$ = {
   }
 };
 
+registerType("WWTControl", [WWTControl, WWTControl$, null]);
 
 // wwtlib.WWTControlBuilder
 
@@ -27889,6 +28098,7 @@ var WWTControlBuilder$ = {
   }
 };
 
+registerType("WWTControlBuilder", [WWTControlBuilder, WWTControlBuilder$, null]);
 
 // wwtlib.WWTElementEvent
 
@@ -27902,6 +28112,7 @@ var WWTElementEvent$ = {
 
 };
 
+registerType("WWTElementEvent", [WWTElementEvent, WWTElementEvent$, null]);
 
 // wwtlib.Coordinates
 
@@ -28405,6 +28616,7 @@ var Coordinates$ = {
   }
 };
 
+registerType("Coordinates", [Coordinates, Coordinates$, null]);
 
 // wwtlib.Fxyf
 
@@ -28515,6 +28727,7 @@ var Fxyf$ = {
   }
 };
 
+registerType("Fxyf", [Fxyf, Fxyf$, HealpixTables]);
 
 // wwtlib.HealpixTile
 
@@ -29069,6 +29282,7 @@ var HealpixTile$ = {
   }
 };
 
+registerType("HealpixTile", [HealpixTile, HealpixTile$, Tile]);
 
 // wwtlib.FitsImage
 
@@ -29452,6 +29666,7 @@ var FitsImage$ = {
   }
 };
 
+registerType("FitsImage", [FitsImage, FitsImage$, WcsImage]);
 
 // wwtlib.Circle
 
@@ -29596,6 +29811,7 @@ var Circle$ = {
   }
 };
 
+registerType("Circle", [Circle, Circle$, Annotation]);
 
 // wwtlib.Poly
 
@@ -29707,6 +29923,7 @@ var Poly$ = {
   }
 };
 
+registerType("Poly", [Poly, Poly$, Annotation]);
 
 // wwtlib.PolyLine
 
@@ -29785,6 +30002,7 @@ var PolyLine$ = {
   }
 };
 
+registerType("PolyLine", [PolyLine, PolyLine$, Annotation]);
 
 // wwtlib.EquirectangularTile
 
@@ -30057,6 +30275,7 @@ var EquirectangularTile$ = {
   }
 };
 
+registerType("EquirectangularTile", [EquirectangularTile, EquirectangularTile$, Tile]);
 
 // wwtlib.ScaleLinear
 
@@ -30076,6 +30295,7 @@ var ScaleLinear$ = {
   }
 };
 
+registerType("ScaleLinear", [ScaleLinear, ScaleLinear$, ScaleMap]);
 
 // wwtlib.ScaleLog
 
@@ -30096,6 +30316,7 @@ var ScaleLog$ = {
   }
 };
 
+registerType("ScaleLog", [ScaleLog, ScaleLog$, ScaleMap]);
 
 // wwtlib.ScalePow
 
@@ -30116,6 +30337,7 @@ var ScalePow$ = {
   }
 };
 
+registerType("ScalePow", [ScalePow, ScalePow$, ScaleMap]);
 
 // wwtlib.ScaleSqrt
 
@@ -30136,6 +30358,7 @@ var ScaleSqrt$ = {
   }
 };
 
+registerType("ScaleSqrt", [ScaleSqrt, ScaleSqrt$, ScaleMap]);
 
 // wwtlib.HistogramEqualization
 
@@ -30164,6 +30387,7 @@ var HistogramEqualization$ = {
   }
 };
 
+registerType("HistogramEqualization", [HistogramEqualization, HistogramEqualization$, ScaleMap]);
 
 // wwtlib.GreatCirlceRouteLayer
 
@@ -30325,6 +30549,7 @@ var GreatCirlceRouteLayer$ = {
   }
 };
 
+registerType("GreatCirlceRouteLayer", [GreatCirlceRouteLayer, GreatCirlceRouteLayer$, Layer]);
 
 // wwtlib.GridLayer
 
@@ -30339,6 +30564,7 @@ var GridLayer$ = {
   }
 };
 
+registerType("GridLayer", [GridLayer, GridLayer$, Layer]);
 
 // wwtlib.ImageSetLayer
 
@@ -30529,6 +30755,7 @@ var ImageSetLayer$ = {
   }
 };
 
+registerType("ImageSetLayer", [ImageSetLayer, ImageSetLayer$, Layer]);
 
 // wwtlib.LayerCollection
 
@@ -30540,6 +30767,8 @@ var LayerCollection$ = {
     return Layer.prototype.draw.call(this, renderContext, opacity, false);
   }
 };
+
+registerType("LayerCollection", [LayerCollection, LayerCollection$, Layer]);
 
 
 // wwtlib.Object3dLayer
@@ -31201,6 +31430,7 @@ var Object3dLayer$ = {
   }
 };
 
+registerType("Object3dLayer", [Object3dLayer, Object3dLayer$, Layer, IUiController]);
 
 // wwtlib.Object3dLayerUI
 
@@ -31261,6 +31491,7 @@ var Object3dLayerUI$ = {
   }
 };
 
+registerType("Object3dLayerUI", [Object3dLayerUI, Object3dLayerUI$, LayerUI]);
 
 // wwtlib.OrbitLayer
 
@@ -31420,6 +31651,7 @@ var OrbitLayer$ = {
   }
 };
 
+registerType("OrbitLayer", [OrbitLayer, OrbitLayer$, Layer]);
 
 // wwtlib.OrbitLayerUI
 
@@ -31480,6 +31712,7 @@ var OrbitLayerUI$ = {
   }
 };
 
+registerType("OrbitLayerUI", [OrbitLayerUI, OrbitLayerUI$, LayerUI]);
 
 // wwtlib.SpreadSheetLayer
 
@@ -33167,6 +33400,7 @@ var SpreadSheetLayer$ = {
   }
 };
 
+registerType("SpreadSheetLayer", [SpreadSheetLayer, SpreadSheetLayer$, Layer]);
 
 // wwtlib.TimeSeriesLayer
 
@@ -33902,6 +34136,7 @@ var TimeSeriesLayer$ = {
   }
 };
 
+registerType("TimeSeriesLayer", [TimeSeriesLayer, TimeSeriesLayer$, Layer]);
 
 // wwtlib.VoTableLayer
 
@@ -34900,6 +35135,7 @@ var VoTableLayer$ = {
   }
 };
 
+registerType("VoTableLayer", [VoTableLayer, VoTableLayer$, Layer]);
 
 // wwtlib.MercatorTile
 
@@ -35257,6 +35493,7 @@ var MercatorTile$ = {
   }
 };
 
+registerType("MercatorTile", [MercatorTile, MercatorTile$, Tile]);
 
 // wwtlib.PlotTile
 
@@ -35495,6 +35732,7 @@ var PlotTile$ = {
   }
 };
 
+registerType("PlotTile", [PlotTile, PlotTile$, Tile]);
 
 // wwtlib.TangentTile
 
@@ -35673,6 +35911,7 @@ var TangentTile$ = {
   }
 };
 
+registerType("TangentTile", [TangentTile, TangentTile$, Tile]);
 
 // wwtlib.ToastTile
 
@@ -36234,6 +36473,7 @@ var ToastTile$ = {
   }
 };
 
+registerType("ToastTile", [ToastTile, ToastTile$, Tile]);
 
 // wwtlib.BitmapOverlay
 
@@ -36341,6 +36581,7 @@ var BitmapOverlay$ = {
   }
 };
 
+registerType("BitmapOverlay", [BitmapOverlay, BitmapOverlay$, Overlay]);
 
 // wwtlib.TextOverlay
 
@@ -36504,6 +36745,7 @@ var TextOverlay$ = {
   }
 };
 
+registerType("TextOverlay", [TextOverlay, TextOverlay$, Overlay]);
 
 // wwtlib.ShapeOverlay
 
@@ -36977,6 +37219,7 @@ var ShapeOverlay$ = {
   }
 };
 
+registerType("ShapeOverlay", [ShapeOverlay, ShapeOverlay$, Overlay]);
 
 // wwtlib.AudioOverlay
 
@@ -37123,6 +37366,7 @@ var AudioOverlay$ = {
   }
 };
 
+registerType("AudioOverlay", [AudioOverlay, AudioOverlay$, Overlay]);
 
 // wwtlib.FlipbookOverlay
 
@@ -37333,6 +37577,7 @@ var FlipbookOverlay$ = {
   }
 };
 
+registerType("FlipbookOverlay", [FlipbookOverlay, FlipbookOverlay$, Overlay]);
 
 // wwtlib.ToolStripSeparator
 
@@ -37344,6 +37589,7 @@ var ToolStripSeparator$ = {
 
 };
 
+registerType("ToolStripSeparator", [ToolStripSeparator, ToolStripSeparator$, ToolStripMenuItem]);
 
 // wwtlib.FrameWizard
 
@@ -37356,6 +37602,7 @@ var FrameWizard$ = {
   }
 };
 
+registerType("FrameWizard", [FrameWizard, FrameWizard$, Dialog]);
 
 // wwtlib.ReferenceFrameProps
 
@@ -37368,6 +37615,7 @@ var ReferenceFrameProps$ = {
   }
 };
 
+registerType("ReferenceFrameProps", [ReferenceFrameProps, ReferenceFrameProps$, Dialog]);
 
 // wwtlib.GreatCircleDialog
 
@@ -37379,6 +37627,7 @@ var GreatCircleDialog$ = {
   }
 };
 
+registerType("GreatCircleDialog", [GreatCircleDialog, GreatCircleDialog$, Dialog]);
 
 // wwtlib.DataVizWizard
 
@@ -37390,6 +37639,7 @@ var DataVizWizard$ = {
   }
 };
 
+registerType("DataVizWizard", [DataVizWizard, DataVizWizard$, Dialog]);
 
 // wwtlib.FitsImageTile
 
@@ -37441,6 +37691,7 @@ var FitsImageTile$ = {
   }
 };
 
+registerType("FitsImageTile", [FitsImageTile, FitsImageTile$, FitsImage]);
 
 // wwtlib.FitsImageJs
 
@@ -37902,6 +38153,7 @@ var FitsImageJs$ = {
   }
 };
 
+registerType("FitsImageJs", [FitsImageJs, FitsImageJs$, FitsImage]);
 
 // wwtlib.ISSLayer
 
@@ -37965,6 +38217,7 @@ var ISSLayer$ = {
   }
 };
 
+registerType("ISSLayer", [ISSLayer, ISSLayer$, Object3dLayer]);
 
 // wwtlib.CatalogSpreadSheetLayer
 
@@ -38002,6 +38255,7 @@ var CatalogSpreadSheetLayer$ = {
   }
 };
 
+registerType("CatalogSpreadSheetLayer", [CatalogSpreadSheetLayer, CatalogSpreadSheetLayer$, SpreadSheetLayer]);
 
 // wwtlib.SlideChangedEventArgs
 
@@ -38019,6 +38273,7 @@ var SlideChangedEventArgs$ = {
   }
 };
 
+registerType("SlideChangedEventArgs", [SlideChangedEventArgs, SlideChangedEventArgs$, ss.EventArgs]);
 
 // wwtlib.ArrivedEventArgs
 
@@ -38055,6 +38310,7 @@ var ArrivedEventArgs$ = {
   }
 };
 
+registerType("ArrivedEventArgs", [ArrivedEventArgs, ArrivedEventArgs$, ss.EventArgs]);
 
 // wwtlib.AnnotationClickEventArgs
 
@@ -38090,6 +38346,7 @@ var AnnotationClickEventArgs$ = {
   }
 };
 
+registerType("AnnotationClickEventArgs", [AnnotationClickEventArgs, AnnotationClickEventArgs$, ss.EventArgs]);
 
 // wwtlib.CollectionLoadedEventArgs
 
@@ -38107,6 +38364,7 @@ var CollectionLoadedEventArgs$ = {
   }
 };
 
+registerType("CollectionLoadedEventArgs", [CollectionLoadedEventArgs, CollectionLoadedEventArgs$, ss.EventArgs]);
 
 // wwtlib.SkyImageTile
 
@@ -38161,252 +38419,9 @@ var SkyImageTile$ = {
   }
 };
 
-// Wrap up module initialization
-
-registerType("IFolder", [IFolder]);
-registerType("Sprite2d", [Sprite2d, Sprite2d$, null]);
-registerType("ViewMoverSlew", [ViewMoverSlew, ViewMoverSlew$, null, IViewMover]);
-registerType("VertexPosition", [VertexPosition, VertexPosition$, null]);
-registerType("MinorPlanets", [MinorPlanets, MinorPlanets$, null]);
-registerType("TileCache", [TileCache, TileCache$, null]);
-registerType("DistanceCalc", [DistanceCalc, DistanceCalc$, null]);
-registerType("Triangle", [Triangle, Triangle$, null]);
-registerType("LayerCollection", [LayerCollection, LayerCollection$, Layer]);
-
-registerType("ScaleTypes", ScaleTypes);
-registerType("URLRewriteMode", URLRewriteMode);
-registerType("SolarSystemObjects", SolarSystemObjects);
-registerType("InterpolationType", InterpolationType);
-registerType("PointType", PointType);
-registerType("FolderGroup", FolderGroup);
-registerType("FolderRefreshType", FolderRefreshType);
-registerType("FolderType", FolderType);
-registerType("ThumbnailSize", ThumbnailSize);
-registerType("CullMode", CullMode);
-registerType("PointScaleTypes", PointScaleTypes);
-registerType("ProjectionType", ProjectionType);
-registerType("ImageSetType", ImageSetType);
-registerType("BandPass", BandPass);
-registerType("Classification", Classification);
-registerType("DataTypes", DataTypes);
-registerType("AltUnits", AltUnits);
-registerType("FadeType", FadeType);
-registerType("ReferenceFrames", ReferenceFrames);
-registerType("ReferenceFrameTypes", ReferenceFrameTypes);
-registerType("CoordinatesTypes", CoordinatesTypes);
-registerType("AltTypes", AltTypes);
-registerType("MarkerMixes", MarkerMixes);
-registerType("ColorMaps", ColorMaps);
-registerType("PlotTypes", PlotTypes);
-registerType("MarkerScales", MarkerScales);
-registerType("RAUnits", RAUnits);
-registerType("Primitives", Primitives);
-registerType("Alignment", Alignment);
-registerType("StockSkyOverlayTypes", StockSkyOverlayTypes);
-registerType("OverlayAnchor", OverlayAnchor);
-registerType("AudioType", AudioType);
-registerType("ShapeType", ShapeType);
-registerType("LoopTypes", LoopTypes);
-registerType("SelectionAnchor", SelectionAnchor);
-registerType("TextBorderStyle", TextBorderStyle);
-registerType("UserLevel", UserLevel);
-registerType("TransitionType", TransitionType);
-registerType("DialogResult", DialogResult);
-registerType("Formatting", Formatting);
-registerType("StateType", StateType);
-registerType("IThumbnail", [IThumbnail]);
-registerType("IPlace", [IPlace]);
-registerType("IUiController", [IUiController]);
-registerType("IViewMover", [IViewMover]);
-registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
-registerType("ISettings", [ISettings]);
-registerType("IUndoStep", [IUndoStep]);
-registerType("GFX", [GFX, null, null]);
-registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
-registerType("FitsProperties", [FitsProperties, FitsProperties$, null]);
-registerType("HipsProperties", [HipsProperties, HipsProperties$, null]);
-registerType("FastMath", [FastMath, FastMath$, null]);
-registerType("HealpixTables", [HealpixTables, HealpixTables$, null]);
-registerType("Xyf", [Xyf, Xyf$, null]);
-registerType("HealpixUtils", [HealpixUtils, HealpixUtils$, null]);
-registerType("Hploc", [Hploc, Hploc$, null]);
-registerType("Pointing", [Pointing, Pointing$, null]);
-registerType("URLHelpers", [URLHelpers, URLHelpers$, null]);
-registerType("Annotation", [Annotation, Annotation$, null]);
-registerType("CameraParameters", [CameraParameters, CameraParameters$, null]);
-registerType("Constellations", [Constellations, Constellations$, null]);
-registerType("Lineset", [Lineset, Lineset$, null]);
-registerType("Linepoint", [Linepoint, Linepoint$, null]);
-registerType("ConstellationFilter", [ConstellationFilter, ConstellationFilter$, null]);
-registerType("Folder", [Folder, Folder$, null, IThumbnail]);
-registerType("FolderBrowser", [FolderBrowser, FolderBrowser$, null]);
-registerType("FolderUp", [FolderUp, FolderUp$, null, IThumbnail]);
-registerType("Dates", [Dates, Dates$, null]);
-registerType("SimpleLineList", [SimpleLineList, SimpleLineList$, null]);
-registerType("OrbitLineList", [OrbitLineList, OrbitLineList$, null]);
-registerType("LineList", [LineList, LineList$, null]);
-registerType("TriangleList", [TriangleList, TriangleList$, null]);
-registerType("TriangleFanList", [TriangleFanList, TriangleFanList$, null]);
-registerType("PointList", [PointList, PointList$, null]);
-registerType("TimeSeriesLineVertex", [TimeSeriesLineVertex, TimeSeriesLineVertex$, null]);
-registerType("TimeSeriesPointVertex", [TimeSeriesPointVertex, TimeSeriesPointVertex$, null]);
-registerType("SimpleLineShader", [SimpleLineShader, SimpleLineShader$, null]);
-registerType("SimpleLineShader2D", [SimpleLineShader2D, SimpleLineShader2D$, null]);
-registerType("OrbitLineShader", [OrbitLineShader, OrbitLineShader$, null]);
-registerType("LineShaderNormalDates", [LineShaderNormalDates, LineShaderNormalDates$, null]);
-registerType("TimeSeriesPointSpriteShader", [TimeSeriesPointSpriteShader, TimeSeriesPointSpriteShader$, null]);
-registerType("KeplerPointSpriteShader", [KeplerPointSpriteShader, KeplerPointSpriteShader$, null]);
-registerType("EllipseShader", [EllipseShader, EllipseShader$, null]);
-registerType("ModelShader", [ModelShader, ModelShader$, null]);
-registerType("ModelShaderTan", [ModelShaderTan, ModelShaderTan$, null]);
-registerType("TileShader", [TileShader, TileShader$, null]);
-registerType("FitsShader", [FitsShader, FitsShader$, null]);
-registerType("ImageShader", [ImageShader, ImageShader$, null]);
-registerType("ImageShader2", [ImageShader2, ImageShader2$, null]);
-registerType("SpriteShader", [SpriteShader, SpriteShader$, null]);
-registerType("ShapeSpriteShader", [ShapeSpriteShader, ShapeSpriteShader$, null]);
-registerType("TextShader", [TextShader, TextShader$, null]);
-registerType("Tessellator", [Tessellator, Tessellator$, null]);
-registerType("Texture", [Texture, Texture$, null, ss.IDisposable]);
-registerType("Grids", [Grids, Grids$, null]);
-registerType("Imageset", [Imageset, Imageset$, null, IThumbnail]);
-registerType("ViewMoverKenBurnsStyle", [ViewMoverKenBurnsStyle, ViewMoverKenBurnsStyle$, null, IViewMover]);
-registerType("KeplerVertex", [KeplerVertex, KeplerVertex$, null]);
-registerType("ScaleMap", [ScaleMap, ScaleMap$, null]);
-registerType("ColorMapContainer", [ColorMapContainer, ColorMapContainer$, null]);
-registerType("Layer", [Layer, Layer$, null]);
-registerType("DomainValue", [DomainValue, DomainValue$, null]);
-registerType("LayerManager", [LayerManager, LayerManager$, null]);
-registerType("LayerMap", [LayerMap, LayerMap$, null]);
-registerType("SkyOverlays", [SkyOverlays, SkyOverlays$, null]);
-registerType("GroundOverlayLayer", [GroundOverlayLayer, GroundOverlayLayer$, null]);
-registerType("FrameTarget", [FrameTarget, FrameTarget$, null]);
-registerType("LayerUI", [LayerUI, LayerUI$, null]);
-registerType("LayerUIMenuItem", [LayerUIMenuItem, LayerUIMenuItem$, null]);
-registerType("LayerUITreeNode", [LayerUITreeNode, LayerUITreeNode$, null]);
-registerType("Group", [Group, Group$, null]);
-registerType("Mesh", [Mesh, Mesh$, null, ss.IDisposable]);
-registerType("Object3d", [Object3d, Object3d$, null]);
-registerType("ObjectNode", [ObjectNode, ObjectNode$, null]);
-registerType("Orbit", [Orbit, Orbit$, null]);
-registerType("EllipseRenderer", [EllipseRenderer, EllipseRenderer$, null]);
-registerType("ReferenceFrame", [ReferenceFrame, ReferenceFrame$, null]);
-registerType("KmlCoordinate", [KmlCoordinate, KmlCoordinate$, null]);
-registerType("KmlLineList", [KmlLineList, KmlLineList$, null]);
-registerType("PushPin", [PushPin, PushPin$, null]);
-registerType("Table", [Table, Table$, null]);
-registerType("VoTable", [VoTable, VoTable$, null]);
-registerType("VoRow", [VoRow, VoRow$, null]);
-registerType("VoColumn", [VoColumn, VoColumn$, null]);
-registerType("WcsImage", [WcsImage, WcsImage$, null]);
-registerType("Place", [Place, Place$, null, IThumbnail, IPlace]);
-registerType("KeplerianElements", [KeplerianElements, KeplerianElements$, null]);
-registerType("BodyAngles", [BodyAngles, BodyAngles$, null]);
-registerType("Planets", [Planets, Planets$, null]);
-registerType("Material", [Material, Material$, null]);
-registerType("InViewReturnMessage", [InViewReturnMessage, InViewReturnMessage$, null]);
-registerType("RenderContext", [RenderContext, RenderContext$, null]);
-registerType("RenderTriangle", [RenderTriangle, RenderTriangle$, null]);
-registerType("ScriptInterface", [ScriptInterface, ScriptInterface$, null]);
-registerType("Settings", [Settings, Settings$, null, ISettings]);
-registerType("Text3dBatch", [Text3dBatch, Text3dBatch$, null]);
-registerType("GlyphItem", [GlyphItem, GlyphItem$, null]);
-registerType("GlyphCache", [GlyphCache, GlyphCache$, null, ss.IDisposable]);
-registerType("Text3d", [Text3d, Text3d$, null]);
-registerType("SpaceTimeController", [SpaceTimeController, SpaceTimeController$, null]);
-registerType("Star", [Star, Star$, null]);
-registerType("Galaxy", [Galaxy, Galaxy$, null]);
-registerType("LatLngEdges", [LatLngEdges, LatLngEdges$, null]);
-registerType("Tile", [Tile, Tile$, null]);
-registerType("Tour", [Tour, Tour$, null, IThumbnail]);
-registerType("FileEntry", [FileEntry, FileEntry$, null]);
-registerType("FileCabinet", [FileCabinet, FileCabinet$, null]);
-registerType("SettingParameter", [SettingParameter, SettingParameter$, null]);
-registerType("Overlay", [Overlay, Overlay$, null]);
-registerType("Selection", [Selection, Selection$, null]);
-registerType("TextObject", [TextObject, TextObject$, null]);
-registerType("TourDocument", [TourDocument, TourDocument$, null]);
-registerType("TourEditTab", [TourEditTab, TourEditTab$, null]);
-registerType("TourEditor", [TourEditor, TourEditor$, null, IUiController]);
-registerType("OverlayList", [OverlayList, OverlayList$, null]);
-registerType("TourEdit", [TourEdit, TourEdit$, null]);
-registerType("SoundEditor", [SoundEditor, SoundEditor$, null]);
-registerType("TourStopList", [TourStopList, TourStopList$, null]);
-registerType("TimeLine", [TimeLine, TimeLine$, null]);
-registerType("TourPlayer", [TourPlayer, TourPlayer$, null, IUiController]);
-registerType("MasterTime", [MasterTime, MasterTime$, null]);
-registerType("TourStop", [TourStop, TourStop$, null, ISettings]);
-registerType("LayerInfo", [LayerInfo, LayerInfo$, null]);
-registerType("UndoTourStopChange", [UndoTourStopChange, UndoTourStopChange$, null, IUndoStep]);
-registerType("Undo", [Undo, Undo$, null]);
-registerType("UndoStep", [UndoStep, UndoStep$, null, IUndoStep]);
-registerType("UndoTourSlidelistChange", [UndoTourSlidelistChange, UndoTourSlidelistChange$, null, IUndoStep]);
-registerType("UndoTourPropertiesChange", [UndoTourPropertiesChange, UndoTourPropertiesChange$, null, IUndoStep]);
-registerType("UiTools", [UiTools, UiTools$, null]);
-registerType("BinaryReader", [BinaryReader, BinaryReader$, null]);
-registerType("Bitmap", [Bitmap, Bitmap$, null]);
-registerType("ColorPicker", [ColorPicker, ColorPicker$, null]);
-registerType("ContextMenuStrip", [ContextMenuStrip, ContextMenuStrip$, null]);
-registerType("ToolStripMenuItem", [ToolStripMenuItem, ToolStripMenuItem$, null]);
-registerType("TagMe", [TagMe, TagMe$, null]);
-registerType("Dialog", [Dialog, Dialog$, null]);
-registerType("Histogram", [Histogram, Histogram$, null]);
-registerType("SimpleInput", [SimpleInput, SimpleInput$, null]);
-registerType("XmlTextWriter", [XmlTextWriter, XmlTextWriter$, null]);
-registerType("VizLayer", [VizLayer, VizLayer$, null]);
-registerType("DataItem", [DataItem, DataItem$, null]);
-registerType("WebFile", [WebFile, WebFile$, null]);
-registerType("FolderDownloadAction", [FolderDownloadAction, FolderDownloadAction$, null]);
-registerType("Wtml", [Wtml, Wtml$, null]);
-registerType("WWTControl", [WWTControl, WWTControl$, null]);
-registerType("WWTControlBuilder", [WWTControlBuilder, WWTControlBuilder$, null]);
-registerType("WWTElementEvent", [WWTElementEvent, WWTElementEvent$, null]);
-registerType("Coordinates", [Coordinates, Coordinates$, null]);
-registerType("Fxyf", [Fxyf, Fxyf$, HealpixTables]);
-registerType("HealpixTile", [HealpixTile, HealpixTile$, Tile]);
-registerType("FitsImage", [FitsImage, FitsImage$, WcsImage]);
-registerType("Circle", [Circle, Circle$, Annotation]);
-registerType("Poly", [Poly, Poly$, Annotation]);
-registerType("PolyLine", [PolyLine, PolyLine$, Annotation]);
-registerType("EquirectangularTile", [EquirectangularTile, EquirectangularTile$, Tile]);
-registerType("ScaleLinear", [ScaleLinear, ScaleLinear$, ScaleMap]);
-registerType("ScaleLog", [ScaleLog, ScaleLog$, ScaleMap]);
-registerType("ScalePow", [ScalePow, ScalePow$, ScaleMap]);
-registerType("ScaleSqrt", [ScaleSqrt, ScaleSqrt$, ScaleMap]);
-registerType("HistogramEqualization", [HistogramEqualization, HistogramEqualization$, ScaleMap]);
-registerType("GreatCirlceRouteLayer", [GreatCirlceRouteLayer, GreatCirlceRouteLayer$, Layer]);
-registerType("GridLayer", [GridLayer, GridLayer$, Layer]);
-registerType("ImageSetLayer", [ImageSetLayer, ImageSetLayer$, Layer]);
-registerType("Object3dLayer", [Object3dLayer, Object3dLayer$, Layer, IUiController]);
-registerType("Object3dLayerUI", [Object3dLayerUI, Object3dLayerUI$, LayerUI]);
-registerType("OrbitLayer", [OrbitLayer, OrbitLayer$, Layer]);
-registerType("OrbitLayerUI", [OrbitLayerUI, OrbitLayerUI$, LayerUI]);
-registerType("SpreadSheetLayer", [SpreadSheetLayer, SpreadSheetLayer$, Layer]);
-registerType("TimeSeriesLayer", [TimeSeriesLayer, TimeSeriesLayer$, Layer]);
-registerType("VoTableLayer", [VoTableLayer, VoTableLayer$, Layer]);
-registerType("MercatorTile", [MercatorTile, MercatorTile$, Tile]);
-registerType("PlotTile", [PlotTile, PlotTile$, Tile]);
-registerType("TangentTile", [TangentTile, TangentTile$, Tile]);
-registerType("ToastTile", [ToastTile, ToastTile$, Tile]);
-registerType("BitmapOverlay", [BitmapOverlay, BitmapOverlay$, Overlay]);
-registerType("TextOverlay", [TextOverlay, TextOverlay$, Overlay]);
-registerType("ShapeOverlay", [ShapeOverlay, ShapeOverlay$, Overlay]);
-registerType("AudioOverlay", [AudioOverlay, AudioOverlay$, Overlay]);
-registerType("FlipbookOverlay", [FlipbookOverlay, FlipbookOverlay$, Overlay]);
-registerType("ToolStripSeparator", [ToolStripSeparator, ToolStripSeparator$, ToolStripMenuItem]);
-registerType("FrameWizard", [FrameWizard, FrameWizard$, Dialog]);
-registerType("ReferenceFrameProps", [ReferenceFrameProps, ReferenceFrameProps$, Dialog]);
-registerType("GreatCircleDialog", [GreatCircleDialog, GreatCircleDialog$, Dialog]);
-registerType("DataVizWizard", [DataVizWizard, DataVizWizard$, Dialog]);
-registerType("FitsImageTile", [FitsImageTile, FitsImageTile$, FitsImage]);
-registerType("FitsImageJs", [FitsImageJs, FitsImageJs$, FitsImage]);
-registerType("ISSLayer", [ISSLayer, ISSLayer$, Object3dLayer]);
-registerType("CatalogSpreadSheetLayer", [CatalogSpreadSheetLayer, CatalogSpreadSheetLayer$, SpreadSheetLayer]);
-registerType("SlideChangedEventArgs", [SlideChangedEventArgs, SlideChangedEventArgs$, ss.EventArgs]);
-registerType("ArrivedEventArgs", [ArrivedEventArgs, ArrivedEventArgs$, ss.EventArgs]);
-registerType("AnnotationClickEventArgs", [AnnotationClickEventArgs, AnnotationClickEventArgs$, ss.EventArgs]);
-registerType("CollectionLoadedEventArgs", [CollectionLoadedEventArgs, CollectionLoadedEventArgs$, ss.EventArgs]);
 registerType("SkyImageTile", [SkyImageTile, SkyImageTile$, TangentTile]);
+
+// Wrap up module initialization
 
 registerEnum("AltTypes", AltTypes);
 registerEnum("AltUnits", AltUnits);
