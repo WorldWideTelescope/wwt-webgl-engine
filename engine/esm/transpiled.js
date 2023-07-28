@@ -17457,7 +17457,7 @@ var Tile$ = {
         tilePrepDevice.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
         tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
         if (this.dataset.get_extension().toLowerCase().indexOf('fits') > -1 && RenderContext.useGlVersion2) {
-          tilePrepDevice.texImage2D(3553, 0, WEBGL.R32F, ss.truncate(this.fitsImage.get_sizeX()), ss.truncate(this.fitsImage.get_sizeY()), 0, 6403, WEBGL.FLOAT, this.fitsImage.dataUnit);
+          tilePrepDevice.texImage2D(3553, 0, WEBGL.R32F, ss.truncate(this.fitsImage.get_sizeX()), ss.truncate(this.fitsImage.get_sizeY()), 0, WEBGL.RED, WEBGL.FLOAT, this.fitsImage.dataUnit);
           tilePrepDevice.texParameteri(3553, 10241, WEBGL.NEAREST);
           tilePrepDevice.texParameteri(3553, 10240, WEBGL.NEAREST);
         }
