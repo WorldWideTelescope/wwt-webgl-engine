@@ -4046,10 +4046,10 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.uniformMatrix4fv(SimpleLineShader.projMatLoc, false, renderContext.get_projection().floatArray());
     gl.uniform4f(SimpleLineShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
     if (renderContext.space || !useDepth) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4107,10 +4107,10 @@ SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth) {
     var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
     gl.uniform4f(SimpleLineShader2D.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
     if (renderContext.space || !useDepth) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4173,10 +4173,10 @@ OrbitLineShader.use = function (renderContext, vertex, lineColor) {
     gl.uniformMatrix4fv(OrbitLineShader.projMatLoc, false, renderContext.get_projection().floatArray());
     gl.uniform4f(OrbitLineShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
     if (renderContext.space) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4246,10 +4246,10 @@ LineShaderNormalDates.use = function (renderContext, vertex, lineColor, zBuffer,
     gl.uniform1f(LineShaderNormalDates.jNowLoc, jNow);
     gl.uniform1f(LineShaderNormalDates.decayLoc, decay);
     if (zBuffer) {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4336,10 +4336,10 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
     gl.uniform1f(TimeSeriesPointSpriteShader.showFarSideLoc, (showFarSide) ? 1 : 0);
     gl.uniform1f(TimeSeriesPointSpriteShader.skyLoc, (sky) ? -1 : 1);
     if (zBuffer) {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4432,10 +4432,10 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
     gl.uniform1f(KeplerPointSpriteShader.scaleLoc, scale);
     gl.uniform1f(KeplerPointSpriteShader.minSizeLoc, minSize);
     if (zBuffer) {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4522,7 +4522,7 @@ EllipseShader.use = function (renderContext, semiMajorAxis, eccentricity, eccent
     gl.uniform1f(EllipseShader.semiMajorAxisLoc, semiMajorAxis);
     gl.uniform1f(EllipseShader.eccentricityLoc, eccentricity);
     gl.uniform1f(EllipseShader.eccentricAnomalyLoc, eccentricAnomaly);
-    gl.disable(2929);
+    gl.disable(WEBGL.DEPTH_TEST);
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
@@ -4615,10 +4615,10 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.uniform3f(ModelShader.sunLoc, sp.x, sp.y, sp.z);
     gl.uniform1i(ModelShader.sampLoc, 0);
     if (renderContext.space || noDepth) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4724,10 +4724,10 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.uniform3f(ModelShaderTan.sunLoc, -sp.x, -sp.y, -sp.z);
     gl.uniform1i(ModelShaderTan.sampLoc, 0);
     if (renderContext.space || noDepth) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4843,10 +4843,10 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.uniform3f(TileShader.sunLoc, -sp.x, -sp.y, -sp.z);
     gl.uniform1i(TileShader.sampLoc, 0);
     if (renderContext.space || noDepth) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -4959,10 +4959,10 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.uniform1i(FitsShader.containsBlanksLoc, FitsShader.containsBlanks);
     gl.uniform1i(FitsShader.scalingLocation, FitsShader.scaleType);
     if (renderContext.space || noDepth) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -5046,10 +5046,10 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.uniformMatrix4fv(ImageShader.projMatLoc, false, renderContext.get_projection().floatArray());
     gl.uniform1i(ImageShader.sampLoc, 0);
     if (renderContext.space || noDepth) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -5133,10 +5133,10 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     gl.uniformMatrix4fv(ImageShader2.projMatLoc, false, renderContext.get_projection().floatArray());
     gl.uniform1i(ImageShader2.sampLoc, 0);
     if (renderContext.space || noDepth) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
@@ -5212,7 +5212,7 @@ SpriteShader.use = function (renderContext, vertex, texture) {
     gl.uniformMatrix4fv(SpriteShader.mvMatLoc, false, mvMat.floatArray());
     gl.uniformMatrix4fv(SpriteShader.projMatLoc, false, renderContext.get_projection().floatArray());
     gl.uniform1i(SpriteShader.sampLoc, 0);
-    gl.disable(2929);
+    gl.disable(WEBGL.DEPTH_TEST);
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
@@ -5262,7 +5262,7 @@ ShapeSpriteShader.init = function (renderContext) {
   ShapeSpriteShader.colorLoc = gl.getAttribLocation(ShapeSpriteShader._prog, 'aColor');
   ShapeSpriteShader.projMatLoc = gl.getUniformLocation(ShapeSpriteShader._prog, 'uPMatrix');
   ShapeSpriteShader.mvMatLoc = gl.getUniformLocation(ShapeSpriteShader._prog, 'uMVMatrix');
-  gl.disable(2929);
+  gl.disable(WEBGL.DEPTH_TEST);
   gl.enable(WEBGL.BLEND);
   gl.blendFunc(770, 771);
   ShapeSpriteShader.initialized = true;
@@ -5278,7 +5278,7 @@ ShapeSpriteShader.use = function (renderContext, vertex) {
     gl.uniformMatrix4fv(ShapeSpriteShader.mvMatLoc, false, mvMat.floatArray());
     gl.uniformMatrix4fv(ShapeSpriteShader.projMatLoc, false, renderContext.get_projection().floatArray());
     gl.uniform1i(ShapeSpriteShader.sampLoc, 0);
-    gl.disable(2929);
+    gl.disable(WEBGL.DEPTH_TEST);
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
     gl.disableVertexAttribArray(2);
@@ -5347,10 +5347,10 @@ TextShader.use = function (renderContext, vertex, texture) {
     gl.uniformMatrix4fv(TextShader.projMatLoc, false, renderContext.get_projection().floatArray());
     gl.uniform1i(TextShader.sampLoc, 0);
     if (renderContext.space) {
-      gl.disable(2929);
+      gl.disable(WEBGL.DEPTH_TEST);
     }
     else {
-      gl.enable(2929);
+      gl.enable(WEBGL.DEPTH_TEST);
     }
     gl.disableVertexAttribArray(0);
     gl.disableVertexAttribArray(1);
