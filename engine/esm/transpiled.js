@@ -3734,7 +3734,7 @@ var TriangleFanList$ = {
       while ($enum1.moveNext()) {
         var buffer = $enum1.current;
         LineShaderNormalDates.use(renderContext, buffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this._zBuffer, this.jNow, (this.timeSeries) ? this.decay : 0);
-        renderContext.gl.drawArrays(6, 0, buffer.count);
+        renderContext.gl.drawArrays(WEBGL.TRIANGLE_FAN, 0, buffer.count);
       }
     }
   },
