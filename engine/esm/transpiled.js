@@ -10277,9 +10277,6 @@ export function Object3d(tourDoc, filename, flipV, flipHandedness, smooth, color
   }
 }
 
-Object3d.maX_VERTICES = 8000;
-Object3d.maX_POLYGONS = 8000;
-
 Object3d._compareVector3 = function (v0, v1) {
   if (v0.x < v1.x) {
     return -1;
