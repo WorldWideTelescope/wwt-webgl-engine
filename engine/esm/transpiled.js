@@ -1079,6 +1079,7 @@ FastMath.cos = function (d) {
   }
   return FastMath._sincoshelper(d);
 };
+
 var FastMath$ = {};
 
 registerType("FastMath", [FastMath, FastMath$, null]);
@@ -1113,6 +1114,7 @@ Xyf.create = function (x, y, f) {
   temp.face = f;
   return temp;
 };
+
 var Xyf$ = {};
 
 registerType("Xyf", [Xyf, Xyf$, null]);
@@ -1152,6 +1154,7 @@ HealpixUtils.fmodulo = function (v1, v2) {
   var tmp = v1 % v2 + v2;
   return (tmp === v2) ? 0 : tmp;
 };
+
 var HealpixUtils$ = {};
 
 registerType("HealpixUtils", [HealpixUtils, HealpixUtils$, null]);
@@ -1176,6 +1179,7 @@ Hploc.create = function (v) {
   }
   return temp;
 };
+
 var Hploc$ = {
   toVec3: function () {
     var st;
@@ -1206,6 +1210,7 @@ Pointing.create = function (theta, phi) {
   temp.phi = phi;
   return temp;
 };
+
 var Pointing$ = {
   normalizeTheta: function () {
     this.theta = HealpixUtils.fmodulo(this.theta, 2 * Math.PI);
@@ -1559,6 +1564,7 @@ Annotation.colorToUint = function (col) {
 Annotation.colorToUintAlpha = function (col, opacity) {
   return opacity << 24 | col.r << 16 | col.g << 8 | col.b;
 };
+
 var Annotation$ = {
   draw: function (renderContext) {
   },
@@ -1738,6 +1744,7 @@ CameraParameters.easeCurve = function (alpha, type) {
       return alpha;
   }
 };
+
 var CameraParameters$ = {
   copy: function () {
     var temp = new CameraParameters();
@@ -1953,6 +1960,7 @@ Constellations.abbreviation = function (name) {
   }
   return name;
 };
+
 var Constellations$ = {
   get_name: function () {
     return this._name;
@@ -2460,6 +2468,7 @@ ConstellationFilter.parse = function (val) {
   }
   return cf;
 };
+
 var ConstellationFilter$ = {
   _saveBits: function () {
     for (var i = 0; i < 3; i++) {
@@ -3088,6 +3097,7 @@ FolderBrowser.create = function () {
   temp.loadImages();
   return temp;
 };
+
 var FolderBrowser$ = {
   setup: function () {
     this.canvas.addEventListener('click', ss.bind('onClick', this), false);
@@ -3582,6 +3592,7 @@ export function Dates(start, end) {
 Dates.empty = function () {
   return new Dates(0, 0);
 };
+
 var Dates$ = {
   copy: function () {
     return new Dates(this.startDate, this.endDate);
@@ -4376,6 +4387,7 @@ TimeSeriesLineVertex.create = function (position, normal, time, color) {
   temp.color = color;
   return temp;
 };
+
 var TimeSeriesLineVertex$ = {
   get_color: function () {
     return this.color;
@@ -4406,6 +4418,7 @@ TimeSeriesPointVertex.create = function (position, size, time, color) {
   tmp.color = color;
   return tmp;
 };
+
 var TimeSeriesPointVertex$ = {
   get_color: function () {
     return this.color;
@@ -4484,6 +4497,7 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
+
 var SimpleLineShader$ = {};
 
 registerType("SimpleLineShader", [SimpleLineShader, SimpleLineShader$, null]);
@@ -4549,6 +4563,7 @@ SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
+
 var SimpleLineShader2D$ = {};
 
 registerType("SimpleLineShader2D", [SimpleLineShader2D, SimpleLineShader2D$, null]);
@@ -4622,6 +4637,7 @@ OrbitLineShader.use = function (renderContext, vertex, lineColor) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
+
 var OrbitLineShader$ = {};
 
 registerType("OrbitLineShader", [OrbitLineShader, OrbitLineShader$, null]);
@@ -4702,6 +4718,7 @@ LineShaderNormalDates.use = function (renderContext, vertex, lineColor, zBuffer,
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
+
 var LineShaderNormalDates$ = {};
 
 registerType("LineShaderNormalDates", [LineShaderNormalDates, LineShaderNormalDates$, null]);
@@ -4804,6 +4821,7 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
   }
 };
+
 var TimeSeriesPointSpriteShader$ = {};
 
 registerType("TimeSeriesPointSpriteShader", [TimeSeriesPointSpriteShader, TimeSeriesPointSpriteShader$, null]);
@@ -4920,6 +4938,7 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
   }
 };
+
 var KeplerPointSpriteShader$ = {};
 
 registerType("KeplerPointSpriteShader", [KeplerPointSpriteShader, KeplerPointSpriteShader$, null]);
@@ -4991,6 +5010,7 @@ EllipseShader.use = function (renderContext, semiMajorAxis, eccentricity, eccent
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
   }
 };
+
 var EllipseShader$ = {};
 
 registerType("EllipseShader", [EllipseShader, EllipseShader$, null]);
@@ -5110,6 +5130,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     }
   }
 };
+
 var ModelShader$ = {};
 
 registerType("ModelShader", [ModelShader, ModelShader$, null]);
@@ -5228,6 +5249,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     }
   }
 };
+
 var ModelShaderTan$ = {};
 
 registerType("ModelShaderTan", [ModelShaderTan, ModelShaderTan$, null]);
@@ -5354,6 +5376,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     }
   }
 };
+
 var TileShader$ = {};
 
 registerType("TileShader", [TileShader, TileShader$, null]);
@@ -5484,6 +5507,7 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     }
   }
 };
+
 var FitsShader$ = {};
 
 registerType("FitsShader", [FitsShader, FitsShader$, null]);
@@ -5577,6 +5601,7 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     }
   }
 };
+
 var ImageShader$ = {};
 
 registerType("ImageShader", [ImageShader, ImageShader$, null]);
@@ -5669,6 +5694,7 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     }
   }
 };
+
 var ImageShader2$ = {};
 
 registerType("ImageShader2", [ImageShader2, ImageShader2$, null]);
@@ -5747,6 +5773,7 @@ SpriteShader.use = function (renderContext, vertex, texture) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
+
 var SpriteShader$ = {};
 
 registerType("SpriteShader", [SpriteShader, SpriteShader$, null]);
@@ -5816,6 +5843,7 @@ ShapeSpriteShader.use = function (renderContext, vertex) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
+
 var ShapeSpriteShader$ = {};
 
 registerType("ShapeSpriteShader", [ShapeSpriteShader, ShapeSpriteShader$, null]);
@@ -5894,6 +5922,7 @@ TextShader.use = function (renderContext, vertex, texture) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
 };
+
 var TextShader$ = {};
 
 registerType("TextShader", [TextShader, TextShader$, null]);
@@ -5985,6 +6014,7 @@ Tessellator.tesselateSimplePoly = function (inputList) {
   tess.process(inputList, results);
   return results;
 };
+
 var Tessellator$ = {
   _isLeftOfHalfSpace: function (pntA, pntB, pntTest) {
     pntA.normalize();
@@ -6121,6 +6151,7 @@ Texture.fitPowerOfTwo = function (val) {
   }
   return val + 1;
 };
+
 var Texture$ = {
   cleanUp: function () {
     this.imageElement = null;
@@ -7134,6 +7165,7 @@ Grids._makePlanetGridText = function () {
     }
   }
 };
+
 var Grids$ = {};
 
 registerType("Grids", [Grids, Grids$, null]);
@@ -7411,6 +7443,7 @@ Imageset.create = function (name, url, dataSetType, bandPass, projection, imageS
   temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame);
   return temp;
 };
+
 var Imageset$ = {
   get_wcsImage: function () {
     return this._wcsImage;
@@ -8032,6 +8065,7 @@ ViewMoverSlew.createUpDown = function (from, to, upDowFactor) {
   temp.init(from.copy(), to.copy());
   return temp;
 };
+
 var ViewMoverSlew$ = {
   init: function (from, to) {
     if (Math.abs(from.lng - to.lng) > 180) {
@@ -8335,6 +8369,7 @@ ColorMapContainer._extractColorArray = function (colors) {
   }
   return colorBuffer;
 };
+
 var ColorMapContainer$ = {
   findClosestColor: function (value) {
     var index;
@@ -8420,6 +8455,7 @@ Layer.fromXml = function (layerNode, someFlag) {
   newLayer.initFromXml(layerNode);
   return newLayer;
 };
+
 var Layer$ = {
   getPrimaryUI: function () {
     return null;
@@ -10253,6 +10289,7 @@ LayerManager._loadOrbitsFile = function (name, data, currentMap) {
   LayerManager.loadTree();
   return layer;
 };
+
 var LayerManager$ = {};
 
 registerType("LayerManager", [LayerManager, LayerManager$, null]);
@@ -10704,6 +10741,7 @@ Mesh.createTangent = function (vertices, indices) {
   mesh.boundingSphere = ConvexHull.findEnclosingSphereFast(points);
   return mesh;
 };
+
 var Mesh$ = {
   dispose: function () {
     if (this.vertexBuffer != null) {
@@ -10899,6 +10937,7 @@ Object3d._disposeTextureList = function (textures) {
     textures.length = 0;
   }
 };
+
 var Object3d$ = {
   _reload: function () {
     if (!this.issLayer) {
@@ -12297,6 +12336,7 @@ EllipseRenderer.createEllipseVertexBufferWithoutStartPoint = function (vertexCou
   vb.unlock();
   return vb;
 };
+
 var EllipseRenderer$ = {};
 
 registerType("EllipseRenderer", [EllipseRenderer, EllipseRenderer$, null]);
@@ -12447,6 +12487,7 @@ ReferenceFrame.computeTLECheckSum = function (line) {
   }
   return ((checksum % 10));
 };
+
 var ReferenceFrame$ = {
   get_representativeColor: function () {
     return this.representativeColor;
@@ -12847,6 +12888,7 @@ PushPin.getPushPinTexture = function (pinId) {
   }
   return texture;
 };
+
 var PushPin$ = {};
 
 registerType("PushPin", [PushPin, PushPin$, null]);
@@ -13005,6 +13047,7 @@ VoTable.loadFromString = function (data) {
   table.loadFromXML(doc);
   return table;
 };
+
 var VoTable$ = {
   _loadData: function () {
     if (this._webFile.get_state() === 2) {
@@ -13318,6 +13361,7 @@ VoColumn.getType = function (type) {
   }
   return Type;
 };
+
 var VoColumn$ = {
   toString: function () {
     return this.name;
@@ -13716,6 +13760,7 @@ MinorPlanets.initMPCVertexBuffer = function () {
   finally {
   }
 };
+
 var MinorPlanets$ = {};
 
 registerType("MinorPlanets", [MinorPlanets, MinorPlanets$, null]);
@@ -13859,6 +13904,7 @@ Place._properCaps = function (name) {
   }
   return ss.trim(ProperName);
 };
+
 var Place$ = {
   get_tag: function () {
     return this._tag;
@@ -15587,6 +15633,7 @@ Planets._drawSphere = function (renderContext, planetID) {
     return;
   }
 };
+
 var Planets$ = {};
 
 registerType("Planets", [Planets, Planets$, null]);
@@ -15742,6 +15789,7 @@ RenderContext.getTilesXForLevel = function (layer, level) {
   }
   return maxX;
 };
+
 var RenderContext$ = {
   save: function () {
     if (this.gl != null) {
@@ -16684,6 +16732,7 @@ RenderTriangle._miterPointOut = function (pntOut, p1x, p1y, p2x, p2y, p3x, p3y, 
   pntOut.x = p1x - dx;
   pntOut.y = p1y - dy;
 };
+
 var RenderTriangle$ = {
   makeNormal: function () {
     var a = this.a.position.copy();
@@ -16878,6 +16927,7 @@ ScriptInterface._addFitsLayer = function (url, name, gotoTarget, loaded) {
   }
   return imagesetLayer;
 };
+
 var ScriptInterface$ = {
   add_ready: function (value) {
     this.__ready = ss.bindAdd(this.__ready, value);
@@ -17483,6 +17533,7 @@ Settings.get_active = function () {
   }
   return Settings._active;
 };
+
 var Settings$ = {
   get_constellationFigureColor: function () {
     return this._constellationFigureColor;
@@ -18271,6 +18322,7 @@ GlyphItem._fromXML = function (node) {
   item.extents = Vector2d.create(parseFloat(node.attributes.getNamedItem('ExtentsWidth').nodeValue), parseFloat(node.attributes.getNamedItem('ExtentsHeight').nodeValue));
   return item;
 };
+
 var GlyphItem$ = {
   addRef: function () {
     this.referenceCount++;
@@ -18314,6 +18366,7 @@ GlyphCache.getCache = function (height) {
 GlyphCache.cleanUpAll = function () {
   ss.clearKeys(GlyphCache._caches);
 };
+
 var GlyphCache$ = {
   get_height: function () {
     return this._cellHeight;
@@ -18765,6 +18818,7 @@ SpaceTimeController.dateToJD = function (Year, Month, Day, bGregorianCalendar) {
   }
   return ss.truncate((365.25 * (Y + 4716))) + ss.truncate((30.6001 * (M + 1))) + Day + B - 1524.5;
 };
+
 var SpaceTimeController$ = {};
 
 registerType("SpaceTimeController", [SpaceTimeController, SpaceTimeController$, null]);
@@ -19007,6 +19061,7 @@ Galaxy.getEType = function (value) {
   }
   return a;
 };
+
 var Galaxy$ = {};
 
 registerType("Galaxy", [Galaxy, Galaxy$, null]);
@@ -19108,6 +19163,7 @@ Tile.getFrustumList = function () {
 Tile.get_subDivisions = function () {
   return 32;
 };
+
 var Tile$ = {
   getIndexBuffer: function (index, accomidation) {
     return this._indexBuffers[index];
@@ -20047,6 +20103,7 @@ TileCache.decimateQueue = function () {
     delete TileCache._queue[t.get_key()];
   }
 };
+
 var TileCache$ = {};
 
 registerType("TileCache", [TileCache, TileCache$, null]);
@@ -20077,6 +20134,7 @@ DistanceCalc.getUVFromInnerPoint = function (ul, ur, ll, lr, pnt) {
   var dHoriz = dRight + dLeft;
   return Vector2d.create(dLeft / dHoriz, dUpper / dVert);
 };
+
 var DistanceCalc$ = {};
 
 registerType("DistanceCalc", [DistanceCalc, DistanceCalc$, null]);
@@ -20144,6 +20202,7 @@ Tour._fromXml = function (child) {
   }
   return temp;
 };
+
 var Tour$ = {
   get_name: function () {
     return this.title;
@@ -20260,6 +20319,7 @@ FileCabinet.fromUrl = function (url, callMe) {
   temp._webFile.send();
   return temp;
 };
+
 var FileCabinet$ = {
   get_packageID: function () {
     return this._packageID;
@@ -20534,6 +20594,7 @@ Overlay._fromXml = function (owner, overlay) {
   newOverlay._initOverlayFromXml(overlay);
   return newOverlay;
 };
+
 var Overlay$ = {
   get_name: function () {
     return this._name;
@@ -21239,6 +21300,7 @@ TextObject._fromXml = function (node) {
   }
   return newTextObject;
 };
+
 var TextObject$ = {
   toString: function () {
     return this.text;
@@ -21323,6 +21385,7 @@ TourDocument.fromUrlRaw = function (url, callMe) {
   temp._cabinet = FileCabinet.fromUrl(url, callMe);
   return temp;
 };
+
 var TourDocument$ = {
   get_tourDirty: function () {
     return this._tourDirty > 0;
@@ -24414,6 +24477,7 @@ export function OverlayList() { }
 OverlayList._updateOverlayList = function (currentTourStop, selection) { };
 
 OverlayList._updateOverlayListSelection = function (selection) { };
+
 var OverlayList$ = {};
 
 registerType("OverlayList", [OverlayList, OverlayList$, null]);
@@ -24437,6 +24501,7 @@ TourEdit._redoStep = function () {
     Undo.stepForward();
   }
 };
+
 var TourEdit$ = {};
 
 registerType("TourEdit", [TourEdit, TourEdit$, null]);
@@ -24495,6 +24560,7 @@ registerType("TourStopList", [TourStopList, TourStopList$, null]);
 export function TimeLine() { }
 
 TimeLine.refreshUi = function () { };
+
 var TimeLine$ = {};
 
 registerType("TimeLine", [TimeLine, TimeLine$, null]);
@@ -24530,6 +24596,7 @@ TourPlayer.add_tourEnded = function (value) {
 TourPlayer.remove_tourEnded = function (value) {
   TourPlayer.__tourEnded = ss.bindSub(TourPlayer.__tourEnded, value);
 };
+
 var TourPlayer$ = {
   render: function (renderContext) {
     if (this._tour == null || this._tour.get_currentTourStop() == null || !TourPlayer._playing) {
@@ -25519,6 +25586,7 @@ TourStop._fromXml = function (owner, tourStop) {
     return null;
   }
 };
+
 var TourStop$ = {
   get_keyFramed: function () {
     return this._keyFramed;
@@ -26948,6 +27016,7 @@ Undo.stepForward = function () {
   step.redo();
   Undo._undoStack.push(step);
 };
+
 var Undo$ = {};
 
 registerType("Undo", [Undo, Undo$, null]);
@@ -27114,6 +27183,7 @@ Triangle.create = function (a, b, c) {
   temp.c = c;
   return temp;
 };
+
 var Triangle$ = {
   subDivide: function (triList, vertexList) {
     var a1 = Vector3d.lerp(vertexList[this.b].position, vertexList[this.c].position, 0.5);
@@ -27317,6 +27387,7 @@ UiTools.split = function (data, delimiters) {
 };
 
 UiTools._beep = function () { };
+
 var UiTools$ = {};
 
 registerType("UiTools", [UiTools, UiTools$, null]);
@@ -27464,6 +27535,7 @@ Bitmap.create = function (width, height) {
   bmp._buffer = new Uint8Array(width * height * 4);
   return bmp;
 };
+
 var Bitmap$ = {
   setPixel: function (x, y, r, g, b, a) {
     var index = (x + y * this.width) * 4;
@@ -27638,6 +27710,7 @@ ToolStripMenuItem.create = function (name) {
   tsmi.name = name;
   return tsmi;
 };
+
 var ToolStripMenuItem$ = {};
 
 registerType("ToolStripMenuItem", [ToolStripMenuItem, ToolStripMenuItem$, null]);
@@ -27716,6 +27789,7 @@ Histogram.updateColorMapper = function (isl, colorMapperName) {
     Tile.texture2d = image.getBitmap().getTexture();
   }
 };
+
 var Histogram$ = {
   close: function (e) {
     var menu = document.getElementById('histogram');
@@ -28438,6 +28512,7 @@ Wtml.loadImagesets = function (folder, folderDownloadAction) {
     }
   }
 };
+
 var Wtml$ = {};
 
 registerType("Wtml", [Wtml, Wtml$, null]);
@@ -28631,6 +28706,7 @@ WWTControl.setForegroundImageName = function (name) {
 WWTControl.showLayers = function (show) {
   WWTControl.showDataLayers = show;
 };
+
 var WWTControl$ = {
   _addAnnotation: function (annotation) {
     this._annotations.push(annotation);
@@ -30943,6 +31019,7 @@ Coordinates.galactictoJ2000 = function (GalacticL2, GalacticB2) {
   var J2000DEC = Math.atan2(J2000pos[2], Math.sqrt(J2000pos[0] * J2000pos[0] + J2000pos[1] * J2000pos[1]));
   return [J2000RA / Math.PI * 180, J2000DEC / Math.PI * 180];
 };
+
 var Coordinates$ = {
   distance: function (pointB) {
     var y = this.get_lat();
@@ -31106,6 +31183,7 @@ Fxyf._fromHploc$1 = function (loc) {
 Fxyf.fromVector = function (v) {
   return Fxyf._fromHploc$1(Hploc.create(v));
 };
+
 var Fxyf$ = {
   toHploc: function () {
     var loc = new Hploc();
@@ -32508,6 +32586,7 @@ EquirectangularTile.create = function (level, x, y, dataset, parent) {
   temp.computeBoundingSphere();
   return temp;
 };
+
 var EquirectangularTile$ = {
   computeBoundingSphere: function () {
     if (!this._topDown$1) {
@@ -33094,6 +33173,7 @@ ImageSetLayer.create = function (set) {
   isl._imageSet$1 = set;
   return isl;
 };
+
 var ImageSetLayer$ = {
   get_imageSet: function () {
     return this._imageSet$1;
@@ -33496,6 +33576,7 @@ Object3dLayer._initRotateUI$1 = function () {
     index++;
   }
 };
+
 var Object3dLayer$ = {
   getPrimaryUI: function () {
     if (this._primaryUI$1 == null) {
@@ -34444,6 +34525,7 @@ SpreadSheetLayer.get__circleTexture$1 = function () {
   }
   return SpreadSheetLayer._circleTexture$1;
 };
+
 var SpreadSheetLayer$ = {
   getTypeName: function () {
     return 'TerraViewer.SpreadSheetLayer';
@@ -36209,6 +36291,7 @@ TimeSeriesLayer._circleTexture$1 = null;
 TimeSeriesLayer.get__circleTexture$1 = function () {
   return TimeSeriesLayer._circleTexture$1;
 };
+
 var TimeSeriesLayer$ = {
   get_dynamicData: function () {
     return this._dynamicData$1;
@@ -37052,6 +37135,7 @@ VoTableLayer.create = function (table, plotType) {
   layer.set_plotType(plotType);
   return layer;
 };
+
 var VoTableLayer$ = {
   get_dynamicData: function () {
     return this._dynamicData$1;
@@ -38164,6 +38248,7 @@ MercatorTile.metersPerPixel2 = function (zoom) {
 MercatorTile._radToDeg$1 = function (rad) {
   return (rad * 180 / Math.PI);
 };
+
 var MercatorTile$ = {
   computeBoundingSphere: function () {
     this._tileDegrees$1 = 360 / Math.pow(2, this.level);
@@ -38480,6 +38565,7 @@ PlotTile.create = function (level, xc, yc, dataset, parent) {
   temp.computeBoundingSphere();
   return temp;
 };
+
 var PlotTile$ = {
   computeBoundingSphere: function () {
     this._initializeGrids$1();
@@ -38924,6 +39010,7 @@ ToastTile.create = function (level, xc, yc, dataset, parent) {
   temp.computeBoundingSphere();
   return temp;
 };
+
 var ToastTile$ = {
   computeBoundingSphere: function () {
     this._initializeGrids$1();
@@ -39467,6 +39554,7 @@ BitmapOverlay.create = function (owner, file) {
   owner.get_owner().addCachedFile(file.name, file);
   return temp;
 };
+
 var BitmapOverlay$ = {
   getTypeName: function () {
     return 'TerraViewer.BitmapOverlay';
@@ -39580,6 +39668,7 @@ TextOverlay.create = function (textObject) {
   to._calculateTextSize$1();
   return to;
 };
+
 var TextOverlay$ = {
   getTypeName: function () {
     return 'TerraViewer.TextOverlay';
@@ -39752,6 +39841,7 @@ ShapeOverlay._create = function (currentTourStop, shapeType) {
   overlay.set_owner(currentTourStop);
   return overlay;
 };
+
 var ShapeOverlay$ = {
   getTypeName: function () {
     return 'TerraViewer.ShapeOverlay';
@@ -40241,6 +40331,7 @@ AudioOverlay.create = function (currentTourStop, file) {
   ao.get_owner().get_owner().addCachedFile(file.name, file);
   return ao;
 };
+
 var AudioOverlay$ = {
   getTypeName: function () {
     return 'TerraViewer.AudioOverlay';
@@ -40755,6 +40846,7 @@ FitsImageJs.createTiledFits = function (dataset, file, callMeBack) {
   fits.isTiledFits = true;
   return fits;
 };
+
 var FitsImageJs$ = {
   readFromBin: function (dataView) {
     FitsImage.prototype.readFromBin.call(this, dataView);
@@ -41242,6 +41334,7 @@ ISSLayer.createSpaceStation = function () {
     ISSLayer._issmodel$2 = o3d;
   }
 };
+
 var ISSLayer$ = {
   draw: function (renderContext, opacity, flat) {
     if (this.object3d == null && ISSLayer._issmodel$2 == null) {
