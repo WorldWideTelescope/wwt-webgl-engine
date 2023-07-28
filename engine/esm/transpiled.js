@@ -4356,7 +4356,7 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
     gl.vertexAttribPointer(TimeSeriesPointSpriteShader.pointSizeLoc, 1, WEBGL.FLOAT, false, 40, 36);
     gl.vertexAttribPointer(TimeSeriesPointSpriteShader.timeLoc, 2, WEBGL.FLOAT, false, 40, 28);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.lineWidth(1);
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
@@ -4461,7 +4461,7 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
     gl.vertexAttribPointer(KeplerPointSpriteShader.azLoc, 2, WEBGL.FLOAT, false, 76, 60);
     gl.vertexAttribPointer(KeplerPointSpriteShader.orbitLoc, 2, WEBGL.FLOAT, false, 76, 68);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.lineWidth(1);
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
@@ -4632,7 +4632,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.vertexAttribPointer(ModelShader.normalLoc, 3, WEBGL.FLOAT, false, stride, 12);
     gl.vertexAttribPointer(ModelShader.textureLoc, 2, WEBGL.FLOAT, false, stride, stride - 8);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
@@ -4741,7 +4741,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
     gl.vertexAttribPointer(ModelShaderTan.normalLoc, 3, WEBGL.FLOAT, false, stride, 12);
     gl.vertexAttribPointer(ModelShaderTan.textureLoc, 2, WEBGL.FLOAT, false, stride, stride - 8);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
@@ -4858,7 +4858,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.vertexAttribPointer(TileShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(TileShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
@@ -4974,7 +4974,7 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
     gl.vertexAttribPointer(FitsShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(FitsShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
@@ -5061,7 +5061,7 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
     gl.vertexAttribPointer(ImageShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(ImageShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
@@ -5148,7 +5148,7 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
     gl.vertexAttribPointer(ImageShader2.vertLoc, 3, WEBGL.FLOAT, false, 32, 0);
     gl.vertexAttribPointer(ImageShader2.textureLoc, 2, WEBGL.FLOAT, false, 32, 24);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
     gl.enable(WEBGL.BLEND);
     if (noDepth) {
@@ -5225,7 +5225,7 @@ SpriteShader.use = function (renderContext, vertex, texture) {
     gl.vertexAttribPointer(SpriteShader.colorLoc, 4, WEBGL.FLOAT, false, 36, 12);
     gl.vertexAttribPointer(SpriteShader.textureLoc, 2, WEBGL.FLOAT, false, 36, 28);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
@@ -5362,7 +5362,7 @@ TextShader.use = function (renderContext, vertex, texture) {
     gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
     gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
     gl.activeTexture(WEBGL.TEXTURE0);
-    gl.bindTexture(3553, texture);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
   }
@@ -5558,9 +5558,9 @@ export function Texture() {
 Texture.getEmpty = function () {
   if (Texture.empty == null) {
     Texture.empty = tilePrepDevice.createTexture();
-    tilePrepDevice.bindTexture(3553, Texture.empty);
-    tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, 5121, new Uint8Array([0, 0, 0, 0]));
-    tilePrepDevice.bindTexture(3553, null);
+    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, Texture.empty);
+    tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, 5121, new Uint8Array([0, 0, 0, 0]));
+    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
   }
   return Texture.empty;
 };
@@ -5623,7 +5623,7 @@ var Texture$ = {
     if (tilePrepDevice != null) {
       try {
         this.texture2d = tilePrepDevice.createTexture();
-        tilePrepDevice.bindTexture(3553, this.texture2d);
+        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, this.texture2d);
         var image = this.imageElement;
         if ((!Texture.isPowerOfTwo(this.imageElement.height) | !Texture.isPowerOfTwo(this.imageElement.width)) === 1) {
           var temp = document.createElement('canvas');
@@ -5633,12 +5633,12 @@ var Texture$ = {
           ctx.drawImage(image, 0, 0, temp.width, temp.height);
           image = temp;
         }
-        tilePrepDevice.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
-        tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
-        tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
-        tilePrepDevice.texParameteri(3553, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
-        tilePrepDevice.generateMipmap(3553);
-        tilePrepDevice.bindTexture(3553, null);
+        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
+        tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
+        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
+        tilePrepDevice.generateMipmap(WEBGL.TEXTURE_2D);
+        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
       }
       catch ($e1) {
         this._errored = true;
@@ -7582,18 +7582,18 @@ ColorMapContainer.bindColorMapTexture = function (gl, colorMapName) {
     texture = ColorMapContainer._getTextureFromName(gl, 'gray');
   }
   gl.activeTexture(WEBGL.TEXTURE1);
-  gl.bindTexture(3553, texture);
+  gl.bindTexture(WEBGL.TEXTURE_2D, texture);
 };
 ColorMapContainer._initColorTexture = function (gl, colorMapContainer) {
   var colorTexture = gl.createTexture();
   gl.activeTexture(WEBGL.TEXTURE1);
-  gl.bindTexture(3553, colorTexture);
-  gl.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
-  gl.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
+  gl.bindTexture(WEBGL.TEXTURE_2D, colorTexture);
+  gl.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+  gl.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
   var colorBuffer = ColorMapContainer._extractColorArray(colorMapContainer.colors);
-  gl.texImage2D(3553, 0, WEBGL.RGB8, colorBuffer.length / 3, 1, 0, WEBGL.RGB, 5121, colorBuffer);
-  gl.texParameteri(3553, 10241, WEBGL.NEAREST);
-  gl.texParameteri(3553, 10240, WEBGL.NEAREST);
+  gl.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGB8, colorBuffer.length / 3, 1, 0, WEBGL.RGB, 5121, colorBuffer);
+  gl.texParameteri(WEBGL.TEXTURE_2D, 10241, WEBGL.NEAREST);
+  gl.texParameteri(WEBGL.TEXTURE_2D, 10240, WEBGL.NEAREST);
   return colorTexture;
 };
 ColorMapContainer._extractColorArray = function (colors) {
@@ -11809,7 +11809,7 @@ PushPin.getPushPinTexture = function (pinId) {
   }
   try {
     texture = tilePrepDevice.createTexture();
-    tilePrepDevice.bindTexture(3553, texture);
+    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, texture);
     var row = Math.floor(pinId / 16);
     var col = pinId % 16;
     var temp = document.createElement('canvas');
@@ -11818,12 +11818,12 @@ PushPin.getPushPinTexture = function (pinId) {
     var ctx = temp.getContext('2d');
     ctx.drawImage(PushPin._pins.imageElement, (col * 32), (row * 32), 32, 32, 0, 0, 32, 32);
     var image = temp;
-    tilePrepDevice.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
-    tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
-    tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
-    tilePrepDevice.texParameteri(3553, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
-    tilePrepDevice.generateMipmap(3553);
-    tilePrepDevice.bindTexture(3553, null);
+    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
+    tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
+    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
+    tilePrepDevice.generateMipmap(WEBGL.TEXTURE_2D);
+    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
     PushPin._pinTextureCache[pinId] = texture;
   }
   catch ($e1) {
@@ -14632,7 +14632,7 @@ var RenderContext$ = {
   set_mainTexture: function (value) {
     if (value != null) {
       this._mainTexture = value;
-      this.gl.bindTexture(3553, this._mainTexture.texture2d);
+      this.gl.bindTexture(WEBGL.TEXTURE_2D, this._mainTexture.texture2d);
     }
     return value;
   },
@@ -17453,13 +17453,13 @@ var Tile$ = {
     if (tilePrepDevice != null) {
       try {
         this.texture2d = tilePrepDevice.createTexture();
-        tilePrepDevice.bindTexture(3553, this.texture2d);
-        tilePrepDevice.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
-        tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
+        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, this.texture2d);
+        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
         if (this.dataset.get_extension().toLowerCase().indexOf('fits') > -1 && RenderContext.useGlVersion2) {
-          tilePrepDevice.texImage2D(3553, 0, WEBGL.R32F, ss.truncate(this.fitsImage.get_sizeX()), ss.truncate(this.fitsImage.get_sizeY()), 0, WEBGL.RED, WEBGL.FLOAT, this.fitsImage.dataUnit);
-          tilePrepDevice.texParameteri(3553, 10241, WEBGL.NEAREST);
-          tilePrepDevice.texParameteri(3553, 10240, WEBGL.NEAREST);
+          tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.R32F, ss.truncate(this.fitsImage.get_sizeX()), ss.truncate(this.fitsImage.get_sizeY()), 0, WEBGL.RED, WEBGL.FLOAT, this.fitsImage.dataUnit);
+          tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10241, WEBGL.NEAREST);
+          tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10240, WEBGL.NEAREST);
         }
         else {
           var image = this.texture;
@@ -17471,11 +17471,11 @@ var Tile$ = {
             ctx.drawImage(image, 0, 0, temp.width, temp.height);
             image = temp;
           }
-          tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
-          tilePrepDevice.texParameteri(3553, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
-          tilePrepDevice.generateMipmap(3553);
+          tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, WEBGL.RGBA, 5121, image);
+          tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
+          tilePrepDevice.generateMipmap(WEBGL.TEXTURE_2D);
         }
-        tilePrepDevice.bindTexture(3553, null);
+        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
       }
       catch ($e1) {
         this.errored = true;
@@ -25111,13 +25111,13 @@ var Bitmap$ = {
   },
   getTexture: function () {
     var tex = tilePrepDevice.createTexture();
-    tilePrepDevice.bindTexture(3553, tex);
-    tilePrepDevice.texParameteri(3553, 10242, WEBGL.CLAMP_TO_EDGE);
-    tilePrepDevice.texParameteri(3553, 10243, WEBGL.CLAMP_TO_EDGE);
-    tilePrepDevice.texImage2D(3553, 0, WEBGL.RGBA, this.width, this.height, 0, WEBGL.RGBA, 5121, this._buffer);
-    tilePrepDevice.texParameteri(3553, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
-    tilePrepDevice.generateMipmap(3553);
-    tilePrepDevice.bindTexture(3553, null);
+    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, tex);
+    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10242, WEBGL.CLAMP_TO_EDGE);
+    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10243, WEBGL.CLAMP_TO_EDGE);
+    tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, this.width, this.height, 0, WEBGL.RGBA, 5121, this._buffer);
+    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, 10241, WEBGL.LINEAR_MIPMAP_NEAREST);
+    tilePrepDevice.generateMipmap(WEBGL.TEXTURE_2D);
+    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
     return tex;
   }
 };
