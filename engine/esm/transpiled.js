@@ -1566,8 +1566,7 @@ Annotation.colorToUintAlpha = function (col, opacity) {
 };
 
 var Annotation$ = {
-  draw: function (renderContext) {
-  },
+  draw: function (renderContext) { },
 
   get_opacity: function () {
     return this._opacity;
@@ -2464,8 +2463,7 @@ ConstellationFilter.parse = function (val) {
       cf.bits[i] = parseInt(parts[i]);
     }
   }
-  catch ($e1) {
-  }
+  catch ($e1) { }
   return cf;
 };
 
@@ -3374,8 +3372,7 @@ var FolderBrowser$ = {
     return value;
   },
 
-  _updatePaginator: function () {
-  },
+  _updatePaginator: function () { },
 
   get_colCount: function () {
     return this._colCount;
@@ -3732,8 +3729,7 @@ var SimpleLineList$ = {
     }
   },
 
-  _emptyLineBuffer: function () {
-  }
+  _emptyLineBuffer: function () { }
 };
 
 registerType("SimpleLineList", [SimpleLineList, SimpleLineList$, null]);
@@ -3962,8 +3958,7 @@ var LineList$ = {
     }
   },
 
-  _emptyLineBuffer: function () {
-  }
+  _emptyLineBuffer: function () { }
 };
 
 registerType("LineList", [LineList, LineList$, null]);
@@ -4037,8 +4032,7 @@ var TriangleList$ = {
     this._emptyTriangleBuffer();
   },
 
-  _emptyTriangleBuffer: function () {
-  },
+  _emptyTriangleBuffer: function () { },
 
   _initTriangleBuffer: function () {
     if (!this._triangleBuffers.length) {
@@ -8608,8 +8602,7 @@ var Layer$ = {
     return ss.safeCast(this, IUiController);
   },
 
-  cleanUp: function () {
-  },
+  cleanUp: function () { },
 
   get_name: function () {
     return this._name;
@@ -8652,8 +8645,7 @@ var Layer$ = {
     return value;
   },
 
-  colorChanged: function () {
-  },
+  colorChanged: function () { },
 
   get_colorValue: function () {
     return this.get_color().toString();
@@ -8709,8 +8701,7 @@ var Layer$ = {
     return;
   },
 
-  initializeFromXml: function (node) {
-  },
+  initializeFromXml: function (node) { },
 
   initFromXml: function (node) {
     this.id = Guid.fromString(node.attributes.getNamedItem('Id').nodeValue);
@@ -9440,8 +9431,7 @@ LayerManager._draw = function (renderContext, opacity, astronomical, referenceFr
     }
     renderContext.set_nominalRadius(thisMap.frame.meanRadius);
   }
-  if (thisMap.frame.showAsPoint) {
-  }
+  if (thisMap.frame.showAsPoint) { }
   for (var pass = 0; pass < 2; pass++) {
     var $enum2 = ss.enumerate(LayerManager.get_allMaps()[referenceFrame].layers);
     while ($enum2.moveNext()) {
@@ -9667,8 +9657,7 @@ LayerManager.layerSelectionChanged = function (selected) {
 
 LayerManager.setTimeSliderValue = function (pos) {
   var layer = ss.safeCast(LayerManager._selectedLayer, ImageSetLayer);
-  if (layer != null && ss.canCast(layer.get_imageSet().get_wcsImage(), FitsImage)) {
-  }
+  if (layer != null && ss.canCast(layer.get_imageSet().get_wcsImage(), FitsImage)) { }
 };
 
 LayerManager.showLayerMenu = function (selected, x, y) {
@@ -10129,8 +10118,7 @@ LayerManager._showOrbitPlanet_Click = function (sender, e) {
       Settings.get_globalSettings().set_planetOrbitsFilter(Settings.get_globalSettings().get_planetOrbitsFilter() & ~bit);
     }
   }
-  catch ($e1) {
-  }
+  catch ($e1) { }
 };
 
 LayerManager._showOrbit_Click = function (sender, e) {
@@ -10440,8 +10428,7 @@ var LayerUI$ = {
     return null;
   },
 
-  setUICallbacks: function (callbacks) {
-  }
+  setUICallbacks: function (callbacks) { }
 };
 
 registerType("LayerUI", [LayerUI, LayerUI$, null]);
@@ -12241,8 +12228,7 @@ Orbit._orbitalToWwt = Matrix3d.create(1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 
 Orbit._initBegun = false;
 
 var Orbit$ = {
-  cleanUp: function () {
-  },
+  cleanUp: function () { },
 
   get_boundingRadius: function () {
     if (this._elements != null) {
@@ -12514,8 +12500,7 @@ var ReferenceFrame$ = {
     return this.name;
   },
 
-  importTrajectory: function (filename) {
-  },
+  importTrajectory: function (filename) { },
 
   saveToXml: function (xmlWriter) {
     xmlWriter._writeStartElement('ReferenceFrame');
@@ -12685,8 +12670,7 @@ var ReferenceFrame$ = {
     }
   },
 
-  _computeFixedRectangular: function (renderContext) {
-  },
+  _computeFixedRectangular: function (renderContext) { },
 
   _computeFixedSherical: function (renderContext) {
     if (this.observingLocation) {
@@ -12709,8 +12693,7 @@ var ReferenceFrame$ = {
     this.worldMatrix._multiply(Matrix3d._rotationY(-(this.lng + 180) / 180 * Math.PI));
   },
 
-  _computeFrameTrajectory: function (renderContext) {
-  },
+  _computeFrameTrajectory: function (renderContext) { },
 
   _computeOrbital: function (renderContext) {
     var ee = this.get_elements();
@@ -12884,8 +12867,7 @@ PushPin.getPushPinTexture = function (pinId) {
     tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
     PushPin._pinTextureCache[pinId] = texture;
   }
-  catch ($e1) {
-  }
+  catch ($e1) { }
   return texture;
 };
 
@@ -13666,8 +13648,7 @@ MinorPlanets._readFromBin = function (br) {
       MinorPlanets.mpcList.push(ee);
     }
   }
-  catch ($e1) {
-  }
+  catch ($e1) { }
   br.close();
 };
 
@@ -13757,8 +13738,7 @@ MinorPlanets.initMPCVertexBuffer = function () {
       MinorPlanets._mpcVertexBuffer = mpcVertexBufferTemp;
     }
   }
-  finally {
-  }
+  finally { }
 };
 
 var MinorPlanets$ = {};
@@ -14300,8 +14280,7 @@ Planets.getPlanet3dLocation = function (target) {
       return Planets._planet3dLocations[target].copy();
     }
   }
-  catch ($e1) {
-  }
+  catch ($e1) { }
   return Vector3d.create(0, 0, 0);
 };
 
@@ -14311,8 +14290,7 @@ Planets.getPlanet3dSufaceAltitude = function (target) {
       return Planets.getAdjustedPlanetRadius(target);
     }
   }
-  catch ($e1) {
-  }
+  catch ($e1) { }
   return 0;
 };
 
@@ -14775,8 +14753,7 @@ Planets.updateOrbits = function (planetCenter) {
       }
     }
   }
-  finally {
-  }
+  finally { }
 };
 
 Planets.readOrbits = function () {
@@ -15406,8 +15383,7 @@ Planets.drawSaturnsRings = function (renderContext, front, distance) {
       RenderTriangle.cullInside = !RenderTriangle.cullInside;
     }
   }
-  else {
-  }
+  else { }
 };
 
 Planets._drawRings = function (renderContext) {
@@ -15936,8 +15912,7 @@ var RenderContext$ = {
     return ((Math.abs(this.viewCamera.lat - this.targetCamera.lat) < 1E-12 && Math.abs(this.viewCamera.lng - this.targetCamera.lng) < 1E-12 && Math.abs(this.viewCamera.zoom - this.targetCamera.zoom) < 1E-12) && this.viewMover == null);
   },
 
-  setTexture: function (texture) {
-  },
+  setTexture: function (texture) { },
 
   get_backgroundImageset: function () {
     return this._backgroundImageset;
@@ -16419,8 +16394,7 @@ var RenderContext$ = {
     this.makeFrustum();
   },
 
-  _setMatrixes: function () {
-  },
+  _setMatrixes: function () { },
 
   get_frustum: function () {
     return this._frustum;
@@ -16583,18 +16557,15 @@ var RenderContext$ = {
     this.targetCamera = this.viewCamera.copy();
   },
 
-  _setVertexBuffer: function (vertexBuffer) {
-  },
+  _setVertexBuffer: function (vertexBuffer) { },
 
-  _setIndexBuffer: function (indexBuffer) {
-  },
+  _setIndexBuffer: function (indexBuffer) { },
 
   setMaterial: function (material, diffuseTex, specularTex, normalMap, opacity) {
     this.set_mainTexture(diffuseTex);
   },
 
-  preDraw: function () {
-  }
+  preDraw: function () { }
 };
 
 registerType("RenderContext", [RenderContext, RenderContext$, null]);
@@ -17247,8 +17218,7 @@ var ScriptInterface$ = {
     }
   },
 
-  hideUI: function (hide) {
-  },
+  hideUI: function (hide) { },
 
   loadTour: function (url) {
     if (WWTControl.singleton != null) {
@@ -17414,8 +17384,7 @@ var ScriptInterface$ = {
     return value;
   },
 
-  loadVOTable: function (url, useCurrentView) {
-  },
+  loadVOTable: function (url, useCurrentView) { },
 
   get_fov: function () {
     if (WWTControl.singleton != null) {
@@ -18414,8 +18383,7 @@ var GlyphCache$ = {
     this._calcOrMake(false);
   },
 
-  _calcOrMake: function (makeTexture) {
-  },
+  _calcOrMake: function (makeTexture) { },
 
   get_version: function () {
     return this._version;
@@ -19671,8 +19639,7 @@ var Tile$ = {
     }
   },
 
-  onCreateVertexBuffer: function (sender, e) {
-  },
+  onCreateVertexBuffer: function (sender, e) { },
 
   get_dataset: function () {
     return this.dataset;
@@ -19892,8 +19859,7 @@ TileCache.getCachedTile = function (level, x, y, dataset, parent) {
       retTile = TileCache._tiles[tileKey];
     }
   }
-  catch ($e1) {
-  }
+  catch ($e1) { }
   return retTile;
 };
 
@@ -20070,10 +20036,8 @@ TileCache.purgeLRU = function () {
       }
     }
   }
-  catch ($e5) {
-  }
-  finally {
-  }
+  catch ($e5) { }
+  finally { }
   return;
 };
 
@@ -20645,17 +20609,13 @@ var Overlay$ = {
     return value;
   },
 
-  play: function () {
-  },
+  play: function () { },
 
-  pause: function () {
-  },
+  pause: function () { },
 
-  stop: function () {
-  },
+  stop: function () { },
 
-  seek: function (time) {
-  },
+  seek: function (time) { },
 
   makePosition: function (centerX, centerY, offsetX, offsetY, angle) {
     centerX -= 960;
@@ -20693,11 +20653,9 @@ var Overlay$ = {
     this.texture2d = null;
   },
 
-  initializeTexture: function () {
-  },
+  initializeTexture: function () { },
 
-  prepMultimedia: function () {
-  },
+  prepMultimedia: function () { },
 
   cleanUpGeometry: function () {
     this.currentRotation = 0;
@@ -20731,8 +20689,7 @@ var Overlay$ = {
     }
   },
 
-  updateRotation: function () {
-  },
+  updateRotation: function () { },
 
   get_animate: function () {
     return this._animate;
@@ -21000,11 +20957,9 @@ var Overlay$ = {
     return 'TerraViewer.Overlay';
   },
 
-  addFilesToCabinet: function (fc) {
-  },
+  addFilesToCabinet: function (fc) { },
 
-  writeOverlayProperties: function (xmlWriter) {
-  },
+  writeOverlayProperties: function (xmlWriter) { },
 
   _initOverlayFromXml: function (node) {
     this.id = node.attributes.getNamedItem('Id').nodeValue;
@@ -21038,8 +20993,7 @@ var Overlay$ = {
     this.initializeFromXml(node);
   },
 
-  initializeFromXml: function (node) {
-  },
+  initializeFromXml: function (node) { },
 
   toString: function () {
     return this.get_name();
@@ -22067,8 +22021,7 @@ var TourDocument$ = {
     return -1;
   },
 
-  cleanUp: function () {
-  },
+  cleanUp: function () { },
 
   getCachedTexture: function (filename, callMe) {
     if (this._textureList == null) {
@@ -22161,8 +22114,7 @@ var TourDocument$ = {
     return value;
   },
 
-  clearTempFiles: function () {
-  }
+  clearTempFiles: function () { }
 };
 
 registerType("TourDocument", [TourDocument, TourDocument$, null]);
@@ -22183,8 +22135,7 @@ export function TourEditTab() {
 }
 
 var TourEditTab$ = {
-  setUiStrings: function () {
-  },
+  setUiStrings: function () { },
 
   get_tour: function () {
     return this._tour;
@@ -22215,16 +22166,14 @@ var TourEditTab$ = {
     this.tourStopList.refresh();
   },
 
-  setFocusedChild: function () {
-  },
+  setFocusedChild: function () { },
 
   selectCurrent: function () {
     this.tourStopList.selectedItem = this._tour.get_currentTourstopIndex();
     this.tourStopList.refresh();
   },
 
-  tourEdit_Load: function (sender, e) {
-  },
+  tourEdit_Load: function (sender, e) { },
 
   playNow: function (fromStart) {
     this.playing = true;
@@ -22234,18 +22183,15 @@ var TourEditTab$ = {
     this.setPlayPauseMode();
   },
 
-  _tourPlayer_TourEnded: function (sender, e) {
-  },
+  _tourPlayer_TourEnded: function (sender, e) { },
 
-  _endTour_CloseTour: function (sender, e) {
-  },
+  _endTour_CloseTour: function (sender, e) { },
 
   _endTour_LaunchTour: function (sender, e) {
     this.playNow(true);
   },
 
-  setEditMode: function (visible) {
-  },
+  setEditMode: function (visible) { },
 
   tourStopList_ItemClicked: function (sender, e) {
     if (this._tour.get_currentTourStop() !== e) {
@@ -22542,8 +22488,7 @@ var TourEditTab$ = {
     this._tour.get_currentTourStop().set_fadeInOverlays(!this._tour.get_currentTourStop().get_fadeInOverlays());
   },
 
-  _insertSlideshow_Click: function (sender, e) {
-  },
+  _insertSlideshow_Click: function (sender, e) { },
 
   _trackSpaceTime_Click: function (sender, e) {
     Undo.push(new UndoTourStopChange(Language.getLocalizedText(532, 'Track Time Edit'), this._tour));
@@ -22881,23 +22826,17 @@ var TourEditTab$ = {
     this.tourEditorUI.addShape('', 4);
   },
 
-  insertVideo_Click: function (sender, e) {
-  },
+  insertVideo_Click: function (sender, e) { },
 
-  insertAudio_Click: function (sender, e) {
-  },
+  insertAudio_Click: function (sender, e) { },
 
-  insertHyperlink_Click: function (sender, e) {
-  },
+  insertHyperlink_Click: function (sender, e) { },
 
-  colorPicker_Click: function (sender, e) {
-  },
+  colorPicker_Click: function (sender, e) { },
 
-  tourEditTab_Leave: function (sender, e) {
-  },
+  tourEditTab_Leave: function (sender, e) { },
 
-  editTourProperties_Click: function (sender, e) {
-  },
+  editTourProperties_Click: function (sender, e) { },
 
   saveTour_Click: function (sender, e) {
     this.save(false);
@@ -22907,14 +22846,11 @@ var TourEditTab$ = {
     return true;
   },
 
-  addVideo_Click: function (sender, e) {
-  },
+  addVideo_Click: function (sender, e) { },
 
-  addPicture_Click: function (sender, e) {
-  },
+  addPicture_Click: function (sender, e) { },
 
-  addShape_Click: function (sender, e) {
-  },
+  addShape_Click: function (sender, e) { },
 
   _addOpenRectangle_Click: function (sender, e) {
     this.tourEditorUI.addShape('', 6);
@@ -22924,8 +22860,7 @@ var TourEditTab$ = {
     this.tourEditorUI.addShape('', 2);
   },
 
-  addText_Click: function (sender, e) {
-  },
+  addText_Click: function (sender, e) { },
 
   preview_EnabledChanged: function (sender, e) {
     if (this.playing) {
@@ -22934,23 +22869,17 @@ var TourEditTab$ = {
     }
   },
 
-  preview_MouseEnter: function (sender, e) {
-  },
+  preview_MouseEnter: function (sender, e) { },
 
-  preview_MouseLeave: function (sender, e) {
-  },
+  preview_MouseLeave: function (sender, e) { },
 
-  preview_MouseUp: function (sender, e) {
-  },
+  preview_MouseUp: function (sender, e) { },
 
-  preview_MouseDown: function (sender, e) {
-  },
+  preview_MouseDown: function (sender, e) { },
 
-  tourStopList_ItemHover: function (sender, e) {
-  },
+  tourStopList_ItemHover: function (sender, e) { },
 
-  refresh: function () {
-  },
+  refresh: function () { },
 
   undoStep: function () {
     if (Undo.peekAction()) {
@@ -23806,8 +23735,7 @@ var TourEditor$ = {
     this.nextSlideCallback(this.selectDialog, ss.bind('_linkSlideChosen', this));
   },
 
-  _flipbookProperties_Click: function (sender, e) {
-  },
+  _flipbookProperties_Click: function (sender, e) { },
 
   _animateMenu_Click: function (sender, e) {
     if (this.get_focus() != null) {
@@ -24546,11 +24474,9 @@ var TourStopList$ = {
     return -1;
   },
 
-  ensureSelectedVisible: function () {
-  },
+  ensureSelectedVisible: function () { },
 
-  ensureAddVisible: function () {
-  }
+  ensureAddVisible: function () { }
 };
 
 registerType("TourStopList", [TourStopList, TourStopList$, null]);
@@ -27026,11 +26952,9 @@ registerType("Undo", [Undo, Undo$, null]);
 export function UndoStep() { }
 
 var UndoStep$ = {
-  undo: function () {
-  },
+  undo: function () { },
 
-  redo: function () {
-  },
+  redo: function () { },
 
   toString: function () {
     return Language.getLocalizedText(551, 'Nothing to Undo');
@@ -27513,8 +27437,7 @@ var BinaryReader$ = {
     return BinaryReader.id++;
   },
 
-  close: function () {
-  }
+  close: function () { }
 };
 
 registerType("BinaryReader", [BinaryReader, BinaryReader$, null]);
@@ -27568,8 +27491,7 @@ export function ColorPicker() {
 }
 
 var ColorPicker$ = {
-  nonMenuClick: function (e) {
-  },
+  nonMenuClick: function (e) { },
 
   show: function (e) {
     WWTControl.scriptInterface.showColorPicker(this, e);
@@ -27601,8 +27523,7 @@ export function ContextMenuStrip() {
 }
 
 var ContextMenuStrip$ = {
-  _dispose: function () {
-  },
+  _dispose: function () { },
 
   _nonMenuClick: function (e) {
     var menu = document.getElementById('contextmenu');
@@ -28151,8 +28072,7 @@ var XmlTextWriter$ = {
     return false;
   },
 
-  _writeProcessingInstruction: function (v1, v2) {
-  },
+  _writeProcessingInstruction: function (v1, v2) { },
 
   _writeStartElement: function (name) {
     this._pushNewElement(name);
@@ -28191,8 +28111,7 @@ var XmlTextWriter$ = {
     this.body += ss.format('</{0}>\r\n', this._elementStack.pop());
   },
 
-  _close: function () {
-  },
+  _close: function () { },
 
   _writeElementString: function (name, value) {
     this._writeStartElement(name);
@@ -28792,8 +28711,7 @@ var WWTControl$ = {
     this._zoomMinSolarSystem = value;
   },
 
-  _notifyMoveComplete: function () {
-  },
+  _notifyMoveComplete: function () { },
 
   get_crossFadeFrame: function () {
     return this._crossFadeFrame;
@@ -30187,8 +30105,7 @@ var WWTControl$ = {
     return WWTControl.imageSets[0];
   },
 
-  _hideUI: function (p) {
-  },
+  _hideUI: function (p) { },
 
   createTour: function (name) {
     if (ss.canCast(this.uiController, TourPlayer)) {
@@ -30261,8 +30178,7 @@ var WWTControl$ = {
     }
   },
 
-  _closeTour: function () {
-  },
+  _closeTour: function () { },
 
   getImagesetByName: function (name) {
     var $enum1 = ss.enumerate(WWTControl.imageSets);
@@ -33855,8 +33771,7 @@ var Object3dLayer$ = {
     return true;
   },
 
-  addFilesToCabinet: function (fc) {
-  },
+  addFilesToCabinet: function (fc) { },
 
   loadData: function (doc, filename) {
     if (ss.endsWith(filename.toLowerCase(), '.obj')) {
@@ -34545,8 +34460,7 @@ var SpreadSheetLayer$ = {
     return true;
   },
 
-  copyToClipboard: function () {
-  },
+  copyToClipboard: function () { },
 
   dynamicUpdate: function () {
     var data = SpreadSheetLayer._getDatafromFeed$1(this.get_dataSourceUrl());
@@ -34772,8 +34686,7 @@ var SpreadSheetLayer$ = {
     }
   },
 
-  checkState: function () {
-  },
+  checkState: function () { },
 
   getMaxValue: function (column) {
     var max = 0;
@@ -36568,8 +36481,7 @@ var TimeSeriesLayer$ = {
     }
   },
 
-  computeDateDomainRange: function (columnStart, columnEnd) {
-  },
+  computeDateDomainRange: function (columnStart, columnEnd) { },
 
   getDomainValues: function (column) {
     return [];
@@ -37932,8 +37844,7 @@ var VoTableLayer$ = {
     return true;
   },
 
-  copyToClipboard: function () {
-  },
+  copyToClipboard: function () { },
 
   findClosest: function (target, distance, defaultPlace, astronomical) {
     var searchPoint = Coordinates.geoTo3dDouble(target.get_lat(), target.get_lng());
@@ -40763,8 +40674,7 @@ export function GreatCircleDialog() {
 }
 
 var GreatCircleDialog$ = {
-  OK: function (frame) {
-  }
+  OK: function (frame) { }
 };
 
 registerType("GreatCircleDialog", [GreatCircleDialog, GreatCircleDialog$, Dialog]);
@@ -40776,8 +40686,7 @@ export function DataVizWizard() {
 }
 
 var DataVizWizard$ = {
-  OK: function () {
-  }
+  OK: function () { }
 };
 
 registerType("DataVizWizard", [DataVizWizard, DataVizWizard$, Dialog]);
@@ -40834,8 +40743,7 @@ var FitsImageTile$ = {
     }
   },
 
-  computeWcs: function () {
-  }
+  computeWcs: function () { }
 };
 
 registerType("FitsImageTile", [FitsImageTile, FitsImageTile$, FitsImage]);
@@ -41380,8 +41288,7 @@ var ISSLayer$ = {
     return;
   },
 
-  cleanUp: function () {
-  }
+  cleanUp: function () { }
 };
 
 registerType("ISSLayer", [ISSLayer, ISSLayer$, Object3dLayer]);
