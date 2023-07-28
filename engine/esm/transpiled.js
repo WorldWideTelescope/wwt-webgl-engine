@@ -14539,7 +14539,7 @@ var RenderContext$ = {
   clear: function () {
     if (this.gl != null) {
       this.gl.viewport(0, 0, ss.truncate(this.width), ss.truncate(this.height));
-      this.gl.clear(16384 | 256);
+      this.gl.clear(WEBGL.COLOR_BUFFER_BIT | WEBGL.DEPTH_BUFFER_BIT);
     }
     else {
       this.device.save();
