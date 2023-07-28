@@ -3297,7 +3297,7 @@ var SimpleLineList$ = {
         else {
           SimpleLineShader.use(renderContext, lineBuffer.vertexBuffer, color, this._zBuffer);
         }
-        renderContext.gl.drawArrays(1, 0, lineBuffer.count);
+        renderContext.gl.drawArrays(WEBGL.LINES, 0, lineBuffer.count);
       }
     }
   },
@@ -3400,7 +3400,7 @@ var OrbitLineList$ = {
     while ($enum1.moveNext()) {
       var lineBuffer = $enum1.current;
       OrbitLineShader.use(renderContext, lineBuffer.vertexBuffer, color);
-      renderContext.gl.drawArrays(1, 0, lineBuffer.count);
+      renderContext.gl.drawArrays(WEBGL.LINES, 0, lineBuffer.count);
     }
   },
   _initLineBuffer: function (renderContext) {
@@ -3522,7 +3522,7 @@ var LineList$ = {
       while ($enum1.moveNext()) {
         var lineBuffer = $enum1.current;
         LineShaderNormalDates.use(renderContext, lineBuffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this._zBuffer, this.jNow, (this.timeSeries) ? this.decay : 0);
-        renderContext.gl.drawArrays(1, 0, lineBuffer.count);
+        renderContext.gl.drawArrays(WEBGL.LINES, 0, lineBuffer.count);
       }
     }
   },
