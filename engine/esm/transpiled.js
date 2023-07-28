@@ -780,6 +780,7 @@ export function VideoOutputType(width, height, fps, format, waitDownload) {
   this.format = format;
   this.waitDownload = waitDownload;
 }
+
 var VideoOutputType$ = {
 
 };
@@ -803,6 +804,7 @@ export function FitsProperties() {
   this.onMainImageLoaded = null;
   this.mainImageLoadedEventHasFired = false;
 }
+
 var FitsProperties$ = {
   _fireMainImageLoaded: function (image) {
     if (this.onMainImageLoaded != null && !this.mainImageLoadedEventHasFired) {
@@ -830,6 +832,7 @@ export function HipsProperties(dataset) {
   this._url += 'properties';
   this._download();
 }
+
 var HipsProperties$ = {
   get_properties: function () {
     return this._properties;
@@ -1314,6 +1317,7 @@ export function URLHelpers() {
   this._flagship_static_lcpaths['/wwtweb/wmsmoon.aspx'] = true;
   this._flagship_static_lcpaths['/wwtweb/wmstoast.aspx'] = true;
 }
+
 var URLHelpers$ = {
   overrideAssetBaseurl: function (baseurl) {
     this._engine_asset_baseurl = baseurl;
@@ -2145,6 +2149,7 @@ export function Lineset(name) {
   this._name = name;
   this.points = [];
 }
+
 var Lineset$ = {
   get_name: function () {
     return this._name;
@@ -2172,6 +2177,7 @@ export function Linepoint(ra, dec, type, name) {
   this.pointType = type;
   this.name = name;
 }
+
 var Linepoint$ = {
   toString: function () {
     if (ss.emptyString(this.name)) {
@@ -2514,6 +2520,7 @@ export function Folder() {
   this._componentIdField = 0;
   this._permissionField = 0;
 }
+
 var Folder$ = {
   toString: function () {
     return this._nameField;
@@ -3314,6 +3321,7 @@ export function FolderUp() {
   this.parent = null;
   this._bounds = new Rectangle();
 }
+
 var FolderUp$ = {
   get_name: function () {
     return 'Up Level';
@@ -3398,6 +3406,7 @@ export function SimpleLineList() {
   this._lineBufferCounts = [];
   this.useLocalCenters = false;
 }
+
 var SimpleLineList$ = {
   get_depthBuffered: function () {
     return this._zBuffer;
@@ -3527,6 +3536,7 @@ export function OrbitLineList() {
   this._lineBufferCounts = [];
   this.useLocalCenters = false;
 }
+
 var OrbitLineList$ = {
   get_depthBuffered: function () {
     return this._zBuffer;
@@ -3640,6 +3650,7 @@ export function LineList() {
   this._lineBuffers = [];
   this._lineBufferCounts = [];
 }
+
 var LineList$ = {
   get_depthBuffered: function () {
     return this._zBuffer;
@@ -3747,6 +3758,7 @@ export function TriangleList() {
   this._triangleBuffers = [];
   this._triangleBufferCounts = [];
 }
+
 var TriangleList$ = {
   addTriangle: function (v1, v2, v3, color, date) {
     this._trianglePoints.push(v1);
@@ -3870,6 +3882,7 @@ export function TriangleFanList() {
   this._buffers = [];
   this._bufferCounts = [];
 }
+
 var TriangleFanList$ = {
   get_depthBuffered: function () {
     return this._zBuffer;
@@ -5687,6 +5700,7 @@ registerType("TextShader", [TextShader, TextShader$, null]);
 /*internal*/ function Sprite2d() {
   this.vertCount = 0;
 }
+
 var Sprite2d$ = {
   draw: function (renderContext, points, count, texture, triangleStrips, opacity) {
     if (this.vertexBuffer == null) {
@@ -7600,6 +7614,7 @@ export function ViewMoverKenBurnsStyle(from, to, time, fromDateTime, toDateTime,
   this._fromTime = SpaceTimeController.get_metaNow();
   this._toTargetTime = time;
 }
+
 var ViewMoverKenBurnsStyle$ = {
   get_complete: function () {
     return this._complete;
@@ -7853,6 +7868,7 @@ registerType("KeplerVertex", [KeplerVertex, KeplerVertex$, null]);
 
 export function ScaleMap() {
 }
+
 var ScaleMap$ = {
 
 };
@@ -8326,6 +8342,7 @@ export function DomainValue(text, markerIndex) {
   this.text = text;
   this.markerIndex = markerIndex;
 }
+
 var DomainValue$ = {
 
 };
@@ -9827,6 +9844,7 @@ export function LayerMap(name, reference) {
   }
   this.frame.meanRadius = radius;
 }
+
 var LayerMap$ = {
   addChild: function (child) {
     child.parent = this;
@@ -9855,6 +9873,7 @@ registerType("LayerMap", [LayerMap, LayerMap$, null]);
 
 export function SkyOverlays() {
 }
+
 var SkyOverlays$ = {
 
 };
@@ -9865,6 +9884,7 @@ registerType("SkyOverlays", [SkyOverlays, SkyOverlays$, null]);
 
 export function GroundOverlayLayer() {
 }
+
 var GroundOverlayLayer$ = {
 
 };
@@ -9875,6 +9895,7 @@ registerType("GroundOverlayLayer", [GroundOverlayLayer, GroundOverlayLayer$, nul
 
 export function FrameTarget() {
 }
+
 var FrameTarget$ = {
 
 };
@@ -9912,6 +9933,7 @@ export function LayerUIMenuItem() {
   this._isEnabled = true;
   this._subMenus = null;
 }
+
 var LayerUIMenuItem$ = {
   get_name: function () {
     return this._name;
@@ -9973,6 +9995,7 @@ export function LayerUITreeNode() {
   this._color = Colors.get_white();
   this._nodes = null;
 }
+
 var LayerUITreeNode$ = {
   add_nodeChecked: function (value) {
     this.__nodeChecked = ss.bindAdd(this.__nodeChecked, value);
@@ -10121,6 +10144,7 @@ export function Group() {
   this.indexCount = 0;
   this.materialIndex = 0;
 }
+
 var Group$ = {
 
 };
@@ -10233,6 +10257,7 @@ registerType("Mesh", [Mesh, Mesh$, null, ss.IDisposable]);
 /*internal*/ function VertexPosition() {
   this.index = 0;
 }
+
 var VertexPosition$ = {
 
 };
@@ -11603,6 +11628,7 @@ export function ObjectNode() {
   this.applyLists = [];
   this.applyListsIndex = [];
 }
+
 var ObjectNode$ = {
 
 };
@@ -12145,6 +12171,7 @@ export function KmlCoordinate() {
   this.lng = 0;
   this.alt = 0;
 }
+
 var KmlCoordinate$ = {
 
 };
@@ -12159,6 +12186,7 @@ export function KmlLineList() {
   this.meanRadius = 6371000;
   this.pointList = [];
 }
+
 var KmlLineList$ = {
   parseWkt: function (geoText, option, alt, date) {
     var parts = UiTools.split(geoText, '(,)');
@@ -12261,6 +12289,7 @@ export function Table() {
   this.delimiter = '\t';
   this.locked = false;
 }
+
 var Table$ = {
   lock: function () {
     this.locked = true;
@@ -12577,6 +12606,7 @@ export function VoRow(owner) {
   this.selected = false;
   this.owner = owner;
 }
+
 var VoRow$ = {
   getColumnData: function (key) {
     if (this.owner.columns[key] != null) {
@@ -12736,6 +12766,7 @@ export function WcsImage() {
   this.filename = '';
   this._colorCombine = false;
 }
+
 var WcsImage$ = {
   get_copyright: function () {
     return this.copyright;
@@ -13469,6 +13500,7 @@ export function KeplerianElements() {
   this.e = 0;
   this.ea = 0;
 }
+
 var KeplerianElements$ = {
 
 };
@@ -13487,6 +13519,7 @@ export function BodyAngles(poleRa, poleDec, primeMeridian, rotationRate) {
   this.primeMeridian = primeMeridian;
   this.rotationRate = rotationRate;
 }
+
 var BodyAngles$ = {
 
 };
@@ -14839,6 +14872,7 @@ export function Material() {
   this.opacity = 0;
   this.isDefault = false;
 }
+
 var Material$ = {
 
 };
@@ -14850,6 +14884,7 @@ registerType("Material", [Material, Material$, null]);
 export function InViewReturnMessage() {
   this.aborted = false;
 }
+
 var InViewReturnMessage$ = {
 
 };
@@ -17046,6 +17081,7 @@ export function Text3dBatch(height) {
   this._vertCount = 0;
   this.height = (height * 3);
 }
+
 var Text3dBatch$ = {
   add: function (newItem) {
     this.items.push(newItem);
@@ -17320,6 +17356,7 @@ export function Text3d(center, up, text, fontsize, scale) {
     this.sky = false;
   }
 }
+
 var Text3d$ = {
   addGlyphPoints: function (pointList, size, position, uv) {
     var points = new Array(6);
@@ -17671,6 +17708,7 @@ export function Star(input) {
     this._makeDistanceAndMagnitude();
   }
 }
+
 var Star$ = {
   get_name: function () {
     return 'HIP' + this.id.toString();
@@ -17880,6 +17918,7 @@ export function LatLngEdges() {
   this.lngMin = 0;
   this.lngMax = 0;
 }
+
 var LatLngEdges$ = {
 
 };
@@ -19037,6 +19076,7 @@ export function FileEntry(filename, size) {
   this.filename = filename;
   this.size = size;
 }
+
 var FileEntry$ = {
   toString: function () {
     return this.filename;
@@ -19246,6 +19286,7 @@ export function SettingParameter(edgeTrigger, opacity, targetState, filter) {
   this.targetState = targetState;
   this.filter = filter;
 }
+
 var SettingParameter$ = {
 
 };
@@ -20756,6 +20797,7 @@ export function TourEditTab() {
   this._player = null;
   this._defultColor = Colors.get_white();
 }
+
 var TourEditTab$ = {
   setUiStrings: function () {
   },
@@ -22944,6 +22986,7 @@ registerType("TourEdit", [TourEdit, TourEdit$, null]);
 export function SoundEditor() {
   this.target = null;
 }
+
 var SoundEditor$ = {
 
 };
@@ -22961,6 +23004,7 @@ export function TourStopList() {
   this.multipleSelection = false;
   this.hitType = false;
 }
+
 var TourStopList$ = {
   selectAll: function () {
     this.selectedItems = {};
@@ -23570,6 +23614,7 @@ export function MasterTime(master, duration) {
   this.master = master;
   this.duration = duration;
 }
+
 var MasterTime$ = {
 
 };
@@ -25124,6 +25169,7 @@ export function LayerInfo() {
   this.endParams = new Array(0);
   this.frameParams = new Array(0);
 }
+
 var LayerInfo$ = {
 
 };
@@ -25144,6 +25190,7 @@ export function UndoTourStopChange(text, tour) {
   this._undoXml = TourStop.getXmlText(tour.get_currentTourStop());
   this._targetTour.set_tourDirty(true);
 }
+
 var UndoTourStopChange$ = {
   get_actionText: function () {
     return this._actionText;
@@ -25237,6 +25284,7 @@ registerType("Undo", [Undo, Undo$, null]);
 
 export function UndoStep() {
 }
+
 var UndoStep$ = {
   undo: function () {
   },
@@ -25264,6 +25312,7 @@ export function UndoTourSlidelistChange(text, tour) {
   this._targetTour = tour;
   this._targetTour.set_tourDirty(true);
 }
+
 var UndoTourSlidelistChange$ = {
   get_actionText: function () {
     return this._actionText;
@@ -25314,6 +25363,7 @@ export function UndoTourPropertiesChange(text, tour) {
   this._targetTour = tour;
   this._targetTour.set_tourDirty(true);
 }
+
 var UndoTourPropertiesChange$ = {
   get_actionText: function () {
     return this._actionText;
@@ -25737,6 +25787,7 @@ export function ColorPicker() {
   this.callBack = null;
   this.color = Colors.get_white();
 }
+
 var ColorPicker$ = {
   nonMenuClick: function (e) {
   },
@@ -25766,6 +25817,7 @@ registerType("ColorPicker", [ColorPicker, ColorPicker$, null]);
 export function ContextMenuStrip() {
   this.items = [];
 }
+
 var ContextMenuStrip$ = {
   _dispose: function () {
   },
@@ -25881,6 +25933,7 @@ registerType("ToolStripMenuItem", [ToolStripMenuItem, ToolStripMenuItem$, null])
 
 export function TagMe() {
 }
+
 var TagMe$ = {
 
 };
@@ -25891,6 +25944,7 @@ registerType("TagMe", [TagMe, TagMe$, null]);
 
 export function Dialog() {
 }
+
 var Dialog$ = {
   add_showDialogHook: function (value) {
     this.__showDialogHook = ss.bindAdd(this.__showDialogHook, value);
@@ -26173,6 +26227,7 @@ export function SimpleInput(title, label, text, v3) {
   this.label = label;
   this.text = text;
 }
+
 var SimpleInput$ = {
   showDialog: function () {
     return 1;
@@ -26244,6 +26299,7 @@ export function XmlTextWriter() {
   this._attributes = {};
   this._value = '';
 }
+
 var XmlTextWriter$ = {
   _pushNewElement: function (name) {
     this._writePending(false);
@@ -26433,6 +26489,7 @@ registerType("VizLayer", [VizLayer, VizLayer$, null]);
 export function DataItem() {
   this.size = 0;
 }
+
 var DataItem$ = {
   getColor: function () {
     return 'Red';
@@ -26449,6 +26506,7 @@ export function WebFile(url) {
   this._triedOnce = false;
   this._url = url;
 }
+
 var WebFile$ = {
   send: function () {
     if (typeof navigator === "undefined") { return; }
@@ -26556,6 +26614,7 @@ export function FolderDownloadAction(action, loadChildFolders) {
   this._onComplete = action;
   this.loadChildFolders = loadChildFolders;
 }
+
 var FolderDownloadAction$ = {
   _folderLoaded: function () {
     this._numLoadingFolders--;
@@ -28488,6 +28547,7 @@ export function WWTControlBuilder(divId) {
   this._startMode = '';
   this._divId = divId;
 }
+
 var WWTControlBuilder$ = {
   startRenderLoop: function (value) {
     this._startRenderLoop = value;
@@ -28533,6 +28593,7 @@ export function WWTElementEvent(x, y) {
   this.offsetX = x;
   this.offsetY = y;
 }
+
 var WWTElementEvent$ = {
 
 };
@@ -30123,6 +30184,7 @@ export function Circle() {
   this._dec$1 = 0;
   Annotation.call(this);
 }
+
 var Circle$ = {
   get_fill: function () {
     return this._fill$1;
@@ -30265,6 +30327,7 @@ export function Poly() {
   this._fillColor$1 = Colors.get_white();
   Annotation.call(this);
 }
+
 var Poly$ = {
   addPoint: function (x, y) {
     Annotation.batchDirty = true;
@@ -30375,6 +30438,7 @@ export function PolyLine() {
   this._lineColor$1 = Colors.get_white();
   Annotation.call(this);
 }
+
 var PolyLine$ = {
   addPoint: function (x, y) {
     Annotation.batchDirty = true;
@@ -30731,6 +30795,7 @@ export function ScaleLinear(min, max) {
   this._max$1 = max;
   this._factor$1 = max - min;
 }
+
 var ScaleLinear$ = {
   map: function (val) {
     return Math.min(255, Math.max(0, ss.truncate(((val - this._min$1) / this._factor$1 * 255))));
@@ -30752,6 +30817,7 @@ export function ScaleLog(min, max) {
   this._factor$1 = max - min;
   this._logFactor$1 = 255 / Math.log(255);
 }
+
 var ScaleLog$ = {
   map: function (val) {
     return Math.min(255, Math.max(0, ss.truncate((Math.log((val - this._min$1) / this._factor$1 * 255) * this._logFactor$1))));
@@ -30773,6 +30839,7 @@ export function ScalePow(min, max) {
   this._factor$1 = max - min;
   this._powFactor$1 = 255 / Math.pow(255, 2);
 }
+
 var ScalePow$ = {
   map: function (val) {
     return Math.min(255, Math.max(0, ss.truncate((Math.pow((val - this._min$1) / this._factor$1 * 255, 2) * this._powFactor$1))));
@@ -30794,6 +30861,7 @@ export function ScaleSqrt(min, max) {
   this._factor$1 = max - min;
   this._sqrtFactor$1 = 255 / Math.sqrt(255);
 }
+
 var ScaleSqrt$ = {
   map: function (val) {
     return Math.min(255, Math.max(0, ss.truncate((Math.sqrt((val - this._min$1) / this._factor$1 * 255) * this._sqrtFactor$1))));
@@ -30823,6 +30891,7 @@ export function HistogramEqualization(image, min, max) {
     this._lookup$1[i] = (Math.min(255, (sum * 255) / totalCounts) + 0.5);
   }
 }
+
 var HistogramEqualization$ = {
   map: function (val) {
     return this._lookup$1[Math.min(10000 - 1, Math.max(0, ss.truncate(((val - this._min$1) / this._factor$1 * (10000 - 1)))))];
@@ -30843,6 +30912,7 @@ export function GreatCirlceRouteLayer() {
   this._percentComplete$1 = 100;
   Layer.call(this);
 }
+
 var GreatCirlceRouteLayer$ = {
   getTypeName: function () {
     return 'TerraViewer.GreatCirlceRouteLayer';
@@ -30998,6 +31068,7 @@ registerType("GreatCirlceRouteLayer", [GreatCirlceRouteLayer, GreatCirlceRouteLa
 export function GridLayer() {
   Layer.call(this);
 }
+
 var GridLayer$ = {
   draw: function (renderContext, opacity, flat) {
     Grids.drawPlanetGrid(renderContext, opacity * this.get_opacity(), this.get_color());
@@ -31204,6 +31275,7 @@ registerType("ImageSetLayer", [ImageSetLayer, ImageSetLayer$, Layer]);
 /*internal*/ function LayerCollection() {
   Layer.call(this);
 }
+
 var LayerCollection$ = {
   draw: function (renderContext, opacity, flat) {
     return Layer.prototype.draw.call(this, renderContext, opacity, false);
@@ -31889,6 +31961,7 @@ export function Object3dLayerUI(layer) {
   LayerUI.call(this);
   this._layer$1 = layer;
 }
+
 var Object3dLayerUI$ = {
   setUICallbacks: function (callbacks) {
     this._callbacks$1 = callbacks;
@@ -31952,6 +32025,7 @@ export function OrbitLayer() {
   this._dataFile$1 = '';
   Layer.call(this);
 }
+
 var OrbitLayer$ = {
   get_frames: function () {
     return this._frames$1;
@@ -32110,6 +32184,7 @@ export function OrbitLayerUI(layer) {
   LayerUI.call(this);
   this._layer$1 = layer;
 }
+
 var OrbitLayerUI$ = {
   setUICallbacks: function (callbacks) {
     this._callbacks$1 = callbacks;
@@ -36204,6 +36279,7 @@ export function TangentTile(level, x, y, dataset, parent) {
   this._topDown$1 = !dataset.get_bottomsUp();
   this.computeBoundingSphere();
 }
+
 var TangentTile$ = {
   computeBoundingSphere: function () {
     if (!this._topDown$1) {
@@ -37847,6 +37923,7 @@ export function FlipbookOverlay() {
   this._playing$1 = true;
   Overlay.call(this);
 }
+
 var FlipbookOverlay$ = {
   getTypeName: function () {
     return 'TerraViewer.FlipbookOverlay';
@@ -38047,6 +38124,7 @@ export function ToolStripSeparator() {
   ToolStripMenuItem.call(this);
   this.name = '--------------------------------------';
 }
+
 var ToolStripSeparator$ = {
 
 };
@@ -38058,6 +38136,7 @@ registerType("ToolStripSeparator", [ToolStripSeparator, ToolStripSeparator$, Too
 export function FrameWizard() {
   Dialog.call(this);
 }
+
 var FrameWizard$ = {
   OK: function (frame) {
     LayerManager.referenceFrameWizardFinished(frame);
@@ -38071,6 +38150,7 @@ registerType("FrameWizard", [FrameWizard, FrameWizard$, Dialog]);
 export function ReferenceFrameProps() {
   Dialog.call(this);
 }
+
 var ReferenceFrameProps$ = {
   OK: function (frame) {
     LayerManager.loadTree();
@@ -38084,6 +38164,7 @@ registerType("ReferenceFrameProps", [ReferenceFrameProps, ReferenceFrameProps$, 
 export function GreatCircleDialog() {
   Dialog.call(this);
 }
+
 var GreatCircleDialog$ = {
   OK: function (frame) {
   }
@@ -38096,6 +38177,7 @@ registerType("GreatCircleDialog", [GreatCircleDialog, GreatCircleDialog$, Dialog
 export function DataVizWizard() {
   Dialog.call(this);
 }
+
 var DataVizWizard$ = {
   OK: function () {
   }
@@ -38108,6 +38190,7 @@ registerType("DataVizWizard", [DataVizWizard, DataVizWizard$, Dialog]);
 export function FitsImageTile(dataset, file, callMeBack) {
   FitsImage.call(this, dataset, file, null, callMeBack);
 }
+
 var FitsImageTile$ = {
   readDataUnitFloat64: function (dataView) {
     var i = 0;
@@ -38693,6 +38776,7 @@ export function CatalogSpreadSheetLayer() {
   this._addedTiles$2 = {};
   SpreadSheetLayer.call(this);
 }
+
 var CatalogSpreadSheetLayer$ = {
   addTileRows: function (tileKey, catalogRows) {
     if (!ss.keyExists(this._addedTiles$2, tileKey)) {
@@ -38731,6 +38815,7 @@ export function SlideChangedEventArgs(caption) {
   ss.EventArgs.call(this);
   this.set_caption(caption);
 }
+
 var SlideChangedEventArgs$ = {
   get_caption: function () {
     return this._caption$2;
@@ -38754,6 +38839,7 @@ export function ArrivedEventArgs(ra, dec, zoom) {
   this.set_dec(dec);
   this.set_zoom(zoom / 6);
 }
+
 var ArrivedEventArgs$ = {
   get_RA: function () {
     return this._ra$2;
@@ -38790,6 +38876,7 @@ export function AnnotationClickEventArgs(ra, dec, id) {
   this.set_dec(dec);
   this.set_id(id);
 }
+
 var AnnotationClickEventArgs$ = {
   get_RA: function () {
     return this._ra$2;
@@ -38822,6 +38909,7 @@ export function CollectionLoadedEventArgs(url) {
   ss.EventArgs.call(this);
   this._url$2 = url;
 }
+
 var CollectionLoadedEventArgs$ = {
   get_url: function () {
     return this._url$2;
@@ -38854,6 +38942,7 @@ export function SkyImageTile(level, x, y, dataset, parent) {
   this.radius = 1.25;
   this.computeBoundingSphere();
 }
+
 var SkyImageTile$ = {
   getLatLngEdges: function () {
     var edges = new LatLngEdges();
