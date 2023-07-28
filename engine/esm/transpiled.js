@@ -3691,7 +3691,7 @@ var TriangleList$ = {
       while ($enum1.moveNext()) {
         var triBuffer = $enum1.current;
         LineShaderNormalDates.use(renderContext, triBuffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0);
-        renderContext.gl.drawArrays(4, 0, triBuffer.count);
+        renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, triBuffer.count);
       }
     }
   }
@@ -5387,11 +5387,11 @@ var Sprite2d$ = {
     }
     if (texture == null) {
       ShapeSpriteShader.use(renderContext, this.vertexBuffer);
-      renderContext.gl.drawArrays((triangleStrips) ? 5 : 4, 0, points.length);
+      renderContext.gl.drawArrays(triangleStrips ? WEBGL.TRIANGLE_STRIP : WEBGL.TRIANGLES, 0, points.length);
     }
     else {
       SpriteShader.use(renderContext, this.vertexBuffer, (texture != null) ? texture.texture2d : null);
-      renderContext.gl.drawArrays((triangleStrips) ? 5 : 4, 0, points.length);
+      renderContext.gl.drawArrays(triangleStrips ? WEBGL.TRIANGLE_STRIP : WEBGL.TRIANGLES, 0, points.length);
     }
   },
   create: function (verts) {
@@ -5724,7 +5724,7 @@ Grids.drawGalaxyImage = function (renderContext, opacity) {
   var distAlpha = (log - 14) * 128;
   var alpha = (Math.min(255, Math.max(0, distAlpha)) * opacity);
   ImageShader.use(renderContext, Grids._galaxyImageVertexBuffer.vertexBuffer, Grids._galaxyImageIndexBuffer, Grids._milkyWayImage.texture2d, opacity, true);
-  renderContext.gl.drawElements(4, Grids._galaxyImageTriangleCount * 3, 5123, 0);
+  renderContext.gl.drawElements(WEBGL.TRIANGLES, Grids._galaxyImageTriangleCount * 3, 5123, 0);
 };
 Grids.drawStars3D = function (renderContext, opacity) {
   var zoom = renderContext.viewCamera.zoom;
@@ -9813,7 +9813,7 @@ var Mesh$ = {
         while ($enum2.moveNext()) {
           var group = $enum2.current;
           if (group.materialIndex === materialIndex) {
-            renderContext.gl.drawElements(4, group.indexCount, 5125, group.startIndex * 4);
+            renderContext.gl.drawElements(WEBGL.TRIANGLES, group.indexCount, 5125, group.startIndex * 4);
           }
         }
       }
@@ -14161,7 +14161,7 @@ Planets.drawSaturnsRings = function (renderContext, front, distance) {
 Planets._drawRings = function (renderContext) {
   Planets._initRings();
   TileShader.use(renderContext, Planets._ringsVertexBuffer.vertexBuffer, null, Planets._ringsTexture.texture2d, 1, false, Vector3d.zero);
-  renderContext.gl.drawArrays(5, 0, Planets._triangleCountRings);
+  renderContext.gl.drawArrays(WEBGL.TRIANGLE_STRIP, 0, Planets._triangleCountRings);
 };
 Planets._initRings = function () {
   if (Planets._ringsVertexBuffer != null) {
@@ -16603,7 +16603,7 @@ var Text3dBatch$ = {
         return;
       }
       TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2d);
-      renderContext.gl.drawArrays(4, 0, this._vertexBuffer.count);
+      renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
     }
   },
   prepareBatch: function () {
@@ -17795,7 +17795,7 @@ var Tile$ = {
       else {
         TileShader.use(renderContext, this._vertexBuffer, this.getIndexBuffer(part, this.accomidation), this.texture2d, opacity, false, this.globalCenter);
       }
-      renderContext.gl.drawElements(4, this.triangleCount * 3, 5123, 0);
+      renderContext.gl.drawElements(WEBGL.TRIANGLES, this.triangleCount * 3, 5123, 0);
     }
   },
   cleanUp: function (removeFromParent) {
