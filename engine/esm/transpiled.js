@@ -33,9 +33,11 @@ import { CAAMoon } from "./astrocalc/moon.js";
 import { AstroCalc } from "./astrocalc.js";
 
 import { tilePrepDevice, set_tilePrepDevice } from "./render_globals.js";
+import { freestandingMode, set_freestandingMode } from "./data_globals.js";
 
 import { BlendState } from "./blend_state.js";
 import { Color, Colors } from "./color.js";
+import { URLHelpers } from "./url_helpers.js";
 
 import {
   PositionTexture,
@@ -68,6 +70,8 @@ import {
   PositionColoredVertexBuffer,
 } from "./graphics/gl_buffers.js"
 
+import { Texture } from "./graphics/texture.js";
+
 
 // wwtlib.ScaleTypes
 
@@ -81,16 +85,6 @@ export var ScaleTypes = {
 
 registerType("ScaleTypes", ScaleTypes);
 registerEnum("ScaleTypes", ScaleTypes);
-
-// wwtlib.URLRewriteMode
-
-export var URLRewriteMode = {
-  asIfAbsolute: 0,
-  originRelative: 1
-};
-
-registerType("URLRewriteMode", URLRewriteMode);
-registerEnum("URLRewriteMode", URLRewriteMode);
 
 // wwtlib.SolarSystemObjects
 
@@ -1236,254 +1230,6 @@ var Pointing$ = {
 };
 
 registerType("Pointing", [Pointing, Pointing$, null]);
-
-// wwtlib.URLHelpers
-
-export function URLHelpers() {
-  this._force_https = false;
-  this._origin_protocol = typeof window === "undefined" ? "https:" : window.location.protocol;
-  this._origin_domain = typeof window === "undefined" ? "" : window.location.hostname;
-  this._force_https = (this._origin_protocol === 'https:');
-  this._domain_handling = {};
-  this._domain_handling['worldwidetelescope.org'] = 0;
-  this._domain_handling['www.worldwidetelescope.org'] = 0;
-  this._domain_handling['cdn.worldwidetelescope.org'] = 0;
-  this._domain_handling['content.worldwidetelescope.org'] = 0;
-  this._domain_handling['beta.worldwidetelescope.org'] = 0;
-  this._domain_handling['beta-cdn.worldwidetelescope.org'] = 0;
-  this._domain_handling['wwtstaging.azurewebsites.net'] = 0;
-  this._domain_handling['wwtfiles.blob.core.windows.net'] = 2;
-  this._domain_handling['wwttiles.blob.core.windows.net'] = 2;
-  this._domain_handling['web.wwtassets.org'] = 2;
-  this._domain_handling['data1.wwtassets.org'] = 2;
-  this._domain_handling['localhost'] = 1;
-  this._domain_handling['127.0.0.1'] = 1;
-  switch (this._origin_domain) {
-    case 'worldwidetelescope.org':
-    case 'www.worldwidetelescope.org':
-    case 'cdn.worldwidetelescope.org':
-      this._core_static_baseurl = this._origin_protocol + '//cdn.worldwidetelescope.org';
-      this._core_dynamic_baseurl = this._origin_protocol + '//worldwidetelescope.org';
-      break;
-    case 'beta.worldwidetelescope.org':
-    case 'beta-cdn.worldwidetelescope.org':
-      this._core_static_baseurl = this._origin_protocol + '//beta-cdn.worldwidetelescope.org';
-      this._core_dynamic_baseurl = this._origin_protocol + '//beta.worldwidetelescope.org';
-      break;
-    default:
-      this._core_static_baseurl = this._origin_protocol + '//cdn.worldwidetelescope.org';
-      this._core_dynamic_baseurl = this._origin_protocol + '//worldwidetelescope.org';
-      break;
-  }
-  this._engine_asset_baseurl = this._origin_protocol + '//web.wwtassets.org/engine/assets';
-  this._flagship_static_lcpaths = {};
-  this._flagship_static_lcpaths['/wwtweb/2massoct.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/bingdemtile.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/bingdemtile2.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/catalog.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/catalog2.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/dem.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/dembath.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/demmars.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/demtile.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/dss.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/dsstoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/dusttoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/earthblend.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/earthmerbath.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/fixedaltitudedemtile.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/g360.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/galex4far.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/galex4near.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/galextoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/gettile.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/gettour.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/gettourfile.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/gettours.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/glimpse.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/halphatoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/hirise.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/hirisedem2.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/hirisedem3.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/jupiter.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/mandel.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/mandel1.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/mars.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/marsdem.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/marshirise.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/marsmoc.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/martiantile.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/martiantile2.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/mipsgal.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/moondem.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/moonoct.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/moontoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/moontoastdem.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/postmars.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/postmarsdem.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/postmarsdem2.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/rasstoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/sdsstoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/sdsstoast2.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/sdsstoast2.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/thumbnail.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/tiles.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/tiles2.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/tilesthumb.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/twomasstoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/tychooct.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/veblend.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/vlsstoast.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/wmap.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/wmsmoon.aspx'] = true;
-  this._flagship_static_lcpaths['/wwtweb/wmstoast.aspx'] = true;
-}
-
-var URLHelpers$ = {
-  overrideAssetBaseurl: function (baseurl) {
-    this._engine_asset_baseurl = baseurl;
-  },
-
-  rewrite: function (url, rwmode) {
-    var lc = url.toLowerCase();
-    var lcproto;
-    var url_no_protocol;
-    if (ss.startsWith(lc, 'http://')) {
-      lcproto = 'http:';
-      url_no_protocol = url.substring(7);
-    } else if (ss.startsWith(lc, 'https://')) {
-      lcproto = 'https:';
-      url_no_protocol = url.substring(8);
-    } else if (ss.startsWith(lc, '//')) {
-      lcproto = '';
-      url_no_protocol = url.substring(2);
-    } else if (ss.startsWith(lc, 'blob:')) {
-      return url;
-    } else {
-      switch (rwmode) {
-        case 0:
-        default:
-          lcproto = '';
-          url_no_protocol = url;
-          break;
-        case 1:
-          url = (new URL(url, window.location.href)).toString();
-          return this.rewrite(url, 0);
-      }
-    }
-    if (WWTControl.singleton.freestandingMode) {
-      return url;
-    }
-    var domain;
-    var rest;
-    var slash_index = url_no_protocol.indexOf('/');
-    if (slash_index < 0) {
-      domain = url_no_protocol;
-      rest = '/';
-    } else {
-      domain = url_no_protocol.substring(0, slash_index);
-      rest = url_no_protocol.substring(slash_index);
-    }
-    var lcdomain = domain.toLowerCase();
-    var lcpath = rest.toLowerCase().split('?')[0];
-    if (!ss.keyExists(this._domain_handling, lcdomain)) {
-      if (ss.startsWith(lcdomain, 'localhost:') || ss.startsWith(lcdomain, '127.0.0.1:')) {
-        this._domain_handling[lcdomain] = 1;
-      }
-      else {
-        this._domain_handling[lcdomain] = 3;
-      }
-    }
-    var mode = this._domain_handling[lcdomain];
-    switch (mode) {
-      case 1:
-        return url;
-      case 2:
-      case 3:
-      default:
-        if (this._force_https && lcproto !== 'https:') {
-          return 'https://' + domain + rest;
-        }
-        return url;
-      case 4:
-        if (!lcproto) {
-          url = 'http://' + url;
-        }
-        url = ss.replaceString(ss.replaceString(encodeURIComponent(url), '%7B', '{'), '%7D', '}');
-        return this._core_dynamic_baseurl + '/webserviceproxy.aspx?targeturl=' + url;
-      case 0:
-        var is_static = false;
-        if (ss.startsWith(lcpath, '/data/')) {
-          is_static = true;
-        }
-        else if (ss.keyExists(this._flagship_static_lcpaths, lcpath)) {
-          is_static = true;
-        }
-        else if (ss.startsWith(lcpath, '/content/')) {
-          is_static = true;
-        }
-        else if (ss.startsWith(lcpath, '/engine/assets/')) {
-          is_static = true;
-        }
-        if (is_static) {
-          return this._core_static_baseurl + rest;
-        }
-        return this._core_dynamic_baseurl + rest;
-    }
-  },
-
-  activateProxy: function (url) {
-    if (WWTControl.singleton.freestandingMode) {
-      return null;
-    }
-    var lc = url.toLowerCase();
-    var url_no_protocol;
-    if (ss.startsWith(lc, 'http://')) {
-      url_no_protocol = url.substring(7);
-    } else if (ss.startsWith(lc, 'https://')) {
-      url_no_protocol = url.substring(8);
-    } else if (ss.startsWith(lc, '//')) {
-      url_no_protocol = url.substring(2);
-    } else {
-      url_no_protocol = url;
-    }
-    var lcdomain;
-    var slash_index = url_no_protocol.indexOf('/');
-    if (slash_index < 0) {
-      lcdomain = url_no_protocol;
-    } else {
-      lcdomain = url_no_protocol.substring(0, slash_index).toLowerCase();
-    }
-    if (!ss.keyExists(this._domain_handling, lcdomain)) {
-      if (ss.startsWith(lcdomain, 'localhost:') || ss.startsWith(lcdomain, '127.0.0.1:')) {
-        this._domain_handling[lcdomain] = 1;
-      }
-      else {
-        this._domain_handling[lcdomain] = 3;
-      }
-    }
-    var mode = this._domain_handling[lcdomain];
-    if (!mode || mode === 2 || mode === 1) {
-      return null;
-    }
-    this._domain_handling[lcdomain] = 4;
-    return this.rewrite(url, 0);
-  },
-
-  engineAssetUrl: function (subpath) {
-    return ss.format('{0}/{1}', this._engine_asset_baseurl, subpath);
-  },
-
-  coreDynamicUrl: function (subpath) {
-    return ss.format('{0}/{1}', this._core_dynamic_baseurl, subpath);
-  },
-
-  coreStaticUrl: function (subpath) {
-    return ss.format('{0}/{1}', this._core_static_baseurl, subpath);
-  }
-};
-
-registerType("URLHelpers", [URLHelpers, URLHelpers$, null]);
 
 
 // wwtlib.Annotation
@@ -6048,120 +5794,6 @@ var Tessellator$ = {
 
 registerType("Tessellator", [Tessellator, Tessellator$, null]);
 
-// wwtlib.Texture
-
-export function Texture() {
-  this.imageElement = null;
-  this.texture2d = null;
-  this._downloading = false;
-  this._ready = false;
-  this._errored = false;
-  this.URL = '';
-}
-
-Texture.empty = null;
-
-Texture.getEmpty = function () {
-  if (Texture.empty == null) {
-    Texture.empty = tilePrepDevice.createTexture();
-    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, Texture.empty);
-    tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
-  }
-  return Texture.empty;
-};
-
-Texture.fromUrl = function (url) {
-  var tex = new Texture();
-  tex.load(url);
-  return tex;
-};
-
-Texture.isPowerOfTwo = function (val) {
-  return !(val & (val - 1));
-};
-
-Texture.fitPowerOfTwo = function (val) {
-  val--;
-  for (var i = 1; i < 32; i <<= 1) {
-    val = val | val >> i;
-  }
-  return val + 1;
-};
-
-var Texture$ = {
-  cleanUp: function () {
-    this.imageElement = null;
-    tilePrepDevice.deleteTexture(this.texture2d);
-  },
-
-  dispose: function () {
-    this.cleanUp();
-  },
-
-  load: function (url) {
-    var $this = this;
-
-    this.URL = url;
-    if (typeof document === "undefined") { return; }
-    if (!this._downloading) {
-      this._downloading = true;
-      this.imageElement = document.createElement('img');
-      var xdomimg = this.imageElement;
-      this.imageElement.addEventListener('load', function (e) {
-        $this._ready = true;
-        $this._downloading = false;
-        $this._errored = false;
-        $this.makeTexture();
-      }, false);
-      this.imageElement.addEventListener('error', function (e) {
-        if (!$this.imageElement.hasAttribute('proxyattempt')) {
-          $this.imageElement.setAttribute('proxyattempt', true);
-          var new_url = URLHelpers.singleton.activateProxy($this.URL);
-          if (new_url != null) {
-            $this.imageElement.src = new_url;
-            return;
-          }
-        }
-        $this._downloading = false;
-        $this._ready = false;
-        $this._errored = true;
-      }, false);
-      xdomimg.crossOrigin = 'anonymous';
-      this.imageElement.src = this.URL;
-    }
-  },
-
-  makeTexture: function () {
-    if (tilePrepDevice != null) {
-      try {
-        this.texture2d = tilePrepDevice.createTexture();
-        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, this.texture2d);
-        var image = this.imageElement;
-        if ((!Texture.isPowerOfTwo(this.imageElement.height) | !Texture.isPowerOfTwo(this.imageElement.width)) === 1) {
-          var temp = document.createElement('canvas');
-          temp.height = Texture.fitPowerOfTwo(image.height);
-          temp.width = Texture.fitPowerOfTwo(image.width);
-          var ctx = temp.getContext('2d');
-          ctx.drawImage(image, 0, 0, temp.width, temp.height);
-          image = temp;
-        }
-        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
-        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_T, WEBGL.CLAMP_TO_EDGE);
-        tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, image);
-        tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
-        tilePrepDevice.generateMipmap(WEBGL.TEXTURE_2D);
-        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
-      }
-      catch ($e1) {
-        this._errored = true;
-      }
-    }
-  }
-};
-
-registerType("Texture", [Texture, Texture$, null, ss.IDisposable]);
-
 // wwtlib.Grids
 
 export function Grids() { }
@@ -6279,7 +5911,7 @@ Grids.drawStars3D = function (renderContext, opacity) {
 };
 
 Grids.initStarVertexBuffer = function (renderContext) {
-  if (!Grids._starsDownloading && !WWTControl.singleton.freestandingMode) {
+  if (!Grids._starsDownloading && !freestandingMode) {
     Grids.getStarFile(URLHelpers.singleton.coreStaticUrl('wwtweb/catalog.aspx?Q=hipparcos'));
     Grids._starsDownloading = true;
   }
@@ -6456,7 +6088,7 @@ Grids.initializeCosmos = function (br) {
 };
 
 Grids._downloadCosmosFile = function () {
-  if (!Grids._downloadingGalaxy && !WWTControl.singleton.freestandingMode) {
+  if (!Grids._downloadingGalaxy && !freestandingMode) {
     Grids.getGalaxyFile(URLHelpers.singleton.coreStaticUrl('wwtweb/catalog.aspx?Q=cosmosnewbin'));
     Grids._downloadingGalaxy = true;
   }
@@ -7444,7 +7076,7 @@ var Imageset$ = {
   },
 
   get_demUrl: function () {
-    if (ss.emptyString(this.demUrl) && !this._projection && !WWTControl.singleton.freestandingMode) {
+    if (ss.emptyString(this.demUrl) && !this._projection && !freestandingMode) {
       return URLHelpers.singleton.coreStaticUrl('wwtweb/BingDemTile.aspx?Q={0},{1},{2}');
     }
     return this.demUrl;
@@ -8842,7 +8474,7 @@ LayerManager.oneTimeInitialization = function () {
 LayerManager.initLayers = function () {
   LayerManager._clearLayers();
   var iss = null;
-  var doISS = !LayerManager.get_tourLayers() && !WWTControl.singleton.freestandingMode;
+  var doISS = !LayerManager.get_tourLayers() && !freestandingMode;
   if (doISS) {
     iss = new LayerMap('ISS', 18);
     iss.frame.epoch = SpaceTimeController._twoLineDateToJulian('10184.51609218');
@@ -13582,7 +13214,7 @@ MinorPlanets.drawMPC3D = function (renderContext, opacity, centerPoint) {
 };
 
 MinorPlanets._startInit = function () {
-  if (!WWTControl.singleton.freestandingMode) {
+  if (!freestandingMode) {
     MinorPlanets.getMpcFile(URLHelpers.singleton.coreStaticUrl('wwtweb/catalog.aspx?Q=mpcbin'));
   }
 };
@@ -13993,7 +13625,7 @@ var Place$ = {
       if (name.indexOf(';') > -1) {
         name = name.substr(0, name.indexOf(';'));
       }
-      if (this.get_classification() === 1 || WWTControl.singleton.freestandingMode) {
+      if (this.get_classification() === 1 || freestandingMode) {
         return URLHelpers.singleton.engineAssetUrl('thumb_star.jpg');
       }
       return URLHelpers.singleton.coreStaticUrl('wwtweb/thumbnail.aspx?name=' + name.toLowerCase());
@@ -19532,7 +19164,7 @@ var Tile$ = {
 
   get_demURL: function () {
     var rewritten_url = URLHelpers.singleton.rewrite(this.dataset.get_demUrl(), 0);
-    if (!this.dataset.get_projection() && !WWTControl.singleton.freestandingMode) {
+    if (!this.dataset.get_projection() && !freestandingMode) {
       var baseUrl = URLHelpers.singleton.coreStaticUrl('wwtweb/demtile.aspx?q={0},{1},{2},M');
       if (!ss.emptyString(rewritten_url)) {
         baseUrl = rewritten_url;
@@ -19992,7 +19624,7 @@ var Tour$ = {
   get_thumbnailUrl: function () {
     if (!ss.emptyString(this._thumbnailUrlField)) {
       return this._thumbnailUrlField;
-    } else if (WWTControl.singleton.freestandingMode) {
+    } else if (freestandingMode) {
       return URLHelpers.singleton.engineAssetUrl('thumb_star.jpg');
     }
     return ss.format(URLHelpers.singleton.coreStaticUrl('wwtweb/GetTourThumbnail.aspx?GUID={0}'), this.id);
@@ -20004,7 +19636,7 @@ var Tour$ = {
   },
 
   get_tourUrl: function () {
-    if (ss.emptyString(this._tourUrl) && !WWTControl.singleton.freestandingMode) {
+    if (ss.emptyString(this._tourUrl) && !freestandingMode) {
       return ss.format(URLHelpers.singleton.coreStaticUrl('wwtweb/GetTour.aspx?GUID={0}'), this.id);
     } else {
       return this._tourUrl;
@@ -30140,7 +29772,7 @@ var WWTControlBuilder$ = {
     } else {
       trueStartMode = 'sky';
     }
-    WWTControl.singleton.freestandingMode = freestandingMode;
+    set_freestandingMode(freestandingMode);
     if (freestandingMode) {
       URLHelpers.singleton.overrideAssetBaseurl(this._freestandingAssetBaseurl);
     }
@@ -40883,7 +40515,7 @@ ISSLayer._issmodel$2 = null;
 ISSLayer._doc$2 = null;
 
 ISSLayer.loadBackground = function () {
-  if (ISSLayer._loading$2 || WWTControl.singleton.freestandingMode) {
+  if (ISSLayer._loading$2 || freestandingMode) {
     return;
   }
   ISSLayer._loading$2 = true;
@@ -41166,8 +40798,6 @@ var SkyImageTile$ = {
 registerType("SkyImageTile", [SkyImageTile, SkyImageTile$, TangentTile]);
 
 // Statics with nontrivial initialization:
-
-URLHelpers.singleton = new URLHelpers();
 
 LayerManager._frameWizardDialog = new FrameWizard();
 LayerManager._dataVizWizardDialog = new DataVizWizard();

@@ -54,6 +54,7 @@ export { CAAStellarMagnitudes } from "./astrocalc/stellar_magnitudes.js";
 
 export { BlendState } from "./blend_state.js";
 export { Color, Colors } from "./color.js";
+export { URLHelpers, URLRewriteMode } from "./url_helpers.js";
 
 export {
     LocationHint,
@@ -99,9 +100,10 @@ export {
     PositionNormalTexturedTangentVertexBuffer,
 } from "./graphics/gl_buffers.js"
 
+import { Texture } from "./graphics/texture.js";
+
 export {
     ScaleTypes,
-    URLRewriteMode,
     SolarSystemObjects,
     InterpolationType,
     PointType,
@@ -158,7 +160,6 @@ export {
     HealpixUtils,
     Hploc,
     Pointing,
-    URLHelpers,
     Annotation,
     CameraParameters,
     Constellations,
@@ -194,7 +195,6 @@ export {
     ShapeSpriteShader,
     TextShader,
     Tessellator,
-    Texture,
     Grids,
     Imageset,
     ViewMoverKenBurnsStyle,
