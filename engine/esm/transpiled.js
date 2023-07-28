@@ -711,7 +711,7 @@ registerEnum("StateType", StateType);
 
 // wwtlib.IFolder
 
-/*internal*/ function IFolder() { }
+export function IFolder() { }
 
 registerType("IFolder", [IFolder]);
 
@@ -5930,7 +5930,7 @@ registerType("TextShader", [TextShader, TextShader$, null]);
 
 // wwtlib.Sprite2d
 
-/*internal*/ function Sprite2d() {
+export function Sprite2d() {
   this.vertCount = 0;
 }
 
@@ -8042,7 +8042,7 @@ registerType("ViewMoverKenBurnsStyle", [ViewMoverKenBurnsStyle, ViewMoverKenBurn
 
 // wwtlib.ViewMoverSlew
 
-/*internal*/ function ViewMoverSlew() {
+export function ViewMoverSlew() {
   this._upTargetTime = 0;
   this._downTargetTime = 0;
   this._toTargetTime = 0;
@@ -10825,7 +10825,7 @@ registerType("Mesh", [Mesh, Mesh$, null, ss.IDisposable]);
 
 // wwtlib.VertexPosition
 
-/*internal*/ function VertexPosition() {
+export function VertexPosition() {
   this.index = 0;
 }
 
@@ -13625,7 +13625,7 @@ registerType("WcsImage", [WcsImage, WcsImage$, null]);
 
 // wwtlib.MinorPlanets
 
-/*internal*/ function MinorPlanets() { }
+export function MinorPlanets() { }
 
 MinorPlanets.mpcList = [];
 MinorPlanets._initBegun = false;
@@ -19847,7 +19847,7 @@ registerType("Tile", [Tile, Tile$, null]);
 
 // wwtlib.TileCache
 
-/*internal*/ function TileCache() { }
+export function TileCache() { }
 
 TileCache._queue = {};
 TileCache._tiles = {};
@@ -20111,7 +20111,7 @@ registerType("TileCache", [TileCache, TileCache$, null]);
 
 // wwtlib.DistanceCalc
 
-/*internal*/ function DistanceCalc() { }
+export function DistanceCalc() { }
 
 DistanceCalc.lineToPoint = function (l0, l1, p) {
   var v = Vector3d.subtractVectors(l1, l0);
@@ -27167,7 +27167,7 @@ registerType("UndoTourPropertiesChange", [UndoTourPropertiesChange, UndoTourProp
 
 // wwtlib.Triangle
 
-/*internal*/ function Triangle() {
+export function Triangle() {
   this.a = 0;
   this.b = 0;
   this.c = 0;
@@ -33375,7 +33375,7 @@ registerType("ImageSetLayer", [ImageSetLayer, ImageSetLayer$, Layer]);
 
 // wwtlib.LayerCollection
 
-/*internal*/ function LayerCollection() {
+export function LayerCollection() {
   Layer.call(this);
 }
 
