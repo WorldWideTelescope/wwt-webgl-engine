@@ -6,6 +6,7 @@
 import { registerType } from "./typesystem.js";
 import { ss } from "./ss.js";
 import { Color } from "./color.js";
+import { tileUvMultiple } from "./render_globals.js";
 
 
 // Break some circular dependencies
@@ -15,13 +16,7 @@ import { Color } from "./color.js";
 // degrees rather than radians, and the Coordinates class applies some
 // transformations in various places. Out of an abundance of caution we
 // reproduce its calculations rotely.
-//
-// In the web engine, the variable `Tile.uvMultiple` is a global that is
-// initialized to 256, but then overwritten to 1 almost immediately. It must be
-// intended to be a per-tile property, but (probably due to some ScriptSharp
-// limitation) is a static in practice.
 
-const TILE_UV_MULTIPLE = 1;
 const RC = (3.1415927 / 180); // not thrilled about the low precision!
 
 function geoTo3dDouble(lat, lng) {
@@ -93,8 +88,8 @@ export function PositionTexture() {
 //     component of the texture coordinate.
 PositionTexture.createPos = function (pos, u, v) {
     var temp = new PositionTexture();
-    temp.tu = u * TILE_UV_MULTIPLE;
-    temp.tv = v * TILE_UV_MULTIPLE;
+    temp.tu = u * tileUvMultiple;
+    temp.tv = v * tileUvMultiple;
     temp.position = pos;
     return temp;
 };
@@ -139,8 +134,8 @@ PositionTexture.createPosSize = function (pos, u, v, width, height) {
 PositionTexture.create = function (xvalue, yvalue, zvalue, u, v) {
     var temp = new PositionTexture();
     temp.position = Vector3d.create(xvalue, yvalue, zvalue);
-    temp.tu = u * TILE_UV_MULTIPLE;
-    temp.tv = v * TILE_UV_MULTIPLE;
+    temp.tu = u * tileUvMultiple;
+    temp.tv = v * tileUvMultiple;
     return temp;
 };
 
@@ -187,8 +182,8 @@ export function PositionColoredTextured() {
 //     component of the texture coordinate.
 PositionColoredTextured.createPos = function (pos, u, v) {
     var temp = new PositionColoredTextured();
-    temp.tu = u * TILE_UV_MULTIPLE;
-    temp.tv = v * TILE_UV_MULTIPLE;
+    temp.tu = u * tileUvMultiple;
+    temp.tv = v * tileUvMultiple;
     temp.position = pos;
     return temp;
 };
@@ -235,8 +230,8 @@ PositionColoredTextured.createPosSize = function (pos, u, v, width, height) {
 PositionColoredTextured.create = function (xvalue, yvalue, zvalue, u, v) {
     var temp = new PositionTexture();
     temp.position = Vector3d.create(xvalue, yvalue, zvalue);
-    temp.tu = u * TILE_UV_MULTIPLE;
-    temp.tv = v * TILE_UV_MULTIPLE;
+    temp.tu = u * tileUvMultiple;
+    temp.tv = v * tileUvMultiple;
     return temp;
 };
 

@@ -100,7 +100,26 @@ export {
     PositionNormalTexturedTangentVertexBuffer,
 } from "./graphics/gl_buffers.js"
 
-import { Texture } from "./graphics/texture.js";
+export { Texture } from "./graphics/texture.js";
+
+export {
+    SimpleLineShader,
+    SimpleLineShader2D,
+    OrbitLineShader,
+    LineShaderNormalDates,
+    TimeSeriesPointSpriteShader,
+    KeplerPointSpriteShader,
+    EllipseShader,
+    ModelShader,
+    ModelShaderTan,
+    TileShader,
+    FitsShader,
+    ImageShader,
+    ImageShader2,
+    SpriteShader,
+    ShapeSpriteShader,
+    TextShader,
+} from "./graphics/shaders.js";
 
 export {
     ScaleTypes,
@@ -178,22 +197,6 @@ export {
     PointList,
     TimeSeriesLineVertex,
     TimeSeriesPointVertex,
-    SimpleLineShader,
-    SimpleLineShader2D,
-    OrbitLineShader,
-    LineShaderNormalDates,
-    TimeSeriesPointSpriteShader,
-    KeplerPointSpriteShader,
-    EllipseShader,
-    ModelShader,
-    ModelShaderTan,
-    TileShader,
-    FitsShader,
-    ImageShader,
-    ImageShader2,
-    SpriteShader,
-    ShapeSpriteShader,
-    TextShader,
     Tessellator,
     Grids,
     Imageset,

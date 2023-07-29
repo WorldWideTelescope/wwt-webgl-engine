@@ -15,3 +15,18 @@ export var tilePrepDevice = null;
 export function set_tilePrepDevice(value) {
     tilePrepDevice = value;
 }
+
+// This used to be Tile.uvMultiple. It's some GL rendering state variable.
+export var tileUvMultiple = 256;
+
+export function set_tileUvMultiple(value) {
+    tileUvMultiple = value;
+}
+
+// This used to be Tile.demEnabled. It controls whether DEM rendering is
+// enabled, hopefully?
+export var tileDemEnabled = false;
+
+export function set_tileDemEnabled(value) {
+    tileDemEnabled = !!value;
+}
