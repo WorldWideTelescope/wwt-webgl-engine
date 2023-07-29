@@ -101,6 +101,7 @@ export {
 } from "./graphics/gl_buffers.js"
 
 export { Texture } from "./graphics/texture.js";
+export { Tessellator } from "./graphics/tessellator.js";
 
 export {
     SimpleLineShader,
@@ -201,7 +202,6 @@ export {
     Folder,
     FolderBrowser,
     FolderUp,
-    Tessellator,
     Grids,
     Imageset,
     ViewMoverKenBurnsStyle,
