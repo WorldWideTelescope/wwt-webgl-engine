@@ -142,6 +142,13 @@ export {
 export { Bitmap } from "./utilities/bitmap.js";
 
 export {
+    ContextMenuStrip,
+    ToolStripMenuItem,
+    ToolStripSeparator,
+    TagMe,
+} from "./utilities/context_menu_strip.js";
+
+export {
     ScaleTypes,
     SolarSystemObjects,
     InterpolationType,
@@ -282,9 +289,6 @@ export {
     UndoTourPropertiesChange,
     UiTools,
     ColorPicker,
-    ContextMenuStrip,
-    ToolStripMenuItem,
-    TagMe,
     Dialog,
     Histogram,
     SimpleInput,
@@ -328,7 +332,6 @@ export {
     ShapeOverlay,
     AudioOverlay,
     FlipbookOverlay,
-    ToolStripSeparator,
     FrameWizard,
     ReferenceFrameProps,
     GreatCircleDialog,
