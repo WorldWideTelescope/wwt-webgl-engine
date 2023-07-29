@@ -148,6 +148,8 @@ export {
     TagMe,
 } from "./utilities/context_menu_strip.js";
 
+export { SimpleInput } from "./utilities/simple_input.js";
+
 export {
     ScaleTypes,
     SolarSystemObjects,
@@ -291,7 +293,6 @@ export {
     ColorPicker,
     Dialog,
     Histogram,
-    SimpleInput,
     XmlTextWriter,
     VizLayer,
     WebFile,
