@@ -149,6 +149,7 @@ export {
 } from "./utilities/context_menu_strip.js";
 
 export { SimpleInput } from "./utilities/simple_input.js";
+export { XmlTextWriter } from "./utilities/xml_text_writer.js";
 
 export {
     ScaleTypes,
@@ -293,7 +294,6 @@ export {
     ColorPicker,
     Dialog,
     Histogram,
-    XmlTextWriter,
     VizLayer,
     WebFile,
     FolderDownloadAction,
