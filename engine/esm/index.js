@@ -139,6 +139,8 @@ export {
     TimeSeriesPointVertex,
 } from "./graphics/primitives3d.js";
 
+export { Bitmap } from "./utilities/bitmap.js";
+
 export {
     ScaleTypes,
     SolarSystemObjects,
@@ -279,7 +281,6 @@ export {
     UndoTourSlidelistChange,
     UndoTourPropertiesChange,
     UiTools,
-    Bitmap,
     ColorPicker,
     ContextMenuStrip,
     ToolStripMenuItem,
