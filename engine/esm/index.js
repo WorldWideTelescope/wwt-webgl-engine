@@ -103,6 +103,8 @@ export {
 export { Texture } from "./graphics/texture.js";
 export { Tessellator } from "./graphics/tessellator.js";
 
+export { BinaryReader } from "./utilities/binary_reader.js";
+
 export {
     SimpleLineShader,
     SimpleLineShader2D,
@@ -277,7 +279,6 @@ export {
     UndoTourSlidelistChange,
     UndoTourPropertiesChange,
     UiTools,
-    BinaryReader,
     Bitmap,
     ColorPicker,
     ContextMenuStrip,
