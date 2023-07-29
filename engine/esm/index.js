@@ -103,10 +103,6 @@ export {
 export { Texture } from "./graphics/texture.js";
 export { Tessellator } from "./graphics/tessellator.js";
 
-export { BinaryReader } from "./utilities/binary_reader.js";
-
-export { Coordinates } from "./coordinates.js";
-
 export {
     SimpleLineShader,
     SimpleLineShader2D,
@@ -150,8 +146,12 @@ export {
     TagMe,
 } from "./utilities/context_menu_strip.js";
 
+export { BinaryReader } from "./utilities/binary_reader.js";
 export { SimpleInput } from "./utilities/simple_input.js";
 export { XmlTextWriter } from "./utilities/xml_text_writer.js";
+
+export { Coordinates } from "./coordinates.js";
+export { FastMath } from "./fast_math.js";
 
 export {
     ScaleTypes,
@@ -203,7 +203,6 @@ export {
     VideoOutputType,
     FitsProperties,
     HipsProperties,
-    FastMath,
     HealpixTables,
     Xyf,
     HealpixUtils,
