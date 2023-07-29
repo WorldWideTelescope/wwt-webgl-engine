@@ -105,6 +105,8 @@ export { Tessellator } from "./graphics/tessellator.js";
 
 export { BinaryReader } from "./utilities/binary_reader.js";
 
+export { Coordinates } from "./coordinates.js";
+
 export {
     SimpleLineShader,
     SimpleLineShader2D,
@@ -301,7 +303,6 @@ export {
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    Coordinates,
     Fxyf,
     HealpixTile,
     FitsImage,
