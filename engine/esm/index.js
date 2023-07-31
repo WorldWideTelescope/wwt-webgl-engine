@@ -152,6 +152,10 @@ export { XmlTextWriter } from "./utilities/xml_text_writer.js";
 
 export { Coordinates } from "./coordinates.js";
 export { FastMath } from "./fast_math.js";
+export { HealpixTables } from "./healpix_tables.js";
+export { HealpixUtils } from "./healpix_utils.js";
+export { Hploc } from "./hploc.js";
+export { Fxyf } from "./fxyf.js";
 
 export {
     ScaleTypes,
@@ -203,10 +207,7 @@ export {
     VideoOutputType,
     FitsProperties,
     HipsProperties,
-    HealpixTables,
     Xyf,
-    HealpixUtils,
-    Hploc,
     Pointing,
     Annotation,
     CameraParameters,
@@ -302,7 +303,6 @@ export {
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    Fxyf,
     HealpixTile,
     FitsImage,
     Circle,

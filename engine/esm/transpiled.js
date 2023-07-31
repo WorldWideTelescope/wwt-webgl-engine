@@ -113,7 +113,8 @@ import { SimpleInput } from "./utilities/simple_input.js";
 import { XmlTextWriter } from "./utilities/xml_text_writer.js";
 
 import { Coordinates } from "./coordinates.js";
-import { FastMath } from "./fast_math.js";
+import { HealpixUtils } from "./healpix_utils.js";
+import { Fxyf } from "./fxyf.js";
 
 
 // wwtlib.ScaleTypes
@@ -943,21 +944,6 @@ var HipsProperties$ = {
 
 registerType("HipsProperties", [HipsProperties, HipsProperties$, null]);
 
-// wwtlib.HealpixTables
-
-export function HealpixTables() { }
-
-HealpixTables.ctab = [0, 1, 256, 257, 2, 3, 258, 259, 512, 513, 768, 769, 514, 515, 770, 771, 4, 5, 260, 261, 6, 7, 262, 263, 516, 517, 772, 773, 518, 519, 774, 775, 1024, 1025, 1280, 1281, 1026, 1027, 1282, 1283, 1536, 1537, 1792, 1793, 1538, 1539, 1794, 1795, 1028, 1029, 1284, 1285, 1030, 1031, 1286, 1287, 1540, 1541, 1796, 1797, 1542, 1543, 1798, 1799, 8, 9, 264, 265, 10, 11, 266, 267, 520, 521, 776, 777, 522, 523, 778, 779, 12, 13, 268, 269, 14, 15, 270, 271, 524, 525, 780, 781, 526, 527, 782, 783, 1032, 1033, 1288, 1289, 1034, 1035, 1290, 1291, 1544, 1545, 1800, 1801, 1546, 1547, 1802, 1803, 1036, 1037, 1292, 1293, 1038, 1039, 1294, 1295, 1548, 1549, 1804, 1805, 1550, 1551, 1806, 1807, 2048, 2049, 2304, 2305, 2050, 2051, 2306, 2307, 2560, 2561, 2816, 2817, 2562, 2563, 2818, 2819, 2052, 2053, 2308, 2309, 2054, 2055, 2310, 2311, 2564, 2565, 2820, 2821, 2566, 2567, 2822, 2823, 3072, 3073, 3328, 3329, 3074, 3075, 3330, 3331, 3584, 3585, 3840, 3841, 3586, 3587, 3842, 3843, 3076, 3077, 3332, 3333, 3078, 3079, 3334, 3335, 3588, 3589, 3844, 3845, 3590, 3591, 3846, 3847, 2056, 2057, 2312, 2313, 2058, 2059, 2314, 2315, 2568, 2569, 2824, 2825, 2570, 2571, 2826, 2827, 2060, 2061, 2316, 2317, 2062, 2063, 2318, 2319, 2572, 2573, 2828, 2829, 2574, 2575, 2830, 2831, 3080, 3081, 3336, 3337, 3082, 3083, 3338, 3339, 3592, 3593, 3848, 3849, 3594, 3595, 3850, 3851, 3084, 3085, 3340, 3341, 3086, 3087, 3342, 3343, 3596, 3597, 3852, 3853, 3598, 3599, 3854, 3855];
-HealpixTables.utab = [0, 1, 4, 5, 16, 17, 20, 21, 64, 65, 68, 69, 80, 81, 84, 85, 256, 257, 260, 261, 272, 273, 276, 277, 320, 321, 324, 325, 336, 337, 340, 341, 1024, 1025, 1028, 1029, 1040, 1041, 1044, 1045, 1088, 1089, 1092, 1093, 1104, 1105, 1108, 1109, 1280, 1281, 1284, 1285, 1296, 1297, 1300, 1301, 1344, 1345, 1348, 1349, 1360, 1361, 1364, 1365, 4096, 4097, 4100, 4101, 4112, 4113, 4116, 4117, 4160, 4161, 4164, 4165, 4176, 4177, 4180, 4181, 4352, 4353, 4356, 4357, 4368, 4369, 4372, 4373, 4416, 4417, 4420, 4421, 4432, 4433, 4436, 4437, 5120, 5121, 5124, 5125, 5136, 5137, 5140, 5141, 5184, 5185, 5188, 5189, 5200, 5201, 5204, 5205, 5376, 5377, 5380, 5381, 5392, 5393, 5396, 5397, 5440, 5441, 5444, 5445, 5456, 5457, 5460, 5461, 16384, 16385, 16388, 16389, 16400, 16401, 16404, 16405, 16448, 16449, 16452, 16453, 16464, 16465, 16468, 16469, 16640, 16641, 16644, 16645, 16656, 16657, 16660, 16661, 16704, 16705, 16708, 16709, 16720, 16721, 16724, 16725, 17408, 17409, 17412, 17413, 17424, 17425, 17428, 17429, 17472, 17473, 17476, 17477, 17488, 17489, 17492, 17493, 17664, 17665, 17668, 17669, 17680, 17681, 17684, 17685, 17728, 17729, 17732, 17733, 17744, 17745, 17748, 17749, 20480, 20481, 20484, 20485, 20496, 20497, 20500, 20501, 20544, 20545, 20548, 20549, 20560, 20561, 20564, 20565, 20736, 20737, 20740, 20741, 20752, 20753, 20756, 20757, 20800, 20801, 20804, 20805, 20816, 20817, 20820, 20821, 21504, 21505, 21508, 21509, 21520, 21521, 21524, 21525, 21568, 21569, 21572, 21573, 21584, 21585, 21588, 21589, 21760, 21761, 21764, 21765, 21776, 21777, 21780, 21781, 21824, 21825, 21828, 21829, 21840, 21841, 21844, 21845];
-HealpixTables.jrll = [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4];
-HealpixTables.jpll = [1, 3, 5, 7, 0, 2, 4, 6, 1, 3, 5, 7];
-HealpixTables.xoffset = [-1, -1, 0, 1, 1, 1, 0, -1];
-HealpixTables.yoffset = [0, 1, 1, 1, 0, -1, -1, -1];
-
-var HealpixTables$ = {};
-
-registerType("HealpixTables", [HealpixTables, HealpixTables$, null]);
-
 // wwtlib.Xyf
 
 export function Xyf() {
@@ -977,83 +963,6 @@ Xyf.create = function (x, y, f) {
 var Xyf$ = {};
 
 registerType("Xyf", [Xyf, Xyf$, null]);
-
-// wwtlib.HealpixUtils
-
-export function HealpixUtils() { }
-
-HealpixUtils.check = function (cond, errtxt) {
-  if (!cond) {
-    throw new Error(errtxt);
-  }
-};
-
-HealpixUtils.isqrt = function (arg) {
-  var res = Math.sqrt((arg) + 0.5);
-  if (arg < (1 << 50)) {
-    return res;
-  }
-  if (res * res > arg) {
-    --res;
-  }
-  else if ((res + 1) * (res + 1) <= arg) {
-    ++res;
-  }
-  return res;
-};
-
-HealpixUtils.cosdist_zphi = function (z1, phi1, z2, phi2) {
-  return z1 * z2 + FastMath.cos(phi1 - phi2) * Math.sqrt((1 - z1 * z1) * (1 - z2 * z2));
-};
-
-HealpixUtils.fmodulo = function (v1, v2) {
-  if (v1 >= 0) {
-    return (v1 < v2) ? v1 : v1 % v2;
-  }
-  var tmp = v1 % v2 + v2;
-  return (tmp === v2) ? 0 : tmp;
-};
-
-var HealpixUtils$ = {};
-
-registerType("HealpixUtils", [HealpixUtils, HealpixUtils$, null]);
-
-// wwtlib.Hploc
-
-export function Hploc() {
-  this.z = 0;
-  this.phi = 0;
-  this.sth = 0;
-  this.have_sth = false;
-}
-
-Hploc.create = function (v) {
-  var temp = new Hploc();
-  var xl = 1 / v.length();
-  temp.z = v.z * xl;
-  temp.phi = FastMath.atan2(v.y, v.x);
-  if (Math.abs(temp.z) > 0.99) {
-    temp.sth = Math.sqrt(v.x * v.x + v.y * v.y) * xl;
-    temp.have_sth = true;
-  }
-  return temp;
-};
-
-var Hploc$ = {
-  toVec3: function () {
-    var st;
-    if (this.have_sth) {
-      st = this.sth;
-    } else {
-      st = Math.sqrt((1 - this.z) * (1 + this.z));
-    }
-    var x = st * FastMath.cos(this.phi);
-    var y = st * FastMath.sin(this.phi);
-    return Vector3d.create(x, this.z, y);
-  }
-};
-
-registerType("Hploc", [Hploc, Hploc$, null]);
 
 // wwtlib.Pointing
 
@@ -26663,122 +26572,6 @@ export function WWTElementEvent(x, y) {
 var WWTElementEvent$ = {};
 
 registerType("WWTElementEvent", [WWTElementEvent, WWTElementEvent$, null]);
-
-// wwtlib.Fxyf
-
-export function Fxyf() {
-  this.fx = 0;
-  this.fy = 0;
-  this.face = 0;
-  HealpixTables.call(this);
-}
-
-Fxyf._halfpi$1 = Math.PI / 2;
-Fxyf._inv_halfpi$1 = 2 / Math.PI;
-Fxyf._twothird$1 = 2 / 3;
-
-Fxyf.create = function (x, y, f) {
-  var temp = new Fxyf();
-  temp.fx = x;
-  temp.fy = y;
-  temp.face = f;
-  return temp;
-};
-
-Fxyf._fromHploc$1 = function (loc) {
-  var temp = new Fxyf();
-  var z = loc.z, phi = loc.phi;
-  var za = Math.abs(z);
-  var tt = HealpixUtils.fmodulo((phi * Fxyf._inv_halfpi$1), 4);
-  if (za <= Fxyf._twothird$1) {
-    var temp1 = 0.5 + tt;
-    var temp2 = z * 0.75;
-    var jp = temp1 - temp2;
-    var jm = temp1 + temp2;
-    var ifp = jp;
-    var ifm = jm;
-    var face_num = (ifp === ifm) ? (ifp | 4) : ((ifp < ifm) ? ifp : (ifm + 8));
-    temp.fx = HealpixUtils.fmodulo(jm, 1);
-    temp.fy = 1 - HealpixUtils.fmodulo(jp, 1);
-    temp.face = face_num;
-  }
-  else {
-    var ntt = Math.min(3, ss.truncate(tt));
-    var tp = tt - ntt;
-    var tmp;
-    if ((za < 0.99) || (!loc.have_sth)) {
-      tmp = Math.sqrt(3 * (1 - za));
-    } else {
-      tmp = loc.sth / Math.sqrt((1 + za) / 3);
-    }
-    var jp = tp * tmp;
-    var jm = (1 - tp) * tmp;
-    if (jp >= 1) {
-      jp = 1;
-    }
-    if (jm >= 1) {
-      jm = 1;
-    }
-    if (z >= 0) {
-      temp.fx = 1 - jm;
-      temp.fy = 1 - jp;
-      temp.face = ntt;
-    } else {
-      temp.fx = jp;
-      temp.fy = jm;
-      temp.face = ntt + 8;
-    }
-  }
-  return temp;
-};
-
-Fxyf.fromVector = function (v) {
-  return Fxyf._fromHploc$1(Hploc.create(v));
-};
-
-var Fxyf$ = {
-  toHploc: function () {
-    var loc = new Hploc();
-    var jr = HealpixTables.jrll[this.face] - this.fx - this.fy;
-    var nr;
-    var tmp;
-    if (jr < 1) {
-      nr = jr;
-      tmp = nr * nr / 3;
-      loc.z = 1 - tmp;
-      if (loc.z > 0.99) {
-        loc.sth = Math.sqrt(tmp * (2 - tmp));
-        loc.have_sth = true;
-      }
-    } else if (jr > 3) {
-      nr = 4 - jr;
-      tmp = nr * nr / 3;
-      loc.z = tmp - 1;
-      if (loc.z < -0.99) {
-        loc.sth = Math.sqrt(tmp * (2 - tmp));
-        loc.have_sth = true;
-      }
-    } else {
-      nr = 1;
-      loc.z = (2 - jr) * 2 / 3;
-    }
-    tmp = HealpixTables.jpll[this.face] * nr + this.fx - this.fy;
-    if (tmp < 0) {
-      tmp += 8;
-    }
-    if (tmp >= 8) {
-      tmp -= 8;
-    }
-    loc.phi = (nr < 1E-15) ? 0 : (0.5 * Fxyf._halfpi$1 * tmp) / nr;
-    return loc;
-  },
-
-  toVec3: function () {
-    return this.toHploc().toVec3();
-  }
-};
-
-registerType("Fxyf", [Fxyf, Fxyf$, HealpixTables]);
 
 // wwtlib.HealpixTile
 
