@@ -165,6 +165,7 @@ export {
     ISettings,
     IUndoStep,
 } from "./interfaces.js";
+export { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
 
 export {
     ScaleTypes,
@@ -211,7 +212,6 @@ export {
     HipsProperties,
     Xyf,
     Pointing,
-    Annotation,
     CameraParameters,
     Constellations,
     Lineset,
@@ -307,9 +307,6 @@ export {
     WWTElementEvent,
     HealpixTile,
     FitsImage,
-    Circle,
-    Poly,
-    PolyLine,
     EquirectangularTile,
     ScaleLinear,
     ScaleLog,
