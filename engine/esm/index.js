@@ -156,6 +156,15 @@ export { HealpixTables } from "./healpix_tables.js";
 export { HealpixUtils } from "./healpix_utils.js";
 export { Hploc } from "./hploc.js";
 export { Fxyf } from "./fxyf.js";
+export {
+    IThumbnail,
+    IPlace,
+    IUiController,
+    IViewMover,
+    IUIServicesCallbacks,
+    ISettings,
+    IUndoStep,
+} from "./interfaces.js";
 
 export {
     ScaleTypes,
@@ -196,13 +205,6 @@ export {
     DialogResult,
     Formatting,
     StateType,
-    IThumbnail,
-    IPlace,
-    IUiController,
-    IViewMover,
-    IUIServicesCallbacks,
-    ISettings,
-    IUndoStep,
     GFX,
     VideoOutputType,
     FitsProperties,

@@ -115,6 +115,14 @@ import { XmlTextWriter } from "./utilities/xml_text_writer.js";
 import { Coordinates } from "./coordinates.js";
 import { HealpixUtils } from "./healpix_utils.js";
 import { Fxyf } from "./fxyf.js";
+import {
+  IThumbnail,
+  IPlace,
+  IUiController,
+  IViewMover,
+  ISettings,
+  IUndoStep,
+} from "./interfaces.js";
 
 
 // wwtlib.ScaleTypes
@@ -286,6 +294,8 @@ registerType("BandPass", BandPass);
 registerEnum("BandPass", BandPass);
 
 // wwtlib.Classification
+//
+// This was defined in `IPlace.cs`, which we've folded into `interfaces.js`.
 
 export var Classification = {
   star: 1,
@@ -526,6 +536,8 @@ registerType("Alignment", Alignment);
 registerEnum("Alignment", Alignment);
 
 // wwtlib.StockSkyOverlayTypes
+//
+// This was defined in `Tours/ISettings.cs`, which we've folded into `interfaces.js`.
 
 export var StockSkyOverlayTypes = {
   empty: 0,
@@ -722,55 +734,6 @@ export var StateType = {
 
 registerType("StateType", StateType);
 registerEnum("StateType", StateType);
-
-// wwtlib.IFolder
-
-export function IFolder() { }
-
-registerType("IFolder", [IFolder]);
-
-
-// wwtlib.IThumbnail
-
-export function IThumbnail() { }
-
-registerType("IThumbnail", [IThumbnail]);
-
-// wwtlib.IPlace
-
-export function IPlace() { }
-
-registerType("IPlace", [IPlace]);
-
-// wwtlib.IUiController
-
-export function IUiController() { }
-
-registerType("IUiController", [IUiController]);
-
-// wwtlib.IViewMover
-
-export function IViewMover() { }
-
-registerType("IViewMover", [IViewMover]);
-
-// wwtlib.IUIServicesCallbacks
-
-export function IUIServicesCallbacks() { }
-
-registerType("IUIServicesCallbacks", [IUIServicesCallbacks]);
-
-// wwtlib.ISettings
-
-export function ISettings() { }
-
-registerType("ISettings", [ISettings]);
-
-// wwtlib.IUndoStep
-
-export function IUndoStep() { }
-
-registerType("IUndoStep", [IUndoStep]);
 
 // GFX
 
@@ -4795,6 +4758,8 @@ var Imageset$ = {
 registerType("Imageset", [Imageset, Imageset$, null, IThumbnail]);
 
 // wwtlib.ViewMoverKenBurnsStyle
+//
+// This was defined in `IViewMover.cs`, which we've folded into `interfaces.js`.
 
 export function ViewMoverKenBurnsStyle(from, to, time, fromDateTime, toDateTime, type) {
   this.interpolationType = 0;
@@ -4872,6 +4837,8 @@ var ViewMoverKenBurnsStyle$ = {
 registerType("ViewMoverKenBurnsStyle", [ViewMoverKenBurnsStyle, ViewMoverKenBurnsStyle$, null, IViewMover]);
 
 // wwtlib.ViewMoverSlew
+//
+// This was defined in `IViewMover.cs`, which we've folded into `interfaces.js`.
 
 export function ViewMoverSlew() {
   this._upTargetTime = 0;
@@ -17183,6 +17150,8 @@ var FileCabinet$ = {
 registerType("FileCabinet", [FileCabinet, FileCabinet$, null]);
 
 // wwtlib.SettingParameter
+//
+// This was defined in `Tours/ISettings.cs`, which we've folded into `interfaces.js`.
 
 export function SettingParameter(edgeTrigger, opacity, targetState, filter) {
   this.targetState = false;
