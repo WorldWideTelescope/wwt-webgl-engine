@@ -166,11 +166,10 @@ export {
     IUndoStep,
 } from "./interfaces.js";
 export { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
+export { SolarSystemObjects, InterpolationType, CameraParameters } from "./camera_parameters.js";
 
 export {
     ScaleTypes,
-    SolarSystemObjects,
-    InterpolationType,
     PointType,
     FolderGroup,
     FolderRefreshType,
@@ -212,7 +211,6 @@ export {
     HipsProperties,
     Xyf,
     Pointing,
-    CameraParameters,
     Constellations,
     Lineset,
     Linepoint,
