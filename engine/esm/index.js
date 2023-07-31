@@ -167,6 +167,7 @@ export {
 } from "./interfaces.js";
 export { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
 export { SolarSystemObjects, InterpolationType, CameraParameters } from "./camera_parameters.js";
+export { StateType, WebFile } from "./web_file.js";
 
 export {
     ScaleTypes,
@@ -204,7 +205,6 @@ export {
     TransitionType,
     DialogResult,
     Formatting,
-    StateType,
     GFX,
     VideoOutputType,
     FitsProperties,
@@ -297,7 +297,6 @@ export {
     Dialog,
     Histogram,
     VizLayer,
-    WebFile,
     FolderDownloadAction,
     Wtml,
     WWTControl,
