@@ -137,6 +137,13 @@ export {
     TimeSeriesPointVertex,
 } from "./graphics/primitives3d.js";
 
+// These are new, post-C# APIs that we wouldn't normally expose, but they
+// support the test suite.
+export {
+    set_tilePrepDevice,
+    set_useGlVersion2
+} from "./render_globals.js";
+
 export { Bitmap } from "./utilities/bitmap.js";
 
 export {
@@ -169,6 +176,23 @@ export { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
 export { SolarSystemObjects, InterpolationType, CameraParameters } from "./camera_parameters.js";
 export { StateType, WebFile } from "./web_file.js";
 
+export { ColorMapContainer } from "./layers/color_map_container.js";
+export { WcsImage } from "./layers/wcs_image.js";
+export { FitsImage } from "./layers/fits_image.js";
+export {
+    DataTypes,
+    ScaleMap,
+    ScaleLinear,
+    ScaleLog,
+    ScalePow,
+    ScaleSqrt,
+    HistogramEqualization,
+    FitsImageJs,
+} from "./layers/fits_image_js.js";
+export { FitsImageTile } from "./layers/fits_image_tile.js";
+
+export { Tile } from "./tile.js";
+
 export {
     ScaleTypes,
     PointType,
@@ -180,7 +204,6 @@ export {
     ImageSetType,
     BandPass,
     Classification,
-    DataTypes,
     AltUnits,
     FadeType,
     ReferenceFrames,
@@ -222,8 +245,6 @@ export {
     Imageset,
     ViewMoverKenBurnsStyle,
     KeplerVertex,
-    ScaleMap,
-    ColorMapContainer,
     Layer,
     DomainValue,
     LayerManager,
@@ -248,7 +269,6 @@ export {
     VoTable,
     VoRow,
     VoColumn,
-    WcsImage,
     Place,
     KeplerianElements,
     BodyAngles,
@@ -267,7 +287,6 @@ export {
     Star,
     Galaxy,
     LatLngEdges,
-    Tile,
     Tour,
     FileEntry,
     FileCabinet,
@@ -303,13 +322,7 @@ export {
     WWTControlBuilder,
     WWTElementEvent,
     HealpixTile,
-    FitsImage,
     EquirectangularTile,
-    ScaleLinear,
-    ScaleLog,
-    ScalePow,
-    ScaleSqrt,
-    HistogramEqualization,
     GreatCirlceRouteLayer,
     GridLayer,
     ImageSetLayer,
@@ -333,8 +346,6 @@ export {
     ReferenceFrameProps,
     GreatCircleDialog,
     DataVizWizard,
-    FitsImageTile,
-    FitsImageJs,
     ISSLayer,
     CatalogSpreadSheetLayer,
     SlideChangedEventArgs,

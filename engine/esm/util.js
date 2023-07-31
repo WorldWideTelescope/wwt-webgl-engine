@@ -579,3 +579,16 @@ var OverlayProperties$ = {
 };
 
 registerType("OverlayProperties", [OverlayProperties, OverlayProperties$, null]);
+
+
+// This used to be Imageset.getTileKey, but to break
+// circular dependencies, we move it here.
+
+export function getTileKey(imageset, level, x, y, parent) {
+    if (imageset.get_projection() === 7 && parent != null) {
+        var ipix = (parent).ipix * 4 + y * 2 + x;
+        return imageset.get_imageSetID().toString() + '\\' + level.toString() + '\\' + ipix.toString();
+    }
+
+    return imageset.get_imageSetID().toString() + '\\' + level.toString() + '\\' + y.toString() + '_' + x.toString();
+}
