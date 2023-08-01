@@ -201,6 +201,7 @@ export { MercatorTile } from "./mercator_tile.js";
 export { PlotTile } from "./plot_tile.js";
 export { LatLngEdges, TangentTile } from "./tangent_tile.js";
 export { SkyImageTile } from "./sky_image_tile.js";
+export { ToastTile } from "./toast_tile.js";
 
 export {
     ScaleTypes,
@@ -334,7 +335,6 @@ export {
     SpreadSheetLayer,
     TimeSeriesLayer,
     VoTableLayer,
-    ToastTile,
     BitmapOverlay,
     TextOverlay,
     ShapeOverlay,
