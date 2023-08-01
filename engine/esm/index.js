@@ -174,6 +174,7 @@ export {
 } from "./interfaces.js";
 export { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
 export { SolarSystemObjects, InterpolationType, CameraParameters } from "./camera_parameters.js";
+export { Star, Galaxy } from "./star.js";
 export { UiTools } from "./ui_tools.js";
 export { StateType, WebFile } from "./web_file.js";
 
@@ -197,6 +198,7 @@ export { RenderTriangle } from "./render_triangle.js";
 export { EquirectangularTile } from "./equirectangular_tile.js";
 export { HealpixTile, Xyf } from "./healpix_tile.js";
 export { MercatorTile } from "./mercator_tile.js";
+export { PlotTile } from "./plot_tile.js";
 
 export {
     ScaleTypes,
@@ -287,8 +289,6 @@ export {
     GlyphCache,
     Text3d,
     SpaceTimeController,
-    Star,
-    Galaxy,
     LatLngEdges,
     Tour,
     FileEntry,
@@ -333,7 +333,6 @@ export {
     SpreadSheetLayer,
     TimeSeriesLayer,
     VoTableLayer,
-    PlotTile,
     TangentTile,
     ToastTile,
     BitmapOverlay,
