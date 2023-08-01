@@ -131,6 +131,7 @@ import {
 import { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
 import { BasePlanets } from "./baseplanets.js";
 import { CameraParameters } from "./camera_parameters.js";
+import { FitsProperties } from "./fits_properties.js";
 import { WebFile } from "./web_file.js";
 import { UiTools } from "./ui_tools.js";
 import { Star, Galaxy } from "./star.js";
@@ -150,19 +151,6 @@ import { TangentTile } from "./tangent_tile.js";
 import { SkyImageTile } from "./sky_image_tile.js";
 import { ToastTile } from "./toast_tile.js";
 
-
-// wwtlib.ScaleTypes
-
-export var ScaleTypes = {
-  linear: 0,
-  log: 1,
-  power: 2,
-  squareRoot: 3,
-  histogramEqualization: 4
-};
-
-registerType("ScaleTypes", ScaleTypes);
-registerEnum("ScaleTypes", ScaleTypes);
 
 // wwtlib.PointType
 
@@ -717,35 +705,6 @@ export function VideoOutputType(width, height, fps, format, waitDownload) {
 var VideoOutputType$ = {};
 
 registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
-
-// wwtlib.FitsProperties
-
-export function FitsProperties() {
-  this.bZero = 0;
-  this.bScale = 1;
-  this.containsBlanks = false;
-  this.blankValue = Number.MIN_VALUE;
-  this.maxVal = Number.MIN_VALUE;
-  this.minVal = Number.MAX_VALUE;
-  this.upperCut = Number.MIN_VALUE;
-  this.lowerCut = Number.MAX_VALUE;
-  this.transparentBlack = false;
-  this.colorMapName = 'viridis';
-  this.scaleType = 0;
-  this.onMainImageLoaded = null;
-  this.mainImageLoadedEventHasFired = false;
-}
-
-var FitsProperties$ = {
-  _fireMainImageLoaded: function (image) {
-    if (this.onMainImageLoaded != null && !this.mainImageLoadedEventHasFired) {
-      this.mainImageLoadedEventHasFired = true;
-      this.onMainImageLoaded(image);
-    }
-  }
-};
-
-registerType("FitsProperties", [FitsProperties, FitsProperties$, null]);
 
 // wwtlib.HipsProperties
 

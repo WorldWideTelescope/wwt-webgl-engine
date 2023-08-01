@@ -174,6 +174,7 @@ export {
 } from "./interfaces.js";
 export { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
 export { SolarSystemObjects, InterpolationType, CameraParameters } from "./camera_parameters.js";
+export { FitsProperties, ScaleTypes } from "./fits_properties.js";
 export { Star, Galaxy } from "./star.js";
 export { UiTools } from "./ui_tools.js";
 export { StateType, WebFile } from "./web_file.js";
@@ -204,7 +205,6 @@ export { SkyImageTile } from "./sky_image_tile.js";
 export { ToastTile } from "./toast_tile.js";
 
 export {
-    ScaleTypes,
     PointType,
     FolderGroup,
     FolderRefreshType,
@@ -240,7 +240,6 @@ export {
     Formatting,
     GFX,
     VideoOutputType,
-    FitsProperties,
     HipsProperties,
     Pointing,
     Constellations,
