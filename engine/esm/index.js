@@ -205,6 +205,7 @@ export { LatLngEdges, TangentTile } from "./tangent_tile.js";
 export { SkyImageTile } from "./sky_image_tile.js";
 export { ToastTile } from "./toast_tile.js";
 export { ProjectionType, ImageSetType, BandPass, Imageset } from "./imageset.js";
+export { Settings, SettingParameter } from "./settings.js";
 
 export {
     PointType,
@@ -282,7 +283,6 @@ export {
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
-    Settings,
     Text3dBatch,
     GlyphItem,
     GlyphCache,
@@ -291,7 +291,6 @@ export {
     Tour,
     FileEntry,
     FileCabinet,
-    SettingParameter,
     Overlay,
     Selection,
     TextObject,
