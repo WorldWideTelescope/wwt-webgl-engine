@@ -192,6 +192,8 @@ export {
 export { FitsImageTile } from "./layers/fits_image_tile.js";
 
 export { Tile } from "./tile.js";
+export { RenderTriangle } from "./render_triangle.js";
+export { EquirectangularTile } from "./equirectangular_tile.js";
 
 export {
     ScaleTypes,
@@ -276,7 +278,6 @@ export {
     Material,
     InViewReturnMessage,
     RenderContext,
-    RenderTriangle,
     ScriptInterface,
     Settings,
     Text3dBatch,
@@ -322,7 +323,6 @@ export {
     WWTControlBuilder,
     WWTElementEvent,
     HealpixTile,
-    EquirectangularTile,
     GreatCirlceRouteLayer,
     GridLayer,
     ImageSetLayer,
