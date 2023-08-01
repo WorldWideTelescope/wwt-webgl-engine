@@ -203,6 +203,7 @@ export { PlotTile } from "./plot_tile.js";
 export { LatLngEdges, TangentTile } from "./tangent_tile.js";
 export { SkyImageTile } from "./sky_image_tile.js";
 export { ToastTile } from "./toast_tile.js";
+export { ProjectionType, ImageSetType, BandPass, Imageset } from "./imageset.js";
 
 export {
     PointType,
@@ -210,9 +211,6 @@ export {
     FolderRefreshType,
     FolderType,
     ThumbnailSize,
-    ProjectionType,
-    ImageSetType,
-    BandPass,
     Classification,
     AltUnits,
     FadeType,
@@ -250,7 +248,6 @@ export {
     FolderBrowser,
     FolderUp,
     Grids,
-    Imageset,
     ViewMoverKenBurnsStyle,
     KeplerVertex,
     Layer,
