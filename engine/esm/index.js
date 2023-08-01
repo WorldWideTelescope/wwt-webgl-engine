@@ -196,6 +196,7 @@ export { Tile } from "./tile.js";
 export { RenderTriangle } from "./render_triangle.js";
 export { EquirectangularTile } from "./equirectangular_tile.js";
 export { HealpixTile, Xyf } from "./healpix_tile.js";
+export { MercatorTile } from "./mercator_tile.js";
 
 export {
     ScaleTypes,
@@ -332,7 +333,6 @@ export {
     SpreadSheetLayer,
     TimeSeriesLayer,
     VoTableLayer,
-    MercatorTile,
     PlotTile,
     TangentTile,
     ToastTile,
