@@ -9,7 +9,7 @@ import { registerType } from "./typesystem.js";
 import { ss } from "./ss.js";
 export { Util } from "./baseutil.js";
 import { Color } from "./color.js";
-import { Vector2d } from "./double3d.js";
+import { Vector2d, Vector3d } from "./double3d.js";
 
 
 // wwtlib.Rectangle
@@ -592,3 +592,37 @@ export function getTileKey(imageset, level, x, y, parent) {
 
     return imageset.get_imageSetID().toString() + '\\' + level.toString() + '\\' + y.toString() + '_' + x.toString();
 }
+
+
+// wwtlib.DistanceCalc
+//
+// This was originally defined in ToastTile.cs but we moved it to sort out the
+// dependency graph.
+
+export function DistanceCalc() { }
+
+DistanceCalc.lineToPoint = function (l0, l1, p) {
+    var v = Vector3d.subtractVectors(l1, l0);
+    var w = Vector3d.subtractVectors(p, l0);
+    var dist = Vector3d.cross(w, v).length() / v.length();
+    return dist;
+};
+
+DistanceCalc.getUVFromInnerPoint = function (ul, ur, ll, lr, pnt) {
+    ul.normalize();
+    ur.normalize();
+    ll.normalize();
+    lr.normalize();
+    pnt.normalize();
+    var dUpper = DistanceCalc.lineToPoint(ul, ur, pnt);
+    var dLower = DistanceCalc.lineToPoint(ll, lr, pnt);
+    var dVert = dUpper + dLower;
+    var dRight = DistanceCalc.lineToPoint(ur, lr, pnt);
+    var dLeft = DistanceCalc.lineToPoint(ul, ll, pnt);
+    var dHoriz = dRight + dLeft;
+    return Vector2d.create(dLeft / dHoriz, dUpper / dVert);
+};
+
+var DistanceCalc$ = {};
+
+registerType("DistanceCalc", [DistanceCalc, DistanceCalc$, null]);

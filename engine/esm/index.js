@@ -174,6 +174,7 @@ export {
 } from "./interfaces.js";
 export { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
 export { SolarSystemObjects, InterpolationType, CameraParameters } from "./camera_parameters.js";
+export { UiTools } from "./ui_tools.js";
 export { StateType, WebFile } from "./web_file.js";
 
 export { ColorMapContainer } from "./layers/color_map_container.js";
@@ -194,6 +195,7 @@ export { FitsImageTile } from "./layers/fits_image_tile.js";
 export { Tile } from "./tile.js";
 export { RenderTriangle } from "./render_triangle.js";
 export { EquirectangularTile } from "./equirectangular_tile.js";
+export { HealpixTile, Xyf } from "./healpix_tile.js";
 
 export {
     ScaleTypes,
@@ -234,7 +236,6 @@ export {
     VideoOutputType,
     FitsProperties,
     HipsProperties,
-    Xyf,
     Pointing,
     Constellations,
     Lineset,
@@ -312,7 +313,6 @@ export {
     UndoStep,
     UndoTourSlidelistChange,
     UndoTourPropertiesChange,
-    UiTools,
     ColorPicker,
     Dialog,
     Histogram,
@@ -322,7 +322,6 @@ export {
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    HealpixTile,
     GreatCirlceRouteLayer,
     GridLayer,
     ImageSetLayer,
