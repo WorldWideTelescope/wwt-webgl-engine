@@ -199,6 +199,8 @@ export { EquirectangularTile } from "./equirectangular_tile.js";
 export { HealpixTile, Xyf } from "./healpix_tile.js";
 export { MercatorTile } from "./mercator_tile.js";
 export { PlotTile } from "./plot_tile.js";
+export { LatLngEdges, TangentTile } from "./tangent_tile.js";
+export { SkyImageTile } from "./sky_image_tile.js";
 
 export {
     ScaleTypes,
@@ -289,7 +291,6 @@ export {
     GlyphCache,
     Text3d,
     SpaceTimeController,
-    LatLngEdges,
     Tour,
     FileEntry,
     FileCabinet,
@@ -333,7 +334,6 @@ export {
     SpreadSheetLayer,
     TimeSeriesLayer,
     VoTableLayer,
-    TangentTile,
     ToastTile,
     BitmapOverlay,
     TextOverlay,
@@ -350,5 +350,4 @@ export {
     ArrivedEventArgs,
     AnnotationClickEventArgs,
     CollectionLoadedEventArgs,
-    SkyImageTile,
 } from "./transpiled.js";

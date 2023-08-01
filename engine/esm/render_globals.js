@@ -31,6 +31,16 @@ export function set_tileDemEnabled(value) {
     tileDemEnabled = !!value;
 }
 
+// This used to be `RenderContext.useGl`. It sets whether we're using WebGL.
+//
+// Older versions of the engine used to support HTML Canvas rendering, but that
+// mode is now deprecated. Uses where `useGl` is false may break at any time.
+export var useGl = false;
+
+export function set_useGl(value) {
+    useGl = !!value;
+}
+
 // This used to be `RenderContext.useGlVersion2`. It sets whether we're
 // using WebGL >= 2.
 export var useGlVersion2 = false;
