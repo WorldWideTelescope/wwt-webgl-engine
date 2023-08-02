@@ -211,6 +211,7 @@ export { Alignment, Text3dBatch, Text3d, GlyphItem, GlyphCache } from "./sky_tex
 export { Lineset, Linepoint, Constellations } from "./constellations.js";
 export { SpaceTimeController } from "./space_time_controller.js";
 export { KeplerianElements, BodyAngles, Planets } from "./planets.js";
+export { Place } from "./place.js";
 
 export {
     PointType,
@@ -275,7 +276,6 @@ export {
     VoTable,
     VoRow,
     VoColumn,
-    Place,
     Material,
     InViewReturnMessage,
     RenderContext,
