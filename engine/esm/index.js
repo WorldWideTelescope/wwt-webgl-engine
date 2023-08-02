@@ -209,6 +209,7 @@ export { Settings, SettingParameter } from "./settings.js";
 export { TextBorderStyle, TextObject } from "./tours/text_object.js";
 export { Alignment, Text3dBatch, Text3d, GlyphItem, GlyphCache } from "./sky_text.js";
 export { Lineset, Linepoint, Constellations } from "./constellations.js";
+export { SpaceTimeController } from "./space_time_controller.js";
 
 export {
     PointType,
@@ -281,7 +282,6 @@ export {
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
-    SpaceTimeController,
     Tour,
     FileEntry,
     FileCabinet,
