@@ -206,6 +206,9 @@ export { SkyImageTile } from "./sky_image_tile.js";
 export { ToastTile } from "./toast_tile.js";
 export { ProjectionType, ImageSetType, BandPass, Imageset } from "./imageset.js";
 export { Settings, SettingParameter } from "./settings.js";
+export { TextBorderStyle, TextObject } from "./tours/text_object.js";
+export { Alignment, Text3dBatch, Text3d, GlyphItem, GlyphCache } from "./sky_text.js";
+export { Lineset, Linepoint, Constellations } from "./constellations.js";
 
 export {
     PointType,
@@ -226,14 +229,12 @@ export {
     MarkerScales,
     RAUnits,
     Primitives,
-    Alignment,
     StockSkyOverlayTypes,
     OverlayAnchor,
     AudioType,
     ShapeType,
     LoopTypes,
     SelectionAnchor,
-    TextBorderStyle,
     UserLevel,
     TransitionType,
     DialogResult,
@@ -242,9 +243,6 @@ export {
     VideoOutputType,
     HipsProperties,
     Pointing,
-    Constellations,
-    Lineset,
-    Linepoint,
     Folder,
     FolderBrowser,
     FolderUp,
@@ -283,17 +281,12 @@ export {
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
-    Text3dBatch,
-    GlyphItem,
-    GlyphCache,
-    Text3d,
     SpaceTimeController,
     Tour,
     FileEntry,
     FileCabinet,
     Overlay,
     Selection,
-    TextObject,
     TourDocument,
     TourEditTab,
     TourEditor,

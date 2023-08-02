@@ -52,7 +52,9 @@ import {
 import {
   freestandingMode,
   makeNewHipsProperties,
+  set_createPlace,
   set_freestandingMode,
+  set_makeNewFolder,
   set_makeNewHipsProperties,
 } from "./data_globals.js";
 
@@ -151,6 +153,9 @@ import { Triangle } from "./triangle.js";
 import { Tile } from "./tile.js";
 import { ProjectionType, ImageSetType, Imageset } from "./imageset.js";
 import { Settings, SettingParameter } from "./settings.js";
+import { Constellations } from "./constellations.js";
+import { TextObject } from "./tours/text_object.js";
+import { Text3d, Text3dBatch } from "./sky_text.js";
 
 
 // wwtlib.PointType
@@ -434,16 +439,6 @@ export var Primitives = {
 registerType("Primitives", Primitives);
 registerEnum("Primitives", Primitives);
 
-// wwtlib.Alignment
-
-export var Alignment = {
-  center: 0,
-  left: 1
-};
-
-registerType("Alignment", Alignment);
-registerEnum("Alignment", Alignment);
-
 // wwtlib.StockSkyOverlayTypes
 //
 // This was defined in `Tours/ISettings.cs`, which we've folded into `interfaces.js`.
@@ -574,19 +569,6 @@ export var SelectionAnchor = {
 
 registerType("SelectionAnchor", SelectionAnchor);
 registerEnum("SelectionAnchor", SelectionAnchor);
-
-// wwtlib.TextBorderStyle
-
-export var TextBorderStyle = {
-  none: 0,
-  tight: 1,
-  small: 2,
-  medium: 3,
-  large: 4
-};
-
-registerType("TextBorderStyle", TextBorderStyle);
-registerEnum("TextBorderStyle", TextBorderStyle);
 
 // wwtlib.UserLevel
 
@@ -821,474 +803,6 @@ var Pointing$ = {
 };
 
 registerType("Pointing", [Pointing, Pointing$, null]);
-
-// wwtlib.Constellations
-
-export function Constellations() {
-  this._pointCount = 0;
-  this._boundry = false;
-  this._noInterpollation = false;
-  this.readOnly = false;
-  this.radius = 1;
-  this._drawCount = 0;
-  this._constellationVertexBuffers = {};
-}
-
-Constellations.RC = 0.017453292519943;
-Constellations._maxSeperation = 0.745;
-Constellations.containment = null;
-Constellations._constToDraw = '';
-Constellations.selectedSegment = null;
-Constellations._artFile = null;
-Constellations.artwork = null;
-Constellations.boundries = null;
-Constellations.pictureBlendStates = {};
-
-Constellations.createBasic = function (name) {
-  var temp = new Constellations();
-  temp._name = name;
-  temp._url = null;
-  temp.lines = [];
-  var $enum1 = ss.enumerate(ss.keys(Constellations.fullNames));
-  while ($enum1.moveNext()) {
-    var abbrv = $enum1.current;
-    temp.lines.push(new Lineset(abbrv));
-  }
-  return temp;
-};
-
-Constellations.create = function (name, url, boundry, noInterpollation, resource) {
-  var temp = new Constellations();
-  temp._noInterpollation = noInterpollation;
-  temp._boundry = boundry;
-  temp._name = name;
-  temp._url = url;
-  temp.getFile();
-  return temp;
-};
-
-Constellations.drawConstellationNames = function (renderContext, opacity, drawColor) {
-  if (Constellations._namesBatch == null) {
-    Constellations.initializeConstellationNames();
-    if (Constellations._namesBatch == null) {
-      return;
-    }
-  }
-  Constellations._namesBatch.draw(renderContext, opacity, drawColor);
-};
-
-Constellations.initializeConstellationNames = function () {
-  if (Constellations.constellationCentroids == null) {
-    return;
-  }
-  Constellations._namesBatch = new Text3dBatch(Settings.get_active().get_constellationLabelsHeight());
-  var $enum1 = ss.enumerate(ss.keys(Constellations.constellationCentroids));
-  while ($enum1.moveNext()) {
-    var key = $enum1.current;
-    var centroid = Constellations.constellationCentroids[key];
-    var center = Coordinates.raDecTo3dAu(centroid.get_RA(), centroid.get_dec(), 1);
-    var up = Vector3d.create(0, 1, 0);
-    var name = centroid.get_name();
-    if (centroid.get_name() === 'Triangulum Australe') {
-      name = ss.replaceString(name, ' ', '\n   ');
-    }
-    Constellations._namesBatch.add(new Text3d(center, up, name, Settings.get_active().get_constellationLabelsHeight(), 0.000125));
-  }
-};
-
-Constellations.drawArtwork = function (renderContext) {
-  if (Constellations.artwork == null) {
-    if (Constellations._artFile == null) {
-      Constellations._artFile = new Folder();
-      Constellations._artFile.loadFromUrl(URLHelpers.singleton.coreStaticUrl('wwtweb/catalog.aspx?W=hevelius'), Constellations._onArtReady);
-    }
-    return;
-  }
-  Constellations._maxSeperation = Math.max(0.5, Math.cos((renderContext.get_fovAngle() * 2) / 180 * Math.PI));
-  var $enum1 = ss.enumerate(Constellations.artwork);
-  while ($enum1.moveNext()) {
-    var place = $enum1.current;
-    var bs = Constellations.pictureBlendStates[place.get_constellation()];
-    bs.set_targetState(Settings.get_active().get_constellationArtFilter().isSet(place.get_constellation()));
-    if (bs.get_state()) {
-      var reverse = false;
-      var centroid = Constellations.constellationCentroids[place.get_constellation()];
-      if (centroid != null) {
-        var pos = Coordinates.raDecTo3d((reverse) ? -centroid.get_RA() - 6 : centroid.get_RA(), (reverse) ? centroid.get_dec() : centroid.get_dec());
-        if (Vector3d.dot(renderContext.get_viewPoint(), pos) > Constellations._maxSeperation) {
-          renderContext.drawImageSet(place.get_studyImageset(), 100);
-        }
-      }
-    }
-  }
-};
-
-Constellations._onArtReady = function () {
-  Constellations._artFile.childLoadCallback(Constellations._loadArtList);
-};
-
-Constellations._loadArtList = function () {
-  Constellations.artwork = Constellations._artFile.get_places();
-};
-
-Constellations.initializeConstellations = function () {
-  if (Constellations.containment == null) {
-    var url = URLHelpers.singleton.engineAssetUrl('ConstellationNamePositions_EN.txt');
-    Constellations._webFileConstNames = new WebFile(url);
-    Constellations._webFileConstNames.onStateChange = Constellations._loadNames;
-    Constellations._webFileConstNames.send();
-    Constellations.containment = Constellations.create('Constellations', URLHelpers.singleton.engineAssetUrl('constellations.txt'), true, true, true);
-  }
-};
-
-Constellations._loadNames = function () {
-  if (Constellations._webFileConstNames.get_state() === 2) {
-    alert(Constellations._webFileConstNames.get_message());
-  }
-  else if (Constellations._webFileConstNames.get_state() === 1) {
-    Constellations._centroidsReady(Constellations._webFileConstNames.getText());
-  }
-};
-
-Constellations._centroidsReady = function (file) {
-  Constellations.constellationCentroids = {};
-  Constellations.fullNames = {};
-  Constellations.abbreviations = {};
-  var rows = file.split('\r\n');
-  var id = 0;
-  var line;
-  var $enum1 = ss.enumerate(rows);
-  while ($enum1.moveNext()) {
-    var row = $enum1.current;
-    line = row;
-    var data = line.split(',');
-    Constellations.fullNames[data[1]] = data[0];
-    Constellations.abbreviations[data[0]] = data[1];
-    ConstellationFilter.bitIDs[data[1]] = id++;
-    Constellations.pictureBlendStates[data[1]] = BlendState.create(true, 1000);
-    Constellations.constellationCentroids[data[1]] = Place.create(data[0], parseFloat(data[3]), parseFloat(data[2]), 128, data[1], 2, 360);
-  }
-  WWTControl.set_renderNeeded(true);
-  ConstellationFilter.buildConstellationFilters();
-};
-
-Constellations.fullName = function (name) {
-  if (ss.keyExists(Constellations.fullNames, name)) {
-    return Constellations.fullNames[name];
-  }
-  return name;
-};
-
-Constellations.abbreviation = function (name) {
-  if (Constellations.abbreviations != null && !ss.emptyString(name) && ss.keyExists(Constellations.abbreviations, name)) {
-    return Constellations.abbreviations[name];
-  }
-  return name;
-};
-
-var Constellations$ = {
-  get_name: function () {
-    return this._name;
-  },
-
-  set_name: function (value) {
-    this._name = value;
-    return value;
-  },
-
-  getFile: function () {
-    this._webFile = new WebFile(this._url);
-    this._webFile.onStateChange = ss.bind('fileStateChange', this);
-    this._webFile.send();
-  },
-
-  fileStateChange: function () {
-    if (this._webFile.get_state() === 2) {
-      alert(this._webFile.get_message());
-    } else if (this._webFile.get_state() === 1) {
-      this._loadConstellationData(this._webFile.getText());
-    }
-  },
-
-  _loadConstellationData: function (data) {
-    if (this._boundry && !this._noInterpollation) {
-      Constellations.boundries = {};
-    }
-    this.lines = [];
-    var lineSet = null;
-    try {
-      var rows = data.split('\r\n');
-      var abrv;
-      var abrvOld = '';
-      var ra;
-      var dec;
-      var lastRa = 0;
-      var type = 0;
-      var $enum1 = ss.enumerate(rows);
-      while ($enum1.moveNext()) {
-        var row = $enum1.current;
-        var line = row;
-        if (line.substr(11, 2) === '- ') {
-          line = line.substr(0, 11) + ' -' + line.substr(13, (line.length - 13));
-        }
-        if (line.substr(11, 2) === '+ ') {
-          line = line.substr(0, 11) + ' +' + line.substr(13, (line.length - 13));
-        }
-        dec = parseFloat(line.substr(11, 10));
-        if (this._noInterpollation) {
-          ra = parseFloat(line.substr(0, 10));
-        }
-        else {
-          ra = parseFloat(line.substr(0, 10));
-        }
-        abrv = ss.trim(line.substr(23, 4));
-        if (!this._boundry) {
-          if (!!ss.trim(line.substr(28, 1))) {
-            type = parseInt(line.substr(28, 1));
-          }
-        }
-        else {
-          if (this._noInterpollation && line.substr(28, 1) !== 'O') {
-            continue;
-          }
-        }
-        if (abrv !== abrvOld) {
-          type = 3;
-          lineSet = new Lineset(abrv);
-          this.lines.push(lineSet);
-          if (this._boundry && !this._noInterpollation) {
-            Constellations.boundries[abrv] = lineSet;
-          }
-          abrvOld = abrv;
-          lastRa = 0;
-        }
-        if (this._noInterpollation) {
-          if (Math.abs(ra - lastRa) > 12) {
-            ra = ra - (24 * (((ra - lastRa) < 0) ? -1 : 1));
-          }
-          lastRa = ra;
-        }
-        var starName = null;
-        if (line.length > 30) {
-          starName = ss.trim(line.substr(30));
-        }
-        if (starName == null || starName !== 'Empty') {
-          lineSet.add(ra, dec, type, starName);
-        }
-        this._pointCount++;
-        type = 1;
-      }
-    }
-    catch ($e2) {
-    }
-    WWTControl.set_renderNeeded(true);
-  },
-
-  draw: function (renderContext, showOnlySelected, focusConsteallation, clearExisting) {
-    Constellations._maxSeperation = Math.max(0.6, Math.cos((renderContext.get_fovAngle() * 2) / 180 * Math.PI));
-    this._drawCount = 0;
-    var lsSelected = null;
-    if (this.lines == null || Constellations.constellationCentroids == null) {
-      return;
-    }
-    Constellations._constToDraw = focusConsteallation;
-    var $enum1 = ss.enumerate(this.lines);
-    while ($enum1.moveNext()) {
-      var ls = $enum1.current;
-      if (Constellations._constToDraw === ls.get_name() && this._boundry) {
-        lsSelected = ls;
-      }
-      else if (!showOnlySelected || !this._boundry) {
-        this._drawSingleConstellation(renderContext, ls, 1);
-      }
-    }
-    if (lsSelected != null) {
-      this._drawSingleConstellation(renderContext, lsSelected, 1);
-    }
-  },
-
-  _drawSingleConstellation: function (renderContext, ls, opacity) {
-    var reverse = false;
-    var centroid = Constellations.constellationCentroids[ls.get_name()];
-    if (centroid != null) {
-      var pos = Coordinates.raDecTo3d((reverse) ? -centroid.get_RA() - 6 : centroid.get_RA(), (reverse) ? centroid.get_dec() : centroid.get_dec());
-      if (Vector3d.dot(renderContext.get_viewPoint(), pos) < Constellations._maxSeperation) {
-        return;
-      }
-    }
-    if (!ss.keyExists(this._constellationVertexBuffers, ls.get_name())) {
-      var count = ls.points.length;
-      var linelist = new SimpleLineList();
-      linelist.set_depthBuffered(false);
-      this._constellationVertexBuffers[ls.get_name()] = linelist;
-      var currentPoint = new Vector3d();
-      var temp;
-      for (var i = 0; i < count; i++) {
-        if (!ls.points[i].pointType || !i) {
-          currentPoint = Coordinates.raDecTo3d(ls.points[i].RA, ls.points[i].dec);
-        }
-        else {
-          temp = Coordinates.raDecTo3d(ls.points[i].RA, ls.points[i].dec);
-          linelist.addLine(currentPoint, temp);
-          currentPoint = temp;
-        }
-      }
-      if (this._boundry) {
-        temp = Coordinates.raDecTo3d(ls.points[0].RA, ls.points[0].dec);
-        linelist.addLine(currentPoint, temp);
-      }
-    }
-    var col = 'red';
-    if (this._boundry) {
-      if (Constellations._constToDraw !== ls.get_name()) {
-        col = Settings.get_globalSettings().get_constellationBoundryColor();
-      }
-      else {
-        col = Settings.get_globalSettings().get_constellationSelectionColor();
-      }
-    } else {
-      col = Settings.get_globalSettings().get_constellationFigureColor();
-    }
-    this._constellationVertexBuffers[ls.get_name()].drawLines(renderContext, opacity, Color.load(col));
-  },
-
-  _drawSingleConstellationOld: function (renderContext, ls) {
-    var reverse = false;
-    var centroid = Constellations.constellationCentroids[ls.get_name()];
-    if (centroid != null) {
-      var pos = Coordinates.raDecTo3d((reverse) ? -centroid.get_RA() - 6 : centroid.get_RA(), (reverse) ? centroid.get_dec() : centroid.get_dec());
-      if (Vector3d.dot(renderContext.get_viewPoint(), pos) < Constellations._maxSeperation) {
-        return;
-      }
-    }
-    this._drawCount++;
-    var col;
-    if (this._boundry) {
-      if (Constellations._constToDraw !== ls.get_name()) {
-        col = Settings.get_globalSettings().get_constellationBoundryColor();
-      }
-      else {
-        col = Settings.get_globalSettings().get_constellationSelectionColor();
-      }
-    } else {
-      col = Settings.get_globalSettings().get_constellationFigureColor();
-    }
-    if (renderContext.gl == null) {
-      var ctx = renderContext.device;
-      var count = ls.points.length;
-      var lastPoint = new Vector3d();
-      ctx.save();
-      var linePending = false;
-      ctx.beginPath();
-      ctx.strokeStyle = col;
-      ctx.lineWidth = 2;
-      ctx.globalAlpha = 0.25;
-      for (var i = 0; i < count; i++) {
-        if (!ls.points[i].pointType || !i) {
-          if (linePending) {
-            ctx.stroke();
-          }
-          lastPoint = renderContext.WVP.transform(Coordinates.raDecTo3d(ls.points[i].RA, ls.points[i].dec));
-          ctx.moveTo(lastPoint.x, lastPoint.y);
-        }
-        else {
-          var newPoint = renderContext.WVP.transform(Coordinates.raDecTo3d(ls.points[i].RA, ls.points[i].dec));
-          ctx.lineTo(newPoint.x, newPoint.y);
-          linePending = true;
-        }
-      }
-      if (this._boundry) {
-        ctx.closePath();
-      }
-      ctx.stroke();
-      ctx.restore();
-    } else {
-    }
-  },
-
-  findConstellationForPoint: function (ra, dec) {
-    if (dec > 88.402 || this.lines == null) {
-      return 'UMI';
-    }
-    var $enum1 = ss.enumerate(this.lines);
-    while ($enum1.moveNext()) {
-      var ls = $enum1.current;
-      var count = ls.points.length;
-      var i;
-      var j;
-      var inside = false;
-      for (i = 0, j = count - 1; i < count; j = i++) {
-        if ((((ls.points[i].dec <= dec) && (dec < ls.points[j].dec)) || ((ls.points[j].dec <= dec) && (dec < ls.points[i].dec))) && (ra < (ls.points[j].RA - ls.points[i].RA) * (dec - ls.points[i].dec) / (ls.points[j].dec - ls.points[i].dec) + ls.points[i].RA)) {
-          inside = !inside;
-        }
-      }
-      if (inside) {
-        return ls.get_name();
-      }
-    }
-    if (ra > 0) {
-      return this.findConstellationForPoint(ra - 24, dec);
-    }
-    if (dec > 65.5) {
-      return 'UMI';
-    }
-    if (dec < -65.5) {
-      return 'OCT';
-    }
-    return 'Error';
-  }
-};
-
-registerType("Constellations", [Constellations, Constellations$, null]);
-
-// wwtlib.Lineset
-
-export function Lineset(name) {
-  this._name = name;
-  this.points = [];
-}
-
-var Lineset$ = {
-  get_name: function () {
-    return this._name;
-  },
-
-  set_name: function (value) {
-    this._name = value;
-    return value;
-  },
-
-  add: function (ra, dec, pointType, name) {
-    this.points.push(new Linepoint(ra, dec, pointType, name));
-  }
-};
-
-registerType("Lineset", [Lineset, Lineset$, null]);
-
-// wwtlib.Linepoint
-
-export function Linepoint(ra, dec, type, name) {
-  this.RA = 0;
-  this.dec = 0;
-  this.pointType = 0;
-  this.name = null;
-  this.RA = ra;
-  this.dec = dec;
-  this.pointType = type;
-  this.name = name;
-}
-
-var Linepoint$ = {
-  toString: function () {
-    if (ss.emptyString(this.name)) {
-      return Coordinates.formatDMS((((this.RA / 360) * 24 + 12) % 24)) + ', ' + Coordinates.formatDMS(this.dec) + ', ' + this.pointType.toString();
-    } else {
-      return this.name + ', ' + this.pointType.toString();
-    }
-  }
-};
-
-registerType("Linepoint", [Linepoint, Linepoint$, null]);
 
 // wwtlib.Folder
 // requires: Place, Imageset, Tour, FolderUp
@@ -1740,6 +1254,11 @@ var Folder$ = {
 };
 
 registerType("Folder", [Folder, Folder$, null, IThumbnail]);
+
+set_makeNewFolder(function () {
+  return new Folder();
+});
+
 
 // wwtlib.FolderBrowser
 
@@ -9034,6 +8553,9 @@ var Place$ = {
 
 registerType("Place", [Place, Place$, null, IThumbnail, IPlace]);
 
+set_createPlace(Place.create);
+
+
 // wwtlib.KeplerianElements
 
 export function KeplerianElements() {
@@ -11884,404 +11406,6 @@ var ScriptInterface$ = {
 
 registerType("ScriptInterface", [ScriptInterface, ScriptInterface$, null]);
 
-// wwtlib.Text3dBatch
-
-export function Text3dBatch(height) {
-  this.height = 128;
-  this.items = [];
-  this._glyphVersion = -1;
-  this.viewTransform = Matrix3d.get_identity();
-  this._textObject = new TextObject();
-  this._vertCount = 0;
-  this.height = (height * 3);
-}
-
-var Text3dBatch$ = {
-  add: function (newItem) {
-    this.items.push(newItem);
-  },
-
-  draw: function (renderContext, opacity, color) {
-    if (renderContext.gl == null) {
-      var viewPoint = Vector3d._transformCoordinate(renderContext.get_viewPoint(), this.viewTransform);
-      var drawHeight = (this.height / renderContext.get_fovAngle()) * renderContext.height / 180;
-      var $enum1 = ss.enumerate(this.items);
-      while ($enum1.moveNext()) {
-        var t3d = $enum1.current;
-        var screenSpacePnt = renderContext.WVP.transform(t3d.center);
-        if (screenSpacePnt.z < 0) {
-          continue;
-        }
-        if (Vector3d.dot(viewPoint, t3d.center) < 0.55) {
-          continue;
-        }
-        var screenSpaceTop = renderContext.WVP.transform(t3d.top);
-        var rotation = Math.atan2(screenSpacePnt.x - screenSpaceTop.x, screenSpacePnt.y - screenSpaceTop.y);
-        var ctx = renderContext.device;
-        ctx.save();
-        ctx.translate(screenSpacePnt.x, screenSpacePnt.y);
-        ctx.rotate(-rotation);
-        ctx.globalAlpha = opacity;
-        ctx.fillStyle = color.toString();
-        ctx.font = 'normal' + ' ' + ((false) ? 'bold' : 'normal') + ' ' + Math.round(drawHeight * 1.2).toString() + 'px ' + 'Arial';
-        ctx.textBaseline = 'top';
-        var tm = ctx.measureText(t3d.text);
-        ctx.fillText(t3d.text, -tm.width / 2, -drawHeight / 2);
-        ctx.restore();
-      }
-    } else {
-      if (this._glyphCache == null || this._glyphCache.get_version() > this._glyphVersion) {
-        this.prepareBatch();
-      }
-      if (!this._glyphCache.ready) {
-        return;
-      }
-      TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2d);
-      renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
-    }
-  },
-
-  prepareBatch: function () {
-    if (this._glyphCache == null) {
-      this._glyphCache = GlyphCache.getCache(this.height);
-    }
-    if (!this._glyphCache.ready) {
-      return;
-    }
-    this._textObject.text = '';
-    this._textObject.fontSize = this.height * 0.5;
-    var verts = [];
-    var $enum1 = ss.enumerate(this.items);
-    while ($enum1.moveNext()) {
-      var t3d = $enum1.current;
-      var text = t3d.text;
-      var left = 0;
-      var top = 0;
-      var fntAdjust = this._textObject.fontSize / 128;
-      var factor = 0.6666;
-      var width = 0;
-      var height = 0;
-      for (var i = 0; i < text.length; i++) {
-        var item = this._glyphCache.getGlyphItem(text.substr(i, 1));
-        if (item != null) {
-          width += item.extents.x;
-          height = Math.max(item.extents.y, height);
-        }
-      }
-      var size = Vector2d.create(width, height);
-      t3d.width = size.x * t3d.scale * factor * fntAdjust;
-      t3d.height = size.y * t3d.scale * factor * fntAdjust;
-      var charsLeft = text.length;
-      for (var i = 0; i < charsLeft; i++) {
-        var item = this._glyphCache.getGlyphItem(text.substr(i, 1));
-        if (item != null) {
-          var position = Rectangle.create(left * t3d.scale * factor, 0 * t3d.scale * factor, item.extents.x * fntAdjust * t3d.scale * factor, item.extents.y * fntAdjust * t3d.scale * factor);
-          left += (item.extents.x * fntAdjust);
-          t3d.addGlyphPoints(verts, item.size, position, item.uvRect);
-        }
-      }
-    }
-    this._vertCount = verts.length;
-    this._vertexBuffer = new PositionTextureVertexBuffer(this._vertCount);
-    var vertBuf = this._vertexBuffer.lock();
-    for (var i = 0; i < this._vertCount; i++) {
-      vertBuf[i] = verts[i];
-    }
-    this._vertexBuffer.unlock();
-    this._glyphVersion = this._glyphCache.get_version();
-  },
-
-  cleanUp: function () {
-    if (this._vertexBuffer != null) {
-      this._vertexBuffer = null;
-    }
-    this.items.length = 0;
-  }
-};
-
-registerType("Text3dBatch", [Text3dBatch, Text3dBatch$, null]);
-
-// wwtlib.GlyphItem
-
-export function GlyphItem(glyph) {
-  this.referenceCount = 0;
-  this.glyph = glyph;
-  this.uvRect = new Rectangle();
-  this.size = new Vector2d();
-  this.referenceCount = 1;
-}
-
-GlyphItem.create = function (glyph, uv, size, extents) {
-  var temp = new GlyphItem(glyph);
-  temp.glyph = glyph;
-  temp.uvRect = uv;
-  temp.size = size;
-  temp.extents = extents;
-  temp.referenceCount = 1;
-  return temp;
-};
-
-GlyphItem._fromXML = function (node) {
-  var glyph = node.attributes.getNamedItem('Glyph').nodeValue;
-  var item = new GlyphItem(glyph);
-  item.uvRect = Rectangle.create(parseFloat(node.attributes.getNamedItem('UVLeft').nodeValue), parseFloat(node.attributes.getNamedItem('UVTop').nodeValue), parseFloat(node.attributes.getNamedItem('UVWidth').nodeValue), parseFloat(node.attributes.getNamedItem('UVHeight').nodeValue));
-  item.size = Vector2d.create(parseFloat(node.attributes.getNamedItem('SizeWidth').nodeValue), parseFloat(node.attributes.getNamedItem('SizeHeight').nodeValue));
-  item.extents = Vector2d.create(parseFloat(node.attributes.getNamedItem('ExtentsWidth').nodeValue), parseFloat(node.attributes.getNamedItem('ExtentsHeight').nodeValue));
-  return item;
-};
-
-var GlyphItem$ = {
-  addRef: function () {
-    this.referenceCount++;
-  },
-
-  release: function () {
-    this.referenceCount--;
-  }
-};
-
-registerType("GlyphItem", [GlyphItem, GlyphItem$, null]);
-
-// wwtlib.GlyphCache
-
-export function GlyphCache(height) {
-  this._cellHeight = 128;
-  this._gridSize = 8;
-  this.ready = false;
-  this._glyphItems = {};
-  this.textObject = new TextObject();
-  this._dirty = true;
-  this._textureDirty = true;
-  this._version = 0;
-  this._cellHeight = height;
-  this._texture = Texture.fromUrl(URLHelpers.singleton.engineAssetUrl('glyphs1.png'));
-  this._webFile = new WebFile(URLHelpers.singleton.engineAssetUrl('glyphs1.xml'));
-  this._webFile.onStateChange = ss.bind('_glyphXmlReady', this);
-  this._webFile.send();
-}
-
-GlyphCache._caches = {};
-GlyphCache._allGlyphs = '';
-
-GlyphCache.getCache = function (height) {
-  if (!ss.keyExists(GlyphCache._caches, height)) {
-    GlyphCache._caches[height] = new GlyphCache(height);
-  }
-  return GlyphCache._caches[height];
-};
-
-GlyphCache.cleanUpAll = function () {
-  ss.clearKeys(GlyphCache._caches);
-};
-
-var GlyphCache$ = {
-  get_height: function () {
-    return this._cellHeight;
-  },
-
-  _glyphXmlReady: function () {
-    if (this._webFile.get_state() === 2) {
-      alert(this._webFile.get_message());
-    } else if (this._webFile.get_state() === 1) {
-      this._loadXmlGlyph(this._webFile.getXml());
-    }
-  },
-
-  _loadXmlGlyph: function (xml) {
-    var nodes = Util.selectSingleNode(xml, 'GlyphItems');
-    var $enum1 = ss.enumerate(nodes.childNodes);
-    while ($enum1.moveNext()) {
-      var glyphItem = $enum1.current;
-      if (glyphItem.nodeName === 'GlyphItem') {
-        var item = GlyphItem._fromXML(glyphItem);
-        this._glyphItems[item.glyph] = item;
-        GlyphCache._allGlyphs = GlyphCache._allGlyphs + item.glyph;
-      }
-    }
-    this.ready = true;
-  },
-
-  get_texture: function () {
-    return this._texture;
-  },
-
-  _makeTexture: function () {
-    this._calcOrMake(true);
-  },
-
-  getGlyphItem: function (glyph) {
-    if (this._dirty) {
-      this._calculateGlyphDetails();
-    }
-    return this._glyphItems[glyph];
-  },
-
-  _calculateGlyphDetails: function () {
-    this._calcOrMake(false);
-  },
-
-  _calcOrMake: function (makeTexture) { },
-
-  get_version: function () {
-    return this._version;
-  },
-
-  set_version: function (value) {
-    this._version = value;
-    return value;
-  },
-
-  addGlyph: function (glyph) {
-    if (!ss.keyExists(this._glyphItems, glyph)) {
-      var item = new GlyphItem(glyph);
-      this._glyphItems[glyph] = item;
-      this._dirty = true;
-      this._textureDirty = true;
-      this._version++;
-      GlyphCache._allGlyphs = GlyphCache._allGlyphs + glyph;
-    } else {
-      this._glyphItems[glyph].addRef();
-    }
-  },
-
-  cleanUp: function () {
-    this._dirty = true;
-    this._texture = null;
-  },
-
-  dispose: function () {
-    this.cleanUp();
-  },
-
-  get_dirty: function () {
-    return this._dirty;
-  },
-
-  set_dirty: function (value) {
-    this._dirty = value;
-    return value;
-  }
-};
-
-registerType("GlyphCache", [GlyphCache, GlyphCache$, null, ss.IDisposable]);
-
-// wwtlib.Text3d
-
-export function Text3d(center, up, text, fontsize, scale) {
-  this.rotation = 0;
-  this.tilt = 0;
-  this.bank = 0;
-  this._matInit = false;
-  this.color = Colors.get_white();
-  this.sky = true;
-  this.scale = 0;
-  this.opacity = 1;
-  this.text = '';
-  this.width = 1;
-  this.height = 1;
-  this.alignment = 0;
-  this.text = text;
-  this.up = up;
-  this.center = center;
-  this.scale = scale;
-  this.top = Vector3d.addVectors(center, Vector3d.scale(up, scale));
-  if (fontsize < 0) {
-    this.sky = false;
-  }
-}
-
-var Text3d$ = {
-  addGlyphPoints: function (pointList, size, position, uv) {
-    var points = new Array(6);
-    for (var i = 0; i < 6; i++) {
-      points[i] = new PositionTexture();
-    }
-    var left = Vector3d.cross(this.center, this.up);
-    var right = Vector3d.cross(this.up, this.center);
-    left.normalize();
-    right.normalize();
-    this.up.normalize();
-    var upTan = Vector3d.cross(this.center, right);
-    upTan.normalize();
-    if (!this.alignment) {
-      left.multiply(this.width - position.get_left() * 2);
-      right.multiply(this.width - ((this.width * 2) - position.get_right() * 2));
-    } else if (this.alignment === 1) {
-      left.multiply(-position.get_left() * 2);
-      right.multiply(position.get_right() * 2);
-    }
-    var top = upTan.copy();
-    var bottom = Vector3d.subtractVectors(Vector3d.get_empty(), upTan);
-    top.multiply(this.height - position.get_top() * 2);
-    bottom.multiply(this.height - ((this.height * 2) - position.get_bottom() * 2));
-    var ul = this.center.copy();
-    ul.add(top);
-    if (this.sky) {
-      ul.add(left);
-    } else {
-      ul.subtract(left);
-    }
-    var ur = this.center.copy();
-    ur.add(top);
-    if (this.sky) {
-      ur.add(right);
-    } else {
-      ur.subtract(right);
-    }
-    var ll = this.center.copy();
-    if (this.sky) {
-      ll.add(left);
-    } else {
-      ll.subtract(left);
-    }
-    ll.add(bottom);
-    var lr = this.center.copy();
-    if (this.sky) {
-      lr.add(right);
-    } else {
-      lr.subtract(right);
-    }
-    lr.add(bottom);
-    points[0].position = ul.copy();
-    points[0].tu = uv.get_left();
-    points[0].tv = uv.get_top();
-    points[2].tu = uv.get_left();
-    points[2].tv = uv.get_bottom();
-    points[2].position = ll.copy();
-    points[1].tu = uv.get_right();
-    points[1].tv = uv.get_top();
-    points[1].position = ur.copy();
-    points[3].tu = uv.get_right();
-    points[3].tv = uv.get_bottom();
-    points[3].position = lr.copy();
-    points[5].tu = uv.get_right();
-    points[5].tv = uv.get_top();
-    points[5].position = ur.copy();
-    points[4].tu = uv.get_left();
-    points[4].tv = uv.get_bottom();
-    points[4].position = ll.copy();
-    if (!!this.rotation || !!this.tilt || !!this.bank) {
-      if (!this._matInit) {
-        var lookAt = Matrix3d.lookAtLH(this.center, new Vector3d(), this.up);
-        var lookAtInv = lookAt.clone();
-        lookAtInv.invert();
-        this._rtbMat = Matrix3d.multiplyMatrix(Matrix3d.multiplyMatrix(Matrix3d.multiplyMatrix(Matrix3d.multiplyMatrix(lookAt, Matrix3d._rotationZ(-this.rotation / 180 * Math.PI)), Matrix3d._rotationX(-this.tilt / 180 * Math.PI)), Matrix3d._rotationY(-this.bank / 180 * Math.PI)), lookAtInv);
-        this._matInit = true;
-      }
-      for (var i = 0; i < 6; i++) {
-        points[i].position = Vector3d._transformCoordinate(points[i].position, this._rtbMat);
-      }
-    }
-    var $enum1 = ss.enumerate(points);
-    while ($enum1.moveNext()) {
-      var pnt = $enum1.current;
-      pointList.push(pnt);
-    }
-  }
-};
-
-registerType("Text3d", [Text3d, Text3d$, null]);
-
 // wwtlib.SpaceTimeController
 
 export function SpaceTimeController() { }
@@ -13855,69 +12979,6 @@ var Selection$ = {
 };
 
 registerType("Selection", [Selection, Selection$, null]);
-
-// wwtlib.TextObject
-
-export function TextObject() {
-  this.bold = false;
-  this.italic = false;
-  this.underline = false;
-  this.fontSize = 0;
-  this.borderStyle = 0;
-}
-
-TextObject.create = function (text, bold, italic, underline, fontSize, fontName, forgroundColor, backgroundColor, borderStyle) {
-  var temp = new TextObject();
-  temp.text = text;
-  temp.bold = bold;
-  temp.italic = italic;
-  temp.underline = underline;
-  temp.fontSize = fontSize;
-  temp.fontName = fontName;
-  temp.foregroundColor = forgroundColor;
-  temp.backgroundColor = backgroundColor;
-  temp.borderStyle = borderStyle;
-  return temp;
-};
-
-TextObject._fromXml = function (node) {
-  var newTextObject = new TextObject();
-  newTextObject.text = Util.getInnerText(node);
-  newTextObject.borderStyle = 0;
-  newTextObject.bold = ss.boolean(node.attributes.getNamedItem('Bold').nodeValue);
-  newTextObject.italic = ss.boolean(node.attributes.getNamedItem('Italic').nodeValue);
-  newTextObject.underline = ss.boolean(node.attributes.getNamedItem('Underline').nodeValue);
-  newTextObject.fontSize = parseFloat(node.attributes.getNamedItem('FontSize').nodeValue);
-  newTextObject.fontName = node.attributes.getNamedItem('FontName').nodeValue;
-  newTextObject.foregroundColor = Color.load(node.attributes.getNamedItem('ForgroundColor').nodeValue);
-  newTextObject.backgroundColor = Color.load(node.attributes.getNamedItem('BackgroundColor').nodeValue);
-  if (node.attributes.getNamedItem('BorderStyle') != null) {
-    newTextObject.borderStyle = Enums.parse('TextBorderStyle', node.attributes.getNamedItem('BorderStyle').nodeValue);
-  }
-  return newTextObject;
-};
-
-var TextObject$ = {
-  toString: function () {
-    return this.text;
-  },
-
-  _saveToXml: function (xmlWriter) {
-    xmlWriter._writeStartElement('TextObject');
-    xmlWriter._writeAttributeString('Bold', this.bold.toString());
-    xmlWriter._writeAttributeString('Italic', this.italic.toString());
-    xmlWriter._writeAttributeString('Underline', this.underline.toString());
-    xmlWriter._writeAttributeString('FontSize', this.fontSize.toString());
-    xmlWriter._writeAttributeString('FontName', this.fontName);
-    xmlWriter._writeAttributeString('ForgroundColor', this.foregroundColor.save());
-    xmlWriter._writeAttributeString('BackgroundColor', this.backgroundColor.save());
-    xmlWriter._writeAttributeString('BorderStyle', Enums.toXml('TextBorderStyle', this.borderStyle));
-    xmlWriter._writeString(this.text);
-    xmlWriter._writeEndElement();
-  }
-};
-
-registerType("TextObject", [TextObject, TextObject$, null]);
 
 // wwtlib.TourDocument
 
@@ -20256,10 +19317,12 @@ WWTControl.getImageSets = function () {
   return WWTControl.imageSets;
 };
 
+// This parameter does nothing. We keep it to maintain API compatibility.
 WWTControl.get_renderNeeded = function () {
   return WWTControl._renderNeeded;
 };
 
+// This parameter does nothing. We keep it to maintain API compatibility.
 WWTControl.set_renderNeeded = function (value) {
   WWTControl._renderNeeded = true;
   return value;
@@ -21679,7 +20742,6 @@ var WWTControl$ = {
   },
 
   gotoTargetFull: function (noZoom, instant, cameraParams, studyImageSet, backgroundImageSet) {
-    WWTControl.set_renderNeeded(true);
     this._tracking = false;
     this._trackingObject = null;
     this._targetStudyImageset = studyImageSet;
@@ -21715,7 +20777,6 @@ var WWTControl$ = {
       this._mover_Midpoint();
     } else {
       this.set__mover(ViewMoverSlew.create(this.renderContext.viewCamera, cameraParams));
-      WWTControl.set_renderNeeded(true);
       this.get__mover().set_midpoint(ss.bind('_mover_Midpoint', this));
     }
   },
@@ -21748,7 +20809,6 @@ var WWTControl$ = {
 
   set__mover: function (value) {
     this.renderContext.viewMover = value;
-    WWTControl.set_renderNeeded(true);
     return value;
   },
 

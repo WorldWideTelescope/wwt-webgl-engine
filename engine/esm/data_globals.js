@@ -20,3 +20,20 @@ export var makeNewHipsProperties = null;
 export function set_makeNewHipsProperties(value) {
     makeNewHipsProperties = value;
 }
+
+// This is equivalent to `new Folder()`. We abstract
+// the function to avoid circular dependencies in the type hierarchy.
+export var makeNewFolder = null;
+
+export function set_makeNewFolder(value) {
+    makeNewFolder = value;
+}
+
+// This is equivalent to `Place.create(name, lat, lng, classification,
+// constellation, type, zoomFactor)`. We abstract the function to avoid circular
+// dependencies in the type hierarchy.
+export var createPlace = null;
+
+export function set_createPlace(value) {
+    createPlace = value;
+}
