@@ -210,6 +210,7 @@ export { TextBorderStyle, TextObject } from "./tours/text_object.js";
 export { Alignment, Text3dBatch, Text3d, GlyphItem, GlyphCache } from "./sky_text.js";
 export { Lineset, Linepoint, Constellations } from "./constellations.js";
 export { SpaceTimeController } from "./space_time_controller.js";
+export { KeplerianElements, BodyAngles, Planets } from "./planets.js";
 
 export {
     PointType,
@@ -275,9 +276,6 @@ export {
     VoRow,
     VoColumn,
     Place,
-    KeplerianElements,
-    BodyAngles,
-    Planets,
     Material,
     InViewReturnMessage,
     RenderContext,
