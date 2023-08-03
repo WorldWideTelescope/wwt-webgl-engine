@@ -218,6 +218,7 @@ export { KeplerVertex } from "./kepler_vertex.js";
 export { Pointing } from "./pointing.js";
 export { Tour } from "./tour.js";
 export { VideoOutputType } from "./video_output_type.js";
+export { VizLayer } from "./viz_layer.js";
 
 export {
     PointType,
@@ -305,7 +306,6 @@ export {
     ColorPicker,
     Dialog,
     Histogram,
-    VizLayer,
     FolderDownloadAction,
     Wtml,
     WWTControl,
