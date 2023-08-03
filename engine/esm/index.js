@@ -215,6 +215,7 @@ export { Place } from "./place.js";
 export { FolderUp } from "./folder_up.js";
 export { Grids } from "./grids.js";
 export { KeplerVertex } from "./kepler_vertex.js";
+export { Pointing } from "./pointing.js";
 
 export {
     PointType,
@@ -248,7 +249,6 @@ export {
     GFX,
     VideoOutputType,
     HipsProperties,
-    Pointing,
     Folder,
     FolderBrowser,
     ViewMoverKenBurnsStyle,
