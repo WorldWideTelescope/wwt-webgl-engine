@@ -216,6 +216,7 @@ export { FolderUp } from "./folder_up.js";
 export { Grids } from "./grids.js";
 export { KeplerVertex } from "./kepler_vertex.js";
 export { Pointing } from "./pointing.js";
+export { Tour } from "./tour.js";
 
 export {
     PointType,
@@ -280,7 +281,6 @@ export {
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
-    Tour,
     FileEntry,
     FileCabinet,
     Overlay,
