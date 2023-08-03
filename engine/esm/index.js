@@ -214,6 +214,7 @@ export { KeplerianElements, BodyAngles, Planets } from "./planets.js";
 export { Place } from "./place.js";
 export { FolderUp } from "./folder_up.js";
 export { Grids } from "./grids.js";
+export { KeplerVertex } from "./kepler_vertex.js";
 
 export {
     PointType,
@@ -251,7 +252,6 @@ export {
     Folder,
     FolderBrowser,
     ViewMoverKenBurnsStyle,
-    KeplerVertex,
     Layer,
     DomainValue,
     LayerManager,
