@@ -85,3 +85,11 @@ export var tileCacheGetCachedTile = null;
 export function set_tileCacheGetCachedTile(value) {
     tileCacheGetCachedTile = value;
 }
+
+// This is another way to access `WWTControl.singleton.renderContext`. It's the
+// global singleton RenderContxt instance.
+export var globalRenderContext = null;
+
+export function set_globalRenderContext(value) {
+    globalRenderContext = value;
+}
