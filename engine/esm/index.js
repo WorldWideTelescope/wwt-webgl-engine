@@ -217,6 +217,7 @@ export { Grids } from "./grids.js";
 export { KeplerVertex } from "./kepler_vertex.js";
 export { Pointing } from "./pointing.js";
 export { Tour } from "./tour.js";
+export { VideoOutputType } from "./video_output_type.js";
 
 export {
     PointType,
@@ -248,7 +249,6 @@ export {
     DialogResult,
     Formatting,
     GFX,
-    VideoOutputType,
     HipsProperties,
     Folder,
     FolderBrowser,

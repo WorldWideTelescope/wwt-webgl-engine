@@ -139,6 +139,7 @@ import { KeplerVertex } from "./kepler_vertex.js";
 import { MinorPlanets } from "./minor_planets.js";
 import { TileCache } from "./tile_cache.js";
 import { Tour } from "./tour.js";
+import { VideoOutputType } from "./video_output_type.js";
 
 
 // wwtlib.PointType
@@ -603,26 +604,6 @@ registerEnum("Formatting", Formatting);
 export function GFX() { }
 
 registerType("GFX", [GFX, null, null]);
-
-// wwtlib.VideoOutputType
-
-export function VideoOutputType(width, height, fps, format, waitDownload) {
-  this.fps = 0;
-  this.width = 0;
-  this.height = 0;
-  this.totalFrames = 0;
-  this.waitDownload = false;
-  this.format = 'image/jpeg';
-  this.width = width;
-  this.height = height;
-  this.fps = fps;
-  this.format = format;
-  this.waitDownload = waitDownload;
-}
-
-var VideoOutputType$ = {};
-
-registerType("VideoOutputType", [VideoOutputType, VideoOutputType$, null]);
 
 // wwtlib.HipsProperties
 
