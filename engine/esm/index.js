@@ -220,6 +220,8 @@ export { Tour } from "./tour.js";
 export { VideoOutputType } from "./video_output_type.js";
 export { VizLayer } from "./viz_layer.js";
 
+export { Layer, DomainValue, AltUnits, FadeType } from "./layers/layer.js";
+
 export {
     PointType,
     FolderGroup,
@@ -227,8 +229,6 @@ export {
     FolderType,
     ThumbnailSize,
     Classification,
-    AltUnits,
-    FadeType,
     ReferenceFrames,
     ReferenceFrameTypes,
     CoordinatesTypes,
@@ -254,8 +254,6 @@ export {
     Folder,
     FolderBrowser,
     ViewMoverKenBurnsStyle,
-    Layer,
-    DomainValue,
     LayerManager,
     LayerMap,
     SkyOverlays,
