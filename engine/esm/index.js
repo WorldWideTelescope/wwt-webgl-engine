@@ -219,6 +219,7 @@ export { Pointing } from "./pointing.js";
 export { Tour } from "./tour.js";
 export { VideoOutputType } from "./video_output_type.js";
 export { VizLayer } from "./viz_layer.js";
+export { Histogram } from "./utilities/histogram.js";
 
 export { Layer, DomainValue, AltUnits, FadeType } from "./layers/layer.js";
 
@@ -226,6 +227,7 @@ export { Layer, DomainValue, AltUnits, FadeType } from "./layers/layer.js";
 export { GreatCirlceRouteLayer } from "./layers/great_circle_route_layer.js";
 
 export { GridLayer } from "./layers/grid_layer.js";
+export { ImageSetLayer } from "./layers/imageset_layer.js";
 
 export {
     PointType,
@@ -308,13 +310,11 @@ export {
     UndoTourPropertiesChange,
     ColorPicker,
     Dialog,
-    Histogram,
     FolderDownloadAction,
     Wtml,
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    ImageSetLayer,
     Object3dLayer,
     Object3dLayerUI,
     OrbitLayer,
