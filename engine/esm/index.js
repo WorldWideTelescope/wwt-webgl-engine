@@ -222,6 +222,9 @@ export { VizLayer } from "./viz_layer.js";
 
 export { Layer, DomainValue, AltUnits, FadeType } from "./layers/layer.js";
 
+// To keep API compatibility, we can't fix this typo.
+export { GreatCirlceRouteLayer } from "./layers/great_circle_route_layer.js";
+
 export {
     PointType,
     FolderGroup,
@@ -309,7 +312,6 @@ export {
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    GreatCirlceRouteLayer,
     GridLayer,
     ImageSetLayer,
     Object3dLayer,
