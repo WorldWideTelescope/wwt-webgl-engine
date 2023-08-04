@@ -140,6 +140,7 @@ import { VideoOutputType } from "./video_output_type.js";
 
 import { Layer } from "./layers/layer.js";
 import { GreatCirlceRouteLayer } from "./layers/great_circle_route_layer.js";
+import { GridLayer } from "./layers/grid_layer.js";
 
 
 // wwtlib.PointType
@@ -17492,22 +17493,6 @@ export function WWTElementEvent(x, y) {
 var WWTElementEvent$ = {};
 
 registerType("WWTElementEvent", [WWTElementEvent, WWTElementEvent$, null]);
-
-// wwtlib.GridLayer
-
-export function GridLayer() {
-  Layer.call(this);
-}
-
-var GridLayer$ = {
-  draw: function (renderContext, opacity, flat) {
-    Grids.drawPlanetGrid(renderContext, opacity * this.get_opacity(), this.get_color());
-    Grids.drawPlanetGridText(renderContext, opacity * this.get_opacity(), this.get_color());
-    return true;
-  }
-};
-
-registerType("GridLayer", [GridLayer, GridLayer$, Layer]);
 
 // wwtlib.ImageSetLayer
 
