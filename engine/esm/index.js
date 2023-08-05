@@ -248,6 +248,20 @@ export { OrbitLayer, OrbitLayerUI } from "./layers/orbit_layer.js";
 export { Table } from "./layers/table.js";
 export { Primitives, VoTable, VoRow, VoColumn } from "./layers/vo_table.js";
 
+export { FileEntry, FileCabinet } from "./tours/file_cabinet.js";
+export {
+    OverlayAnchor,
+    AudioType,
+    ShapeType,
+    LoopTypes,
+    Overlay,
+    AudioOverlay,
+    BitmapOverlay,
+    FlipbookOverlay,
+    ShapeOverlay,
+    TextOverlay,
+} from "./tours/overlay.js";
+
 export {
     PointType,
     FolderGroup,
@@ -264,10 +278,6 @@ export {
     MarkerScales,
     RAUnits,
     StockSkyOverlayTypes,
-    OverlayAnchor,
-    AudioType,
-    ShapeType,
-    LoopTypes,
     SelectionAnchor,
     UserLevel,
     TransitionType,
@@ -289,9 +299,6 @@ export {
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
-    FileEntry,
-    FileCabinet,
-    Overlay,
     Selection,
     TourDocument,
     TourEditTab,
@@ -320,11 +327,6 @@ export {
     SpreadSheetLayer,
     TimeSeriesLayer,
     VoTableLayer,
-    BitmapOverlay,
-    TextOverlay,
-    ShapeOverlay,
-    AudioOverlay,
-    FlipbookOverlay,
     FrameWizard,
     ReferenceFrameProps,
     GreatCircleDialog,
