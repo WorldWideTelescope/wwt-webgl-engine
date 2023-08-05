@@ -262,6 +262,12 @@ export {
     TextOverlay,
 } from "./tours/overlay.js";
 export { Selection, SelectionAnchor } from "./tours/selection.js";
+export {
+    TransitionType,
+    TourStop,
+    LayerInfo,
+    UndoTourStopChange,
+} from "./tours/tour_stop.js";
 
 export {
     PointType,
@@ -280,7 +286,6 @@ export {
     RAUnits,
     StockSkyOverlayTypes,
     UserLevel,
-    TransitionType,
     DialogResult,
     Formatting,
     GFX,
@@ -309,9 +314,6 @@ export {
     TimeLine,
     TourPlayer,
     MasterTime,
-    TourStop,
-    LayerInfo,
-    UndoTourStopChange,
     Undo,
     UndoStep,
     UndoTourSlidelistChange,
