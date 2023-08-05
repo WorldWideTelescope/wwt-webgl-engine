@@ -222,12 +222,26 @@ export { VizLayer } from "./viz_layer.js";
 export { Histogram } from "./utilities/histogram.js";
 
 export { Layer, DomainValue, AltUnits, FadeType } from "./layers/layer.js";
+export {
+    LayerUI,
+    LayerUIMenuItem,
+    LayerUITreeNode,
+} from "./layers/layer_ui.js";
 
 // To keep API compatibility, we can't fix this typo.
 export { GreatCirlceRouteLayer } from "./layers/great_circle_route_layer.js";
 
 export { GridLayer } from "./layers/grid_layer.js";
 export { ImageSetLayer } from "./layers/imageset_layer.js";
+export {
+    Group,
+    Material,
+    Mesh,
+    Object3d,
+    ObjectNode,
+    Object3dLayer,
+    Object3dLayerUI,
+} from "./layers/object3d.js";
 
 export {
     PointType,
@@ -266,13 +280,6 @@ export {
     SkyOverlays,
     GroundOverlayLayer,
     FrameTarget,
-    LayerUI,
-    LayerUIMenuItem,
-    LayerUITreeNode,
-    Group,
-    Mesh,
-    Object3d,
-    ObjectNode,
     Orbit,
     EllipseRenderer,
     ReferenceFrame,
@@ -283,7 +290,6 @@ export {
     VoTable,
     VoRow,
     VoColumn,
-    Material,
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
@@ -315,8 +321,6 @@ export {
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    Object3dLayer,
-    Object3dLayerUI,
     OrbitLayer,
     OrbitLayerUI,
     SpreadSheetLayer,
