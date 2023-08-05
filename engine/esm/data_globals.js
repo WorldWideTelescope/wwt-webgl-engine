@@ -45,3 +45,11 @@ export var globalWWTControl = null;
 export function set_globalWWTControl(value) {
     globalWWTControl = value;
 }
+
+// This is another way to access the `WWTControl.scriptInterface` singleton. It's
+// the global singleton ScriptInterface instance.
+export var globalScriptInterface = null;
+
+export function set_globalScriptInterface(value) {
+    globalScriptInterface = value;
+}

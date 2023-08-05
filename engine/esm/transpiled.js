@@ -32,9 +32,11 @@ import {
 
 import {
   freestandingMode,
+  globalScriptInterface,
   globalWWTControl,
   makeNewHipsProperties,
   set_freestandingMode,
+  set_globalScriptInterface,
   set_globalWWTControl,
   set_makeNewFolder,
   set_makeNewHipsProperties,
@@ -1882,8 +1884,8 @@ LayerManager.set_tourLayers = function (value) {
 };
 
 LayerManager.loadTree = function () {
-  if (WWTControl.scriptInterface != null) {
-    WWTControl.scriptInterface.refreshLayerManagerNow();
+  if (globalScriptInterface != null) {
+    globalScriptInterface.refreshLayerManagerNow();
   }
 };
 
@@ -2681,9 +2683,9 @@ LayerManager.layerSelectionChanged = function (selected) {
       }
     }
   }
-  WWTControl.scriptInterface.setTimeSlider('left', '');
-  WWTControl.scriptInterface.setTimeSlider('right', '');
-  WWTControl.scriptInterface.setTimeSlider('title', Language.getLocalizedText(667, 'Time Scrubber'));
+  globalScriptInterface.setTimeSlider('left', '');
+  globalScriptInterface.setTimeSlider('right', '');
+  globalScriptInterface.setTimeSlider('title', Language.getLocalizedText(667, 'Time Scrubber'));
 };
 
 LayerManager.setTimeSliderValue = function (pos) {
@@ -3071,7 +3073,7 @@ LayerManager.scaleMenu_click = function (sender, e) {
 LayerManager._showViewer_Click = function (sender, e) {
   if (ss.canCast(LayerManager._selectedLayer, VoTableLayer)) {
     var layer = ss.safeCast(LayerManager._selectedLayer, VoTableLayer);
-    WWTControl.scriptInterface.displayVoTableLayer(layer);
+    globalScriptInterface.displayVoTableLayer(layer);
   }
 };
 
@@ -6577,7 +6579,7 @@ var TourDocument$ = {
       doc.readAsText(this._cabinet.getFileBlob(master));
     }
     catch (ex) {
-      WWTControl.scriptInterface._fireTourError(ex);
+      globalScriptInterface._fireTourError(ex);
     }
   },
 
@@ -9738,7 +9740,7 @@ var TourPlayer$ = {
         Settings.tourSettings = this._tour.get_currentTourStop();
         SpaceTimeController.set_now(this._tour.get_currentTourStop().get_startTime());
         SpaceTimeController.set_syncToClock(false);
-        WWTControl.scriptInterface._fireSlideChanged(caption);
+        globalScriptInterface._fireSlideChanged(caption);
       }
     }
     if (renderContext.gl != null) {
@@ -9755,7 +9757,7 @@ var TourPlayer$ = {
         var $enum3 = ss.enumerate(this._tour.get_currentTourStop().get_overlays());
         while ($enum3.moveNext()) {
           var overlay = $enum3.current;
-          if (overlay.get_name().toLowerCase() !== 'caption' || WWTControl.scriptInterface.get_showCaptions()) {
+          if (overlay.get_name().toLowerCase() !== 'caption' || globalScriptInterface.get_showCaptions()) {
             overlay.set_tweenFactor(CameraParameters.easeCurve(this._tour.get_currentTourStop().get_tweenPosition(), (overlay.get_interpolationType() === 5) ? this._tour.get_currentTourStop().get_interpolationType() : overlay.get_interpolationType()));
             overlay.draw3D(renderContext, false);
           }
@@ -9779,7 +9781,7 @@ var TourPlayer$ = {
         var $enum5 = ss.enumerate(this._tour.get_currentTourStop().get_overlays());
         while ($enum5.moveNext()) {
           var overlay = $enum5.current;
-          if (overlay.get_name().toLowerCase() !== 'caption' || WWTControl.scriptInterface.get_showCaptions()) {
+          if (overlay.get_name().toLowerCase() !== 'caption' || globalScriptInterface.get_showCaptions()) {
             overlay.set_tweenFactor(CameraParameters.easeCurve(this._tour.get_currentTourStop().get_tweenPosition(), (overlay.get_interpolationType() === 5) ? this._tour.get_currentTourStop().get_interpolationType() : overlay.get_interpolationType()));
             overlay.draw3D(renderContext, false);
           }
@@ -9894,7 +9896,7 @@ var TourPlayer$ = {
           TourPlayer.__tourEnded(this, new ss.EventArgs());
         }
         globalWWTControl._hideUI(false);
-        WWTControl.scriptInterface._fireTourEnded();
+        globalScriptInterface._fireTourEnded();
       }
     }
   },
@@ -10023,7 +10025,7 @@ var TourPlayer$ = {
       }
     }
     globalWWTControl._hideUI(TourPlayer.noRestoreUIOnStop);
-    WWTControl.scriptInterface._fireTourEnded();
+    globalScriptInterface._fireTourEnded();
   },
 
   updateSlideStates: function () {
@@ -10226,10 +10228,10 @@ var TourPlayer$ = {
     if (TourPlayer._playing) {
       this.stop(TourPlayer._switchedToFullScreen);
       globalWWTControl._freezeView();
-      WWTControl.scriptInterface._fireTourPaused();
+      globalScriptInterface._fireTourPaused();
     } else {
       this.play();
-      WWTControl.scriptInterface._fireTourResume();
+      globalScriptInterface._fireTourResume();
     }
   },
 
@@ -10668,7 +10670,7 @@ TourStop._fromXml = function (owner, tourStop) {
     return newTourStop;
   }
   catch (ex) {
-    WWTControl.scriptInterface._fireTourError(ex);
+    globalScriptInterface._fireTourError(ex);
     return null;
   }
 };
@@ -12253,7 +12255,7 @@ var ColorPicker$ = {
   nonMenuClick: function (e) { },
 
   show: function (e) {
-    WWTControl.scriptInterface.showColorPicker(this, e);
+    globalScriptInterface.showColorPicker(this, e);
   },
 
   getColorFromClick: function (e) {
@@ -12483,6 +12485,7 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
   if (globalRenderContext.device == null) {
     WWTControl.scriptInterface = new ScriptInterface();
     WWTControl.scriptInterface.settings = Settings.get_current();
+    set_globalScriptInterface(WWTControl.scriptInterface);
     var canvas = WWTControl._createCanvasElement(DivId);
     var gl = canvas.getContext('webgl2');
     if (gl != null) {
@@ -12521,7 +12524,7 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
   if (startRenderLoop) {
     globalWWTControl.render();
   }
-  return WWTControl.scriptInterface;
+  return globalScriptInterface;
 };
 
 WWTControl._createCanvasElement = function (DivId) {
@@ -12591,7 +12594,7 @@ var WWTControl$ = {
       while ($enum1.moveNext()) {
         var note = $enum1.current;
         if (note.hitTest(this.renderContext, ra, dec, x, y)) {
-          WWTControl.scriptInterface._fireAnnotationclicked(ra, dec, note.get_id());
+          globalScriptInterface._fireAnnotationclicked(ra, dec, note.get_id());
           return true;
         }
         index++;
@@ -12794,7 +12797,7 @@ var WWTControl$ = {
           this.renderContext.targetAz = this.renderContext.az = currentAltAz.get_az();
         }
         if (this.get__mover().get_complete()) {
-          WWTControl.scriptInterface._fireArrived(this.get__mover().get_currentPosition().get_RA(), this.get__mover().get_currentPosition().get_dec(), globalRenderContext.viewCamera.zoom);
+          globalScriptInterface._fireArrived(this.get__mover().get_currentPosition().get_RA(), this.get__mover().get_currentPosition().get_dec(), globalRenderContext.viewCamera.zoom);
           this.set__mover(null);
           this._notifyMoveComplete();
         }
@@ -13518,7 +13521,7 @@ var WWTControl$ = {
     if (this._mouseDown && !this._moved) {
       var raDecDown = this.getCoordinatesForScreenPoint(Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e));
       if (!this._annotationclicked(raDecDown.x, raDecDown.y, Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e))) {
-        WWTControl.scriptInterface._fireClick(raDecDown.x, raDecDown.y);
+        globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
       }
     }
     this._mouseDown = false;
@@ -13663,7 +13666,7 @@ var WWTControl$ = {
   },
 
   _setupComplete: function () {
-    WWTControl.scriptInterface._fireReady();
+    globalScriptInterface._fireReady();
   },
 
   gotoRADecZoom: function (ra, dec, zoom, instant, roll) {
@@ -14050,7 +14053,7 @@ var WWTControl$ = {
       var player = new TourPlayer();
       player.set_tour($this.tour);
       globalWWTControl.uiController = player;
-      WWTControl.scriptInterface._fireTourReady();
+      globalScriptInterface._fireTourReady();
     });
   },
 
@@ -14064,7 +14067,7 @@ var WWTControl$ = {
     this.tour = TourDocument.fromUrl(url, function () {
       $this.setupTour();
       $this.tourEdit.playNow(true);
-      WWTControl.scriptInterface._fireTourReady();
+      globalScriptInterface._fireTourReady();
     });
   },
 
