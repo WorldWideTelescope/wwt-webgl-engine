@@ -125,6 +125,7 @@ import { MinorPlanets } from "./minor_planets.js";
 import { TileCache } from "./tile_cache.js";
 import { Tour } from "./tour.js";
 import { VideoOutputType } from "./video_output_type.js";
+import { ColorPicker } from "./utilities/color_picker.js";
 import { Histogram } from "./utilities/histogram.js";
 
 import { Layer } from "./layers/layer.js";
@@ -9453,40 +9454,6 @@ var UndoTourPropertiesChange$ = {
 };
 
 registerType("UndoTourPropertiesChange", [UndoTourPropertiesChange, UndoTourPropertiesChange$, null, IUndoStep]);
-
-// wwtlib.ColorPicker
-// requires : ScriptInterface
-
-export function ColorPicker() {
-  this.callBack = null;
-  this.color = Colors.get_white();
-}
-
-var ColorPicker$ = {
-  nonMenuClick: function (e) { },
-
-  show: function (e) {
-    globalScriptInterface.showColorPicker(this, e);
-  },
-
-  getColorFromClick: function (e) {
-    var image = document.getElementById('colorhex');
-    var canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(image, 0, 0);
-    var pixels = ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data;
-    this.color = Color.fromArgb(pixels[3], pixels[0], pixels[1], pixels[2]);
-    return this.color;
-  },
-
-  pickColor: function (e) {
-    this.callBack(this.color);
-  }
-};
-
-registerType("ColorPicker", [ColorPicker, ColorPicker$, null]);
 
 // wwtlib.Dialog
 
