@@ -245,6 +245,7 @@ export {
 export { Orbit, EllipseRenderer } from "./layers/orbit.js";
 export { ReferenceFrame, ReferenceFrameTypes } from "./layers/reference_frame.js";
 export { OrbitLayer, OrbitLayerUI } from "./layers/orbit_layer.js";
+export { Table } from "./layers/table.js";
 
 export {
     PointType,
@@ -285,7 +286,6 @@ export {
     KmlCoordinate,
     KmlLineList,
     PushPin,
-    Table,
     VoTable,
     VoRow,
     VoColumn,
