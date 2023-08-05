@@ -243,6 +243,8 @@ export {
     Object3dLayerUI,
 } from "./layers/object3d.js";
 export { Orbit, EllipseRenderer } from "./layers/orbit.js";
+export { ReferenceFrame, ReferenceFrameTypes } from "./layers/reference_frame.js";
+export { OrbitLayer, OrbitLayerUI } from "./layers/orbit_layer.js";
 
 export {
     PointType,
@@ -252,7 +254,6 @@ export {
     ThumbnailSize,
     Classification,
     ReferenceFrames,
-    ReferenceFrameTypes,
     CoordinatesTypes,
     AltTypes,
     MarkerMixes,
@@ -281,7 +282,6 @@ export {
     SkyOverlays,
     GroundOverlayLayer,
     FrameTarget,
-    ReferenceFrame,
     KmlCoordinate,
     KmlLineList,
     PushPin,
@@ -320,8 +320,6 @@ export {
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    OrbitLayer,
-    OrbitLayerUI,
     SpreadSheetLayer,
     TimeSeriesLayer,
     VoTableLayer,
