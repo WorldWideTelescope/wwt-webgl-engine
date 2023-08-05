@@ -246,6 +246,7 @@ export { Orbit, EllipseRenderer } from "./layers/orbit.js";
 export { ReferenceFrame, ReferenceFrameTypes } from "./layers/reference_frame.js";
 export { OrbitLayer, OrbitLayerUI } from "./layers/orbit_layer.js";
 export { Table } from "./layers/table.js";
+export { Primitives, VoTable, VoRow, VoColumn } from "./layers/vo_table.js";
 
 export {
     PointType,
@@ -262,7 +263,6 @@ export {
     PlotTypes,
     MarkerScales,
     RAUnits,
-    Primitives,
     StockSkyOverlayTypes,
     OverlayAnchor,
     AudioType,
@@ -286,9 +286,6 @@ export {
     KmlCoordinate,
     KmlLineList,
     PushPin,
-    VoTable,
-    VoRow,
-    VoColumn,
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
