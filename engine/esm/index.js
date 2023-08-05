@@ -261,6 +261,7 @@ export {
     ShapeOverlay,
     TextOverlay,
 } from "./tours/overlay.js";
+export { Selection, SelectionAnchor } from "./tours/selection.js";
 
 export {
     PointType,
@@ -278,7 +279,6 @@ export {
     MarkerScales,
     RAUnits,
     StockSkyOverlayTypes,
-    SelectionAnchor,
     UserLevel,
     TransitionType,
     DialogResult,
@@ -299,7 +299,6 @@ export {
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
-    Selection,
     TourDocument,
     TourEditTab,
     TourEditor,
