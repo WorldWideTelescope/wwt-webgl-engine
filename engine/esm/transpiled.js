@@ -32,8 +32,10 @@ import {
 
 import {
   freestandingMode,
+  globalWWTControl,
   makeNewHipsProperties,
   set_freestandingMode,
+  set_globalWWTControl,
   set_makeNewFolder,
   set_makeNewHipsProperties,
 } from "./data_globals.js";
@@ -1246,7 +1248,7 @@ var FolderBrowser$ = {
     if (index > -1) {
       if (ss.canCast(this._items[index], Place)) {
         var place = this._items[index];
-        WWTControl.singleton.gotoTarget(place, false, false, true);
+        globalWWTControl.gotoTarget(place, false, false, true);
         return;
       }
       if (ss.canCast(this._items[index], Imageset)) {
@@ -1256,7 +1258,7 @@ var FolderBrowser$ = {
       }
       if (ss.canCast(this._items[index], Tour)) {
         var tour = this._items[index];
-        WWTControl.singleton.playTour(tour.get_tourUrl());
+        globalWWTControl.playTour(tour.get_tourUrl());
         return;
       }
       if (ss.canCast(this._items[index], Folder)) {
@@ -2401,7 +2403,7 @@ LayerManager._getFrameTarget = function (renderContext, TrackingFrame) {
 
 LayerManager._prepTourLayers = function () {
   if (TourPlayer.get_playing()) {
-    var player = WWTControl.singleton.uiController;
+    var player = globalWWTControl.uiController;
     if (player != null) {
       var tour = player.get_tour();
       if (tour.get_currentTourStop() != null) {
@@ -2432,7 +2434,7 @@ LayerManager._draw = function (renderContext, opacity, astronomical, referenceFr
     return;
   }
   if (TourPlayer.get_playing()) {
-    var player = WWTControl.singleton.uiController;
+    var player = globalWWTControl.uiController;
     if (player != null) {
       var tour = player.get_tour();
       if (tour.get_currentTourStop() != null) {
@@ -2579,7 +2581,7 @@ LayerManager._preDraw = function (renderContext, opacity, astronomical, referenc
     return;
   }
   if (TourPlayer.get_playing()) {
-    var player = ss.safeCast(WWTControl.singleton.uiController, TourPlayer);
+    var player = ss.safeCast(globalWWTControl.uiController, TourPlayer);
     if (player != null) {
       var tour = player.get_tour();
       if (tour.get_currentTourStop() != null) {
@@ -2825,9 +2827,9 @@ LayerManager.showLayerMenu = function (selected, x, y) {
     addGridLayer.click = LayerManager._addGirdLayer_Click;
     var convertToOrbit = ToolStripMenuItem.create('Extract Orbit Layer');
     if (map.frame.reference !== 19) {
-      if ((WWTControl.singleton.get_solarSystemMode() | WWTControl.singleton.sandboxMode) === 1) {
+      if ((globalWWTControl.get_solarSystemMode() | globalWWTControl.sandboxMode) === 1) {
         var spacerNeeded = false;
-        if (map.frame.reference !== 18 && !WWTControl.singleton.sandboxMode) {
+        if (map.frame.reference !== 18 && !globalWWTControl.sandboxMode) {
           if (!Sky) {
           }
           try {
@@ -4034,9 +4036,9 @@ Planets3d._initRings = function () {
 
 Planets3d._drawSphere = function (renderContext, planetID) {
   var planetName = Planets3d.getImageSetNameNameFrom3dId(planetID);
-  var planet = WWTControl.singleton.getImagesetByName(planetName);
+  var planet = globalWWTControl.getImagesetByName(planetName);
   if (planet == null) {
-    planet = WWTControl.singleton.getImagesetByName('Bing Maps Aerial');
+    planet = globalWWTControl.getImagesetByName('Bing Maps Aerial');
   }
   if (planet != null) {
     renderContext.drawImageSet(planet, 100);
@@ -4339,8 +4341,8 @@ var RenderContext$ = {
     var viewModeChanged = this._backgroundImageset != null && value != null && (this._backgroundImageset.get_dataSetType() !== value.get_dataSetType());
     this._backgroundImageset = value;
     if (viewModeChanged) {
-      WWTControl.singleton._freezeView();
-      WWTControl.singleton.clampZooms(this);
+      globalWWTControl._freezeView();
+      globalWWTControl.clampZooms(this);
     }
     return value;
   },
@@ -4461,7 +4463,7 @@ var RenderContext$ = {
   },
 
   getAltitudeForLatLongForPlanet: function (planetID, viewLat, viewLong) {
-    var layer = WWTControl.singleton.getImagesetByName(Planets.getNameFrom3dId(planetID));
+    var layer = globalWWTControl.getImagesetByName(Planets.getNameFrom3dId(planetID));
     if (layer == null) {
       return 0;
     }
@@ -4481,7 +4483,7 @@ var RenderContext$ = {
   },
 
   getEarthAltitude: function (ViewLat, ViewLong, meters) {
-    if (WWTControl.singleton.get_solarSystemMode()) {
+    if (globalWWTControl.get_solarSystemMode()) {
       var pnt = Coordinates.geoTo3dDouble(ViewLat, ViewLong + 90);
       var EarthMat = Planets.earthMatrixInv;
       pnt = Vector3d._transformCoordinate(pnt, EarthMat);
@@ -4996,7 +4998,7 @@ ScriptInterface._addImageSet = function (name, gotoTarget, loaded, imageset) {
   var imagesetLayer = LayerManager.addImageSetLayerCallback(imageset, name, loaded);
   if (gotoTarget) {
     var zoom = imageset._guessZoomSetting(globalRenderContext.viewCamera.zoom);
-    WWTControl.singleton.gotoRADecZoom(imageset.get_viewCenterX() / 15, imageset.get_viewCenterY(), zoom, false, null);
+    globalWWTControl.gotoRADecZoom(imageset.get_viewCenterX() / 15, imageset.get_viewCenterY(), zoom, false, null);
   }
   return imagesetLayer;
 };
@@ -5019,7 +5021,7 @@ ScriptInterface._addFitsLayer = function (url, name, gotoTarget, loaded) {
     LayerManager.addFitsImageSetLayer(imagesetLayer, name);
     if (gotoTarget) {
       var zoom = imageset._guessZoomSetting(globalRenderContext.viewCamera.zoom);
-      WWTControl.singleton.gotoRADecZoom(wcsImage.get_viewCenterX() / 15, wcsImage.get_viewCenterY(), zoom, false, null);
+      globalWWTControl.gotoRADecZoom(wcsImage.get_viewCenterX() / 15, wcsImage.get_viewCenterY(), zoom, false, null);
     }
     if (loaded != null) {
       loaded(imagesetLayer);
@@ -5281,14 +5283,14 @@ var ScriptInterface$ = {
   },
 
   gotoRaDecZoom: function (ra, dec, zoom, instant, roll) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.gotoRADecZoom(ra / 15, dec, zoom * 6, instant, roll);
+    if (globalWWTControl != null) {
+      globalWWTControl.gotoRADecZoom(ra / 15, dec, zoom * 6, instant, roll);
     }
   },
 
   setBackgroundImageByName: function (name) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.setBackgroundImageByName(name);
+    if (globalWWTControl != null) {
+      globalWWTControl.setBackgroundImageByName(name);
     }
   },
 
@@ -5301,65 +5303,65 @@ var ScriptInterface$ = {
   },
 
   setForegroundImageByName: function (name) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.setForegroundImageByName(name);
+    if (globalWWTControl != null) {
+      globalWWTControl.setForegroundImageByName(name);
       globalRenderContext.viewCamera.opacity = 100;
     }
   },
 
   setForegroundOpacity: function (opacity) {
-    if (WWTControl.singleton != null) {
+    if (globalWWTControl != null) {
       globalRenderContext.viewCamera.opacity = opacity;
     }
   },
 
   addCatalogHipsByName: function (name) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.addCatalogHipsByName(name);
+    if (globalWWTControl != null) {
+      globalWWTControl.addCatalogHipsByName(name);
     }
   },
 
   addCatalogHipsByNameWithCallback: function (name, onLoad) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.addCatalogHipsByNameWithCallback(name, onLoad);
+    if (globalWWTControl != null) {
+      globalWWTControl.addCatalogHipsByNameWithCallback(name, onLoad);
     }
   },
 
   removeCatalogHipsByName: function (name) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.removeCatalogHipsByName(name);
+    if (globalWWTControl != null) {
+      globalWWTControl.removeCatalogHipsByName(name);
     }
   },
 
   getCatalogHipsDataInView: function (name, limit, onComplete) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.getCatalogHipsDataInView(name, limit, onComplete);
+    if (globalWWTControl != null) {
+      globalWWTControl.getCatalogHipsDataInView(name, limit, onComplete);
     }
   },
 
   setCutsForFits: function (imagesetName, min, max) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.setCutsForFits(imagesetName, min, max);
+    if (globalWWTControl != null) {
+      globalWWTControl.setCutsForFits(imagesetName, min, max);
     }
   },
 
   setColorMapForFits: function (imagesetName, colorMapName) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.setColorMapForFits(imagesetName, colorMapName);
+    if (globalWWTControl != null) {
+      globalWWTControl.setColorMapForFits(imagesetName, colorMapName);
     }
   },
 
   setScaleTypeForFits: function (imagesetName, scaleType) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.setScaleTypeForFits(imagesetName, scaleType);
+    if (globalWWTControl != null) {
+      globalWWTControl.setScaleTypeForFits(imagesetName, scaleType);
     }
   },
 
   hideUI: function (hide) { },
 
   loadTour: function (url) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.playTour(url);
+    if (globalWWTControl != null) {
+      globalWWTControl.playTour(url);
     }
   },
 
@@ -5375,12 +5377,12 @@ var ScriptInterface$ = {
     if (mode != null && mode.toLowerCase() === 'fits') {
       return ScriptInterface._addFitsLayer(url, name, gotoTarget, loaded);
     } else if (mode != null && mode.toLowerCase() === 'preloaded') {
-      var imageset = WWTControl.singleton.getImageSetByUrl(url);
+      var imageset = globalWWTControl.getImageSetByUrl(url);
       if (imageset != null) {
         return ScriptInterface._addImageSet(name, gotoTarget, loaded, imageset);
       }
     } else {
-      var imageset = WWTControl.singleton.getImageSetByUrl(url);
+      var imageset = globalWWTControl.getImageSetByUrl(url);
       if (imageset != null) {
         return ScriptInterface._addImageSet(name, gotoTarget, loaded, imageset);
       }
@@ -5413,14 +5415,14 @@ var ScriptInterface$ = {
   },
 
   playTour: function () {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.playCurrentTour();
+    if (globalWWTControl != null) {
+      globalWWTControl.playCurrentTour();
     }
   },
 
   stopTour: function () {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.stopCurrentTour();
+    if (globalWWTControl != null) {
+      globalWWTControl.stopCurrentTour();
     }
   },
 
@@ -5438,21 +5440,21 @@ var ScriptInterface$ = {
   },
 
   zoom: function (factor) {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton.zoom(factor);
+    if (globalWWTControl != null) {
+      globalWWTControl.zoom(factor);
     }
     return;
   },
 
   getRA: function () {
-    if (WWTControl.singleton != null) {
+    if (globalWWTControl != null) {
       return globalRenderContext.get_RA();
     }
     return 0;
   },
 
   getDec: function () {
-    if (WWTControl.singleton != null) {
+    if (globalWWTControl != null) {
       return globalRenderContext.get_dec();
     }
     return 0;
@@ -5481,23 +5483,23 @@ var ScriptInterface$ = {
 
   addAnnotation: function (annotation) {
     if (annotation != null && ss.canCast(annotation, Annotation)) {
-      if (WWTControl.singleton != null) {
-        WWTControl.singleton._addAnnotation(annotation);
+      if (globalWWTControl != null) {
+        globalWWTControl._addAnnotation(annotation);
       }
     }
   },
 
   removeAnnotation: function (annotation) {
     if (annotation != null) {
-      if (WWTControl.singleton != null) {
-        WWTControl.singleton._removeAnnotation(annotation);
+      if (globalWWTControl != null) {
+        globalWWTControl._removeAnnotation(annotation);
       }
     }
   },
 
   clearAnnotations: function () {
-    if (WWTControl.singleton != null) {
-      WWTControl.singleton._clearAnnotations();
+    if (globalWWTControl != null) {
+      globalWWTControl._clearAnnotations();
     }
   },
 
@@ -5522,7 +5524,7 @@ var ScriptInterface$ = {
   loadVOTable: function (url, useCurrentView) { },
 
   get_fov: function () {
-    if (WWTControl.singleton != null) {
+    if (globalWWTControl != null) {
       return globalRenderContext.viewCamera.zoom / 6;
     }
     return 60;
@@ -6639,7 +6641,7 @@ var TourDocument$ = {
               var imageSetLayer = newLayer;
               var imageset = imageSetLayer.get_imageSet();
               if (imageset.get_projection() === ProjectionType.healpix && imageset.get_extension() === '.tsv') {
-                WWTControl.singleton.addCatalogHips(imageset);
+                globalWWTControl.addCatalogHips(imageset);
                 continue;
               }
             }
@@ -7333,7 +7335,7 @@ var TourEditTab$ = {
     this.tourStopList.tour = this._tour;
     Overlay.defaultAnchor = 1;
     if (this._tour.get_tourStops().length > 0) {
-      WWTControl.singleton.gotoTarget(this._tour.get_tourStops()[0].get_target(), false, true, false);
+      globalWWTControl.gotoTarget(this._tour.get_tourStops()[0].get_target(), false, true, false);
       this._tour.set_currentTourstopIndex(0);
       this.tourStopList.selectedItem = this._tour.get_currentTourstopIndex();
       this.musicTrack.target = this._tour.get_currentTourStop();
@@ -7415,7 +7417,7 @@ var TourEditTab$ = {
       this._tour.get_currentTourStop().syncSettings();
       SpaceTimeController.set_now(this._tour.get_currentTourStop().get_startTime());
       SpaceTimeController.set_syncToClock(false);
-      WWTControl.singleton.gotoTarget(ts.get_target(), false, true, false);
+      globalWWTControl.gotoTarget(ts.get_target(), false, true, false);
       this._tour.get_currentTourStop().set_tweenPosition(0);
       this._tour.get_currentTourStop()._updateLayerOpacity();
       LayerManager.setVisibleLayerList(this._tour.get_currentTourStop().layers);
@@ -7690,7 +7692,7 @@ var TourEditTab$ = {
 
   playFromCurrentTourstop: function () {
     this.playing = true;
-    WWTControl.singleton.gotoTarget(this._tour.get_currentTourStop().get_target(), false, true, false);
+    globalWWTControl.gotoTarget(this._tour.get_currentTourStop().get_target(), false, true, false);
     SpaceTimeController.set_now(this._tour.get_currentTourStop().get_startTime());
     SpaceTimeController.set_syncToClock(false);
     this.setPlayPauseMode();
@@ -7703,7 +7705,7 @@ var TourEditTab$ = {
 
   _showSkyPosition_Click: function (sender, e) {
     if (this._tour.get_currentTourStop() != null) {
-      WWTControl.singleton.gotoTarget(this._tour.get_currentTourStop().get_target(), false, true, false);
+      globalWWTControl.gotoTarget(this._tour.get_currentTourStop().get_target(), false, true, false);
       this._tour.get_currentTourStop().syncSettings();
       SpaceTimeController.set_now(this._tour.get_currentTourStop().get_startTime());
       SpaceTimeController.set_syncToClock(false);
@@ -7717,7 +7719,7 @@ var TourEditTab$ = {
     this._tour.get_currentTourStop().set_tweenPosition(1);
     this._tour.get_currentTourStop()._updateLayerOpacity();
     if (this._tour.get_currentTourStop() != null && this._tour.get_currentTourStop().get_endTarget() != null) {
-      WWTControl.singleton.gotoTargetFull(false, true, this._tour.get_currentTourStop().get_endTarget().get_camParams(), this._tour.get_currentTourStop().get_target().get_studyImageset(), this._tour.get_currentTourStop().get_target().get_backgroundImageset());
+      globalWWTControl.gotoTargetFull(false, true, this._tour.get_currentTourStop().get_endTarget().get_camParams(), this._tour.get_currentTourStop().get_target().get_studyImageset(), this._tour.get_currentTourStop().get_target().get_backgroundImageset());
       globalRenderContext.set_solarSystemTrack(this._tour.get_currentTourStop().get_endTarget().get_target());
       SpaceTimeController.set_now(this._tour.get_currentTourStop().get_endTime());
       this._tour.get_currentTourStop().syncSettings();
@@ -7731,9 +7733,9 @@ var TourEditTab$ = {
   _setEndSkyPosition_Click: function (sender, e) {
     if (this._tour.get_currentTourStop() != null) {
       Undo.push(new UndoTourStopChange(Language.getLocalizedText(435, 'Set End Camera Position'), this._tour));
-      var newPlace = Place.createCameraParams('End Place', globalRenderContext.viewCamera.copy(), 268435456, WWTControl.singleton.constellation, globalRenderContext.get_backgroundImageset().get_dataSetType(), globalRenderContext.get_solarSystemTrack());
+      var newPlace = Place.createCameraParams('End Place', globalRenderContext.viewCamera.copy(), 268435456, globalWWTControl.constellation, globalRenderContext.get_backgroundImageset().get_dataSetType(), globalRenderContext.get_solarSystemTrack());
       this._tour.get_currentTourStop().set_endTarget(newPlace);
-      this._tour.get_currentTourStop().get_endTarget().set_constellation(WWTControl.singleton.constellation);
+      this._tour.get_currentTourStop().get_endTarget().set_constellation(globalWWTControl.constellation);
       this._tour.get_currentTourStop().set_endTime(SpaceTimeController.get_now());
       this._tour.get_currentTourStop().set_tweenPosition(1);
       var $enum1 = ss.enumerate(ss.keys(this._tour.get_currentTourStop().layers));
@@ -7758,7 +7760,7 @@ var TourEditTab$ = {
       this._tour.get_currentTourStop().get_target().set_target(globalRenderContext.get_solarSystemTrack());
       this._tour.get_currentTourStop().get_target().set_type(globalRenderContext.get_backgroundImageset().get_dataSetType());
       this._tour.get_currentTourStop().get_target().set_camParams(globalRenderContext.viewCamera.copy());
-      this._tour.get_currentTourStop().get_target().set_constellation(WWTControl.singleton.constellation);
+      this._tour.get_currentTourStop().get_target().set_constellation(globalWWTControl.constellation);
       this._tour.get_currentTourStop().get_target().set_studyImageset(globalRenderContext.get_foregroundImageset());
       this._tour.get_currentTourStop().get_target().set_type(globalRenderContext.get_backgroundImageset().get_dataSetType());
       this._tour.get_currentTourStop().get_target().set_backgroundImageset(globalRenderContext.get_backgroundImageset().get_stockImageSet());
@@ -7780,7 +7782,7 @@ var TourEditTab$ = {
   _captureThumbnail: function (tourStop) {
     var $this = this;
 
-    WWTControl.singleton.captureThumbnail(function (blob) {
+    globalWWTControl.captureThumbnail(function (blob) {
       var filename = ss.format('{0}.thumb.png', tourStop.get_id());
       $this._tour.addCachedFile(filename, blob);
       tourStop.set_thumbnail($this._tour.getCachedTexture(filename, function () {
@@ -7811,7 +7813,7 @@ var TourEditTab$ = {
     Undo.push(new UndoTourSlidelistChange(Language.getLocalizedText(426, 'Add New Slide'), this._tour));
     Cursor.set_current(Cursors.get_waitCursor());
     var placeName = 'Current Screen';
-    var newPlace = Place.createCameraParams(placeName, globalRenderContext.viewCamera.copy(), 268435456, WWTControl.singleton.constellation, globalRenderContext.get_backgroundImageset().get_dataSetType(), globalRenderContext.get_solarSystemTrack());
+    var newPlace = Place.createCameraParams(placeName, globalRenderContext.viewCamera.copy(), 268435456, globalWWTControl.constellation, globalRenderContext.get_backgroundImageset().get_dataSetType(), globalRenderContext.get_solarSystemTrack());
     newPlace.set_studyImageset(globalRenderContext.get_foregroundImageset());
     newPlace.set_backgroundImageset(globalRenderContext.get_backgroundImageset().get_stockImageSet());
     var newTourStop = TourStop.create(newPlace);
@@ -7932,17 +7934,17 @@ var TourEditTab$ = {
           this._player = new TourPlayer();
         }
         this._player.set_tour(this._tour);
-        WWTControl.singleton.uiController = this._player;
+        globalWWTControl.uiController = this._player;
         this._player.play();
         this.tourStopList.showAddButton = false;
       }
       else {
-        WWTControl.singleton.uiController = this.tourEditorUI;
+        globalWWTControl.uiController = this.tourEditorUI;
         if (this._player != null) {
           this._player.stop(false);
         }
         this._player = null;
-        WWTControl.singleton.set__mover(null);
+        globalWWTControl.set__mover(null);
         this.tourStopList.showAddButton = this._tour.get_editMode();
       }
     } else {
@@ -7951,19 +7953,19 @@ var TourEditTab$ = {
           this._player = new TourPlayer();
         }
         this._player.set_tour(this._tour);
-        WWTControl.singleton.uiController = this._player;
+        globalWWTControl.uiController = this._player;
         this._player.play();
         this.tourStopList.showAddButton = false;
       }
       else {
-        WWTControl.singleton.uiController = null;
+        globalWWTControl.uiController = null;
         globalRenderContext.freezeView();
         if (this._player != null) {
           this._player.stop(false);
         }
         this._player = null;
-        WWTControl.singleton.uiController = null;
-        WWTControl.singleton.set__mover(null);
+        globalWWTControl.uiController = null;
+        globalWWTControl.set__mover(null);
         this.tourStopList.showAddButton = this._tour.get_editMode();
       }
     }
@@ -9820,8 +9822,8 @@ var TourPlayer$ = {
     }
     if (this._tour.get_currentTourstopIndex() < (this._tour.get_tourStops().length - 1) || this._tour.get_currentTourStop().get_isLinked()) {
       if (this._tour.get_currentTourStop().get_endTarget() != null) {
-        WWTControl.singleton.gotoTargetFull(false, true, this._tour.get_currentTourStop().get_endTarget().get_camParams(), this._tour.get_currentTourStop().get_target().get_studyImageset(), this._tour.get_currentTourStop().get_target().get_backgroundImageset());
-        WWTControl.singleton.set__mover(null);
+        globalWWTControl.gotoTargetFull(false, true, this._tour.get_currentTourStop().get_endTarget().get_camParams(), this._tour.get_currentTourStop().get_target().get_studyImageset(), this._tour.get_currentTourStop().get_target().get_backgroundImageset());
+        globalWWTControl.set__mover(null);
       }
       this._onTarget = false;
       if (this._tour.get_currentTourStop().get_isLinked()) {
@@ -9874,7 +9876,7 @@ var TourPlayer$ = {
         default:
           break;
       }
-      WWTControl.singleton.gotoTarget(this._tour.get_currentTourStop().get_target(), false, instant, false);
+      globalWWTControl.gotoTarget(this._tour.get_currentTourStop().get_target(), false, instant, false);
       this._slideStartTime = ss.now();
       Settings.tourSettings = this._tour.get_currentTourStop();
       SpaceTimeController.set_now(this._tour.get_currentTourStop().get_startTime());
@@ -9887,11 +9889,11 @@ var TourPlayer$ = {
         this.play();
       }
       else {
-        WWTControl.singleton._freezeView();
+        globalWWTControl._freezeView();
         if (TourPlayer.__tourEnded != null) {
           TourPlayer.__tourEnded(this, new ss.EventArgs());
         }
-        WWTControl.singleton._hideUI(false);
+        globalWWTControl._hideUI(false);
         WWTControl.scriptInterface._fireTourEnded();
       }
     }
@@ -9932,7 +9934,7 @@ var TourPlayer$ = {
     } else {
       TourPlayer._playing = true;
     }
-    WWTControl.singleton._hideUI(true);
+    globalWWTControl._hideUI(true);
     TourPlayer._playing = true;
     if (this._tour.get_tourStops().length > 0) {
       this._onTarget = false;
@@ -9957,7 +9959,7 @@ var TourPlayer$ = {
       if (this._tour.get_currentTourstopIndex() > 0) {
         this._playMasterForCurrent();
       }
-      WWTControl.singleton.gotoTarget(this._tour.get_currentTourStop().get_target(), false, true, false);
+      globalWWTControl.gotoTarget(this._tour.get_currentTourStop().get_target(), false, true, false);
     }
     this._slideStartTime = ss.now();
     TourPlayer._playing = true;
@@ -10020,7 +10022,7 @@ var TourPlayer$ = {
         overlay.stop();
       }
     }
-    WWTControl.singleton._hideUI(TourPlayer.noRestoreUIOnStop);
+    globalWWTControl._hideUI(TourPlayer.noRestoreUIOnStop);
     WWTControl.scriptInterface._fireTourEnded();
   },
 
@@ -10037,27 +10039,27 @@ var TourPlayer$ = {
       this._tour.get_currentTourStop().faderOpacity = 0;
       var elapsedSeconds = this._tour.get_currentTourStop().get_tweenPosition() * this._tour.get_currentTourStop().get_duration() / 1000;
       if (slideChanging) {
-        WWTControl.singleton.set_crossFadeFrame(false);
+        globalWWTControl.set_crossFadeFrame(false);
       }
       switch (this._tour.get_currentTourStop().get__transition()) {
         case 0:
           this._tour.get_currentTourStop().faderOpacity = 0;
-          WWTControl.singleton.set_crossFadeFrame(false);
+          globalWWTControl.set_crossFadeFrame(false);
           break;
         case 2:
           if (slideChanging) {
           }
           if (elapsedSeconds < (elapsedSeconds - this._tour.get_currentTourStop().get__transitionHoldTime())) {
-            WWTControl.singleton.set_crossFadeFrame(true);
+            globalWWTControl.set_crossFadeFrame(true);
             this._tour.get_currentTourStop().faderOpacity = 1;
           }
           else {
             this._tour.get_currentTourStop().faderOpacity = 0;
-            WWTControl.singleton.set_crossFadeFrame(false);
+            globalWWTControl.set_crossFadeFrame(false);
           }
           break;
         case 1:
-          WWTControl.singleton.set_crossFadeFrame(true);
+          globalWWTControl.set_crossFadeFrame(true);
           var opacity = Math.max(0, 1 - Math.min(1, (elapsedSeconds - this._tour.get_currentTourStop().get__transitionHoldTime()) / this._tour.get_currentTourStop().get__transitionTime()));
           this._tour.get_currentTourStop().faderOpacity = opacity;
           if (slideChanging) {
@@ -10065,12 +10067,12 @@ var TourPlayer$ = {
           break;
         case 3:
         case 4:
-          WWTControl.singleton.set_crossFadeFrame(false);
+          globalWWTControl.set_crossFadeFrame(false);
           var opacity = Math.max(0, 1 - Math.max(0, elapsedSeconds - this._tour.get_currentTourStop().get__transitionHoldTime()) / this._tour.get_currentTourStop().get__transitionTime());
           this._tour.get_currentTourStop().faderOpacity = opacity;
           break;
         case 5:
-          WWTControl.singleton.set_crossFadeFrame(false);
+          globalWWTControl.set_crossFadeFrame(false);
           break;
         default:
           break;
@@ -10082,7 +10084,7 @@ var TourPlayer$ = {
           case 5:
           case 3:
             if (!this._tour.get_currentTourStop().faderOpacity) {
-              WWTControl.singleton.set_crossFadeFrame(false);
+              globalWWTControl.set_crossFadeFrame(false);
               var opacity = Math.max(0, 1 - Math.min(1, ((this._tour.get_currentTourStop().get_duration() / 1000) - elapsedSeconds) / nextTransTime));
               this._tour.get_currentTourStop().faderOpacity = opacity;
             }
@@ -10174,7 +10176,7 @@ var TourPlayer$ = {
     switch (e.keyCode) {
       case 27:
         this.stop(TourPlayer._switchedToFullScreen);
-        WWTControl.singleton._closeTour();
+        globalWWTControl._closeTour();
         return true;
       case 32:
         this.pauseTour();
@@ -10214,7 +10216,7 @@ var TourPlayer$ = {
   playFromTourstop: function (tourStop) {
     this.stop(true);
     this._tour.set_currentTourStop(tourStop);
-    WWTControl.singleton.gotoTarget(this._tour.get_currentTourStop().get_target(), false, true, false);
+    globalWWTControl.gotoTarget(this._tour.get_currentTourStop().get_target(), false, true, false);
     SpaceTimeController.set_now(this._tour.get_currentTourStop().get_startTime());
     SpaceTimeController.set_syncToClock(false);
     this.play();
@@ -10223,7 +10225,7 @@ var TourPlayer$ = {
   pauseTour: function () {
     if (TourPlayer._playing) {
       this.stop(TourPlayer._switchedToFullScreen);
-      WWTControl.singleton._freezeView();
+      globalWWTControl._freezeView();
       WWTControl.scriptInterface._fireTourPaused();
     } else {
       this.play();
@@ -10243,8 +10245,8 @@ var TourPlayer$ = {
   },
 
   pointToView: function (pnt) {
-    var clientHeight = WWTControl.singleton.canvas.height;
-    var clientWidth = WWTControl.singleton.canvas.width;
+    var clientHeight = globalWWTControl.canvas.height;
+    var clientWidth = globalWWTControl.canvas.width;
     var viewWidth = (clientWidth / clientHeight) * 1116;
     var x = ((pnt.x) / (clientWidth) * viewWidth) - ((viewWidth - 1920) / 2);
     var y = (pnt.y) / clientHeight * 1116;
@@ -12500,10 +12502,10 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
       globalRenderContext.gl = gl;
       set_useGl(true);
     }
-    WWTControl.singleton.canvas = canvas;
+    globalWWTControl.canvas = canvas;
     globalRenderContext.width = canvas.width;
     globalRenderContext.height = canvas.height;
-    WWTControl.singleton.setup(canvas, startLat, startLng, startZoom);
+    globalWWTControl.setup(canvas, startLat, startLng, startZoom);
     Constellations.initializeConstellations();
     LayerManager.oneTimeInitialization();
     if (startMode === 'earth') {
@@ -12517,7 +12519,7 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
   globalRenderContext.viewCamera.lng += 0;
   globalRenderContext._initGL();
   if (startRenderLoop) {
-    WWTControl.singleton.render();
+    globalWWTControl.render();
   }
   return WWTControl.scriptInterface;
 };
@@ -14047,7 +14049,7 @@ var WWTControl$ = {
       $this.setupTour();
       var player = new TourPlayer();
       player.set_tour($this.tour);
-      WWTControl.singleton.uiController = player;
+      globalWWTControl.uiController = player;
       WWTControl.scriptInterface._fireTourReady();
     });
   },
@@ -14286,7 +14288,7 @@ var WWTControl$ = {
       ctx.drawImage(image, cx, cy, cw, ch);
       if (typeof temp.msToBlob == 'function') { var blob = temp.msToBlob(); blobReady(blob); } else { temp.toBlob(blobReady, format); }
     }, false);
-    image.src = WWTControl.singleton.canvas.toDataURL();
+    image.src = globalWWTControl.canvas.toDataURL();
   },
 
   clampZooms: function (rc) {
@@ -19567,6 +19569,7 @@ LayerManager._greatCircleDialog = new GreatCircleDialog();
 WWTControl.exploreRoot = new Folder();
 WWTControl.singleton = new WWTControl();
 WWTControl.singleton.renderContext = new RenderContext();
+set_globalWWTControl(WWTControl.singleton);
 set_globalRenderContext(WWTControl.singleton.renderContext);
 
 SpaceTimeController._metaNow = ss.now();

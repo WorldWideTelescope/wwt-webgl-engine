@@ -37,3 +37,11 @@ export var createPlace = null;
 export function set_createPlace(value) {
     createPlace = value;
 }
+
+// This is another way to access `WWTControl.singleton`. It's the
+// global singleton WWTControl instance.
+export var globalWWTControl = null;
+
+export function set_globalWWTControl(value) {
+    globalWWTControl = value;
+}
