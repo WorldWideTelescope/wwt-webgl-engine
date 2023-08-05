@@ -242,6 +242,7 @@ export {
     Object3dLayer,
     Object3dLayerUI,
 } from "./layers/object3d.js";
+export { Orbit, EllipseRenderer } from "./layers/orbit.js";
 
 export {
     PointType,
@@ -280,8 +281,6 @@ export {
     SkyOverlays,
     GroundOverlayLayer,
     FrameTarget,
-    Orbit,
-    EllipseRenderer,
     ReferenceFrame,
     KmlCoordinate,
     KmlLineList,

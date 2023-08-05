@@ -57,7 +57,6 @@ import {
 import { WEBGL } from "./graphics/webgl_constants.js";
 
 import {
-  PositionVertexBuffer,
   PositionTextureVertexBuffer,
 } from "./graphics/gl_buffers.js"
 
@@ -65,7 +64,6 @@ import { Texture } from "./graphics/texture.js";
 import { Tessellator } from "./graphics/tessellator.js";
 
 import {
-  EllipseShader,
   TileShader,
 } from "./graphics/shaders.js";
 
@@ -135,6 +133,7 @@ import { GridLayer } from "./layers/grid_layer.js";
 import { ImageSetLayer } from "./layers/imageset_layer.js";
 import { LayerUI, LayerUITreeNode } from "./layers/layer_ui.js";
 import { Object3dLayer, Object3d } from "./layers/object3d.js";
+import { Orbit, EllipseRenderer } from "./layers/orbit.js";
 
 
 // wwtlib.PointType
@@ -3466,121 +3465,6 @@ export function FrameTarget() { }
 var FrameTarget$ = {};
 
 registerType("FrameTarget", [FrameTarget, FrameTarget$, null]);
-
-// wwtlib.Orbit
-
-export function Orbit(elements, segments, color, thickness, scale) {
-  this._elements = null;
-  this._orbitColor = Colors.get_white();
-  this._scale = 0;
-  this._segmentCount = 0;
-  this._elements = elements;
-  this._segmentCount = segments;
-  this._orbitColor = color;
-  this._scale = scale;
-}
-
-Orbit._orbitalToWwt = Matrix3d.create(1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1);
-Orbit._initBegun = false;
-
-var Orbit$ = {
-  cleanUp: function () { },
-
-  get_boundingRadius: function () {
-    if (this._elements != null) {
-      return (this._elements.a * (1 + this._elements.e)) / this._scale;
-    } else {
-      return 0;
-    }
-  },
-
-  draw3D: function (renderContext, opacity, centerPoint) {
-    var orbitalPlaneOrientation = Matrix3d.multiplyMatrix(Matrix3d._rotationZ(Coordinates.degreesToRadians(this._elements.w)), Matrix3d.multiplyMatrix(Matrix3d._rotationX(Coordinates.degreesToRadians(this._elements.i)), Matrix3d._rotationZ(Coordinates.degreesToRadians(this._elements.omega))));
-    orbitalPlaneOrientation = Matrix3d.multiplyMatrix(orbitalPlaneOrientation, Orbit._orbitalToWwt);
-    var worldMatrix = Matrix3d.multiplyMatrix(Matrix3d.multiplyMatrix(orbitalPlaneOrientation, Matrix3d.translation(centerPoint)), renderContext.get_world());
-    var M = this._elements.n * (SpaceTimeController.get_jNow() - this._elements.t);
-    var F = 1;
-    if (M < 0) {
-      F = -1;
-    }
-    M = Math.abs(M) / 360;
-    M = (M - ss.truncate(M)) * 360 * F;
-    var color = Color._fromArgbColor(ss.truncate((opacity * 255)), this._orbitColor);
-    M = Coordinates.degreesToRadians(M);
-    var E = M;
-    for (var i = 0; i < 5; i++) {
-      E += (M - E + this._elements.e * Math.sin(E)) / (1 - this._elements.e * Math.cos(E));
-    }
-    EllipseRenderer.drawEllipse(renderContext, this._elements.a / this._scale, this._elements.e, E, color, worldMatrix);
-  }
-};
-
-registerType("Orbit", [Orbit, Orbit$, null]);
-
-// wwtlib.EllipseRenderer
-
-export function EllipseRenderer() { }
-
-EllipseRenderer.drawEllipseWithPosition = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix, positionNow) {
-  if (EllipseRenderer._ellipseShader == null) {
-    EllipseRenderer._ellipseShader = new EllipseShader();
-  }
-  if (EllipseRenderer._ellipseVertexBuffer == null) {
-    EllipseRenderer._ellipseVertexBuffer = EllipseRenderer.createEllipseVertexBuffer(500);
-  }
-  var savedWorld = renderContext.get_world();
-  renderContext.set_world(worldMatrix);
-  renderContext.gl.bindBuffer(WEBGL.ARRAY_BUFFER, EllipseRenderer._ellipseVertexBuffer.vertexBuffer);
-  renderContext.gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
-  EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, 1, savedWorld, positionNow);
-  renderContext.gl.drawArrays(WEBGL.LINE_STRIP, 0, EllipseRenderer._ellipseVertexBuffer.count);
-  renderContext.set_world(savedWorld);
-};
-
-EllipseRenderer.drawEllipse = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix) {
-  if (EllipseRenderer._ellipseShader == null) {
-    EllipseRenderer._ellipseShader = new EllipseShader();
-  }
-  if (EllipseRenderer._ellipseWithoutStartPointVertexBuffer == null) {
-    EllipseRenderer._ellipseWithoutStartPointVertexBuffer = EllipseRenderer.createEllipseVertexBufferWithoutStartPoint(360);
-  }
-  var savedWorld = renderContext.get_world();
-  renderContext.set_world(worldMatrix);
-  renderContext.gl.bindBuffer(WEBGL.ARRAY_BUFFER, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.vertexBuffer);
-  renderContext.gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
-  EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, 1, savedWorld, Vector3d.create(0, 0, 0));
-  renderContext.gl.drawArrays(WEBGL.LINE_STRIP, 0, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.count - 1);
-  renderContext.set_world(savedWorld);
-};
-
-EllipseRenderer.createEllipseVertexBuffer = function (vertexCount) {
-  var vb = new PositionVertexBuffer(vertexCount);
-  var verts = vb.lock();
-  var index = 0;
-  for (var i = 0; i < vertexCount / 2; ++i) {
-    verts[index++] = Vector3d.create(2 * i / vertexCount * 0.05, 0, 0);
-  }
-  for (var i = 0; i < vertexCount / 2; ++i) {
-    verts[index++] = Vector3d.create(2 * i / vertexCount * 0.95 + 0.05, 0, 0);
-  }
-  vb.unlock();
-  return vb;
-};
-
-EllipseRenderer.createEllipseVertexBufferWithoutStartPoint = function (vertexCount) {
-  var vb = new PositionVertexBuffer(vertexCount);
-  var verts = vb.lock();
-  verts[0] = Vector3d.create(1E-06, 0, 0);
-  for (var i = 1; i < vertexCount; ++i) {
-    verts[i] = Vector3d.create(2 * i / vertexCount, 0, 0);
-  }
-  vb.unlock();
-  return vb;
-};
-
-var EllipseRenderer$ = {};
-
-registerType("EllipseRenderer", [EllipseRenderer, EllipseRenderer$, null]);
 
 // wwtlib.ReferenceFrame
 
