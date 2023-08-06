@@ -53,3 +53,12 @@ export var globalScriptInterface = null;
 export function set_globalScriptInterface(value) {
     globalScriptInterface = value;
 }
+
+// This is another way to access `LayerManager.setVisibleLayerList()`. Once
+// again, we need this to break some circular dependencies in the module
+// structure.
+export var setManagerVisibleLayerList = null;
+
+export function set_setManagerVisibleLayerList(value) {
+    setManagerVisibleLayerList = value;
+}

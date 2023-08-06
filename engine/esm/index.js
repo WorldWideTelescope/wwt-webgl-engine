@@ -218,6 +218,7 @@ export { KeplerVertex } from "./kepler_vertex.js";
 export { Pointing } from "./pointing.js";
 export { Tour } from "./tour.js";
 export { VideoOutputType } from "./video_output_type.js";
+export { ViewMoverKenBurnsStyle } from "./view_mover.js";
 export { VizLayer } from "./viz_layer.js";
 export { ColorPicker } from "./utilities/color_picker.js";
 export { Dialog } from "./utilities/dialog.js";
@@ -284,6 +285,7 @@ export {
     TourStopList,
     TimeLine,
 } from "./tours/tour_editor.js";
+export { TourPlayer, MasterTime } from "./tours/tour_player.js";
 
 export {
     PointType,
@@ -308,7 +310,6 @@ export {
     HipsProperties,
     Folder,
     FolderBrowser,
-    ViewMoverKenBurnsStyle,
     LayerManager,
     LayerMap,
     SkyOverlays,
@@ -322,8 +323,6 @@ export {
     ScriptInterface,
     TourDocument,
     TourEditTab,
-    TourPlayer,
-    MasterTime,
     FolderDownloadAction,
     Wtml,
     WWTControl,
