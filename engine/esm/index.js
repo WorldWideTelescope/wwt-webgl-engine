@@ -220,6 +220,7 @@ export { Tour } from "./tour.js";
 export { VideoOutputType } from "./video_output_type.js";
 export { VizLayer } from "./viz_layer.js";
 export { ColorPicker } from "./utilities/color_picker.js";
+export { Dialog } from "./utilities/dialog.js";
 export { Histogram } from "./utilities/histogram.js";
 
 export { Layer, DomainValue, AltUnits, FadeType } from "./layers/layer.js";
@@ -319,7 +320,6 @@ export {
     UndoStep,
     UndoTourSlidelistChange,
     UndoTourPropertiesChange,
-    Dialog,
     FolderDownloadAction,
     Wtml,
     WWTControl,

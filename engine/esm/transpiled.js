@@ -126,6 +126,7 @@ import { TileCache } from "./tile_cache.js";
 import { Tour } from "./tour.js";
 import { VideoOutputType } from "./video_output_type.js";
 import { ColorPicker } from "./utilities/color_picker.js";
+import { Dialog } from "./utilities/dialog.js";
 import { Histogram } from "./utilities/histogram.js";
 
 import { Layer } from "./layers/layer.js";
@@ -9454,28 +9455,6 @@ var UndoTourPropertiesChange$ = {
 };
 
 registerType("UndoTourPropertiesChange", [UndoTourPropertiesChange, UndoTourPropertiesChange$, null, IUndoStep]);
-
-// wwtlib.Dialog
-
-export function Dialog() { }
-
-var Dialog$ = {
-  add_showDialogHook: function (value) {
-    this.__showDialogHook = ss.bindAdd(this.__showDialogHook, value);
-  },
-
-  remove_showDialogHook: function (value) {
-    this.__showDialogHook = ss.bindSub(this.__showDialogHook, value);
-  },
-
-  show: function (dialogArgs, e) {
-    if (this.__showDialogHook != null) {
-      this.__showDialogHook(dialogArgs, e);
-    }
-  }
-};
-
-registerType("Dialog", [Dialog, Dialog$, null]);
 
 // wwtlib.FolderDownloadAction
 
