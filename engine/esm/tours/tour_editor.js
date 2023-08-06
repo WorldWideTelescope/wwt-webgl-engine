@@ -2,6 +2,9 @@
 // Licensed under the MIT License
 
 // Infrastructure for editing tours.
+//
+// This file defines `TourEdit` and `TourEditor`, among others; the type
+// `TourEditTab` is defined in `tour_edit.js`.
 
 import { ss } from "../ss.js";
 import { registerType } from "../typesystem.js";

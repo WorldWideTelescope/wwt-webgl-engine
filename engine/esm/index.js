@@ -316,6 +316,7 @@ export {
 } from "./layers/layer_manager.js";
 
 export { UserLevel, TourDocument } from "./tours/tour_document.js";
+export { TourEditTab } from "./tours/tour_edit.js";
 
 export {
     PointType,
@@ -334,7 +335,6 @@ export {
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
-    TourEditTab,
     FolderDownloadAction,
     Wtml,
     WWTControl,
