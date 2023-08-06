@@ -315,6 +315,8 @@ export {
     FrameTarget,
 } from "./layers/layer_manager.js";
 
+export { UserLevel, TourDocument } from "./tours/tour_document.js";
+
 export {
     PointType,
     FolderGroup,
@@ -323,7 +325,6 @@ export {
     ThumbnailSize,
     Classification,
     StockSkyOverlayTypes,
-    UserLevel,
     DialogResult,
     Formatting,
     GFX,
@@ -333,7 +334,6 @@ export {
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
-    TourDocument,
     TourEditTab,
     FolderDownloadAction,
     Wtml,
