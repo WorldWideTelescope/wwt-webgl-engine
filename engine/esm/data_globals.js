@@ -71,3 +71,12 @@ export var tourDocumentFromUrlRaw = null;
 export function set_tourDocumentFromUrlRaw(value) {
     tourDocumentFromUrlRaw = value;
 }
+
+// This is another way to access `LayerManager.getAllMaps()`.  Once again, we
+// need this to break some circular dependencies in the module structure.
+
+export var layerManagerGetAllMaps = null;
+
+export function set_layerManagerGetAllMaps(value) {
+    layerManagerGetAllMaps = value;
+}

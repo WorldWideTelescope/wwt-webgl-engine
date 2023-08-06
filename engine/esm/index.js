@@ -298,6 +298,13 @@ export {
     RAUnits,
     TimeSeriesLayer,
 } from "./layers/time_series_layer.js";
+export {
+    KmlCoordinate,
+    KmlLineList,
+    PushPin,
+    SpreadSheetLayer,
+    CatalogSpreadSheetLayer,
+} from "./layers/spreadsheet_layer.js";
 
 export {
     PointType,
@@ -320,9 +327,6 @@ export {
     SkyOverlays,
     GroundOverlayLayer,
     FrameTarget,
-    KmlCoordinate,
-    KmlLineList,
-    PushPin,
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
@@ -333,13 +337,11 @@ export {
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    SpreadSheetLayer,
     VoTableLayer,
     FrameWizard,
     ReferenceFrameProps,
     GreatCircleDialog,
     DataVizWizard,
-    CatalogSpreadSheetLayer,
     SlideChangedEventArgs,
     ArrivedEventArgs,
     AnnotationClickEventArgs,
