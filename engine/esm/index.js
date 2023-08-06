@@ -270,6 +270,12 @@ export {
     LayerInfo,
     UndoTourStopChange,
 } from "./tours/tour_stop.js";
+export {
+    Undo,
+    UndoStep,
+    UndoTourSlidelistChange,
+    UndoTourPropertiesChange,
+} from "./tours/undo.js";
 
 export {
     PointType,
@@ -316,10 +322,6 @@ export {
     TimeLine,
     TourPlayer,
     MasterTime,
-    Undo,
-    UndoStep,
-    UndoTourSlidelistChange,
-    UndoTourPropertiesChange,
     FolderDownloadAction,
     Wtml,
     WWTControl,
