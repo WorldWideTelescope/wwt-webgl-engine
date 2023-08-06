@@ -39,6 +39,7 @@ import {
   set_makeNewFolder,
   set_makeNewHipsProperties,
   set_setManagerVisibleLayerList,
+  set_tourDocumentFromUrlRaw,
 } from "./data_globals.js";
 
 import { BlendState } from "./blend_state.js";
@@ -145,6 +146,8 @@ import { TourStop, LayerInfo, UndoTourStopChange } from "./tours/tour_stop.js";
 import { Undo, UndoTourSlidelistChange } from "./tours/undo.js";
 import { TourEditor, TourEdit, SoundEditor, TourStopList, OverlayList, TimeLine } from "./tours/tour_editor.js";
 import { TourPlayer, MasterTime } from "./tours/tour_player.js";
+
+import { ISSLayer } from "./layers/iss_layer.js";
 
 
 // wwtlib.PointType
@@ -5310,6 +5313,8 @@ TourDocument.fromUrlRaw = function (url, callMe) {
   temp._cabinet = FileCabinet.fromUrl(url, callMe);
   return temp;
 };
+
+set_tourDocumentFromUrlRaw(TourDocument.fromUrlRaw);
 
 var TourDocument$ = {
   get_tourDirty: function () {
@@ -12761,81 +12766,6 @@ var DataVizWizard$ = {
 };
 
 registerType("DataVizWizard", [DataVizWizard, DataVizWizard$, Dialog]);
-
-// wwtlib.ISSLayer
-
-export function ISSLayer() {
-  Object3dLayer.call(this);
-  this.id = ISSLayer.issGuid;
-}
-
-ISSLayer.issGuid = Guid.fromString('00000001-0002-0003-0405-060708090a0b');
-ISSLayer._loading$2 = false;
-ISSLayer._issmodel$2 = null;
-ISSLayer._doc$2 = null;
-
-ISSLayer.loadBackground = function () {
-  if (ISSLayer._loading$2 || freestandingMode) {
-    return;
-  }
-  ISSLayer._loading$2 = true;
-  var url = URLHelpers.singleton.coreStaticUrl('data/iss.wtt');
-  ISSLayer._doc$2 = TourDocument.fromUrlRaw(url, function () {
-    ISSLayer.createSpaceStation();
-  });
-};
-
-ISSLayer.createSpaceStation = function () {
-  ISSLayer._doc$2.set_id('28016047-97a9-4b33-a226-cd820262a151');
-  var filename = '0c10ae54-b6da-4282-bfda-f34562d403bc.3ds';
-  var o3d = new Object3d(ISSLayer._doc$2, filename, true, false, true, Colors.get_white());
-  if (o3d != null) {
-    o3d.issLayer = true;
-    ISSLayer._issmodel$2 = o3d;
-  }
-};
-
-var ISSLayer$ = {
-  draw: function (renderContext, opacity, flat) {
-    if (this.object3d == null && ISSLayer._issmodel$2 == null) {
-      if (!ISSLayer._loading$2) {
-        var worldView = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
-        var v = worldView.transform(Vector3d.get_empty());
-        var scaleFactor = Math.sqrt(worldView.get_m11() * worldView.get_m11() + worldView.get_m22() * worldView.get_m22() + worldView.get_m33() * worldView.get_m33());
-        var dist = v.length();
-        var radius = scaleFactor;
-        var viewportHeight = ss.truncate(renderContext.height);
-        var p11 = renderContext.get_projection().get_m11();
-        var p34 = renderContext.get_projection().get_m34();
-        var p44 = renderContext.get_projection().get_m44();
-        var w = Math.abs(p34) * dist + p44;
-        var pixelsPerUnit = (p11 / w) * viewportHeight;
-        var radiusInPixels = (radius * pixelsPerUnit);
-        if (radiusInPixels > 0.5) {
-          ISSLayer.loadBackground();
-        }
-      }
-    }
-    this.object3d = ISSLayer._issmodel$2;
-    return Object3dLayer.prototype.draw.call(this, renderContext, opacity, flat);
-  },
-
-  getPrimaryUI: function () {
-    return null;
-  },
-
-  addFilesToCabinet: function (fc) {
-    return;
-  },
-
-  loadData: function (doc, filename) {
-    return;
-  },
-
-  cleanUp: function () { }
-};
-
-registerType("ISSLayer", [ISSLayer, ISSLayer$, Object3dLayer]);
 
 // wwtlib.CatalogSpreadSheetLayer
 

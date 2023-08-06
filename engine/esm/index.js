@@ -287,6 +287,8 @@ export {
 } from "./tours/tour_editor.js";
 export { TourPlayer, MasterTime } from "./tours/tour_player.js";
 
+export { ISSLayer } from "./layers/iss_layer.js";
+
 export {
     PointType,
     FolderGroup,
@@ -335,7 +337,6 @@ export {
     ReferenceFrameProps,
     GreatCircleDialog,
     DataVizWizard,
-    ISSLayer,
     CatalogSpreadSheetLayer,
     SlideChangedEventArgs,
     ArrivedEventArgs,

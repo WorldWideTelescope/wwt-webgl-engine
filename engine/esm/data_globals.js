@@ -62,3 +62,12 @@ export var setManagerVisibleLayerList = null;
 export function set_setManagerVisibleLayerList(value) {
     setManagerVisibleLayerList = value;
 }
+
+// This is another way to access `TourDocument.fromUrlRaw()`.  Once again, we
+// need this to break some circular dependencies in the module structure.
+
+export var tourDocumentFromUrlRaw = null;
+
+export function set_tourDocumentFromUrlRaw(value) {
+    tourDocumentFromUrlRaw = value;
+}
