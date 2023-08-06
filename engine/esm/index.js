@@ -288,6 +288,16 @@ export {
 export { TourPlayer, MasterTime } from "./tours/tour_player.js";
 
 export { ISSLayer } from "./layers/iss_layer.js";
+export {
+    CoordinatesTypes,
+    AltTypes,
+    MarkerMixes,
+    ColorMaps,
+    PlotTypes,
+    MarkerScales,
+    RAUnits,
+    TimeSeriesLayer,
+} from "./layers/time_series_layer.js";
 
 export {
     PointType,
@@ -297,13 +307,6 @@ export {
     ThumbnailSize,
     Classification,
     ReferenceFrames,
-    CoordinatesTypes,
-    AltTypes,
-    MarkerMixes,
-    ColorMaps,
-    PlotTypes,
-    MarkerScales,
-    RAUnits,
     StockSkyOverlayTypes,
     UserLevel,
     DialogResult,
@@ -331,7 +334,6 @@ export {
     WWTControlBuilder,
     WWTElementEvent,
     SpreadSheetLayer,
-    TimeSeriesLayer,
     VoTableLayer,
     FrameWizard,
     ReferenceFrameProps,
