@@ -305,6 +305,7 @@ export {
     SpreadSheetLayer,
     CatalogSpreadSheetLayer,
 } from "./layers/spreadsheet_layer.js";
+export { VoTableLayer } from "./layers/vo_table_layer.js";
 
 export {
     PointType,
@@ -337,7 +338,6 @@ export {
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
-    VoTableLayer,
     FrameWizard,
     ReferenceFrameProps,
     GreatCircleDialog,
