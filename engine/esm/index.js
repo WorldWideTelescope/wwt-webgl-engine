@@ -276,6 +276,14 @@ export {
     UndoTourSlidelistChange,
     UndoTourPropertiesChange,
 } from "./tours/undo.js";
+export {
+    TourEditor,
+    OverlayList,
+    TourEdit,
+    SoundEditor,
+    TourStopList,
+    TimeLine,
+} from "./tours/tour_editor.js";
 
 export {
     PointType,
@@ -314,12 +322,6 @@ export {
     ScriptInterface,
     TourDocument,
     TourEditTab,
-    TourEditor,
-    OverlayList,
-    TourEdit,
-    SoundEditor,
-    TourStopList,
-    TimeLine,
     TourPlayer,
     MasterTime,
     FolderDownloadAction,
