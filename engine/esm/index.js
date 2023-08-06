@@ -306,6 +306,14 @@ export {
     CatalogSpreadSheetLayer,
 } from "./layers/spreadsheet_layer.js";
 export { VoTableLayer } from "./layers/vo_table_layer.js";
+export {
+    ReferenceFrames,
+    LayerManager,
+    LayerMap,
+    SkyOverlays,
+    GroundOverlayLayer,
+    FrameTarget,
+} from "./layers/layer_manager.js";
 
 export {
     PointType,
@@ -314,7 +322,6 @@ export {
     FolderType,
     ThumbnailSize,
     Classification,
-    ReferenceFrames,
     StockSkyOverlayTypes,
     UserLevel,
     DialogResult,
@@ -323,11 +330,6 @@ export {
     HipsProperties,
     Folder,
     FolderBrowser,
-    LayerManager,
-    LayerMap,
-    SkyOverlays,
-    GroundOverlayLayer,
-    FrameTarget,
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
