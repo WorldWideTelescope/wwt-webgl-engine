@@ -4,7 +4,7 @@
 // The main planet-related code.
 //
 // This does not include the 3D planet-rendering code, which has been separated
-// into `planets3d.js`.
+// into `planets_3d.js`.
 
 import { ss } from "./ss.js";
 import { registerType } from "./typesystem.js";
@@ -945,6 +945,8 @@ Planets._drawPlanet = function (renderContext, planetID, opacity) {
         if (!Planets._planetLocations[planetID].shadow) {
             return;
         }
+
+        //Shadows of moons
         brush = Planets._planetTextures[15];
     }
     if (renderContext.gl != null) {
