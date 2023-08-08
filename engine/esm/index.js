@@ -316,6 +316,12 @@ export {
     FrameTarget,
 } from "./layers/layer_manager.js";
 
+// When we import this module, we install the `Layer.fromXml()` function, which
+// depends on the specific layer types established above. I am probably being
+// too conservative about circular module dependencies but there are worse ways
+// to be.
+import { layerFromXml as _ } from "./layers/from_xml.js";
+
 export { UserLevel, TourDocument } from "./tours/tour_document.js";
 export { TourEditTab } from "./tours/tour_edit.js";
 
@@ -327,10 +333,9 @@ export {
 } from "./folder.js";
 export { FolderBrowser, ThumbnailSize } from "./folder_browser.js";
 export { HipsProperties } from "./hips_properties.js";
+export { InViewReturnMessage, RenderContext } from "./render_context.js";
 
 export {
-    InViewReturnMessage,
-    RenderContext,
     ScriptInterface,
     FolderDownloadAction,
     Wtml,
