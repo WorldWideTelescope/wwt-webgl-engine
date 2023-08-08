@@ -319,10 +319,14 @@ export { UserLevel, TourDocument } from "./tours/tour_document.js";
 export { TourEditTab } from "./tours/tour_edit.js";
 
 export {
-    PointType,
     FolderGroup,
     FolderRefreshType,
     FolderType,
+    Folder,
+} from "./folder.js";
+
+export {
+    PointType,
     ThumbnailSize,
     Classification,
     StockSkyOverlayTypes,
@@ -330,7 +334,6 @@ export {
     Formatting,
     GFX,
     HipsProperties,
-    Folder,
     FolderBrowser,
     InViewReturnMessage,
     RenderContext,
