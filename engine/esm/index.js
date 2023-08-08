@@ -351,6 +351,9 @@ export {
 export {
     FolderDownloadAction,
     Wtml,
+} from "./wtml.js";
+
+export {
     FrameWizard,
     ReferenceFrameProps,
     GreatCircleDialog,
