@@ -324,17 +324,16 @@ export {
     FolderType,
     Folder,
 } from "./folder.js";
+export { FolderBrowser, ThumbnailSize } from "./folder_browser.js";
 
 export {
     PointType,
-    ThumbnailSize,
     Classification,
     StockSkyOverlayTypes,
     DialogResult,
     Formatting,
     GFX,
     HipsProperties,
-    FolderBrowser,
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
