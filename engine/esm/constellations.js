@@ -4,7 +4,7 @@
 // Constellations in the sky.
 
 import { ss } from "./ss.js";
-import { registerType } from "./typesystem.js";
+import { registerType, registerEnum } from "./typesystem.js";
 import { Vector3d } from "./double3d.js";
 import { createPlace, makeNewFolder } from "./data_globals.js";
 import { SimpleLineList } from "./graphics/primitives3d.js";
@@ -16,6 +16,19 @@ import { Settings } from "./settings.js";
 import { Text3d, Text3dBatch } from "./sky_text.js";
 import { URLHelpers } from "./url_helpers.js";
 import { WebFile } from "./web_file.js";
+
+
+// wwtlib.PointType
+
+export var PointType = {
+    move: 0,
+    line: 1,
+    dash: 2,
+    start: 3
+};
+
+registerType("PointType", PointType);
+registerEnum("PointType", PointType);
 
 
 // wwtlib.Lineset

@@ -3,10 +3,72 @@
 
 // Planet-related code that can come lower in the dependency graph.
 
-import { registerType } from "./typesystem.js";
+import { registerType, registerEnum } from "./typesystem.js";
 import { Colors } from "./color.js";
 import { ConstellationFilter } from "./constellation_filter.js";
 import { ISettings } from "./interfaces.js";
+
+
+// wwtlib.StockSkyOverlayTypes
+//
+// This was defined in `Tours/ISettings.cs`, which we've folded into `interfaces.js`.
+
+export var StockSkyOverlayTypes = {
+    empty: 0,
+    equatorialGrid: 1,
+    equatorialGridText: 2,
+    galacticGrid: 3,
+    galacticGridText: 4,
+    eclipticGrid: 5,
+    eclipticGridText: 6,
+    eclipticOverview: 7,
+    eclipticOverviewText: 8,
+    precessionChart: 9,
+    altAzGrid: 10,
+    altAzGridText: 11,
+    constellationFigures: 12,
+    constellationBoundaries: 13,
+    constellationFocusedOnly: 14,
+    constellationNames: 15,
+    constellationPictures: 16,
+    fadeToBlack: 17,
+    fadeToLogo: 18,
+    fadeToGradient: 19,
+    screenBroadcast: 20,
+    fadeRemoteOnly: 21,
+    skyGrids: 22,
+    constellations: 23,
+    solarSystemStars: 24,
+    solarSystemMilkyWay: 25,
+    solarSystemCosmos: 26,
+    solarSystemOrbits: 27,
+    solarSystemPlanets: 28,
+    solarSystemAsteroids: 29,
+    solarSystemLighting: 30,
+    solarSystemMinorOrbits: 31,
+    showEarthCloudLayer: 32,
+    showElevationModel: 33,
+    showAtmosphere: 34,
+    multiResSolarSystemBodies: 35,
+    auroraBorialis: 36,
+    earthCutAway: 37,
+    showSolarSystem: 38,
+    clouds8k: 39,
+    filedOfView: 40,
+    showISSModel: 41,
+    solarSystemCMB: 42,
+    mpcZone1: 43,
+    mpcZone2: 44,
+    mpcZone3: 45,
+    mpcZone4: 46,
+    mpcZone5: 47,
+    mpcZone6: 48,
+    mpcZone7: 49,
+    orbitFilters: 50
+};
+
+registerType("StockSkyOverlayTypes", StockSkyOverlayTypes);
+registerEnum("StockSkyOverlayTypes", StockSkyOverlayTypes);
 
 
 // wwtlib.SettingParameter

@@ -3,8 +3,18 @@
 
 // Writing XML.
 
-import { registerType } from "../typesystem.js";
+import { registerType, registerEnum } from "../typesystem.js";
 import { ss } from "../ss.js";
+
+
+// wwtlib.Formatting
+
+export var Formatting = {
+    indented: 1
+};
+
+registerType("Formatting", Formatting);
+registerEnum("Formatting", Formatting);
 
 
 // wwtlib.XmlTextWriter

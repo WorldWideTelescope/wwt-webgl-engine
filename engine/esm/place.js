@@ -4,7 +4,7 @@
 // A place to look at, potentially with associated imagesets.
 
 import { ss } from "./ss.js";
-import { registerType, Enums } from "./typesystem.js";
+import { registerType, registerEnum, Enums } from "./typesystem.js";
 import { Vector3d } from "./double3d.js";
 import { freestandingMode, set_createPlace } from "./data_globals.js";
 import { Util } from "./baseutil.js";
@@ -15,6 +15,53 @@ import { URLHelpers } from "./url_helpers.js";
 import { Coordinates } from "./coordinates.js";
 import { Imageset } from "./imageset.js";
 import { Planets } from "./planets.js";
+
+
+// wwtlib.Classification
+//
+// This was defined in `IPlace.cs`, which we've folded into `interfaces.js`.
+
+export var Classification = {
+    star: 1,
+    supernova: 2,
+    blackHole: 4,
+    neutronStar: 8,
+    doubleStar: 16,
+    multipleStars: 32,
+    asterism: 64,
+    constellation: 128,
+    openCluster: 256,
+    globularCluster: 512,
+    nebulousCluster: 1024,
+    nebula: 2048,
+    emissionNebula: 4096,
+    planetaryNebula: 8192,
+    reflectionNebula: 16384,
+    darkNebula: 32768,
+    giantMolecularCloud: 65536,
+    supernovaRemnant: 131072,
+    interstellarDust: 262144,
+    quasar: 524288,
+    galaxy: 1048576,
+    spiralGalaxy: 2097152,
+    irregularGalaxy: 4194304,
+    ellipticalGalaxy: 8388608,
+    knot: 16777216,
+    plateDefect: 33554432,
+    clusterOfGalaxies: 67108864,
+    otherNGC: 134217728,
+    unidentified: 268435456,
+    solarSystem: 536870912,
+    unfiltered: 1073741823,
+    stellar: 63,
+    stellarGroupings: 2032,
+    nebulae: 523264,
+    galactic: 133693440,
+    other: 436207616
+};
+
+registerType("Classification", Classification);
+registerEnum("Classification", Classification);
 
 
 // wwtlib.Place

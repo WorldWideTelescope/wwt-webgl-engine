@@ -87,6 +87,7 @@ export {
     PopupVolume,
     PopupColorPicker,
     OverlayProperties,
+    DialogResult,
 } from "./util.js";
 
 export { AstroRaDec, RiseSetDetails, AstroCalc } from "./astrocalc.js";
@@ -155,7 +156,7 @@ export {
 
 export { BinaryReader } from "./utilities/binary_reader.js";
 export { SimpleInput } from "./utilities/simple_input.js";
-export { XmlTextWriter } from "./utilities/xml_text_writer.js";
+export { XmlTextWriter, Formatting } from "./utilities/xml_text_writer.js";
 
 export { Coordinates } from "./coordinates.js";
 export { FastMath } from "./fast_math.js";
@@ -205,13 +206,13 @@ export { LatLngEdges, TangentTile } from "./tangent_tile.js";
 export { SkyImageTile } from "./sky_image_tile.js";
 export { ToastTile } from "./toast_tile.js";
 export { ProjectionType, ImageSetType, BandPass, Imageset } from "./imageset.js";
-export { Settings, SettingParameter } from "./settings.js";
+export { Settings, SettingParameter, StockSkyOverlayTypes } from "./settings.js";
 export { TextBorderStyle, TextObject } from "./tours/text_object.js";
 export { Alignment, Text3dBatch, Text3d, GlyphItem, GlyphCache } from "./sky_text.js";
-export { Lineset, Linepoint, Constellations } from "./constellations.js";
+export { PointType, Lineset, Linepoint, Constellations } from "./constellations.js";
 export { SpaceTimeController } from "./space_time_controller.js";
 export { KeplerianElements, BodyAngles, Planets } from "./planets.js";
-export { Place } from "./place.js";
+export { Place, Classification } from "./place.js";
 export { FolderUp } from "./folder_up.js";
 export { Grids } from "./grids.js";
 export { KeplerVertex } from "./kepler_vertex.js";
@@ -328,12 +329,6 @@ export { FolderBrowser, ThumbnailSize } from "./folder_browser.js";
 export { HipsProperties } from "./hips_properties.js";
 
 export {
-    PointType,
-    Classification,
-    StockSkyOverlayTypes,
-    DialogResult,
-    Formatting,
-    GFX,
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
@@ -351,3 +346,16 @@ export {
     AnnotationClickEventArgs,
     CollectionLoadedEventArgs,
 } from "./transpiled.js";
+
+
+// GFX
+//
+// This was a global holder for constants used in the AstroCalc component. We've
+// moved those constants into their specific modules, but still expose the name
+// just in case someone actually referenced it.
+
+import { registerType } from "./typesystem.js";
+
+export function GFX() { }
+
+registerType("GFX", [GFX, null, null]);

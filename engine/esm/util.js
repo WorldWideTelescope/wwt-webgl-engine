@@ -5,7 +5,7 @@
 
 import * as uuid from "uuid";
 
-import { registerType } from "./typesystem.js";
+import { registerType, registerEnum } from "./typesystem.js";
 import { ss } from "./ss.js";
 export { Util } from "./baseutil.js";
 import { Color } from "./color.js";
@@ -626,3 +626,13 @@ DistanceCalc.getUVFromInnerPoint = function (ul, ur, ll, lr, pnt) {
 var DistanceCalc$ = {};
 
 registerType("DistanceCalc", [DistanceCalc, DistanceCalc$, null]);
+
+
+// wwtlib.DialogResult
+
+export var DialogResult = {
+    OK: 1
+};
+
+registerType("DialogResult", DialogResult);
+registerEnum("DialogResult", DialogResult);
