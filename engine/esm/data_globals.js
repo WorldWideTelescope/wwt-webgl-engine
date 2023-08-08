@@ -80,3 +80,12 @@ export var layerManagerGetAllMaps = null;
 export function set_layerManagerGetAllMaps(value) {
     layerManagerGetAllMaps = value;
 }
+
+// This is another way to access `Wtml.getWtmlFile()`.  Once again, we
+// need this to break some circular dependencies in the module structure.
+
+export var loadWtmlFile = null;
+
+export function set_loadWtmlFile(value) {
+    loadWtmlFile = value;
+}

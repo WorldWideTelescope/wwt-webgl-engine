@@ -334,9 +334,15 @@ export {
 export { FolderBrowser, ThumbnailSize } from "./folder_browser.js";
 export { HipsProperties } from "./hips_properties.js";
 export { InViewReturnMessage, RenderContext } from "./render_context.js";
+export {
+    SlideChangedEventArgs,
+    ArrivedEventArgs,
+    AnnotationClickEventArgs,
+    CollectionLoadedEventArgs,
+    ScriptInterface,
+} from "./script_interface.js";
 
 export {
-    ScriptInterface,
     FolderDownloadAction,
     Wtml,
     WWTControl,
@@ -346,10 +352,6 @@ export {
     ReferenceFrameProps,
     GreatCircleDialog,
     DataVizWizard,
-    SlideChangedEventArgs,
-    ArrivedEventArgs,
-    AnnotationClickEventArgs,
-    CollectionLoadedEventArgs,
 } from "./transpiled.js";
 
 
