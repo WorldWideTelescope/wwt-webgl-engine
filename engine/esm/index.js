@@ -6,6 +6,10 @@
 // To maintain compatibility with a *lot* of legacy code, we export way more
 // types and interfaces than we would if we were starting from scratch, often
 // with confusing or misspelled names. So it goes.
+//
+// The import/exports here are in rough dependency order throughout the
+// codebase, although there are numerous places where circular references sneak
+// in.
 
 export { ss } from "./ss.js";
 
@@ -322,6 +326,16 @@ export {
 // to be.
 import { layerFromXml as _ } from "./layers/from_xml.js";
 
+// And when we import *this* module, we also attach some instances to the
+// LayerManager class. I'm not sure if they're even used in the webclient, which
+// would be the only place that reasonably would.
+export {
+    FrameWizard,
+    ReferenceFrameProps,
+    GreatCircleDialog,
+    DataVizWizard,
+} from "./layers/manager_dialogs.js";
+
 export { UserLevel, TourDocument } from "./tours/tour_document.js";
 export { TourEditTab } from "./tours/tour_edit.js";
 
@@ -353,22 +367,42 @@ export {
     Wtml,
 } from "./wtml.js";
 
-export {
-    FrameWizard,
-    ReferenceFrameProps,
-    GreatCircleDialog,
-    DataVizWizard,
-} from "./transpiled.js";
-
 
 // GFX
 //
 // This was a global holder for constants used in the AstroCalc component. We've
 // moved those constants into their specific modules, but still expose the name
-// just in case someone actually referenced it.
+// just in case someone actually referenced it. Since we've removed all of the
+// constants that it contains, though, if someone was reckless enough to try to
+// use this variable their usage would almost surely be broken by now.
 
 import { registerType } from "./typesystem.js";
 
 export function GFX() { }
 
 registerType("GFX", [GFX, null, null]);
+
+
+// Nontrivial initializations.
+
+import { ss } from "./ss.js";
+import { set_globalRenderContext } from "./render_globals.js";
+import { set_globalWWTControl } from "./data_globals.js";
+import { KeplerVertex } from "./kepler_vertex.js";
+import { SpaceTimeController } from "./space_time_controller.js";
+import { Folder } from "./folder.js";
+import { RenderContext } from "./render_context.js";
+import { WWTControl } from "./wwt_control.js";
+
+WWTControl.exploreRoot = new Folder();
+WWTControl.singleton = new WWTControl();
+WWTControl.singleton.renderContext = new RenderContext();
+set_globalWWTControl(WWTControl.singleton);
+set_globalRenderContext(WWTControl.singleton.renderContext);
+
+SpaceTimeController._metaNow = ss.now();
+SpaceTimeController._now = ss.now();
+SpaceTimeController.last = SpaceTimeController.get_metaNow();
+SpaceTimeController.updateClock();
+
+KeplerVertex.baseDate = ss.truncate(SpaceTimeController.utcToJulian(ss.now()));
