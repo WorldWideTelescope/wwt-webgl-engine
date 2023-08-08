@@ -325,6 +325,7 @@ export {
     Folder,
 } from "./folder.js";
 export { FolderBrowser, ThumbnailSize } from "./folder_browser.js";
+export { HipsProperties } from "./hips_properties.js";
 
 export {
     PointType,
@@ -333,7 +334,6 @@ export {
     DialogResult,
     Formatting,
     GFX,
-    HipsProperties,
     InViewReturnMessage,
     RenderContext,
     ScriptInterface,
