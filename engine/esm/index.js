@@ -343,11 +343,14 @@ export {
 } from "./script_interface.js";
 
 export {
-    FolderDownloadAction,
-    Wtml,
     WWTControl,
     WWTControlBuilder,
     WWTElementEvent,
+} from "./wwt_control.js";
+
+export {
+    FolderDownloadAction,
+    Wtml,
     FrameWizard,
     ReferenceFrameProps,
     GreatCircleDialog,
