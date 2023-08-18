@@ -26,7 +26,7 @@ export var OverlayAnchor = {
 };
 
 registerType("OverlayAnchor", OverlayAnchor);
-registerEnum("OverlayAnchdor", OverlayAnchor);
+registerEnum("OverlayAnchor", OverlayAnchor);
 
 
 // wwtlib.AudioType
