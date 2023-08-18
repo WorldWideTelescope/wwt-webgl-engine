@@ -22,7 +22,7 @@ SimpleLineShader._prog = null;
 SimpleLineShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision highp float;
         uniform vec4 lineColor;
 
@@ -31,7 +31,7 @@ SimpleLineShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
 
         uniform mat4 uMVMatrix;
@@ -111,7 +111,7 @@ SimpleLineShader2D._prog = null;
 SimpleLineShader2D.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
        precision highp float;
        uniform vec4 lineColor;
 
@@ -120,7 +120,7 @@ SimpleLineShader2D.init = function (renderContext) {
        }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
 
         void main(void) {
@@ -194,7 +194,7 @@ OrbitLineShader._prog = null;
 OrbitLineShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision highp float;
         uniform vec4 lineColor;
         varying lowp vec4 vColor;
@@ -204,7 +204,7 @@ OrbitLineShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec4 aVertexColor;
 
@@ -292,7 +292,7 @@ LineShaderNormalDates._prog = null;
 LineShaderNormalDates.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision highp float;
         uniform vec4 lineColor;
         varying lowp vec4 vColor;
@@ -303,7 +303,7 @@ LineShaderNormalDates.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec4 aVertexColor;
         attribute vec2 aTime;
@@ -420,7 +420,7 @@ TimeSeriesPointSpriteShader._prog = null;
 TimeSeriesPointSpriteShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
         uniform vec4 lineColor;
         varying lowp vec4 vColor;
@@ -434,7 +434,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec4 aVertexColor;
         attribute vec2 aTime;
@@ -593,7 +593,7 @@ KeplerPointSpriteShader._prog = null;
 KeplerPointSpriteShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
         uniform vec4 lineColor;
         varying lowp vec4 vColor;
@@ -607,7 +607,7 @@ KeplerPointSpriteShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 ABC;
         attribute vec3 abc;
         attribute float PointSize;
@@ -801,7 +801,7 @@ EllipseShader._prog = null;
 EllipseShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
         varying lowp vec4 vColor;
 
@@ -811,7 +811,7 @@ EllipseShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 Angle;
         uniform mat4 matWVP;
         uniform mat4 matPosition;
@@ -916,7 +916,7 @@ ModelShader.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
 ModelShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
 
         varying vec2 vTextureCoord;
@@ -944,7 +944,7 @@ ModelShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec3 aNormal;
         attribute vec2 aTextureCoord;
@@ -1081,7 +1081,7 @@ ModelShaderTan.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
 ModelShaderTan.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
 
         varying vec2 vTextureCoord;
@@ -1109,7 +1109,7 @@ ModelShaderTan.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec3 aNormal;
         attribute vec2 aTextureCoord;
@@ -1245,7 +1245,7 @@ TileShader.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
 TileShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
 
         varying vec2 vTextureCoord;
@@ -1273,7 +1273,7 @@ TileShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
 
@@ -1434,7 +1434,7 @@ FitsShader.scaleType = 0;
 FitsShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         #version 300 es
 
         precision mediump float;
@@ -1494,7 +1494,7 @@ FitsShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         #version 300 es
 
         in vec3 aVertexPosition;
@@ -1639,7 +1639,7 @@ ImageShader._prog = null;
 ImageShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
 
         varying vec2 vTextureCoord;
@@ -1653,7 +1653,7 @@ ImageShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
 
@@ -1761,7 +1761,7 @@ ImageShader2._prog = null;
 ImageShader2.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
 
         varying vec2 vTextureCoord;
@@ -1775,7 +1775,7 @@ ImageShader2.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
 
@@ -1884,7 +1884,7 @@ SpriteShader._prog = null;
 SpriteShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
 
         varying vec2 vTextureCoord;
@@ -1896,7 +1896,7 @@ SpriteShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
         attribute lowp vec4 aColor;
@@ -1993,7 +1993,7 @@ ShapeSpriteShader._prog = null;
 ShapeSpriteShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
 
         varying lowp vec4 vColor;
@@ -2003,7 +2003,7 @@ ShapeSpriteShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute lowp vec4 aColor;
 
@@ -2088,7 +2088,7 @@ TextShader._prog = null;
 TextShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `
+    const fragShaderText = `\
         precision mediump float;
 
         varying vec2 vTextureCoord;
@@ -2100,7 +2100,7 @@ TextShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `
+    const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
 
