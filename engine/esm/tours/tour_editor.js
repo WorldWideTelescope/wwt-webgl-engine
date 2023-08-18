@@ -21,6 +21,7 @@ import { Settings } from "../settings.js";
 import { UiTools } from "../ui_tools.js";
 import { Cursor, Cursors, Language, OverlayProperties, SelectLink, PopupVolume } from "../util.js";
 import { Overlay, AudioOverlay, BitmapOverlay, FlipbookOverlay, ShapeOverlay, TextOverlay } from "./overlay.js";
+import { Selection } from "./selection.js";
 import { Undo, UndoTourSlidelistChange } from "./undo.js";
 import { UndoTourStopChange } from "./tour_stop.js";
 

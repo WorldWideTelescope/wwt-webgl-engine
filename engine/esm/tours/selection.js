@@ -34,6 +34,11 @@ registerEnum("SelectionAnchor", SelectionAnchor);
 
 
 // wwtlib.Selection
+//
+// Note: this type is a bit dangerous because there is a built-in browser type
+// of the same name. So if you forget to import this type into your module, your
+// code will likely get the other one instead. As usual, we're reluctant to
+// rename it because that would break API compatibility.
 
 export function Selection() {
     this._singleSelectHandles = null;
