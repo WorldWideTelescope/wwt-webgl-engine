@@ -91,7 +91,23 @@ createApp(App, {
 
 Note that for now, **you can only include one WWT component in each app**,
 because the WWT engine library maintains global state. To work around this, use
-iframes.
+iframes. 
+
+Alternatively, it is possible to mount separate *full instances* of
+the application to the same web page by passing in a unique `id` when creating
+the Vue app using the `customId` prop.
+
+```ts
+...
+
+createApp(App, {
+    wwtNamespace: "mywwt",
+    customId: "myCustomId"
+  })
+  .use(wwtPinia)
+  .component('WorldWideTelescope', WWTComponent)
+  .mount("#app");
+```
 
 Finally, if you’re using [Webpack], you may run into a pitfall because this
 library must explicitly depend on the Vue package to obtain its TypeScript
