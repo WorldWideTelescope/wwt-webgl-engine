@@ -1,4 +1,55 @@
-# rc: micro bump
+# rc: minor bump
+
+Historically, the WWT engine in this module has consisted of JavaScript code
+that was transpiled from a C# codebase using an unmaintained tool called
+ScriptSharp. In this release, we drop the C# and work directly from JavaScript
+(#261, #262, @pkgw).
+
+The intention is that this change should be invisible to consumers of this
+module. However, a few internal APIs have been renamed as part of the
+adaptation, to better isolate dependencies. It is possible that external code
+referenced these symbols despite their internal nature, but since this is
+unsupported and we are not aware of any actual instances of this, we are not
+categorizing these as API breaks:
+
+- Some APIs in the `Planets` module/class have been moved into a new
+  `Planets3d` name
+- `RenderContext.useGl` become `render_globals.(set_)useGl`
+- `RenderContext.useGlVersion2` become `render_globals.(set_)useGlVersion2`
+- `Tile.demEnabled` become `render_globals.(set_)tileDemEnabled`
+- `Tile.prepDevice` become `render_globals.(set_)tilePrepDevice`
+- `Tile.uvMultiple` become `render_globals.(set_)tileUvMultiple`
+- `TileCache.accessID` become `render_globals.(set_)tileCacheAccessID`
+- `TileCache.addTileToQueue` become `render_globals.(set_)tileCacheAddTileToQueue`
+- `TileCache.getCachedTile` become `render_globals.(set_)tileCacheGetCachedTile`
+- `TileCache.getTile` become `render_globals.(set_)tileCacheGetTile`
+- `TileCache.removeFromQueue` become `render_globals.(set_)tileCacheRemoveFromQueue`
+- `WWTControl.singleton.freestandingMode` became `data_globals.(set_)freestandingMode`
+- `Object3d.maX_VERTICES` and `Object3d.maX_POLYGONS` have disappeared.
+
+It is also possible that the reorganization has unintentionally introduced
+changes breaking existing code or behaviors, although a great deal of effort has
+been spent to test that no visible changes have occurred. Any behavior changes
+traceable to this migration are bugs that will be fixed.
+
+The new codebase is written in plain JavaScript with ES6 (["ESM"]) module
+syntax. [Webpack] then assembles the modularized source files into a [UMD]-style
+single module file, the same form factor as delivered in previous releases. This
+new approach will dramatically ease many aspects of WWT engine development
+especially the use of JavaScript libraries and browser features, debugging, and
+streamlining the build.
+
+[Webpack]: https://webpack.js.org/
+["ESM"]: https://nodejs.org/api/esm.html#modules-ecmascript-modules
+[UMD]: https://github.com/umdjs/umd
+
+This release does *not* support building against the individual ESM module
+files, although you might be able to get such a use case to work. This is an
+obvious potential direction for future work. Another possible direction for work
+is a port to TypeScript.
+
+
+# @wwtelescope/engine 7.28.2 (2023-07-23)
 
 - Actually use the crosshairs color setting (#260, @Carifio24).
 

@@ -1,4 +1,4 @@
-# Copyright 2020-2022 the .NET Foundation
+# Copyright 2020-2023 the .NET Foundation
 # Licensed under the MIT License
 
 # Setup steps for the build and deployment processes.
@@ -69,12 +69,6 @@ steps:
     displayName: Set up node.js
     inputs:
       versionSpec: '16'
-
-  - bash: |
-      set -xeuo pipefail
-      mkdir -p engine/wwtlib/bin
-      cp $PIPELINE_WORKSPACE/scriptsharp/wwtlib.js engine/wwtlib/bin/
-    displayName: Restore ScriptSharp wwtlib.js
 
   - bash: yarn install
     displayName: Install Yarn dependencies

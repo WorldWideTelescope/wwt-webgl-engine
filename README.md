@@ -45,8 +45,6 @@ workshops, and a variety of other needs.
 1. Check out this repository to a machine with [Node.js] and [Yarn].
 1. `git submodule update --init`
 1. `yarn install`
-1. Either build or obtain the file `engine/wwtlib/bin/wwtlib.js` as described
-   below.
 1. `yarn lint` (uses [ESLint])
 1. `yarn build` creates:
    1. The core engine package in the `engine/` package.
@@ -80,8 +78,7 @@ The most important subdirectories are:
 
 [monorepo]: https://en.wikipedia.org/wiki/Monorepo
 
-- `@wwtelescope/engine` in `engine/`, the core engine code transpiled from C# and
-  wrapped in TypeScript annotations
+- `@wwtelescope/engine` in `engine/`, the core engine code with TypeScript annotations
 - `@wwtelescope/engine-pinia` in `engine-pinia/`, a higher-level package that turns the
   engine into a reusable [Vue]/[Pinia] component
 - `@wwtelescope/embed` in `embed/`, a web application that turns WWT into a
@@ -99,41 +96,9 @@ subdirectory. That module has been superseded by the Pinia version.
 [Vuex]: https://vuex.vuejs.org/
 
 
-## The `engine/wwtlib/bin/wwtlib.js` file
+## Building the code
 
-There’s one big wrinkle to the build process: the bulk of the engine code is
-actually C# code in the directory `engine/wwtlib/`. It’s forked from
-[wwt-windows-client] and is transpiled into JavaScript using an unreleased
-version of [ScriptSharp], an unmaintained tool. Fortunately, that build process
-results in a single file, `engine/wwtlib/bin/wwtlib.js`, that you can download
-from our CI systems if you’re not able to perform a Visual Studio build.
-
-[wwt-windows-client]: https://github.com/WorldWideTelescope/wwt-windows-client
-[ScriptSharp]: https://github.com/nikhilk/scriptsharp
-
-To build the engine library starting from C#:
-
-1. You need a Windows machine with Visual Studio 2017. Other versions of Visual
-   Studio might also work.
-1. Open the `engine/WebGLEngine.sln` solution and build the project it contains.
-   This should create the file `engine/wwtlib/bin/wwtlib.js`.
-
-Otherwise, check out the latest continuous integration build of this repository,
-download the `scriptsharp` artifact, and copy the `wwtlib.js` file to the location
-given above. (To find the artifact, go to the appropriate build in this project's
-[pipeline] on [Azure DevOps]). Under 'Related', select '9 published', and download
-artifacts for `scriptsharp`). If you want to change the C# code, you can file a pull
-request and access the artifacts associated with your pull request builds.
-
-[Azure DevOps]: https://azure.microsoft.com/en-us/services/devops/?nav=min
-[pipeline]: https://dev.azure.com/aasworldwidetelescope/WWT/_build?definitionId=21
-
-
-
-## Building the rest of the code
-
-Besides the creation of the file `engine/wwtlib/bin/wwtlib.js`, virtually
-everything in this repository is built using standard [Node.js]/[Yarn] tooling.
+Code in this repository is built using standard [Node.js]/[Yarn] tooling.
 These tools must be installed before you can do anything else. To set up your
 checkout, follow the instructions in the [Developers’ Quick Start][dqs] above.
 
