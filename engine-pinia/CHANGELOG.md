@@ -1,3 +1,12 @@
+# @wwtelescope/engine-pinia 0.8.0 (2023-09-14)
+
+- Add a `customId` prop the WWT component (#265, @nmearl). This allows you to
+  precisely control the DOM id of the `<div>` that the app will bind to, in case
+  the default ID selection (`wwtcmpt${N}`) does not work. In particular, if you
+  have multiple independent WWT Vue apps within the same DOM tree, you can use
+  this to avoid clashes.
+
+
 # @wwtelescope/engine-pinia 0.7.0 (2023-06-08)
 
 - Have the `addImagesetToRepository` method return an imageset (#256, @pkgw).

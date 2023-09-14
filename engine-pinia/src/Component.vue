@@ -23,6 +23,7 @@ export default defineComponent({
   props: {
     wwtNamespace: { type: String, default: "wwt", required: true },
     wwtFreestandingAssetBaseurl: String,
+    customId: String
   },
 
   data(): ComponentData {
@@ -45,7 +46,7 @@ export default defineComponent({
 
   created() {
     // Create a globally unique ID for the div that the WWT engine can latch onto.
-    const uid = `wwtcmpt${idCounter}`;
+    const uid = this.customId === undefined ? `wwtcmpt${idCounter}` : this.customId;
     Object.defineProperties(this, {
       uniqueId: { get() { return uid; } },
     });
