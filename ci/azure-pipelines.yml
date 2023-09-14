@@ -1,4 +1,4 @@
-# Copyright 2020 the .NET Foundation
+# Copyright 2020-2023 the .NET Foundation
 # Licensed under the MIT License
 
 trigger:
@@ -8,9 +8,9 @@ trigger:
     - rc
 
 stages:
-- stage: ScriptSharpBuild
+- stage: Prep
   jobs:
-  - template: azure-scriptsharp-build.yml
+  - template: azure-prep.yml
 
 - stage: MainBuild
   jobs:
