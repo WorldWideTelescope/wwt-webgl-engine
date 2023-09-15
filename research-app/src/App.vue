@@ -345,7 +345,7 @@
       v-if="!hideAllChrome"
       @keydown.stop
     >
-      To get the full AAS WWT experience, consider using the latest version of
+      To get the full WWT experience, consider using the latest version of
       Chrome, Firefox or Edge. In case you would like to use Safari, we
       recommend that you
       <a href="https://discussions.apple.com/thread/8655829">enable WebGL 2.0</a
