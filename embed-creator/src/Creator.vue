@@ -19,7 +19,7 @@
         <b-tabs no-fade content-class="mt-3" v-model="currentTabIndex">
           <b-tab title="Home" active>
             <p>
-              Wecome to the AAS WorldWide Telescope embed creator tool! This
+              Wecome to the WorldWide Telescope embed creator tool! This
               site helps you create HTML code that you can use to embed WWT in
               your own websites.
             </p>

@@ -1,4 +1,4 @@
-This package turns the [AAS WorldWide Telescope][wwt] rendering engine,
+This package turns the [WorldWide Telescope][wwt] rendering engine,
 [@wwtelescope/engine], into a well-behaved web app component using [Vue],
 [Pinia], and [TypeScript].
 

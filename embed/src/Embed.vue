@@ -158,7 +158,7 @@
       <p>
         Powered by
         <a href="https://worldwidetelescope.org/home/"
-          >AAS WorldWide Telescope</a
+          >WorldWide Telescope</a
         >
         <a href="https://worldwidetelescope.org/home/"
           ><img alt="WWT Logo" src="./assets/logo_wwt.png"

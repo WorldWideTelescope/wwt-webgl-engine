@@ -1,5 +1,5 @@
 {
-  "author": "The AAS WorldWide Telescope Team <hello@worldwidetelescope.org>",
+  "author": "The WorldWide Telescope Team <hello@worldwidetelescope.org>",
   "bugs": {
     "email": "hello@worldwidetelescope.org",
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
@@ -23,7 +23,7 @@
     "vue-slider-component": "^4.1.0-beta.2",
     "vue3-popper": "^1.5.0"
   },
-  "description": "The AAS WorldWide Telescope research app.",
+  "description": "The WorldWide Telescope research app.",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
@@ -54,7 +54,7 @@
     "@wwtelescope/research-app-messages": "thiscommit:2023-02-19:Kuk5Ppd"
   },
   "keywords": [
-    "AAS WorldWide Telescope"
+    "WorldWide Telescope"
   ],
   "license": "MIT",
   "name": "@wwtelescope/research-app",

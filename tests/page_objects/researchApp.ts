@@ -40,7 +40,7 @@ const researchAppCommands = {
 };
 
 const researchAppProps = {
-  title: "AAS WorldWide Telescope",
+  title: "WorldWide Telescope",
   builtinUrl: "https://web.wwtassets.org/engine/assets/builtin-image-sets.wtml",
   hipsUrl: "http://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips",
 };

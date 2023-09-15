@@ -1,10 +1,10 @@
 {
-  "author": "The AAS WorldWide Telescope Team <hello@worldwidetelescope.org>",
+  "author": "The WorldWide Telescope Team <hello@worldwidetelescope.org>",
   "bugs": {
     "email": "hello@worldwidetelescope.org",
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
-  "description": "Basic astronomy utilities for the AAS WorldWide Telescope framework.",
+  "description": "Basic astronomy utilities for the WorldWide Telescope framework.",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
@@ -15,7 +15,7 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "keywords": [
-    "AAS WorldWide Telescope"
+    "WorldWide Telescope"
   ],
   "license": "MIT",
   "main": "./dist/src/index.js",
