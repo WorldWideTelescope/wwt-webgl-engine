@@ -5,7 +5,7 @@ insert_anchor_links = "right"
 +++
 
 The “[WebGL] engine” is the core renderer that powers the web-based forms of the
-[AAS](https://aas.org/) [WorldWide Telescope] software system. While it
+[WorldWide Telescope] software system. While it
 underpins the [WWT web client] application, it is a reusable [TypeScript]
 framework that can be embedded in webpages or your own applications. Like this!
 
