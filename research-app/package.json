@@ -1,7 +1,7 @@
 {
-  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "author": "The WorldWide Telescope Team <hello@worldwidetelescope.org>",
   "bugs": {
-    "email": "wwt@aas.org",
+    "email": "hello@worldwidetelescope.org",
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
@@ -23,7 +23,7 @@
     "vue-slider-component": "^4.1.0-beta.2",
     "vue3-popper": "^1.5.0"
   },
-  "description": "The AAS WorldWide Telescope research app.",
+  "description": "The WorldWide Telescope research app.",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
@@ -47,14 +47,14 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "7cb232125428a91bd8fd10be24fec904e3589cce",
-    "@wwtelescope/engine": "thiscommit:2022-04-04:M9auxuE",
+    "@wwtelescope/engine": "thiscommit:2023-09-15:8Z0O5N5",
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/engine-pinia": "thiscommit:2022-11-10:R3G9gH3",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/research-app-messages": "thiscommit:2023-02-19:Kuk5Ppd"
   },
   "keywords": [
-    "AAS WorldWide Telescope"
+    "WorldWide Telescope"
   ],
   "license": "MIT",
   "name": "@wwtelescope/research-app",

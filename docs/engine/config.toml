@@ -1,6 +1,6 @@
 base_url = "//docs.worldwidetelescope.org/webgl-reference/1/"
 title = "WWT WebGL Engine Reference Manual"
-description = "The AAS WorldWide Telescope WebGL Engine reference manual."
+description = "The WorldWide Telescope WebGL Engine reference manual."
 theme = "wwtguide"
 
 [extra]

@@ -1,5 +1,14 @@
 # rc: minor bump
 
+- Require the new, ESM-based version of the WebGL engine (#271, @pkgw). While
+  the engine transition should not affect any packages that depend on it, such
+  as this one, this requirement will help isolate any bugs associated with the
+  transition.
+- Update sponsorship branding and "front door" email address (#269, #271, @pkgw).
+
+
+# @wwtelescope/engine-pinia 0.8.0 (2023-09-14)
+
 - Add a `customId` prop the WWT component (#265, @nmearl). This allows you to
   precisely control the DOM id of the `<div>` that the app will bind to, in case
   the default ID selection (`wwtcmpt${N}`) does not work. In particular, if you

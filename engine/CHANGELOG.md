@@ -1,4 +1,10 @@
-# rc: minor bump
+# rc: micro bump
+
+- Fix tracking functionality in "local horizon mode" (#270, @Carifio24).
+- Update sponsorship branding and "front door" email address (#269, #271, @pkgw).
+
+
+# @wwtelescope/engine 7.29.0 (2023-09-14)
 
 Historically, the WWT engine in this module has consisted of JavaScript code
 that was transpiled from a C# codebase using an unmaintained tool called

@@ -1,7 +1,7 @@
 {
-  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "author": "The WorldWide Telescope Team <hello@worldwidetelescope.org>",
   "bugs": {
-    "email": "wwt@aas.org",
+    "email": "hello@worldwidetelescope.org",
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
@@ -10,7 +10,7 @@
     "browserstack-local": "^1.4.8",
     "jsdom": "^21.1.0"
   },
-  "description": "Tests for the AAS WorldWide Telescope engine and apps.",
+  "description": "Tests for the WorldWide Telescope engine and apps.",
   "devDependencies": {
     "@types/nightwatch": "^2.3.12",
     "chromedriver": "^92.0.2",
@@ -22,7 +22,7 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "keywords": [
-    "AAS WorldWide Telescope"
+    "WorldWide Telescope"
   ],
   "license": "MIT",
   "name": "@wwtelescope/tests",

@@ -38,7 +38,7 @@ version of the app. If you’re hand-coding HTML, you might write:
   allowfullscreen
   frameborder="0"
 >
-  <p>ERROR: cannot display AAS WorldWide Telescope research app!</p>
+  <p>ERROR: cannot display WorldWide Telescope research app!</p>
 </iframe>
 ```
 
