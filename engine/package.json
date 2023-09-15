@@ -1,8 +1,8 @@
 {
-  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "author": "The AAS WorldWide Telescope Team <hello@worldwidetelescope.org>",
   "browser": "./src/index.js",
   "bugs": {
-    "email": "wwt@aas.org",
+    "email": "hello@worldwidetelescope.org",
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
