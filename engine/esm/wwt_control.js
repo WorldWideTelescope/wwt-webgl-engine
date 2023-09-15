@@ -975,8 +975,8 @@ var WWTControl$ = {
             }
             else if (this.renderContext.space && Settings.get_active().get_localHorizonMode()) {
                 var currentAltAz = Coordinates.equitorialToHorizon(Coordinates.fromRaDec(this._trackingObject.get_RA(), this._trackingObject.get_dec()), SpaceTimeController.get_location(), SpaceTimeController.get_now());
-                this.renderContext.targetAlt = currentAltAz.get_alt();
-                this.renderContext.targetAz = currentAltAz.get_az();
+                this.renderContext.targetAlt = this.renderContext.alt = currentAltAz.get_alt();
+                this.renderContext.targetAz = this.renderContext.az = currentAltAz.get_az();
             }
             else {
                 this.renderContext.viewCamera.lng = this.renderContext.targetCamera.lng = this.rAtoViewLng(this._trackingObject.get_RA());
