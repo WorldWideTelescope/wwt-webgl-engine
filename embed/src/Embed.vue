@@ -157,14 +157,14 @@
     <div id="credits" v-show="embedSettings.creditMode == CreditMode.Default">
       <p>
         Powered by
-        <a href="https://worldwidetelescope.org/home/"
+        <a href="https://worldwidetelescope.org/home/" target="_blank"
           >WorldWide Telescope</a
         >
-        <a href="https://worldwidetelescope.org/home/"
+        <a href="https://worldwidetelescope.org/home/" target="_blank"
           ><img alt="WWT Logo" src="./assets/logo_wwt.png"
         /></a>
-        <a href="https://aas.org/"
-          ><img alt="AAS Logo" src="./assets/logo_aas.png"
+        <a href="https://numfocus.org/" target="_blank"
+          ><img alt="NumFOCUS Logo" src="./assets/logo_nf.png"
         /></a>
       </p>
     </div>
