@@ -43,6 +43,9 @@ workshops, and a variety of other needs.
 ## Developers’ quick start
 
 1. Check out this repository to a machine with [Node.js] and [Yarn].
+   1. Builds with versions of Node.js around 18.17 may fail with [an Invalid URL
+      error](https://github.com/nodejs/node/issues/48855).
+   1. There have also been reports of builds that hang on Linux with Node 20.x.
 1. `git submodule update --init`
 1. `yarn install`
 1. `yarn lint` (uses [ESLint])
