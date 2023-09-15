@@ -437,8 +437,8 @@
           <a href="#">Back to top</a>
         </p>
         <p>
-          Copyright 2020
-          <a href="https://aas.org/">American Astronomical Society</a>.
+          Copyright 2023
+          <a href="https://worldwidetelescope.org/home/" target="_blank">WWT contributors</a>.
         </p>
       </footer>
     </b-container>
