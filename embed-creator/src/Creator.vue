@@ -19,7 +19,7 @@
         <b-tabs no-fade content-class="mt-3" v-model="currentTabIndex">
           <b-tab title="Home" active>
             <p>
-              Wecome to the AAS WorldWide Telescope embed creator tool! This
+              Wecome to the WorldWide Telescope embed creator tool! This
               site helps you create HTML code that you can use to embed WWT in
               your own websites.
             </p>
@@ -437,8 +437,8 @@
           <a href="#">Back to top</a>
         </p>
         <p>
-          Copyright 2020
-          <a href="https://aas.org/">American Astronomical Society</a>.
+          Copyright 2023
+          <a href="https://worldwidetelescope.org/home/" target="_blank">WWT contributors</a>.
         </p>
       </footer>
     </b-container>

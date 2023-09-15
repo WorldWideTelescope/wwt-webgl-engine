@@ -1,3 +1,8 @@
+# @wwtelescope/astro 0.2.4 (2023-09-15)
+
+- Update sponsorship branding and "front door" email address (#269, #271, @pkgw).
+
+
 # @wwtelescope/astro 0.2.3 (2023-07-21)
 
 - Add a `type: module` field to the `package.json` file (#264, @pkgw). This more

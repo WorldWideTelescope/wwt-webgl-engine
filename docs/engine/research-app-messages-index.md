@@ -1,4 +1,4 @@
-This package defines messages for controlling the AAS WorldWide Telescope
+This package defines messages for controlling the WorldWide Telescope
 [research app]. The only implementation code that it contains are [TypeScript]
 [type guard functions].
 

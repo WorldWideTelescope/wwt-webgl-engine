@@ -1,3 +1,12 @@
+# @wwtelescope/embed 1.7.0 (2023-09-15)
+
+- Require the new, ESM-based version of the WebGL engine (#271, @pkgw). While
+  the engine transition should not affect any packages that depend on it, such
+  as this one, this requirement will help isolate any bugs associated with the
+  transition.
+- Update sponsorship branding and "front door" email address (#269, #271, @pkgw).
+
+
 # @wwtelescope/embed 1.6.2 (2023-03-31)
 
 - No code changes

@@ -1,15 +1,15 @@
 {
-  "author": "The AAS WorldWide Telescope Team <wwt@aas.org>",
+  "author": "The WorldWide Telescope Team <hello@worldwidetelescope.org>",
   "bugs": {
-    "email": "wwt@aas.org",
+    "email": "hello@worldwidetelescope.org",
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
     "@wwtelescope/astro": "workspace:>=0.1.0",
-    "@wwtelescope/engine": "workspace:^7.27.0",
+    "@wwtelescope/engine": "workspace:^7.29.1",
     "@wwtelescope/engine-types": "workspace:>=0.6.0"
   },
-  "description": "Helpful extensions to the AAS WorldWide Telescope engine.",
+  "description": "Helpful extensions to the WorldWide Telescope engine.",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
@@ -21,11 +21,11 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:workspace:>=0.1.0",
-    "@wwtelescope/engine": "thiscommit:2023-06-08:wiuLDxn",
+    "@wwtelescope/engine": "thiscommit:2023-09-15:QN4FSax",
     "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2"
   },
   "keywords": [
-    "AAS WorldWide Telescope"
+    "WorldWide Telescope"
   ],
   "license": "MIT",
   "main": "./dist/src/index.js",
@@ -42,5 +42,5 @@
   },
   "type": "module",
   "types": "./dist/src/index.d.ts",
-  "version": "0.15.1"
+  "version": "0.16.0"
 }

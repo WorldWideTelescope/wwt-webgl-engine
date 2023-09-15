@@ -1,3 +1,8 @@
+# @wwtelescope/embed-common 0.3.5 (2023-09-15)
+
+- Update sponsorship branding and "front door" email address (#269, #271, @pkgw).
+
+
 # @wwtelescope/embed-common 0.3.4 (2023-07-23)
 
 - Add a `type: module` field to the `package.json` file (#264, @pkgw). This more

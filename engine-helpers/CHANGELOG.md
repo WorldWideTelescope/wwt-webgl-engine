@@ -1,3 +1,12 @@
+# @wwtelescope/engine-helpers 0.16.0 (2023-09-15)
+
+- Require the new, ESM-based version of the WebGL engine (#271, @pkgw). While
+  the engine transition should not affect any packages that depend on it, such
+  as this one, this requirement will help isolate any bugs associated with the
+  transition.
+- Update sponsorship branding and "front door" email address (#269, #271, @pkgw).
+
+
 # @wwtelescope/engine-helpers 0.15.1 (2023-07-23)
 
 - Add a `type: module` field to the `package.json` file (#264, @pkgw). This more

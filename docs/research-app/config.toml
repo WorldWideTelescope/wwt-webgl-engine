@@ -1,6 +1,6 @@
 base_url = "//docs.worldwidetelescope.org/research-app/1/"
 title = "WWT Research Application Manual"
-description = "The AAS WorldWide Telescope research app manual."
+description = "The WorldWide Telescope research app manual."
 theme = "wwtguide"
 
 [extra]

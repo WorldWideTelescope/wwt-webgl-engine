@@ -199,7 +199,7 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
         if (gl != null) {
             set_useGlVersion2(true);
         } else {
-            console.warn('This browser does not support WebGL 2.0. Some features will work suboptimally. To get the full AAS WWT experience, consider using the latest version of Chrome, Firefox or Edge. In case you would like to use Safari, we recommend that you enable WebGL 2.0');
+            console.warn('This browser does not support WebGL 2.0. Some features will work suboptimally. To get the full WWT experience, consider using the latest version of Chrome, Firefox or Edge. In case you would like to use Safari, we recommend that you enable WebGL 2.0');
             gl = canvas.getContext('webgl');
         }
 
@@ -975,8 +975,8 @@ var WWTControl$ = {
             }
             else if (this.renderContext.space && Settings.get_active().get_localHorizonMode()) {
                 var currentAltAz = Coordinates.equitorialToHorizon(Coordinates.fromRaDec(this._trackingObject.get_RA(), this._trackingObject.get_dec()), SpaceTimeController.get_location(), SpaceTimeController.get_now());
-                this.renderContext.targetAlt = currentAltAz.get_alt();
-                this.renderContext.targetAz = currentAltAz.get_az();
+                this.renderContext.targetAlt = this.renderContext.alt = currentAltAz.get_alt();
+                this.renderContext.targetAz = this.renderContext.az = currentAltAz.get_az();
             }
             else {
                 this.renderContext.viewCamera.lng = this.renderContext.targetCamera.lng = this.rAtoViewLng(this._trackingObject.get_RA());
