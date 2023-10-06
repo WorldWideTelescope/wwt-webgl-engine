@@ -30,7 +30,7 @@ const justCircleAnnotationSettingNames = [
 
 /** A list of the names of the available settings for `CircleAnnotation`
  * instances and their equivalents (things implementing
- * [[CircleAnnotationSettingsInterface]]).
+ * {@link CircleAnnotationSettingsInterface}).
  *
  * This is a superset of the names available for generic annotations.
 */
