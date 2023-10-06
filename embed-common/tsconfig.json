@@ -29,6 +29,7 @@
     "excludePrivate": true,
     "validation": {
       "invalidLink": true
-    }
+    },
+    "intentionallyNotExported": ["BaseEngineSetting"]
   }
 }
