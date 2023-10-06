@@ -10,13 +10,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended'
   ],
   rules: {
-    "no-unused-vars": [
-      "warn", {
-        "args": "all",
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_"
-      }
-    ],
+    "no-unused-vars": "off", // this rule is superseded by typescript-eslint's version
     "@typescript-eslint/no-unused-vars": [
       "warn", {
         "args": "all",
