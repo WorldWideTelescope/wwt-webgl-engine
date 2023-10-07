@@ -33,33 +33,6 @@
     "excludePrivate": true,
     "validation": {
       "invalidLink": true
-    },
-    "intentionallyNotExported": [
-      "AltTypes",
-      "AltUnits",
-      "BandPass",
-      "BaseEngineSetting",
-      "BaseLayerSetting",
-      "BaseImageSetLayerSetting",
-      "BaseSpreadSheetLayerSetting",
-      "BaseVoTableLayerSetting",
-      "Classification",
-      "ConstellationFilterInterface",
-      "CoordinatesType",
-      "FadeType",
-      "FolderGroup",
-      "FolderRefreshType",
-      "FolderType",
-      "ImageSetType",
-      "MarkerScales",
-      "PlotTypes",
-      "PointScaleTypes",
-      "ProjectionType",
-      "RAUnits",
-      "ScaleTypes",
-      "SettingsInterface",
-      "SolarSystemObjects",
-      "Thumbnail"
-    ]
+    }
   }
 }
