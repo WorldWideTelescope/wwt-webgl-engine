@@ -5,7 +5,7 @@
 <script lang="ts">
 import { defineComponent, markRaw, nextTick } from "vue";
 import { mapActions } from "pinia";
-import { engineStore } from "./store"
+import { engineStore } from "./store";
 
 import { WWTInstance } from "@wwtelescope/engine-helpers";
 
@@ -17,11 +17,13 @@ interface ComponentData {
   renderLoopId: number | undefined;
 }
 
-/** This is the component docstring. */
+// Due to something weird about how TypeDoc is handling this, the docstring for
+// this variable is in `shims-vue.d.ts`. That looks like it would be a problem
+// if we had more than one SFC `.vue` file, but we don't.
 export default defineComponent({
-
   props: {
-    wwtNamespace: { type: String, default: "wwt", required: true },
+    // This was required for Vuex, but is no longer used with Pinia.
+    wwtNamespace: { type: String, default: "wwt", required: false },
     wwtFreestandingAssetBaseurl: String,
     customId: String
   },
@@ -104,6 +106,5 @@ export default defineComponent({
 
     this.internalUnlinkFromInstance();
   }
-
 });
 </script>

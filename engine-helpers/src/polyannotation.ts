@@ -28,7 +28,7 @@ const justPolyAnnotationSettingNames = [
 
 /** A list of the names of the available settings for `PolyAnnotation`
  * instances and their equivalents (things implementing
- * [[PolyAnnotationSettingsInterface]]).
+ * {@link PolyAnnotationSettingsInterface}).
  *
  * This is a superset of the names available for generic annotations.
 */

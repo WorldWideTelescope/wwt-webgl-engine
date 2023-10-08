@@ -80,7 +80,7 @@ const justSpreadSheetLayerSettingNames = [
 
 /** A list of the names of the available settings for `SpreadSheetLayer`
  * instances and their equivalents (things implementing
- * [[SpreadSheetLayerSettingsInterface]]).
+ * {@link SpreadSheetLayerSettingsInterface}).
  *
  * This is a superset of the names available for generic layers.
 */

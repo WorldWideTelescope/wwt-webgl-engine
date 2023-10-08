@@ -17,3 +17,17 @@ packages:
 
 [Vue]: https://vuejs.org/
 [Pinia]: https://pinia.vuejs.org/
+
+If you’re interested in writing code to control a WWT display, you might want to
+check out the following sections of the documentation:
+
+- For pure JavaScript without any frameworks (the [hosted JavaScript
+  model](../getting-started/hosted-javascript-model.md)) see
+  [@wwtelescope/engine](./engine/).
+- To control an embedded instance of the research app (the [embedded app
+  model](../getting-started/embedded-app-model.md)) see
+  [@wwtelescope/research-app-messages](./research-app-messages/).
+- For a custom component-based web app built with Vue (the [Vue component
+  model](../getting-started/vue-component-model.md)) see [the WWT Pinia
+  interface](engine-pinia/classes/WWTAwareComponent.html#md:the-wwt-pinia-interface)
+  in [@wwtelescope/engine-pinia](./engine-pinia/).

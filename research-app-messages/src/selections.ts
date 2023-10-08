@@ -1,17 +1,18 @@
+// Copyright 2021-2023 the .NET Foundation
+// Licensed under the MIT License
+
+// Note: module-level docstring found in `index.ts`
+
 export const ImageSetTypes = ["earth", "planet", "sky", "panorama", "solarSystem", "sandbox"] as const;
 export type ImageSetType = (typeof ImageSetTypes)[number];
 
 /** This class holds basic information about an imageset.
  *
- * Discover imagesets through the [[WWTAwareComponent.wwtAvailableImagesets]]
- * state variable. In standard practice there will be hundreds of available
- * imagesets of many different kinds.
- *
- * Imagesets may be uniquely identified by their associated image data [[url]].
+ * Imagesets may be uniquely identified by their associated image data {@link url}.
  * (If you really need to have multiple imagesets associated with the same URL,
  * add a `#fragment` to the end.)
  */
- export interface ImagesetInfo {
+export interface ImagesetInfo {
   /** The URL of the image data. */
   url: string;
 
@@ -33,6 +34,7 @@ export type ImageSetType = (typeof ImageSetTypes)[number];
   extension: string;
 }
 
+/** Basic information abou a spreadsheet layer. */
 export interface SpreadSheetLayerInfo {
   /* The user-facing name of the layer */
   name: string;
@@ -46,25 +48,31 @@ export interface SpreadSheetLayerInfo {
 
 export type CatalogLayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
 
-/**
- * Information about a selected source in the engine.
- * The values for right ascension and declination are given in radians.
- * `name` gives a string name for the source.
- * `catalogLayer` contains information about the layer, which varies
- * based on the layer type.
- * For a standard spreadsheet layer, see [[SpreadSheetLayerInfo]]
- * For a HiPS catalog, see [[ImagesetInfo]].
- * `layerData` contains all of the associated data for the source, 
- * which will depends on the contents of the particular catalog.
- * `zoomDeg`, if present, defines the FOV, in degrees, that WWT will
- * use when moving to the source.
- */
+/** Information about a selected source in the engine. */
 export interface Source {
+  /** The right ascension of the source, in radians. */
   ra: number;
+
+  /** The declination of the source, in radians. */
   dec: number;
+
+  /** A user-facing name for he source */
   name: string;
+
+  /** Information about the layer containing the source. Details depend on
+   * whether this is a spreadsheet/tabular layer (in which case it is
+   * {@link SpreadSheetLayerInfo} or a HiPS progressive catalog layer (in which
+   * case it is {@link ImagesetInfo}).
+   */
   catalogLayer: CatalogLayerInfo;
+
+  /** If present, defines the FOV setting (in degrees) that WWT will use when
+   * moving to the source. */
   zoomDeg?: number;
+
+  /** All associated data for the source, as a key-value map. The contents here
+   * will depend on the contens of the catalog from which this source
+   * originated. */
   layerData: {
     [field: string]: string | undefined;
   };
@@ -88,7 +96,7 @@ export interface SelectionStateMessage {
   /** The tag identifying this message type. */
   type: "wwt_selection_state";
 
-  /** An app/client session identifier. See the description for [[ViewStateMessage.sessionId]].
+  /** An app/client session identifier. See the description for {@link ViewStateMessage.sessionId}.
    */
   sessionId: string;
 
@@ -98,9 +106,13 @@ export interface SelectionStateMessage {
   /** The list of sources that are currently selected. */
   selectedSources?: Source[];
 }
-  
-export interface AddSourceMessage {
 
+/** Manually add a selected source to the research app UI.
+ *
+ * The primary intended use case of this message is to allow saved UI state to
+ * be reconstructed.
+ */
+export interface AddSourceMessage {
   /** The tag identifying this message type */
   type: "add_source";
 
@@ -108,13 +120,22 @@ export interface AddSourceMessage {
   source: Source;
 }
 
+/** A type-guard function for {@link AddSourceMessage}. */
 export function isAddSourceMessage(o: any): o is AddSourceMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.type === 'add_source' &&
-      typeof o.source === 'object';
+    typeof o.source === 'object';
 }
 
+/** Modify whether the sources in a particular layer can be interactively
+ * selected by the user.
+ *
+ * Sometimes you want to display a layer of sources, but you don't want the user
+ * to be able to click on them for interactive selection. This message helps you
+ * accomplish that.
+ * 
+ * See also {@link ModifyAllSelectabilityMessage}.
+ */
 export interface ModifySelectabilityMessage {
-
   /** The tag identifying this message type */
   type: "modify_selectability";
 
@@ -125,13 +146,22 @@ export interface ModifySelectabilityMessage {
   selectable: boolean;
 }
 
-/** A type-guard function for [[ModifySelectabilityMessage]]. */
+/** A type-guard function for {@link ModifySelectabilityMessage}. */
 export function isModifySelectabilityMessage(o: any): o is ModifySelectabilityMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.type === 'modify_selectability' &&
     typeof o.id === 'string' &&
     typeof o.selectable === 'boolean';
 }
 
+/** Modify whether the sources in all layers can be interactively selected by
+ * the user.
+ *
+ * Sometimes you want to display various tables of sources, but you don't want
+ * the user to be able to click on them for interactive selection. This message
+ * helps you accomplish that.
+ *
+ * See also {@link ModifySelectabilityMessage}.
+ */
 export interface ModifyAllSelectabilityMessage {
 
   /** The tag identifying this message type. */
@@ -141,7 +171,7 @@ export interface ModifyAllSelectabilityMessage {
   selectable: boolean;
 }
 
-/** A type-guard function for [[ModifyAllSelectabilityMessage]]. */
+/** A type-guard function for {@link ModifyAllSelectabilityMessage}. */
 export function isModifyAllSelectabilityMessage(o: any): o is ModifyAllSelectabilityMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.type === 'modify_all_selectability' &&
     typeof o.selectable === 'boolean';
