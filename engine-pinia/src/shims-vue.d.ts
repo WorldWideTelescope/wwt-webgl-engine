@@ -25,7 +25,7 @@ declare module "*.vue" {
    * Then, one of your app’s component templates could use a
    * `<WorldWideTelescope>` tag to insert a WWT display. Your other components
    * could then use the APIs defined in [The WWT Pinia
-   * Interface](../classes/WWTAwareComponent.html#md:the-wwt-pinia-interface) to
+   * Interface](../functions/engineStore.html#md:the-wwt-pinia-interface) to
    * monitor and control the WWT’s status.
    */
   const component: ReturnType<typeof defineComponent>;

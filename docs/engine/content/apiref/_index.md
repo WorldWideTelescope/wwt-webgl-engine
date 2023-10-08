@@ -29,5 +29,5 @@ check out the following sections of the documentation:
   [@wwtelescope/research-app-messages](./research-app-messages/).
 - For a custom component-based web app built with Vue (the [Vue component
   model](../getting-started/vue-component-model.md)) see [the WWT Pinia
-  interface](engine-pinia/classes/WWTAwareComponent.html#md:the-wwt-pinia-interface)
+  interface](engine-pinia/functions/engineStore.html#md:the-wwt-pinia-interface)
   in [@wwtelescope/engine-pinia](./engine-pinia/).

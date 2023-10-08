@@ -44,6 +44,9 @@ import { WWTGlobalState } from "./store";
  *   .mount("#app");
  * ```
  *
+ * Once you’ve activated the special WWT Pinia instance in this way, you can
+ * interact with the WWT engine state via the {@link engineStore} interface.
+ *
  * This Pinia instance is initialized with a special `$wwt` singleton value that
  * the {@link WWTComponent} uses to share global state with Pinia.
  */
