@@ -1,4 +1,4 @@
-// Copyright 2020-2021 the .NET Foundation
+// Copyright 2020-2023 the .NET Foundation
 // Licensed under the MIT License
 
 import { defineComponent } from "vue";
@@ -15,7 +15,7 @@ import { engineStore } from "./store";
  *
  * This class doesn’t implement any special functionality itself. All it does is
  * provide a set of state variables and methods that are pre-connected to [the
- * WWT Pinia interface](#the-wwt-pinia-interface). A component inheriting from
+ * WWT Pinia interface](#md:the-wwt-pinia-interface). A component inheriting from
  * this class can use whichever ones it needs without having to set up that
  * integration itself.
  *
