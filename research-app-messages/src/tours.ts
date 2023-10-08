@@ -10,7 +10,7 @@
  * parameters are all correct.
  *
  * The underlying implementation maps to
- * [WWTAwareComponent.viewAsTourXml](../../engine-pinia/classes/WWTAwareComponent.html#viewAsTourXml).
+ * [engineStore.viewAsTourXml](../../engine-pinia/functions/engineStore.html#viewAsTourXml).
  */
 export interface GetViewAsTourMessage {
   /** The tag identifying this message type. */

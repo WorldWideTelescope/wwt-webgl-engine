@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2023 the .NET Foundation
 // Licensed under the MIT License
 
 // This type moved to a lower-level dependency, but we re-export it to maintain
@@ -19,12 +19,8 @@ export {
   engineStore,
 } from "./store";
 
+export { default as WWTComponent } from "./Component.vue";
 export { WWTAwareComponent } from "./wwtaware";
-
-// Can't figure out a one-liner way to re-export the default export from
-// Component.vue under a specific name, so:
-import WWTComponent from "./Component.vue";
-export { WWTComponent }
 
 // Finally, we define the `wwtPinia` thingie.
 
@@ -47,6 +43,9 @@ import { WWTGlobalState } from "./store";
  *   .component("WorldWideTelescope", WWTComponent)
  *   .mount("#app");
  * ```
+ *
+ * Once you’ve activated the special WWT Pinia instance in this way, you can
+ * interact with the WWT engine state via the {@link engineStore} interface.
  *
  * This Pinia instance is initialized with a special `$wwt` singleton value that
  * the {@link WWTComponent} uses to share global state with Pinia.

@@ -23,21 +23,22 @@ tutorials for these popular packages around the web as well.
 This package provides the following building blocks:
 
 - A system that lets you control the WWT engine using the [Pinia]
-  state-management framework. This integration provides a standardized way for
-  different pieces of code (say, different components of a web app) to observe
-  the state of the WWT engine (say, the current coordinates of its view center)
-  as well as control it (say, trigger a slew to a new location).
+  state-management framework, accessed with the {@link engineStore} function.
+  This integration provides a standardized way for different pieces of code
+  (say, different components of a web app) to observe the state of the WWT
+  engine (say, the current coordinates of its view center) as well as control it
+  (say, trigger a slew to a new location).
 - A reusable [Vue] component, {@link WWTComponent}, that contains a WWT view and
   links it up to the Pinia system. If you include a {@link WWTComponent} in your
   Vue-based web application, you can control it from anywhere else in your
-  codebase by using Pinia actions like {@link WWTAwareComponent.gotoRADecZoom}.
+  codebase by using Pinia actions like {@link engineStore.gotoRADecZoom}.
 - Finally, this package also provides a helper called {@link WWTAwareComponent}.
   If you are using Vue’s [“options API”][opt-api], you can use it as a base
   class for your own Vue components (say, a readout of the current view
   coordinates) to gain easy access to the WWT state. Specifically, this base
   class provides a full suite of getters and methods that are automagically
   wired up to the engine’s Pinia state. In Vue’s [“composition API”][opt-api],
-  the recommended style is use the Pinia store directly.
+  the recommended style is use the {@link engineStore} directly.
 
 [Vue component]: https://vuejs.org/guide/essentials/component-basics.html
 [opt-api]: https://vuejs.org/guide/introduction.html#api-styles
@@ -50,20 +51,22 @@ wrapping it — can do so, thanks to Pinia.
 
 # API Overview
 
-If you‘re constructing a Vue app based on this system, you’ll need to use two
+If you‘re constructing a Vue app based on this system, you’ll need to use these
 key interfaces:
 
 - {@link WWTComponent} to include an actual WWT view in your app somewhere
-- {@link wwtPinia} to set up the WWT Pinia linkage.
+- If that you have any code that needs to interact with WWT, also:
+  - {@link wwtPinia} to set up the WWT Pinia linkage.
+  - {@link engineStore} or {@link WWTAwareComponent} to talk to the engine.
 
-See the next section for a minimal example of how to do this. You may also find
-it convenient to use {@link WWTAwareComponent} as a base class for some of your
-components to get pre-wired methods for interacting with the WWT engine Pinia
-state.
+See the next section for a minimal example of how to do this. If you’re using
+Vue’s Options API, you may also find it convenient to use {@link
+WWTAwareComponent} as a base class for some of your components to get pre-wired
+methods for interacting with the WWT engine Pinia state.
 
 Once you have wired things up, you presumably want to know what WWT is doing and
 to command it! See [The WWT Pinia
-Interface](classes/WWTAwareComponent.html#md:the-wwt-pinia-interface) for an
+Interface](functions/engineStore.html#md:the-wwt-pinia-interface) for an
 overview of all the possible ways that your application code can interact with
 the WWT engine.
 
@@ -79,7 +82,7 @@ If you’re familiar with Vue, you might want to see what a minimal
 <template>
   <div id="app">
     <!-- Include a WWT Component: -->
-    <WorldWideTelescope wwt-namespace="mywwt"></WorldWideTelescope>
+    <WorldWideTelescope></WorldWideTelescope>
     <p class="coord-overlay">{{ coordText }}</p>
   </div>
 </template>
@@ -132,9 +135,7 @@ import { wwtPinia, WWTComponent } from "@wwtelescope/engine-pinia";
 
 import App from "./App.vue";
 
-createApp(App, {
-    wwtNamespace: "mywwt"
-  })
+createApp(App)
   .use(wwtPinia)
   .component('WorldWideTelescope', WWTComponent)
   .mount("#app");
@@ -152,7 +153,6 @@ the Vue app using the `customId` prop.
 ...
 
 createApp(App, {
-    wwtNamespace: "mywwt",
     customId: "myCustomId"
   })
   .use(wwtPinia)
