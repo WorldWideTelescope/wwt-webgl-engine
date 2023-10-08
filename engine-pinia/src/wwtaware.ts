@@ -5,27 +5,25 @@ import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import { engineStore } from "./store";
 
-/** A class for Vue components that wish to interact with a [[WWTComponent]]
- * through the Pinia state management system.
+/** This is a helper base class for Vue components that wish to interact with a
+ * {@link WWTComponent} through the Pinia state management system. It is only
+ * recommended for using using Vue’s [“options API”][opt-api]. If you are
+ * instead using the “composition API”, it is recommended to use
+ * {@link engineStore} directly.
  *
- * Skip to [The WWT Pinia Interface](#the-wwt-pinia-interface) for a quick summary
- * of how WWT's state is exposed and controlled in Pinia.
+ * [opt-api]: https://vuejs.org/guide/introduction.html#api-styles
  *
- * ## Introduction
+ * This class doesn’t implement any special functionality itself. All it does is
+ * provide a set of state variables and methods that are pre-connected to [the
+ * WWT Pinia interface](#the-wwt-pinia-interface). A component inheriting from
+ * this class can use whichever ones it needs without having to set up that
+ * integration itself.
  *
- * Vue applications are composed of multiple [components]. In a WWT-powered app,
- * one of those components will be a `<WorldWideTelescope>` component containing
- * the actual WWT rendering window. The other components of the app will wish to
- * monitor or alter the state of the WWT rendering window. The
- * [[WWTAwareComponent]] class provides a convenient framework for doing so.
+ * # Example
  *
- * [components]: https://vuejs.org/v2/guide/components.html
- *
- * In particular, if your component [extends] this class, it
- * will automatically be set up with fields and methods allowing you to interact
- * with the WWT engine’s state. A minimal example:
- *
- * [extends]: https://vuejs.org/api/options-composition.html#extends
+ * Say that you are creating a simple WWT-powered app with a main `App.vue`
+ * component that includes a WWT sub-component and a readout of the current
+ * coordinates of the WWT view center. Your app Vue file might look like this:
  *
  * ```vue
  * <template>
@@ -41,10 +39,11 @@ import { engineStore } from "./store";
  *   import { WWTAwareComponent } from "@wwtelescope/engine-pinia";
  *
  *   export default App = defineComponent({
- *     extends: WWTAwareComponent,
+ *     extends: WWTAwareComponent, // <== we are extending WWTAwareComponent
  *
  *     computed: {
  *      coordText() {
+ *        // We don't have to define `wwtRARad` and `wwtDecRad` ourselves:
  *        return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
  *      }
  *     }
@@ -52,176 +51,209 @@ import { engineStore } from "./store";
  * </script>
  * ```
  *
- * This simple `App` component will display the coordinates of the current center
- * of the WWT view, and the coordinate readout will update automagically as the
- * user interacts with the view.
+ * Because this component extends {@link WWTAwareComponent}, it automatically
+ * has getters for {@link wwtRARad} and {@link wwtDecRad} that can be used to
+ * set up the coordinate readout easily.
  *
- * ## Props
+ * Note that [the `extends` option is not recommended (or easily used) in the
+ * Composition API][1], which is why it is recommended to use
+ * {@link engineStore} directly instead.
  *
- * Classes inheriting from [[WWTAwareComponent]] automatically define a prop
- * named [[wwtNamespace]]. This should be set to the namespace of the [Pinia
- * module] used to track the `<WorldWideTelescope>` component’s state — that is,
- * it should have the same value as that component’s own `wwtNamespace` prop.
- * The default value is `"wwt"`.
+ * [1]: https://vuejs.org/api/options-composition.html#extends
  *
- * [Pinia module]: https://pinia.vuejs.org/core-concepts/
+ * # The WWT Pinia Interface
  *
- * ## The WWT Pinia Interface
+ * A component deriving from {@link WWTAwareComponent}, or any other piece of
+ * code that has access to the WWT Pinia store, can monitor or manipulate the
+ * state of the WWT renderer.
  *
- * Your [[WWTAwareComponent]] can monitor or manipulate the state of the WWT
- * renderer using the following interfaces, grouped by category. As a reminder,
- * in the Pinia paradigm, state is expressed in [state variables] and [getters],
- * and modified either directly or through [actions] (which can be asynchronous).
+ * Here we document all of the available interfaces, grouping them by category.
+ * As a reminder, in the Pinia paradigm, state is expressed in [state variables]
+ * and [getters], and modified either directly or through [actions] (which can
+ * be asynchronous).
  *
  * [state variables]: https://pinia.vuejs.org/core-concepts/state.html
+ *
  * [getters]: https://pinia.vuejs.org/core-concepts/getters.html
+ *
  * [actions]: https://pinia.vuejs.org/core-concepts/actions.html
  *
- * ### Initialization
+ * ## Initialization
  *
  * Actions:
  *
- * - [[waitForReady]]
- * - [[setupForImageset]]
+ * - {@link waitForReady}
+ * - {@link setupForImageset}
  *
- * ### Basic View Information
+ * ## Basic View Information
  *
  * State:
  *
- * - [[wwtCurrentTime]]
- * - [[wwtClockDiscontinuities]]
- * - [[wwtClockRate]]
- * - [[wwtDecRad]]
- * - [[wwtRARad]]
- * - [[wwtZoomDeg]]
+ * - {@link wwtCurrentTime}
+ * - {@link wwtClockDiscontinuities}
+ * - {@link wwtClockRate}
+ * - {@link wwtDecRad}
+ * - {@link wwtRARad}
+ * - {@link wwtZoomDeg}
+ * - {@link wwtRollRad}
  *
  * Getters:
  *
- * - [[findRADecForScreenPoint]]
+ * - {@link findRADecForScreenPoint}
+ * - {@link findScreenPointForRADec}
  *
  * Actions:
  *
- * - [[gotoRADecZoom]]
- * - [[gotoTarget]]
- * - [[setClockRate]]
- * - [[setClockSync]]
- * - [[setTime]]
- * - [[setTrackedObject]]
- * - [[zoom]]
+ * - {@link gotoRADecZoom}
+ * - {@link timeToRADecZoom}
+ * - {@link gotoTarget}
+ * - {@link setClockRate}
+ * - {@link setClockSync}
+ * - {@link setTime}
+ * - {@link setTrackedObject}
+ * - {@link zoom}
+ * - {@link move}
+ * - {@link tilt}
  *
- * ### Image Sets
+ * ## Image Sets
  *
  * State:
  *
- * - [[wwtAvailableImagesets]]
- * - [[wwtBackgroundImageset]]
- * - [[wwtForegroundImageset]]
- * - [[wwtForegroundOpacity]]
- * - [[wwtRenderType]]
+ * - {@link wwtAvailableImagesets}
+ * - {@link wwtBackgroundImageset}
+ * - {@link wwtForegroundImageset}
+ * - {@link wwtForegroundOpacity}
+ * - {@link wwtRenderType}
  *
  * Getters:
  *
- * - [[lookupImageset]]
+ * - {@link lookupImageset}
  *
  * Actions:
  *
- * - [[loadImageCollection]]
- * - [[setBackgroundImageByName]]
- * - [[setForegroundImageByName]]
- * - [[setForegroundOpacity]]
- * - [[setupForImageset]]
- * - [[updateAvailableImagesets]]
+ * - {@link loadImageCollection}
+ * - {@link addImagesetToRepository}
+ * - {@link setBackgroundImageByName}
+ * - {@link setForegroundImageByName}
+ * - {@link setForegroundOpacity}
+ * - {@link setupForImageset}
  *
- * ### Imageset Layers (including FITS imagery)
+ *
+ * ## General Layer Management
  *
  * State:
  *
- * - [[wwtActiveLayers]]
- * - [[wwtImagesetLayers]]
+ * - {@link wwtActiveLayers}
  *
  * Getters:
  *
- * - [[activeImagesetLayerStates]]
- * - [[imagesetForLayer]]
- * - [[imagesetStateForLayer]]
+ * - {@link layerById}
  *
  * Actions:
  *
- * - [[addImageSetLayer]]
- * - [[loadFitsLayer]] (deprecated)
- * - [[applyFitsLayerSettings]]
- * - [[setFitsLayerColormap]]
- * - [[stretchFitsLayer]]
- * - [[setImageSetLayerOrder]]
- * - [[deleteLayer]]
+ * - {@link deleteLayer}
  *
- * ### Tabular Data Layers
+ * ## Imageset Layers (including FITS imagery)
  *
  * State:
  *
- * - [[wwtActiveLayers]]
- * - [[wwtSpreadSheetLayers]]
- *
- * Actions:
- *
- * - [[createTableLayer]]
- * - [[applyTableLayerSettings]]
- * - [[updateTableLayer]]
- * - [[deleteLayer]]
- *
- * ### Annotations
- *
- * Actions:
- *
- * - [[addAnnotation]]
- * - [[clearAnnotations]]
- * - [[removeAnnotation]]
- *
- * ### Progressive HiPS Catalogs
- *
- * These have some characteristics of both imagesets and tabular ("spreadsheet") data
- * layers.
+ * - {@link wwtActiveLayers}
+ * - {@link wwtImagesetLayers}
  *
  * Getters:
  *
- * - [[layerForHipsCatalog]]
- * - [[spreadsheetStateForHipsCatalog]]
+ * - {@link activeImagesetLayerStates}
+ * - {@link imagesetForLayer}
+ * - {@link imagesetStateForLayer}
+ * - {@link imagesetLayerById}
  *
  * Actions:
  *
- * - [[addCatalogHipsByName]]
- * - [[applyTableLayerSettings]]
- * - [[getCatalogHipsDataInView]]
- * - [[removeCatalogHipsByName]]
+ * - {@link addImageSetLayer}
+ * - {@link loadFitsLayer} (deprecated)
+ * - {@link applyFitsLayerSettings}
+ * - {@link setFitsLayerColormap}
+ * - {@link stretchFitsLayer}
+ * - {@link setImageSetLayerOrder}
+ * - {@link deleteLayer}
  *
- * ### Tours
+ * ## Tabular (“Spreadsheet”) Data Layers
  *
  * State:
  *
- * - [[wwtIsTourPlayerActive]]
- * - [[wwtIsTourPlaying]]
- * - [[wwtTourCompletions]]
- * - [[wwtTourRunTime]]
- * - [[wwtTourStopStartTimes]]
- * - [[wwtTourTimecode]]
+ * - {@link wwtActiveLayers}
+ * - {@link wwtSpreadSheetLayers}
+ *
+ * Getters:
+ *
+ * - {@link spreadSheetLayer}
+ * - {@link spreadsheetState}
+ * - {@link spreadSheetLayerById}
+ * - {@link spreadsheetStateById}
  *
  * Actions:
  *
- * - [[loadTour]]
- * - [[seekToTourTimecode]]
- * - [[setTourPlayerLeaveSettingsWhenStopped]]
- * - [[startTour]]
- * - [[toggleTourPlayPauseState]]
+ * - {@link createTableLayer}
+ * - {@link applyTableLayerSettings}
+ * - {@link updateTableLayer}
+ * - {@link deleteLayer}
  *
- * ### Miscellaneous
+ * ## Annotations
+ *
+ * Actions:
+ *
+ * - {@link addAnnotation}
+ * - {@link clearAnnotations}
+ * - {@link removeAnnotation}
+ *
+ * ## Progressive HiPS Catalogs
+ *
+ * These have some characteristics of both imagesets and tabular ("spreadsheet")
+ * data layers.
+ *
+ * Getters:
+ *
+ * - {@link layerForHipsCatalog}
+ * - {@link spreadsheetStateForHipsCatalog}
+ *
+ * Actions:
+ *
+ * - {@link addCatalogHipsByName}
+ * - {@link applyTableLayerSettings}
+ * - {@link getCatalogHipsDataInView}
+ * - {@link removeCatalogHipsByName}
+ *
+ * ## Tours
  *
  * State:
  *
- * - [[showWebGl2Warning]]
+ * - {@link wwtIsTourPlayerActive}
+ * - {@link wwtIsTourPlaying}
+ * - {@link wwtTourCompletions}
+ * - {@link wwtTourRunTime}
+ * - {@link wwtTourStopStartTimes}
+ * - {@link wwtTourTimecode}
  *
  * Actions:
  *
- * - [[applySetting]]
+ * - {@link loadTour}
+ * - {@link seekToTourTimecode}
+ * - {@link setTourPlayerLeaveSettingsWhenStopped}
+ * - {@link startTour}
+ * - {@link toggleTourPlayPauseState}
+ *
+ * ## Miscellaneous
+ *
+ * State:
+ *
+ * - {@link wwtShowWebGl2Warning}
+ *
+ * Actions:
+ *
+ * - {@link applySetting}
+ * - {@link viewAsTourXml}
+ * - {@link captureFrame}
+ * - {@link captureVideo}
  **/
 export const WWTAwareComponent = defineComponent({
   props: {
@@ -229,11 +261,12 @@ export const WWTAwareComponent = defineComponent({
      * This prop should have the same value in all components in the app that
      * reference WWT.
      */
-    wwtNamespace: { type: String, default: "wwt", required: true },
+    wwtNamespace: { type: String, default: "wwt", required: false },
     wwtFreestandingAssetBaseurl: String,
   },
 
   computed: {
+    // Renamed getters:
     ...mapState(engineStore, {
 
       /** The GUIDs of all rendered layers, in their draw order.
@@ -249,15 +282,15 @@ export const WWTAwareComponent = defineComponent({
       /** Information about the imagesets that are available to be used as a background.
          *
          * The info includes the name, which can then be used to set the background image
-         * via the [[setBackgroundImageByName]] mutation.
+         * via the {@link setBackgroundImageByName} mutation.
          */
       wwtAvailableImagesets: 'availableImagesets',
 
-      /** The current background [Imageset](../../engine/classes/imageset.html), or
+      /** The current background [Imageset](../../engine/classes/Imageset-1.html), or
        * null if it is undefined.
        *
        * You can cause this state variable to change using the
-       * [[setBackgroundImageByName]] mutation.
+       * {@link setBackgroundImageByName} mutation.
        * **/
       wwtBackgroundImageset: 'backgroundImageset',
 
@@ -285,11 +318,11 @@ export const WWTAwareComponent = defineComponent({
        */
       wwtDecRad: 'decRad',
 
-      /** The current foreground [Imageset](../../engine/classes/imageset.html), or
+      /** The current foreground [Imageset](../../engine/classes/Imageset-1.html), or
        * null if it is undefined.
        *
        * You can cause this state variable to change using the
-       * [[setForegroundImageByName]] mutation.
+       * {@link setForegroundImageByName} mutation.
        * **/
       wwtForegroundImageset: 'foregroundImageset',
 
@@ -299,7 +332,7 @@ export const WWTAwareComponent = defineComponent({
 
       /** A table of activated imageset layers.
        *
-       * Use [[imagesetStateForLayer]] to access information about a particular
+       * Use {@link imagesetStateForLayer} to access information about a particular
        * layer.
        */
       wwtImagesetLayers: 'imagesetLayers',
@@ -321,7 +354,7 @@ export const WWTAwareComponent = defineComponent({
        *
        * This is derived from the "type" of the active background imageset. To
        * change the mode, change the background imageset with
-       * [[setBackgroundImageByName]].
+       * {@link setBackgroundImageByName}.
        */
       wwtRenderType: 'renderType',
 
@@ -333,7 +366,7 @@ export const WWTAwareComponent = defineComponent({
 
       /** A table of activated imageset layers.
        *
-       * Use [[imagesetStateForLayer]] to access information about a particular
+       * Use {@link imagesetStateForLayer} to access information about a particular
        * layer.
        */
       wwtSpreadSheetLayers: 'spreadSheetLayers',
@@ -342,7 +375,7 @@ export const WWTAwareComponent = defineComponent({
        *
        * The main use of this state variable is that you can
        * [watch](https://vuejs.org/api/reactivity-core.html#watch) for changes to it and be alerted
-       * when a tour finishes. Watching [[wwtIsTourPlaying]] doesn't suffice because
+       * when a tour finishes. Watching {@link wwtIsTourPlaying} doesn't suffice because
        * that will trigger when a tour is paused. */
       wwtTourCompletions: 'tourCompletions',
 
@@ -369,7 +402,7 @@ export const WWTAwareComponent = defineComponent({
        * non-linearly, it is also possible for the timecode to progress non-linearly
        * even when the tour plays back without user interaction.
        *
-       * In combination with [[wwtTourStopStartTimes]], you can use this value to
+       * In combination with {@link wwtTourStopStartTimes}, you can use this value to
        * determine the index number of the currently active tour stop.
        *
        * If no tour is loaded, this is zero.
@@ -386,10 +419,11 @@ export const WWTAwareComponent = defineComponent({
       wwtZoomDeg: 'zoomDeg',
     }),
 
+    // Getters re-exported without renaming:
     ...mapState(engineStore, [
       /** Get the reactive state for the active imageset layers
        *
-       * These layers are created using the [[addImageSetLayer]] action. The state
+       * These layers are created using the {@link addImageSetLayer} action. The state
        * structures returned by this function are part of the reactive store, so
        * you can wire them up to your UI and they will update correctly. The list is
        * returned in the engine's render order.
@@ -404,13 +438,26 @@ export const WWTAwareComponent = defineComponent({
       /** Given an RA and Dec position, return the x, y coordinates of the screen point */
       "findScreenPointForRADec",
 
+      /** Get the actual WWT `Layer` for the layer with the given ID.
+       *
+       * Do not use this function for UI purposes -- the WWT layer object is not
+       * integrated into the reactive state system, and so if you use it as a
+       * basis for UI elements, those elements will not be updated properly
+       * if/when the layer's settings change. If you know the specific type of
+       * your layer, you can use functions like {@link imagesetStateForLayer} or
+       * {@link spreadSheetStateById} to get reactive data structures.
+       *
+       * @param id The layer's identifier.
+       */
+      "layerById",
+
       /** Look up the WWT engine object for an active imageset layer.
        *
        * This getter gets the WWT `Imageset` object associated with an imageset
        * layer. The returned object is *not* part of the Vue(x) reactivity system,
        * so you shouldn't use it to set up UI elements, but you can obtain more
        * detailed information about the imageset than is stored in the state
-       * management system. For UI purposes, use [[imagesetStateForLayer]].
+       * management system. For UI purposes, use {@link imagesetStateForLayer}.
        *
        * @param guidtext The GUID of the layer to query, as a string
        * @returns The layer's underlying imageset, or null if the GUID is
@@ -418,13 +465,24 @@ export const WWTAwareComponent = defineComponent({
        */
       "imagesetForLayer",
 
+      /** Get the actual WWT `ImageSetLayer` for the imageset layer with the given ID.
+       *
+       * Do not use this function for UI purposes -- the WWT layer object is not
+       * integrated into the reactive state system, and so if you use it as a basis
+       * for UI elements, those elements will not be updated properly if/when the
+       * layer's settings change. Use {@link imagesetStateForLayer} instead.
+       *
+       * @param id The imageset layer's identifier.
+       */
+      "imagesetLayerById",
+
       /** Look up the reactive state for an active imageset layer.
        *
-       * These layers are created using the [[addImageSetLayer]] action. The state
+       * These layers are created using the {@link addImageSetLayer} action. The state
        * returned by this function is part of the reactive store, so you can
        * wire it up to your UI and it will update as the layer settings are changed.
        * If you need "runtime" state not captured in the reactivity system, you may
-       * need to use [[imagesetForLayer]] instead.
+       * need to use {@link imagesetForLayer} instead.
        *
        * @param guidtext The GUID of the layer to query, as a string
        * @returns The layer state, or null if the GUID is unrecognized
@@ -436,23 +494,23 @@ export const WWTAwareComponent = defineComponent({
        * Do not use this function for UI purposes -- the WWT layer object is not
        * integrated into the reactive state system, and so if you use it as a basis
        * for UI elements, those elements will not be updated properly if/when the
-       * layer's settings change. Use [[spreadsheetStateForHipsCatalog]] instead.
+       * layer's settings change. Use {@link spreadsheetStateForHipsCatalog} instead.
        *
        * @param name The `datasetName` of the HiPS catalog
        */
       "layerForHipsCatalog",
 
-      /** Look up an [Imageset](../../engine/classes/imageset.html) in the engine’s
+      /** Look up an [Imageset](../../engine/classes/Imageset-1.html) in the engine’s
        * table of ones with registered names.
        *
        * This delegates to
-       * [WWTControl.getImagesetByName()](../../engine/wwtcontrol.html#getimagesetbyname),
+       * [WWTControl.getImagesetByName()](../../engine/classes/WWTControl-1.html#getimagesetbyname),
        * which has very eager name-matching rules. But if nothing matches, null is
        * returned.
        *
        * Imagesets are not added to the engine’s list of names automatically. In
        * order for an imageset to be findable by this function, its containing
-       * folder must have been loaded using the [[loadImageCollection]] action.
+       * folder must have been loaded using the {@link loadImageCollection} action.
        */
       "lookupImageset",
 
@@ -461,7 +519,7 @@ export const WWTAwareComponent = defineComponent({
        * Do not use this function for UI purposes -- the WWT layer object is not
        * integrated into the reactive state system, and so if you use it as a basis
        * for UI elements, those elements will not be updated properly if/when the
-       * layer's settings change. Use [[spreadsheetState]] instead.
+       * layer's settings change. Use {@link spreadsheetState} instead.
        *
        * @param id The table layer's identifier.
        */
@@ -473,7 +531,7 @@ export const WWTAwareComponent = defineComponent({
        * Do not use this function for UI purposes -- the WWT layer object is not
        * integrated into the reactive state system, and so if you use it as a basis
        * for UI elements, those elements will not be updated properly if/when the
-       * layer's settings change. Use [[spreadsheetState]] instead.
+       * layer's settings change. Use {@link spreadsheetState} instead.
        *
        * @param id The table layer's identifier.
        */
@@ -526,7 +584,7 @@ export const WWTAwareComponent = defineComponent({
 
       /** Request the creation of a tabular data layer.
        *
-       * The action resolves to a new [SpreadSheetLayer](../../engine/classes/spreadsheetlayer.html) instance.
+       * The action resolves to a new [SpreadSheetLayer](../../engine/classes/SpreadSheetLayer.html) instance.
        */
       "createTableLayer",
 
@@ -546,7 +604,7 @@ export const WWTAwareComponent = defineComponent({
       "timeToRADecZoom",
 
       /** Command the view to steer as specified in
-       * [the options](../../engine-helpers/interfaces/gototargetoptions.html).
+       * [the options](../../engine-helpers/interfaces/GotoTargetOptions.html).
        *
        * The async action completes when the view arrives, or when
        * a subsequent view command overrides this one.
@@ -557,9 +615,9 @@ export const WWTAwareComponent = defineComponent({
        *
        * The image collection is a [WTML file](https://docs.worldwidetelescope.org/data-guide/1/data-file-formats/collections/)
        * Images in collections loaded this way become usable for name-based lookup
-       * by interfaces such as [[setForegroundImageByName]].
+       * by interfaces such as {@link setForegroundImageByName}.
        *
-       * The action resolves to a [Folder](../../engine/classes/folder.html) instance.
+       * The action resolves to a [Folder](../../engine/classes/Folder.html) instance.
        * It’s asynchronous because the specified WTML file has to be downloaded.
        */
       "loadImageCollection",
@@ -578,18 +636,17 @@ export const WWTAwareComponent = defineComponent({
       /** Deprecated. Use addImageSetLayer instead.
        * Request the creation of a FITS image layer.
        *
-       * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
+       * The action resolves to a new [ImageSetLayer](../../engine/classes/ImageSetLayer.html) instance.
        * It’s asynchronous because the requested FITS file has to be downloaded.
        */
       "loadFitsLayer",
 
       /** Request the creation of a image layer. Either a single FITS or an image set.
        *
-       * The action resolves to a new [ImageSetLayer](../../engine/classes/imagesetlayer.html) instance.
+       * The action resolves to a new [ImageSetLayer](../../engine/classes/ImageSetLayer.html) instance.
        * It’s asynchronous because the requested url has to be downloaded.
        */
       "addImageSetLayer",
-
 
       /** Request the engine to load a tour file.
        *
@@ -613,16 +670,16 @@ export const WWTAwareComponent = defineComponent({
       // Formerly mutations
       // TODO: Alphabetize this into one big list
 
-      /** Add an [Annotation](../../engine/classes/annotation.html) to the view. */
+      /** Add an [Annotation](../../engine/classes/Annotation.html) to the view. */
       "addAnnotation",
 
       /** Alter one or more settings of the specified FITS image layer as specified
-       * in [the options](../../engine-helpers/interfaces/applyfitslayersettingsoptions.html).
+       * in [the options](../../engine-helpers/interfaces/ApplyFitsLayerSettingsOptions.html).
        */
       "applyFitsLayerSettings",
 
       /** Alter one or more settings of the specified tabular data layers as specified
-       * in [the options](../../engine-helpers/interfaces/applytablelayersettingsoptions.html).
+       * in [the options](../../engine-helpers/interfaces/ApplyTableLayerSettingsOptions.html).
        */
       "applyTableLayerSettings",
 
@@ -637,16 +694,16 @@ export const WWTAwareComponent = defineComponent({
        * The number of frames per second and total frame count are specified as well. */
       'captureVideo',
 
-      /** Clear all [Annotations](../../engine/classes/annotation.html) from the view. */
+      /** Clear all [Annotations](../../engine/classes/Annotation.html) from the view. */
       "clearAnnotations",
 
       /** Delete the specified layer from the layer manager.
        *
-       * A layer may be identified by either its name or its [id](../../engine/classes/layer.html#id).
+       * A layer may be identified by either its name or its [id](../../engine/classes/Layer.html#id).
        */
       "deleteLayer",
 
-      /** Remove the specified [Annotation](../../engine/classes/annotation.html) from the view. */
+      /** Remove the specified [Annotation](../../engine/classes/Annotation.html) from the view. */
       "removeAnnotation",
 
       /** Remove a "catalog HiPS" dataset to the current view, by name. */
@@ -654,7 +711,7 @@ export const WWTAwareComponent = defineComponent({
 
       /** Seek tour playback to the specified timecode.
        *
-       * See [[wwtTourTimecode]] for a definition of the tour timecode.
+       * See {@link wwtTourTimecode} for a definition of the tour timecode.
        *
        * An important limitation is that the engine can only seek to the very
        * beginning of a tour stop. If you request a timecode in the middle of a
@@ -662,13 +719,13 @@ export const WWTAwareComponent = defineComponent({
        */
       "seekToTourTimecode",
 
-      /** Set the current background [Imageset](../../engine/classes/imageset.html)
+      /** Set the current background [Imageset](../../engine/classes/Imageset-1.html)
        * based on its name.
        *
-       * The name lookup here is effectively done using [[lookupImageset]]. If
+       * The name lookup here is effectively done using {@link lookupImageset}. If
        * the name is not found, the current background imageset remains unchanged.
        *
-       * Changing the background imageset may change the value of [[wwtRenderType]],
+       * Changing the background imageset may change the value of {@link wwtRenderType},
        * and the overall "mode" of the WWT renderer.
        */
       "setBackgroundImageByName",
@@ -679,29 +736,29 @@ export const WWTAwareComponent = defineComponent({
        * real time. A value of -0.1 means that the WWT clock moves backwards, ten
        * times slower than real time.
        *
-       * Altering this causes an increment in [[wwtClockDiscontinuities]].
+       * Altering this causes an increment in {@link wwtClockDiscontinuities}.
        */
       "setClockRate",
 
       /** Set whether the WWT clock should progress with real time.
        *
        * See
-       * [SpaceTimeController.set_syncToClock()](../../engine/modules/spacetimecontroller.html#set_synctoclock).
+       * [SpaceTimeController.set_syncToClock()](../../engine/modules/SpaceTimeController.html#set_synctoclock).
        * This interface effectively allows you to pause the WWT clock.
        *
-       * Altering this causes an increment in [[wwtClockDiscontinuities]].
+       * Altering this causes an increment in {@link wwtClockDiscontinuities}.
        */
       "setClockSync",
 
       /** Set the colormap used for a FITS image layer according to
-       * [the options](../../engine-helpers/interfaces/setfitslayercolormapoptions.html).
+       * [the options](../../engine-helpers/interfaces/SetFitsLayerColormapOptions.html).
        */
       "setFitsLayerColormap",
 
-      /** Set the current foreground [Imageset](../../engine/classes/imageset.html)
+      /** Set the current foreground [Imageset](../../engine/classes/Imageset-1.html)
        * based on its name.
        *
-       * The name lookup here is effectively done using [[lookupImageset]]. If
+       * The name lookup here is effectively done using {@link lookupImageset}. If
        * the name is not found, the current foreground imageset remains unchanged.
        */
       "setForegroundImageByName",
@@ -712,7 +769,7 @@ export const WWTAwareComponent = defineComponent({
        */
       "setForegroundOpacity",
 
-      /** Change the [ImageSetLayer](../../engine/classes/imagesetlayer.html)
+      /** Change the [ImageSetLayer](../../engine/classes/ImageSetLayer.html)
        * position in the draw cycle.
        */
       "setImageSetLayerOrder",
@@ -730,19 +787,19 @@ export const WWTAwareComponent = defineComponent({
 
       /** Set the current time of WWT's internal clock.
        *
-       * Altering this causes an increment in [[wwtClockDiscontinuities]].
+       * Altering this causes an increment in {@link wwtClockDiscontinuities}.
        */
       "setTime",
 
       /** Set the "tracked object" in the 3D solar system view.
        *
        * Allowed values are
-       * [defined in @wwtelescope/engine-types](../../engine-types/enums/solarsystemobjects.html).
+       * [defined in @wwtelescope/engine-types](../../engine-types/enums/SolarSystemObjects.html).
        */
       "setTrackedObject",
 
       /** Set up the background and foreground imagesets according to
-       * [the options](../../engine-helpers/interfaces/setupforimagesetoptions.html)
+       * [the options](../../engine-helpers/interfaces/SetupForImagesetOptions.html)
        *
        * The main use of this interface is that it provides a mechanism to guess
        * the appropriate background imageset given a foreground imageset that you
@@ -757,7 +814,7 @@ export const WWTAwareComponent = defineComponent({
       "startTour",
 
       /** Alter the "stretch" of a FITS image layer according to
-       * [the options](../../engine-helpers/interfaces/stretchfitslayeroptions.html).
+       * [the options](../../engine-helpers/interfaces/StretchFitsLayerOptions.html).
        */
       "stretchFitsLayer",
 
@@ -768,7 +825,7 @@ export const WWTAwareComponent = defineComponent({
       "toggleTourPlayPauseState",
 
       /** Update the contents of a tabular data layer according to
-       * [the options](../../engine-helpers/interfaces/updatetablelayeroptions.html).
+       * [the options](../../engine-helpers/interfaces/UpdateTableLayerOptions.html).
        */
       "updateTableLayer",
 
@@ -779,7 +836,7 @@ export const WWTAwareComponent = defineComponent({
        * This action may result in an action that takes a perceptible amount of
        * time to resolve, if the "smooth pan" renderer option is enabled. To have
        * proper asynchronous feedback about when the zoom operation completes, use
-       * [[gotoRADecZoom]].
+       * {@link gotoRADecZoom}.
        */
       "zoom",
 

@@ -57,6 +57,7 @@ interface WWTLinkedCallback {
   (): void;
 }
 
+/** The class of the global `$wwt` magic singleton. */
 export class WWTGlobalState {
   inst: WWTInstance | null = null;
   onLinkedCallbacks: WWTLinkedCallback[] = [];
@@ -81,11 +82,11 @@ export class WWTGlobalState {
 
 /** This class holds basic information about an imageset.
  *
- * Discover imagesets through the [[WWTAwareComponent.wwtAvailableImagesets]]
+ * Discover imagesets through the {@link WWTAwareComponent.wwtAvailableImagesets}
  * state variable. In standard practice there will be hundreds of available
  * imagesets of many different kinds.
  *
- * Imagesets may be uniquely identified by their associated image data [[url]].
+ * Imagesets may be uniquely identified by their associated image data {@link url}.
  * (If you really need to have multiple imagesets associated with the same URL,
  * add a `#fragment` to the end.)
  */
@@ -127,6 +128,7 @@ export class ImagesetInfo {
   }
 }
 
+/** Information about a spreadsheet (data table) layer. */
 export class SpreadSheetLayerInfo {
   /** The user-facing name of the layer */
   name: string;
@@ -165,7 +167,7 @@ export class ImageSetLayerState {
    * different).
    *
    * [@wwtelescope/engine-helpers]: ../../engine-helpers/
-   * [ImageSetLayerState]: ../../engine-helpers/classes/imagesetlayerstate.html
+   * [ImageSetLayerState]: ../../engine-helpers/classes/ImageSetLayerState.html
   */
   settings: ImageSetLayerSettings;
 
@@ -181,7 +183,7 @@ export class ImageSetLayerState {
   /** For FITS-like images, the name of the color map used to render the image
    * data.
    *
-   * See [here](../../engine/modules/colormapcontainer.html#fromnamedcolormap)
+   * See [here](../../engine/modules/ColorMapContainer.html#fromnamedcolormap)
    * for the supported options. */
   colormapName: string;
 
@@ -204,150 +206,51 @@ export class ImageSetLayerState {
 }
 
 /** This interface expresses the properties exposed by the WWT Engine’s Pinia
- * store module.
+ * store module. These are re-exposed by {@link WWTAwareComponent} with their
+ * names prefixed with `wwt`.
  *
- * See [[WWTAwareComponent]] for an organized overview of the different aspects
- * of WWT state that are exposed in the Pinia framework, along with associated
- * getters and actions.
- *
- * Much of this interface duplicates state that is already stored within the WWT
- * engine itself (i.e., the `WWTInstance`). Due to the way that the Vue/Pinia
- * reactivity framework works, we need to mirror the engine state into Pinia. The
- * first reason to do this is that, as far as I can tell, there's no good way to
- * integrate the "external" state of the WWT instance into the reactivity
- * framework so that dependencies can be mapped correctly. And we can't just
- * integrate the WWT instance into the reactivity framework -- well, I haven't
- * tried, but I'm 99% sure that it won't work with all of the WebGL textures and
- * whatnot. I.e., the WWT types that hold state are not "plain old data".
- *
- * The second reason is that it is recommended for app state to be flattened and
- * normalized when expressed in a store, as in [this post]. The WWT engine
- * certainly does *not* express its state in such a manner.
- *
- * [this post]: https://forum.vuejs.org/t/vuex-best-practices-for-complex-objects/10143/2
- *
- * The duplication of WWT's data structures is annoying, but the actual amount
- * of mirrored data isn't very big.
+ * **This support interface is intentionally undocumented — see [The WWT Pinia
+ * Interface](../classes/WWTAwareComponent.html#md:the-wwt-pinia-interface)
+ * instead!** This interface is entirely redundant with the items defined
+ * {@link WWTAwareComponent} and we have opted to centralize the in-depth
+ * documentation there.
  */
 export interface WWTEnginePiniaState {
   // NOTE: We were orginally alphabetizing these all, but now I think it will be
   // better to group topically related fields.
 
-  /** Info about the imagesets that are available in the engine to be used as backgrounds */
+  // NOTE 2: as per the above, any items changed here should also be changed in
+  // the definition of WWTAwareComponent, and documentation should go there.
+
   availableImagesets: ImagesetInfo[];
-
-  /** The current imageset acting as the background imagery, if defined. */
   backgroundImageset: Imageset | null;
-
-  /** The number of times that the WWT engine clock has been changed in a
-   * discontinuous manner.
-   *
-   * The point of this property is that one can watch() it and get alerted to
-   * when this happens.
-   */
   clockDiscontinuities: number;
-
-  /** The rate at which the WWT engine clock progresses, compared to real time. */
   clockRate: number;
-
-  /** The current WWT clock time of the view, as a UTC Date. */
   currentTime: Date;
-
-  /** The current declination of the view, in radians.
-   *
-   * TODO: define this properly for planetary lat/lng views!
-   */
   decRad: number;
-
-  /** The current imageset acting as the foreground imagery, if defined. */
   foregroundImageset: Imageset | null;
-
-  /** The opacity with which the foreground imageset is rendered; valid
-   * values are between 0 and 100 (inclusive).
-   */
   foregroundOpacity: number;
-
-  /** Whether the tour playback mode is active.
-   *
-   * Specifically, this is true if the `WWTControl` has a `uiController` item
-   * that is a `TourPlayer` item. See also [[isTourPlaying]].
-   */
   isTourPlayerActive: boolean;
-
-  /** Whether a tour is actively playing right now.
-   *
-   * It might be the case that a tour player is active, but the tour is paused.
-   */
   isTourPlaying: boolean;
-
-  /** The current right ascension of the view, in radians.
-   *
-   * TODO: define this properly for planetary lat/lng views!
-   */
   raRad: number;
-
-  /** The current mode of the renderer */
   renderType: ImageSetType;
-
-  /** The current roll of the view camera, in radians */
   rollRad: number;
-
-  /** The time when the state is created */
   timeAtStartup: number;
-
-  /** The number of times that a tour has played through to the end.
-   *
-   * The point of this property is that one can watch() it and get alerted to
-   * tour completion.
-   */
   tourCompletions: number;
-
-  /** The total run-time of the current tour, if there is one, measured in seconds. */
   tourRunTime: number | null;
-
-  /** The start times of the stops in the tour, measured in seconds.
-   *
-   * It is possible for tour stops to be linked in a non-linear order, such that
-   * actual playback won't proceed linearly in the way that this API would imply.
-   */
   tourStopStartTimes: number[];
-
-  /** How far we have progressed into the current tour, in seconds.
-   *
-   * This number does not necessarily progress monotonically due to the way that
-   * WWT measures tour playback progress. We associate a start time with each
-   * "stop" in the tour, and can measure progress through a stop, but stops do
-   * not necessarily transition from one to another in linear fashion.
-   *
-   * That being said, this number should range between 0 and the runtime of the
-   * current tour. If no tour is loaded, it will be zero.
-   */
   tourTimecode: number;
-
   showWebGl2Warning: boolean;
-
-  /** The current zoom level of the view, in degrees.
-   *
-   * The zoom level is the angular height of the viewport, times size.
-   *
-   * TODO: define this properly for 3D modes!
-   */
   zoomDeg: number;
 
   // Layers and layer management
 
-  /** The GUIDs of all rendered layers, in their draw order. */
   activeLayers: string[];
-
-  /** Settings for all registered imageset layers. */
   imagesetLayers: { [guidtext: string]: ImageSetLayerState };
-
-  /** Settings for all registered WWT spreadsheet layers. */
   spreadSheetLayers: { [guidtext: string]: SpreadSheetLayerState };
-
 }
 
-/** The parameters for the [[createTableLayer]] action. */
+/** The parameters for the {@link WWTAwareComponent.createTableLayer} action. */
 export interface CreateTableLayerParams {
   /** The name to assign the layer. TODO: understand where (if anywhere) this name is exposed. */
   name: string;
@@ -359,6 +262,7 @@ export interface CreateTableLayerParams {
   dataCsv: string;
 }
 
+/** The parameters for the {@link WWTAwareComponent.timeToRADecZoom} action. */
 export interface TimeToRADecZoomParams {
   /** The right ascension of the target, in radians. */
   raRad: number;
@@ -373,7 +277,7 @@ export interface TimeToRADecZoomParams {
   rollRad?: number;
 }
 
-/** The parameters for the [[gotoRADecZoom]] action. */
+/** The parameters for the {@link WWTAwareComponent.gotoRADecZoom} action. */
 export interface GotoRADecZoomParams {
   /** The right ascension to go to, in radians. */
   raRad: number;
@@ -397,8 +301,7 @@ export interface GotoRADecZoomParams {
   rollRad?: number;
 }
 
-/** The parameters for the [[loadTour]] action.
- */
+/** The parameters for the {@link WWTAwareComponent.loadTour} action. */
 export interface LoadTourParams {
   /** The tour URL to load. */
   url: string;
@@ -407,7 +310,7 @@ export interface LoadTourParams {
   play: boolean;
 }
 
-/** The parameters for the [[loadImageCollection]] action. */
+/** The parameters for the {@link WWTAwareComponent.loadImageCollection} action. */
 export interface LoadImageCollectionParams {
   /** The WTML URL to load. */
   url: string;
@@ -452,15 +355,82 @@ function availableImagesets(): ImagesetInfo[] {
   return WWTControl.getImageSets().map(ImagesetInfo.fromImageset);
 }
 
-/** The WWT Pinia implementation.
+/** The [Pinia] “use store” function defining the state of the WWT engine.
  *
- * See [[WWTAwareComponent]] for an organized overview of the state variables,
- * getters, and actions exposed by this module.
+ * [Pinia]: https://pinia.vuejs.org/core-concepts/#Defining-a-Store
+ *
+ * According to modern conventions, this function should be named
+ * `useWWTEngineStore()`. Calling it returns a [Pinia store
+ * object](https://pinia.vuejs.org/api/modules/pinia.html#Store) that allows you
+ * to access and modify the WWT state. To get a broad sense of how Pinia store
+ * objects may be used  in general, [explore the Pinia
+ * documentation](https://pinia.vuejs.org/core-concepts/).
+ *
+ * **The detailed API associated with this interface is intentionally undocumented
+ * — see [The WWT Pinia
+ * Interface](../classes/WWTAwareComponent.html#md:the-wwt-pinia-interface)
+ * instead!** The store returned by this function has an API that is identical
+ * to that of {@link WWTAwareComponent} and we have opted to centralize the
+ * in-depth documentation there.
+ *
+ * ## Example
+ *
+ * If you were implementing a WWT-aware component using the Vue [“Composition
+ * API”][comp-api] with a `<script setup>` single-file component, you might
+ * write something like:
+ *
+ * [comp-api]: https://vuejs.org/guide/introduction.html#api-styles
+ *
+ * ```vue
+ * <template>
+ *   <div id="app">
+ *     <!-- Include a WWT Component: -->
+ *     <WorldWideTelescope></WorldWideTelescope>
+ *     <p class="coord-overlay">{{ coordText }}</p>
+ *   </div>
+ * </template>
+ *
+ * <script setup lang="ts">
+ * import { computed } from "vue";
+ * import { fmtDegLat, fmtHours } from "@wwtelescope/astro";
+ * import { engineStore } from "@wwtelescope/engine-pinia";
+ *
+ * const wwt = engineStore();
+ * const coordText = computed(() => `${fmtHours(wwt.raRad)} ${fmtDegLat(wwt.decRad)}`);
+ * </script>
+ *
+ * <style lang="less">
+ * #app { ... blah blah ... }
+ * </style>
+ * ```
+ *
+ * If you wanted to define a Vue component manually in TypeScript and manually
+ * connect some of its state or methods to the WWT Pinia store, you might write:
+ *
+ * ```ts
+ * import { defineComponent } from "vue";
+ * import { mapActions } from "pinia";
+ * import { engineStore } from "@wwtelescope/engine-pinia";
+ *
+ * export class MyWWTAwareComponent extends defineComponent({
+ *   methods: {
+ *    ...mapActions(engineStore, ["gotoRADecZoom"])
+ *   }
+ * }) {}
+ * ```
+ *
+ * This would define a component with an associated method named `gotoRADecZoom`
+ * that would be magically wired up to the corresponding {@link gotoRADecZoom}
+ * store action. However, the whole point of the {@link WWTAwareComponent} class
+ * is to make it so that you don’t need to write this code yourself: it exposes
+ * all of the store’s state and methods in a predefined component. Instead of
+ * manually mapping out of the store as written above, you can just extend it
+ * and get everything “for free”.
  */
 export const engineStore = defineStore('wwt-engine', {
+  // NOTE: We were originally alphabetizing these all, but now I think it will
+  // be better to group topically related fields.
 
-  // NOTE: We were originally alphabetizing these all, but now I think it will be
-  // better to group topically related fields.
   state: (): WWTEnginePiniaState => ({
     activeLayers: [],
     availableImagesets: [],
@@ -487,6 +457,7 @@ export const engineStore = defineStore('wwt-engine', {
     zoomDeg: 0.0,
   }),
 
+  // Everything here should be documented in wwtaware.ts!
   getters: {
     lookupImageset(_state) {
       return (imagesetName: string) => {
@@ -629,9 +600,9 @@ export const engineStore = defineStore('wwt-engine', {
         return state.spreadSheetLayers[key] || null;
       }
     }
-
   },
 
+  // Everything here should be documented in wwtaware.ts!
   actions: {
     internalLinkToInstance(wwt: WWTInstance): void {
       this.$wwt.link(wwt);
@@ -897,7 +868,7 @@ export const engineStore = defineStore('wwt-engine', {
 
     async loadTour(
       { url, play }: LoadTourParams
-    ) {
+    ): Promise<{ tourRunTime: number | null; tourStopStartTimes: number[]; }> {
       if (this.$wwt.inst === null)
         throw new Error('cannot loadTour without linking to WWTInstance');
 
@@ -984,7 +955,6 @@ export const engineStore = defineStore('wwt-engine', {
       return wwtLayer;
     },
 
-    // deprecated, but maintained for compatibility:
     async loadFitsLayer(
       options: LoadFitsLayerOptions
     ): Promise<ImageSetLayer> {
@@ -1127,6 +1097,7 @@ export const engineStore = defineStore('wwt-engine', {
     //
     // These have some characteristics of imagesets, and some characteristics
     // of spreadsheet layers.
+
     async addCatalogHipsByName(options: AddCatalogHipsByNameOptions): Promise<Imageset> {
       if (this.$wwt.inst == null)
         throw new Error('cannot addCatalogHipsByName without linking to WWTInstance');
@@ -1196,8 +1167,6 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot captureThumbnail without linking to WWTInstance');
       return this.$wwt.inst.captureFrame(options);
     },
-
-    // Capturing a video as a readable stream
 
     captureVideo(options: CaptureVideoOptions): ReadableStream<Blob | null> {
       if (this.$wwt.inst === null)

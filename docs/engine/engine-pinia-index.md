@@ -8,21 +8,72 @@ This package turns the [WorldWide Telescope][wwt] rendering engine,
 [Pinia]: https://pinia.vuejs.org/
 [TypeScript]: https://www.typescriptlang.org/
 
-The important top-level interfaces are:
+Vue and Pinia are systems that provide a slick, modern framework for creating
+[component-based] Web applications. This kind of approach requires more
+infrastructure than hand-coding HTML and JavaScript, but it allows you to build
+large, sophisticated apps in a tractable way — while also making it easy to take
+advantage of pre-built, third-party app components. To learn more about these
+frameworks, we suggest checking out [the Vue
+guide](https://vuejs.org/guide/introduction.html) and then [the Pinia
+guide](https://pinia.vuejs.org/core-concepts/). There are many, many other
+tutorials for these popular packages around the web as well.
 
-- The [WWTAwareComponent] component defining Vue/Pinia hooks for interfacing with the
-  engine
+[component-based]: https://vuejs.org/guide/essentials/component-basics.html
 
-[createPlugin]: ./globals.html#createplugin
-[WWTAwareComponent]: ./classes/wwtawarecomponent.html
+This package provides the following building blocks:
+
+- A system that lets you control the WWT engine using the [Pinia]
+  state-management framework. This integration provides a standardized way for
+  different pieces of code (say, different components of a web app) to observe
+  the state of the WWT engine (say, the current coordinates of its view center)
+  as well as control it (say, trigger a slew to a new location).
+- A reusable [Vue] component, {@link WWTComponent}, that contains a WWT view and
+  links it up to the Pinia system. If you include a {@link WWTComponent} in your
+  Vue-based web application, you can control it from anywhere else in your
+  codebase by using Pinia actions like {@link WWTAwareComponent.gotoRADecZoom}.
+- Finally, this package also provides a helper called {@link WWTAwareComponent}.
+  If you are using Vue’s [“options API”][opt-api], you can use it as a base
+  class for your own Vue components (say, a readout of the current view
+  coordinates) to gain easy access to the WWT state. Specifically, this base
+  class provides a full suite of getters and methods that are automagically
+  wired up to the engine’s Pinia state. In Vue’s [“composition API”][opt-api],
+  the recommended style is use the Pinia store directly.
+
+[Vue component]: https://vuejs.org/guide/essentials/component-basics.html
+[opt-api]: https://vuejs.org/guide/introduction.html#api-styles
+
+The key benefit provided by this whole framework is that it makes it easy to
+integrate WWT into a modern, component-based web application. *Any* component
+that needs to observe or control the WWT view — not just the one directly
+wrapping it — can do so, thanks to Pinia.
 
 
-# Quick Start
+# API Overview
 
-A minimal Vue [single-file-component][sfc] building on this library might look like
-this:
+If you‘re constructing a Vue app based on this system, you’ll need to use two
+key interfaces:
 
-[sfc]: https://vuejs.org/v2/guide/single-file-components.html
+- {@link WWTComponent} to include an actual WWT view in your app somewhere
+- {@link wwtPinia} to set up the WWT Pinia linkage.
+
+See the next section for a minimal example of how to do this. You may also find
+it convenient to use {@link WWTAwareComponent} as a base class for some of your
+components to get pre-wired methods for interacting with the WWT engine Pinia
+state.
+
+Once you have wired things up, you presumably want to know what WWT is doing and
+to command it! See [The WWT Pinia
+Interface](classes/WWTAwareComponent.html#md:the-wwt-pinia-interface) for an
+overview of all the possible ways that your application code can interact with
+the WWT engine.
+
+
+# Quick Start for Vue Initiates
+
+If you’re familiar with Vue, you might want to see what a minimal
+[single-file-component][sfc] building on this library would look like:
+
+[sfc]: https://vuejs.org/guide/scaling-up/sfc.html
 
 ```vue
 <template>
@@ -69,9 +120,9 @@ export default App = defineComponent({
 </style>
 ```
 
-By having your app extend the [[WWTAwareComponent]] component, you get [TypeScript]
-definitions of all of the properties, getters, and actions that allow
-you to observe the WWT component and control it programmatically.
+By having your app extend the {@link WWTAwareComponent} component, you get
+[TypeScript] definitions of all of the properties, getters, and actions that
+allow you to observe the WWT component and control it programmatically.
 
 The associated main application file might look like this:
 
@@ -91,7 +142,7 @@ createApp(App, {
 
 Note that for now, **you can only include one WWT component in each app**,
 because the WWT engine library maintains global state. To work around this, use
-iframes. 
+iframes.
 
 Alternatively, it is possible to mount separate *full instances* of
 the application to the same web page by passing in a unique `id` when creating
@@ -138,18 +189,17 @@ See [this GitHub
 comment](https://github.com/vuejs/vue-cli/issues/4271#issuecomment-585299391)
 for more information.
 
-Once you've gotten the basics set up, consult the documentation of the
-[WWTAwareComponent] for an organized overview of all of the ways that your app
+Once you've gotten the basics set up, consult the documentation of the {@link
+WWTAwareComponent} for an organized overview of all of the ways that your app
 can interact with the WWT rendering engine.
 
 
 # Motivation
 
 The [@wwtelescope/engine] module provides an extremely powerful and flexible
-astronomical visualization engine. However, because its code is transpiled from
-the C# underyling the [WWT Windows application][wwt-windows], it is far from
-idiomatic and does not integrate smoothly into the modern web development
-ecosystem.
+astronomical visualization engine. However, because its code was based on the C#
+underyling the [WWT Windows application][wwt-windows], it is far from idiomatic
+and does not integrate smoothly into the modern web development ecosystem.
 
 [wwt-windows]: https://github.com/WorldWideTelescope/wwt-windows-client
 
@@ -172,7 +222,7 @@ libraries, and things get even more complicated if you want to link them up with
 Pinia. The architecture of this library may seem a bit complicated but it’s the
 most streamlined approach we could devise.
 
-[vue-component]: https://vuejs.org/v2/guide/components.html
+[vue-component]: https://vuejs.org/guide/essentials/component-basics.html
 
 The core decision made by this library is to use [Pinia] to manage the shared
 state of the WWT engine and the surrounding web app. We haven’t seriously

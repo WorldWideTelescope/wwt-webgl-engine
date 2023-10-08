@@ -37,6 +37,9 @@
     "out": "../docs/engine/static/apiref/engine-pinia",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
+    "plugin": [
+      "typedoc-plugin-vue"
+    ],
     "validation": {
       "invalidLink": true
     }
