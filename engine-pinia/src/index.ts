@@ -1,4 +1,4 @@
-// Copyright 2020 the .NET Foundation
+// Copyright 2020-2023 the .NET Foundation
 // Licensed under the MIT License
 
 // This type moved to a lower-level dependency, but we re-export it to maintain
@@ -19,12 +19,8 @@ export {
   engineStore,
 } from "./store";
 
+export { default as WWTComponent } from "./Component.vue";
 export { WWTAwareComponent } from "./wwtaware";
-
-// Can't figure out a one-liner way to re-export the default export from
-// Component.vue under a specific name, so:
-import WWTComponent from "./Component.vue";
-export { WWTComponent }
 
 // Finally, we define the `wwtPinia` thingie.
 
