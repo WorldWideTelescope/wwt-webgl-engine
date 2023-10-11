@@ -1,6 +1,6 @@
 +++
 title = "Freestanding Mode"
-weight = 100
+weight = 10000
 sort_by = "weight"
 insert_anchor_links = "right"
 +++
