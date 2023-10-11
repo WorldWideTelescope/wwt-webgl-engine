@@ -57,14 +57,14 @@ await wwt.waitForReady();
 ```
 
 After the engine has signaled readiness, you can start controlling it.
-The {{helpersapi(p="classes/wwtinstance.html",t="WWTInstance")}} class offers
+The {{helpersapi(p="classes/WWTInstance.html",t="WWTInstance")}} class offers
 two conveniences:
 
 1. Its `ctl`, `si`, `lm`, and `stc` fields provide access to the core components
    of the WWT engine as exposed in {{engineapi(p="index.html",t="@wwtelescope/engine")}}.
 2. The class also provides convenience wrappers around certain APIs that benefit from
    more idiomatic JavaScript/TypeScript usage, as in the async-aware
-   method {{helpersapi(p="classes/wwtinstance.html#waitforready",t="waitForReady()")}}.
+   method {{helpersapi(p="classes/WWTInstance.html#waitForReady",t="waitForReady()")}}.
 
-Check out the {{helpersapi(p="classes/wwtinstance.html",t="WWTInstance")}} API
+Check out the {{helpersapi(p="classes/WWTInstance.html",t="WWTInstance")}} API
 reference to explore the possibilities!

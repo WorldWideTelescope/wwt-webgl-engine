@@ -39,7 +39,7 @@ The key elements are:
    `wwtlib`.
 2. A `<div>` element that becomes home for the WWT viewport.
 3. A JavaScript shim that calls the
-   function {{engineapi(p="modules/wwtcontrol.html#initcontrol",t="WWTControl.initControl")}}
+   function {{engineapi(p="functions/WWTControl.initControl.html",t="WWTControl.initControl")}}
    to initialize the engine and start it rendering.
 
 With this minimal initialization, you get a viewer that allows you to pan around
@@ -51,11 +51,11 @@ full power of the WWT rendering engine through the JavaScript APIs that are
 documented in the {{engineapi(p="index.html",t="@wwtelescope/engine")}}
 TypeScript module, namespaced inside the `wwtlib` variable. The majority of your
 programmatic interactions with the engine will occur
-the {{engineapi(p="modules/wwtcontrol.html",t="WWTControl")}}
+the {{engineapi(p="classes/WWTControl-1.html",t="WWTControl")}}
 class, accessed through
-the {{engineapi(p="modules/wwtcontrol.html#singleton",t="wwtlib.WWTControl.singleton")}}
+the {{engineapi(p="variables/WWTControl.singleton.html",t="wwtlib.WWTControl.singleton")}}
 singleton value, and
-the {{engineapi(p="classes/scriptinterface.html",t="ScriptInterface")}} class,
+the {{engineapi(p="classes/ScriptInterface.html",t="ScriptInterface")}} class,
 returned by
-the {{engineapi(p="modules/wwtcontrol.html#initcontrol",t="wwtlib.WWTControl.initControl")}}
+the {{engineapi(p="functions/WWTControl.initControl.html",t="wwtlib.WWTControl.initControl")}}
 function.
