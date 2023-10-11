@@ -13,19 +13,22 @@ an unpredictable amount of time. Since we’re using the plain JavaScript engine
 which is quite conservative in the language features it uses, this means that we
 need to add a callback.
 
-Edit the JavaScript code of your `index.html` file to read as follows:
+Edit the JavaScript code of your `index.html` file to read as follows (new or
+modified lines of code are highlighted):
 
-```js,hl_lines=4-5 8-12
+```js,hl_lines=1 6-7 10-14
+var script_interface, wwt;
+
 function init_wwt() {
     const builder = new wwtlib.WWTControlBuilder("wwtcanvas");
     builder.startRenderLoop(true);
-    const script_interface = builder.create();
+    script_interface = builder.create();
     script_interface.add_ready(on_ready);
 }
 
-function on_ready(script_interface) {
+function on_ready() {
     console.log("WWT is ready!");
-    const wwt = wwtlib.WWTControl.singleton;
+    wwt = wwtlib.WWTControl.singleton;
     wwt.gotoRADecZoom(17.75, -28.9, 10, false);
 }
 

@@ -26,7 +26,7 @@ In that directory, create a file `index.html` with the following content:
     <script src="https://web.wwtassets.org/engine/7/wwtsdk.js"></script>
 </head>
 <body>
-    <div id="wwtcanvas" style="width: 750px; height: 750px"></div>
+    <div id="wwtcanvas" style="width: 750px; height: 750px; background-color: #000"></div>
 
     <script type="text/javascript">
         function init_wwt() {
