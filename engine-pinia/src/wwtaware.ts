@@ -15,12 +15,14 @@ import { engineStore } from "./store";
  *
  * This class doesn’t implement any special functionality itself. All it does is
  * provide a set of state variables and methods that are pre-connected to [the
- * WWT Pinia
- * interface](../functions/engineStore.html#md:the-wwt-pinia-interface). A
- * component inheriting from this class can use whichever ones it needs without
- * having to set up that integration itself. For that reason, **the detailed API
- * associated with this class is intentionally undocumented**, so that the
- * in-depth documentation can be centralized in one place.
+ * WWT Pinia interface][api-summary]. A component inheriting from this class can
+ * use whichever ones it needs without having to set up that integration itself.
+ * For that reason, **the detailed API associated with this class is
+ * intentionally undocumented**, so that the in-depth documentation can be
+ * centralized in one place: see [the API summary][api-summary] associated with
+ * the {@link engineStore} function.
+ *
+ * [api-summary]: ../functions/engineStore.html#md:the-wwt-pinia-interface
  *
  * # Example
  *
