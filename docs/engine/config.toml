@@ -3,6 +3,9 @@ title = "WWT WebGL Engine Reference Manual"
 description = "The WorldWide Telescope WebGL Engine reference manual."
 theme = "wwtguide"
 
+[markdown]
+highlight_code = true
+
 [extra]
 github_base = "//github.com/WorldWideTelescope/wwt-webgl-engine"
 google_analytics_id = "UA-107473046-3"
