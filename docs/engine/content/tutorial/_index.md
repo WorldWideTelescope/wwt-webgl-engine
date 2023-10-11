@@ -1,5 +1,5 @@
 +++
-title = "Tutorial"
+title = "WWT API Tutorial"
 weight = 200
 sort_by = "weight"
 insert_anchor_links = "right"

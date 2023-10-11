@@ -6,7 +6,7 @@ weight = 300
 Next, we’ll change the imagery that WWT is displaying. Edit the JavaScript code
 of your `index.html` file to read as follows:
 
-```js,hl_lines=12 17-19
+```js,hl_lines=13 17-19
 var script_interface, wwt;
 
 function init_wwt() {
@@ -18,8 +18,8 @@ function init_wwt() {
 
 function on_ready() {
     console.log("WWT is ready!");
-    script_interface.add_arrived(on_arrived);
     wwt = wwtlib.WWTControl.singleton;
+    script_interface.add_arrived(on_arrived);
     wwt.gotoRADecZoom(17.75, -28.9, 10, false);
 }
 
@@ -161,16 +161,3 @@ can control its clock, which by default tracks real time. The precise view that
 you get when you enter this mode will, by default, reflect the actual positions
 of the planets at the time that you run the app. This mode has a ton of features
 that we won’t go into just yet.
-
-
-# Callback Hell
-
-You might note that we’re piling up a lot of callbacks here. We sure are!
-There’s a reason that web developers talk about [callback
-hell](http://callbackhell.com) — this style of programming rapidly becomes very
-hard to scale and maintain. **This is why we strongly recommend avoiding plain
-JavaScript when building complex WWT apps.** More sophisticated models like the
-[Vue component model](@/getting-started/vue-component-model.md), or even the
-[TypeScript model](@/getting-started/bundled-typescript-model.md) with `async`
-syntax, take a bit more effort to learn, but provide much better tools for
-managing the complex timing concerns of modern web apps.
