@@ -88,6 +88,16 @@ access to the information retrieved from the WTML URL.
 
 </div>
 
+<div class="callout callout-note">
+
+WWT can overlay more than two images at once if needed: it has a generic system
+for adding visual
+{{piniaapi(p="functions/engineStore.html#md:general-layer-management",t="layers")}},
+which can be stacked and combined in arbitrary numbers. “Imageset layers” add
+imagery using the same underlying framework as the background/foreground system.
+
+</div>
+
 
 # Getting Data into WWT
 
