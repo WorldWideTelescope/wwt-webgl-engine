@@ -1,17 +1,7 @@
-// Copyright 2021 the .NET Foundation
+// Copyright 2021-2023 the .NET Foundation
 // Licensed under the MIT License
 
-/** Various settings for the research app itself.
- *
- * This module contains messages and types relating to generic "settings" of the
- * research app that can be controlled. The [[classicPywwt]] module defines many
- * other settings and messages that control the appearance of graphical elements
- * in the WWT engine such as layers and annotations.
- *
- * The defined messages are:
- *
- * - [[ModifySettingsMessage]]
- * */
+// Note: module-level docstring found in `index.ts`
 
 /** An identifier of something with settings that can be modified.
  *
@@ -28,7 +18,7 @@ export type SettingsTarget = "app";
  * */
 export type GenericSetting = [string, any];  // eslint-disable-line @typescript-eslint/no-explicit-any
 
-/** Type guard function for [[GenericSetting]]. */
+/** Type guard function for {@link GenericSetting}. */
 export function isGenericSetting(obj: any): obj is GenericSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return Object.prototype.toString.call(obj) === '[object Array]' &&
     obj.length == 2 &&
@@ -38,7 +28,7 @@ export function isGenericSetting(obj: any): obj is GenericSetting {  // eslint-d
 /** Settings for the overall application.
  *
  * This should be thought of as an enumeration type, all of whose options are
- * compatible with [[GenericSetting]]. Right now, there are only two options
+ * compatible with {@link GenericSetting}. Right now, there are only two options
  * available, though.
  * */
 export type AppSetting =
@@ -50,7 +40,7 @@ const appSettingTypeInfo: { [i: string]: boolean | number } = {
   "selectionProximity/number": 4
 };
 
-/** Type guard function for [[AppSetting]]. */
+/** Type guard function for {@link AppSetting}. */
 export function isAppSetting(obj: GenericSetting): obj is AppSetting {
   const key = obj[0] + "/" + typeof obj[1];
   return (key in appSettingTypeInfo);
@@ -60,7 +50,7 @@ export function isAppSetting(obj: GenericSetting): obj is AppSetting {
 /** A message to modify various settings in a generic way.
  *
  * This is the generic message to be used for modifying settings. Its
- * [[settings]] payload is weakly-typed.
+ * {@link settings} payload is weakly-typed.
 */
 export interface ModifySettingsMessage {
   /** The tag identifying this message type. */
@@ -73,12 +63,12 @@ export interface ModifySettingsMessage {
   settings: GenericSetting[];
 }
 
-/** A type-guard-like function for the app mode of [[ModifySettingsMessage]].
+/** A type-guard-like function for the app mode of {@link ModifySettingsMessage}.
  *
- * @param o An object that might be a [[ModifySettingsMessage]]
- * @returns A list of recognized [[AppSetting]]s in the message if so; otherwise null
+ * @param o An object that might be a {@link ModifySettingsMessage}
+ * @returns A list of recognized {@link AppSetting}s in the message if so; otherwise null
  *
- * This function is like a type guard for the [[ModifySettingsMessage]]
+ * This function is like a type guard for the {@link ModifySettingsMessage}
  * interface, with the additional constraint that it only matches messages
  * targeting the overall app. If that is the case, it returns an array of the
  * settings that matched this package's knowledge of acceptable app settings.

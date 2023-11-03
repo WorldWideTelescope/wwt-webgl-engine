@@ -26,7 +26,7 @@ const justPolyLineAnnotationSettingNames = [
 
 /** A list of the names of the available settings for `PolyLineAnnotation`
  * instances and their equivalents (things implementing
- * [[PolyLineAnnotationSettingsInterface]]).
+ * {@link PolyLineAnnotationSettingsInterface}).
  *
  * This is a superset of the names available for generic annotations.
 */

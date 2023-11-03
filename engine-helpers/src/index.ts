@@ -120,7 +120,7 @@ export const enum InitControlViewType {
   Earth = "earth",
 }
 
-/** Options for the [[WWTInstance]] constructor. */
+/** Options for the {@link WWTInstance} constructor. */
 export interface InitControlSettings {
   /** The identifier of the DOM element to which to attach the control. If
    * unspecified, defaults to `"wwt"`. */
@@ -154,7 +154,7 @@ export interface InitControlSettings {
   startMode?: InitControlViewType;
 }
 
-/** Options for [[WWTInstance.gotoTarget]]. */
+/** Options for {@link WWTInstance.gotoTarget}. */
 export interface GotoTargetOptions {
   /** The destination of the view. */
   place: Place;
@@ -175,7 +175,7 @@ export interface GotoTargetOptions {
 
 
 /** Deprecated, use AddImageSetLayerOptions instead.
- *  Options for [[WWTInstance.addImageSetLayer]]. */
+ *  Options for {@link WWTInstance.addImageSetLayer}. */
 export interface LoadFitsLayerOptions {
   /** The URL of the FITS file. */
   url: string;
@@ -188,20 +188,20 @@ export interface LoadFitsLayerOptions {
   gotoTarget: boolean;
 }
 
-/** Options for [[WWTInstance.addImageSetLayer]]. */
+/** Options for {@link WWTInstance.addImageSetLayer}. */
 export interface AddImageSetLayerOptions {
   /** The URL of the FITS file *or* the URL of the desired image set.
    *
    * This should match an image set URL previously loaded with
-   * [[WWTInstance.loadImageCollection]]. */
+   * {@link WWTInstance.loadImageCollection}. */
   url: string;
 
   /** Indicates what type of layer you are adding.
    *
-   * If "fits", the [[url]] will be taken to point to a single FITS File that
+   * If "fits", the {@link url} will be taken to point to a single FITS File that
    * should be added. If "preloaded", it will be taken to match the URL
    * associated with an imageset that has already been added to WWT's internal
-   * catalogs via [[WWTInstance.loadImageCollection]]. If "autodetect", WWT will
+   * catalogs via {@link WWTInstance.loadImageCollection}. If "autodetect", WWT will
    * guess: if the URL ends with a FITS-like extension, "fits" mode will be
    * activated; otherwise it will use "preloaded" mode. */
   mode: "autodetect" | "fits" | "preloaded";
@@ -214,7 +214,7 @@ export interface AddImageSetLayerOptions {
   goto: boolean;
 }
 
-/** Options for [[WWTInstance.setImageSetLayerOrder]]. */
+/** Options for {@link WWTInstance.setImageSetLayerOrder}. */
 export interface SetLayerOrderOptions {
   /** The ID of the layer. */
   id: string;
@@ -224,7 +224,7 @@ export interface SetLayerOrderOptions {
 }
 
 
-/** Options for [[WWTInstance.stretchFitsLayer]]. */
+/** Options for {@link WWTInstance.stretchFitsLayer}. */
 export interface StretchFitsLayerOptions {
   /** The ID of the FITS layer. */
   id: string;
@@ -239,7 +239,7 @@ export interface StretchFitsLayerOptions {
   vmax: number;
 }
 
-/** Options for [[WWTInstance.setFitsLayerColormap]]. */
+/** Options for {@link WWTInstance.setFitsLayerColormap}. */
 export interface SetFitsLayerColormapOptions {
   /** The ID of the FITS layer. */
   id: string;
@@ -293,7 +293,7 @@ export interface GetCatalogHipsDataInViewOptions {
   limit: boolean;
 }
 
-/** Options for [[setupForImageset]]. */
+/** Options for {@link WWTInstance.setupForImageset}. */
 export interface SetupForImagesetOptions {
   /** The imageset to foreground. */
   foreground: Imageset;
@@ -303,7 +303,7 @@ export interface SetupForImagesetOptions {
   background?: Imageset;
 }
 
-/** Options for [CaptureFrame] */
+/** Options for {@link WWTInstance.captureFrame}. */
 export interface CaptureFrameOptions {
   /** The desired image width, in pixels. */
   width: number;
@@ -353,9 +353,16 @@ class SavedPromise<P, T> {
 }
 
 export class WWTInstance {
+  /** The [`WWTControl`](../../engine/classes/WWTControl-1.html) associated with this instance. */
   readonly ctl: WWTControl;
+
+  /** The [`LayerManager`](../../engine/modules/LayerManager.html) associated with this instance. */
   readonly lm: LayerManagerObject;
+
+  /** The [`ScriptInterface`](../../engine/classes/ScriptInterface.html) associated with this instance. */
   readonly si: ScriptInterface;
+
+  /** The [`SpaceTimeController`](../../engine/modules/SpaceTimeController.html) associated with this instance. */
   readonly stc: SpaceTimeControllerObject;
 
   /** Create a WWT control, attaching it to a DOM element.
@@ -571,7 +578,7 @@ export class WWTInstance {
   * an XML document in the [WTML collection][wtml] format. Any `ImageSet`
   * entries in the collection, or `Place` entries containing image sets, will
   * be added to the WWT instance’s list of available imagery. Subsequent calls
-  * to functions like [[setForegroundImageByName]] will be able to locate the
+  * to functions like {@link setForegroundImageByName} will be able to locate the
   * new imagesets and display them to the user.
   *
   * Each unique URL is only requested once. Once a given URL has been
@@ -651,7 +658,7 @@ export class WWTInstance {
    * The FITS file must be downloaded and processed, so this API is
    * asynchronous, and is not appropriate for files that might be large.
    *
-   * The image set must have previously been created with [[loadImageCollection]]
+   * The image set must have previously been created with {@link loadImageCollection}
    */
   async addImageSetLayer(options: AddImageSetLayerOptions): Promise<ImageSetLayer> {
     return new Promise((resolve, _reject) => {
@@ -729,7 +736,7 @@ export class WWTInstance {
    * imgset.get_hipsProperties().get_catalogSpreadSheetLayer()
    * ```
    *
-   * You can use methods like [[applyTableLayerSettings]] to modify the settings
+   * You can use methods like {@link applyTableLayerSettings} to modify the settings
    * of this layer by extracting its ID string with `layer.id.toString()`.
    *
    * The contents of this catalog will update dynamically as the user navigates
@@ -751,7 +758,7 @@ export class WWTInstance {
 
   /** Fetch the subset of catalog HiPS data contained within the current view.
    *
-   * The imageset should have been loaded with the [[addCatalogHipsByName]]
+   * The imageset should have been loaded with the {@link addCatalogHipsByName}
    * call. The *limit* option should almost always be true, since if it is false
    * the data-fetch operation can potentially attempt to download and return
    * gigabytes of data.
@@ -900,7 +907,7 @@ export class WWTInstance {
 
   /** Load a tour from a URL.
    *
-   * Once the tour has loaded, you can use [[getActiveTourPlayer]] to get the
+   * Once the tour has loaded, you can use {@link getActiveTourPlayer} to get the
    * tour player controller and the underlying tour document.
    *
    * @param url The URL of the tour to load and play.

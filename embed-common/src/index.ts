@@ -108,6 +108,13 @@ export class EmbedSettings {
     return s;
   }
 
+  /** Return a set of
+   * [`BaseEngineSetting`](../../engine-types/types/BaseEngineSetting.html)
+   * values implied by this configuration. (The `BaseEngineSetting` type is
+   * defined in the `@wwtelescope/engine-types` module.)
+   *
+   * @returns A list of setting values.
+   */
   asSettings(): BaseEngineSetting[] {
     const s: BaseEngineSetting[] = [];
     s.push(["showCrosshairs", this.showCrosshairs]);

@@ -199,7 +199,7 @@ Coordinates.cartesianToSpherical2 = function (vector) {
 Coordinates.cartesianToSphericalSky = function (vector) {
     var rho = Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
     var ra = Math.atan2(vector.z, vector.x);
-    var dec = Math.asin(-vector.y / rho);
+    var dec = Math.asin(vector.y / rho);
     return Vector2d.create(ra / Math.PI * 12, dec / Math.PI * 180);
 };
 
@@ -207,7 +207,7 @@ Coordinates.sphericalSkyToCartesian = function (vector) {
     var ra = vector.x * (Math.PI / 12);
     var dec = vector.y * (Math.PI / 180);
     var x = Math.cos(ra) * Math.cos(dec);
-    var y = -Math.sin(dec);
+    var y = Math.sin(dec);
     var z = Math.sin(ra) * Math.cos(dec);
     return Vector3d.create(x, y, z);
 };

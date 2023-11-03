@@ -3,3 +3,10 @@
   height: 360px;
   margin: 1rem 0;
 }
+
+/* Syntax highlighting customizations */
+
+pre mark {
+  display: block;
+  color: #c0c5ce;
+}

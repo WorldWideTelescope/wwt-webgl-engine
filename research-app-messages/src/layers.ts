@@ -1,19 +1,7 @@
-// Copyright 2021 the .NET Foundation
+// Copyright 2021-2023 the .NET Foundation
 // Licensed under the MIT License
 
-/** Messages relating to layers.
- *
- * This module contains messages and types relating to various graphical layers
- * that can be added to the WWT view. However, note that the [[classicPywwt]]
- * module defines a bunch of messages on the same topic, especially concerning
- * imageset and data-table layers.
- *
- * The defined messages are:
- *
- * - [[LoadHipsCatalogMessage]] leading to [[LoadHipsCatalogCompletedMessage]]
- * - [[GetHipsCatalogDataInViewMessage]] leading to [[GetHipsCatalogDataInViewReply]]
- *
- * */
+// Note: module-level docstring found in `index.ts`
 
 import { PywwtSpreadSheetLayerSetting } from './classic_pywwt';
 
@@ -22,8 +10,8 @@ import { PywwtSpreadSheetLayerSetting } from './classic_pywwt';
  * HiPS catalogs are a bit funky because in some ways, they behave like
  * imagesets, while in other ways, they behave like data table layers.
  *
- * This message may result in a [[LoadHipsCatalogCompletedMessage]] reply, if
- * you specify the [[threadId]].
+ * This message may result in a {@link LoadHipsCatalogCompletedMessage} reply, if
+ * you specify the {@link threadId}.
  */
 export interface LoadHipsCatalogMessage {
   /** The tag identifying this message type. */
@@ -37,7 +25,7 @@ export interface LoadHipsCatalogMessage {
    * The engine must "know about" this catalog by having loaded a WTML file that
    * defines it. It comes pre-loaded with a library of well-known catalogs. The
    * recognized catalog names can be learned through
-   * [[ApplicationStateMessage.hipsCatalogNames]].
+   * {@link ApplicationStateMessage.hipsCatalogNames}.
    */
   name: string;
 
@@ -52,7 +40,7 @@ export interface LoadHipsCatalogMessage {
   threadId?: string;
 }
 
-/** A type-guard function for [[LoadHipsCatalogMessage]]. */
+/** A type-guard function for {@link LoadHipsCatalogMessage}. */
 export function isLoadHipsCatalogMessage(o: any): o is LoadHipsCatalogMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event === 'layer_hipscat_load' &&
     typeof o.tableId === 'string' &&
@@ -93,7 +81,7 @@ export interface SpreadSheetLayerInfo {
 
 /** Ask the app to return the HiPS catalog data in the current viewport.
  *
- * This message will result in a [[GetHipsCatalogDataInViewReply]] if the
+ * This message will result in a {@link GetHipsCatalogDataInViewReply} if the
  * input parameters are all correct.
  */
 export interface GetHipsCatalogDataInViewMessage {
@@ -117,7 +105,7 @@ export interface GetHipsCatalogDataInViewMessage {
   limit: boolean;
 }
 
-/** A type-guard function for [[GetHipsCatalogDataInViewMessage]]. */
+/** A type-guard function for {@link GetHipsCatalogDataInViewMessage}. */
 export function isGetHipsCatalogDataInViewMessage(o: any): o is GetHipsCatalogDataInViewMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event === 'layer_hipscat_datainview' &&
     typeof o.threadId === 'string' &&

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 the .NET Foundation
+// Copyright 2020-2023 the .NET Foundation
 // Licensed under the MIT License
 
 // Toplevel documentation found at @/docs/engine/research-app-messages-index.md
@@ -9,13 +9,120 @@ import * as selections from './selections';
 import * as settings from './settings';
 import * as tours from './tours';
 
-export {
-  classicPywwt,
-  layers,
-  selections,
-  settings,
-  tours,
-};
+/** Messages created for older versions of the
+ * [pywwt](https://pywwt.readthedocs.io/) Python package.
+ *
+ * These can be grouped into the following categories:
+ *
+ * ### View Control
+ *
+ * - {@link CenterOnCoordinatesMessage}
+ * - {@link PauseTimeMessage}
+ * - {@link ResumeTimeMessage}
+ * - {@link SetDatetimeMessage}
+ * - {@link SetViewerModeMessage}
+ * - {@link TrackObjectMessage}
+ *
+ * ### Image set Layers
+ *
+ * - {@link CreateImageSetLayerMessage}
+ * - {@link ModifyFitsLayerMessage}
+ * - {@link RemoveImageSetLayerMessage}
+ * - {@link SetFitsLayerColormapMessage}
+ * - {@link StretchFitsLayerMessage}
+ *
+ * ### Data Table Layers
+ *
+ * - {@link CreateTableLayerMessage}
+ * - {@link ModifyTableLayerMessage}
+ * - {@link RemoveTableLayerMessage}
+ * - {@link UpdateTableLayerMessage}
+ *
+ * ### Image Sets
+ *
+ * - {@link LoadImageCollectionMessage}
+ * - {@link LoadImageCollectionCompletedMessage}
+ * - {@link SetBackgroundByNameMessage}
+ * - {@link SetForegroundByNameMessage}
+ * - {@link SetForegroundOpacityMessage}
+ *
+ * ### Annotations
+ *
+ * - {@link AddLinePointMessage}
+ * - {@link AddPolygonPointMessage}
+ * - {@link ClearAnnotationsMessage}
+ * - {@link CreateAnnotationMessage}
+ * - {@link ModifyAnnotationMessage}
+ * - {@link RemoveAnnotationMessage}
+ * - {@link SetCircleCenterMessage}
+ *
+ * ## Tours
+ *
+ * - {@link LoadTourMessage}
+ * - {@link PauseTourMessage}
+ * - {@link ResumeTourMessage}
+ *
+ * ## Miscellaneous
+ *
+ * - {@link ModifySettingMessage}
+ */
+export { classicPywwt };
+
+/** Messages relating to layers.
+ *
+ * This module contains messages and types relating to various graphical layers
+ * that can be added to the WWT view. However, note that the {@link classicPywwt}
+ * module defines a bunch of messages on the same topic, especially concerning
+ * imageset and data-table layers.
+ *
+ * The defined messages are:
+ *
+ * - {@link LoadHipsCatalogMessage} leading to {@link LoadHipsCatalogCompletedMessage}
+ * - {@link GetHipsCatalogDataInViewMessage} leading to {@link GetHipsCatalogDataInViewReply}
+ *
+ **/
+export { layers };
+
+/** Messages related to selections.
+ *
+ * This module contains messages and types relating to interactive selection of
+ * different items in the WWT display
+ *
+ * The defined messages are:
+ *
+ * - {@link AddSourceMessage}
+ * - {@link ModifySelectabilityMessage}
+ * - {@link ModifyAllSelectabilityMessage}
+ * - {@link SelectionStateMessage}
+ */
+export { selections };
+
+
+/** Various settings for the research app itself.
+ *
+ * This module contains messages and types relating to generic "settings" of the
+ * research app that can be controlled. The {@link classicPywwt} module defines many
+ * other settings and messages that control the appearance of graphical elements
+ * in the WWT engine such as layers and annotations.
+ *
+ * The defined messages are:
+ *
+ * - {@link ModifySettingsMessage}
+ * */
+export { settings };
+
+/** Messages relating to tours.
+ *
+ * This module contains messages and types relating to WWT tours, in particular
+ * obtaining the current view as a tour. However, note that the
+ * {@link classicPywwt} module defines a bunch of messages on the same topic,
+ * especially concerning loading and playback of tours.
+ *
+ * The defined messages are:
+ *
+ * - {@link GetViewAsTourMessage} leading to {@link GetViewAsTourReply}
+ */
+export { tours };
 
 /** Information about the current position of the WWT view.
  *
@@ -29,8 +136,8 @@ export {
  * The WWT clock time isn't sent directly, so that constant updates aren't
  * needed in the common case that the clock is running. If you care about the
  * current time of the WWT clock, you should maintain state that tracks the most
- * recently provided values of the [[engineClockISOT]], [[systemClockISOT]], and
- * [[engineClockRateFactor]] fields. If you need to estimate the current time of
+ * recently provided values of the {@link engineClockISOT}, {@link systemClockISOT}, and
+ * {@link engineClockRateFactor} fields. If you need to estimate the current time of
  * the WWT clock, you should calculate:
  *
  * ```
@@ -60,7 +167,7 @@ export interface ViewStateMessage {
    * If a single client is communicating with multiple apps, it needs to be able
    * to tell which app is the source of any update messages. This session
    * identifier allows clients to do so. The default value is "default". But if
-   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * a client sends a {@link PingPongMessage} with a customized ``sessionId`` field,
    * that value will start appearing in these view state update messages.
    */
   sessionId: string;
@@ -107,7 +214,6 @@ export function isViewStateMessage(o: any): o is ViewStateMessage {  // eslint-d
     typeof o.engineClockRateFactor === "number";
 }
 
-
 /** Information about the current state of the WWT application.
  *
  * This message may be broadcasted by the application in response to various
@@ -131,7 +237,7 @@ export interface ApplicationStateMessage {
    * If a single client is communicating with multiple apps, it needs to be able
    * to tell which app is the source of any unsolicited messages. This session
    * identifier allows clients to do so. The default value is "default". But if
-   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * a client sends a {@link PingPongMessage} with a customized ``sessionId`` field,
    * that value will start appearing in these view state update messages.
    */
   sessionId: string;
@@ -144,21 +250,20 @@ export interface ApplicationStateMessage {
 /** A "ping" or "pong" message.
  *
  * If you send this message to the app, it will reply with its own
- * [[PingPongMessage]] that repeats your [[threadId]] and [[sessionId]].
+ * {@link PingPongMessage} that repeats your {@link threadId} and {@link sessionId}.
  *
  * If you're trying to communicate with the WWT research app through the
  * [postMessage()] web API, there's no surefire way to know that the app is
  * actually receiving your messages. This is a particular issue when the app is
  * starting up. The least-bad way to account for this is to periodically send
- * pings and wait until you start getting replies. The [[threadId]] parameter
+ * pings and wait until you start getting replies. The {@link threadId} parameter
  * makes it possible to distinguish messages between multiple instances of the
  * app and multiple app clients.
  *
- * [postMessage()]:
- * https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+ * [postMessage()]: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
  *
- * This message also includes a [[sessionId]] field that allows clients to set
- * up customized tagging in [[ViewStateMessage]] updates, which is helpful when
+ * This message also includes a {@link sessionId} field that allows clients to set
+ * up customized tagging in {@link ViewStateMessage} updates, which is helpful when
  * a client is messaging with multiple apps and needs to distinguish their
  * replies.
  * */
@@ -171,7 +276,7 @@ export interface PingPongMessage {
 
   /** A client session identifier string.
    *
-   * If specified, the app will start sending [[ViewStateMessage]] updates to
+   * If specified, the app will start sending {@link ViewStateMessage} updates to
    * the sender of this ping-pong message, and those updates will be tagged with
    * this session ID. This is useful if a client is communicating with multiple
    * apps and its messaging transport mechanism prevents it from identifying the
@@ -180,7 +285,7 @@ export interface PingPongMessage {
   sessionId?: string;
 }
 
-/** Type guard function for [[PingPongMessage]]. */
+/** Type guard function for {@link PingPongMessage}. */
 export function isPingPongMessage(o: any): o is PingPongMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.type === "string" &&
     o.type == "wwt_ping_pong" &&
@@ -208,13 +313,13 @@ export interface PointerMoveMessage {
    * If a single client is communicating with multiple apps, it needs to be able
    * to tell which app is the source of any update messages. This session
    * identifier allows clients to do so. The default value is "default". But if
-   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * a client sends a {@link PingPongMessage} with a customized ``sessionId`` field,
    * that value will start appearing in these view state update messages.
    */
   sessionId?: string;
 }
 
-/** Type guard function for [[PointerMoveMessage]]. */
+/** Type guard function for {@link PointerMoveMessage}. */
 export function isPointerMoveMessage(o: any): o is PointerMoveMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.type === "string" &&
     o.type == "wwt_pointer_move" &&
@@ -242,13 +347,13 @@ export interface PointerUpMessage {
    * If a single client is communicating with multiple apps, it needs to be able
    * to tell which app is the source of any update messages. This session
    * identifier allows clients to do so. The default value is "default". But if
-   * a client sends a [[PingPongMessage]] with a customized ``sessionId`` field,
+   * a client sends a {@link PingPongMessage} with a customized ``sessionId`` field,
    * that value will start appearing in these view state update messages.
    */
   sessionId?: string;
 }
 
-/** Type guard function for [[PointerUpMessage]]. */
+/** Type guard function for {@link PointerUpMessage}. */
 export function isPointerUpMessage(o: any): o is PointerUpMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.type === "string" &&
     o.type == "wwt_pointer_up" &&

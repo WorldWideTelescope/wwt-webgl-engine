@@ -71,7 +71,7 @@ const justVoTableLayerSettingNames = [
 
 /** A list of the names of the available settings for `VoTableLayer`
  * instances and their equivalents (things implementing
- * [[VoTableLayerSettingsInterface]]).
+ * {@link VoTableLayerSettingsInterface}).
  *
  * This is a superset of the names available for generic layers.
 */

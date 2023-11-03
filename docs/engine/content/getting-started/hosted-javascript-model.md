@@ -13,22 +13,23 @@ Here’s simple HTML that will get you going:
 ```html
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <title>My First WWT Application</title>
     <script src="https://web.wwtassets.org/engine/7/wwtsdk.js"></script>
-    <!--[if IE]> <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-  </head>
-  <body>
-    <div id="wwtcanvas" style="width: 750px; height: 750px"></div>
+</head>
+<body>
+    <div id="wwtcanvas" style="width: 750px; height: 750px; background-color: #000"></div>
 
     <script type="text/javascript">
-      function init_wwt() {
-          wwtlib.WWTControl.initControl('wwtcanvas');
-      }
+        function init_wwt() {
+            const builder = new wwtlib.WWTControlBuilder("wwtcanvas");
+            builder.startRenderLoop(true);
+            builder.create();
+        }
 
-      window.addEventListener('load', init_wwt);
+        window.addEventListener("load", init_wwt);
     </script>
-  </body>
+</body>
 </html>
 ```
 
@@ -38,9 +39,9 @@ The key elements are:
    engine. You interface with this library via a global variable named
    `wwtlib`.
 2. A `<div>` element that becomes home for the WWT viewport.
-3. A JavaScript shim that calls the
-   function {{engineapi(p="modules/wwtcontrol.html#initcontrol",t="WWTControl.initControl")}}
-   to initialize the engine and start it rendering.
+3. A JavaScript shim that uses the
+   {{engineapi(p="classes/WWTControlBuilder.html",t="WWTControlBuilder")}}
+   class to initialize the engine and start it rendering.
 
 With this minimal initialization, you get a viewer that allows you to pan around
 and use the scroll wheel to zoom in, providing an interface reminiscent of
@@ -51,11 +52,11 @@ full power of the WWT rendering engine through the JavaScript APIs that are
 documented in the {{engineapi(p="index.html",t="@wwtelescope/engine")}}
 TypeScript module, namespaced inside the `wwtlib` variable. The majority of your
 programmatic interactions with the engine will occur
-the {{engineapi(p="modules/wwtcontrol.html",t="WWTControl")}}
+the {{engineapi(p="classes/WWTControl-1.html",t="WWTControl")}}
 class, accessed through
-the {{engineapi(p="modules/wwtcontrol.html#singleton",t="wwtlib.WWTControl.singleton")}}
+the {{engineapi(p="variables/WWTControl.singleton.html",t="wwtlib.WWTControl.singleton")}}
 singleton value, and
-the {{engineapi(p="classes/scriptinterface.html",t="ScriptInterface")}} class,
+the {{engineapi(p="classes/ScriptInterface.html",t="ScriptInterface")}} class,
 returned by
-the {{engineapi(p="modules/wwtcontrol.html#initcontrol",t="wwtlib.WWTControl.initControl")}}
+the {{engineapi(p="classes/WWTControlBuilder.html#create",t="WWTControlBuilder.create()")}}
 function.
