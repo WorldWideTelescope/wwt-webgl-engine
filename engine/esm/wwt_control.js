@@ -1488,15 +1488,23 @@ var WWTControl$ = {
         // vector at its 0,0,0 default.
 
         if (this.renderContext.get_projection() != null) {
+
+            // We start with an (x, y) point in screen space
+            // This next block converts its to a point [vx, vy, 1] where vx, vy are in [-1, 1]
+            // i.e. clip space
+            // We're also accounting for the fact that pixel coordinates run down the screen,
+            // but clip space goes upwards (like we're used to for y).
+            // We also take projection scaling into account here.
             var v = new Vector3d();
             v.x = (((2 * ptCursor.x) / backBufferWidth) - 1) / this.renderContext.get_projection().get_m11();
-            v.y = (((2 * ptCursor.y) / backBufferHeight) - 1) / this.renderContext.get_projection().get_m22();
+            v.y = -(((2 * ptCursor.y) / backBufferHeight) - 1) / this.renderContext.get_projection().get_m22();
             v.z = 1;
-            var m = Matrix3d.multiplyMatrix(this.renderContext.get_view(), this.renderContext.get_world());
 
+            var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
             m.invert();
 
             // Transform the screen space pick ray into 3D space
+            // The last column (offsets) should be zero, which is why we've been able to ignore w
             vPickRayDir.x = v.x * m.get_m11() + v.y * m.get_m21() + v.z * m.get_m31();
             vPickRayDir.y = v.x * m.get_m12() + v.y * m.get_m22() + v.z * m.get_m32();
             vPickRayDir.z = v.x * m.get_m13() + v.y * m.get_m23() + v.z * m.get_m33();
@@ -1506,12 +1514,11 @@ var WWTControl$ = {
     },
 
     transformWorldPointToPickSpace: function (worldPoint, backBufferWidth, backBufferHeight) {
-        var m = Matrix3d.multiplyMatrix(this.renderContext.get_view(), this.renderContext.get_world());
-        m.invert();
+        var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
         var p = new Vector2d();
-        var vz = worldPoint.x * m.get_m31() + worldPoint.y * m.get_m32() + worldPoint.z * m.get_m33();
-        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m12() + worldPoint.z * m.get_m13()) / vz;
-        var vy = (worldPoint.x * m.get_m21() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m23()) / vz;
+        var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33();
+        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31()) / vz;
+        var vy = -(worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32()) / vz;
         p.x = Math.round((1 + this.renderContext.get_projection().get_m11() * vx) * (backBufferWidth / 2));
         p.y = Math.round((1 + this.renderContext.get_projection().get_m22() * vy) * (backBufferHeight / 2));
         return p;

@@ -237,17 +237,31 @@ var URLHelpers$ = {
             case DomainHandling.tryNoProxy:
             default:
                 if (this._force_https && lcproto !== 'https:') {
-                    // Force HTTPS and we'll see what happens. If
-                    // downloading fails, we'll set a flag and use our
-                    // proxy to launder the security.
+                    // Force HTTPS and we'll see what happens. If downloading
+                    // fails, we'll set a flag and use our proxy to launder the
+                    // security.
+                    //
+                    // As a quasi-hack to work around some stuff emited by the
+                    // Azure backend, make sure to strip off an `:80` port
+                    // specification if we're upgrading. If there's a port
+                    // specification that's anything else, don't try HTTPS - it
+                    // won't work.
                     //
                     // NOTE: it is important that we use `domain` and not
                     // `lcdomain`, even though domain names are
                     // case-insensitive, because we might be processing a
                     // template URL containing text like `{S}`, and WWT's
-                    // replacements *are* case-sensitive. Yes, I did learn
-                    // this the hard way.
-                    return 'https://' + domain + rest;
+                    // replacements *are* case-sensitive. Yes, I did learn this
+                    // the hard way.
+                    var rewrite_domain = domain;
+
+                    if (ss.endsWith(domain, ":80")) {
+                        rewrite_domain = domain.substring(0, domain.length - 3);
+                    } else if (domain.indexOf(':') >= 0) {
+                        return url;
+                    }
+
+                    return 'https://' + rewrite_domain + rest;
                 }
                 return url;
 

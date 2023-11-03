@@ -398,7 +398,6 @@ import {
   extractSpreadSheetLayerSettings,
   extractImageSetLayerSettings,
   isCircleAnnotationSetting,
-  isEngineSetting,
   isImageSetLayerSetting,
   isPolyAnnotationSetting,
   isPolyLineAnnotationSetting,

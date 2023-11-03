@@ -1,65 +1,10 @@
-// Copyright 2020-2021 the .NET Foundation
+// Copyright 2020-2023 the .NET Foundation
 // Licensed under the MIT License
 
-/** Messages created for older versions of the
- * [pywwt](https://pywwt.readthedocs.io/) Python package.
- *
- * These can be grouped into the following categories:
- *
- * ### View Control
- *
- * - [[CenterOnCoordinatesMessage]]
- * - [[PauseTimeMessage]]
- * - [[ResumeTimeMessage]]
- * - [[SetDatetimeMessage]]
- * - [[SetViewerModeMessage]]
- * - [[TrackObjectMessage]]
- *
- * ### Image set Layers
- *
- * - [[CreateImageSetLayerMessage]]
- * - [[ModifyFitsLayerMessage]]
- * - [[RemoveImageSetLayerMessage]]
- * - [[SetFitsLayerColormapMessage]]
- * - [[StretchFitsLayerMessage]]
- *
- * ### Data Table Layers
- *
- * - [[CreateTableLayerMessage]]
- * - [[ModifyTableLayerMessage]]
- * - [[RemoveTableLayerMessage]]
- * - [[UpdateTableLayerMessage]]
- *
- * ### Image Sets
- *
- * - [[LoadImageCollectionMessage]]
- * - [[LoadImageCollectionCompletedMessage]]
- * - [[SetBackgroundByNameMessage]]
- * - [[SetForegroundByNameMessage]]
- * - [[SetForegroundOpacityMessage]]
- *
- * ### Annotations
- *
- * - [[AddLinePointMessage]]
- * - [[AddPolygonPointMessage]]
- * - [[ClearAnnotationsMessage]]
- * - [[CreateAnnotationMessage]]
- * - [[ModifyAnnotationMessage]]
- * - [[RemoveAnnotationMessage]]
- * - [[SetCircleCenterMessage]]
- *
- * ## Tours
- *
- * - [[LoadTourMessage]]
- * - [[PauseTourMessage]]
- * - [[ResumeTourMessage]]
- *
- * ## Miscellaneous
- *
- * - [[ModifySettingMessage]]
- */
+// Note: module-level docstring found in `index.ts`
 
-// As far as I can tell, I have to implement all of these type guard functions manually :-(
+// We've implemented type guard functions manually :-( A framework like `io-ts`
+// would be nicer.
 
 /** A command to add a point to a line annotation.
 */
@@ -189,8 +134,8 @@ export function isCreateAnnotationMessage(o: any): o is CreateAnnotationMessage 
 
 /** A command to create an image set layer.
  *
- * This command is a more flexible evolution of [[CreateFitsLayerMessage]]. They
- * have the same [[event]] tag, but this one has a [[mode]] parameter.
+ * This command is a more flexible evolution of {@link CreateFitsLayerMessage}. They
+ * have the same {@link event} tag, but this one has a {@link mode} parameter.
  * */
 export interface CreateImageSetLayerMessage {
   /** The tag identifying this message type. */
@@ -218,7 +163,7 @@ export interface CreateImageSetLayerMessage {
   name?: string;
 }
 
-/** Type guard function for [[CreateImageSetLayerMessage]]. */
+/** Type guard function for {@link CreateImageSetLayerMessage}. */
 export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "image_layer_create" &&
@@ -231,8 +176,8 @@ export function isCreateImageSetLayerMessage(o: any): o is CreateImageSetLayerMe
 
 /** A command to create a FITS-backed images set layer.
  *
- * This command is deprecated. You should use [[CreateImageSetLayerMessage]]
- * instead. The two commands have the same [[event]] tag, but this one lacks
+ * This command is deprecated. You should use {@link CreateImageSetLayerMessage}
+ * instead. The two commands have the same {@link event} tag, but this one lacks
  * a `mode` parameter.
  * */
 export interface CreateFitsLayerMessage {
@@ -244,10 +189,10 @@ export interface CreateFitsLayerMessage {
   url: string;
 }
 
-/** Type guard function for [[CreateFitsLayerMessage]].
+/** Type guard function for {@link CreateFitsLayerMessage}.
  *
  * These messages may not have a `mode` field, so that they can be distinguished
- * from [[CreateImageSetLayerMessage]] instances.
+ * from {@link CreateImageSetLayerMessage} instances.
  * */
 export function isCreateFitsLayerMessage(o: any): o is CreateFitsLayerMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
@@ -348,7 +293,7 @@ export interface LoadImageCollectionCompletedMessage {
   threadId?: string;
 }
 
-/** Type guard function for [[LoadImageCollectionCompletedMessage]]. */
+/** Type guard function for {@link LoadImageCollectionCompletedMessage}. */
 export function isLoadImageCollectionCompletedMessage(o: any): o is LoadImageCollectionCompletedMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return typeof o.event === "string" &&
     o.event == "load_image_collection_completed" &&

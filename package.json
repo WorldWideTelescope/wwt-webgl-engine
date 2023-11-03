@@ -38,7 +38,8 @@
   },
   "devDependencies": {
     "concurrently": "^5.2.0",
-    "rimraf": "^3"
+    "rimraf": "^3",
+    "typedoc-plugin-vue": "^1.1.0"
   },
   "packageManager": "yarn@3.3.0"
 }

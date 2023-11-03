@@ -3,11 +3,12 @@ title = "The Vue/Pinia Component Model"
 weight = 400
 +++
 
-The main WWT applications are built using the [Vue] UI framework using the
-[Pinia] state management library. If you use these too, you can take advantage of
-a lot of useful tools for creating your own customized WWT-based applications.
+The main WWT applications are built using the [Vue 3] UI framework with the
+[Pinia] state management library. If you use these too, you can take advantage
+of a lot of useful tools for creating your own customized WWT-based
+applications.
 
-[Vue]: https://vuejs.org/
+[Vue 3]: https://vuejs.org/
 [Pinia]: https://pinia.vuejs.org/
 
 We’ll assume that you already have a skeleton Vue app in place. To add WWT to

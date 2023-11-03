@@ -1,5 +1,15 @@
 # rc: micro bump
 
+- Correct world <-> screen coordinate transformations for when the camera roll
+  angle is nonzero (#279, @Carifio24).
+- Fit a corner case in HTTPS URL rewriting (#281, @pkgw). This should hopefully
+  fix the linkage between Astrometry.Net and WWT, among other things.
+- Update to the latest typedoc, and other improvements to the documentation
+  infrastructure (#274, #275, #276, #277, #278, @pkgw).
+
+
+# @wwtelescope/engine 7.29.1 (2023-09-15)
+
 - Fix tracking functionality in "local horizon mode" (#270, @Carifio24).
 - Update sponsorship branding and "front door" email address (#269, #271, @pkgw).
 

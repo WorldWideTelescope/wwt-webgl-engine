@@ -1,9 +1,12 @@
-base_url = "//docs.worldwidetelescope.org/research-app/1/"
+base_url = "https://docs.worldwidetelescope.org/research-app/latest/"
 title = "WWT Research Application Manual"
 description = "The WorldWide Telescope research app manual."
 theme = "wwtguide"
 
+[markdown]
+highlight_code = true
+
 [extra]
-github_base = "//github.com/WorldWideTelescope/wwt-webgl-engine"
-google_analytics_id = "UA-107473046-3"
+github_base = "https://github.com/WorldWideTelescope/wwt-webgl-engine"
+google_analytics_id = "G-D1J49XX0CV"
 stylesheets = ["extras.css"]

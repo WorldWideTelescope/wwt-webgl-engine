@@ -1,5 +1,11 @@
 # rc: micro bump
 
+- Update to the latest typedoc, and other improvements to the documentation
+  infrastructure (#274, #275, #276, #277, #278, @pkgw).
+
+
+# @wwtelescope/engine-types 0.6.6 (2023-09-15)
+
 - Update sponsorship branding and "front door" email address (#269, #271, @pkgw).
 
 

@@ -30,7 +30,7 @@ const justImageSetLayerSettingNames = [
 
 /** A list of the names of the available settings for `ImageSetLayer`
  * instances and their equivalents (things implementing
- * [[ImageSetLayerSettingsInterface]]).
+ * {@link ImageSetLayerSettingsInterface}).
  *
  * This is a superset of the names available for generic layers.
 */
