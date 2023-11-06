@@ -115,6 +115,9 @@ export function WWTControl() {
     this._pointerIds = new Array(2);
     this._pinchingZoomRect = new Array(2);
     this._moved = false;
+    this._zooming = false;
+    this._rotating = false;
+    this._dragThreshold = 4;
 
     this._foregroundCanvas = null;
     this._fgDevice = null;
@@ -1160,7 +1163,7 @@ var WWTControl$ = {
             var newRect = new Array(2);
             newRect[0] = Vector2d.create(t0.pageX, t0.pageY);
             newRect[1] = Vector2d.create(t1.pageX, t1.pageY);
-            if (this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null) {
+            if (!this._dragging && this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null) {
                 var centerPoint = Vector2d.create(this.renderContext.width / 2, this.renderContext.height / 2);
                 var delta1 = Vector2d.subtract(newRect[0], this._pinchingZoomRect[0]);
                 var delta2 = Vector2d.subtract(newRect[1], this._pinchingZoomRect[1]);
@@ -1176,13 +1179,14 @@ var WWTControl$ = {
                 var angularComponent2 = Vector2d.subtract(delta2, radialComponent2);
                 var radialMagnitude = radialComponent1.get_length() + radialComponent2.get_length();
                 var angularMagnitude = angularComponent1.get_length() + angularComponent2.get_length();
-                if (radialMagnitude >= angularMagnitude) {
+                if (radialMagnitude >= angularMagnitude && !this._rotating) {
                     var oldDist = this.getDistance(this._pinchingZoomRect[0], this._pinchingZoomRect[1]);
                     var newDist = this.getDistance(newRect[0], newRect[1]);
                     var ratio = oldDist / newDist;
                     this.zoom(ratio);
+                    this._zooming = true;
                 }
-                else {
+                else if (!this._zooming) {
                     var oldCenterDelta1 = Vector2d.subtract(this._pinchingZoomRect[0], centerPoint);
                     var oldCenterDelta2 = Vector2d.subtract(this._pinchingZoomRect[1], centerPoint);
                     var newCenterDelta1 = Vector2d.subtract(newRect[0], centerPoint);
@@ -1197,6 +1201,7 @@ var WWTControl$ = {
                             angle *= -1;
                         }
                         this.roll(angle);
+                        this._rotating = true;
                     }
                 }
             }
@@ -1207,10 +1212,10 @@ var WWTControl$ = {
         }
         ev.preventDefault();
         ev.stopPropagation();
-        if (this._mouseDown) {
-            this._dragging = true;
+        if (this._mouseDown && !(this._rotating || this._zooming)) {
             var curX = ev.targetTouches[0].pageX - this._lastX;
             var curY = ev.targetTouches[0].pageY - this._lastY;
+            this._dragging = this._dragging || (Math.sqrt(curX * curX + curY * curY) > this._dragThreshold);
             this.move(curX, curY);
             this._lastX = ev.targetTouches[0].pageX;
             this._lastY = ev.targetTouches[0].pageY;
@@ -1248,6 +1253,8 @@ var WWTControl$ = {
         }
         this._mouseDown = false;
         this._dragging = false;
+        this._zooming = false;
+        this._rotating = false;
     },
 
     // Pointer events
