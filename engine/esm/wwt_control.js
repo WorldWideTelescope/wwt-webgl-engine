@@ -1157,12 +1157,14 @@ var WWTControl$ = {
 
     onTouchMove: function (e) {
         var ev = e;
+
         if (this._hasTwoTouches) {
             var t0 = ev.touches[0];
             var t1 = ev.touches[1];
             var newRect = new Array(2);
             newRect[0] = Vector2d.create(t0.pageX, t0.pageY);
             newRect[1] = Vector2d.create(t1.pageX, t1.pageY);
+
             if (!this._dragging && this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null) {
                 var centerPoint = Vector2d.create(this.renderContext.width / 2, this.renderContext.height / 2);
                 var delta1 = Vector2d.subtract(newRect[0], this._pinchingZoomRect[0]);
@@ -1179,14 +1181,14 @@ var WWTControl$ = {
                 var angularComponent2 = Vector2d.subtract(delta2, radialComponent2);
                 var radialMagnitude = radialComponent1.get_length() + radialComponent2.get_length();
                 var angularMagnitude = angularComponent1.get_length() + angularComponent2.get_length();
-                if (radialMagnitude >= angularMagnitude && !this._rotating) {
+
+                if (radialMagnitude >= 0.5 * angularMagnitude && !this._rotating) {
                     var oldDist = this.getDistance(this._pinchingZoomRect[0], this._pinchingZoomRect[1]);
                     var newDist = this.getDistance(newRect[0], newRect[1]);
                     var ratio = oldDist / newDist;
                     this.zoom(ratio);
                     this._zooming = true;
-                }
-                else if (!this._zooming) {
+                } else if (!this._zooming) {
                     var oldCenterDelta1 = Vector2d.subtract(this._pinchingZoomRect[0], centerPoint);
                     var oldCenterDelta2 = Vector2d.subtract(this._pinchingZoomRect[1], centerPoint);
                     var newCenterDelta1 = Vector2d.subtract(newRect[0], centerPoint);
@@ -1195,6 +1197,7 @@ var WWTControl$ = {
                     var cross2 = this.crossProductZ(oldCenterDelta2, newCenterDelta2);
                     var angle1 = Math.asin(cross1 / (oldCenterDelta1.get_length() * newCenterDelta1.get_length()));
                     var angle2 = Math.asin(cross2 / (oldCenterDelta2.get_length() * newCenterDelta2.get_length()));
+
                     if (angle1 * angle2 >= 0) {
                         var angle = angle1 + angle2;
                         if (this.get_planetLike() || this.get_solarSystemMode()) {
@@ -1205,13 +1208,16 @@ var WWTControl$ = {
                     }
                 }
             }
+
             this._pinchingZoomRect = newRect;
             ev.stopPropagation();
             ev.preventDefault();
             return;
         }
+
         ev.preventDefault();
         ev.stopPropagation();
+
         if (this._mouseDown && !(this._rotating || this._zooming)) {
             var curX = ev.targetTouches[0].pageX - this._lastX;
             var curY = ev.targetTouches[0].pageY - this._lastY;
