@@ -1,5 +1,14 @@
 # rc: micro bump
 
+- Improve handling of touch gestures: don't be so eager to rotate, and
+  avoid panning as the user lifts up their fingers (#283, @Carifio24)
+- Build the UMD module with a `globalObject` of `this` rather than `self` (#282,
+  @pkgw). This should make the distributed files work in a wider variety of
+  contexts, including the Constellations dev builds.
+
+
+# @wwtelescope/engine 7.29.2 (2023-11-03)
+
 - Correct world <-> screen coordinate transformations for when the camera roll
   angle is nonzero (#279, @Carifio24).
 - Fit a corner case in HTTPS URL rewriting (#281, @pkgw). This should hopefully
