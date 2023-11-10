@@ -1,3 +1,9 @@
+# @wwtelescope/research-app-messages 0.17.3 (2023-11-10)
+
+- Update to the latest typedoc, and other improvements to the documentation
+  infrastructure (#274, #275, #276, #277, #278, @pkgw).
+
+
 # @wwtelescope/research-app-messages 0.17.2 (2023-09-15)
 
 - Update sponsorship branding and "front door" email address (#269, #271, @pkgw).

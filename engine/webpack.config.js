@@ -4,6 +4,7 @@ var config = {
     entry: "./esm/index.js",
     output: {
         path: path.resolve(__dirname, "src"),
+        globalObject: "this",
         library: {
             name: "wwtlib",
             type: "umd"
