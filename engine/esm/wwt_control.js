@@ -118,6 +118,7 @@ export function WWTControl() {
     this._zooming = false;
     this._rotating = false;
     this._dragThreshold = 4;
+    this._twoTouchCenter = null;
 
     this._foregroundCanvas = null;
     this._fgDevice = null;
@@ -1142,6 +1143,9 @@ var WWTControl$ = {
         this._lastY = ev.targetTouches[0].pageY;
         if (ev.targetTouches.length === 2) {
             this._hasTwoTouches = true;
+            var t0 = ev.touches[0];
+            var t1 = ev.touches[1];
+            this._twoTouchCenter = Vector2d.create(0.5 * (t0.pageX + t1.pageX), 0.5 * (t0.pageY + t1.pageY));
             return;
         }
         if (this.uiController != null) {
@@ -1165,12 +1169,11 @@ var WWTControl$ = {
             newRect[0] = Vector2d.create(t0.pageX, t0.pageY);
             newRect[1] = Vector2d.create(t1.pageX, t1.pageY);
 
-            if (!this._dragging && this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null) {
-                var centerPoint = Vector2d.create(this.renderContext.width / 2, this.renderContext.height / 2);
+            if (!this._dragging && this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null && this._twoTouchCenter != null) {
                 var delta1 = Vector2d.subtract(newRect[0], this._pinchingZoomRect[0]);
                 var delta2 = Vector2d.subtract(newRect[1], this._pinchingZoomRect[1]);
-                var radialDirection1 = Vector2d.subtract(this._pinchingZoomRect[0], centerPoint);
-                var radialDirection2 = Vector2d.subtract(this._pinchingZoomRect[1], centerPoint);
+                var radialDirection1 = Vector2d.subtract(this._pinchingZoomRect[0], this._twoTouchCenter);
+                var radialDirection2 = Vector2d.subtract(this._pinchingZoomRect[1], this._twoTouchCenter);
                 radialDirection1.normalize();
                 radialDirection2.normalize();
                 var radialDot1 = delta1.x * radialDirection1.x + delta1.y * radialDirection1.y;
@@ -1189,10 +1192,10 @@ var WWTControl$ = {
                     this.zoom(ratio);
                     this._zooming = true;
                 } else if (!this._zooming) {
-                    var oldCenterDelta1 = Vector2d.subtract(this._pinchingZoomRect[0], centerPoint);
-                    var oldCenterDelta2 = Vector2d.subtract(this._pinchingZoomRect[1], centerPoint);
-                    var newCenterDelta1 = Vector2d.subtract(newRect[0], centerPoint);
-                    var newCenterDelta2 = Vector2d.subtract(newRect[1], centerPoint);
+                    var oldCenterDelta1 = Vector2d.subtract(this._pinchingZoomRect[0], this._twoTouchCenter);
+                    var oldCenterDelta2 = Vector2d.subtract(this._pinchingZoomRect[1], this._twoTouchCenter);
+                    var newCenterDelta1 = Vector2d.subtract(newRect[0], this._twoTouchCenter);
+                    var newCenterDelta2 = Vector2d.subtract(newRect[1], this._twoTouchCenter);
                     var cross1 = this.crossProductZ(oldCenterDelta1, newCenterDelta1);
                     var cross2 = this.crossProductZ(oldCenterDelta2, newCenterDelta2);
                     var angle1 = Math.asin(cross1 / (oldCenterDelta1.get_length() * newCenterDelta1.get_length()));
@@ -1246,6 +1249,7 @@ var WWTControl$ = {
         if (this._hasTwoTouches) {
             if (ev.touches.length < 2) {
                 this._hasTwoTouches = false;
+                this._twoTouchCenter = null;
             }
             return;
         }
