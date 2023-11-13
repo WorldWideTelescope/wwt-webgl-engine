@@ -117,7 +117,7 @@ export function WWTControl() {
     this._moved = false;
     this._zooming = false;
     this._rotating = false;
-    this._dragThreshold = 4;
+    this._dragThreshold = 8;
     this._twoTouchCenter = null;
 
     this._foregroundCanvas = null;
