@@ -13,7 +13,7 @@
   "description": "Tests for the WorldWide Telescope engine and apps.",
   "devDependencies": {
     "@types/nightwatch": "^2.3.12",
-    "chromedriver": "^92.0.2",
+    "chromedriver": "^119.0.1",
     "edgedriver": "^4.17134.1",
     "geckodriver": "^2.0.3",
     "nightwatch": "^1.7.13",
