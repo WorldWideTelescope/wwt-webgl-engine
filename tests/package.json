@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@types/jsdom": "^21.1.0",
-    "axios": "^0.22",
+    "axios": "^1.6",
     "browserstack-local": "^1.4.8",
     "jsdom": "^21.1.0"
   },
