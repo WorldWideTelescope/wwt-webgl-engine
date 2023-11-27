@@ -1170,6 +1170,7 @@ var WWTControl$ = {
             newRect[1] = Vector2d.create(t1.pageX, t1.pageY);
 
             if (!this._dragging && this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null && this._twoTouchCenter != null) {
+                this._twoTouchCenter = Vector2d.create(0.5 * (t0.pageX + t1.pageX), 0.5 * (t0.pageY + t1.pageY));
                 var delta1 = Vector2d.subtract(newRect[0], this._pinchingZoomRect[0]);
                 var delta2 = Vector2d.subtract(newRect[1], this._pinchingZoomRect[1]);
                 var radialDirection1 = Vector2d.subtract(this._pinchingZoomRect[0], this._twoTouchCenter);
@@ -1185,7 +1186,7 @@ var WWTControl$ = {
                 var radialMagnitude = radialComponent1.get_length() + radialComponent2.get_length();
                 var angularMagnitude = angularComponent1.get_length() + angularComponent2.get_length();
 
-                if (radialMagnitude >= 0.5 * angularMagnitude && !this._rotating) {
+                if (radialMagnitude >= 0.75 * angularMagnitude && !this._rotating) {
                     var oldDist = this.getDistance(this._pinchingZoomRect[0], this._pinchingZoomRect[1]);
                     var newDist = this.getDistance(newRect[0], newRect[1]);
                     var ratio = oldDist / newDist;
