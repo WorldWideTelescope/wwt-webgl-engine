@@ -24,6 +24,7 @@ import {
   LayerMap,
   SpreadSheetLayer,
   SpreadSheetLayerSettingsInterfaceRO,
+  TileCache,
   WWTControl,
 } from "@wwtelescope/engine";
 
@@ -1871,6 +1872,11 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error("cannot captureVideo without linking to WWTInstance");
       return this.$wwt.inst.captureVideo(options);
+    },
+
+    /** Clear the current cache of tiles */
+    clearTileCache(): void {
+      TileCache.clearCache();
     }
   },
 });

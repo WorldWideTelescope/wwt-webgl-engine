@@ -169,6 +169,7 @@ export const WWTAwareComponent = defineComponent({
       "zoom",
       "move",
       "tilt",
+      "clearTileCache",
     ]),
   }
 });
