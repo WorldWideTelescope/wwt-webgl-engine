@@ -1923,6 +1923,12 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
  */
 export type SpreadSheetLayerSetting = LayerSetting | BaseSpreadSheetLayerSetting;
 
+/** A class that represents the current cache of loaded tiles. */
+export class TileCache {
+  /** Clear the current cache of tiles */
+  static clearCache(): void;
+}
+
 /** A WWT tour. */
 export class TourDocument {
   /** Get this tour's "attributes and credits" text.
