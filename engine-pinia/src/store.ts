@@ -814,7 +814,7 @@ function availableImagesets(): ImagesetInfo[] {
  * - {@link viewAsTourXml}
  * - {@link captureFrame}
  * - {@link captureVideo}
- * - @{link clearTileCache}
+ * - {@link clearTileCache}
  */
 export const engineStore = defineStore('wwt-engine', {
   // NOTE: We were originally alphabetizing these all, but now I think it will
