@@ -74,6 +74,16 @@ TileCache.getCachedTile = function (level, x, y, dataset, parent) {
 
 set_tileCacheGetCachedTile(TileCache.getCachedTile);
 
+TileCache.clearCache = function() {
+  for (const tile of Object.values(TileCache._tiles)) {
+    try {
+      tile.cleanUp(true);
+    } catch (e) {
+      continue;
+    }
+  }
+}
+
 TileCache.getReadyToRenderTileCount = function () {
     var notReadyCullList = [];
     var readyCullList = [];

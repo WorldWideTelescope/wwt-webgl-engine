@@ -361,3 +361,13 @@ export function isPointerUpMessage(o: any): o is PointerUpMessage {  // eslint-d
     typeof o.clientY === "number" &&
     (o.sessionId === undefined || typeof o.sessionId === "string");
 }
+
+export interface ClearTileCacheMessage {
+  /** The tag identifying this message type */
+    event: "clear_tile_cache";
+}
+
+/** Type guard function for {@link ClearTileCacheMessage} */
+export function isClearTileCacheMessage(obj: any): obj is ClearTileCacheMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return typeof obj.event === "string" && obj.event === "clear_tile_cache";
+}

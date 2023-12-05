@@ -414,6 +414,7 @@ import {
 import {
   classicPywwt,
   isPingPongMessage,
+  isClearTileCacheMessage,
   layers,
   selections,
   settings,
@@ -1892,6 +1893,8 @@ const App = defineComponent({
         this.handleModifyAllSelectability
       );
 
+      this.messageHandlers.set("clear_tile_cache", this.handleClearTileCache);
+
       // Ignore incoming view_state messages. When testing the app, you might want
       // to launch it as (e.g.)
       // `http://localhost:8080/?origin=http://localhost:8080/` so that you can
@@ -2022,6 +2025,13 @@ const App = defineComponent({
       }
 
       return false;
+    },
+
+    handleClearTileCache(msg: any): boolean {
+      if (!isClearTileCacheMessage(msg)) return false;
+
+      this.clearTileCache();
+      return true;
     },
 
     wwtOnPointerMove(event: PointerEvent) {

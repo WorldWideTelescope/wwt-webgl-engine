@@ -24,6 +24,7 @@ import {
   LayerMap,
   SpreadSheetLayer,
   SpreadSheetLayerSettingsInterfaceRO,
+  TileCache,
   WWTControl,
 } from "@wwtelescope/engine";
 
@@ -813,6 +814,7 @@ function availableImagesets(): ImagesetInfo[] {
  * - {@link viewAsTourXml}
  * - {@link captureFrame}
  * - {@link captureVideo}
+ * - {@link clearTileCache}
  */
 export const engineStore = defineStore('wwt-engine', {
   // NOTE: We were originally alphabetizing these all, but now I think it will
@@ -1871,6 +1873,15 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error("cannot captureVideo without linking to WWTInstance");
       return this.$wwt.inst.captureVideo(options);
+    },
+
+    /** Clear the current cache of tiles.
+      * The intended use case here is if a network issue caused a necessary tile to not load.
+      * This should only be used when necessary, as any previously downloaded tiles will need
+      * to be re-fetched.
+      * */
+    clearTileCache(): void {
+      TileCache.clearCache();
     }
   },
 });
