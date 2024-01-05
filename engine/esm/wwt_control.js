@@ -1105,6 +1105,9 @@ var WWTControl$ = {
         if (this.renderContext.targetCamera.zoom > this.get_zoomMax()) {
             this.renderContext.targetCamera.zoom = this.get_zoomMax();
         }
+        if (this.renderContext.targetCamera.zoom < this.get_zoomMin()) {
+            this.renderContext.targetCamera.zoom = this.get_zoomMin();
+        }
         if (!Settings.get_globalSettings().get_smoothPan()) {
             this.renderContext.viewCamera = this.renderContext.targetCamera.copy();
         }
