@@ -49,7 +49,7 @@
     "@wwtelescope/astro": "7cb232125428a91bd8fd10be24fec904e3589cce",
     "@wwtelescope/engine": "thiscommit:2023-09-15:8Z0O5N5",
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/engine-pinia": "thiscommit:2022-11-10:R3G9gH3",
+    "@wwtelescope/engine-pinia": "thiscommit:2024-02-07:OwPqq4M",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/research-app-messages": "thiscommit:2023-02-19:Kuk5Ppd"
   },
