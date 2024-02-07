@@ -120,8 +120,8 @@ export function WWTControl() {
     this._dragThreshold = 8;
     this._twoTouchCenter = null;
     this._lastTouchRect = new Array(2);
-    this._twoTouchFrames = 0;
-    this._twoTouchFrameThreshold = 10;
+    this._twoTouchEvents = 0;
+    this._twoTouchEventThreshold = 10;
 
     this._foregroundCanvas = null;
     this._fgDevice = null;
@@ -1173,10 +1173,10 @@ var WWTControl$ = {
             var newRect = new Array(2);
             newRect[0] = Vector2d.create(t0.pageX, t0.pageY);
             newRect[1] = Vector2d.create(t1.pageX, t1.pageY);
-            this._twoTouchFrames += 1;
+            this._twoTouchEvents += 1;
 
             if (!this._dragging && this._lastTouchRect[0] != null && this._lastTouchRect[1] != null &&
-                this._twoTouchCenter != null && this._twoTouchFrames > this._twoTouchFrameThreshold) {
+                this._twoTouchCenter != null && this._twoTouchEvents > this._twoTouchEventThreshold) {
 
                 var delta1 = Vector2d.subtract(newRect[0], this._lastTouchRect[0]);
                 var delta2 = Vector2d.subtract(newRect[1], this._lastTouchRect[1]);
@@ -1263,7 +1263,7 @@ var WWTControl$ = {
                 this._lastTouchRect[0] = null;
                 this._lastTouchRect[1] = null;
                 this._twoTouchCenter = null;
-                this._twoTouchFrames = 0;
+                this._twoTouchEvents = 0;
             }
             return;
         }
