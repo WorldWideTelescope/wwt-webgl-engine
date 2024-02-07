@@ -41,7 +41,7 @@
   "internalDepVersions": {
     "@wwtelescope/embed-common": "manual:workspace:>=0.2.0",
     "@wwtelescope/engine": "thiscommit:2023-09-15:u5a68Lm",
-    "@wwtelescope/engine-pinia": "thiscommit:2022-11-10:R3G9gH3"
+    "@wwtelescope/engine-pinia": "thiscommit:2024-02-07:wwKwK5K"
   },
   "keywords": [
     "WorldWide Telescope"

@@ -1,4 +1,10 @@
-# rc: micro bump
+# rc: minor bump
+
+- Define a new message that should trigger the engine to clear its tile cache
+  (#291, @Carifio24).
+
+
+# @wwtelescope/research-app-messages 0.17.3 (2023-11-10)
 
 - Update to the latest typedoc, and other improvements to the documentation
   infrastructure (#274, #275, #276, #277, #278, @pkgw).

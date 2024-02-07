@@ -53,3 +53,8 @@ The {@link PingPongMessage} interface is also special. If you send this message 
 app, it will reply with an identical message. This is useful for checking
 whether the app has started up, because usually there is no alternative to
 polling it.
+
+The {@link ClearTileCacheMessage} interface describes a message that, when received by
+the app, will cause it to refresh its current cache of tiles. The primary use case
+for this should be if a network error has caused a necessary tile to fail to load. This
+should be used only when necessary, as it clears all previously downloaded tiles.

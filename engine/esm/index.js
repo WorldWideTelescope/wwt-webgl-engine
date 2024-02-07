@@ -201,6 +201,7 @@ export {
 export { FitsImageTile } from "./layers/fits_image_tile.js";
 
 export { Tile } from "./tile.js";
+export { TileCache } from "./tile_cache.js";
 export { RenderTriangle } from "./render_triangle.js";
 export { EquirectangularTile } from "./equirectangular_tile.js";
 export { HealpixTile, Xyf } from "./healpix_tile.js";
