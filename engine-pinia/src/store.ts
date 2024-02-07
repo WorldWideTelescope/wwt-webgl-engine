@@ -1501,7 +1501,7 @@ export const engineStore = defineStore('wwt-engine', {
     */
     async loadTour(
       { url, play }: LoadTourParams
-    ): Promise<{ tourRunTime: number | null; tourStopStartTimes: number[]; }> {
+    ): Promise<void> {
       if (this.$wwt.inst === null)
         throw new Error('cannot loadTour without linking to WWTInstance');
 
@@ -1526,7 +1526,8 @@ export const engineStore = defineStore('wwt-engine', {
         }
       }
 
-      return { tourRunTime, tourStopStartTimes };
+      this.tourRunTime = tourRunTime;
+      this.tourStopStartTimes = tourStopStartTimes;
     },
 
     /** Request the engine to load the specified image collection.
