@@ -11,7 +11,7 @@ parameters:
 jobs:
 - job: build_linux
   pool:
-    vmImage: ubuntu-20.04
+    vmImage: ubuntu-latest
   steps:
   - template: azure-job-setup.yml
     parameters:
@@ -122,7 +122,7 @@ jobs:
 
 - job: browserstack
   pool:
-    vmImage: ubuntu-20.04
+    vmImage: ubuntu-latest
   steps:
   - template: azure-job-setup.yml
     parameters:
@@ -167,7 +167,7 @@ jobs:
 
 - job: lint
   pool:
-    vmImage: ubuntu-20.04
+    vmImage: ubuntu-latest
   steps:
   - template: azure-job-setup.yml
     parameters:
@@ -182,7 +182,7 @@ jobs:
 
 - job: docs_engine
   pool:
-    vmImage: ubuntu-20.04
+    vmImage: ubuntu-latest
   steps:
   - template: azure-job-setup.yml
     parameters:
@@ -224,7 +224,7 @@ jobs:
 
 - job: docs_research
   pool:
-    vmImage: ubuntu-20.04
+    vmImage: ubuntu-latest
   steps:
   - template: azure-job-setup.yml
     parameters:
