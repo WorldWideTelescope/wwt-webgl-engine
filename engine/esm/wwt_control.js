@@ -1186,13 +1186,13 @@ var WWTControl$ = {
                 var radialMagnitude = radialComponent1.get_length() + radialComponent2.get_length();
                 var angularMagnitude = angularComponent1.get_length() + angularComponent2.get_length();
 
-                if (radialMagnitude >= 0.75 * angularMagnitude && !this._rotating) {
+                if (radialMagnitude > 1.25 * angularMagnitude && !this._rotating) {
                     var oldDist = this.getDistance(this._pinchingZoomRect[0], this._pinchingZoomRect[1]);
                     var newDist = this.getDistance(newRect[0], newRect[1]);
                     var ratio = oldDist / newDist;
                     this.zoom(ratio);
                     this._zooming = true;
-                } else if (!this._zooming) {
+                } else if (!this._zooming && radialMagnitude > 0) {
                     var oldCenterDelta1 = Vector2d.subtract(this._pinchingZoomRect[0], this._twoTouchCenter);
                     var oldCenterDelta2 = Vector2d.subtract(this._pinchingZoomRect[1], this._twoTouchCenter);
                     var newCenterDelta1 = Vector2d.subtract(newRect[0], this._twoTouchCenter);
