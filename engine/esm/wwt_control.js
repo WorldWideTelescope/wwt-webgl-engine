@@ -119,6 +119,8 @@ export function WWTControl() {
     this._rotating = false;
     this._dragThreshold = 8;
     this._twoTouchCenter = null;
+    this._twoTouchFrames = 0;
+    this._twoTouchFrameThreshold = 10;
 
     this._foregroundCanvas = null;
     this._fgDevice = null;
@@ -1168,8 +1170,10 @@ var WWTControl$ = {
             var newRect = new Array(2);
             newRect[0] = Vector2d.create(t0.pageX, t0.pageY);
             newRect[1] = Vector2d.create(t1.pageX, t1.pageY);
+            this._twoTouchFrames += 1;
 
-            if (!this._dragging && this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null && this._twoTouchCenter != null) {
+            if (!this._dragging && this._pinchingZoomRect[0] != null && this._pinchingZoomRect[1] != null &&
+                this._twoTouchCenter != null && this._twoTouchFrames > this._twoTouchFrameThreshold) {
                 this._twoTouchCenter = Vector2d.create(0.5 * (t0.pageX + t1.pageX), 0.5 * (t0.pageY + t1.pageY));
                 var delta1 = Vector2d.subtract(newRect[0], this._pinchingZoomRect[0]);
                 var delta2 = Vector2d.subtract(newRect[1], this._pinchingZoomRect[1]);
@@ -1186,7 +1190,7 @@ var WWTControl$ = {
                 var radialMagnitude = radialComponent1.get_length() + radialComponent2.get_length();
                 var angularMagnitude = angularComponent1.get_length() + angularComponent2.get_length();
 
-                if (radialMagnitude > 1.25 * angularMagnitude && !this._rotating) {
+                if (radialMagnitude > angularMagnitude && !this._rotating) {
                     var oldDist = this.getDistance(this._pinchingZoomRect[0], this._pinchingZoomRect[1]);
                     var newDist = this.getDistance(newRect[0], newRect[1]);
                     var ratio = oldDist / newDist;
@@ -1251,6 +1255,7 @@ var WWTControl$ = {
             if (ev.touches.length < 2) {
                 this._hasTwoTouches = false;
                 this._twoTouchCenter = null;
+                this._twoTouchFrames = 0;
             }
             return;
         }
