@@ -1,3 +1,9 @@
+# @wwtelescope/engine-helpers 0.16.1 (2024-02-07)
+
+- No code changes
+- Update to the latest typedoc and work on the docs a bit.
+
+
 # @wwtelescope/engine-helpers 0.16.0 (2023-09-15)
 
 - Require the new, ESM-based version of the WebGL engine (#271, @pkgw). While

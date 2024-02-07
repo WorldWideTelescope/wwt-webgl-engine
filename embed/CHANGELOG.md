@@ -1,3 +1,9 @@
+# @wwtelescope/embed 1.7.1 (2024-02-07)
+
+- Pull in a change in the `@wwtelescope/engine-pinia` package that corrects the
+  tour playback timeline scrubber (#294, @pkgw).
+
+
 # @wwtelescope/embed 1.7.0 (2023-09-15)
 
 - Require the new, ESM-based version of the WebGL engine (#271, @pkgw). While

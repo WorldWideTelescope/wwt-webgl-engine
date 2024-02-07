@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.17.0 (2024-02-07)
+
+- Handle a new JSON message activating mechanism in the engine that allows the
+  tile cache to be manually cleared (#291, @Carifio24)
+
+
 # @wwtelescope/research-app 0.16.0 (2023-09-15)
 
 - Require the new, ESM-based version of the WebGL engine (#271, @pkgw). While

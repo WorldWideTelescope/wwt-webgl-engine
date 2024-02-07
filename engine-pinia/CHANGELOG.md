@@ -1,3 +1,12 @@
+# @wwtelescope/engine-pinia 0.10.0 (2024-02-07)
+
+- Expose the new mechanism in the engine that allows the tile cache to be
+  manually cleared (#291, @Carifio24)
+- Correct the `loadTour()` method on the Pinia store, fixing higher-level
+  management and introspection of the tour timeline (#294, @pkgw)
+- Lots of work on the documentation (#274, #275, #276, #277, #278, @pkgw)
+
+
 # @wwtelescope/engine-pinia 0.9.0 (2023-09-15)
 
 - Require the new, ESM-based version of the WebGL engine (#271, @pkgw). While

@@ -10,7 +10,7 @@
     "@fortawesome/vue-fontawesome": "^3",
     "@wwtelescope/embed-common": "workspace:>=0.2.0",
     "@wwtelescope/engine": "workspace:^7.29.1",
-    "@wwtelescope/engine-pinia": "workspace:>=0.1.0",
+    "@wwtelescope/engine-pinia": "workspace:>=0.10.0",
     "screenfull": "^5",
     "v-tooltip": "^2.1",
     "vue": "^3",
@@ -41,7 +41,7 @@
   "internalDepVersions": {
     "@wwtelescope/embed-common": "manual:workspace:>=0.2.0",
     "@wwtelescope/engine": "thiscommit:2023-09-15:u5a68Lm",
-    "@wwtelescope/engine-pinia": "thiscommit:2022-11-10:R3G9gH3"
+    "@wwtelescope/engine-pinia": "thiscommit:2024-02-07:wwKwK5K"
   },
   "keywords": [
     "WorldWide Telescope"
@@ -59,5 +59,5 @@
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },
-  "version": "1.7.0"
+  "version": "1.7.1"
 }

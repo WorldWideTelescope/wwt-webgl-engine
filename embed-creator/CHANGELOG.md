@@ -1,3 +1,8 @@
+# @wwtelescope/embed-creator 0.5.1 (2024-02-07)
+
+- No code changes; update to the latest typedoc for documentation generation.
+
+
 # @wwtelescope/embed-creator 0.5.0 (2023-09-15)
 
 - Require the new, ESM-based version of the WebGL engine (#271, @pkgw). While

@@ -1,3 +1,8 @@
+# @wwtelescope/embed-common 0.3.6 (2024-02-07)
+
+- No code changes; update some of the documentation infrastructure.
+
+
 # @wwtelescope/embed-common 0.3.5 (2023-09-15)
 
 - Update sponsorship branding and "front door" email address (#269, #271, @pkgw).

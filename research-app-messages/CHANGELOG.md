@@ -1,3 +1,9 @@
+# @wwtelescope/research-app-messages 0.18.0 (2024-02-07)
+
+- Define a new message that should trigger the engine to clear its tile cache
+  (#291, @Carifio24).
+
+
 # @wwtelescope/research-app-messages 0.17.3 (2023-11-10)
 
 - Update to the latest typedoc, and other improvements to the documentation

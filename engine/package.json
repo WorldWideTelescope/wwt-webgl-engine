@@ -56,5 +56,5 @@
     "tscheck": "tsc"
   },
   "types": "./src/index.d.ts",
-  "version": "7.29.3"
+  "version": "7.30.0"
 }

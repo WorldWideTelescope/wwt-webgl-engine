@@ -1,3 +1,11 @@
+# @wwtelescope/engine 7.30.0 (2024-02-07)
+
+- Add a `TileCache.clearCache()` method allowing the tile cache to be cleared
+  (#290, #291, @Carifio24). This shouldn't be used often but can provide a bit
+  of a "reset button" if tile downloads have a hiccup.
+- Actually honor the `zoomMin` setting (#292, @johnarban)
+
+
 # @wwtelescope/engine 7.29.3 (2023-11-10)
 
 - Improve handling of touch gestures: don't be so eager to rotate, and
