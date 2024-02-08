@@ -1,4 +1,10 @@
-# rc: minor bump
+# rc: micro bump
+
+- Further improvements to touch gesture handling (#288, @Carifio24). Hopefully
+  this nails it!
+
+
+# @wwtelescope/engine 7.30.0 (2024-02-07)
 
 - Add a `TileCache.clearCache()` method allowing the tile cache to be cleared
   (#290, #291, @Carifio24). This shouldn't be used often but can provide a bit
