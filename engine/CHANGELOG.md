@@ -1,3 +1,9 @@
+# @wwtelescope/engine 7.30.1 (2024-02-08)
+
+- Further improvements to touch gesture handling (#288, @Carifio24). Hopefully
+  this nails it!
+
+
 # @wwtelescope/engine 7.30.0 (2024-02-07)
 
 - Add a `TileCache.clearCache()` method allowing the tile cache to be cleared
