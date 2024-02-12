@@ -9,6 +9,7 @@
 import { ss } from "./ss.js";
 import { registerType } from "./typesystem.js";
 import { Vector3d, Vector4d, Matrix3d, PositionTexture } from "./double3d.js";
+import { GM } from "./astrocalc/galilean_moons.js";
 import { WEBGL } from "./graphics/webgl_constants.js";
 import { PositionTextureVertexBuffer } from "./graphics/gl_buffers.js";
 import { OrbitLineList } from "./graphics/primitives3d.js";
@@ -16,6 +17,7 @@ import { Texture } from "./graphics/texture.js";
 import { TileShader } from "./graphics/shaders.js";
 import { Util } from "./baseutil.js";
 import { BasePlanets } from "./baseplanets.js";
+import { SolarSystemObjects } from "./camera_parameters.js";
 import { globalWWTControl } from "./data_globals.js";
 import { Color, Colors } from "./color.js";
 import { Planets } from "./planets.js";
@@ -78,10 +80,13 @@ Planets3d.initPlanetResources = function (renderContext) { };
 
 Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
     Planets3d.initPlanetResources(renderContext);
+
     var distss = UiTools.solarSystemToMeters(renderContext.get_solarSystemCameraDistance());
-    var moonFade = Math.min(1, Math.max(Util.log10(distss) - 7.3, 0));
+    //var moonFade = Math.min(1, Math.max(Util.log10(distss) - 7.3, 0));
     var fade = Math.min(1, Math.max(Util.log10(distss) - 8.6, 0));
+
     if (Settings.get_active().get_solarSystemOrbits() && fade > 0) {
+        // Mercury -> Pluto
         for (var ii = 1; ii < 10; ii++) {
             var id = ii;
             if (ii === 9) {
@@ -90,10 +95,67 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
             var angle = Math.atan2(Planets._planet3dLocations[id].z, Planets._planet3dLocations[id].x);
             Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[id], id, centerPoint, angle, Planets._planet3dLocations[id], fade);
         }
+
+        // Moon is handled specially
         var mid = 9;
         Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[mid], mid, centerPoint, 0, Planets._planet3dLocations[mid], fade);
+
+        // Galilean satellites. "Compute the positions of the Galilean
+        // satellites at two times; we need the second in order to estimate the
+        // velocity."
+
+        const muJupiter = 1.26686534e8;
+        const deltaT = 1.0 / 1440.0 * 0.1;
+        const gal0 = GM.calculate(Planets._jNow);
+        const gal1 = GM.calculate(Planets._jNow - deltaT);
+        const position0 = [
+            gal0.satellite1.eclipticRectangularCoordinates,
+            gal0.satellite2.eclipticRectangularCoordinates,
+            gal0.satellite3.eclipticRectangularCoordinates,
+            gal0.satellite4.eclipticRectangularCoordinates,
+        ];
+        const position1 = [
+            gal1.satellite1.eclipticRectangularCoordinates,
+            gal1.satellite2.eclipticRectangularCoordinates,
+            gal1.satellite3.eclipticRectangularCoordinates,
+            gal1.satellite4.eclipticRectangularCoordinates,
+        ];
+        const galileans = [
+            SolarSystemObjects.io,
+            SolarSystemObjects.europa,
+            SolarSystemObjects.ganymede,
+            SolarSystemObjects.callisto,
+        ]
+
+        for (var i = 0; i < 4; i++) {
+            const id = galileans[i];
+            const bit = Math.pow(2, id);
+
+            if (!(Settings.get_active().get_planetOrbitsFilter() & bit)) {
+                continue;
+            }
+
+            const p0 = position0[i];
+            const p1 = position1[i];
+            const r0 = Vector3d.create(p0.x, p0.z, p0.y);
+            const r1 = Vector3d.create(p1.x, p1.z, p1.y);
+            const v = Vector3d.scale(Vector3d.subtractVectors(r0, r1), 1. / deltaT);
+            const elements = Planets._stateVectorToKeplerian(r0, v, muJupiter);
+            Planets3d._drawSingleOrbitElements(
+                renderContext,
+                Planets.planetColors[id],
+                id,
+                centerPoint,
+                0.0,
+                Planets._planet3dLocations[id],
+                elements
+            );
+        }
+
     }
+
     ss.clearKeys(Planets._drawOrder);
+
     var camera = renderContext.cameraPosition.copy();
     for (var planetId = 0; planetId < 14; planetId++) {
         // If we're using realistic lighting and this is an eclipsed
@@ -109,16 +171,19 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
             }
         }
     }
+
     var distVectorEarth = Vector3d.subtractVectors(camera, Vector3d.subtractVectors(Planets._planet3dLocations[19], centerPoint));
     if (!ss.keyExists(Planets._drawOrder, distVectorEarth.length())) {
         Planets._drawOrder[distVectorEarth.length()] = 19;
     }
+
     var $enum1 = ss.enumerate(ss.keys(Planets._drawOrder));
     while ($enum1.moveNext()) {
         var key = $enum1.current;
         var planetId = Planets._drawOrder[key];
         Planets3d._drawPlanet3d(renderContext, planetId, centerPoint);
     }
+
     return true;
 };
 
