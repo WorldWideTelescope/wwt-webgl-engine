@@ -1,4 +1,4 @@
-// Copyright 2023 the .NET Foundation
+// Copyright 2023-2024 the .NET Foundation
 // Licensed under the MIT License
 
 // Web GL support for annotations.
@@ -235,38 +235,58 @@ var Circle$ = {
 
     draw: function (renderContext) {
         var onScreen = true;
+
         var rad = this._radius$1;
         if (this._skyRelative$1) {
             rad /= renderContext.get_fovScale() / 3600;
         }
+
         var screenSpacePnt = renderContext.WVP.transform(this.center);
         if (screenSpacePnt.z < 0) {
             onScreen = false;
         }
+
         if (Vector3d.dot(renderContext.get_viewPoint(), this.center) < 0.55) {
             onScreen = false;
         }
+
         if (renderContext.gl != null) {
             if (Annotation.batchDirty || this.annotationDirty) {
                 var up = Vector3d.create(0, 1, 0);
                 var xNormal = Vector3d.cross(this.center, up);
                 var yNormal = Vector3d.cross(this.center, xNormal);
-                var r = this._radius$1 / 44;
+
+                // Here we guard, lamely, against div-by-0; circles at decs of
+                // +-90 will surely not render well.
+                var cosdec = Math.cos(this._dec$1 * Math.PI / 180)
+                cosdec = Math.max(cosdec, 1e-5);
+                var r = this._radius$1 * Math.PI / (180 * cosdec);
+
                 var segments = 72;
                 var radiansPerSegment = Math.PI * 2 / segments;
                 var vertexList = [];
+
                 for (var j = 0; j <= segments; j++) {
                     var x = Math.cos(j * radiansPerSegment) * r;
                     var y = Math.sin(j * radiansPerSegment) * r;
-                    vertexList.push(Vector3d.create(this.center.x + x * xNormal.x + y * yNormal.x, this.center.y + x * xNormal.y + y * yNormal.y, this.center.z + x * xNormal.z + y * yNormal.z));
+                    vertexList.push(
+                        Vector3d.create(
+                            this.center.x + x * xNormal.x + y * yNormal.x,
+                            this.center.y + x * xNormal.y + y * yNormal.y,
+                            this.center.z + x * xNormal.z + y * yNormal.z
+                        )
+                    );
                 }
+
                 if (this._strokeWidth$1 > 0 && vertexList.length > 1) {
                     var lineColorWithOpacity = this._lineColor$1._clone();
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
-                    for (var i = 0; i < (vertexList.length - 1); i++) {
+
+                    for (var i = 0; i < vertexList.length - 1; i++) {
                         Annotation.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
                 }
+
                 if (this._fill$1) {
                     var fillColorWithOpacity = this._fillColor$1._clone();
                     fillColorWithOpacity.a = Math.round(fillColorWithOpacity.a * this.get_opacity());
@@ -274,6 +294,7 @@ var Circle$ = {
                     vertexList.splice(0, 0, pos);
                     Annotation.triangleFanPointList.addShape(vertexList, fillColorWithOpacity, new Dates(0, 1));
                 }
+
                 this.annotationDirty = false;
             }
         } else {
