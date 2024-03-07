@@ -1131,11 +1131,10 @@ var WWTControl$ = {
     onGestureChange: function (e) {
         var g = e;
         this._mouseDown = false;
-        this.renderContext.targetCamera.zoom = this.renderContext.viewCamera.zoom = Math.min(360, this._beginZoom * (1 / g.scale));
+        this.renderContext.targetCamera.zoom = this.renderContext.viewCamera.zoom = Math.max(this.get_zoomMin(), Math.min(this.get_zoomMax(), this._beginZoom * (1 / g.scale)));
     },
 
     onGestureEnd: function (e) {
-        var g = e;
         this._mouseDown = false;
     },
 
