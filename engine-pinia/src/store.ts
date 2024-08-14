@@ -1378,6 +1378,10 @@ export const engineStore = defineStore('wwt-engine', {
         player.close();
         this.$wwt.inst.ctl.uiController = null;
       }
+
+      this.tourRunTime = null;
+      this.tourStopStartTimes = [];
+      this.tourTimecode = 0;
     },
 
     /** Toggle the play/pause state of the current tour.
