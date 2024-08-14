@@ -1349,6 +1349,37 @@ export const engineStore = defineStore('wwt-engine', {
       player.play();
     },
 
+    /** Stop playing the currently loaded tour.
+      *
+      * Nothing happens if no tour is currently playing.
+      */
+    stopTour(): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot stop tour without linking to WWTInstance');
+
+      const player = this.$wwt.inst.getActiveTourPlayer();
+      if (player === null)
+        throw new Error('no tour to stop');
+
+      // The argument here is currently unused in the engine
+      player.stop(false);
+    },
+
+    /** Close the active tour player, if there is one active.
+      *
+      * Any tour that is currently playing will be stopped.
+      */
+    closeTourPlayer(): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot close tour player without linking to WWTInstance');
+
+      const player = this.$wwt.inst.getActiveTourPlayer();
+      if (player !== null) {
+        player.close();
+        this.$wwt.inst.ctl.uiController = null;
+      }
+    },
+
     /** Toggle the play/pause state of the current tour.
      *
      * Nothing happens if no tour is loaded.
