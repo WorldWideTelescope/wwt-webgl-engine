@@ -800,6 +800,8 @@ function availableImagesets(): ImagesetInfo[] {
  * - {@link seekToTourTimecode}
  * - {@link setTourPlayerLeaveSettingsWhenStopped}
  * - {@link startTour}
+ * - {@link stopTour}
+ * - {@link closeTourPlayer}
  * - {@link toggleTourPlayPauseState}
  *
  * ## Miscellaneous
