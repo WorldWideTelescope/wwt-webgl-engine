@@ -136,6 +136,8 @@ export const WWTAwareComponent = defineComponent({
       "loadFitsLayer",
       "addImageSetLayer",
       "loadTour",
+      "stopTour",
+      "closeTourPlayer",
       "viewAsTourXml",
       "waitForReady",
       // Formerly mutations
