@@ -1345,10 +1345,7 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot start tour without linking to WWTInstance');
 
       const player = this.$wwt.inst.getActiveTourPlayer();
-      if (player === null)
-        throw new Error('no tour to start');
-
-      player.play();
+      player?.play();
     },
 
     /** Stop playing the currently loaded tour.
@@ -1360,11 +1357,9 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot stop tour without linking to WWTInstance');
 
       const player = this.$wwt.inst.getActiveTourPlayer();
-      if (player === null)
-        throw new Error('no tour to stop');
 
       // The argument here is currently unused in the engine
-      player.stop(false);
+      player?.stop(false);
     },
 
     /** Close the active tour player, if there is one active.
@@ -1395,11 +1390,9 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot play/pause tour without linking to WWTInstance');
 
       const player = this.$wwt.inst.getActiveTourPlayer();
-      if (player === null)
-        throw new Error('no tour to play/pause');
 
       // Despite the unclear name, this function does toggle play/pause state.
-      player.pauseTour();
+      player?.pauseTour();
     },
 
     /** Set whether the renderer settings of tours should remain applied after
