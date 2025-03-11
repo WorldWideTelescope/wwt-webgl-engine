@@ -499,6 +499,9 @@ export interface GotoRADecZoomParams {
 
   /** Optional: The target roll of the camera, in radians. */
   rollRad?: number;
+
+  /** Optional: The desired duration of the movement */
+  duration?: number;
 }
 
 /** The parameters for the {{@link engineStore.loadTour} action. */
@@ -1485,11 +1488,11 @@ export const engineStore = defineStore('wwt-engine', {
      * TODO: document semantics when not in 2D sky mode!
      */
     async gotoRADecZoom(
-      { raRad, decRad, zoomDeg, instant, rollRad }: GotoRADecZoomParams
+      { raRad, decRad, zoomDeg, instant, rollRad, duration }: GotoRADecZoomParams
     ): Promise<void> {
       if (this.$wwt.inst === null)
         throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
-      return this.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad);
+      return this.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad, duration);
     },
 
     /** Returns the time it would take, in seconds, to navigate to the given target. */

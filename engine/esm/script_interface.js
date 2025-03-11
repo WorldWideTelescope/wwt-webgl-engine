@@ -461,9 +461,9 @@ var ScriptInterface$ = {
         }
     },
 
-    gotoRaDecZoom: function (ra, dec, zoom, instant, roll) {
+    gotoRaDecZoom: function (ra, dec, zoom, instant, roll, duration) {
         if (globalWWTControl != null) {
-            globalWWTControl.gotoRADecZoom(ra / 15, dec, zoom * 6, instant, roll);
+            globalWWTControl.gotoRADecZoom(ra / 15, dec, zoom * 6, instant, roll, duration);
         }
     },
 
