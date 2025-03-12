@@ -112,9 +112,17 @@ export function ViewMoverSlew() {
     this._complete = false;
 }
 
-ViewMoverSlew.create = function (from, to) {
+ViewMoverSlew.create = function (from, to, duration) {
     var temp = new ViewMoverSlew();
     temp.init(from, to);
+    if (duration) {
+      const originalTargetTime = temp._toTargetTime;
+      const upFraction = temp._upTargetTime / originalTargetTime;
+      const downFraction = temp._downTargetTime / originalTargetTime;
+      temp._upTargetTime = duration * upFraction;
+      temp._downTargetTime = duration * downFraction;
+      temp._toTargetTime = duration; 
+    }
     return temp;
 };
 

@@ -2549,16 +2549,18 @@ export class WWTControl {
    * @param zoom The target zoom level (see below)
    * @param instant Whether to snap the view instantly or move gradually.
    * @param roll_deg Optional, The roll of the camera, in degrees.
+   * @param duration Optional, The duration of the motion, in seconds.
    *
    * If `instant` is true or the commanded camera position is extremely close to the
    * current camera position, the view will update instantly. Otherwise it will
-   * scroll there smoothly, taking an unpredictable amount of time to arrive.
+   * scroll there smoothly. If no duration is specified, it will take an unpredictable
+   * amount of time to arrive.
    *
    * The zoom level is the height of the viewport in degrees, times six.
    *
    * Navigating the view in this way ends any "tracking" status of the current view.
    */
-  gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean, roll_deg?: number): void;
+  gotoRADecZoom(ra_hours: number, dec_deg: number, zoom: number, instant: boolean, roll_deg?: number, duration?: number): void;
 
   /** Returns how long moving to the given position will take, in seconds.
  *
@@ -2579,10 +2581,11 @@ export class WWTControl {
    * @param instant If true, the view camera will immediately snap to the
    * destination position. Otherwise, it will gradually move.
    * @param trackObject If true, the camera will continue tracking the view
+   * @param duration If specified, the duration of the motion (in seconds)
    * target as it moves with the progression of the WWT internal clock.
    *
    */
-  gotoTarget(place: Place, noZoom: boolean, instant: boolean, trackObject: boolean): void;
+  gotoTarget(place: Place, noZoom: boolean, instant: boolean, trackObject: boolean, duration?: number): void;
 
   /** Change the zoom of the current view. The change is not necessarily
    * instantaneous, depending on whether the "smooth pan" setting is activated.

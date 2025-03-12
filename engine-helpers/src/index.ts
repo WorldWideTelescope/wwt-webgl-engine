@@ -171,6 +171,9 @@ export interface GotoTargetOptions {
   /** If true, the camera will continue tracking the view target as it moves
    * with the progression of the WWT internal clock. */
   trackObject: boolean;
+
+  /** Optional: The desired duration of the movement */
+  duration?: number;
 }
 
 
@@ -503,15 +506,17 @@ export class WWTInstance {
    * @param zoomDeg The zoom setting, in *degrees*
    * @param instant Whether to snap the camera instantly, or pan it
    * @param rollRad If specified, the roll of the target camera position, in radians
+   * @param duration If specified, the duration of the motion (in seconds)
    * @returns A void promise that resolves when the camera arrives at the target position.
    */
-  async gotoRADecZoom(raRad: number, decRad: number, zoomDeg: number, instant: boolean, rollRad?: number): Promise<void> {
+  async gotoRADecZoom(raRad: number, decRad: number, zoomDeg: number, instant: boolean, rollRad?: number, duration?: number): Promise<void> {
     this.ctl.gotoRADecZoom(
       raRad * R2H,
       decRad * R2D,
       zoomDeg,
       instant,
-      rollRad
+      rollRad,
+      duration,
     );
     return this.makeArrivePromise(instant);
   }
