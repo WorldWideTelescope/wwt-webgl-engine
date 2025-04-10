@@ -1610,7 +1610,7 @@ var WWTControl$ = {
         globalScriptInterface._fireReady();
     },
 
-    gotoRADecZoom: function (ra, dec, zoom, instant, roll) {
+    gotoRADecZoom: function (ra, dec, zoom, instant, roll, duration) {
         this._tracking = false;
         this._trackingObject = null;
         this.gotoTargetFull(
@@ -1618,7 +1618,8 @@ var WWTControl$ = {
             instant,
             this._cameraParametersFromRADecZoom(ra, dec, zoom, roll),
             globalRenderContext.get_foregroundImageset(),
-            globalRenderContext.get_backgroundImageset()
+            globalRenderContext.get_backgroundImageset(),
+            duration,
         );
     },
 
@@ -1648,7 +1649,7 @@ var WWTControl$ = {
         return this.renderContext.get_backgroundImageset().get_dataSetType() == ImageSetType.solarSystem;
     },
 
-    gotoTarget: function (place, noZoom, instant, trackObject) {
+    gotoTarget: function (place, noZoom, instant, trackObject, duration) {
         if (place == null) {
             return;
         }
@@ -1673,7 +1674,7 @@ var WWTControl$ = {
                 if (target !== 65536) {
                     this._trackingObject = place;
                     if (target === this._solarSystemTrack && !(place.get_classification() === 1 || place.get_classification() === 1048576)) {
-                        this.gotoTarget3(place.get_camParams(), noZoom, instant);
+                        this.gotoTarget3(place.get_camParams(), noZoom, instant, duration);
                         return;
                     }
                     var jumpTime = 4;
@@ -1789,7 +1790,7 @@ var WWTControl$ = {
                         // replace with planet surface
                         camTo.viewTarget = Planets.getPlanetTargetPoint(target, camTo.lat, camTo.lng, SpaceTimeController.getJNowForFutureTime(jumpTime));
                     }
-                    var solarMover = new ViewMoverKenBurnsStyle(fromParams, camTo, jumpTime, SpaceTimeController.get_now(), SpaceTimeController.getTimeForFutureTime(jumpTime), 3);
+                    var solarMover = new ViewMoverKenBurnsStyle(fromParams, camTo, duration ?? jumpTime, SpaceTimeController.get_now(), SpaceTimeController.getTimeForFutureTime(jumpTime), 3);
                     solarMover.fastDirectionMove = true;
                     this.set__mover(solarMover);
                     return;
@@ -1812,10 +1813,10 @@ var WWTControl$ = {
         }
         if (place.get_classification() === 128) {
             camParams.zoom = this.get_zoomMax();
-            this.gotoTargetFull(false, instant, camParams, null, null);
+            this.gotoTargetFull(false, instant, camParams, null, null, duration);
         } else {
             this._solarSystemTrack = place.get_target();
-            this.gotoTargetFull(noZoom, instant, camParams, place.get_studyImageset(), place.get_backgroundImageset());
+            this.gotoTargetFull(noZoom, instant, camParams, place.get_studyImageset(), place.get_backgroundImageset(), duration);
             if (trackObject) {
                 this._tracking = true;
                 this._trackingObject = place;
@@ -1823,17 +1824,17 @@ var WWTControl$ = {
         }
     },
 
-    gotoTarget3: function (camParams, noZoom, instant) {
+    gotoTarget3: function (camParams, noZoom, instant, duration) {
         this._tracking = false;
         this._trackingObject = null;
-        this.gotoTargetFull(noZoom, instant, camParams, this.renderContext.get_foregroundImageset(), this.renderContext.get_backgroundImageset());
+        this.gotoTargetFull(noZoom, instant, camParams, this.renderContext.get_foregroundImageset(), this.renderContext.get_backgroundImageset(), duration);
     },
 
     _tooCloseForSlewMove: function (cameraParams) {
         return Math.abs(this.renderContext.viewCamera.lat - cameraParams.lat) < 1E-12 && Math.abs(this.renderContext.viewCamera.lng - cameraParams.lng) < 1E-12 && Math.abs(this.renderContext.viewCamera.zoom - cameraParams.zoom) < 1E-12 && Math.abs(this.renderContext.viewCamera.rotation - cameraParams.rotation) < 1E-12;
     },
 
-    gotoTargetFull: function (noZoom, instant, cameraParams, studyImageSet, backgroundImageSet) {
+    gotoTargetFull: function (noZoom, instant, cameraParams, studyImageSet, backgroundImageSet, duration) {
         this._tracking = false;
         this._trackingObject = null;
         this._targetStudyImageset = studyImageSet;
@@ -1868,7 +1869,7 @@ var WWTControl$ = {
             }
             this._mover_Midpoint();
         } else {
-            this.set__mover(ViewMoverSlew.create(this.renderContext.viewCamera, cameraParams));
+            this.set__mover(ViewMoverSlew.create(this.renderContext.viewCamera, cameraParams, duration));
             this.get__mover().set_midpoint(ss.bind('_mover_Midpoint', this));
         }
     },
