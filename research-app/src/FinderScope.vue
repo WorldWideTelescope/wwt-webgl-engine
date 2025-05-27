@@ -1,6 +1,7 @@
 <template>
   <div
     class="finder-scope"
+    v-if="place"
     :style="cssVars"
   >
     <div class="moveable">
@@ -29,16 +30,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { Constellations, Imageset, Place } from "@wwtelescope/engine";
+import { mapState } from "pinia";
+import { defineComponent, PropType } from 'vue';
 import { fmtHours } from "@wwtelescope/astro";
+import { Constellations, Imageset, Place } from "@wwtelescope/engine";
+import { engineStore } from '@wwtelescope/engine-pinia';
 import { Classification, ImageSetType } from '@wwtelescope/engine-types';
+
+import { SearchDataProvider } from './search';
 
 export default defineComponent({
   props: {
     modelValue: { type: Boolean, required: true },
-    place: { type: Place, required: true },
+    searchProvider: { type: Object as PropType<SearchDataProvider>, required: true },
     position: { type: Array, required: true },
+  },
+
+  data() {
+    return {
+      place: null as Place | null,
+    };
   },
 
   emits: {
@@ -53,14 +64,23 @@ export default defineComponent({
     formatHms(angleRad: number): string {
       return fmtHours(angleRad);
     },
+    updateClosest(raRad: number, decRad: number) {
+      this.searchProvider.closestLocation({ ra: raRad, dec: decRad }).then(place => {
+        this.place = place;
+      });
+    }
   },
 
   computed: {
+    ...mapState(engineStore, [
+      "raRad",
+      "decRad",
+    ]),
     constellation(): string {
-      return Constellations.fullNames[this.place.get_constellation()];
+      return Constellations.fullNames[this.place?.get_constellation() ?? ""];
     },
     classification(): string {
-      const type = Classification[this.place.get_classification()];
+      const type = Classification[this.place?.get_classification() ?? 0];
       const addSpaces = /(?<!^)([A-Z])/;
       const cls = type.replace(addSpaces, " $1");
       return cls.charAt(0).toUpperCase() + cls.slice(1);
@@ -68,20 +88,26 @@ export default defineComponent({
     credits(): string | undefined {
       return this.imageset?.get_creditsText();
     },
-    imageset(): Imageset | null {
-      return this.place.get_backgroundImageset() ?? this.place.get_studyImageset();
+    imageset(): Imageset | null | undefined {
+      return this.place?.get_backgroundImageset() ?? this.place?.get_studyImageset();
     },
-    thumbnail(): string {
-      return this.place.get_thumbnailUrl() ?? (this.imageset?.get_thumbnailUrl());
+    thumbnail(): string | undefined {
+      return this.place?.get_thumbnailUrl() ?? (this.imageset?.get_thumbnailUrl());
     },
     isSurvey(): boolean {
-      return this.place.get_type() == ImageSetType.sky;
+      return this.place?.get_type() == ImageSetType.sky;
     },
     names(): string {
+      if (!this.place) {
+        return "";
+      }
       const names = this.place.get_names();
       return names.length > 0 ? names.join(", ") : this.place.get_name();
     },
     queryStringName(): string {
+      if (!this.place) {
+        return "";
+      }
       const nameSegments = this.place.get_name().split(";");
       const index = nameSegments.length > 1 ? 1 : 0;
       const name = encodeURIComponent(nameSegments[index]);
@@ -93,6 +119,15 @@ export default defineComponent({
         "--left": this.position[1],
       };
     },
+  },
+
+  watch: {
+    raRad(ra: number) {
+      this.updateClosest(ra, this.decRad);
+    },
+    decRad(dec: number) {
+      this.updateClosest(this.raRad, dec);
+    }
   }
 });
 </script>

@@ -375,6 +375,7 @@ import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
+import { WWTControl } from "@wwtelescope/engine";
 
 interface Message {
   event?: string;
@@ -2874,6 +2875,12 @@ const App = defineComponent({
     }
 
     this.waitForReady().then(() => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      window.app = this; window.wwt = WWTControl.singleton;
+
+      this.setBackgroundImageByName("Earth");
+      this.setForegroundImageByName("Earth");
       const script = this.getQueryScript(window.location);
       if (script !== null) {
         this.$options.statusMessageDestination = window;
