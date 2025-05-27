@@ -8,6 +8,12 @@
       @pointerdown="wwtOnPointerDown"
     ></WorldWideTelescope>
 
+    <finder-scope
+      v-if="finderScopeActive"
+      :position="finderScopePosition"
+      :place="finderScopePlace"
+    ></finder-scope>
+
     <!-- keydown.stops here and below prevent any keynav presses from reaching
       the toplevel UI handlers -->
     <div id="ui-elements">
@@ -383,6 +389,7 @@ import {
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
+  Place,
   Poly,
   PolyLine,
   SpreadSheetLayer,
@@ -1195,6 +1202,10 @@ const App = defineComponent({
       lastSelectedSource: null as Source | null,
       selectionProximity: 4,
       hideAllChrome: false,
+      showFinderScope: false,
+      finderScopeActive: false,
+      finderScopePosition: [0, 0] as [number, number],
+      finderScopePlace: null as Place | null,
       hipsUrl: `${window.location.protocol}//www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips`, // Temporary
       isPointerMoving: false,
       messageQueue: [] as Message[],
@@ -2019,6 +2030,7 @@ const App = defineComponent({
         for (const s of appModified) {
           if (s[0] == "hideAllChrome") this.hideAllChrome = s[1];
           if (s[0] == "selectionProximity") this.selectionProximity = s[1];
+          if (s[0] == "showFinderScope") this.showFinderScope = s[1];
         }
 
         return true;

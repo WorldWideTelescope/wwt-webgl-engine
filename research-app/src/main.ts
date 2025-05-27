@@ -138,6 +138,7 @@ createApp(App, {
   .component('imageset-item', ImagesetItem)
   .component('source-item', SourceItem)
   .component('transition-expand', TransitionExpand)
+  .component('finder-scope', FinderScope)
 
   // Mount the app
   .mount("#app");
