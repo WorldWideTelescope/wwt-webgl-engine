@@ -54,6 +54,7 @@ export default defineComponent({
 
   emits: {
     "update:modelValue": (_value: boolean) => true,
+    "place": (_place: Place) => true,
   },
 
   methods: {
