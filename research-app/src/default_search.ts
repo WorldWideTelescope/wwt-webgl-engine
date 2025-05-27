@@ -141,13 +141,15 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
       .then(res => res.text())
       .then(text => {
         const prunedText = text.slice(DefaultSearchDataProvider._prefix.length);
-        return eval(`x={${prunedText}}`);
+        const js = `const x=${prunedText}; x`;
+        return eval(js);
       });
   }
 
   parseData(data: SearchData): Record<string, Place[]> {
     let imagesetID = 100;
     const places: Record<string, Place[]> = {};
+    console.log(data);
     data.Constellations.forEach(info => {
       const constellation = info.name;
       const constellationPlaces: Place[] = [];
@@ -193,16 +195,23 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
     let closestDist: Vector3d | null = null;
     let closestPlace: Place | null = null;
     searchPlaces.forEach(place => {
-      const dist = Vector3d.subtractVectors(place.get_location3d(), coordinates3D);
-      if ((closestDist !== null) && (closestDist.length() > dist.length())) {
-        closestPlace = place;
-        closestDist = dist;
+      try {
+        const dist = Vector3d.subtractVectors(place.get_location3d(), coordinates3D);
+        if ((closestDist === null) || (closestDist.length() > dist.length())) {
+          closestPlace = place;
+          closestDist = dist;
+        }
+      } catch (error) {
+        if (place && place.get_name() !== "Earth") {
+          console.warn(error);
+        }
       }
     });
 
     // TODO:
     // Add in getting astronomical details for place
 
+    console.log(closestPlace);
     return closestPlace;
   }
 }

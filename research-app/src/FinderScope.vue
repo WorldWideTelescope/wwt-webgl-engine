@@ -115,8 +115,8 @@ export default defineComponent({
     },
     cssVars() {
       return {
-        "--top": this.position[0],
-        "--left": this.position[1],
+        "--top": `${this.position[0]}px`,
+        "--left": `${this.position[1]}px`,
       };
     },
   },
@@ -134,6 +134,11 @@ export default defineComponent({
 
 <style scoped lang="less">
 .finder-scope {
-  position: relative;
+  position: absolute;
+  top: var(--top);
+  left: var(--left);
+  background: rgba(25, 30, 43, 0.7);
+  color: rgba(255, 255, 255, 0.8);
+  pointer-events: auto;
 }
 </style>

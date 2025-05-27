@@ -9,9 +9,10 @@
     ></WorldWideTelescope>
 
     <finder-scope
-      v-if="finderScopeActive"
+      v-if="showFinderScope"
+      :model-value="finderScopeActive"
       :position="finderScopePosition"
-      :place="finderScopePlace"
+      :search-provider="searchProvider"
     ></finder-scope>
 
     <!-- keydown.stops here and below prevent any keynav presses from reaching
@@ -373,6 +374,7 @@ import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
 import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
+import type { SearchDataProvider } from "./search";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { WWTControl } from "@wwtelescope/engine";
@@ -440,6 +442,7 @@ import {
   convertSpreadSheetLayerSetting,
 } from "./settings";
 import { defineComponent, isProxy, toRaw } from "vue";
+import { DefaultSearchDataProvider } from "./default_search";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1203,10 +1206,10 @@ const App = defineComponent({
       lastSelectedSource: null as Source | null,
       selectionProximity: 4,
       hideAllChrome: false,
-      showFinderScope: false,
+      showFinderScope: true,
       finderScopeActive: false,
       finderScopePosition: [0, 0] as [number, number],
-      finderScopePlace: null as Place | null,
+      searchProvider: new DefaultSearchDataProvider() as SearchDataProvider,
       hipsUrl: `${window.location.protocol}//www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips`, // Temporary
       isPointerMoving: false,
       messageQueue: [] as Message[],
@@ -2099,6 +2102,11 @@ const App = defineComponent({
     wwtOnPointerDown(event: PointerEvent) {
       this.isPointerMoving = false;
       this.pointerStartPosition = { x: event.pageX, y: event.pageY };
+
+      if (this.showFinderScope && event.button === 2) {  // Right click
+        this.finderScopePosition = [event.pageX, event.pageY];
+        this.finderScopeActive = true;
+      }
     },
 
     wwtOnPointerUp(event: PointerEvent) {
@@ -2879,8 +2887,6 @@ const App = defineComponent({
       // @ts-ignore
       window.app = this; window.wwt = WWTControl.singleton;
 
-      this.setBackgroundImageByName("Earth");
-      this.setForegroundImageByName("Earth");
       const script = this.getQueryScript(window.location);
       if (script !== null) {
         this.$options.statusMessageDestination = window;
