@@ -649,8 +649,13 @@ export class ConstellationFilter implements ConstellationFilterInterface {
 
 export class Constellations {
   static containment: Constellations;
+  static fullNames: Record<string, string>;
 
   findConstellationForPoint(ra: number, dec: number): string;
+}
+
+export class Coordinates {
+  static raDecTo3d(ra: number, dec: number): Vector3d;
 }
 
 /** The full EngineSetting type, which augments engine-types' BaseEngineSetting
@@ -1191,6 +1196,7 @@ export class Place implements Thumbnail {
   set_lat(v: number): number;
   get_lng(): number;
   set_lng(v: number): number;
+  get_location3d(): Vector3d;
   get_magnitude(): number;
   set_magnitude(v: number): number;
   get_name(): string;
@@ -2239,6 +2245,17 @@ export type URLHelpers = typeof URLHelpers;
 export enum URLRewriteMode {
   AsIfAbsolute = 0, // act as if this URL is absolute even if it is missing a domain
   OriginRelative = 1, // if this URL is relative, treat it as relative to the browser origin
+}
+
+export class Vector3d {
+  x: number;
+  y: number;
+  z: number;
+
+  length(): number;
+
+  static create(x: number, y: number, z: number): Vector3d;
+  static subtractVectors(left: Vector3d, right: Vector3d): Vector3d;
 }
 
 /** A VOTable dataset.
