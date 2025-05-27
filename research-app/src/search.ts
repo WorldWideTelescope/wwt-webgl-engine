@@ -1,6 +1,5 @@
-import { Imageset, Place, URLHelpers, URLRewriteMode } from "@wwtelescope/engine";
-import { BandPass, ProjectionType, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Classification, ImageSetType } from "@wwtelescope/engine-types";
+import { Imageset, Place, URLHelpers, URLRewriteMode, WWTControl } from "@wwtelescope/engine";
+import { BandPass, Classification, ImageSetType, ProjectionType, SolarSystemObjects } from "@wwtelescope/engine-types";
 
 export interface SearchImageset {
   bd: number;
@@ -133,9 +132,10 @@ export class SearchDataProvider {
 
   parseData(data: SearchData) {
     let imagesetID = 100;
+    const places: Record<string, Place[]> = {};
     data.Constellations.forEach(info => {
       const constellation = info.name;
-      const places: Place[] = [];
+      const constellationPlaces: Place[] = [];
       info.places.forEach(searchPlace => {
         const place = createPlace(searchPlace, constellation);
 
@@ -150,11 +150,16 @@ export class SearchDataProvider {
         if (constellation === "SolarSystem") {
           place.set_target(SolarSystemObjects.undefined);
         }
-
         rewriteURLs(place);
 
-        places.push(place);
+        constellationPlaces.push(place);
       });
+
+      places[constellation] = constellationPlaces;
     });
+  }
+
+  closestLocation(location: { ra: number; dec: number; }): Place {
+    const coordinates = Coordinates.raDecTo3D(location.ra, location.dec);
   }
 }
