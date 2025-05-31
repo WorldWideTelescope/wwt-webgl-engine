@@ -13,7 +13,6 @@
       :model-value="finderScopeActive"
       :position="finderScopePosition"
       :search-provider="searchProvider"
-      @place="finderScopePlaceChange"
     ></finder-scope>
 
     <!-- keydown.stops here and below prevent any keynav presses from reaching
@@ -1209,7 +1208,6 @@ const App = defineComponent({
       hideAllChrome: false,
       showFinderScope: true,
       finderScopeActive: false,
-      finderScopeCircle: null as Circle | null,
       finderScopePosition: [0, 0] as [number, number],
       searchProvider: new DefaultSearchDataProvider() as SearchDataProvider,
       hipsUrl: `${window.location.protocol}//www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips`, // Temporary
@@ -1381,12 +1379,6 @@ const App = defineComponent({
       'removeResearchAppTableLayer',
       'setResearchAppTableLayerSelectability',
     ]),
-
-    finderScopePlaceChange(place: Place) {
-      if (this.finderScopeCircle !== null) {
-        this.removeAnnotation(this.finderScopeCircle);
-      }
-    },
 
     parseFloatParam(param: string | (string | null)[], fallback: number): number {
       if (typeof param === "string") {
@@ -2894,6 +2886,10 @@ const App = defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       window.app = this; window.wwt = WWTControl.singleton;
+
+      this.applySetting(["showConstellationBoundries", true]);
+      this.applySetting(["showConstellationLabels", true]);
+      this.applySetting(["showCrosshairs", true]);
 
       const script = this.getQueryScript(window.location);
       if (script !== null) {

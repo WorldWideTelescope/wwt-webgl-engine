@@ -1,7 +1,13 @@
-import { Constellations, Coordinates, Imageset, Place, URLHelpers, URLRewriteMode, Vector3d } from "@wwtelescope/engine";
+import { distance } from "@wwtelescope/astro";
+import { Constellations, Imageset, Place, URLHelpers, URLRewriteMode } from "@wwtelescope/engine";
 import { BandPass, Classification, ImageSetType, ProjectionType, SolarSystemObjects } from "@wwtelescope/engine-types";
 
 import { SearchDataProvider } from "./search";
+
+const H2R = Math.PI / 12;
+const D2R = Math.PI / 180;
+const R2D = 180 / Math.PI;
+const D2H = 1 / 15;
 
 interface SearchImageset {
   bd: number;
@@ -149,7 +155,6 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
   parseData(data: SearchData): Record<string, Place[]> {
     let imagesetID = 100;
     const places: Record<string, Place[]> = {};
-    console.log(data);
     data.Constellations.forEach(info => {
       const constellation = info.name;
       const constellationPlaces: Place[] = [];
@@ -178,10 +183,9 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
     return places;
   }
 
-  async closestLocation(location: { ra: number; dec: number; }): Promise<Place | null> {
+  async closestLocation(location: { raDeg: number; decDeg: number; }): Promise<Place | null> {
     await this.loadDataIfNeeded();
-    const coordinates3D = Coordinates.raDecTo3d(location.ra, location.dec);
-    const constellation = Constellations.containment.findConstellationForPoint(location.ra, location.dec);
+    const constellation = Constellations.containment.findConstellationForPoint(location.raDeg * D2H, location.decDeg);
 
     let constellationPlaces: Place[] = [];
     const ssPlaces: Place[] = this._data["SolarSystem"];
@@ -192,12 +196,15 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
     }
 
     const searchPlaces = ssPlaces.concat(constellationPlaces);
-    let closestDist: Vector3d | null = null;
+    let closestDist: number | null = null;
     let closestPlace: Place | null = null;
     searchPlaces.forEach(place => {
       try {
-        const dist = Vector3d.subtractVectors(place.get_location3d(), coordinates3D);
-        if ((closestDist === null) || (closestDist.length() > dist.length())) {
+        console.log(place);
+        console.log(place.get_RA());
+        const dist = distance(place.get_RA() * H2R, place.get_dec() * D2R, location.raDeg * D2R, location.decDeg * D2R);
+        // console.log(dist, closestDist);
+        if ((!isNaN(dist)) && ((closestDist === null) || (dist < closestDist))) {
           closestPlace = place;
           closestDist = dist;
         }

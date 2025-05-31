@@ -2,5 +2,5 @@ import { Place } from "@wwtelescope/engine";
 
 
 export interface SearchDataProvider {
-  closestLocation(location: { ra: number; dec: number; }): Promise<Place | null>;
+  closestLocation(location: { raDeg: number; decDeg: number; }): Promise<Place | null>;
 }
