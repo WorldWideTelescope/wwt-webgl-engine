@@ -10,7 +10,7 @@
 
     <finder-scope
       v-if="showFinderScope"
-      :model-value="finderScopeActive"
+      v-model="finderScopeActive"
       :position="finderScopePosition"
       :search-provider="searchProvider"
     ></finder-scope>

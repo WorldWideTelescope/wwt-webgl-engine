@@ -200,10 +200,7 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
     let closestPlace: Place | null = null;
     searchPlaces.forEach(place => {
       try {
-        console.log(place);
-        console.log(place.get_RA());
         const dist = distance(place.get_RA() * H2R, place.get_dec() * D2R, location.raDeg * D2R, location.decDeg * D2R);
-        // console.log(dist, closestDist);
         if ((!isNaN(dist)) && ((closestDist === null) || (dist < closestDist))) {
           closestPlace = place;
           closestDist = dist;

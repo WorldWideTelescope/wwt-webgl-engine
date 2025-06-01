@@ -1,7 +1,7 @@
 <template>
   <div
     class="finder-scope"
-    v-if="place"
+    v-if="modelValue && place"
     :style="cssVars"
   >
     <div class="moveable">
@@ -15,6 +15,7 @@
       <a class="thumbnail">
         <img :src="thumbnail" />
       </a>
+      <h4><strong>Classification:</strong> <span>{{ classification }}</span></h4>
       <h4 v-if="isSurvey"><strong>Constellation:</strong> <span>{{ constellation }}</span></h4>
       <h4><strong>Names:</strong> <span>{{ names }}</span></h4>
       <hr />
@@ -65,17 +66,13 @@ export default defineComponent({
     ]),
     close(): void {
       this.$emit("update:modelValue", false);
-      console.log("CLOSE");
     },
     formatHms(angleRad: number): string {
       return fmtHours(angleRad);
     },
     updateClosest() {
       const position = this.findRADecForScreenPoint({ x: this.position[0], y: this.position[1] });
-      console.log("Position:", position);
       this.searchProvider.closestLocation({ raDeg: position.ra, decDeg: position.dec }).then(place => {
-        console.log(this.raRad, this.decRad);
-        console.log("Updating place", place);
         this.place = place;
       });
     },
@@ -113,7 +110,7 @@ export default defineComponent({
       return Constellations.fullNames[this.place?.get_constellation() ?? ""];
     },
     classification(): string {
-      const type = Classification[this.place?.get_classification() ?? 0];
+      const type = Classification[this.place?.get_classification() ?? Classification.unidentified];
       const addSpaces = /(?<!^)([A-Z])/;
       const cls = type.replace(addSpaces, " $1");
       return cls.charAt(0).toUpperCase() + cls.slice(1);
@@ -148,8 +145,8 @@ export default defineComponent({
     },
     cssVars() {
       return {
-        "--top": `${this.position[0]}px`,
-        "--left": `${this.position[1]}px`,
+        "--left": `${this.position[0]}px`,
+        "--top": `${this.position[1]}px`,
       };
     },
   },
