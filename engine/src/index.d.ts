@@ -1705,6 +1705,8 @@ export class Settings implements EngineSettingsInterface {
   set_planetOrbitsFilter(v: number): number;
   get_constellations(): boolean;
   set_constellations(v: boolean): boolean;
+
+  static get_active(): Settings;
 }
 
 export namespace SpaceTimeController {

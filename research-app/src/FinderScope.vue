@@ -28,6 +28,8 @@
       >
         <div><label>RA</label>: <span>{{ formatHms(place.get_RA()) }}</span></div>
         <div><label>Dec</label>: <span>{{ formatHms(place.get_dec()) }}</span></div>
+        <div v-if="altAz"><label>Alt</label>: <span>{{ formatHms(altAz.get_alt() * D2R) }}</span></div>
+        <div v-if="altAz"><label>Az</label>: <span>{{ formatHms(altAz.get_az() * D2R) }}</span></div>
       </div>
       <h5 v-if="credits"><strong>Image Credit:</strong> {{ credits }}</h5>
     </div>
@@ -37,8 +39,8 @@
 <script lang="ts">
 import { mapActions, mapState } from "pinia";
 import { defineComponent, PropType } from 'vue';
-import { fmtHours } from "@wwtelescope/astro";
-import { Circle, Constellations, Coordinates, Imageset, Place } from "@wwtelescope/engine";
+import { fmtHours, D2R } from "@wwtelescope/astro";
+import { Circle, Constellations, Coordinates, Imageset, Place, Settings } from "@wwtelescope/engine";
 import { engineStore } from '@wwtelescope/engine-pinia';
 import { Classification, ImageSetType } from '@wwtelescope/engine-types';
 
@@ -62,6 +64,7 @@ export default defineComponent({
       alpha,
       width,
       canvasSize,
+      D2R,
     };
   },
 
@@ -166,7 +169,7 @@ export default defineComponent({
         context?.clearRect(0, 0, canvas.width, canvas.height);
       }
       this.crosshairsDrawn = false;
-    }
+    },
   },
 
   computed: {
@@ -176,16 +179,16 @@ export default defineComponent({
       "decRad",
       "findRADecForScreenPoint",
     ]),
-    // altAz(): Coordinates | null {
-    //   if (this.place === null) {
-    //     return null;
-    //   }
-    //   return Coordinates.equitorialToHorizon(
-    //     Coordinates.fromRaDec(this.place.get_RA(), this.place.get_dec()),
-    //     Coordinates.fromLatLng(),
-    //     this.currentTime,
-    //   );
-    // },
+    altAz(): Coordinates | null {
+      if (this.place === null) {
+        return null;
+      }
+      return Coordinates.equitorialToHorizon(
+        Coordinates.fromRaDec(this.place.get_RA(), this.place.get_dec()),
+        Coordinates.fromLatLng(this.wwtSettings.get_locationLat(), this.wwtSettings.get_locationLng()),
+        this.currentTime,
+      );
+    },
     constellation(): string {
       return Constellations.fullNames[this.place?.get_constellation() ?? ""];
     },
@@ -241,6 +244,9 @@ export default defineComponent({
     },
     headerHeight() {
       return 0.5 * this.canvasSize * Math.abs(Math.sin(Math.PI - this.alpha) - Math.sin(Math.PI / 2 + this.alpha));
+    },
+    wwtSettings(): Settings {
+      return Settings.get_active();
     }
   },
 
