@@ -215,7 +215,6 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
     // TODO:
     // Add in getting astronomical details for place
 
-    console.log(closestPlace);
     return closestPlace;
   }
 }

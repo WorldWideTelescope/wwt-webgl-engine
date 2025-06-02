@@ -655,7 +655,22 @@ export class Constellations {
 }
 
 export class Coordinates {
+  get_RA(): number;
+  set_RA(ra: number): void;
+  get_dec(): number;
+  set_dec(dec: number): void;
+  get_lat(): number;
+  set_lat(lat: number): void;
+  get_lng(): number;
+  set_lng(lng: number): void;
+  get_alt(): number;
+  set_alt(alt: number): void;
+  get_az(): number;
+  set_az(az: number): void;
+  static fromRaDec(raHrs: number, decDeg: number): Coordinates;
+  static fromLatLng(latDeg: number, lngDeg: number): Coordinates;
   static raDecTo3d(ra: number, dec: number): Vector3d;
+  static equitorialToHorizon(equitorial: Coordinates, location: Coordinates, utc: Date): Coordinates;
 }
 
 /** The full EngineSetting type, which augments engine-types' BaseEngineSetting

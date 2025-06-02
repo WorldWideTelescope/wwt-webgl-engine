@@ -1,7 +1,7 @@
 <template>
   <div
     class="finder-scope"
-    v-if="modelValue && place"
+    v-show="modelValue && place"
     :style="cssVars"
   >
     <canvas class="fs-crosshairs"></canvas>
@@ -24,10 +24,10 @@
       <div><strong>Names:</strong> <span>{{ names }}</span></div>
       <hr />
       <div
-        v-if="isSurvey"
+        v-if="place && isSurvey"
       >
-        <p><label>RA</label>: <span>{{ formatHms(place.get_RA()) }}</span></p>
-        <p><label>Dec</label>: <span>{{ formatHms(place.get_dec()) }}</span></p>
+        <div><label>RA</label>: <span>{{ formatHms(place.get_RA()) }}</span></div>
+        <div><label>Dec</label>: <span>{{ formatHms(place.get_dec()) }}</span></div>
       </div>
       <h5 v-if="credits"><strong>Image Credit:</strong> {{ credits }}</h5>
     </div>
@@ -38,7 +38,7 @@
 import { mapActions, mapState } from "pinia";
 import { defineComponent, PropType } from 'vue';
 import { fmtHours } from "@wwtelescope/astro";
-import { Circle, Constellations, Imageset, Place } from "@wwtelescope/engine";
+import { Circle, Constellations, Coordinates, Imageset, Place } from "@wwtelescope/engine";
 import { engineStore } from '@wwtelescope/engine-pinia';
 import { Classification, ImageSetType } from '@wwtelescope/engine-types';
 
@@ -89,8 +89,7 @@ export default defineComponent({
     },
     clearCircle() {
       if (this.circle !== null) {
-        this.removeAnnotation(this.circle);
-        this.circle = null;
+        this.circle.set_opacity(0);
       }
     },
     updateCircleForPlace(place: Place | null) {
@@ -104,15 +103,17 @@ export default defineComponent({
       circle.set_radius(0.22);
       circle.set_skyRelative(false);
       circle.set_lineWidth(3);
+      circle.set_opacity(this.modelValue ? 1 : 0);
       if (this.circle === null) {
-        this.addAnnotation(circle);
+        console.log("Adding circle");
         this.circle = circle;
+        this.addAnnotation(circle);
       }
     },
     drawCrosshairs() {
       const canvas = this.$el.querySelector(".fs-crosshairs") as HTMLCanvasElement;
-      canvas.height = 170;
-      canvas.width = 170;
+      canvas.height = this.canvasSize;
+      canvas.width = this.canvasSize;
       const context = canvas.getContext("2d");
       if (context === null) {
         return;
@@ -122,29 +123,32 @@ export default defineComponent({
       const centerY = canvas.height / 2;
       const radius = canvas.width / 2;
 
-      context.beginPath();
-      context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      context.fillStyle = "transparent";
-      context.fill();
-      context.lineWidth = 4;
       context.strokeStyle = "rgba(25, 30, 43, 0.7)";
-      context.stroke();
+      context.fillStyle = "transparent";
+      context.lineWidth = 4;
 
       context.beginPath();
+      context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      context.fill();
+      context.stroke();
+
       context.fillStyle = "rgba(25, 30, 43, 0.7)";
       context.strokeStyle = "transparent";
       context.lineWidth = 0;
+
+      context.beginPath();
       context.arc(centerX, centerY, radius, 0.5 * Math.PI, Math.PI);
       context.lineTo(0, canvas.height);
       context.lineTo(centerX, canvas.height);
       context.fill();
       context.stroke();
 
+      context.strokeStyle = "rgba(216, 216, 216, 0.5)";
+      context.lineWidth = 1;
+
       context.beginPath();
       context.moveTo(0, centerY);
       context.lineTo(canvas.width, centerY);
-      context.strokeStyle = "rgba(216, 216, 216, 0.5)";
-      context.lineWidth = 1;
       context.stroke();
 
       context.beginPath();
@@ -157,18 +161,31 @@ export default defineComponent({
     },
     clearCrosshairs() {
       const canvas = this.$el.querySelector(".fs-crosshairs") as HTMLCanvasElement;
-      const context = canvas.getContext("2d");
-      context?.clearRect(0, 0, canvas.width, canvas.height);
+      if (canvas !== null) {
+        const context = canvas.getContext("2d");
+        context?.clearRect(0, 0, canvas.width, canvas.height);
+      }
       this.crosshairsDrawn = false;
     }
   },
 
   computed: {
     ...mapState(engineStore, [
+      "currentTime",
       "raRad",
       "decRad",
       "findRADecForScreenPoint",
     ]),
+    // altAz(): Coordinates | null {
+    //   if (this.place === null) {
+    //     return null;
+    //   }
+    //   return Coordinates.equitorialToHorizon(
+    //     Coordinates.fromRaDec(this.place.get_RA(), this.place.get_dec()),
+    //     Coordinates.fromLatLng(),
+    //     this.currentTime,
+    //   );
+    // },
     constellation(): string {
       return Constellations.fullNames[this.place?.get_constellation() ?? ""];
     },
@@ -219,7 +236,7 @@ export default defineComponent({
       };
     },
     infoWidth() {
-      const deltaX = 0.5 * this.canvasSize * Math.abs(0.5 - Math.cos(Math.PI / 2 + this.alpha));
+      const deltaX = 0.5 * this.canvasSize * (1 - Math.cos(Math.PI / 2 + this.alpha));
       return this.width - deltaX;
     },
     headerHeight() {
@@ -229,18 +246,25 @@ export default defineComponent({
 
   watch: {
     raRad(_ra: number) {
-      this.updateClosest();
+      if (this.modelValue) {
+        this.updateClosest();
+      }
     },
     decRad(_dec: number) {
-      this.updateClosest();
+      if (this.modelValue) {
+        this.updateClosest();
+      }
     },
     position(_location: [number, number]) {
-      this.updateClosest();
+      if (this.modelValue) {
+        this.updateClosest();
+      }
     },
     modelValue(value: boolean) {
-      this.clearCircle();
       if (value) {
-        this.updateCircleForPlace(this.place);
+        this.updateClosest();
+      } else {
+        this.place = null;
       }
 
       this.$nextTick(() => {
@@ -308,6 +332,12 @@ export default defineComponent({
     border: 1px solid gray;
     padding: 2px;
     border-radius: 2px;
+  }
+
+  .close-icon {
+    position: absolute;
+    top: 7px;
+    right: 7px;
   }
 }
 
