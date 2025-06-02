@@ -19,19 +19,55 @@
       ></font-awesome-icon>
     </div>
     <div class="fs-info">
-      <div><strong>Classification:</strong> <span>{{ classification }}</span></div>
-      <div v-if="isSurvey"><strong>Constellation:</strong> <span>{{ constellation }}</span></div>
-      <div><strong>Names:</strong> <span>{{ names }}</span></div>
-      <hr />
-      <div
-        v-if="place && isSurvey"
-      >
-        <div><label>RA</label>: <span>{{ formatHms(place.get_RA()) }}</span></div>
-        <div><label>Dec</label>: <span>{{ formatHms(place.get_dec()) }}</span></div>
-        <div v-if="altAz"><label>Alt</label>: <span>{{ formatHms(altAz.get_alt() * D2R) }}</span></div>
-        <div v-if="altAz"><label>Az</label>: <span>{{ formatHms(altAz.get_az() * D2R) }}</span></div>
+      <div>
+        <div><strong>Classification:</strong> <span>{{ classification }}</span></div>
+        <div v-if="isSurvey"><strong>Constellation:</strong> <span>{{ constellation }}</span></div>
+        <div><strong>Names:</strong> <span>{{ names }}</span></div>
+        <hr />
+        <div
+          v-if="place && isSurvey"
+          class="fs-values"
+        >
+          <div class="fs-value"><label>RA:</label> <span>{{ formatHms(place.get_RA()) }}</span></div>
+          <div class="fs-value"><label>Dec:</label> <span>{{ formatHms(place.get_dec()) }}</span></div>
+          <div v-if="altAz" class="fs-value"><label>Alt:</label> <span>{{ formatHms(altAz.get_alt() * D2R) }}</span></div>
+          <div v-if="altAz" class="fs-value"><label>Az:</label> <span>{{ formatHms(altAz.get_az() * D2R) }}</span></div>
+        </div>
       </div>
       <h5 v-if="credits"><strong>Image Credit:</strong> {{ credits }}</h5>
+      <div class="fs-buttons">
+        <button 
+          v-if="place"
+          @click="showObject"
+        >
+          Show Object
+        </button>
+        <button
+          v-if="imageset != null"
+          @click="setAsBackground"
+        >
+          Set as background
+        </button>
+        <button
+          v-if="imageset != null"
+          @click="setAsForeground"
+        >
+          Set as foreground
+        </button>
+      </div>
+      <div class="fs-logos">
+        <a
+          v-for="(info, index) in infoURLData"
+          :key="index"
+          :class="['icon-link', info.name]"
+          :alt="info.alt"
+          :href="info.url"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img :src="info.img">
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -55,7 +91,7 @@ export default defineComponent({
 
   data() {
     const canvasSize = 150;
-    const width = 350;
+    const width = 400;
     const alpha = Math.PI / 18;
     return {
       place: null as Place | null,
@@ -77,12 +113,36 @@ export default defineComponent({
     ...mapActions(engineStore, [
       "addAnnotation",
       "removeAnnotation",
+      "gotoTarget",
+      "setBackgroundImageByName",
+      "setForegroundImageByName",
     ]),
     close(): void {
       this.$emit("update:modelValue", false);
     },
     formatHms(angleRad: number): string {
       return fmtHours(angleRad);
+    },
+    showObject() {
+      if (this.place !== null) {
+        console.log(this.place);
+        this.gotoTarget({
+          place: this.place,
+          noZoom: false,
+          instant: false,
+          trackObject: true,
+        });
+      }
+    },
+    setAsForeground() {
+      if (this.imageset != null) {
+        this.setForegroundImageByName(this.imageset.get_name());
+      }
+    },
+    setAsBackground() {
+      if (this.imageset != null) {
+        this.setBackgroundImageByName(this.imageset.get_name());
+      }
     },
     updateClosest() {
       const position = this.findRADecForScreenPoint({ x: this.position[0], y: this.position[1] });
@@ -124,7 +184,22 @@ export default defineComponent({
   
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      const radius = canvas.width / 2;
+      const radius = this.circleRadius;
+
+      const gap = this.canvasSize - 2 * this.circleRadius;
+
+      context.strokeStyle = "rgba(216, 216, 216, 0.5)";
+      context.lineWidth = 1;
+
+      context.beginPath();
+      context.moveTo(gap, centerY + gap);
+      context.lineTo(canvas.width - gap, centerY + gap);
+      context.stroke();
+
+      context.beginPath();
+      context.moveTo(centerX + gap, gap);
+      context.lineTo(centerX + gap, canvas.height - gap);
+      context.stroke();
 
       context.strokeStyle = "rgba(25, 30, 43, 0.7)";
       context.fillStyle = "transparent";
@@ -146,19 +221,6 @@ export default defineComponent({
       context.fill();
       context.stroke();
 
-      context.strokeStyle = "rgba(216, 216, 216, 0.5)";
-      context.lineWidth = 1;
-
-      context.beginPath();
-      context.moveTo(0, centerY);
-      context.lineTo(canvas.width, centerY);
-      context.stroke();
-
-      context.beginPath();
-      context.moveTo(centerX, 0);
-      context.lineTo(centerX, canvas.height);
-      context.stroke();
-
       this.crosshairsDrawn = true;
 
     },
@@ -178,6 +240,7 @@ export default defineComponent({
       "raRad",
       "decRad",
       "findRADecForScreenPoint",
+      "zoomDeg",
     ]),
     altAz(): Coordinates | null {
       if (this.place === null) {
@@ -205,7 +268,7 @@ export default defineComponent({
       return this.place?.get_backgroundImageset() ?? this.place?.get_studyImageset();
     },
     thumbnail(): string | undefined {
-      return this.place?.get_thumbnailUrl() ?? (this.imageset?.get_thumbnailUrl());
+      return this.place?.get_thumbnailUrl() ?? this.imageset?.get_thumbnailUrl();
     },
     isSurvey(): boolean {
       return this.place?.get_type() == ImageSetType.sky;
@@ -238,6 +301,9 @@ export default defineComponent({
         "--width": `${this.width}px`,
       };
     },
+    circleRadius(): number {
+      return 0.5 * this.canvasSize - 2;
+    },
     infoWidth() {
       const deltaX = 0.5 * this.canvasSize * (1 - Math.cos(Math.PI / 2 + this.alpha));
       return this.width - deltaX;
@@ -247,6 +313,40 @@ export default defineComponent({
     },
     wwtSettings(): Settings {
       return Settings.get_active();
+    },
+    infoURLData() {
+      return [
+        {
+          name: "wikipedia",
+          img: require("./wikipedia.svg"),
+          url: `https://wikipedia.org/wiki/Special:Search?search=${this.queryStringName}`,
+          alt: "Look up on Wikipedia",
+        },
+        {
+          name: "ads",
+          img: require("./ads.svg"),
+          url: `https://ui.adsabs.harvard.edu/search/q=object:%22${this.queryStringName}%22`,
+          alt: "Look up on SAO/NASA ADS",
+        },
+        {
+          name: "simbad",
+          img: require("./simbad.png"),
+          url: `https://simbad.u-strasbg.fr/simbad/sim-id?Ident=${this.queryStringName}`,
+          alt: "Look up on SIMBAD",
+        },
+        {
+          name: "ned",
+          img: require("./ned.png"),
+          url: `https://ned.ipac.caltech.edu/cgi-bin/nph-imgdata?objname=${this.queryStringName}`,
+          alt: "Look up on NED",
+        },
+        {
+          name: "esasky",
+          img: require("./esasky.png"),
+          url: `http://sky.esa.int/?action=goto&target=${(this.place?.get_RA() ?? 0)*15}%20${this.place?.get_dec() ?? 0}&hips=DSS2%20color&fov=${this.zoomDeg/6}&cooframe=J2000&sci=true`,
+          alt: "View in ESASky",
+        }
+      ];
     }
   },
 
@@ -331,7 +431,9 @@ export default defineComponent({
   height: var(--header-height);
 
   a {
+    margin-top: 5px;
     height: fit-content;
+    display: inline-block;
   }
 
   img {
@@ -357,6 +459,49 @@ export default defineComponent({
   div {
     font-size: 10pt;
     font-style: normal;
+  }
+}
+
+.fs-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+
+  button {
+    background: transparent;
+    border: 1px solid rgba(216, 216, 216, 0.7);
+    border-radius: 2px;
+    color: white;
+
+    &:hover {
+      background: white;
+      color: rgba(25, 30, 43, 0.7);
+    }
+  }
+}
+
+.fs-values {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-flow: column;
+  column-gap: 10px;
+
+  .fs-value {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.fs-logos {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .icon-link img {
+    width: 36px;
+    margin: 2px;
   }
 }
 </style>
