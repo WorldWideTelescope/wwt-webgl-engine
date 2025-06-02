@@ -4,7 +4,11 @@
     v-if="modelValue && place"
     :style="cssVars"
   >
-    <div class="moveable">
+    <canvas class="fs-crosshairs"></canvas>
+    <div class="fs-header">
+      <a class="thumbnail">
+        <img :src="thumbnail" />
+      </a>
       <font-awesome-icon
         icon="xmark"
         size="lg"
@@ -12,12 +16,11 @@
         @keyup.enter="close"
         @click="close"
       ></font-awesome-icon>
-      <a class="thumbnail">
-        <img :src="thumbnail" />
-      </a>
-      <h4><strong>Classification:</strong> <span>{{ classification }}</span></h4>
-      <h4 v-if="isSurvey"><strong>Constellation:</strong> <span>{{ constellation }}</span></h4>
-      <h4><strong>Names:</strong> <span>{{ names }}</span></h4>
+    </div>
+    <div class="fs-info">
+      <div><strong>Classification:</strong> <span>{{ classification }}</span></div>
+      <div v-if="isSurvey"><strong>Constellation:</strong> <span>{{ constellation }}</span></div>
+      <div><strong>Names:</strong> <span>{{ names }}</span></div>
       <hr />
       <div
         v-if="isSurvey"
@@ -51,6 +54,9 @@ export default defineComponent({
     return {
       place: null as Place | null,
       circle: null as Circle | null,
+      crosshairsDrawn: false,
+      infoWidth: 180,
+      canvasSize: 150,
     };
   },
 
@@ -97,6 +103,53 @@ export default defineComponent({
         this.addAnnotation(circle);
         this.circle = circle;
       }
+    },
+    drawCrosshairs() {
+      const canvas = this.$el.querySelector(".fs-crosshairs") as HTMLCanvasElement;
+      canvas.height = 170;
+      canvas.width = 170;
+      const context = canvas.getContext("2d");
+      if (context === null) {
+        return;
+      }
+  
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = canvas.width / 2;
+
+      context.beginPath();
+      context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      context.fillStyle = "transparent";
+      context.fill();
+      context.lineWidth = 4;
+      context.strokeStyle = "rgba(25, 30, 43, 0.7)";
+      context.stroke();
+
+      context.beginPath();
+      context.fillStyle = "rgba(25, 30, 43, 0.7)";
+      context.arc(centerX, centerY, radius, 0.5 * Math.PI, Math.PI);
+      context.lineTo(0, canvas.height);
+      context.lineTo(centerX, canvas.height);
+      context.fill();
+      context.stroke();
+
+      context.beginPath();
+      context.moveTo(0, centerY);
+      context.lineTo(canvas.width, centerY);
+      context.strokeStyle = "rgba(216, 216, 216, 0.5)";
+      context.lineWidth = 1;
+      context.stroke();
+
+      context.beginPath();
+      context.moveTo(centerX, 0);
+      context.lineTo(centerX, canvas.height);
+      context.stroke();
+
+    },
+    clearCrosshairs() {
+      const canvas = this.$el.querySelector(".fs-crosshairs") as HTMLCanvasElement;
+      const context = canvas.getContext("2d");
+      context?.clearRect(0, 0, canvas.width, canvas.height);
     }
   },
 
@@ -147,8 +200,14 @@ export default defineComponent({
       return {
         "--left": `${this.position[0]}px`,
         "--top": `${this.position[1]}px`,
+        "--canvas-size": `${this.canvasSize}px`,
+        "--info-width": `${this.infoWidth}px`,
+        "--width": `${this.width}px`,
       };
     },
+    width() {
+      return this.infoWidth + this.canvasSize;
+    }
   },
 
   watch: {
@@ -163,9 +222,12 @@ export default defineComponent({
       if (value) {
         this.updateCircleForPlace(this.place);
       }
-    },
-    place(newPlace: Place | null) {
-      this.updateCircleForPlace(newPlace); 
+
+      this.$nextTick(() => {
+        if (value && !this.crosshairsDrawn) {
+          this.drawCrosshairs();
+        }
+      });
     }
   }
 });
@@ -176,8 +238,53 @@ export default defineComponent({
   position: absolute;
   top: var(--top);
   left: var(--left);
-  background: rgba(25, 30, 43, 0.7);
+  width: var(--width);
+  background: transparent;
   color: rgba(255, 255, 255, 0.8);
   pointer-events: auto;
+  padding: 5px;
+
+  .fs-header, .fs-info {
+    margin-left: 5px;
+  }
+}
+
+.fs-crosshairs {
+  position: absolute;
+  width: var(--canvas-size);
+  height: var(--canvas-size);
+  top: 0;
+  right: calc(var(--canvas-size) / 4);
+}
+
+.fs-header {
+  position: absolute;
+  top: calc(var(--canvas-size) / 2);
+  left: 0;
+  background: rgba(25, 30, 43, 0.7);
+  width: calc(var(--width) - var(--canvas-size));
+
+  a {
+    height: fit-content;
+  }
+
+  img {
+    border: 1px solid gray;
+    padding: 2px;
+    border-radius: 2px;
+  }
+}
+
+.fs-info {
+  position: absolute;
+  top: calc(50px + var(--canvas-size) / 2);
+  left: 0;
+  background: rgba(25, 30, 43, 0.7);
+  width: var(--info-width);
+
+  div {
+    font-size: 10pt;
+    font-style: normal;
+  }
 }
 </style>
