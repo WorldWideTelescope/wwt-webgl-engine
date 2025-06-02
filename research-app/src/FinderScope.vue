@@ -5,6 +5,7 @@
     :style="cssVars"
   >
     <canvas class="fs-crosshairs"></canvas>
+    <div class="fs-moveable"></div>
     <div class="fs-header">
       <a class="thumbnail">
         <img :src="thumbnail" />
@@ -51,12 +52,16 @@ export default defineComponent({
   },
 
   data() {
+    const canvasSize = 150;
+    const width = 350;
+    const alpha = Math.PI / 18;
     return {
       place: null as Place | null,
       circle: null as Circle | null,
       crosshairsDrawn: false,
-      infoWidth: 180,
-      canvasSize: 150,
+      alpha,
+      width,
+      canvasSize,
     };
   },
 
@@ -127,6 +132,8 @@ export default defineComponent({
 
       context.beginPath();
       context.fillStyle = "rgba(25, 30, 43, 0.7)";
+      context.strokeStyle = "transparent";
+      context.lineWidth = 0;
       context.arc(centerX, centerY, radius, 0.5 * Math.PI, Math.PI);
       context.lineTo(0, canvas.height);
       context.lineTo(centerX, canvas.height);
@@ -145,11 +152,14 @@ export default defineComponent({
       context.lineTo(centerX, canvas.height);
       context.stroke();
 
+      this.crosshairsDrawn = true;
+
     },
     clearCrosshairs() {
       const canvas = this.$el.querySelector(".fs-crosshairs") as HTMLCanvasElement;
       const context = canvas.getContext("2d");
       context?.clearRect(0, 0, canvas.width, canvas.height);
+      this.crosshairsDrawn = false;
     }
   },
 
@@ -197,16 +207,23 @@ export default defineComponent({
       return name.replace(/%20/g, "+");
     },
     cssVars() {
+      const left = this.position[0] - this.width + 0.5 * this.canvasSize;
+      const top = this.position[1] - 0.5 * this.canvasSize;
       return {
-        "--left": `${this.position[0]}px`,
-        "--top": `${this.position[1]}px`,
+        "--left": `${left}px`,
+        "--top": `${top}px`,
         "--canvas-size": `${this.canvasSize}px`,
+        "--header-height": `${this.headerHeight}px`,
         "--info-width": `${this.infoWidth}px`,
         "--width": `${this.width}px`,
       };
     },
-    width() {
-      return this.infoWidth + this.canvasSize;
+    infoWidth() {
+      const deltaX = 0.5 * this.canvasSize * Math.abs(0.5 - Math.cos(Math.PI / 2 + this.alpha));
+      return this.width - deltaX;
+    },
+    headerHeight() {
+      return 0.5 * this.canvasSize * Math.abs(Math.sin(Math.PI - this.alpha) - Math.sin(Math.PI / 2 + this.alpha));
     }
   },
 
@@ -215,6 +232,9 @@ export default defineComponent({
       this.updateClosest();
     },
     decRad(_dec: number) {
+      this.updateClosest();
+    },
+    position(_location: [number, number]) {
       this.updateClosest();
     },
     modelValue(value: boolean) {
@@ -228,6 +248,9 @@ export default defineComponent({
           this.drawCrosshairs();
         }
       });
+    },
+    place(newPlace: Place | null) {
+      this.updateCircleForPlace(newPlace);
     }
   }
 });
@@ -243,10 +266,22 @@ export default defineComponent({
   color: rgba(255, 255, 255, 0.8);
   pointer-events: auto;
   padding: 5px;
+  min-height: var(--canvas-size);
+  height: fit-content;
+  padding: 0px;
 
   .fs-header, .fs-info {
     margin-left: 5px;
   }
+}
+
+.fs-moveable {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--width) - var(--canvas-size));
+  height: calc(var(--canvas-size) - var(--header-height));
 }
 
 .fs-crosshairs {
@@ -254,15 +289,16 @@ export default defineComponent({
   width: var(--canvas-size);
   height: var(--canvas-size);
   top: 0;
-  right: calc(var(--canvas-size) / 4);
+  right: 0;
 }
 
 .fs-header {
   position: absolute;
-  top: calc(var(--canvas-size) / 2);
+  top: calc(var(--canvas-size) - var(--header-height));
   left: 0;
   background: rgba(25, 30, 43, 0.7);
-  width: calc(var(--width) - var(--canvas-size));
+  width: calc(var(--width) - var(--canvas-size) - 1px);
+  height: var(--header-height);
 
   a {
     height: fit-content;
@@ -277,7 +313,7 @@ export default defineComponent({
 
 .fs-info {
   position: absolute;
-  top: calc(50px + var(--canvas-size) / 2);
+  top: var(--canvas-size);
   left: 0;
   background: rgba(25, 30, 43, 0.7);
   width: var(--info-width);
