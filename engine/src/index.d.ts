@@ -643,6 +643,22 @@ export namespace ColorMapContainer {
   export function fromNamedColormap(name: string): ColorMapContainer;
 }
 
+export class RiseSetDetails {
+  constructor(bValid: boolean, rise: number, transit: number, set: number, neverRises: boolean);
+  bValid: boolean;
+  rise: number;
+  transit: number;
+  set: number;
+  bNeverRises: boolean;
+}
+
+export class AstroCalc {
+  static getRiseTrinsitSet(jd: number, lat: number, lng: number,
+                           ra1: number, dec1: number, ra2: number,
+                           dec2: number, ra3: number, dec3: number,
+                           type: number): RiseSetDetails;
+}
+
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
 }

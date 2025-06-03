@@ -32,6 +32,7 @@
           <div class="fs-value"><label>Dec:</label> <span>{{ formatHms(place.get_dec()) }}</span></div>
           <div v-if="altAz" class="fs-value"><label>Alt:</label> <span>{{ formatHms(altAz.get_alt() * D2R) }}</span></div>
           <div v-if="altAz" class="fs-value"><label>Az:</label> <span>{{ formatHms(altAz.get_az() * D2R) }}</span></div>
+          <div v-if="riseSet" class="fs-value"><label>Rise:</label> <span>{{ formatHms(riseSet.rise) }}</span></div>
         </div>
       </div>
       <h5 v-if="credits"><strong>Image Credit:</strong> {{ credits }}</h5>
@@ -76,7 +77,7 @@
 import { mapActions, mapState } from "pinia";
 import { defineComponent, PropType } from 'vue';
 import { fmtHours, D2R } from "@wwtelescope/astro";
-import { Circle, Constellations, Coordinates, Imageset, Place, Settings } from "@wwtelescope/engine";
+import { AstroCalc, Circle, Constellations, Coordinates, Imageset, Place, RiseSetDetails, Settings } from "@wwtelescope/engine";
 import { engineStore } from '@wwtelescope/engine-pinia';
 import { Classification, ImageSetType } from '@wwtelescope/engine-types';
 
@@ -311,6 +312,30 @@ export default defineComponent({
     headerHeight() {
       return 0.5 * this.canvasSize * Math.abs(Math.sin(Math.PI - this.alpha) - Math.sin(Math.PI / 2 + this.alpha));
     },
+    riseSet(): RiseSetDetails | null {
+      if (this.place === null) {
+        return null;
+      }
+      let type = 0;
+      switch (this.place.get_name().toLowerCase()) {
+        case "sun":
+          type = 1;
+          break;
+        case "moon":
+          type = 2;
+          break;
+        default:
+          type = 0;
+          break;
+      }
+      console.log(this.currentTime.getTime());
+      const riseSet = AstroCalc.getRiseTrinsitSet(
+        this.currentTime.getTime(), this.wwtSettings.get_locationLat(), -this.wwtSettings.get_locationLng(),
+        this.place.get_RA(), this.place.get_dec(), this.place.get_RA(), this.place.get_dec(),
+        this.place.get_RA(), this.place.get_dec(), type);
+      console.log(riseSet);
+      return riseSet;
+    },
     wwtSettings(): Settings {
       return Settings.get_active();
     },
@@ -476,6 +501,7 @@ export default defineComponent({
     &:hover {
       background: white;
       color: rgba(25, 30, 43, 0.7);
+      cursor: pointer;
     }
   }
 }
