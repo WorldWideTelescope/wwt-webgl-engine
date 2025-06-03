@@ -2103,7 +2103,7 @@ const App = defineComponent({
       this.isPointerMoving = false;
       this.pointerStartPosition = { x: event.pageX, y: event.pageY };
 
-      if (this.showFinderScope && event.button === 2) {  // Right click
+      if (this.showFinderScope && this.wwtBackgroundImageset?.get_dataSetType() == ImageSetType.sky && event.button === 2) {  // Right click
         this.finderScopePosition = [event.pageX, event.pageY];
         this.finderScopeActive = true;
       }
@@ -3100,6 +3100,12 @@ const App = defineComponent({
       };
 
       this.$options.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+    },
+
+    wwtBackgroundImageset(imageset: Imageset | null) {
+      if (imageset?.get_dataSetType() !== ImageSetType.sky) {
+        this.finderScopeActive = false;
+      }
     },
 
     sources: {
