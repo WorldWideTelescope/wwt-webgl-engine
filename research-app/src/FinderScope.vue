@@ -32,7 +32,15 @@
           <div class="fs-value"><label>Dec:</label> <span>{{ formatHms(place.get_dec()) }}</span></div>
           <div v-if="altAz" class="fs-value"><label>Alt:</label> <span>{{ formatHms(altAz.get_alt() * D2R) }}</span></div>
           <div v-if="altAz" class="fs-value"><label>Az:</label> <span>{{ formatHms(altAz.get_az() * D2R) }}</span></div>
-          <div v-if="riseSet" class="fs-value"><label>Rise:</label> <span>{{ formatHms(riseSet.rise) }}</span></div>
+          <div v-if="riseSet" class="fs-value"><label>Rise:</label>
+            <span v-if="!riseSet.bNeverRises">{{ formatDecimal(riseSet.rise) }}</span>
+            <span v-else>N/A</span>
+          </div>
+          <div v-if="riseSet" class="fs-value"><label>Transit:</label><span>{{ formatDecimal(riseSet.transit) }}</span></div>
+          <div v-if="riseSet" class="fs-value"><label>Set:</label>
+            <span v-if="riseSet.bValid || riseSet.bNeverRises">{{ formatDecimal(riseSet.set) }}</span>
+            <span v-else>N/A</span>
+          </div>
         </div>
       </div>
       <h5 v-if="credits"><strong>Image Credit:</strong> {{ credits }}</h5>
@@ -76,8 +84,8 @@
 <script lang="ts">
 import { mapActions, mapState } from "pinia";
 import { defineComponent, PropType } from 'vue';
-import { fmtHours, D2R } from "@wwtelescope/astro";
-import { AstroCalc, Circle, Constellations, Coordinates, Imageset, Place, RiseSetDetails, Settings } from "@wwtelescope/engine";
+import { formatDecimalHours, fmtHours, D2R } from "@wwtelescope/astro";
+import { AstroCalc, Circle, Constellations, Coordinates, Imageset, Place, RiseSetDetails, Settings, SpaceTimeController } from "@wwtelescope/engine";
 import { engineStore } from '@wwtelescope/engine-pinia';
 import { Classification, ImageSetType } from '@wwtelescope/engine-types';
 
@@ -124,9 +132,11 @@ export default defineComponent({
     formatHms(angleRad: number): string {
       return fmtHours(angleRad);
     },
+    formatDecimal(hours: number): string {
+      return formatDecimalHours(hours); 
+    },
     showObject() {
       if (this.place !== null) {
-        console.log(this.place);
         this.gotoTarget({
           place: this.place,
           noZoom: false,
@@ -169,7 +179,6 @@ export default defineComponent({
       circle.set_lineWidth(3);
       circle.set_opacity(this.modelValue ? 1 : 0);
       if (this.circle === null) {
-        console.log("Adding circle");
         this.circle = circle;
         this.addAnnotation(circle);
       }
@@ -328,13 +337,10 @@ export default defineComponent({
           type = 0;
           break;
       }
-      console.log(this.currentTime.getTime());
-      const riseSet = AstroCalc.getRiseTrinsitSet(
-        this.currentTime.getTime(), this.wwtSettings.get_locationLat(), -this.wwtSettings.get_locationLng(),
+      return AstroCalc.getRiseTrinsitSet(
+        SpaceTimeController.get_jNow(), this.wwtSettings.get_locationLat(), -this.wwtSettings.get_locationLng(),
         this.place.get_RA(), this.place.get_dec(), this.place.get_RA(), this.place.get_dec(),
         this.place.get_RA(), this.place.get_dec(), type);
-      console.log(riseSet);
-      return riseSet;
     },
     wwtSettings(): Settings {
       return Settings.get_active();

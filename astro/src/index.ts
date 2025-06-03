@@ -175,3 +175,20 @@ export function fmtDegLat(angleRad: number, sep1 = ":", sep2 = ":", precision = 
 export function fmtDegLon(angleRad: number, sep1 = ":", sep2 = ":", precision = 0): string {
   return _formatSexagesimal(angnorm(angleRad) * R2D, false, 3, sep1, sep2, precision);
 }
+
+export function formatDecimalHours(dayFraction: number, sep = ":"): string {
+  // Looks like a timezone correction?
+  const ts = new Date(new Date().toUTCString()).valueOf() - new Date().valueOf();
+  const hr = ts / (1000 * 60 * 60);
+  let day = (dayFraction - hr);
+  while (day > 24) {
+    day -= 24;
+  }
+  while (day < 0) {
+    day += 24;
+  }
+
+  const hours = Math.floor(day);
+  const minutes = ((day * 60) - (hours * 60)).toFixed(0);
+  return [hours, minutes].map(n => n.toString().padStart(2, '0')).join(sep);
+}
