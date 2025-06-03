@@ -76,7 +76,7 @@ function createPlace(searchPlace: SearchPlace, constellation: string): Place {
   return place;
 }
 
-function createImageset(searchImageset: SearchImageset, id: number): Imageset {
+function createImageset(searchImageset: SearchImageset): Imageset {
   const bandPass = (searchImageset.bp !== undefined) ? searchImageset.bp : BandPass.visible;
   const projection = (searchImageset.pr !== undefined) ? searchImageset.pr : ProjectionType.tan;
   const baseTileLevel = (searchImageset.bl !== undefined) ? searchImageset.bl : 0;
@@ -121,6 +121,8 @@ function createImageset(searchImageset: SearchImageset, id: number): Imageset {
   imageset.set_referenceFrame("");
   imageset.set_meanRadius(0);
   imageset.set_baseTileDegrees(-1);
+
+  imageset.set_imageSetID(imageset.getHashCode());
   
   return imageset;
 }
@@ -162,9 +164,8 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
         const place = createPlace(searchPlace, constellation);
 
         const imagesetInfo = searchPlace.fgi;
-        imagesetID += 1;
         if (imagesetInfo) {
-          const imageset = createImageset(imagesetInfo, imagesetID);
+          const imageset = createImageset(imagesetInfo);
           place.set_studyImageset(imageset);
           rewriteURLs(imageset);
         }

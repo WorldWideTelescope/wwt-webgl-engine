@@ -121,10 +121,12 @@ export default defineComponent({
   methods: {
     ...mapActions(engineStore, [
       "addAnnotation",
+      "addImagesetToRepository",
       "removeAnnotation",
       "gotoTarget",
       "setBackgroundImageByName",
       "setForegroundImageByName",
+      "setForegroundOpacity",
     ]),
     close(): void {
       this.$emit("update:modelValue", false);
@@ -147,11 +149,14 @@ export default defineComponent({
     },
     setAsForeground() {
       if (this.imageset != null) {
+        this.addImagesetToRepository(this.imageset);
         this.setForegroundImageByName(this.imageset.get_name());
+        this.setForegroundOpacity(100);
       }
     },
     setAsBackground() {
       if (this.imageset != null) {
+        this.addImagesetToRepository(this.imageset);
         this.setBackgroundImageByName(this.imageset.get_name());
       }
     },
@@ -430,6 +435,7 @@ export default defineComponent({
   min-height: var(--canvas-size);
   height: fit-content;
   padding: 0px;
+  pointer-events: none;
 
   .fs-header, .fs-info {
     margin-left: 5px;
@@ -437,7 +443,6 @@ export default defineComponent({
 }
 
 .fs-moveable {
-  pointer-events: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -455,6 +460,7 @@ export default defineComponent({
 
 .fs-header {
   position: absolute;
+  pointer-events: auto;
   top: calc(var(--canvas-size) - var(--header-height));
   left: 0;
   background: rgba(25, 30, 43, 0.7);
@@ -481,6 +487,7 @@ export default defineComponent({
 }
 
 .fs-info {
+  pointer-events: auto;
   position: absolute;
   top: var(--canvas-size);
   left: 0;
