@@ -1206,7 +1206,7 @@ const App = defineComponent({
       lastSelectedSource: null as Source | null,
       selectionProximity: 4,
       hideAllChrome: false,
-      showFinderScope: true,
+      showFinderScope: false,
       finderScopeActive: false,
       finderScopePosition: [0, 0] as [number, number],
       searchProvider: new DefaultSearchDataProvider() as SearchDataProvider,
