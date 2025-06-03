@@ -28,10 +28,10 @@
           v-if="place && isSurvey"
           class="fs-values"
         >
-          <div class="fs-value"><label>RA:</label> <span>{{ formatHms(place.get_RA()) }}</span></div>
-          <div class="fs-value"><label>Dec:</label> <span>{{ formatHms(place.get_dec()) }}</span></div>
-          <div v-if="altAz" class="fs-value"><label>Alt:</label> <span>{{ formatHms(altAz.get_alt() * D2R) }}</span></div>
-          <div v-if="altAz" class="fs-value"><label>Az:</label> <span>{{ formatHms(altAz.get_az() * D2R) }}</span></div>
+          <div class="fs-value"><label>RA:</label> <span>{{ formatHms(place.get_RA() * H2R) }}</span></div>
+          <div class="fs-value"><label>Dec:</label> <span>{{ formatDegLat(place.get_dec() * D2R) }}</span></div>
+          <div v-if="altAz" class="fs-value"><label>Alt:</label> <span>{{ formatDegLat(altAz.get_alt() * D2R) }}</span></div>
+          <div v-if="altAz" class="fs-value"><label>Az:</label> <span>{{ formatDegAz(altAz.get_az() * D2R) }}</span></div>
           <div v-if="riseSet" class="fs-value"><label>Rise:</label>
             <span v-if="!riseSet.bNeverRises">{{ formatDecimal(riseSet.rise) }}</span>
             <span v-else>N/A</span>
@@ -84,7 +84,7 @@
 <script lang="ts">
 import { mapActions, mapState } from "pinia";
 import { defineComponent, PropType } from 'vue';
-import { formatDecimalHours, fmtHours, D2R } from "@wwtelescope/astro";
+import { formatDecimalHours, fmtHours, D2R, H2R, fmtDegLat, fmtDegAz } from "@wwtelescope/astro";
 import { AstroCalc, Circle, Constellations, Coordinates, Imageset, Place, RiseSetDetails, Settings, SpaceTimeController } from "@wwtelescope/engine";
 import { engineStore } from '@wwtelescope/engine-pinia';
 import { Classification, ImageSetType } from '@wwtelescope/engine-types';
@@ -110,6 +110,7 @@ export default defineComponent({
       width,
       canvasSize,
       D2R,
+      H2R,
     };
   },
 
@@ -133,6 +134,12 @@ export default defineComponent({
     },
     formatHms(angleRad: number): string {
       return fmtHours(angleRad);
+    },
+    formatDegLat(lat: number): string {
+      return fmtDegLat(lat);
+    },
+    formatDegAz(az: number): string {
+      return fmtDegAz(az);
     },
     formatDecimal(hours: number): string {
       return formatDecimalHours(hours); 
@@ -258,7 +265,7 @@ export default defineComponent({
       "zoomDeg",
     ]),
     altAz(): Coordinates | null {
-      if (this.place === null) {
+      if (!this.modelValue || this.place === null) {
         return null;
       }
       return Coordinates.equitorialToHorizon(

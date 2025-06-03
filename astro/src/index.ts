@@ -176,6 +176,23 @@ export function fmtDegLon(angleRad: number, sep1 = ":", sep2 = ":", precision = 
   return _formatSexagesimal(angnorm(angleRad) * R2D, false, 3, sep1, sep2, precision);
 }
 
+/** Format an azimuthal angle, measured in radians, as sexagesimal degrees.
+ *
+ * Before formatting, the angle is normalized to lie within 0-2pi.
+ *
+ * @param angleRad The latitude in radians.
+ * @param sep1 The text to put between the degrees and the arcminutes. Defaults
+ * to `":"`.
+ * @param sep2 The text to put between the arcminutes and the arcseconds.
+ * Defaults to `":"`.
+ * @param precision The number of places of decimal precision to include in the
+ * result. Defaults to 0.
+ * @returns The formatted angle.
+ */
+export function fmtDegAz(angleRad: number, sep1 = ":", sep2 = ":", precision = 0): string {
+  return _formatSexagesimal(angleRad * R2D, false, 2, sep1, sep2, precision);
+}
+
 export function formatDecimalHours(dayFraction: number, sep = ":"): string {
   // Looks like a timezone correction?
   const ts = new Date(new Date().toUTCString()).valueOf() - new Date().valueOf();
