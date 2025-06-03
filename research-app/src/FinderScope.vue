@@ -157,7 +157,7 @@ export default defineComponent({
     },
     updateClosest() {
       const position = this.findRADecForScreenPoint({ x: this.position[0], y: this.position[1] });
-      this.searchProvider.closestLocation({ raDeg: position.ra, decDeg: position.dec }).then(place => {
+      this.searchProvider.placeForLocation({ raDeg: position.ra, decDeg: position.dec }).then(place => {
         this.place = place;
       });
     },

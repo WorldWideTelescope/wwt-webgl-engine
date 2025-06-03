@@ -183,7 +183,7 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
     return places;
   }
 
-  async closestLocation(location: { raDeg: number; decDeg: number; }): Promise<Place | null> {
+  async placeForLocation(location: { raDeg: number; decDeg: number; }): Promise<Place | null> {
     await this.loadDataIfNeeded();
     const constellation = Constellations.containment.findConstellationForPoint(location.raDeg * D2H, location.decDeg);
 
@@ -211,9 +211,6 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
         }
       }
     });
-
-    // TODO:
-    // Add in getting astronomical details for place
 
     return closestPlace;
   }
