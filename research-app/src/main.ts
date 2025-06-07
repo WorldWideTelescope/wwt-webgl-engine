@@ -44,6 +44,7 @@ import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
 
 import App from "./App.vue";
+import FinderScope from "./FinderScope.vue";
 import ImagesetItem from "./ImagesetItem.vue";
 import SourceItem from "./SourceItem.vue";
 import SpreadsheetItem from "./SpreadsheetItem.vue";
@@ -138,6 +139,7 @@ createApp(App, {
   .component('imageset-item', ImagesetItem)
   .component('source-item', SourceItem)
   .component('transition-expand', TransitionExpand)
+  .component('finder-scope', FinderScope)
 
   // Mount the app
   .mount("#app");
