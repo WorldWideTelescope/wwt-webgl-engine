@@ -84,7 +84,7 @@
 <script lang="ts">
 import { mapActions, mapState } from "pinia";
 import { defineComponent, PropType } from 'vue';
-import { formatDecimalHours, fmtHours, D2R, H2R, fmtDegLat, fmtDegAz } from "@wwtelescope/astro";
+import { formatDecimalHours, fmtHours, D2R, H2R, R2D, fmtDegLat, formatSexagesimal } from "@wwtelescope/astro";
 import { AstroCalc, Circle, Constellations, Coordinates, Imageset, Place, RiseSetDetails, Settings, SpaceTimeController } from "@wwtelescope/engine";
 import { engineStore } from '@wwtelescope/engine-pinia';
 import { Classification, ImageSetType } from '@wwtelescope/engine-types';
@@ -133,13 +133,20 @@ export default defineComponent({
       this.$emit("update:modelValue", false);
     },
     formatHms(angleRad: number): string {
-      return fmtHours(angleRad);
+      return fmtHours(angleRad, "h", "m", 1, "s");
     },
     formatDegLat(lat: number): string {
       return fmtDegLat(lat);
     },
     formatDegAz(az: number): string {
-      return fmtDegAz(az);
+      return formatSexagesimal({
+        value: az * R2D,
+        showPlus: false,
+        padWhole: 2,
+        firstSeparator: ":",
+        secondSeparator: ":",
+        precision: 0,
+      });
     },
     formatDecimal(hours: number): string {
       return formatDecimalHours(hours); 

@@ -89,20 +89,40 @@ export function angnorm(angleRad: number): number {
   return Math.atan2(num, den);
 }
 
-function _formatSexagesimal(
-  value: number,
-  showPlus: boolean,
-  padWhole: number,
-  sep1: string,
-  sep2: string,
-  precision: number
+/** Options for {@link formatSexagesimal} */
+export interface FormatSexagesimalOptions {
+  /** The numerical value to format */
+  value: number;
+
+  /** Whether to show a leading plus if the value is positive */
+  showPlus: boolean;
+
+  /** The number of digits to which to pad the whole number part of the formatted expression */
+  padWhole: number;
+
+  /** The separator between the first two pieces of the formatted expression */
+  firstSeparator: string;
+
+  /** The separator between the second two pieces of the formatted expression */
+  secondSeparator: string;
+
+  /** If given, a suffix appended to the end of the formatted expression */
+  suffix?: string;
+
+  /** The number of places of decimal precision to include in the result. */
+  precision: number;
+}
+
+export function formatSexagesimal(
+  options: FormatSexagesimalOptions,
 ): string {
   let prefix = "";
 
+  let value = options.value;
   if (value < 0) {
     value = -value;
     prefix = "-";
-  } else if (showPlus) {
+  } else if (options.showPlus) {
     prefix = "+";
   }
 
@@ -113,11 +133,14 @@ function _formatSexagesimal(
   const seconds = Math.floor(value);
   const remainder = value - seconds;
 
-  const wText = String(whole).padStart(padWhole, '0');
+  const wText = String(whole).padStart(options.padWhole, '0');
   const mText = String(minutes).padStart(2, '0');
   const sText = String(seconds).padStart(2, '0');
-  const rText = remainder.toFixed(precision).slice(1);  // drop the leading "0"
-  return `${prefix}${wText}${sep1}${mText}${sep2}${sText}${rText}`
+  const rText = remainder.toFixed(options.precision).slice(1);  // drop the leading "0"
+  const suffix = options.suffix ?? "";
+  const sep1 = options.firstSeparator;
+  const sep2 = options.secondSeparator;
+  return `${prefix}${wText}${sep1}${mText}${sep2}${sText}${rText}${suffix}`
 }
 
 /** Format an angle, measured in radians, as sexagesimal hours.
@@ -133,8 +156,16 @@ function _formatSexagesimal(
  * result. Defaults to 0.
  * @returns The formatted angle.
  */
-export function fmtHours(angleRad: number, sep1 = ":", sep2 = ":", precision = 0): string {
-  return _formatSexagesimal(angnorm(angleRad) * R2H, false, 2, sep1, sep2, precision);
+export function fmtHours(angleRad: number, sep1 = ":", sep2 = ":", precision = 0, suffix = ""): string {
+  return formatSexagesimal({
+    value: angnorm(angleRad) * R2H,
+    showPlus: false,
+    padWhole: 2,
+    firstSeparator: sep1,
+    secondSeparator: sep2,
+    precision,
+    suffix,
+  });
 }
 
 /** Format a latitudinal angle, measured in radians, as sexagesimal degrees.
@@ -155,7 +186,14 @@ export function fmtDegLat(angleRad: number, sep1 = ":", sep2 = ":", precision = 
   if (angleRad < -PI || angleRad > PI)
     return ` ??${sep1}??${sep2}??`;
 
-  return _formatSexagesimal(angleRad * R2D, true, 2, sep1, sep2, precision);
+  return formatSexagesimal({
+    value: angleRad * R2D,
+    showPlus: true,
+    padWhole: 2,
+    firstSeparator: sep1,
+    secondSeparator: sep2,
+    precision,
+  });
 }
 
 /** Format a longitudinal angle, measured in radians, as sexagesimal degrees.
@@ -173,24 +211,14 @@ export function fmtDegLat(angleRad: number, sep1 = ":", sep2 = ":", precision = 
  * @returns The formatted angle.
  */
 export function fmtDegLon(angleRad: number, sep1 = ":", sep2 = ":", precision = 0): string {
-  return _formatSexagesimal(angnorm(angleRad) * R2D, false, 3, sep1, sep2, precision);
-}
-
-/** Format an azimuthal angle, measured in radians, as sexagesimal degrees.
- *
- * Before formatting, the angle is normalized to lie within 0-2pi.
- *
- * @param angleRad The latitude in radians.
- * @param sep1 The text to put between the degrees and the arcminutes. Defaults
- * to `":"`.
- * @param sep2 The text to put between the arcminutes and the arcseconds.
- * Defaults to `":"`.
- * @param precision The number of places of decimal precision to include in the
- * result. Defaults to 0.
- * @returns The formatted angle.
- */
-export function fmtDegAz(angleRad: number, sep1 = ":", sep2 = ":", precision = 0): string {
-  return _formatSexagesimal(angleRad * R2D, false, 2, sep1, sep2, precision);
+  return formatSexagesimal({
+    value: angnorm(angleRad) * R2D,
+    showPlus: false,
+    padWhole: 3,
+    firstSeparator: sep1,
+    secondSeparator: sep2,
+    precision,
+  });
 }
 
 export function formatDecimalHours(dayFraction: number, sep = ":"): string {
