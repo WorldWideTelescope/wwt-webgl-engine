@@ -653,7 +653,7 @@ export class RiseSetDetails {
 }
 
 export class AstroCalc {
-  static getRiseTrinsitSet(jd: number, lat: number, lng: number,
+  static getRiseTransitSet(jd: number, lat: number, lng: number,
                            ra1: number, dec1: number, ra2: number,
                            dec2: number, ra3: number, dec3: number,
                            type: number): RiseSetDetails;

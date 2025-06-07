@@ -356,7 +356,7 @@ export default defineComponent({
           type = 0;
           break;
       }
-      return AstroCalc.getRiseTrinsitSet(
+      return AstroCalc.getRiseTransitSet(
         SpaceTimeController.get_jNow(), this.wwtSettings.get_locationLat(), -this.wwtSettings.get_locationLng(),
         this.place.get_RA(), this.place.get_dec(), this.place.get_RA(), this.place.get_dec(),
         this.place.get_RA(), this.place.get_dec(), type);
