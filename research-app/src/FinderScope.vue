@@ -497,6 +497,10 @@ export default defineComponent({
     position: absolute;
     top: 7px;
     right: 7px;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 
