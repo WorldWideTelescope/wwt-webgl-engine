@@ -106,6 +106,8 @@ export default defineComponent({
       place: null as Place | null,
       circle: null as Circle | null,
       crosshairsDrawn: false,
+      crosshairsColor: "rgba(216, 216, 216, 0.5)",
+      backgroundColor: "rgba(25, 30, 43, 0.7)",
       alpha,
       width,
       canvasSize,
@@ -217,7 +219,7 @@ export default defineComponent({
 
       const gap = this.canvasSize - 2 * this.circleRadius;
 
-      context.strokeStyle = "rgba(216, 216, 216, 0.5)";
+      context.strokeStyle = this.crosshairsColor;
       context.lineWidth = 1;
 
       context.beginPath();
@@ -230,16 +232,15 @@ export default defineComponent({
       context.lineTo(centerX + gap, canvas.height - gap);
       context.stroke();
 
-      context.strokeStyle = "rgba(25, 30, 43, 0.7)";
+      context.strokeStyle = this.backgroundColor;
       context.fillStyle = "transparent";
       context.lineWidth = 4;
 
       context.beginPath();
       context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      context.fill();
       context.stroke();
 
-      context.fillStyle = "rgba(25, 30, 43, 0.7)";
+      context.fillStyle = this.backgroundColor;
       context.strokeStyle = "transparent";
       context.lineWidth = 0;
 
@@ -248,10 +249,8 @@ export default defineComponent({
       context.lineTo(0, canvas.height);
       context.lineTo(centerX, canvas.height);
       context.fill();
-      context.stroke();
 
       this.crosshairsDrawn = true;
-
     },
     clearCrosshairs() {
       const canvas = this.$el.querySelector(".fs-crosshairs") as HTMLCanvasElement;
@@ -328,6 +327,8 @@ export default defineComponent({
         "--header-height": `${this.headerHeight}px`,
         "--info-width": `${this.infoWidth}px`,
         "--width": `${this.width}px`,
+        "--fs-background-color": this.backgroundColor,
+        "--fs-crosshairs-color": this.crosshairsColor,
       };
     },
     circleRadius(): number {
@@ -438,6 +439,7 @@ export default defineComponent({
 
 <style scoped lang="less">
 .finder-scope {
+
   position: absolute;
   top: var(--top);
   left: var(--left);
@@ -477,8 +479,8 @@ export default defineComponent({
   pointer-events: auto;
   top: calc(var(--canvas-size) - var(--header-height));
   left: 0;
-  background: rgba(25, 30, 43, 0.7);
-  width: calc(var(--width) - var(--canvas-size) - 1px);
+  background: var(--fs-background-color);
+  width: calc(var(--width) - var(--canvas-size) - 4px);
   height: var(--header-height);
 
   a {
@@ -509,7 +511,7 @@ export default defineComponent({
   position: absolute;
   top: var(--canvas-size);
   left: 0;
-  background: rgba(25, 30, 43, 0.7);
+  background: var(--fs-background-color);
   width: var(--info-width);
 
   div {
@@ -525,13 +527,13 @@ export default defineComponent({
 
   button {
     background: transparent;
-    border: 1px solid rgba(216, 216, 216, 0.7);
+    border: 1px solid var(--fs-crosshairs-color);
     border-radius: 2px;
     color: white;
 
     &:hover {
       background: white;
-      color: rgba(25, 30, 43, 0.7);
+      color: var(--fs-background-color);
       cursor: pointer;
     }
   }
