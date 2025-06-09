@@ -643,16 +643,23 @@ export namespace ColorMapContainer {
   export function fromNamedColormap(name: string): ColorMapContainer;
 }
 
+/** A class describing rise/set/transit details */
 export class RiseSetDetails {
   constructor(bValid: boolean, rise: number, transit: number, set: number, neverRises: boolean);
+  /** Whether the set of information is valid */
   bValid: boolean;
+  /** The rise time */
   rise: number;
+  /** The transit time */
   transit: number;
+  /** The set time */
   set: number;
+  /** If true, this means that the object never rises/sets */
   bNeverRises: boolean;
 }
 
 export class AstroCalc {
+  /** Calculate rise/set/transit details given a time, location, and ra/dec values */
   static getRiseTransitSet(jd: number, lat: number, lng: number,
                            ra1: number, dec1: number, ra2: number,
                            dec2: number, ra3: number, dec3: number,
