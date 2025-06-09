@@ -155,7 +155,6 @@ export class DefaultSearchDataProvider implements SearchDataProvider {
   }
 
   parseData(data: SearchData): Record<string, Place[]> {
-    let imagesetID = 100;
     const places: Record<string, Place[]> = {};
     data.Constellations.forEach(info => {
       const constellation = info.name;

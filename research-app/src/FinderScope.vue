@@ -418,9 +418,7 @@ export default defineComponent({
       }
     },
     modelValue(value: boolean) {
-      if (value) {
-        this.updateClosest();
-      } else {
+      if (!value) {
         this.place = null;
       }
 
