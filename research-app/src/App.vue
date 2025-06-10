@@ -2743,7 +2743,6 @@ const App = defineComponent({
     // Add Imagery As Layer tool
 
     addImagery(iinfo: ImagesetInfo) {
-      console.log(iinfo);
       const msg: classicPywwt.CreateImageSetLayerMessage = {
         event: "image_layer_create",
         url: iinfo.url,
