@@ -1,13 +1,9 @@
-import { distance } from "@wwtelescope/astro";
+import { distance, H2R, D2R, D2H } from "@wwtelescope/astro";
 import { Constellations, Imageset, Place, URLHelpers, URLRewriteMode } from "@wwtelescope/engine";
 import { BandPass, Classification, ImageSetType, ProjectionType, SolarSystemObjects } from "@wwtelescope/engine-types";
 
 import { SearchDataProvider } from "./search";
 
-const H2R = Math.PI / 12;
-const D2R = Math.PI / 180;
-const R2D = 180 / Math.PI;
-const D2H = 1 / 15;
 
 interface SearchImageset {
   bd: number;

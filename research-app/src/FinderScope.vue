@@ -285,7 +285,10 @@ export default defineComponent({
     },
     classification(): string {
       const type = Classification[this.place?.get_classification() ?? Classification.unidentified];
-      const addSpaces = /(?<!^)([A-Z])/;
+      // I would prefer to do something like the following, but lookbehind isn't supported
+      // for Safari <= 16.3. But all of our classification names are all letters, so this should be fine
+      // const addSpaces = /(?<!^)([A-Z])/g;
+      const addSpaces = /[a-zA-Z]([A-Z])/g;
       const cls = type.replace(addSpaces, " $1");
       return cls.charAt(0).toUpperCase() + cls.slice(1);
     },
