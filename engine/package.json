@@ -52,7 +52,7 @@
     "clean": "rimraf src/index.js src/index.js.map src/index.min.js tests/results.xml tsconfig.tsbuildinfo",
     "doc": "typedoc src/index.d.ts",
     "lint": "eslint esm",
-    "test": "mocha-headless-chrome -f tests/tests.html -r xunit >tests/results.xml",
+    "test": "mocha-headless-chrome -f tests/tests.html -r xunit -a no-sandbox -a disable-setuid-sandbox > tests/results.xml",
     "tscheck": "tsc"
   },
   "types": "./src/index.d.ts",
