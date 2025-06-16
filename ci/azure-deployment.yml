@@ -46,7 +46,7 @@ jobs:
     displayName: Deploy hosted engine artifacts
     inputs:
       SourcePath: '$(Pipeline.Workspace)/engine-hosted'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azureSubscription: 'wwt-web-service-connection'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
