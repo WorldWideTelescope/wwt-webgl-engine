@@ -46,7 +46,7 @@ jobs:
     displayName: Deploy hosted engine artifacts
     inputs:
       SourcePath: '$(Pipeline.Workspace)/engine-hosted'
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
@@ -56,7 +56,7 @@ jobs:
     condition: and(succeeded(), ne(variables['ENGINE_DEPLOYMENT_TAG'], 'skip'))
     displayName: CDN purge - hosted engine artifacts
     inputs:
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
@@ -96,7 +96,7 @@ jobs:
     displayName: Deploy embed web application
     inputs:
       SourcePath: '$(Pipeline.Workspace)/embed'
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
@@ -106,7 +106,7 @@ jobs:
     condition: and(succeeded(), ne(variables['EMBED_DEPLOYMENT_TAG'], 'skip'))
     displayName: CDN purge - embed web app
     inputs:
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
@@ -147,7 +147,7 @@ jobs:
     displayName: Deploy embed-creator web application
     inputs:
       SourcePath: '$(Pipeline.Workspace)/embed-creator'
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
@@ -160,7 +160,7 @@ jobs:
     condition: and(succeeded(), ne(variables['CREATOR_DEPLOYMENT_TAG'], 'skip'))
     displayName: CDN purge - embed-creator web app
     inputs:
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
@@ -205,7 +205,7 @@ jobs:
     displayName: Deploy research web application
     inputs:
       SourcePath: '$(Pipeline.Workspace)/research-app'
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
@@ -215,7 +215,7 @@ jobs:
     condition: and(succeeded(), ne(variables['RESEARCH_APP_DEPLOYMENT_TAG'], 'skip'))
     displayName: CDN purge - research web app
     inputs:
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
@@ -257,7 +257,7 @@ jobs:
     displayName: Deploy engine documentation
     inputs:
       SourcePath: '$(Pipeline.Workspace)/docs-engine'
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
@@ -266,7 +266,7 @@ jobs:
   - task: AzurePowerShell@4
     displayName: CDN purge - engine docs
     inputs:
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
@@ -303,7 +303,7 @@ jobs:
     displayName: Deploy research app documentation
     inputs:
       SourcePath: '$(Pipeline.Workspace)/docs-research-app'
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
@@ -312,7 +312,7 @@ jobs:
   - task: AzurePowerShell@4
     displayName: CDN purge - research app docs
     inputs:
-      azureSubscription: 'wwt-web-service-connection'
+      azureSubscription: 'aas@wwtadmindotnetfoundation'
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
