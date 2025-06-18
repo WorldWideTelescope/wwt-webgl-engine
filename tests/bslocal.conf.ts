@@ -53,7 +53,7 @@ const winKeyMaker = function(version: string, browser: string): string {
 addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', WINDOWS_VERSIONS, WINDOWS_BROWSERS, winKeyMaker);
 
 // OS X
-const OSX_VERSIONS = ["Big Sur", "Catalina", "Mojave"];
+const OSX_VERSIONS = ["Monterey", "Big Sur", "Catalina", "Mojave"];
 const OSX_BROWSERS = ["Chrome", "MicrosoftEdge", "Firefox", "Safari"];
 const osxKeyMaker = function(version: string, browser: string): string {
   const browserName = (browser === 'MicrosoftEdge' ? 'Edge' : browser);
@@ -71,7 +71,7 @@ const simpleKeyMaker = function(_version: string, browser: string): string {
   return browser.toLowerCase();
 };
 addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', ['10'], ['Chrome', 'Firefox', 'MicrosoftEdge'], simpleKeyMaker);
-addBrowsers(environments, BSLOCAL_CAPABILITIES, 'OS X', ['Big Sur'], ['Safari'], simpleKeyMaker);
+addBrowsers(environments, BSLOCAL_CAPABILITIES, 'OS X', ['Monterey'], ['Safari'], simpleKeyMaker);
 
 // Code to copy seleniumhost/port into test settings
 for (const i in nightwatch_config.test_settings) {
