@@ -46,7 +46,7 @@ jobs:
     displayName: Deploy hosted engine artifacts
     inputs:
       SourcePath: '$(Pipeline.Workspace)/engine-hosted'
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azureSubscription: 'wwt-web-service-connection'
       Destination: 'AzureBlob'
       storage: 'wwtwebstatic'
       ContainerName: '$web'
@@ -56,7 +56,7 @@ jobs:
     condition: and(succeeded(), ne(variables['ENGINE_DEPLOYMENT_TAG'], 'skip'))
     displayName: CDN purge - hosted engine artifacts
     inputs:
-      azureSubscription: 'aas@wwtadmindotnetfoundation'
+      azureSubscription: 'wwt-web-service-connection'
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
