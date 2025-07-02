@@ -12,7 +12,8 @@
     "engine-types",
     "research-app",
     "research-app-messages",
-    "tests"
+    "tests",
+    "ui-components",
   ],
   "scripts": {
     "build": "yarn workspaces foreach -vt run build",
@@ -34,7 +35,8 @@
     "@wwtelescope/engine-pinia": "workspace:*",
     "@wwtelescope/engine-types": "workspace:*",
     "@wwtelescope/research-app": "workspace:*",
-    "@wwtelescope/research-app-messages": "workspace:*"
+    "@wwtelescope/research-app-messages": "workspace:*",
+    "@wwtelescope/ui-components": "workspace:*"
   },
   "devDependencies": {
     "concurrently": "^5.2.0",
