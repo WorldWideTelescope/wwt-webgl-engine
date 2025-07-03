@@ -13,7 +13,7 @@
     "research-app",
     "research-app-messages",
     "tests",
-    "ui-components",
+    "ui-components"
   ],
   "scripts": {
     "build": "yarn workspaces foreach -vt run build",

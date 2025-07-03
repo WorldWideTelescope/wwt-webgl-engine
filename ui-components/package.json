@@ -13,7 +13,7 @@
   "description": "UI components build on top of the WWT WebGL Vue/Pinia store",
   "homepage": "https://worldwidetelescope.org/home/",
   "keywords": [
-    "WorldWide Telescope",
+    "WorldWide Telescope"
   ],
   "license": "MIT",
   "main": "./dist/index.common.js",
