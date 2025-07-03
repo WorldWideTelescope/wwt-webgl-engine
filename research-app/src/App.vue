@@ -374,7 +374,6 @@ import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 
 import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
-import type { SearchDataProvider } from "./search";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { WWTControl } from "@wwtelescope/engine";
@@ -392,7 +391,6 @@ import {
   Imageset,
   ImageSetLayer,
   ImageSetLayerSetting,
-  Place,
   Poly,
   PolyLine,
   SpreadSheetLayer,
@@ -434,6 +432,7 @@ import {
   PointerUpMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
+import { type SearchDataProvider, DefaultSearchDataProvider } from "@wwtelescope/ui-components";
 
 import {
   convertEngineSetting,
@@ -442,7 +441,6 @@ import {
   convertSpreadSheetLayerSetting,
 } from "./settings";
 import { defineComponent, isProxy, toRaw } from "vue";
-import { DefaultSearchDataProvider } from "./default_search";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;

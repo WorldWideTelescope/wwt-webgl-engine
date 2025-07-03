@@ -20,21 +20,12 @@
   ],
   "references": [
     {
-      "path": "../astro"
-    },
-    {
-      "path": "../engine"
-    },
-    {
-      "path": "../engine-helpers"
-    },
-    {
-      "path": "../engine-types"
+      "path": "../engine-pinia"
     },
   ],
   "typedocOptions": {
-    "readme": "../docs/engine/engine-pinia-index.md",
-    "out": "../docs/engine/static/apiref/engine-pinia",
+    "readme": "../docs/engine/ui-components-index.md",
+    "out": "../docs/engine/static/apiref/ui-components",
     "gaID": "UA-107473046-3",
     "excludePrivate": true,
     "plugin": [
