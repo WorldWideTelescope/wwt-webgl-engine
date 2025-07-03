@@ -44,13 +44,13 @@ import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
 
 import App from "./App.vue";
-import FinderScope from "./FinderScope.vue";
 import ImagesetItem from "./ImagesetItem.vue";
 import SourceItem from "./SourceItem.vue";
 import SpreadsheetItem from "./SpreadsheetItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import { wwtEngineNamespace } from "./namespaces";
 import { wwtPinia, WWTComponent } from "@wwtelescope/engine-pinia";
+import { FinderScope } from "@wwtelescope/ui-components";
 
 
 library.add(faAdjust);

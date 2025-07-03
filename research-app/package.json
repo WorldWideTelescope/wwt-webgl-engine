@@ -15,6 +15,7 @@
     "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0",
     "@wwtelescope/engine-types": "workspace:0.0.0-dev.0",
     "@wwtelescope/research-app-messages": "workspace:0.0.0-dev.0",
+    "@wwtelescope/ui-components": "workspace:0.0.0-dev.0",
     "moment": "^2.29.1",
     "screenfull": "^5",
     "vue": "^3",
