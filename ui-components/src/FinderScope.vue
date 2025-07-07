@@ -372,31 +372,31 @@ export default defineComponent({
       return [
         {
           name: "wikipedia",
-          img: require("./assets/wikipedia.svg"),
+          img: "https://upload.wikimedia.org/wikipedia/en/8/80/Wikipedia-logo-v2.svg",
           url: `https://wikipedia.org/wiki/Special:Search?search=${this.queryStringName}`,
           alt: "Look up on Wikipedia",
         },
         {
           name: "ads",
-          img: require("./assets/ads.svg"),
+          img: "https://ui.adsabs.harvard.edu/help/img/bbb_assets/ads_partial_logo_dark_background.svg",
           url: `https://ui.adsabs.harvard.edu/search/q=object:%22${this.queryStringName}%22`,
           alt: "Look up on SAO/NASA ADS",
         },
         {
           name: "simbad",
-          img: require("./assets/simbad.png"),
+          img: "https://cds.unistra.fr/img/cds/simbad.svg",
           url: `https://simbad.u-strasbg.fr/simbad/sim-id?Ident=${this.queryStringName}`,
           alt: "Look up on SIMBAD",
         },
         {
           name: "ned",
-          img: require("./assets/ned.png"),
+          img: "https://www.ipac.caltech.edu/system/activities/logos/61/small/NED-small_copy.png",
           url: `https://ned.ipac.caltech.edu/cgi-bin/nph-imgdata?objname=${this.queryStringName}`,
           alt: "Look up on NED",
         },
         {
           name: "esasky",
-          img: require("./assets/esasky.png"),
+          img: "https://sky.esa.int/esasky/esasky_cl_7_3_9_2025_07_03T09_50_05Z/E36D5EC1618ABCDE1D2EAF66AE09752C.cache.png",
           url: `http://sky.esa.int/?action=goto&target=${(this.place?.get_RA() ?? 0)*15}%20${this.place?.get_dec() ?? 0}&hips=DSS2%20color&fov=${this.zoomDeg/6}&cooframe=J2000&sci=true`,
           alt: "View in ESASky",
         }
