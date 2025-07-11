@@ -28,16 +28,18 @@ export function isGenericSetting(obj: any): obj is GenericSetting {  // eslint-d
 /** Settings for the overall application.
  *
  * This should be thought of as an enumeration type, all of whose options are
- * compatible with {@link GenericSetting}. Right now, there are only two options
+ * compatible with {@link GenericSetting}. Right now, there are only three options
  * available, though.
  * */
 export type AppSetting =
   ["hideAllChrome", boolean] |
-  ["selectionProximity", number];
+  ["selectionProximity", number] |
+  ["showFinderScope", boolean];
 
 const appSettingTypeInfo: { [i: string]: boolean | number } = {
   "hideAllChrome/boolean": true,
-  "selectionProximity/number": 4
+  "selectionProximity/number": 4,
+  "showFinderScope/boolean": true,
 };
 
 /** Type guard function for {@link AppSetting}. */

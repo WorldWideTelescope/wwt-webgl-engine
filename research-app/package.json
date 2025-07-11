@@ -15,6 +15,7 @@
     "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0",
     "@wwtelescope/engine-types": "workspace:0.0.0-dev.0",
     "@wwtelescope/research-app-messages": "workspace:0.0.0-dev.0",
+    "@wwtelescope/ui-components": "workspace:0.0.0-dev.0",
     "moment": "^2.29.1",
     "screenfull": "^5",
     "vue": "^3",
@@ -51,7 +52,8 @@
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/engine-pinia": "thiscommit:2024-02-07:OwPqq4M",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/research-app-messages": "thiscommit:2023-02-19:Kuk5Ppd"
+    "@wwtelescope/research-app-messages": "thiscommit:2023-02-19:Kuk5Ppd",
+    "@wwtelescope/ui-components": "thiscommit:2025-07-11:6supceo"
   },
   "keywords": [
     "WorldWide Telescope"

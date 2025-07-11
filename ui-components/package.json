@@ -1,0 +1,51 @@
+{
+  "author": "The WorldWide Telescope Team <hello@worldwidetelescope.org>",
+  "browser": "dist/index.umd.js",
+  "bugs": {
+    "email": "hello@worldwidetelescope.org",
+    "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
+  },
+  "dependencies": {
+    "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0",
+    "pinia": "^2.0.22",
+    "vue": "^3"
+  },
+  "description": "UI components build on top of the WWT WebGL Vue/Pinia store",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-plugin-typescript": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "@vue/eslint-config-typescript": "^11.0.2",
+    "eslint": "^8.24.0",
+    "eslint-plugin-vue": "^9.5.1",
+    "rimraf": "^3",
+    "typedoc": "0.25.1",
+    "typescript": "~4.8.4",
+    "vue-template-compiler": "~2.6.11"
+  },
+  "homepage": "https://worldwidetelescope.org/home/",
+  "internalDepVersions": {
+      "@wwtelescope/engine-pinia": "thiscommit:2025-07-11:lNe9Fk1"
+  },
+  "keywords": [
+    "WorldWide Telescope"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.common.js",
+  "module": "dist/",
+  "name": "@wwtelescope/ui-components",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "github:WorldWideTelescope/wwt-webgl-engine",
+  "scripts": {
+    "build": "vue-cli-service build --target lib --name index src/index.ts",
+    "clean": "rimraf dist",
+    "doc": "typedoc src/index.ts",
+    "lint": "vue-cli-service lint src"
+  },
+  "types": "./dist/src/index.d.ts",
+  "version": "0.0.0-dev.0"
+}

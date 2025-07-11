@@ -1909,6 +1909,7 @@ __metadata:
     "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0"
     "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
     "@wwtelescope/research-app-messages": "workspace:0.0.0-dev.0"
+    "@wwtelescope/ui-components": "workspace:0.0.0-dev.0"
     copyfiles: ^2.2.0
     eslint: ^8.24.0
     eslint-plugin-vue: ^9.5.1
@@ -1946,6 +1947,28 @@ __metadata:
     nightwatch: ^1.7.13
     rimraf: ^3
     typescript: ~4.8.4
+  languageName: unknown
+  linkType: soft
+
+"@wwtelescope/ui-components@workspace:*, @wwtelescope/ui-components@workspace:0.0.0-dev.0, @wwtelescope/ui-components@workspace:ui-components":
+  version: 0.0.0-use.local
+  resolution: "@wwtelescope/ui-components@workspace:ui-components"
+  dependencies:
+    "@typescript-eslint/eslint-plugin": ^5.38.1
+    "@typescript-eslint/parser": ^5.38.1
+    "@vue/cli-plugin-eslint": ^5.0.8
+    "@vue/cli-plugin-typescript": ^5.0.8
+    "@vue/cli-service": ^5.0.8
+    "@vue/eslint-config-typescript": ^11.0.2
+    "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0"
+    eslint: ^8.24.0
+    eslint-plugin-vue: ^9.5.1
+    pinia: ^2.0.22
+    rimraf: ^3
+    typedoc: 0.25.1
+    typescript: ~4.8.4
+    vue: ^3
+    vue-template-compiler: ~2.6.11
   languageName: unknown
   linkType: soft
 
@@ -11974,6 +11997,7 @@ __metadata:
     "@wwtelescope/engine-types": "workspace:*"
     "@wwtelescope/research-app": "workspace:*"
     "@wwtelescope/research-app-messages": "workspace:*"
+    "@wwtelescope/ui-components": "workspace:*"
     concurrently: ^5.2.0
     rimraf: ^3
     typedoc-plugin-vue: ^1.1.0

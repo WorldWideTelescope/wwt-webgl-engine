@@ -643,14 +643,57 @@ export namespace ColorMapContainer {
   export function fromNamedColormap(name: string): ColorMapContainer;
 }
 
+/** A class describing rise/set/transit details */
+export class RiseSetDetails {
+  constructor(bValid: boolean, rise: number, transit: number, set: number, neverRises: boolean);
+  /** Whether the set of information is valid */
+  bValid: boolean;
+  /** The rise time */
+  rise: number;
+  /** The transit time */
+  transit: number;
+  /** The set time */
+  set: number;
+  /** If true, this means that the object never rises/sets */
+  bNeverRises: boolean;
+}
+
+export class AstroCalc {
+  /** Calculate rise/set/transit details given a time, location, and ra/dec values */
+  static getRiseTransitSet(jd: number, lat: number, lng: number,
+                           ra1: number, dec1: number, ra2: number,
+                           dec2: number, ra3: number, dec3: number,
+                           type: number): RiseSetDetails;
+}
+
 export class ConstellationFilter implements ConstellationFilterInterface {
   clone(): ConstellationFilter;
 }
 
 export class Constellations {
   static containment: Constellations;
+  static fullNames: Record<string, string>;
 
   findConstellationForPoint(ra: number, dec: number): string;
+}
+
+export class Coordinates {
+  get_RA(): number;
+  set_RA(ra: number): void;
+  get_dec(): number;
+  set_dec(dec: number): void;
+  get_lat(): number;
+  set_lat(lat: number): void;
+  get_lng(): number;
+  set_lng(lng: number): void;
+  get_alt(): number;
+  set_alt(alt: number): void;
+  get_az(): number;
+  set_az(az: number): void;
+  static fromRaDec(raHrs: number, decDeg: number): Coordinates;
+  static fromLatLng(latDeg: number, lngDeg: number): Coordinates;
+  static raDecTo3d(ra: number, dec: number): Vector3d;
+  static equitorialToHorizon(equitorial: Coordinates, location: Coordinates, utc: Date): Coordinates;
 }
 
 /** The full EngineSetting type, which augments engine-types' BaseEngineSetting
@@ -1191,6 +1234,7 @@ export class Place implements Thumbnail {
   set_lat(v: number): number;
   get_lng(): number;
   set_lng(v: number): number;
+  get_location3d(): Vector3d;
   get_magnitude(): number;
   set_magnitude(v: number): number;
   get_name(): string;
@@ -1684,6 +1728,8 @@ export class Settings implements EngineSettingsInterface {
   set_planetOrbitsFilter(v: number): number;
   get_constellations(): boolean;
   set_constellations(v: boolean): boolean;
+
+  static get_active(): Settings;
 }
 
 export namespace SpaceTimeController {
@@ -2239,6 +2285,17 @@ export type URLHelpers = typeof URLHelpers;
 export enum URLRewriteMode {
   AsIfAbsolute = 0, // act as if this URL is absolute even if it is missing a domain
   OriginRelative = 1, // if this URL is relative, treat it as relative to the browser origin
+}
+
+export class Vector3d {
+  x: number;
+  y: number;
+  z: number;
+
+  length(): number;
+
+  static create(x: number, y: number, z: number): Vector3d;
+  static subtractVectors(left: Vector3d, right: Vector3d): Vector3d;
 }
 
 /** A VOTable dataset.

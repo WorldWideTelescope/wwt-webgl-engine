@@ -8,6 +8,13 @@
       @pointerdown="wwtOnPointerDown"
     ></WorldWideTelescope>
 
+    <finder-scope
+      v-if="showFinderScope"
+      v-model="finderScopeActive"
+      :position="finderScopePosition"
+      :search-provider="searchProvider"
+    ></finder-scope>
+
     <!-- keydown.stops here and below prevent any keynav presses from reaching
       the toplevel UI handlers -->
     <div id="ui-elements">
@@ -424,6 +431,7 @@ import {
   PointerUpMessage,
   ViewStateMessage,
 } from "@wwtelescope/research-app-messages";
+import { type SearchDataProvider, DefaultSearchDataProvider } from "@wwtelescope/ui-components";
 
 import {
   convertEngineSetting,
@@ -1195,6 +1203,10 @@ const App = defineComponent({
       lastSelectedSource: null as Source | null,
       selectionProximity: 4,
       hideAllChrome: false,
+      showFinderScope: false,
+      finderScopeActive: false,
+      finderScopePosition: [0, 0] as [number, number],
+      searchProvider: new DefaultSearchDataProvider() as SearchDataProvider,
       hipsUrl: `${window.location.protocol}//www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips`, // Temporary
       isPointerMoving: false,
       messageQueue: [] as Message[],
@@ -2019,6 +2031,7 @@ const App = defineComponent({
         for (const s of appModified) {
           if (s[0] == "hideAllChrome") this.hideAllChrome = s[1];
           if (s[0] == "selectionProximity") this.selectionProximity = s[1];
+          if (s[0] == "showFinderScope") this.showFinderScope = s[1];
         }
 
         return true;
@@ -2086,6 +2099,11 @@ const App = defineComponent({
     wwtOnPointerDown(event: PointerEvent) {
       this.isPointerMoving = false;
       this.pointerStartPosition = { x: event.pageX, y: event.pageY };
+
+      if (this.showFinderScope && this.wwtBackgroundImageset?.get_dataSetType() == ImageSetType.sky && event.button === 2) {  // Right click
+        this.finderScopePosition = [event.pageX, event.pageY];
+        this.finderScopeActive = true;
+      }
     },
 
     wwtOnPointerUp(event: PointerEvent) {
@@ -2722,7 +2740,6 @@ const App = defineComponent({
     // Add Imagery As Layer tool
 
     addImagery(iinfo: ImagesetInfo) {
-      console.log(iinfo);
       const msg: classicPywwt.CreateImageSetLayerMessage = {
         event: "image_layer_create",
         url: iinfo.url,
@@ -3071,6 +3088,12 @@ const App = defineComponent({
       };
 
       this.$options.statusMessageDestination.postMessage(msg, this.allowedOrigin);
+    },
+
+    wwtBackgroundImageset(imageset: Imageset | null) {
+      if (imageset?.get_dataSetType() !== ImageSetType.sky) {
+        this.finderScopeActive = false;
+      }
     },
 
     sources: {
