@@ -349,6 +349,7 @@ export default defineComponent({
         return null;
       }
       let type = 0;
+      const offset = this.place.get_classification() == Classification.solarSystem ? 0 : 0.5;
       switch (this.place.get_name().toLowerCase()) {
         case "sun":
           type = 1;
@@ -361,7 +362,7 @@ export default defineComponent({
           break;
       }
       return AstroCalc.getRiseTransitSet(
-        SpaceTimeController.get_jNow(), this.wwtSettings.get_locationLat(), -this.wwtSettings.get_locationLng(),
+        SpaceTimeController.get_jNow() + offset, this.wwtSettings.get_locationLat(), -this.wwtSettings.get_locationLng(),
         this.place.get_RA(), this.place.get_dec(), this.place.get_RA(), this.place.get_dec(),
         this.place.get_RA(), this.place.get_dec(), type);
     },
