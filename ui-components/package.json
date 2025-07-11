@@ -26,6 +26,9 @@
     "vue-template-compiler": "~2.6.11"
   },
   "homepage": "https://worldwidetelescope.org/home/",
+  "internalDepVersions": {
+      "@wwtelescope/engine-pinia": "thiscommit:2025-07-11:lNe9Fk1"
+  },
   "keywords": [
     "WorldWide Telescope"
   ],
