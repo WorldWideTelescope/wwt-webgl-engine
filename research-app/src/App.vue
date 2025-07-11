@@ -376,7 +376,6 @@ import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { WWTControl } from "@wwtelescope/engine";
 
 interface Message {
   event?: string;
