@@ -2,7 +2,7 @@
 
 The [@wwtelescope/ui-components] package builds on the [Pinia] store provided by the
 [@wwtelescope/engine-pinia] package to create a set of reusable Vue components that
-provide UI displays of WorldWide Telescope (WWT) state and information.
+facilitate building user interfaces for WorldWide Telescope (WWT) applications.
 Some of these components are inspired by UI elements of the [WWT webclient][webclient].
 The WWT Research App [@wwtelescope/research-app] uses the Finder Scope component
 provided by this package. Learn more about WWT [here][wwt-home].
