@@ -678,6 +678,7 @@ export class Constellations {
 }
 
 export class Coordinates {
+  constructor(ra: number, dec: number);
   get_RA(): number;
   set_RA(ra: number): void;
   get_dec(): number;
