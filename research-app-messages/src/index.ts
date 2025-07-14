@@ -4,6 +4,7 @@
 // Toplevel documentation found at @/docs/engine/research-app-messages-index.md
 
 import * as classicPywwt from './classic_pywwt';
+import * as finderScope from './finder_scope';
 import * as layers from './layers';
 import * as selections from './selections';
 import * as settings from './settings';
@@ -67,6 +68,8 @@ import * as tours from './tours';
  * - {@link ModifySettingMessage}
  */
 export { classicPywwt };
+
+export { finderScope };
 
 /** Messages relating to layers.
  *

@@ -13,6 +13,7 @@
       v-model="finderScopeActive"
       :position="finderScopePosition"
       :search-provider="searchProvider"
+      @place="handleFinderScopePlaceUpdate"
     ></finder-scope>
 
     <!-- keydown.stops here and below prevent any keynav presses from reaching
@@ -376,6 +377,7 @@ import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
+import { Place, Settings } from "@wwtelescope/engine";
 
 interface Message {
   event?: string;
@@ -422,6 +424,7 @@ import {
   classicPywwt,
   isPingPongMessage,
   isClearTileCacheMessage,
+  finderScope,
   layers,
   selections,
   settings,
@@ -2863,6 +2866,20 @@ const App = defineComponent({
         }
       }
       return null;
+    },
+
+    handleFinderScopePlaceUpdate(place: Place | null) {
+      // Notify clients about a change in the selected Finder Scope place
+      if (this.$options.statusMessageDestination === null || this.allowedOrigin === null)
+        return;
+
+      const msg: finderScope.FinderScopePlaceMessage = {
+        type: "finder_scope_place",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        place: place?._saveToXml() ?? null,
+      };
+      this.$options.statusMessageDestination.postMessage(msg, this.allowedOrigin);
     }
   },
 
@@ -2883,6 +2900,11 @@ const App = defineComponent({
       if (script !== null) {
         this.$options.statusMessageDestination = window;
       }
+
+      const settings = Settings.get_active();
+      settings.set_locationLat(42 + 42 / 60 + 54 / 3600);
+      settings.set_locationLng(-71 - 7 / 60 - 58 / 3600);
+      console.log(settings);
 
       // This returns a promise but I don't think that we need to wait for that
       // to resolve before going ahead and starting to listen for messages.

@@ -118,7 +118,7 @@ export default defineComponent({
 
   emits: {
     "update:modelValue": (_value: boolean) => true,
-    "place": (_place: Place) => true,
+    "place": (_place: Place | null) => true,
   },
 
   methods: {
@@ -434,6 +434,7 @@ export default defineComponent({
     },
     place(newPlace: Place | null) {
       this.updateCircleForPlace(newPlace);
+      this.$emit("place", newPlace);
     }
   }
 });
