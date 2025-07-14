@@ -7,7 +7,7 @@ interfaces for [WorldWide Telescope][wwt] (WWT) applications.
 
 Currently this package provides the following component:
 
-- A Finder Scope, which is an overlay on the WWT view that provides information about the
+- The Finder Scope, which is an overlay on the WWT view that provides information about the
   nearest item of interest (encoded as a WWT Place object) to the center of its crosshairs.
   The list of items of interest is provided via an object implementing the 
   {@link SearchDataProvider} interface. This package provides the implementing
@@ -21,5 +21,10 @@ Currently this package provides the following component:
     the closest location to the given position (so that it will lie under the finder 
     scope's crosshairs), but implementations are free to return any `Place` that they
     choose.
+
+- The Skyball, which shows a representation of the current WWT viewport on the field
+  of the sky. This is drawn on an HTML5 canvas, with the canvas size and display colors
+  being customizable via props. This component is a Vue version of an item of the same
+  name from the WWT [webclient].
 
 [webclient]: https://worldwidetelescope.org/webclient/
