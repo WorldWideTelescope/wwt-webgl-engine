@@ -2875,9 +2875,7 @@ const App = defineComponent({
 
       const msg: finderScope.FinderScopePlaceMessage = {
         type: "finder_scope_place",
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        place: place?._saveToXml() ?? null,
+        place: place?.asXml() ?? null,
       };
       this.$options.statusMessageDestination.postMessage(msg, this.allowedOrigin);
     }
@@ -2900,11 +2898,6 @@ const App = defineComponent({
       if (script !== null) {
         this.$options.statusMessageDestination = window;
       }
-
-      const settings = Settings.get_active();
-      settings.set_locationLat(42 + 42 / 60 + 54 / 3600);
-      settings.set_locationLng(-71 - 7 / 60 - 58 / 3600);
-      console.log(settings);
 
       // This returns a promise but I don't think that we need to wait for that
       // to resolve before going ahead and starting to listen for messages.

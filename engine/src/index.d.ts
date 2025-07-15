@@ -1264,6 +1264,7 @@ export class Place implements Thumbnail {
   set_zoomLevel(v: number): number;
 
   updatePlanetLocation(jNow: number): void;
+  asXml(elementName?: string): string;
 }
 
 
