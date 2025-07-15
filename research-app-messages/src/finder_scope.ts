@@ -8,5 +8,5 @@ export interface FinderScopePlaceMessage {
    * The currently selected `Place`, represented as an XML string.
    * If the `Place` has changed to be empty, we send null
    */ 
-  place: string | null;
+  placeXml: string | null;
 }

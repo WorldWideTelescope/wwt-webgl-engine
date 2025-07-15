@@ -2875,7 +2875,7 @@ const App = defineComponent({
 
       const msg: finderScope.FinderScopePlaceMessage = {
         type: "finder_scope_place",
-        place: place?.asXml() ?? null,
+        placeXml: place?.asXml() ?? null,
       };
       this.$options.statusMessageDestination.postMessage(msg, this.allowedOrigin);
     }
