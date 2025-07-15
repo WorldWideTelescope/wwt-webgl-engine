@@ -710,7 +710,14 @@ var ScriptInterface$ = {
             return globalRenderContext.viewCamera.zoom / 6;
         }
         return 60;
-    }
+    },
+
+    get_roll: function() {
+        if (globalRenderContext != null) {
+            return globalRenderContext.viewCamera.rotation;
+        }
+      return 0;
+    },
 };
 
 registerType("ScriptInterface", [ScriptInterface, ScriptInterface$, null]);
