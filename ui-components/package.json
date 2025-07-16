@@ -33,7 +33,7 @@
       "@wwtelescope/astro": "thiscommit:2025-07-16:Xs7auXo",
       "@wwtelescope/engine": "thiscommit:2025-07-16:jGH6s11",
       "@wwtelescope/engine-pinia": "thiscommit:2025-07-11:lNe9Fk1",
-      "@wwtelescope/engine-types": "thiscommit:2022-11-29:OIQ6vzL"
+      "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145"
   },
   "keywords": [
     "WorldWide Telescope"
