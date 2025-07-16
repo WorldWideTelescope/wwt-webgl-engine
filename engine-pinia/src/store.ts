@@ -499,6 +499,9 @@ export interface GotoRADecZoomParams {
 
   /** Optional: The target roll of the camera, in radians. */
   rollRad?: number;
+
+  /** Optional: The desired duration of the movement */
+  duration?: number;
 }
 
 /** The parameters for the {{@link engineStore.loadTour} action. */
@@ -800,6 +803,8 @@ function availableImagesets(): ImagesetInfo[] {
  * - {@link seekToTourTimecode}
  * - {@link setTourPlayerLeaveSettingsWhenStopped}
  * - {@link startTour}
+ * - {@link stopTour}
+ * - {@link closeTourPlayer}
  * - {@link toggleTourPlayPauseState}
  *
  * ## Miscellaneous
@@ -1343,10 +1348,40 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot start tour without linking to WWTInstance');
 
       const player = this.$wwt.inst.getActiveTourPlayer();
-      if (player === null)
-        throw new Error('no tour to start');
+      player?.play();
+    },
 
-      player.play();
+    /** Stop playing the currently loaded tour.
+      *
+      * Nothing happens if no tour is currently playing.
+      */
+    stopTour(): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot stop tour without linking to WWTInstance');
+
+      const player = this.$wwt.inst.getActiveTourPlayer();
+
+      // The argument here is currently unused in the engine
+      player?.stop(false);
+    },
+
+    /** Close the active tour player, if there is one active.
+      *
+      * Any tour that is currently playing will be stopped.
+      */
+    closeTourPlayer(): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot close tour player without linking to WWTInstance');
+
+      const player = this.$wwt.inst.getActiveTourPlayer();
+      if (player !== null) {
+        player.close();
+        this.$wwt.inst.ctl.uiController = null;
+      }
+
+      this.tourRunTime = null;
+      this.tourStopStartTimes = [];
+      this.tourTimecode = 0;
     },
 
     /** Toggle the play/pause state of the current tour.
@@ -1358,11 +1393,9 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot play/pause tour without linking to WWTInstance');
 
       const player = this.$wwt.inst.getActiveTourPlayer();
-      if (player === null)
-        throw new Error('no tour to play/pause');
 
       // Despite the unclear name, this function does toggle play/pause state.
-      player.pauseTour();
+      player?.pauseTour();
     },
 
     /** Set whether the renderer settings of tours should remain applied after
@@ -1455,11 +1488,11 @@ export const engineStore = defineStore('wwt-engine', {
      * TODO: document semantics when not in 2D sky mode!
      */
     async gotoRADecZoom(
-      { raRad, decRad, zoomDeg, instant, rollRad }: GotoRADecZoomParams
+      { raRad, decRad, zoomDeg, instant, rollRad, duration }: GotoRADecZoomParams
     ): Promise<void> {
       if (this.$wwt.inst === null)
         throw new Error('cannot gotoRADecZoom without linking to WWTInstance');
-      return this.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad);
+      return this.$wwt.inst.gotoRADecZoom(raRad, decRad, zoomDeg, instant, rollRad, duration);
     },
 
     /** Returns the time it would take, in seconds, to navigate to the given target. */

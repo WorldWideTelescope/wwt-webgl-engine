@@ -100,7 +100,7 @@ jobs:
 
 - job: build_macos
   pool:
-    vmImage: macos-11
+    vmImage: macos-latest
   steps:
   - template: azure-job-setup.yml
     parameters:

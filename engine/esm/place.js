@@ -15,6 +15,7 @@ import { URLHelpers } from "./url_helpers.js";
 import { Coordinates } from "./coordinates.js";
 import { Imageset } from "./imageset.js";
 import { Planets } from "./planets.js";
+import { XmlTextWriter } from "./utilities/xml_text_writer.js";
 
 
 // wwtlib.Classification
@@ -488,6 +489,12 @@ var Place$ = {
             Imageset.saveToXml(xmlWriter, this._studyImageset, '');
         }
         xmlWriter._writeEndElement();
+    },
+
+    asXml: function(elementName) {
+      var xmlWriter = new XmlTextWriter();
+      this._saveToXml(xmlWriter, elementName || 'Place');
+      return xmlWriter.body;
     },
 
     get_bounds: function () {

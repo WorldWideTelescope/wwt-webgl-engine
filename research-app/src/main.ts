@@ -50,6 +50,7 @@ import SpreadsheetItem from "./SpreadsheetItem.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import { wwtEngineNamespace } from "./namespaces";
 import { wwtPinia, WWTComponent } from "@wwtelescope/engine-pinia";
+import { FinderScope } from "@wwtelescope/ui-components";
 
 
 library.add(faAdjust);
@@ -138,6 +139,7 @@ createApp(App, {
   .component('imageset-item', ImagesetItem)
   .component('source-item', SourceItem)
   .component('transition-expand', TransitionExpand)
+  .component('finder-scope', FinderScope)
 
   // Mount the app
   .mount("#app");

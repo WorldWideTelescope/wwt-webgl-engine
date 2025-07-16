@@ -58,7 +58,7 @@ following ways:
 
 ## Activating Freestanding Mode
 
-If you are using WWT in [the Vue/Pinia component model](../getting-started/vue-component-model.md),
+If you are using WWT in [the Vue/Pinia component model](@/getting-started/vue-component-model.md),
 activate freestanding mode by specifying the [Vue prop] `wwt-freestanding-asset-baseurl`:
 
 ```xml
@@ -81,14 +81,14 @@ used by the engine. The default value used in the production version of WWT is
 you don’t mind depending on `wwtassets.org`.
 
 If you're using the [bundled TypeScript
-model](../getting-started/bundled-typescript-model.md), you can activate the
+model](@/getting-started/bundled-typescript-model.md), you can activate the
 mode with an analogous parameter,
 {{helpersapi(p="interfaces/InitControlSettings.html#freestandingAssetBaseurl",t="InitControlSettings#freestandingAssetBaseurl")}},
 when calling {{helpersapi(p="classes/WWTInstance.html#constructor",t="the WWTInstance constructor")}}
 provided in the {{helpersapi(p="index.html",t="@wwtelescope/engine-helpers")}} package.
 
 Finally, at the lowest levels of abstraction, such as what you would have in the
-[hosted JavaScript model](../getting-started/hosted-javascript-model.md), you
+[hosted JavaScript model](@/getting-started/hosted-javascript-model.md), you
 can call the {{engineapi(p="classes/WWTControlBuilder.html#freestandingMode",
 t="freestandingMode() method")}} on the
 {{engineapi(p="classes/WWTControlBuilder.html", t="WWTControlBuilder class")}}

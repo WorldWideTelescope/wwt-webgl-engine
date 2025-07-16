@@ -211,6 +211,8 @@ AstroCalc.getRiseTrinsitSet = function (jd, lat, lng, ra1, dec1, ra2, dec2, ra3,
     return new RiseSetDetails(RiseTransitSetTime.bValid, RiseTransitSetTime.rise, RiseTransitSetTime.transit, RiseTransitSetTime.set, neverRises);
 };
 
+AstroCalc.getRiseTransitSet = AstroCalc.getRiseTrinsitSet;
+
 var AstroCalc$ = {};
 
 registerType("AstroCalc", [AstroCalc, AstroCalc$, null]);

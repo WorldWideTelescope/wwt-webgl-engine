@@ -536,7 +536,7 @@ Planets.updateOrbits = function (planetCenter) {
                             var centerId = planetCenter;
                             var now = Planets._jNow + ((Planets.planetOrbitalYears[i] * 365.25 / Planets._orbitalSampleRate) * (j - (Planets._orbitalSampleRate / 2)));
                             var center = new Vector3d();
-                            if (i === SolarSystemObjects.moone) {
+                            if (i === SolarSystemObjects.moon) {
                                 centerId = -1;
                             }
                             else if (i > 9 && i < 14) {

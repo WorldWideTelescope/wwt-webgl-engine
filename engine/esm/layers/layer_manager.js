@@ -1078,7 +1078,7 @@ LayerManager.showLayerMenu = function (selected, x, y) {
     }
     else if (ss.canCast(selected, LayerMap)) {
         var map = ss.safeCast(selected, LayerMap);
-        var sandbox = map.frame.reference.toString() === 'Sandbox';
+        var sandbox = Enums.toXml('ReferenceFrames', map.frame.reference) === 'Sandbox';
         var Dome = map.frame.name === 'Dome';
         var Sky = map.frame.name === 'Sky';
         if (Dome) {
@@ -1135,7 +1135,7 @@ LayerManager.showLayerMenu = function (selected, x, y) {
                     if (!Sky) {
                     }
                     try {
-                        var name = map.frame.reference.toString();
+                        var name = Enums.toXml('ReferenceFrames', map.frame.reference);
                         if (name !== 'Sandbox') {
                             var ssObj = Enums.parse('SolarSystemObjects', name);
                             var id = ssObj;
@@ -1164,7 +1164,7 @@ LayerManager.showLayerMenu = function (selected, x, y) {
                     LayerManager._contextMenu.items.push(showOrbit);
                     LayerManager._contextMenu.items.push(spacer0);
                 }
-                if (map.frame.reference.toString() === 'Sandbox') {
+                if (Enums.toXml('ReferenceFrames', map.frame.reference) === 'Sandbox') {
                     LayerManager._contextMenu.items.push(newLight);
                 }
             }
