@@ -13,6 +13,7 @@
       v-model="finderScopeActive"
       :position="finderScopePosition"
       :search-provider="searchProvider"
+      @place="handleFinderScopePlaceUpdate"
     ></finder-scope>
 
     <!-- keydown.stops here and below prevent any keynav presses from reaching
@@ -376,6 +377,7 @@ import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
+import { Place, Settings } from "@wwtelescope/engine";
 
 interface Message {
   event?: string;
@@ -422,6 +424,7 @@ import {
   classicPywwt,
   isPingPongMessage,
   isClearTileCacheMessage,
+  finderScope,
   layers,
   selections,
   settings,
@@ -2863,6 +2866,18 @@ const App = defineComponent({
         }
       }
       return null;
+    },
+
+    handleFinderScopePlaceUpdate(place: Place | null) {
+      // Notify clients about a change in the selected Finder Scope place
+      if (this.$options.statusMessageDestination === null || this.allowedOrigin === null)
+        return;
+
+      const msg: finderScope.FinderScopePlaceMessage = {
+        type: "finder_scope_place",
+        placeXml: place?.asXml() ?? null,
+      };
+      this.$options.statusMessageDestination.postMessage(msg, this.allowedOrigin);
     }
   },
 
