@@ -1,3 +1,8 @@
+# @wwtelescope/embed 1.7.2 (2025-07-16)
+
+- No code changes; update webpack dependency version.
+
+
 # @wwtelescope/embed 1.7.1 (2024-02-07)
 
 - Pull in a change in the `@wwtelescope/engine-pinia` package that corrects the

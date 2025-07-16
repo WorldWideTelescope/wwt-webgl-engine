@@ -30,7 +30,7 @@ SpaceTimeController.updateClock = function () {
         var justNow = SpaceTimeController.get_metaNow();
         if (SpaceTimeController._timeRate !== 1) {
             var ts = justNow.getTime() - SpaceTimeController.last.getTime();
-            var ticks = (ts * SpaceTimeController._timeRate);
+            var ticks = (ts * (SpaceTimeController._timeRate - 1));
             SpaceTimeController._offset += ticks;
         }
         SpaceTimeController.last = justNow;

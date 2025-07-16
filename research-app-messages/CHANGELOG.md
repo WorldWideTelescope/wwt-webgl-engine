@@ -1,3 +1,10 @@
+# @wwtelescope/research-app-messages 0.18.1 (2025-07-16)
+
+- Add a new `FinderScopePlaceMessage` to notify clients about the current `Place` that
+  is selected in the research app's Finder Scope (#330, @Carifio24). This message
+  exports the `Place` as an XML string.
+
+
 # @wwtelescope/research-app-messages 0.18.0 (2024-02-07)
 
 - Define a new message that should trigger the engine to clear its tile cache

@@ -1,3 +1,8 @@
+# @wwtelescope/embed-creator 0.5.2 (2025-07-16)
+
+- No code changes; update webpack dependency version.
+
+
 # @wwtelescope/embed-creator 0.5.1 (2024-02-07)
 
 - No code changes; update to the latest typedoc for documentation generation.

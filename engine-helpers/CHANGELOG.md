@@ -1,3 +1,9 @@
+# @wwtelescope/engine-helpers 0.17.0 (2025-07-16)
+
+- Add an optional `duration` parameter to the `GotoTargetOptions` interface, whose value
+  is the desired duration of the move, in seconds (#320, @Carifio24).
+
+
 # @wwtelescope/engine-helpers 0.16.1 (2024-02-07)
 
 - No code changes

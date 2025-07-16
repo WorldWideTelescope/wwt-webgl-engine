@@ -1,3 +1,11 @@
+# @wwtelescope/engine-pinia 0.11.0 (2025-07-16)
+
+- Add an optional `duration` parameter to the `GotoRADecZoomParams` interface, whose value
+  is the desired duration of the move, in seconds (#320, @Carifio24).
+- Add methods to the Pinia store for stopping and closing a tour, and expose these to
+  the WWT component (#311, @Carifio24).
+
+
 # @wwtelescope/engine-pinia 0.10.0 (2024-02-07)
 
 - Expose the new mechanism in the engine that allows the tile cache to be

@@ -6,14 +6,14 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/astro": "workspace:>=0.2.2",
-    "@wwtelescope/engine": "workspace:^7.29.1",
-    "@wwtelescope/engine-helpers": "workspace:>=0.15.0",
-    "@wwtelescope/engine-types": "workspace:>=0.6.3",
+    "@wwtelescope/astro": "workspace:>=0.3.0",
+    "@wwtelescope/engine": "workspace:^7.31.0",
+    "@wwtelescope/engine-pinia": "workspace:>=0.11.0",
+    "@wwtelescope/engine-types": "workspace:>=0.6.1",
     "pinia": "^2.0.22",
     "vue": "^3"
   },
-  "description": "The WorldWide Telescope WebGL engine wrapped into a Vue/Pinia component",
+  "description": "UI components build on top of the WWT WebGL Vue/Pinia store",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
@@ -30,10 +30,10 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/astro": "thiscommit:2022-11-29:pfBFAzl",
-    "@wwtelescope/engine": "thiscommit:2023-09-15:tnfPTUa",
-    "@wwtelescope/engine-helpers": "thiscommit:2023-06-08:51W7HwZ",
-    "@wwtelescope/engine-types": "thiscommit:2022-11-29:OIQ6vzL"
+    "@wwtelescope/astro": "thiscommit:2025-07-16:Xs7auXo",
+    "@wwtelescope/engine": "thiscommit:2025-07-16:jGH6s11",
+    "@wwtelescope/engine-pinia": "thiscommit:2025-07-11:lNe9Fk1",
+    "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145"
   },
   "keywords": [
     "WorldWide Telescope"
@@ -41,7 +41,7 @@
   "license": "MIT",
   "main": "./dist/index.common.js",
   "module": "dist/",
-  "name": "@wwtelescope/engine-pinia",
+  "name": "@wwtelescope/ui-components",
   "publishConfig": {
     "access": "public"
   },
@@ -53,5 +53,5 @@
     "lint": "vue-cli-service lint src"
   },
   "types": "./dist/src/index.d.ts",
-  "version": "0.11.0"
+  "version": "0.1.0"
 }

@@ -1,3 +1,9 @@
+# @wwtelescope/astro 0.3.0 (2025-07-16)
+
+- Expose the previously internal `formatSexagesimal` function and modify its signature
+  to use a parameter object. Add a new `formatDecimalHours` utility function (#324, @Carifio24).
+
+
 # @wwtelescope/astro 0.2.5 (2023-11-03)
 
 - Update to the latest typedoc, and other improvements to the documentation

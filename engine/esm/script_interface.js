@@ -461,9 +461,9 @@ var ScriptInterface$ = {
         }
     },
 
-    gotoRaDecZoom: function (ra, dec, zoom, instant, roll) {
+    gotoRaDecZoom: function (ra, dec, zoom, instant, roll, duration) {
         if (globalWWTControl != null) {
-            globalWWTControl.gotoRADecZoom(ra / 15, dec, zoom * 6, instant, roll);
+            globalWWTControl.gotoRADecZoom(ra / 15, dec, zoom * 6, instant, roll, duration);
         }
     },
 
@@ -710,7 +710,14 @@ var ScriptInterface$ = {
             return globalRenderContext.viewCamera.zoom / 6;
         }
         return 60;
-    }
+    },
+
+    get_roll: function() {
+        if (globalRenderContext != null) {
+            return globalRenderContext.viewCamera.rotation;
+        }
+      return 0;
+    },
 };
 
 registerType("ScriptInterface", [ScriptInterface, ScriptInterface$, null]);

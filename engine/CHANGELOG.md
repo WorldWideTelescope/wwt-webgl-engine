@@ -1,3 +1,25 @@
+# @wwtelescope/engine 7.31.0 (2025-07-16)
+
+- Add a method for getting a `Place` as XML. This method uses pre-existing engine
+  functionality to create the XML representation (#330, @Carifio24).
+- Add a method allowing the view's roll angle to be obtained from the WWT script
+  interface (#329, @Carifio24).
+- Expose the constructor for the `Coordinates` class to TypeScript (#328, @Carifio24).
+- Expose several items from the engine to TypeScript, including the `Vector3d` and
+  `Coordinates` classes, and functionality for obtaining the rise/set/transit 
+  time of an object (#324, @Carifio24).
+- Allow adding an optional duration to the slew mover and the various `goto` methods of
+  `WWTControl` (#320, @Carifio24). If specified, the movement will have the specified
+  duration (in seconds), rather than a duration determined by the engine.
+- Fix a bug where the gesture change handler was not respecting using the mode-dependent
+  maximum zoom (#304, Carifio24). This fixes a bug that affected Solar System zooming
+  on iOS.
+- Fix a bug where the WWT clock ran too fast unless the rate was exactly 1 (#301, @Carifio24).
+- Fix an issue with circle annotation sizing (#299, @pkgw). In particular, the circle
+  sizing was missing a declination-dependent adjustment.
+- Port code for drawing Galilean moons over from the Windows client (#298, @pkgw).
+
+
 # @wwtelescope/engine 7.30.1 (2024-02-08)
 
 - Further improvements to touch gesture handling (#288, @Carifio24). Hopefully

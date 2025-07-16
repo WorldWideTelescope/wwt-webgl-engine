@@ -1,3 +1,11 @@
+# @wwtelescope/research-app 0.17.1 (2025-07-16)
+
+- Export the current `Place` selected by the Finder Scope in a message (#330, @Carifio24).
+  This `Place` is represented as an XML string.
+- Add the option to display the Finder Scope in the research app (#324, @Carifio24). The
+  Finder Scope must be enabled via a new research app setting and uses the same search
+  data as is used in the WWT webclient.
+
 # @wwtelescope/research-app 0.17.0 (2024-02-07)
 
 - Handle a new JSON message activating mechanism in the engine that allows the
