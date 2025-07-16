@@ -52,7 +52,7 @@
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/engine-pinia": "thiscommit:2024-02-07:OwPqq4M",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/research-app-messages": "thiscommit:2023-02-19:Kuk5Ppd",
+    "@wwtelescope/research-app-messages": "thiscommit:2025-07-16:AvbWk1X",
     "@wwtelescope/ui-components": "thiscommit:2025-07-11:6supceo"
   },
   "keywords": [
