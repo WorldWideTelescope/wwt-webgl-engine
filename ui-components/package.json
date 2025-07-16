@@ -6,7 +6,10 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
+    "@wwtelescope/astro": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine": "workspace:0.0.0-dev.0",
     "@wwtelescope/engine-pinia": "workspace:0.0.0-dev.0",
+    "@wwtelescope/engine-types": "workspace:0.0.0-dev.0",
     "pinia": "^2.0.22",
     "vue": "^3"
   },
@@ -27,8 +30,10 @@
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
+      "@wwtelescope/astro": "thiscommit:2025-07-16:Xs7auXo",
       "@wwtelescope/engine": "thiscommit:2025-07-16:jGH6s11",
-      "@wwtelescope/engine-pinia": "thiscommit:2025-07-11:lNe9Fk1"
+      "@wwtelescope/engine-pinia": "thiscommit:2025-07-11:lNe9Fk1",
+      "@wwtelescope/engine-types": "thiscommit:2025-07-16:tRvsalP"
   },
   "keywords": [
     "WorldWide Telescope"
