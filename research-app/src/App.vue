@@ -3111,6 +3111,12 @@ const App = defineComponent({
       }
     },
 
+    showFinderScope(show: boolean) {
+      if (!show) {
+        this.finderScopeActive = false;
+      }
+    },
+
     sources: {
       handler(sources: Source[]) {
         // Notify clients when the list of selected sources is changed

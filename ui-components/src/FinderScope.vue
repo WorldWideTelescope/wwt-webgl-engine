@@ -121,6 +121,10 @@ export default defineComponent({
     "place": (_place: Place | null) => true,
   },
 
+  unmounted() {
+    this.clearCircle();
+  },
+
   methods: {
     ...mapActions(engineStore, [
       "addAnnotation",
@@ -425,7 +429,6 @@ export default defineComponent({
       if (!value) {
         this.place = null;
       }
-
       this.$nextTick(() => {
         if (value && !this.crosshairsDrawn) {
           this.drawCrosshairs();
