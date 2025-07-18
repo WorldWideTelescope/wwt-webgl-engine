@@ -1,3 +1,10 @@
+# @wwtelescope/research-app 0.18.0 (2025-07-18)
+
+- Fix a bug where the research app's embedded Finder Scope could fail to draw its
+  crosshairs (#333, @Carifio24). This could only happen after the Finder Scope was enabled,
+  disabled, and re-enabled via the research app settings.
+
+
 # @wwtelescope/research-app 0.17.1 (2025-07-16)
 
 - Export the current `Place` selected by the Finder Scope in a message (#330, @Carifio24).
