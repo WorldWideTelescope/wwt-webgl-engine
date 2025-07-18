@@ -1,4 +1,9 @@
-# rc: minor bump
+# rc: micro bump
+
+- Fix a bug where the Finder Scope's circle annotation could fail to be cleared when
+  the component is destroyed (#333, @Carifio24).
+
+# @wwtelescope/ui-components 0.1.0 (2025-07-16)
 
 First release of a new subpackage for general-purpose WWT user interface components.
 Currently this package contains two components, both of which are based on the components
