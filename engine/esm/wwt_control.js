@@ -930,7 +930,7 @@ var WWTControl$ = {
             Grids.drawPrecessionChart(this.renderContext, 1, Settings.get_active().get_precessionChartColor());
         }
         if (Settings.get_active().get_showEcliptic()) {
-            Grids.drawEcliptic(this.renderContext, 1, Settings.get_active().get_eclipticColor());
+            Grids.drawEcliptic(this.renderContext, 1, Settings.get_active().get_eclipticColor(), Settings.get_active().get_showEclipticCircle());
             if (Settings.get_active().get_showEclipticOverviewText()) {
                 Grids.drawEclipticText(this.renderContext, 1, Settings.get_active().get_eclipticColor());
             }
