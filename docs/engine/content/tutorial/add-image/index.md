@@ -122,8 +122,9 @@ See also the [WWT Data Guide].
 
 You might note that we’re piling up a lot of callbacks here. We sure are!
 There’s a reason that web developers talk about [callback
-hell](http://callbackhell.com) — this style of programming rapidly becomes very
-hard to scale and maintain. **This is why we strongly recommend avoiding plain
+hell](https://www.geeksforgeeks.org/javascript/what-to-understand-callback-and-callback-hell-in-javascript/)
+— this style of programming rapidly becomes very hard to scale and maintain.
+**This is why we strongly recommend avoiding plain
 JavaScript when building complex WWT apps.** More sophisticated models like the
 [Vue component model](@/getting-started/vue-component-model.md), or even the
 [TypeScript model](@/getting-started/bundled-typescript-model.md) with `async`
