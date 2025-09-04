@@ -1621,6 +1621,8 @@ export class Settings implements EngineSettingsInterface {
   set_showConstellationSelection(v: boolean): boolean;
   get_showEcliptic(): boolean;
   set_showEcliptic(v: boolean): boolean;
+  get_showEclipticCircle(): boolean;
+  set_showEclipticCircle(v: boolean): boolean;
   get_showElevationModel(): boolean;
   set_showElevationModel(v: boolean): boolean;
   get_showFieldOfView(): boolean;

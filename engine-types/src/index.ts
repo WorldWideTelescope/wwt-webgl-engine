@@ -289,6 +289,7 @@ export type BaseEngineSetting =
   ["showCrosshairs", boolean] |
   ["showEarthSky", boolean] |
   ["showEcliptic", boolean] |
+  ["showEclipticCircle", boolean] |
   ["showEclipticGrid", boolean] |
   ["showEclipticGridText", boolean] |
   ["showEclipticOverviewText", boolean] |
@@ -355,6 +356,7 @@ const baseEngineSettingTypeInfo = {
   "showCrosshairs/boolean": true,
   "showEarthSky/boolean": true,
   "showEcliptic/boolean": true,
+  "showEclipticCircle/boolean": true,
   "showEclipticGrid/boolean": true,
   "showEclipticGridText/boolean": true,
   "showEclipticOverviewText/boolean": true,
