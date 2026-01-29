@@ -1,6 +1,7 @@
 // Originally `AARISETRANSITSET.CPP`
 // "Purpose: Implementation for the algorithms which obtain the Rise, Transit and Set times"
 // Last update of original: PJN / 15-10-2004
+// Updated to include correction for RA wrap-around PJN / 28-03-2009 & PJN / 74-04-2017
 //
 // Translated into C# and released by Microsoft, then transpiled into JavaScript
 // by ScriptSharp, for the WorldWide Telescope project.
@@ -47,6 +48,41 @@ registerType("CAARiseTransitSetDetails", [CAARiseTransitSetDetails, CAARiseTrans
 // CAARiseTransitSet
 
 export function CAARiseTransitSet() { }
+CAARiseTransitSet.correctRAValuesForInterpolation = function (Alpha1, Alpha2, Alpha3) {
+    // Itnroduced with v1.79
+    Alpha1 = CT.m24(Alpha1);
+    Alpha2 = CT.m24(Alpha2);
+    Alpha3 = CT.m24(Alpha3);
+    if (Math.abs(Alpha2 - Alpha1) > 12.0)
+        {
+            if (Alpha2 > Alpha1)
+            Alpha1 += 24;
+            else
+            Alpha2 += 24;
+        }
+        if (Math.abs(Alpha3 - Alpha2) > 12.0)
+        {
+            if (Alpha3 > Alpha2)
+            Alpha2 += 24;
+            else
+            Alpha3 += 24;
+        }
+        if (Math.abs(Alpha2 - Alpha1) > 12.0)
+        {
+            if (Alpha2 > Alpha1)
+            Alpha1 += 24;
+            else
+            Alpha2 += 24;
+        }
+        if (Math.abs(Alpha3 - Alpha2) > 12.0)
+        {
+            if (Alpha3 > Alpha2)
+            Alpha2 += 24;
+            else
+            Alpha3 += 24;
+        }
+    return [Alpha1, Alpha2, Alpha3];
+}
 
 CAARiseTransitSet.rise = function (JD, Alpha1, Delta1, Alpha2, Delta2, Alpha3, Delta3, Longitude, Latitude, h0) {
     var details = new CAARiseTransitSetDetails();
@@ -66,25 +102,10 @@ CAARiseTransitSet.rise = function (JD, Alpha1, Delta1, Alpha2, Delta2, Alpha3, D
     var M0 = (Alpha2 * 15 + Longitude - theta0) / 360;
     var M1 = M0 - H0 / 360;
     var M2 = M0 + H0 / 360;
-    if (M0 > 1) {
-        M0 -= 1;
-    }
-    else if (M0 < 0) {
-        M0 += 1;
-    }
-    if (M1 > 1) {
-        M1 -= 1;
-    }
-    else if (M1 < 0) {
-        M1 += 1;
-    }
-    if (M2 > 1) {
-        M2 -= 1;
-    }
-    else if (M2 < 0) {
-        M2 += 1;
-    }
+    
+    [Alpha1, Alpha2, Alpha3] = CAARiseTransitSet.correctRAValuesForInterpolation(Alpha1, Alpha2, Alpha3);
     for (var i = 0; i < 2; i++) {
+        // find rise
         var theta1 = theta0 + 360.985647 * M1;
         theta1 = CT.m360(theta1);
         var n = M1 + deltaT / 86400;
@@ -94,6 +115,7 @@ CAARiseTransitSet.rise = function (JD, Alpha1, Delta1, Alpha2, Delta2, Alpha3, D
         var Horizontal = CT.eq2H(H / 15, Delta, Latitude);
         var DeltaM = (Horizontal.y - h0) / (360 * Math.cos(CT.d2R(Delta)) * Math.cos(LatitudeRad) * Math.sin(CT.d2R(H)));
         M1 += DeltaM;
+        // find transit
         theta1 = theta0 + 360.985647 * M0;
         theta1 = CT.m360(theta1);
         n = M0 + deltaT / 86400;
@@ -104,6 +126,7 @@ CAARiseTransitSet.rise = function (JD, Alpha1, Delta1, Alpha2, Delta2, Alpha3, D
         }
         DeltaM = -H / 360;
         M0 += DeltaM;
+        // find set
         theta1 = theta0 + 360.985647 * M2;
         theta1 = CT.m360(theta1);
         n = M2 + deltaT / 86400;
