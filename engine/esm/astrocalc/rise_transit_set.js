@@ -2,6 +2,8 @@
 // "Purpose: Implementation for the algorithms which obtain the Rise, Transit and Set times"
 // Last update of original: PJN / 15-10-2004
 // Updated to include correction for RA wrap-around PJN / 28-03-2009 & PJN / 74-04-2017
+// Updated to include fix for not porperly constraining M PJN / 30-04-2009
+// Update to include wrapping of H values in the transit calculation. 
 //
 // Translated into C# and released by Microsoft, then transpiled into JavaScript
 // by ScriptSharp, for the WorldWide Telescope project.
@@ -48,6 +50,17 @@ registerType("CAARiseTransitSetDetails", [CAARiseTransitSetDetails, CAARiseTrans
 // CAARiseTransitSet
 
 export function CAARiseTransitSet() { }
+
+CAARiseTransitSet.constraintM = function (M) {
+    while (M > 1) {
+        M -= 1;
+    }
+    while (M < 0) {
+        M += 1;
+    }
+    return M;
+};
+
 CAARiseTransitSet.correctRAValuesForInterpolation = function (Alpha1, Alpha2, Alpha3) {
     // Itnroduced with v1.79
     Alpha1 = CT.m24(Alpha1);
@@ -100,9 +113,12 @@ CAARiseTransitSet.rise = function (JD, Alpha1, Delta1, Alpha2, Delta2, Alpha3, D
     var H0 = Math.acos(cosH0);
     H0 = CT.r2D(H0);
     var M0 = (Alpha2 * 15 + Longitude - theta0) / 360;
+    M0 = CAARiseTransitSet.constraintM(M0);
     var M1 = M0 - H0 / 360;
     var M2 = M0 + H0 / 360;
-    
+    M1 = CAARiseTransitSet.constraintM(M1);
+    M2 = CAARiseTransitSet.constraintM(M2);
+
     [Alpha1, Alpha2, Alpha3] = CAARiseTransitSet.correctRAValuesForInterpolation(Alpha1, Alpha2, Alpha3);
     for (var i = 0; i < 2; i++) {
         // find rise
@@ -115,17 +131,20 @@ CAARiseTransitSet.rise = function (JD, Alpha1, Delta1, Alpha2, Delta2, Alpha3, D
         var Horizontal = CT.eq2H(H / 15, Delta, Latitude);
         var DeltaM = (Horizontal.y - h0) / (360 * Math.cos(CT.d2R(Delta)) * Math.cos(LatitudeRad) * Math.sin(CT.d2R(H)));
         M1 += DeltaM;
+        
         // find transit
         theta1 = theta0 + 360.985647 * M0;
         theta1 = CT.m360(theta1);
         n = M0 + deltaT / 86400;
         Alpha = INTP.interpolate(n, Alpha1, Alpha2, Alpha3);
         H = theta1 - Longitude - Alpha * 15;
-        if (H < -180) {
-            H += 360;
+        H = CT.m360(H);
+        if (H > 180) {
+            H -= 360;
         }
         DeltaM = -H / 360;
         M0 += DeltaM;
+        
         // find set
         theta1 = theta0 + 360.985647 * M2;
         theta1 = CT.m360(theta1);
