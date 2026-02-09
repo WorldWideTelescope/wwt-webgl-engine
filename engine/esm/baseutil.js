@@ -11,27 +11,39 @@ import { ss } from "./ss.js";
 export function Util() {
 }
 
+// Assumptions for this function:
+// - Delimiters are literal strings (not regex)
+// - Delimiters can be multiple characters
+// - When multiple delimiters match at the same position, the longer delimiter
+// - Keep empty tokens
+// - Empty-string delimiters ("") are ignored (or treated as no-op)
 Util.splitString = function (target, split) {
     var parts = [];
     var start = 0;
     var end = 0;
+    var sortedSplit = split.slice().sort((a, b) => b.length - a.length);
     for (var i = 0; i < target.length; i++) {
-        var found = false;
-        for (var j = 0; j < split.length; j++) {
-            if (target[i] === split[j]) {
-                parts.push(target.substring(start, end - start));
-                found = true;
-                continue;
+        var foundLength = 0;
+        for (var j = 0; j < sortedSplit.length; j++) {
+            var delimiter = sortedSplit[j];
+            var substr = target.substring(end, end + delimiter.length);
+            if (substr == delimiter) {
+                if (end > start) {
+                  parts.push(target.substring(start, end));
+                }
+                foundLength = delimiter.length;
+                end += foundLength;
+                start = end;
+                break;
             }
-            start = i + 1;
-            end = i + 1;
         }
-        if (!found) {
+        if (foundLength == 0) {
             end++;
         }
     }
+    end = target.length;
     if (end > start) {
-        parts.push(target.substring(start, end - start));
+        parts.push(target.substring(start, end));
     }
     return parts;
 };
