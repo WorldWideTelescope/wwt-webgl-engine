@@ -21,6 +21,7 @@ import {
     SimpleLineShader2D,
     OrbitLineShader,
     LineShaderNormalDates,
+    LineShaderNormalDates2D,
     TimeSeriesPointSpriteShader,
 } from "./shaders.js";
 
@@ -476,12 +477,22 @@ export function TriangleList() {
     this.decay = 0;
     this.autoTime = true;
     this.jNow = 0;
+    this.pure2D = false;
     this._dataToDraw = false;
     this._triangleBuffers = [];
     this._triangleBufferCounts = [];
 }
 
 var TriangleList$ = {
+    get_depthBuffered: function() {
+        return this.depthBuffered;
+    },
+
+    set_depthBuffered: function (value) {
+        this.depthBuffered = value;
+        return value;
+    },
+
     addTriangle: function (v1, v2, v3, color, date) {
         this._trianglePoints.push(v1);
         this._trianglePoints.push(v2);
@@ -586,7 +597,11 @@ var TriangleList$ = {
             var $enum1 = ss.enumerate(this._triangleBuffers);
             while ($enum1.moveNext()) {
                 var triBuffer = $enum1.current;
-                LineShaderNormalDates.use(renderContext, triBuffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0);
+                if (this.pure2D) {
+                  LineShaderNormalDates2D.use(renderContext, triBuffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0);
+                } else {
+                  LineShaderNormalDates.use(renderContext, triBuffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0);
+                }
                 renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, triBuffer.count);
             }
         }
@@ -603,6 +618,7 @@ export function TriangleFanList() {
     this.timeSeries = false;
     this.decay = 0;
     this.jNow = 0;
+    this.pure2D = false;
     this._shapes = [];
     this._colors = [];
     this._dates = [];
@@ -635,7 +651,11 @@ var TriangleFanList$ = {
             var $enum1 = ss.enumerate(this._buffers);
             while ($enum1.moveNext()) {
                 var buffer = $enum1.current;
-                LineShaderNormalDates.use(renderContext, buffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this._zBuffer, this.jNow, (this.timeSeries) ? this.decay : 0);
+                if (this.pure2D) {
+                    LineShaderNormalDates2D.use(renderContext, buffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this._zBuffer, this.jNow, (this.timeSeries) ? this.decay : 0);
+                } else {
+                    LineShaderNormalDates.use(renderContext, buffer.vertexBuffer, Color.fromArgb(255, 255, 255, 255), this._zBuffer, this.jNow, (this.timeSeries) ? this.decay : 0);
+                }
                 renderContext.gl.drawArrays(WEBGL.TRIANGLE_FAN, 0, buffer.count);
             }
         }
