@@ -510,9 +510,15 @@ var TriangleList$ = {
             var v12;
             var v23;
             var v31;
-            v12 = Vector3d.midPointByLength(v1, v2);
-            v23 = Vector3d.midPointByLength(v2, v3);
-            v31 = Vector3d.midPointByLength(v3, v1);
+            if (this.pure2D) {
+              v12 = Vector3d.midPoint(v1, v2);
+              v23 = Vector3d.midPoint(v2, v3);
+              v31 = Vector3d.midPoint(v3, v1);
+            } else {
+              v12 = Vector3d.midPointByLength(v1, v2);
+              v23 = Vector3d.midPointByLength(v2, v3);
+              v31 = Vector3d.midPointByLength(v3, v1);
+            }
             this.addSubdividedTriangles(v1, v12, v31, color, date, subdivisions);
             this.addSubdividedTriangles(v12, v23, v31, color, date, subdivisions);
             this.addSubdividedTriangles(v12, v2, v23, color, date, subdivisions);
