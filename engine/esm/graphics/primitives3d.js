@@ -510,11 +510,16 @@ var TriangleList$ = {
             var v12;
             var v23;
             var v31;
+
+            // In "pure 2D" (clip space) mode, we just want the midpoint
             if (this.pure2D) {
               v12 = Vector3d.midPoint(v1, v2);
               v23 = Vector3d.midPoint(v2, v3);
               v31 = Vector3d.midPoint(v3, v1);
             } else {
+              // In sky mode, we want everything to live on a sphere
+              // so we take the midpoint, then set the length back to the sphere radius
+              // (assumed by `midPointByLength` to be the length of the first argument)
               v12 = Vector3d.midPointByLength(v1, v2);
               v23 = Vector3d.midPointByLength(v2, v3);
               v31 = Vector3d.midPointByLength(v3, v1);
