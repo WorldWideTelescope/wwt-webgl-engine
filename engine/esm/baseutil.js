@@ -14,13 +14,14 @@ export function Util() {
 // Assumptions for this function:
 // - Delimiters are literal strings (not regex)
 // - Delimiters can be multiple characters
-// - When multiple delimiters match at the same position, the longer delimiter
-// - Keep empty tokens
+// - When multiple delimiters match at the same position, the longer delimiter is preferred
 // - Empty-string delimiters ("") are ignored (or treated as no-op)
 Util.splitString = function (target, split) {
     var parts = [];
     var start = 0;
     var end = 0;
+    // NB: We don't sort in-place as the caller may still need the list of delimiters
+    // We also don't use `toSorted` to maintain IE compatibility
     var sortedSplit = split.slice().sort((a, b) => b.length - a.length);
     for (var i = 0; i < target.length; i++) {
         var foundLength = 0;
