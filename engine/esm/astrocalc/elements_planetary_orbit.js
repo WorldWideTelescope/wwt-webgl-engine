@@ -22,87 +22,60 @@
 import { registerType } from "../typesystem.js";
 import { CT } from "./coordinate_transformation.js";
 
+import { Mercury, Venus, Mars } from "aa-js";
+
 
 // EPO - was CAAElementsPlanetaryOrbit
 
 export function EPO() { }
 
 EPO.mercuryMeanLongitude = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(252.250906 + 149474.0722491 * T + 0.0003035 * Tsquared + 1.8E-08 * Tcubed);
+    return Mercury.getMeanLongitude(JD);
 };
 
 EPO.mercurySemimajorAxis = function (UnnamedParameter1) {
-    return 0.38709831;
+    // TODO: getSemiMajorAxis is not exported from AA.js - should it be?
+    return Mercury.orbitalElements.semiMajorAxis[0];
 };
 
 EPO.mercuryEccentricity = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return 0.20563175 + 2.0407E-05 * T - 2.83E-08 * Tsquared - 1.8E-10 * Tcubed;
+    return Mercury.getEccentricity(JD);
 };
 
 EPO.mercuryInclination = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(7.004986 + 0.0018215 * T - 1.81E-05 * Tsquared + 5.6E-08 * Tcubed);
+    return Mercury.getInclination(JD);
 };
 
 EPO.mercuryLongitudeAscendingNode = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(48.330893 + 1.1861883 * T + 0.00017542 * Tsquared + 2.15E-07 * Tcubed);
+    return Mercury.getLongitudeOfAscendingNode(JD);
 };
 
 EPO.mercuryLongitudePerihelion = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(77.456119 + 1.5564776 * T + 0.00029544 * Tsquared + 9E-09 * Tcubed);
+    return Mercury.getLongitudeOfPerihelion(JD);
 };
 
 EPO.venusMeanLongitude = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(181.979801 + 58519.2130302 * T + 0.00031014 * Tsquared + 1.5E-08 * Tcubed);
+    return Venus.getMeanLongitude(JD);
 };
 
 EPO.venusSemimajorAxis = function (UnnamedParameter1) {
-    return 0.72332982;
+    return Venus.orbitalElements.semiMajorAxis[0];
 };
 
 EPO.venusEccentricity = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return 0.00677192 - 4.7765E-05 * T + 9.81E-08 * Tsquared + 4.6E-10 * Tcubed;
+    return Venus.getEccentricity(JD);
 };
 
 EPO.venusInclination = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(3.394662 + 0.0010037 * T - 8.8E-07 * Tsquared - 7E-09 * Tcubed);
+    return Venus.getInclination(JD);
 };
 
 EPO.venusLongitudeAscendingNode = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(76.67992 + 0.9011206 * T + 0.00040618 * Tsquared - 9.3E-08 * Tcubed);
+    return Venus.getLongitudeOfAscendingNode(JD);
 };
 
 EPO.venusLongitudePerihelion = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(131.563703 + 1.4022288 * T - 0.00107618 * Tsquared - 5.678E-06 * Tcubed);
+    return Venus.getLongitudeOfPerihelion(JD);
 };
 
 EPO.earthMeanLongitude = function (JD) {
@@ -135,14 +108,11 @@ EPO.earthLongitudePerihelion = function (JD) {
 };
 
 EPO.marsMeanLongitude = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(355.433 + 19141.6964471 * T + 0.00031052 * Tsquared + 1.6E-08 * Tcubed);
+    return Mars.getMeanLongitude(JD);
 };
 
 EPO.marsSemimajorAxis = function (UnnamedParameter1) {
-    return 1.523679342;
+    return Mars.orbitalElements.semiMajorAxis[0];
 };
 
 EPO.marsEccentricity = function (JD) {
