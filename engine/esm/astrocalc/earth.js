@@ -21,6 +21,8 @@
 import { registerType } from "../typesystem.js";
 import { CT } from "./coordinate_transformation.js";
 
+import { Earth, Equinox } from "aa-js";
+
 
 // VSC
 
@@ -71,200 +73,35 @@ const g_B4EarthCoefficientsJ2000 = [new VSC(6, 2.27, 6283.08), new VSC(1, 0, 0)]
 export function CAAEarth() { }
 
 CAAEarth.eclipticLongitude = function (JD) {
-    var rho = (JD - 2451545) / 365250;
-    var rhosquared = rho * rho;
-    var rhocubed = rhosquared * rho;
-    var rho4 = rhocubed * rho;
-    var rho5 = rho4 * rho;
-    var nL0Coefficients = g_L0EarthCoefficients.length;
-    var L0 = 0;
-    var i;
-    for (i = 0; i < nL0Coefficients; i++) {
-        L0 += g_L0EarthCoefficients[i].a * Math.cos(g_L0EarthCoefficients[i].b + g_L0EarthCoefficients[i].c * rho);
-    }
-    var nL1Coefficients = g_L1EarthCoefficients.length;
-    var L1 = 0;
-    for (i = 0; i < nL1Coefficients; i++) {
-        L1 += g_L1EarthCoefficients[i].a * Math.cos(g_L1EarthCoefficients[i].b + g_L1EarthCoefficients[i].c * rho);
-    }
-    var nL2Coefficients = g_L2EarthCoefficients.length;
-    var L2 = 0;
-    for (i = 0; i < nL2Coefficients; i++) {
-        L2 += g_L2EarthCoefficients[i].a * Math.cos(g_L2EarthCoefficients[i].b + g_L2EarthCoefficients[i].c * rho);
-    }
-    var nL3Coefficients = g_L3EarthCoefficients.length;
-    var L3 = 0;
-    for (i = 0; i < nL3Coefficients; i++) {
-        L3 += g_L3EarthCoefficients[i].a * Math.cos(g_L3EarthCoefficients[i].b + g_L3EarthCoefficients[i].c * rho);
-    }
-    var nL4Coefficients = g_L4EarthCoefficients.length;
-    var L4 = 0;
-    for (i = 0; i < nL4Coefficients; i++) {
-        L4 += g_L4EarthCoefficients[i].a * Math.cos(g_L4EarthCoefficients[i].b + g_L4EarthCoefficients[i].c * rho);
-    }
-    var nL5Coefficients = g_L5EarthCoefficients.length;
-    var L5 = 0;
-    for (i = 0; i < nL5Coefficients; i++) {
-        L5 += g_L5EarthCoefficients[i].a * Math.cos(g_L5EarthCoefficients[i].b + g_L5EarthCoefficients[i].c * rho);
-    }
-    var vvalue = (L0 + L1 * rho + L2 * rhosquared + L3 * rhocubed + L4 * rho4 + L5 * rho5) / 100000000;
-    vvalue = CT.m360(CT.r2D(vvalue));
-    return vvalue;
+    // NB: This AA function can take an optional second `equinox` parameter
+    // which can be either MeanOfTheDate (default) or J2000
+    return Earth.getEclipticLongitude(JD);
 };
 
 CAAEarth.eclipticLatitude = function (JD) {
-    var rho = (JD - 2451545) / 365250;
-    var rhosquared = rho * rho;
-    var rhocubed = rhosquared * rho;
-    var rho4 = rhocubed * rho;
-    var nB0Coefficients = g_B0EarthCoefficients.length;
-    var B0 = 0;
-    var i;
-    for (i = 0; i < nB0Coefficients; i++) {
-        B0 += g_B0EarthCoefficients[i].a * Math.cos(g_B0EarthCoefficients[i].b + g_B0EarthCoefficients[i].c * rho);
-    }
-    var nB1Coefficients = g_B1EarthCoefficients.length;
-    var B1 = 0;
-    for (i = 0; i < nB1Coefficients; i++) {
-        B1 += g_B1EarthCoefficients[i].a * Math.cos(g_B1EarthCoefficients[i].b + g_B1EarthCoefficients[i].c * rho);
-    }
-    var nB2Coefficients = g_B2EarthCoefficients.length;
-    var B2 = 0;
-    for (i = 0; i < nB2Coefficients; i++) {
-        B2 += g_B2EarthCoefficients[i].a * Math.cos(g_B2EarthCoefficients[i].b + g_B2EarthCoefficients[i].c * rho);
-    }
-    var nB3Coefficients = g_B3EarthCoefficients.length;
-    var B3 = 0;
-    for (i = 0; i < nB3Coefficients; i++) {
-        B3 += g_B3EarthCoefficients[i].a * Math.cos(g_B3EarthCoefficients[i].b + g_B3EarthCoefficients[i].c * rho);
-    }
-    var nB4Coefficients = g_B4EarthCoefficients.length;
-    var B4 = 0;
-    for (i = 0; i < nB4Coefficients; i++) {
-        B4 += g_B4EarthCoefficients[i].a * Math.cos(g_B4EarthCoefficients[i].b + g_B4EarthCoefficients[i].c * rho);
-    }
-    var vvalue = (B0 + B1 * rho + B2 * rhosquared + B3 * rhocubed + B4 * rho4) / 100000000;
-    vvalue = CT.r2D(vvalue);
-    return vvalue;
+    // NB: This AA function can take an optional second `equinox` parameter
+    // which can be either MeanOfTheDate (default) or J2000
+    return Earth.getEclipticLatitude(JD);
 };
 
 CAAEarth.radiusVector = function (JD) {
-    var rho = (JD - 2451545) / 365250;
-    var rhosquared = rho * rho;
-    var rhocubed = rhosquared * rho;
-    var rho4 = rhocubed * rho;
-    var nR0Coefficients = g_R0EarthCoefficients.length;
-    var R0 = 0;
-    var i;
-    for (i = 0; i < nR0Coefficients; i++) {
-        R0 += g_R0EarthCoefficients[i].a * Math.cos(g_R0EarthCoefficients[i].b + g_R0EarthCoefficients[i].c * rho);
-    }
-    var nR1Coefficients = g_R1EarthCoefficients.length;
-    var R1 = 0;
-    for (i = 0; i < nR1Coefficients; i++) {
-        R1 += g_R1EarthCoefficients[i].a * Math.cos(g_R1EarthCoefficients[i].b + g_R1EarthCoefficients[i].c * rho);
-    }
-    var nR2Coefficients = g_R2EarthCoefficients.length;
-    var R2 = 0;
-    for (i = 0; i < nR2Coefficients; i++) {
-        R2 += g_R2EarthCoefficients[i].a * Math.cos(g_R2EarthCoefficients[i].b + g_R2EarthCoefficients[i].c * rho);
-    }
-    var nR3Coefficients = g_R3EarthCoefficients.length;
-    var R3 = 0;
-    for (i = 0; i < nR3Coefficients; i++) {
-        R3 += g_R3EarthCoefficients[i].a * Math.cos(g_R3EarthCoefficients[i].b + g_R3EarthCoefficients[i].c * rho);
-    }
-    var nR4Coefficients = g_R4EarthCoefficients.length;
-    var R4 = 0;
-    for (i = 0; i < nR4Coefficients; i++) {
-        R4 += g_R4EarthCoefficients[i].a * Math.cos(g_R4EarthCoefficients[i].b + g_R4EarthCoefficients[i].c * rho);
-    }
-    return (R0 + R1 * rho + R2 * rhosquared + R3 * rhocubed + R4 * rho4) / 100000000;
+    return Earth.getRadiusVector(JD);
 };
 
 CAAEarth.sunMeanAnomaly = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    return CT.m360(357.5291092 + 35999.0502909 * T - 0.0001536 * Tsquared + Tcubed / 24490000);
+    return Earth.getMeanAnomaly(JD);
 };
 
 CAAEarth.eccentricity = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    return 1 - 0.002516 * T - 7.4E-06 * Tsquared;
+    return Earth.getEccentricity(JD);
 };
 
 CAAEarth.eclipticLongitudeJ2000 = function (JD) {
-    var rho = (JD - 2451545) / 365250;
-    var rhosquared = rho * rho;
-    var rhocubed = rhosquared * rho;
-    var rho4 = rhocubed * rho;
-    var nL0Coefficients = g_L0EarthCoefficients.length;
-    var L0 = 0;
-    var i;
-    for (i = 0; i < nL0Coefficients; i++) {
-        L0 += g_L0EarthCoefficients[i].a * Math.cos(g_L0EarthCoefficients[i].b + g_L0EarthCoefficients[i].c * rho);
-    }
-    var nL1Coefficients = g_L1EarthCoefficientsJ2000.length;
-    var L1 = 0;
-    for (i = 0; i < nL1Coefficients; i++) {
-        L1 += g_L1EarthCoefficientsJ2000[i].a * Math.cos(g_L1EarthCoefficientsJ2000[i].b + g_L1EarthCoefficientsJ2000[i].c * rho);
-    }
-    var nL2Coefficients = g_L2EarthCoefficientsJ2000.length;
-    var L2 = 0;
-    for (i = 0; i < nL2Coefficients; i++) {
-        L2 += g_L2EarthCoefficientsJ2000[i].a * Math.cos(g_L2EarthCoefficientsJ2000[i].b + g_L2EarthCoefficientsJ2000[i].c * rho);
-    }
-    var nL3Coefficients = g_L3EarthCoefficientsJ2000.length;
-    var L3 = 0;
-    for (i = 0; i < nL3Coefficients; i++) {
-        L3 += g_L3EarthCoefficientsJ2000[i].a * Math.cos(g_L3EarthCoefficientsJ2000[i].b + g_L3EarthCoefficientsJ2000[i].c * rho);
-    }
-    var nL4Coefficients = g_L4EarthCoefficientsJ2000.length;
-    var L4 = 0;
-    for (i = 0; i < nL4Coefficients; i++) {
-        L4 += g_L4EarthCoefficientsJ2000[i].a * Math.cos(g_L4EarthCoefficientsJ2000[i].b + g_L4EarthCoefficientsJ2000[i].c * rho);
-    }
-    var vvalue = (L0 + L1 * rho + L2 * rhosquared + L3 * rhocubed + L4 * rho4) / 100000000;
-    vvalue = CT.m360(CT.r2D(vvalue));
-    return vvalue;
+    return Earth.getEclipticLongitude(JD, Equinox.StandardJ2000);
 };
 
 CAAEarth.eclipticLatitudeJ2000 = function (JD) {
-    var rho = (JD - 2451545) / 365250;
-    var rhosquared = rho * rho;
-    var rhocubed = rhosquared * rho;
-    var rho4 = rhocubed * rho;
-    var nB0Coefficients = g_B0EarthCoefficients.length;
-    var B0 = 0;
-    var i;
-    for (i = 0; i < nB0Coefficients; i++) {
-        B0 += g_B0EarthCoefficients[i].a * Math.cos(g_B0EarthCoefficients[i].b + g_B0EarthCoefficients[i].c * rho);
-    }
-    var nB1Coefficients = g_B1EarthCoefficientsJ2000.length;
-    var B1 = 0;
-    for (i = 0; i < nB1Coefficients; i++) {
-        B1 += g_B1EarthCoefficientsJ2000[i].a * Math.cos(g_B1EarthCoefficientsJ2000[i].b + g_B1EarthCoefficientsJ2000[i].c * rho);
-    }
-    var nB2Coefficients = g_B2EarthCoefficientsJ2000.length;
-    var B2 = 0;
-    for (i = 0; i < nB2Coefficients; i++) {
-        B2 += g_B2EarthCoefficientsJ2000[i].a * Math.cos(g_B2EarthCoefficientsJ2000[i].b + g_B2EarthCoefficientsJ2000[i].c * rho);
-    }
-    var nB3Coefficients = g_B3EarthCoefficientsJ2000.length;
-    var B3 = 0;
-    for (i = 0; i < nB3Coefficients; i++) {
-        B3 += g_B3EarthCoefficientsJ2000[i].a * Math.cos(g_B3EarthCoefficientsJ2000[i].b + g_B3EarthCoefficientsJ2000[i].c * rho);
-    }
-    var nB4Coefficients = g_B4EarthCoefficientsJ2000.length;
-    var B4 = 0;
-    for (i = 0; i < nB4Coefficients; i++) {
-        B4 += g_B4EarthCoefficientsJ2000[i].a * Math.cos(g_B4EarthCoefficientsJ2000[i].b + g_B4EarthCoefficientsJ2000[i].c * rho);
-    }
-    var vvalue = (B0 + B1 * rho + B2 * rhosquared + B3 * rhocubed + B4 * rho4) / 100000000;
-    vvalue = CT.r2D(vvalue);
-    return vvalue;
+    return Earth.getEclipticLatitude(JD, Equinox.StandardJ2000);
 };
 
 var CAAEarth$ = {};
