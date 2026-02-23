@@ -2,7 +2,7 @@
 // "Purpose: Implementation for the algorithms which obtain the Rise, Transit and Set times"
 // Last update of original: PJN / 15-10-2004
 // Updated to include correction for RA wrap-around PJN / 28-03-2009 & PJN / 74-04-2017
-// Updated to include fix for not porperly constraining M PJN / 30-04-2009
+// Updated to include fix for not properly constraining M PJN / 30-04-2009
 // Update to include wrapping of H values in the transit calculation. 
 //
 // Translated into C# and released by Microsoft, then transpiled into JavaScript
