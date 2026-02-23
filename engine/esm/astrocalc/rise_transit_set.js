@@ -52,13 +52,8 @@ registerType("CAARiseTransitSetDetails", [CAARiseTransitSetDetails, CAARiseTrans
 export function CAARiseTransitSet() { }
 
 CAARiseTransitSet.constraintM = function (M) {
-    while (M > 1) {
-        M -= 1;
-    }
-    while (M < 0) {
-        M += 1;
-    }
-    return M;
+    // floor is **much** faster than AA+ while loop implementation
+    return M - Math.floor(M);
 };
 
 CAARiseTransitSet.correctRAValuesForInterpolation = function (Alpha1, Alpha2, Alpha3) {
