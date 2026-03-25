@@ -803,8 +803,10 @@ var WWTControl$ = {
             Annotation.drawBatch(this.renderContext);
             if ((ss.now() - this._lastMouseMove) > 400) {
                 var raDecDown = this.getCoordinatesForScreenPoint(this._hoverTextPoint.x, this._hoverTextPoint.y);
-                this._annotationHover(raDecDown.x, raDecDown.y, this._hoverTextPoint.x, this._hoverTextPoint.y);
-                this._lastMouseMove = new Date(2100, 1, 1);
+                if (raDecDown) {
+                  this._annotationHover(raDecDown.x, raDecDown.y, this._hoverTextPoint.x, this._hoverTextPoint.y);
+                  this._lastMouseMove = new Date(2100, 1, 1);
+                }
             }
             if (!ss.emptyString(this._hoverText)) {
                 this._drawHoverText(this.renderContext);
@@ -1509,8 +1511,42 @@ var WWTControl$ = {
 
     getCoordinatesForScreenPoint: function (x, y) {
         var pt = Vector2d.create(x, y);
+        const planetMode = this.renderType < 2;  // Earth or Planet
         var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, true);
-        return Coordinates.cartesianToSphericalSky(PickRayDir);
+
+        if (planetMode) {  // Earth or Planet
+          const planetRadius = 1;
+
+          const near = -1;
+          const far = 1;
+          const pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
+          const pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
+          const diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+          diff.normalize();
+
+          const b = 2 * Vector3d.dot(pointNear, diff);
+          const pointNearLenSq = Vector3d.getLengthSq(pointNear);
+          const c = pointNearLenSq - planetRadius * planetRadius;
+          const discriminant = b * b - 4 * c;
+          const sqrtD = Math.sqrt(discriminant);
+          const t0 = -(b + sqrtD) / 2;
+          const t1 = (-b + sqrtD) / 2;
+          const t = t0 > 0 ? t0 : (t1 > 0 ? t1 : null);
+
+          if (t == null) {
+            return null;
+          }
+
+          const pWorld = Vector3d.create(
+            pointNear.x + t * diff.x,
+            pointNear.y + t * diff.y,
+            pointNear.z + t * diff.z,
+          );
+
+          return Coordinates.cartesianToSpherical2(pWorld);
+        } else {
+          return Coordinates.cartesianToSphericalSky(PickRayDir);
+        }
     },
 
     transformPickPointToWorldSpace: function (ptCursor, backBufferWidth, backBufferHeight, normalize=true, z=1) {
