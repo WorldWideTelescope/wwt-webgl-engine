@@ -1543,7 +1543,7 @@ var WWTControl$ = {
             pointNear.z + t * diff.z,
           );
 
-          return Coordinates.cartesianToSpherical2(pWorld);
+          return Coordinates.cartesianToLatLng(pWorld);
         } else {
           return Coordinates.cartesianToSphericalSky(PickRayDir);
         }
@@ -1587,18 +1587,27 @@ var WWTControl$ = {
 
     transformWorldPointToPickSpace: function (worldPoint, backBufferWidth, backBufferHeight) {
         var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
-        var p = new Vector2d();
+        m = Matrix3d.multiplyMatrix(m, this.renderContext.get_projection());
         var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33();
         var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31()) / vz;
         var vy = -(worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32()) / vz;
-        p.x = Math.round((1 + this.renderContext.get_projection().get_m11() * vx) * (backBufferWidth / 2));
-        p.y = Math.round((1 + this.renderContext.get_projection().get_m22() * vy) * (backBufferHeight / 2));
+
+        var p = new Vector2d();
+        p.x = Math.round((vx + 1) * backBufferWidth / 2);
+        p.y = Math.round(-(vy + 1) * backBufferHeight / 2);
         return p;
     },
 
-    getScreenPointForCoordinates: function (ra, dec) {
-        var pt = Vector2d.create(ra, dec);
-        var cartesian = Coordinates.sphericalSkyToCartesian(pt);
+    // In Sky mode, (lon, lat) means (ra, dec)
+    getScreenPointForCoordinates: function (lon, lat) {
+        const planetMode = this.renderType < 2;  // Earth or Planet
+        var cartesian;
+        if (planetMode) {
+          var pt = Vector2d.create(lon, lat);
+          cartesian = Coordinates.sphericalSkyToCartesian(pt);
+        } else {
+          cartesian = Coordinates.geoTo3d(lon, lat);
+        }
         var result = this.transformWorldPointToPickSpace(cartesian, this.renderContext.width, this.renderContext.height);
         return result;
     },
