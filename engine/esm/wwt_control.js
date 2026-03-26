@@ -1559,7 +1559,7 @@ var WWTControl$ = {
         }
     },
 
-    transformPickPointToWorldSpace: function (ptCursor, backBufferWidth, backBufferHeight, normalize=true, z=1) {
+    transformPickPointToWorldSpace: function (ptCursor, backBufferWidth, backBufferHeight, normalize=true, z=-1) {
         var vPickRayDir = new Vector3d();
 
         // It is possible for this function to be called before the RenderContext is
@@ -1569,7 +1569,7 @@ var WWTControl$ = {
         if (this.renderContext.get_projection() != null) {
 
             // We start with an (x, y) point in screen space
-            // This next block converts its to a point [vx, vy, 1] where vx, vy are in [-1, 1]
+            // This next block converts its to a point [vx, vy, z] where vx, vy are in [-1, 1]
             // i.e. clip space
             // We're also accounting for the fact that pixel coordinates run down the screen,
             // but clip space goes upwards (like we're used to for y).
@@ -1585,12 +1585,53 @@ var WWTControl$ = {
             // Transform the screen space pick ray into 3D space
             // w here is always 1
             const d = v.x * m.get_m14() + v.y * m.get_m24() + v.z * m.get_m34() + m.get_m44();
+
             vPickRayDir.x = (v.x * m.get_m11() + v.y * m.get_m21() + v.z * m.get_m31() + m.get_offsetX()) / d;
             vPickRayDir.y = (v.x * m.get_m12() + v.y * m.get_m22() + v.z * m.get_m32() + m.get_offsetY()) / d;
             vPickRayDir.z = (v.x * m.get_m13() + v.y * m.get_m23() + v.z * m.get_m33() + m.get_offsetZ()) / d;
             if (normalize) {
               vPickRayDir.normalize();
             }
+        }
+
+        // console.log("xxxxxxx");
+        // console.log(vPickRayDir);
+        // console.log(this.transformPickPointToWorldSpaceOld(ptCursor, backBufferWidth, backBufferHeight));
+        // console.log("xxxxxxx");
+        return vPickRayDir;
+    },
+
+    transformPickPointToWorldSpaceOld: function (ptCursor, backBufferWidth, backBufferHeight) {
+        var vPickRayDir = new Vector3d();
+
+        // It is possible for this function to be called before the RenderContext is
+        // set up, in which case the Projection is null. In that case we'll leave the
+        // vector at its 0,0,0 default.
+
+        if (this.renderContext.get_projection() != null) {
+
+            // We start with an (x, y) point in screen space
+            // This next block converts its to a point [vx, vy, 1] where vx, vy are in [-1, 1]
+            // i.e. clip space
+            // We're also accounting for the fact that pixel coordinates run down the screen,
+            // but clip space goes upwards (like we're used to for y).
+            // We also take projection scaling into account here.
+            var v = new Vector3d();
+            v.x = (((2 * ptCursor.x) / backBufferWidth) - 1) / this.renderContext.get_projection().get_m11();
+            v.y = -(((2 * ptCursor.y) / backBufferHeight) - 1) / this.renderContext.get_projection().get_m22();
+            v.z = 1;
+
+            var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
+            m.invert();
+
+            console.log(this.renderContext);
+
+            // Transform the screen space pick ray into 3D space
+            // The last column (offsets) should be zero, which is why we've been able to ignore w
+            vPickRayDir.x = v.x * m.get_m11() + v.y * m.get_m21() + v.z * m.get_m31();
+            vPickRayDir.y = v.x * m.get_m12() + v.y * m.get_m22() + v.z * m.get_m32();
+            vPickRayDir.z = v.x * m.get_m13() + v.y * m.get_m23() + v.z * m.get_m33();
+            vPickRayDir.normalize();
         }
         return vPickRayDir;
     },
