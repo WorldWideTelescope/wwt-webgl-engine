@@ -1292,6 +1292,19 @@ var WWTControl$ = {
         var index = 0;
         var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }
 
+        console.log("===========");
+        console.log(e.offsetX, e.offsetY);
+        const coords = this.getCoordinatesForScreenPoint(e.offsetX, e.offsetY);
+        console.log(coords);
+        if (coords !== null) {
+          console.log(this.getScreenPointForCoordinates.bind(this));
+          // const ra = ((15 * (coords.x + 720)) % 360) / 15;  // Sky
+          const ra = coords.x; // Planet
+          console.log(ra);
+          console.log(this.getScreenPointForCoordinates(ra, coords.y));
+        }
+        console.log("==========");
+
         // Check for this pointer already being in the list because as of July
         // 2020, Chrome/Mac sometimes fails to deliver the pointerUp event.
 
@@ -1533,6 +1546,7 @@ var WWTControl$ = {
           const t0 = -(b + sqrtD) / 2;
           const t1 = (-b + sqrtD) / 2;
           const t = t0 > 0 ? t0 : (t1 > 0 ? t1 : null);
+          console.log(`t: ${t}`);
 
           if (t == null) {
             return null;
@@ -1593,15 +1607,36 @@ var WWTControl$ = {
         var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
         m = Matrix3d.multiplyMatrix(m, this.renderContext.get_projection());
 
+        console.log(m);
+        console.log(this.renderContext.get_world());
+
         var d = worldPoint.x * m.get_m14() + worldPoint.y * m.get_m24() + worldPoint.z * m.get_m34() + m.get_m44();
         var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33() + m.get_m43() / d;
-        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31() + m.get_m42()) / d;
-        var vy = (worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32() + m.get_m41()) / d;
+        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31() + m.get_m41()) / d;
+        var vy = (worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32() + m.get_m42()) / d;
+
+        console.log(vx, vy, vz, d);
 
         var p = new Vector2d();
-        p.x = Math.round((vx + 1) * backBufferWidth / 2);
+        p.x = Math.round((1 + vx) * backBufferWidth / 2);
         p.y = Math.round((1 - vy) * backBufferHeight / 2);
+
+        console.log("wwwwwwwwwwwwww");
+        console.log(p);
+        console.log(this.transformWorldPointToPickSpaceOld(worldPoint, backBufferWidth, backBufferHeight));
+        console.log("wwwwwwwwwwwwww");
         
+        return p;
+    },
+
+    transformWorldPointToPickSpaceOld: function (worldPoint, backBufferWidth, backBufferHeight) {
+        var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
+        var p = new Vector2d();
+        var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33();
+        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31()) / vz;
+        var vy = -(worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32()) / vz;
+        p.x = Math.round((1 + this.renderContext.get_projection().get_m11() * vx) * (backBufferWidth / 2));
+        p.y = Math.round((1 + this.renderContext.get_projection().get_m22() * vy) * (backBufferHeight / 2));
         return p;
     },
 
@@ -1610,11 +1645,12 @@ var WWTControl$ = {
         const planetMode = this.renderType < 2;  // Earth or Planet
         var cartesian;
         if (planetMode) {
+          cartesian = Coordinates.geoTo3d(lon, lat);
+        } else {
           var pt = Vector2d.create(lon, lat);
           cartesian = Coordinates.sphericalSkyToCartesian(pt);
-        } else {
-          cartesian = Coordinates.geoTo3d(lon, lat);
         }
+        console.log(cartesian);
         var result = this.transformWorldPointToPickSpace(cartesian, this.renderContext.width, this.renderContext.height);
         return result;
     },
