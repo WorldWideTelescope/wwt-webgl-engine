@@ -1292,13 +1292,13 @@ var WWTControl$ = {
         var index = 0;
         var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }
 
-        console.log(e.offsetX, e.offsetY);
-        const coords = this.getCoordinatesForScreenPoint(e.offsetX, e.offsetY);
-        console.log(coords);
-        if (coords !== null) {
-          console.log(this.getScreenPointForCoordinates(coords.x, coords.y));
-        }
-        console.log("==========");
+        // console.log(e.offsetX, e.offsetY);
+        // const coords = this.getCoordinatesForScreenPoint(e.offsetX, e.offsetY);
+        // console.log(coords);
+        // if (coords !== null) {
+        //   console.log(this.getScreenPointForCoordinates(coords.x, coords.y));
+        // }
+        // console.log("==========");
 
         // Check for this pointer already being in the list because as of July
         // 2020, Chrome/Mac sometimes fails to deliver the pointerUp event.
@@ -1522,7 +1522,6 @@ var WWTControl$ = {
     getCoordinatesForScreenPoint: function (x, y) {
         var pt = Vector2d.create(x, y);
         const planetMode = this.renderType < 2;  // Earth or Planet
-        var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, true);
 
         if (planetMode) {  // Earth or Planet
           const planetRadius = 1;
@@ -1555,6 +1554,12 @@ var WWTControl$ = {
 
           return Coordinates.cartesianToLatLng(pWorld);
         } else {
+          var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height);
+          console.log(PickRayDir);
+          console.log(this.transformPickPointToWorldSpaceOld(pt, this.renderContext.width, this.renderContext.height));
+          console.log(Coordinates.cartesianToSphericalSky(PickRayDir));
+          console.log(Coordinates.cartesianToSphericalSky(this.transformPickPointToWorldSpaceOld(pt, this.renderContext.width, this.renderContext.height)));
+          console.log("tttttttttttt");
           return Coordinates.cartesianToSphericalSky(PickRayDir);
         }
     },
@@ -1596,7 +1601,7 @@ var WWTControl$ = {
 
         // console.log("xxxxxxx");
         // console.log(vPickRayDir);
-        // console.log(this.transformPickPointToWorldSpaceOld(ptCursor, backBufferWidth, backBufferHeight));
+        // console.log(this.transformPickPointToWorldSpaceOld(ptCursor, backBufferWidth, backBufferHeight, z));
         // console.log("xxxxxxx");
         return vPickRayDir;
     },
@@ -1624,7 +1629,7 @@ var WWTControl$ = {
             var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
             m.invert();
 
-            console.log(this.renderContext);
+            // console.log(this.renderContext);
 
             // Transform the screen space pick ray into 3D space
             // The last column (offsets) should be zero, which is why we've been able to ignore w
@@ -1649,10 +1654,10 @@ var WWTControl$ = {
         p.x = Math.round((vx + 1) * backBufferWidth / 2);
         p.y = Math.round((1 - vy) * backBufferHeight / 2);
         
-        console.log("wwwwwwwwwwwwww");
-        console.log(p);
-        console.log(this.transformWorldPointToPickSpaceOld(worldPoint, backBufferWidth, backBufferHeight));
-        console.log("wwwwwwwwwwwwww");
+        // console.log("wwwwwwwwwwwwww");
+        // console.log(p);
+        // console.log(this.transformWorldPointToPickSpaceOld(worldPoint, backBufferWidth, backBufferHeight));
+        // console.log("wwwwwwwwwwwwww");
 
         return p;
     },
