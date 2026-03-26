@@ -1642,12 +1642,29 @@ var WWTControl$ = {
 
         var d = worldPoint.x * m.get_m14() + worldPoint.y * m.get_m24() + worldPoint.z * m.get_m34() + m.get_m44();
         var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33() + m.get_m43() / d;
-        var vx = worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31() + m.get_m42() / d;
-        var vy = worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32() + m.get_m41() / d;
+        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31() + m.get_m42()) / d;
+        var vy = (worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32() + m.get_m41()) / d;
 
         var p = new Vector2d();
         p.x = Math.round((vx + 1) * backBufferWidth / 2);
         p.y = Math.round((1 - vy) * backBufferHeight / 2);
+        
+        console.log("wwwwwwwwwwwwww");
+        console.log(p);
+        console.log(this.transformWorldPointToPickSpaceOld(worldPoint, backBufferWidth, backBufferHeight));
+        console.log("wwwwwwwwwwwwww");
+
+        return p;
+    },
+
+    transformWorldPointToPickSpaceOld: function (worldPoint, backBufferWidth, backBufferHeight) {
+        var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
+        var p = new Vector2d();
+        var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33();
+        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31()) / vz;
+        var vy = -(worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32()) / vz;
+        p.x = Math.round((1 + this.renderContext.get_projection().get_m11() * vx) * (backBufferWidth / 2));
+        p.y = Math.round((1 + this.renderContext.get_projection().get_m22() * vy) * (backBufferHeight / 2));
         return p;
     },
 
