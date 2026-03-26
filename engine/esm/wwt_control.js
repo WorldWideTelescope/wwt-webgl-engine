@@ -1292,6 +1292,14 @@ var WWTControl$ = {
         var index = 0;
         var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }
 
+        console.log(e.offsetX, e.offsetY);
+        const coords = this.getCoordinatesForScreenPoint(e.offsetX, e.offsetY);
+        console.log(coords);
+        if (coords !== null) {
+          console.log(this.getScreenPointForCoordinates(coords.x, coords.y));
+        }
+        console.log("==========");
+
         // Check for this pointer already being in the list because as of July
         // 2020, Chrome/Mac sometimes fails to deliver the pointerUp event.
 
@@ -1441,8 +1449,10 @@ var WWTControl$ = {
         }
         if (this._mouseDown && !this._moved) {
             var raDecDown = this.getCoordinatesForScreenPoint(Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e));
-            if (!this._annotationclicked(raDecDown.x, raDecDown.y, Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e))) {
-                globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
+            if (raDecDown) {
+              if (!this._annotationclicked(raDecDown.x, raDecDown.y, Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e))) {
+                  globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
+              }
             }
         }
         this._mouseDown = false;
@@ -1588,13 +1598,15 @@ var WWTControl$ = {
     transformWorldPointToPickSpace: function (worldPoint, backBufferWidth, backBufferHeight) {
         var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
         m = Matrix3d.multiplyMatrix(m, this.renderContext.get_projection());
-        var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33();
-        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31()) / vz;
-        var vy = -(worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32()) / vz;
+
+        var d = worldPoint.x * m.get_m14() + worldPoint.y * m.get_m24() + worldPoint.z * m.get_m34() + m.get_m44();
+        var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33() + m.get_m43() / d;
+        var vx = worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31() + m.get_m42() / d;
+        var vy = worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32() + m.get_m41() / d;
 
         var p = new Vector2d();
         p.x = Math.round((vx + 1) * backBufferWidth / 2);
-        p.y = Math.round(-(vy + 1) * backBufferHeight / 2);
+        p.y = Math.round((1 - vy) * backBufferHeight / 2);
         return p;
     },
 
@@ -1608,6 +1620,7 @@ var WWTControl$ = {
         } else {
           cartesian = Coordinates.geoTo3d(lon, lat);
         }
+        console.log(cartesian);
         var result = this.transformWorldPointToPickSpace(cartesian, this.renderContext.width, this.renderContext.height);
         return result;
     },

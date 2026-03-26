@@ -2122,14 +2122,14 @@ const App = defineComponent({
         this.$options.statusMessageDestination.postMessage(message, this.allowedOrigin);
       }
 
-      if (!this.isPointerMoving) {
-        this.updateLastClosePoint(event);
-        if (this.lastClosePt !== null) {
-          const source = this.sourceCreator(this.lastClosePt);
-          this.addSource(source);
-          this.lastSelectedSource = source;
-        }
-      }
+      // if (!this.isPointerMoving) {
+      //   this.updateLastClosePoint(event);
+      //   if (this.lastClosePt !== null) {
+      //     const source = this.sourceCreator(this.lastClosePt);
+      //     this.addSource(source);
+      //     this.lastSelectedSource = source;
+      //   }
+      // }
 
       this.pointerStartPosition = null;
       this.isPointerMoving = false;
@@ -2894,6 +2894,12 @@ const App = defineComponent({
     }
 
     this.waitForReady().then(() => {
+
+      // const iset = "Earth";
+      // this.setBackgroundImageByName(iset);
+      // this.setForegroundImageByName(iset);
+
+      this.applySetting(["showCrosshairs", true]);
       const script = this.getQueryScript(window.location);
       if (script !== null) {
         this.$options.statusMessageDestination = window;
