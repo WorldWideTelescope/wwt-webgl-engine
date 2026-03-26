@@ -1292,14 +1292,6 @@ var WWTControl$ = {
         var index = 0;
         var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }
 
-        // console.log(e.offsetX, e.offsetY);
-        // const coords = this.getCoordinatesForScreenPoint(e.offsetX, e.offsetY);
-        // console.log(coords);
-        // if (coords !== null) {
-        //   console.log(this.getScreenPointForCoordinates(coords.x, coords.y));
-        // }
-        // console.log("==========");
-
         // Check for this pointer already being in the list because as of July
         // 2020, Chrome/Mac sometimes fails to deliver the pointerUp event.
 
@@ -1555,11 +1547,6 @@ var WWTControl$ = {
           return Coordinates.cartesianToLatLng(pWorld);
         } else {
           var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height);
-          console.log(PickRayDir);
-          console.log(this.transformPickPointToWorldSpaceOld(pt, this.renderContext.width, this.renderContext.height));
-          console.log(Coordinates.cartesianToSphericalSky(PickRayDir));
-          console.log(Coordinates.cartesianToSphericalSky(this.transformPickPointToWorldSpaceOld(pt, this.renderContext.width, this.renderContext.height)));
-          console.log("tttttttttttt");
           return Coordinates.cartesianToSphericalSky(PickRayDir);
         }
     },
@@ -1599,45 +1586,6 @@ var WWTControl$ = {
             }
         }
 
-        // console.log("xxxxxxx");
-        // console.log(vPickRayDir);
-        // console.log(this.transformPickPointToWorldSpaceOld(ptCursor, backBufferWidth, backBufferHeight, z));
-        // console.log("xxxxxxx");
-        return vPickRayDir;
-    },
-
-    transformPickPointToWorldSpaceOld: function (ptCursor, backBufferWidth, backBufferHeight) {
-        var vPickRayDir = new Vector3d();
-
-        // It is possible for this function to be called before the RenderContext is
-        // set up, in which case the Projection is null. In that case we'll leave the
-        // vector at its 0,0,0 default.
-
-        if (this.renderContext.get_projection() != null) {
-
-            // We start with an (x, y) point in screen space
-            // This next block converts its to a point [vx, vy, 1] where vx, vy are in [-1, 1]
-            // i.e. clip space
-            // We're also accounting for the fact that pixel coordinates run down the screen,
-            // but clip space goes upwards (like we're used to for y).
-            // We also take projection scaling into account here.
-            var v = new Vector3d();
-            v.x = (((2 * ptCursor.x) / backBufferWidth) - 1) / this.renderContext.get_projection().get_m11();
-            v.y = -(((2 * ptCursor.y) / backBufferHeight) - 1) / this.renderContext.get_projection().get_m22();
-            v.z = 1;
-
-            var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
-            m.invert();
-
-            // console.log(this.renderContext);
-
-            // Transform the screen space pick ray into 3D space
-            // The last column (offsets) should be zero, which is why we've been able to ignore w
-            vPickRayDir.x = v.x * m.get_m11() + v.y * m.get_m21() + v.z * m.get_m31();
-            vPickRayDir.y = v.x * m.get_m12() + v.y * m.get_m22() + v.z * m.get_m32();
-            vPickRayDir.z = v.x * m.get_m13() + v.y * m.get_m23() + v.z * m.get_m33();
-            vPickRayDir.normalize();
-        }
         return vPickRayDir;
     },
 
@@ -1654,22 +1602,6 @@ var WWTControl$ = {
         p.x = Math.round((vx + 1) * backBufferWidth / 2);
         p.y = Math.round((1 - vy) * backBufferHeight / 2);
         
-        // console.log("wwwwwwwwwwwwww");
-        // console.log(p);
-        // console.log(this.transformWorldPointToPickSpaceOld(worldPoint, backBufferWidth, backBufferHeight));
-        // console.log("wwwwwwwwwwwwww");
-
-        return p;
-    },
-
-    transformWorldPointToPickSpaceOld: function (worldPoint, backBufferWidth, backBufferHeight) {
-        var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
-        var p = new Vector2d();
-        var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33();
-        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31()) / vz;
-        var vy = -(worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32()) / vz;
-        p.x = Math.round((1 + this.renderContext.get_projection().get_m11() * vx) * (backBufferWidth / 2));
-        p.y = Math.round((1 + this.renderContext.get_projection().get_m22() * vy) * (backBufferHeight / 2));
         return p;
     },
 
@@ -1683,7 +1615,6 @@ var WWTControl$ = {
         } else {
           cartesian = Coordinates.geoTo3d(lon, lat);
         }
-        console.log(cartesian);
         var result = this.transformWorldPointToPickSpace(cartesian, this.renderContext.width, this.renderContext.height);
         return result;
     },
