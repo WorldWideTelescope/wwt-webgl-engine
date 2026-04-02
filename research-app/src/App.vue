@@ -2895,10 +2895,6 @@ const App = defineComponent({
 
     this.waitForReady().then(() => {
 
-      const iset = "Earth";
-      this.setBackgroundImageByName(iset);
-      this.setForegroundImageByName(iset);
-
       this.applySetting(["showCrosshairs", true]);
       const script = this.getQueryScript(window.location);
       if (script !== null) {
