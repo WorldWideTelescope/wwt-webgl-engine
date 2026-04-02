@@ -801,13 +801,13 @@ var WWTControl$ = {
                 index++;
             }
             Annotation.drawBatch(this.renderContext);
-            // if ((ss.now() - this._lastMouseMove) > 400) {
-            //     var raDecDown = this.getCoordinatesForScreenPoint(this._hoverTextPoint.x, this._hoverTextPoint.y);
-            //     if (raDecDown) {
-            //       this._annotationHover(raDecDown.x, raDecDown.y, this._hoverTextPoint.x, this._hoverTextPoint.y);
-            //       this._lastMouseMove = new Date(2100, 1, 1);
-            //     }
-            // }
+            if ((ss.now() - this._lastMouseMove) > 400) {
+                var ptDown = this.getCoordinatesForScreenPoint(this._hoverTextPoint.x, this._hoverTextPoint.y);
+                if (ptDown) {
+                  this._annotationHover(ptDown.x, ptDown.y, this._hoverTextPoint.x, this._hoverTextPoint.y);
+                  this._lastMouseMove = new Date(2100, 1, 1);
+                }
+            }
             if (!ss.emptyString(this._hoverText)) {
                 this._drawHoverText(this.renderContext);
             }
