@@ -1523,7 +1523,6 @@ var WWTControl$ = {
           const pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
           const pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
           const diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
-          const diffLen = diff.length();
           diff.normalize();
 
           const b = 2 * Vector3d.dot(pointNear, diff);
