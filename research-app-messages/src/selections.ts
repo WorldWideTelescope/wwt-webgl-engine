@@ -49,13 +49,7 @@ export interface SpreadSheetLayerInfo {
 export type CatalogLayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
 
 /** Information about a selected source in the engine. */
-export interface Source {
-  /** The right ascension of the source, in radians. */
-  ra: number;
-
-  /** The declination of the source, in radians. */
-  dec: number;
-
+export interface BaseSource {
   /** A user-facing name for he source */
   name: string;
 
@@ -77,6 +71,24 @@ export interface Source {
     [field: string]: string | undefined;
   };
 }
+
+export interface SkySource extends BaseSource {
+  /** The right ascension of the source, in radians. */
+  ra: number;
+
+  /** The declination of the source, in radians. */
+  dec: number;
+}
+
+export interface LngLatSource extends BaseSource {
+  /** The longitude of the source, in radians. */
+  lng: number;
+
+  /** The latitude of the source, in radians. */
+  lat: number;
+}
+
+export type Source = SkySource | LngLatSource;
 
 /** Information about the current state of source and catalog selection
  * inside the WWT application

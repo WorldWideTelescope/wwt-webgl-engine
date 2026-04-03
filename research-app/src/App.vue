@@ -1156,8 +1156,8 @@ class KeyboardControlSettings {
 }
 
 interface RawSourceInfo {
-  ra: number;
-  dec: number;
+  lng: number;
+  lat: number;
   catalogLayer: CatalogLayerInfo;
   colNames: string[];
   values: string[];
@@ -2092,8 +2092,8 @@ const App = defineComponent({
       const needsUpdate =
         closestPt == null ||
         this.lastClosePt == null ||
-        this.lastClosePt.ra != closestPt.ra ||
-        this.lastClosePt.dec != closestPt.dec;
+        this.lastClosePt.lng != closestPt.lng ||
+        this.lastClosePt.lat != closestPt.lat;
       if (needsUpdate) {
         this.lastClosePt = closestPt;
       }
@@ -2122,14 +2122,14 @@ const App = defineComponent({
         this.$options.statusMessageDestination.postMessage(message, this.allowedOrigin);
       }
 
-      // if (!this.isPointerMoving) {
-      //   this.updateLastClosePoint(event);
-      //   if (this.lastClosePt !== null) {
-      //     const source = this.sourceCreator(this.lastClosePt);
-      //     this.addSource(source);
-      //     this.lastSelectedSource = source;
-      //   }
-      // }
+      if (!this.isPointerMoving) {
+        this.updateLastClosePoint(event);
+        if (this.lastClosePt !== null) {
+          const source = this.sourceCreator(this.lastClosePt);
+          this.addSource(source);
+          this.lastSelectedSource = source;
+        }
+      }
 
       this.pointerStartPosition = null;
       this.isPointerMoving = false;
@@ -2150,8 +2150,8 @@ const App = defineComponent({
         obj[sourceInfo.colNames[i]] = sourceInfo.values[i];
       }
       return {
-        ra: sourceInfo.ra,
-        dec: sourceInfo.dec,
+        lng: sourceInfo.lng,
+        lat: sourceInfo.lat,
         catalogLayer: sourceInfo.catalogLayer,
         layerData: obj,
         name: this.nameForSource(obj, sourceInfo.catalogLayer.name),
@@ -2819,8 +2819,11 @@ const App = defineComponent({
       const rowSeparator = "\r\n";
       const colSeparator = "\t";
 
-      const raDecDeg = this.findRADecForScreenPoint(point);
-      const target = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
+      const coordsDeg = this.findCoordinatesForScreenPoint(point);
+      if (!coordsDeg) {
+        return null;
+      }
+      const target = { lng: D2R * coordsDeg.lng, lat: D2R * coordsDeg.lat };
 
       for (const layerInfo of this.selectableTableLayers()) {
         const layer = this.spreadSheetLayer(layerInfo);
@@ -2840,14 +2843,14 @@ const App = defineComponent({
 
         for (const row of rows) {
           const values = row.split(colSeparator);
-          const ra = D2R * Number(values[lngCol]);
-          const dec = D2R * Number(values[latCol]);
-          const pt = { ra: ra, dec: dec };
-          const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
+          const lng = D2R * Number(values[lngCol]);
+          const lat = D2R * Number(values[latCol]);
+          const pt = { lng, lat };
+          const dist = distance(target.lng, target.lat, pt.lng, pt.lat);
           if (dist < minDist) {
             closestPt = {
-              ra: ra,
-              dec: dec,
+              lng,
+              lat,
               colNames: colNames,
               values: values,
               catalogLayer: layerInfo,
@@ -2858,8 +2861,8 @@ const App = defineComponent({
       }
 
       if (closestPt !== null) {
-        const closestRADecDeg = { ra: closestPt.ra * R2D, dec: closestPt.dec * R2D };
-        const closestScreenPoint = this.findScreenPointForRADec(closestRADecDeg);
+        const closestLngLatDeg = { lng: closestPt.lng * R2D, lat: closestPt.lat * R2D };
+        const closestScreenPoint = this.findScreenPointForCoordinates(closestLngLatDeg);
         const pixelDist = Math.sqrt((point.x - closestScreenPoint.x) ** 2 + (point.y - closestScreenPoint.y) ** 2);
         if (!threshold || pixelDist < threshold) {
           return closestPt;
@@ -2894,8 +2897,6 @@ const App = defineComponent({
     }
 
     this.waitForReady().then(() => {
-
-      this.applySetting(["showCrosshairs", true]);
       const script = this.getQueryScript(window.location);
       if (script !== null) {
         this.$options.statusMessageDestination = window;
