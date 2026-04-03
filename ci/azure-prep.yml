@@ -18,6 +18,7 @@ jobs:
       $d = Join-Path $Env:Temp cranko-$(New-Guid)
       [void][System.IO.Directory]::CreateDirectory($d)
       cd $d
+      $tempDir = New-Item -ItemType Directory -Path (Join-Path $env:TEMP ([Guid]::NewGuid().ToString()))
       [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
       iex ((New-Object System.Net.WebClient).DownloadString('https://pkgw.github.io/cranko/fetch-latest.ps1'))
       echo "##vso[task.prependpath]$d"
