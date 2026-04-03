@@ -1513,7 +1513,7 @@ var WWTControl$ = {
 
     getCoordinatesForScreenPoint: function (x, y) {
         var pt = Vector2d.create(x, y);
-        const planetMode = this.renderType < 2;  // Earth or Planet
+        const planetMode = this.get_planetLike();  // Earth or Planet
 
         if (planetMode) {  // Earth or Planet
           const planetRadius = 1;
@@ -1544,7 +1544,9 @@ var WWTControl$ = {
             pointNear.z + t * diff.z,
           );
 
-          return Coordinates.cartesianToLatLng(pWorld);
+          var latLon = Coordinates.cartesianToLatLng(pWorld);
+          latLon.x -= 180;
+          return latLon;
         } else {
           var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height);
           return Coordinates.cartesianToSphericalSky(PickRayDir);
@@ -1609,6 +1611,7 @@ var WWTControl$ = {
         const planetMode = this.renderType < 2;  // Earth or Planet
         var cartesian;
         if (planetMode) {
+          lon += 180;
           cartesian = Coordinates.geoTo3d(lat, lon);
         } else {
           var pt = Vector2d.create(lon, lat);
