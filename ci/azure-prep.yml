@@ -27,6 +27,14 @@ jobs:
       $executable = Join-Path $tempDir "cranko.exe"
       echo $executable
       Set-Alias -Name cranko -Value $executable
+      'Set-Alias -Name cranko -Value $executable' | Out-File -FilePath $profilePath -Append
+
+      $profilePath = $PROFILE.CurrentUserAllHosts
+      $profileDir = Split-Path $profilePath
+      if (!(Test-Path $profileDir)) { New-Item -Type Directory -Path $profileDir }
+
+      
+          
     displayName: Install latest Cranko (Windows)
 
   - task: NodeTool@0
