@@ -24,6 +24,8 @@ jobs:
       echo "##vso[task.prependpath]$d"
       echo $file
       ls $tempDir
+      $executable = Join-Path $tempDir "cranko.exe"
+      Set-Alias -Name cranko -Value $executable
       echo $path | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     displayName: Install latest Cranko (Windows)
 
