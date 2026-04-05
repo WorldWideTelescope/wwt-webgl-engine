@@ -929,6 +929,12 @@ var RenderContext$ = {
         this._frustum[4].b = viewProjection.get_m23();
         this._frustum[4].c = viewProjection.get_m33();
         this._frustum[4].d = viewProjection.get_m43();
+        if (this.get_backgroundImageset().get_dataSetType() < 2) {
+          this._frustum[4].a += viewProjection.get_m14();
+          this._frustum[4].b += viewProjection.get_m24();
+          this._frustum[4].c += viewProjection.get_m34();
+          this._frustum[4].d += viewProjection.get_m44();
+        }
 
         // Far plane
         this._frustum[5].a = viewProjection.get_m14() - viewProjection.get_m13();

@@ -4,17 +4,29 @@
 import { defineStore } from 'pinia';
 
 import { ImagesetInfo, SpreadSheetLayerInfo } from '@wwtelescope/engine-pinia';
+import { ImageSetType } from '@wwtelescope/engine-types';
 
-export interface Source {
-  ra: number;
-  dec: number;
+export interface BaseSource {
   name: string;
   catalogLayer: CatalogLayerInfo;
   zoomDeg?: number;
   layerData: {
     [field: string]: string | undefined;
   };
+  type: ImageSetType; 
 }
+
+export interface SkySource extends BaseSource {
+  ra: number;
+  dec: number;
+}
+
+export interface LngLatSource extends BaseSource {
+  lng: number;
+  lat: number;
+}
+
+export type Source = SkySource | LngLatSource;
 
 // This union type includes ImagesetInfo as an option to include HiPS catalogs
 // which combine elements of both Imageset and Spreadsheet layers
@@ -63,7 +75,13 @@ function infoKey(info: CatalogLayerInfo) {
 }
 
 function sourcesEqual(s1: Source, s2: Source) {
-  return (s1.ra === s2.ra) && (s1.dec === s2.dec) && (infoKey(s1.catalogLayer) === infoKey(s2.catalogLayer));
+  const lng1 = "lng" in s1 ? s1.lng : s1.ra;
+  const lng2 = "lng" in s2 ? s2.lng : s2.ra;
+  const lat1 = "lat" in s1 ? s1.lat : s1.dec;
+  const lat2 = "lat" in s2 ? s2.lat : s2.dec;
+  return (lng1 === lng2) &&
+         (lat1 === lat2) &&
+         (infoKey(s1.catalogLayer) === infoKey(s2.catalogLayer));
 }
 
 function getFilteredLayers(statusMap: { [id: string]: TableLayerStatus | undefined },

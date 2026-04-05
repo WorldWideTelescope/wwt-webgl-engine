@@ -802,9 +802,11 @@ var WWTControl$ = {
             }
             Annotation.drawBatch(this.renderContext);
             if ((ss.now() - this._lastMouseMove) > 400) {
-                var raDecDown = this.getCoordinatesForScreenPoint(this._hoverTextPoint.x, this._hoverTextPoint.y);
-                this._annotationHover(raDecDown.x, raDecDown.y, this._hoverTextPoint.x, this._hoverTextPoint.y);
-                this._lastMouseMove = new Date(2100, 1, 1);
+                var ptDown = this.getCoordinatesForScreenPoint(this._hoverTextPoint.x, this._hoverTextPoint.y);
+                if (ptDown) {
+                  this._annotationHover(ptDown.x, ptDown.y, this._hoverTextPoint.x, this._hoverTextPoint.y);
+                  this._lastMouseMove = new Date(2100, 1, 1);
+                }
             }
             if (!ss.emptyString(this._hoverText)) {
                 this._drawHoverText(this.renderContext);
@@ -1439,8 +1441,10 @@ var WWTControl$ = {
         }
         if (this._mouseDown && !this._moved) {
             var raDecDown = this.getCoordinatesForScreenPoint(Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e));
-            if (!this._annotationclicked(raDecDown.x, raDecDown.y, Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e))) {
-                globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
+            if (raDecDown) {
+              if (!this._annotationclicked(raDecDown.x, raDecDown.y, Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e))) {
+                  globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
+              }
             }
         }
         this._mouseDown = false;
@@ -1509,11 +1513,47 @@ var WWTControl$ = {
 
     getCoordinatesForScreenPoint: function (x, y) {
         var pt = Vector2d.create(x, y);
-        var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height);
-        return Coordinates.cartesianToSphericalSky(PickRayDir);
+        const planetMode = this.get_planetLike();  // Earth or Planet
+
+        if (planetMode) {  // Earth or Planet
+          const planetRadius = 1;
+
+          const near = -1;
+          const far = 1;
+          const pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
+          const pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
+          const diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+          diff.normalize();
+
+          const b = 2 * Vector3d.dot(pointNear, diff);
+          const pointNearLenSq = Vector3d.getLengthSq(pointNear);
+          const c = pointNearLenSq - planetRadius * planetRadius;
+          const discriminant = b * b - 4 * c;
+          const sqrtD = Math.sqrt(discriminant);
+          const t0 = -(b + sqrtD) / 2;
+          const t1 = (-b + sqrtD) / 2;
+          const t = t0 > 0 ? t0 : (t1 > 0 ? t1 : null);
+
+          if (t == null) {
+            return null;
+          }
+
+          const pWorld = Vector3d.create(
+            pointNear.x + t * diff.x,
+            pointNear.y + t * diff.y,
+            pointNear.z + t * diff.z,
+          );
+
+          var latLon = Coordinates.cartesianToLatLng(pWorld);
+          latLon.x -= 180;
+          return latLon;
+        } else {
+          var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height);
+          return Coordinates.cartesianToSphericalSky(PickRayDir);
+        }
     },
 
-    transformPickPointToWorldSpace: function (ptCursor, backBufferWidth, backBufferHeight) {
+    transformPickPointToWorldSpace: function (ptCursor, backBufferWidth, backBufferHeight, normalize=true, z=-1) {
         var vPickRayDir = new Vector3d();
 
         // It is possible for this function to be called before the RenderContext is
@@ -1523,43 +1563,60 @@ var WWTControl$ = {
         if (this.renderContext.get_projection() != null) {
 
             // We start with an (x, y) point in screen space
-            // This next block converts its to a point [vx, vy, 1] where vx, vy are in [-1, 1]
+            // This next block converts its to a point [vx, vy, z] where vx, vy are in [-1, 1]
             // i.e. clip space
             // We're also accounting for the fact that pixel coordinates run down the screen,
             // but clip space goes upwards (like we're used to for y).
-            // We also take projection scaling into account here.
             var v = new Vector3d();
-            v.x = (((2 * ptCursor.x) / backBufferWidth) - 1) / this.renderContext.get_projection().get_m11();
-            v.y = -(((2 * ptCursor.y) / backBufferHeight) - 1) / this.renderContext.get_projection().get_m22();
-            v.z = 1;
+            v.x = (((2 * ptCursor.x) / backBufferWidth) - 1);
+            v.y = -(((2 * ptCursor.y) / backBufferHeight) - 1);
+            v.z = z;
 
             var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
+            m = Matrix3d.multiplyMatrix(m, this.renderContext.get_projection());
             m.invert();
 
             // Transform the screen space pick ray into 3D space
-            // The last column (offsets) should be zero, which is why we've been able to ignore w
-            vPickRayDir.x = v.x * m.get_m11() + v.y * m.get_m21() + v.z * m.get_m31();
-            vPickRayDir.y = v.x * m.get_m12() + v.y * m.get_m22() + v.z * m.get_m32();
-            vPickRayDir.z = v.x * m.get_m13() + v.y * m.get_m23() + v.z * m.get_m33();
-            vPickRayDir.normalize();
+            // w here is always 1
+            const d = v.x * m.get_m14() + v.y * m.get_m24() + v.z * m.get_m34() + m.get_m44();
+
+            vPickRayDir.x = (v.x * m.get_m11() + v.y * m.get_m21() + v.z * m.get_m31() + m.get_offsetX()) / d;
+            vPickRayDir.y = (v.x * m.get_m12() + v.y * m.get_m22() + v.z * m.get_m32() + m.get_offsetY()) / d;
+            vPickRayDir.z = (v.x * m.get_m13() + v.y * m.get_m23() + v.z * m.get_m33() + m.get_offsetZ()) / d;
+            if (normalize) {
+              vPickRayDir.normalize();
+            }
         }
+
         return vPickRayDir;
     },
 
     transformWorldPointToPickSpace: function (worldPoint, backBufferWidth, backBufferHeight) {
         var m = Matrix3d.multiplyMatrix(this.renderContext.get_world(), this.renderContext.get_view());
+        m = Matrix3d.multiplyMatrix(m, this.renderContext.get_projection());
+
+        var d = worldPoint.x * m.get_m14() + worldPoint.y * m.get_m24() + worldPoint.z * m.get_m34() + m.get_m44();
+        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31() + m.get_m41()) / d;
+        var vy = (worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32() + m.get_m42()) / d;
+
         var p = new Vector2d();
-        var vz = worldPoint.x * m.get_m13() + worldPoint.y * m.get_m23() + worldPoint.z * m.get_m33();
-        var vx = (worldPoint.x * m.get_m11() + worldPoint.y * m.get_m21() + worldPoint.z * m.get_m31()) / vz;
-        var vy = -(worldPoint.x * m.get_m12() + worldPoint.y * m.get_m22() + worldPoint.z * m.get_m32()) / vz;
-        p.x = Math.round((1 + this.renderContext.get_projection().get_m11() * vx) * (backBufferWidth / 2));
-        p.y = Math.round((1 + this.renderContext.get_projection().get_m22() * vy) * (backBufferHeight / 2));
+        p.x = Math.round((1 + vx) * backBufferWidth / 2);
+        p.y = Math.round((1 - vy) * backBufferHeight / 2);
+
         return p;
     },
 
-    getScreenPointForCoordinates: function (ra, dec) {
-        var pt = Vector2d.create(ra, dec);
-        var cartesian = Coordinates.sphericalSkyToCartesian(pt);
+    // In Sky mode, (lon, lat) means (ra, dec)
+    getScreenPointForCoordinates: function (lon, lat) {
+        const planetMode = this.renderType < 2;  // Earth or Planet
+        var cartesian;
+        if (planetMode) {
+          lon += 180;
+          cartesian = Coordinates.geoTo3d(lat, lon);
+        } else {
+          var pt = Vector2d.create(lon, lat);
+          cartesian = Coordinates.sphericalSkyToCartesian(pt);
+        }
         var result = this.transformWorldPointToPickSpace(cartesian, this.renderContext.width, this.renderContext.height);
         return result;
     },
