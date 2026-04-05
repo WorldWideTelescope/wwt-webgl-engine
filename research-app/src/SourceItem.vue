@@ -44,10 +44,10 @@
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
         <div class="detail-row">
-          <span class="prompt">RA:</span><span>{{ lngStr }}</span>
+          <span class="prompt">{{ "lng" in source ? "Lon:" : "RA:" }}</span><span>{{ lngStr }}</span>
         </div>
         <div class="detail-row">
-          <span class="prompt">Dec:</span><span>{{ latStr }}</span>
+          <span class="prompt">{{ "lat" in source ? "Lat:" : "Dec:" }}</span><span>{{ latStr }}</span>
         </div>
         <div class="detail-row">
           <span class="prompt">Table:</span

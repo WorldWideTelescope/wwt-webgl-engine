@@ -377,7 +377,7 @@ import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Place, Settings } from "@wwtelescope/engine";
+import { Place } from "@wwtelescope/engine";
 
 interface Message {
   event?: string;
@@ -2149,13 +2149,26 @@ const App = defineComponent({
       for (let i = 0; i < sourceInfo.values.length; i++) {
         obj[sourceInfo.colNames[i]] = sourceInfo.values[i];
       }
-      return {
-        lng: sourceInfo.lng,
-        lat: sourceInfo.lat,
+      const planetLike = this.wwtBackgroundImageset && [ImageSetType.earth, ImageSetType.planet].includes(this.wwtBackgroundImageset.get_dataSetType());
+      const baseInfo = {
         catalogLayer: sourceInfo.catalogLayer,
         layerData: obj,
         name: this.nameForSource(obj, sourceInfo.catalogLayer.name),
       };
+
+      if (planetLike) {
+        return {
+          ...baseInfo,
+          lng: sourceInfo.lng,
+          lat: sourceInfo.lat,
+        };
+      } else {
+        return {
+          ...baseInfo,
+          ra: sourceInfo.lng,
+          dec: sourceInfo.lat,
+        };
+      }
     },
 
     // ImageSet layers, including FITS layers:
