@@ -50,7 +50,7 @@ export type CatalogLayerInfo = SpreadSheetLayerInfo | ImagesetInfo;
 
 /** Information about a selected source in the engine. */
 export interface BaseSource {
-  /** A user-facing name for he source */
+  /** A user-facing name for the source */
   name: string;
 
   /** Information about the layer containing the source. Details depend on
@@ -70,6 +70,9 @@ export interface BaseSource {
   layerData: {
     [field: string]: string | undefined;
   };
+
+  /** The reference frame that the source is associated with */
+  type: ImageSetType;
 }
 
 export interface SkySource extends BaseSource {

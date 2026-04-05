@@ -4,6 +4,7 @@
 import { defineStore } from 'pinia';
 
 import { ImagesetInfo, SpreadSheetLayerInfo } from '@wwtelescope/engine-pinia';
+import { ImageSetType } from '@wwtelescope/engine-types';
 
 export interface BaseSource {
   name: string;
@@ -12,6 +13,7 @@ export interface BaseSource {
   layerData: {
     [field: string]: string | undefined;
   };
+  type: ImageSetType; 
 }
 
 export interface SkySource extends BaseSource {

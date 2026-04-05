@@ -52,7 +52,7 @@
               <label>Sources</label>
             </div>
             <source-item
-              v-for="source of sources"
+              v-for="source of sources.filter(src => src.type === wwtBackgroundImageset?.get_dataSetType())"
               v-bind:key="source.name"
               v-bind:source="source"
             />
@@ -2149,11 +2149,13 @@ const App = defineComponent({
       for (let i = 0; i < sourceInfo.values.length; i++) {
         obj[sourceInfo.colNames[i]] = sourceInfo.values[i];
       }
-      const planetLike = this.wwtBackgroundImageset && [ImageSetType.earth, ImageSetType.planet].includes(this.wwtBackgroundImageset.get_dataSetType());
+      const type = this.wwtBackgroundImageset?.get_dataSetType() ?? ImageSetType.sky;
+      const planetLike = [ImageSetType.earth, ImageSetType.planet].includes(type);
       const baseInfo = {
         catalogLayer: sourceInfo.catalogLayer,
         layerData: obj,
         name: this.nameForSource(obj, sourceInfo.catalogLayer.name),
+        type,
       };
 
       if (planetLike) {
@@ -2575,6 +2577,7 @@ const App = defineComponent({
       const rawLayer = isProxy(layer) ? toRaw(layer): layer;
       return {
         ...rawSource,
+        type: ImageSetType[rawSource.type] as selections.ImageSetType,
         catalogLayer: rawLayer,
       };
     },
@@ -2707,6 +2710,7 @@ const App = defineComponent({
       }
       return {
         ...src,
+        type: ImageSetType[src.type],
         catalogLayer: layer,
       };
     },
