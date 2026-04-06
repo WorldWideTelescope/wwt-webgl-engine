@@ -1513,32 +1513,32 @@ var WWTControl$ = {
 
     getCoordinatesForScreenPoint: function (x, y) {
         var pt = Vector2d.create(x, y);
-        const planetMode = this.get_planetLike();  // Earth or Planet
+        var planetMode = this.get_planetLike();
 
-        if (planetMode) {  // Earth or Planet
-          const planetRadius = 1;
+        if (planetMode) {
+          var planetRadius = 1;
 
-          const near = -1;
-          const far = 1;
-          const pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
-          const pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
-          const diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+          var near = -1;
+          var far = 1;
+          var pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
+          var pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
+          var diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
           diff.normalize();
 
-          const b = 2 * Vector3d.dot(pointNear, diff);
-          const pointNearLenSq = Vector3d.getLengthSq(pointNear);
-          const c = pointNearLenSq - planetRadius * planetRadius;
-          const discriminant = b * b - 4 * c;
-          const sqrtD = Math.sqrt(discriminant);
-          const t0 = -(b + sqrtD) / 2;
-          const t1 = (-b + sqrtD) / 2;
-          const t = t0 > 0 ? t0 : (t1 > 0 ? t1 : null);
+          var b = 2 * Vector3d.dot(pointNear, diff);
+          var pointNearLenSq = Vector3d.getLengthSq(pointNear);
+          var c = pointNearLenSq - planetRadius * planetRadius;
+          var discriminant = b * b - 4 * c;
+          var sqrtD = Math.sqrt(discriminant);
+          var t0 = -(b + sqrtD) / 2;
+          var t1 = (-b + sqrtD) / 2;
+          var t = t0 > 0 ? t0 : (t1 > 0 ? t1 : null);
 
           if (t == null) {
             return null;
           }
 
-          const pWorld = Vector3d.create(
+          var pWorld = Vector3d.create(
             pointNear.x + t * diff.x,
             pointNear.y + t * diff.y,
             pointNear.z + t * diff.z,
@@ -1578,7 +1578,7 @@ var WWTControl$ = {
 
             // Transform the screen space pick ray into 3D space
             // w here is always 1
-            const d = v.x * m.get_m14() + v.y * m.get_m24() + v.z * m.get_m34() + m.get_m44();
+            var d = v.x * m.get_m14() + v.y * m.get_m24() + v.z * m.get_m34() + m.get_m44();
 
             vPickRayDir.x = (v.x * m.get_m11() + v.y * m.get_m21() + v.z * m.get_m31() + m.get_offsetX()) / d;
             vPickRayDir.y = (v.x * m.get_m12() + v.y * m.get_m22() + v.z * m.get_m32() + m.get_offsetY()) / d;
@@ -1608,7 +1608,7 @@ var WWTControl$ = {
 
     // In Sky mode, (lon, lat) means (ra, dec)
     getScreenPointForCoordinates: function (lon, lat) {
-        const planetMode = this.renderType < 2;  // Earth or Planet
+        var planetMode = this.get_planetLike();
         var cartesian;
         if (planetMode) {
           lon += 180;
