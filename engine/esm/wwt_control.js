@@ -1292,6 +1292,13 @@ var WWTControl$ = {
         var index = 0;
         var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }
 
+        console.log("------------");
+        console.log(this.getScreenPointForCoordinates(0, 0, 0));
+        const mars = Planets._planet3dLocations[3];
+        console.log(mars);
+        console.log(this.getScreenPointForCoordinates(mars.x, mars.y, mars.z));
+        console.log("------------");
+
         // Check for this pointer already being in the list because as of July
         // 2020, Chrome/Mac sometimes fails to deliver the pointerUp event.
 
@@ -1516,15 +1523,10 @@ var WWTControl$ = {
         var planetMode = this.get_planetLike();
 
         if (planetMode) {
-          var planetRadius = 1;
-
-          var near = -1;
-          var far = 1;
-          var pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
-          var pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
-          var diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+          var [pointNear, diff] = this.getRayForScreenPoint(x, y);
           diff.normalize();
 
+          var planetRadius = 1;
           var b = 2 * Vector3d.dot(pointNear, diff);
           var pointNearLenSq = Vector3d.getLengthSq(pointNear);
           var c = pointNearLenSq - planetRadius * planetRadius;
@@ -1551,6 +1553,17 @@ var WWTControl$ = {
           var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height);
           return Coordinates.cartesianToSphericalSky(PickRayDir);
         }
+    },
+
+    getRayForScreenPoint: function (x, y) {
+      var pt = Vector2d.create(x, y);
+      var near = -1;
+      var far = 1;
+      var pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
+      var pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
+      var diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+      
+      return [pointNear, diff];
     },
 
     transformPickPointToWorldSpace: function (ptCursor, backBufferWidth, backBufferHeight, normalize=true, z=-1) {
@@ -1606,15 +1619,18 @@ var WWTControl$ = {
         return p;
     },
 
-    // In Sky mode, (lon, lat) means (ra, dec)
-    getScreenPointForCoordinates: function (lon, lat) {
+    // In Sky mode, (x, y) means (ra, dec)
+    // In planet-like modes, (x, y) means (lon, lat)
+    getScreenPointForCoordinates: function (x, y, z=0) {
         var planetMode = this.get_planetLike();
         var cartesian;
         if (planetMode) {
-          lon += 180;
-          cartesian = Coordinates.geoTo3d(lat, lon);
+          x += 180;
+          cartesian = Coordinates.geoTo3d(y, x);
+        } else if (this.get_solarSystemMode()) {
+          cartesian = Vector3d.create(x, y, z); 
         } else {
-          var pt = Vector2d.create(lon, lat);
+          var pt = Vector2d.create(x, y);
           cartesian = Coordinates.sphericalSkyToCartesian(pt);
         }
         var result = this.transformWorldPointToPickSpace(cartesian, this.renderContext.width, this.renderContext.height);
