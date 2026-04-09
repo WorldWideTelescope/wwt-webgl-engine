@@ -389,6 +389,7 @@ var ToastTile$ = {
         }
         this.geometryCreated = true;
         Tile.prototype.createGeometry.call(this, renderContext);
+        console.log("Creating geometry");
         if (!this._subDivided$1) {
             if (this._vertexList$1 == null) {
                 this._initializeGrids$1();

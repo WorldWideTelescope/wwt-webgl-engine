@@ -376,7 +376,7 @@ import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
-import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
+import { AltUnits, CoordinatesType, ImageSetType, MarkerScales, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Place } from "@wwtelescope/engine";
 
 interface Message {
@@ -2914,6 +2914,42 @@ const App = defineComponent({
     }
 
     this.waitForReady().then(() => {
+
+      const iset = "Solar System";
+      this.setBackgroundImageByName(iset);
+      this.setForegroundImageByName(iset);
+
+      this.setTrackedObject(SolarSystemObjects.moon);
+
+      const r = 0.00005;
+      const items: string[] = [];
+      const N = 20;
+      for (let i = 1; i < N; i++) {
+        const angle = i / 20 * 2 * Math.PI;
+        const x = r * Math.cos(angle);
+        const y = r * Math.sin(angle);
+        items.push(`${x}\t${y}\t0`);
+      }
+      const data = items.join("\r\n");
+
+      this.createTableLayer({
+        referenceFrame: "Sky",
+        name: "Data",
+        dataCsv: data,
+     }).then(layer => {
+      layer.set_xAxisColumn(0);
+      layer.set_yAxisColumn(1);
+      layer.set_zAxisColumn(2);
+      layer.set_cartesianScale(AltUnits.astronomicalUnits);
+      layer.set_coordinatesType(CoordinatesType.rectangular);
+      layer.set_markerScale(MarkerScales.screen);
+      layer.set_scaleFactor(10);
+      layer.set_showFarSide(true);
+      layer.set_color(Color.fromArgb(255, 255, 0, 0));
+
+      console.log(layer);
+     });
+
       const script = this.getQueryScript(window.location);
       if (script !== null) {
         this.$options.statusMessageDestination = window;
