@@ -2921,7 +2921,7 @@ const App = defineComponent({
 
       this.setTrackedObject(SolarSystemObjects.moon);
 
-      const r = 0.00005;
+      const r = 0.00007;
       const items: string[] = [];
       const N = 20;
       for (let i = 1; i < N; i++) {
@@ -2943,7 +2943,7 @@ const App = defineComponent({
       layer.set_cartesianScale(AltUnits.astronomicalUnits);
       layer.set_coordinatesType(CoordinatesType.rectangular);
       layer.set_markerScale(MarkerScales.screen);
-      layer.set_scaleFactor(10);
+      layer.set_scaleFactor(40);
       layer.set_showFarSide(true);
       layer.set_color(Color.fromArgb(255, 255, 0, 0));
 

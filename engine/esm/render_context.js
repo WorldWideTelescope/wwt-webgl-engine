@@ -935,7 +935,8 @@ var RenderContext$ = {
     this._frustum[4].b = viewProjection.get_m23();
     this._frustum[4].c = viewProjection.get_m33();
     this._frustum[4].d = viewProjection.get_m43();
-    if (this.get_backgroundImageset().get_dataSetType() < 2) {
+    const datasetType = this.get_backgroundImageset().get_dataSetType();
+    if (datasetType < 2 || datasetType == 4) {
       this._frustum[4].a += viewProjection.get_m14();
       this._frustum[4].b += viewProjection.get_m24();
       this._frustum[4].c += viewProjection.get_m34();

@@ -705,9 +705,6 @@ var WWTControl$ = {
             matLocal._multiply(Matrix3d.translation(vt));
             this.renderContext.set_world(matLocal);
             this.renderContext.makeFrustum();
-            LayerManager._draw(this.renderContext, 1, true, 'Sky', true, false);
-            this.renderContext.set_world(matOld);
-            this.renderContext.makeFrustum();
             if (this.renderContext.get_solarSystemCameraDistance() < 15000) {
                 this.renderContext.setupMatricesSolarSystem(false);
                 if (Settings.get_active().get_solarSystemMinorPlanets()) {
@@ -717,6 +714,9 @@ var WWTControl$ = {
                     Planets3d.drawPlanets3D(this.renderContext, 1, this.renderContext.viewCamera.viewTarget);
                 }
             }
+            LayerManager._draw(this.renderContext, 1, true, 'Sky', true, false);
+            this.renderContext.set_world(matOld);
+            this.renderContext.makeFrustum();
         } else {
             // RenderType is not SolarSystem
             if (!this.renderType || this.renderType === 1) {
