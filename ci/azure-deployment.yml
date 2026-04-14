@@ -60,7 +60,7 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Clear-AzCdnEndpointContent `
+        Clear-AzFrontDoorCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
@@ -110,7 +110,7 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Clear-AzCdnEndpointContent `
+        Clear-AzFrontDoorCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
@@ -165,7 +165,7 @@ jobs:
       scriptType: 'inlineScript'
       inline: |
         $names = @('/', '/*', '/css/*', '/js/*')
-        Clear-AzCdnEndpointContent `
+        Clear-AzFrontDoorCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtwebembed-prod `
@@ -219,7 +219,7 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Clear-AzCdnEndpointContent `
+        Clear-AzFrontDoorCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtweb-prod `
@@ -270,7 +270,7 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Clear-AzCdnEndpointContent `
+        Clear-AzFrontDoorCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtwebdocs-prod `
@@ -316,7 +316,7 @@ jobs:
       azurePowerShellVersion: 'LatestVersion'
       scriptType: 'inlineScript'
       inline: |
-        Clear-AzCdnEndpointContent `
+        Clear-AzFrontDoorCdnEndpointContent `
           -ProfileName wwt-cdn-01 `
           -ResourceGroupName wwt-web01 `
           -EndpointName wwtwebdocs-prod `
