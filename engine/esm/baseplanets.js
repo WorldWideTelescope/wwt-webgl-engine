@@ -20,7 +20,9 @@ BasePlanets.drawPointPlanet = function (renderContext, location, size, color, zO
         ppList.minSize = 20;
         ppList.addPoint(location.copy(), color._clone(), new Dates(0, 1), size / 100);
         ppList.depthBuffered = true;
+        renderContext.gl.depthMask(false);
         ppList.draw(renderContext, 1, false);
+        renderContext.gl.depthMask(true);
     }
     else {
         var screenSpacePnt = renderContext.WVP.transform(center);
