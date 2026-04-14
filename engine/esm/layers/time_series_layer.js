@@ -874,7 +874,9 @@ var TimeSeriesLayer$ = {
             this.pointList.timeSeries = this.timeSeries;
             this.pointList.jNow = jNow;
             this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+            renderContext.gl.depthMask(false);
             this.pointList.draw(renderContext, opacity * this.get_opacity(), false);
+            renderContext.gl.depthMask(true);
         }
         if (this.lineList != null) {
             this.lineList.sky = this.get_astronomical();
