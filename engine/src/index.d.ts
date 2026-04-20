@@ -2761,6 +2761,14 @@ export class WWTControl {
   /** Given RA and Dec, return the x and y coordinates of the corresponding screen point */
   getScreenPointForCoordinates(ra: number, dec: number): { x: number; y: number };
 
+  /** For 3D mode: Return a list of two vectors corresponding to the given screen point.
+   *
+   * The first vector n corresponds to the point on the near plane that corresponds to the screen point.
+   * The second vector v gives the direction of the 3d world space ray defined by the point,
+   * so points along the ray n + v * t with t > 0 will lie at the given screen point.
+   */
+  getRayForScreenPoint(x: number, y: number): [Vector3d, Vector3d];
+
   /** Start loading the tour stored at the specified URL.
    *
    * When loading is complete, a `tourReady` event will be issued, which you can
