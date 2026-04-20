@@ -1625,6 +1625,9 @@ var WWTControl$ = {
         var planetMode = this.get_planetLike();
         var cartesian;
         if (planetMode) {
+          // We (human users) measure longitude from 180 W -> 180 E, or in (-180, 180)
+          // But the internal spherical coordinate system runs from (0, 360)
+          // so we bump (-180, 180) -> (0, 360) by adding 180
           x += 180;
           cartesian = Coordinates.geoTo3d(y, x);
         } else if (this.get_solarSystemMode()) {
