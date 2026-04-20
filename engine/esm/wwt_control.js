@@ -1523,7 +1523,8 @@ var WWTControl$ = {
         var planetMode = this.get_planetLike();
 
         if (planetMode) {
-          var [pointNear, diff] = this.getRayForScreenPoint(x, y);
+          const near = planetMode ? -1 : this.renderContext.nearPlane;
+          var [pointNear, diff] = this.getRayForScreenPoint(x, y, near);
           diff.normalize();
 
           var planetRadius = 1;
@@ -1555,10 +1556,8 @@ var WWTControl$ = {
         }
     },
 
-    getRayForScreenPoint: function (x, y) {
+    getRayForScreenPoint: function (x, y, near=-1, far=1) {
       var pt = Vector2d.create(x, y);
-      var near = -1;
-      var far = 1;
       var pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
       var pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
       var diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
