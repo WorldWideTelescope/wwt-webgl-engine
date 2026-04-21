@@ -1523,8 +1523,7 @@ var WWTControl$ = {
         var planetMode = this.get_planetLike();
 
         if (planetMode) {
-          const near = planetMode ? -1 : this.renderContext.nearPlane;
-          var [pointNear, diff] = this.getRayForScreenPoint(x, y, near);
+          var [pointNear, diff] = this.getRayForScreenPoint(x, y);
           diff.normalize();
 
           var planetRadius = 1;
