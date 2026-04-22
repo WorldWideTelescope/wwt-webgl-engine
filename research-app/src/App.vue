@@ -377,7 +377,7 @@ import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Place } from "@wwtelescope/engine";
+import { Place, WWTControl } from "@wwtelescope/engine";
 
 interface Message {
   event?: string;
@@ -2878,7 +2878,7 @@ const App = defineComponent({
       }
 
       if (closestPt !== null) {
-        const closestLngLatDeg = { lng: closestPt.lng * R2D, lat: closestPt.lat * R2D };
+        const closestLngLatDeg = { x: closestPt.lng * R2D, y: closestPt.lat * R2D };
         const closestScreenPoint = this.findScreenPointForCoordinates(closestLngLatDeg);
         const pixelDist = Math.sqrt((point.x - closestScreenPoint.x) ** 2 + (point.y - closestScreenPoint.y) ** 2);
         if (!threshold || pixelDist < threshold) {
@@ -2918,6 +2918,14 @@ const App = defineComponent({
       if (script !== null) {
         this.$options.statusMessageDestination = window;
       }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      window.wwt = WWTControl.singleton;
+
+      const iset = "Solar System";
+      this.setBackgroundImageByName(iset);
+      this.setForegroundImageByName(iset);
 
       // This returns a promise but I don't think that we need to wait for that
       // to resolve before going ahead and starting to listen for messages.
