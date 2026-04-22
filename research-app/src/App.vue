@@ -2919,14 +2919,6 @@ const App = defineComponent({
         this.$options.statusMessageDestination = window;
       }
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.wwt = WWTControl.singleton;
-
-      const iset = "Solar System";
-      this.setBackgroundImageByName(iset);
-      this.setForegroundImageByName(iset);
-
       // This returns a promise but I don't think that we need to wait for that
       // to resolve before going ahead and starting to listen for messages.
       this.loadImageCollection({
