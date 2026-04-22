@@ -2773,6 +2773,7 @@ export class WWTControl {
   getScreenPointForCoordinates(x: number, y: number, z?: number): { x: number; y: number };
 
   /** For 3D mode: Return a list of two vectors corresponding to the given screen point.
+   * Specific z-values for the near and far planes can optionally be specified.
    *
    * The first vector n corresponds to the point on the near plane that corresponds to the screen point.
    * The second vector v gives the direction of the 3d world space ray defined by the point,
