@@ -1516,15 +1516,10 @@ var WWTControl$ = {
         var planetMode = this.get_planetLike();
 
         if (planetMode) {
-          var planetRadius = 1;
-
-          var near = -1;
-          var far = 1;
-          var pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
-          var pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
-          var diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+          var [pointNear, diff] = this.getRayForScreenPoint(x, y);
           diff.normalize();
 
+          var planetRadius = 1;
           var b = 2 * Vector3d.dot(pointNear, diff);
           var pointNearLenSq = Vector3d.getLengthSq(pointNear);
           var c = pointNearLenSq - planetRadius * planetRadius;
@@ -1551,6 +1546,15 @@ var WWTControl$ = {
           var PickRayDir = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height);
           return Coordinates.cartesianToSphericalSky(PickRayDir);
         }
+    },
+
+    getRayForScreenPoint: function (x, y, near=-1, far=1) {
+      var pt = Vector2d.create(x, y);
+      var pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
+      var pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
+      var diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+      
+      return [pointNear, diff];
     },
 
     transformPickPointToWorldSpace: function (ptCursor, backBufferWidth, backBufferHeight, normalize=true, z=-1) {
@@ -1606,15 +1610,21 @@ var WWTControl$ = {
         return p;
     },
 
-    // In Sky mode, (lon, lat) means (ra, dec)
-    getScreenPointForCoordinates: function (lon, lat) {
+    // In Sky mode, (x, y) means (ra, dec)
+    // In planet-like modes, (x, y) means (lon, lat)
+    getScreenPointForCoordinates: function (x, y, z=0) {
         var planetMode = this.get_planetLike();
         var cartesian;
         if (planetMode) {
-          lon += 180;
-          cartesian = Coordinates.geoTo3d(lat, lon);
+          // We (human users) measure longitude from 180 W -> 180 E, or in (-180, 180)
+          // But the internal spherical coordinate system runs from (0, 360)
+          // so we bump (-180, 180) -> (0, 360) by adding 180
+          x += 180;
+          cartesian = Coordinates.geoTo3d(y, x);
+        } else if (this.get_solarSystemMode()) {
+          cartesian = Vector3d.create(x, y, z); 
         } else {
-          var pt = Vector2d.create(lon, lat);
+          var pt = Vector2d.create(x, y);
           cartesian = Coordinates.sphericalSkyToCartesian(pt);
         }
         var result = this.transformWorldPointToPickSpace(cartesian, this.renderContext.width, this.renderContext.height);

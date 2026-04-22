@@ -2755,11 +2755,31 @@ export class WWTControl {
   /** Remove a previously loaded "catalog HiPS" dataset from the view. */
   removeCatalogHipsByName(name: string): void;
 
-  /** Given x and y coordinates on the screen, returns the RA and Dec */
-  getCoordinatesForScreenPoint(x: number, y: number): { x: number; y: number };
+  /**
+   * Given x and y coordinates on the screen, returns the RA and Dec
+   *
+   * In Sky mode, (x, y) means (RA, Dec)
+   * In planet-like modes (Earth and Planet), (x, y) means (lon, lat)
+   * In Solar System mode, this is the (x, y, z) coordinates
+   */
+  getCoordinatesForScreenPoint(x: number, y: number): { x: number; y: number; z?: number; };
 
-  /** Given RA and Dec, return the x and y coordinates of the corresponding screen point */
-  getScreenPointForCoordinates(ra: number, dec: number): { x: number; y: number };
+  /** Given world space coordinates, return the x and y coordinates of the corresponding screen point
+   *
+   * In Sky mode, (x, y) means (RA, Dec)
+   * In planet-like modes (Earth and Planet), (x, y) means (lon, lat)
+   * In Solar System mode, this is the (x, y, z) coordinates
+   */
+  getScreenPointForCoordinates(x: number, y: number, z?: number): { x: number; y: number };
+
+  /** For 3D mode: Return a list of two vectors corresponding to the given screen point.
+   * Specific z-values for the near and far planes can optionally be specified.
+   *
+   * The first vector n corresponds to the point on the near plane that corresponds to the screen point.
+   * The second vector v gives the direction of the 3d world space ray defined by the point,
+   * so points along the ray n + v * t with t > 0 will lie at the given screen point.
+   */
+  getRayForScreenPoint(x: number, y: number, near?: number, far?: number): [Vector3d, Vector3d];
 
   /** Start loading the tour stored at the specified URL.
    *

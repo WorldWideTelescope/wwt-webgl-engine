@@ -2840,7 +2840,7 @@ const App = defineComponent({
       if (!coordsDeg) {
         return null;
       }
-      const target = { lng: D2R * coordsDeg.lng, lat: D2R * coordsDeg.lat };
+      const target = { lng: D2R * coordsDeg.x, lat: D2R * coordsDeg.y };
 
       for (const layerInfo of this.selectableTableLayers()) {
         const layer = this.spreadSheetLayer(layerInfo);
@@ -2878,7 +2878,7 @@ const App = defineComponent({
       }
 
       if (closestPt !== null) {
-        const closestLngLatDeg = { lng: closestPt.lng * R2D, lat: closestPt.lat * R2D };
+        const closestLngLatDeg = { x: closestPt.lng * R2D, y: closestPt.lat * R2D };
         const closestScreenPoint = this.findScreenPointForCoordinates(closestLngLatDeg);
         const pixelDist = Math.sqrt((point.x - closestScreenPoint.x) ** 2 + (point.y - closestScreenPoint.y) ** 2);
         if (!threshold || pixelDist < threshold) {
