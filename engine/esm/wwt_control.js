@@ -1292,13 +1292,6 @@ var WWTControl$ = {
         var index = 0;
         var evt = arguments[0], cnv = arguments[0].target; if (cnv.setPointerCapture) { cnv.setPointerCapture(evt.pointerId); } else if (cnv.msSetPointerCapture) { cnv.msSetPointerCapture(evt.pointerId); }
 
-        console.log("------------");
-        console.log(this.getScreenPointForCoordinates(0, 0, 0));
-        const mars = Planets._planet3dLocations[3];
-        console.log(mars);
-        console.log(this.getScreenPointForCoordinates(mars.x, mars.y, mars.z));
-        console.log("------------");
-
         // Check for this pointer already being in the list because as of July
         // 2020, Chrome/Mac sometimes fails to deliver the pointerUp event.
 

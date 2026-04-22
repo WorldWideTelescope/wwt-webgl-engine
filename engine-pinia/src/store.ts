@@ -901,20 +901,34 @@ export const engineStore = defineStore('wwt-engine', {
       }
     },
 
-    /** Get the coordinates, in degrees, for x, y coordinates on the screen */
+    /** Get the coordinates, in degrees, for x, y coordinates on the screen
+     *
+     * In Sky mode, (x, y) means (RA, Dec)
+     * In planet-like modes (Earth and Planet), (x, y) means (lon, lat)
+     * In Solar System mode, this is the (x, y, z) coordinates
+     */
     findCoordinatesForScreenPoint(_state) {
-      return (pt: { x: number; y: number; }): { lng: number; lat: number } | null => {
+      return (pt: { x: number; y: number; }): { x: number; y: number, z?: number } | null => {
         if (this.$wwt.inst === null)
           throw new Error('cannot findCoordinatesForScreenPoint without linking to WWTInstance');
         const coords = this.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
-        if (coords === null) {
+        const background = this.backgroundImageset;
+        if (coords === null || background === null) {
           return null;
         }
-        if (this.backgroundImageset?.get_dataSetType() === ImageSetType.sky) {
-          return { lng: (15 * coords.x + 720) % 360, lat: coords.y };
-        } else {
-          return { lng: coords.x, lat: coords.y };
+
+        switch (background.get_dataSetType()) {
+          case ImageSetType.sky:
+            return { x: (15 * coords.x + 720) % 360, y: coords.y };
+          case ImageSetType.earth:
+          case ImageSetType.planet:
+            return { x: coords.x, y: coords.y };
+          case ImageSetType.solarSystem:
+            return { x: coords.x, y: coords.y, z: coords.z };
+          default:
+            return null;
         }
+
       }
     },
 

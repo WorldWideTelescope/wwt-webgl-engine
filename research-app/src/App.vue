@@ -377,7 +377,7 @@ import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Place, WWTControl } from "@wwtelescope/engine";
+import { Place } from "@wwtelescope/engine";
 
 interface Message {
   event?: string;
@@ -2840,7 +2840,7 @@ const App = defineComponent({
       if (!coordsDeg) {
         return null;
       }
-      const target = { lng: D2R * coordsDeg.lng, lat: D2R * coordsDeg.lat };
+      const target = { lng: D2R * coordsDeg.x, lat: D2R * coordsDeg.y };
 
       for (const layerInfo of this.selectableTableLayers()) {
         const layer = this.spreadSheetLayer(layerInfo);

@@ -2755,8 +2755,14 @@ export class WWTControl {
   /** Remove a previously loaded "catalog HiPS" dataset from the view. */
   removeCatalogHipsByName(name: string): void;
 
-  /** Given x and y coordinates on the screen, returns the RA and Dec */
-  getCoordinatesForScreenPoint(x: number, y: number): { x: number; y: number };
+  /**
+   * Given x and y coordinates on the screen, returns the RA and Dec
+   *
+   * In Sky mode, (x, y) means (RA, Dec)
+   * In planet-like modes (Earth and Planet), (x, y) means (lon, lat)
+   * In Solar System mode, this is the (x, y, z) coordinates
+   */
+  getCoordinatesForScreenPoint(x: number, y: number): { x: number; y: number; z?: number; };
 
   /** Given world space coordinates, return the x and y coordinates of the corresponding screen point
    *
