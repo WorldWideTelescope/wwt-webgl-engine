@@ -1,3 +1,12 @@
+# @wwtelescope/engine-pinia 0.12.0 (2026-04-24)
+
+- Add `findCoordinatesForScreenPoint` and `findScreenPointForCoordinates` methods
+  to Pinia store to allow screen <--> world transformations in non-sky modes
+  (#369, @Carifio24).
+- Add `findRayForScreenPoint` method for screen -> world transformations in
+  3D mode (#378, @Carifio24).
+
+
 # @wwtelescope/engine-pinia 0.11.0 (2025-07-16)
 
 - Add an optional `duration` parameter to the `GotoRADecZoomParams` interface, whose value

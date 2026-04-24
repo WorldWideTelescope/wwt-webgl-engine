@@ -1,3 +1,12 @@
+# @wwtelescope/research-app 0.19.0 (2026-04-24)
+
+- Update the research app to allow selecting sources in either sky or planet-like
+  (Earth or Planet) modes (#369, @Carifio24).
+- Update the research app to be compatible with engine updates to screen <--> world
+  conversions (#378, @Carifio24).
+- Bump webpack from 5.94.0 to 5.104.1 (#351)
+
+
 # @wwtelescope/research-app 0.18.0 (2025-07-18)
 
 - Fix a bug where the research app's embedded Finder Scope could fail to draw its

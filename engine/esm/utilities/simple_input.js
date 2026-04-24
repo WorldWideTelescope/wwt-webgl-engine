@@ -49,8 +49,12 @@ var SimpleInput$ = {
         this._textElement.addEventListener('click', ss.bind('ignoreMe', this), true);
         var okButton = document.getElementById('simpleinputok');
         var cancelButton = document.getElementById('simpleinputcancel');
+        var closeButton = document.getElementById('simpleinputclose');
         okButton.addEventListener('click', ss.bind('okClicked', this), false);
         cancelButton.addEventListener('click', ss.bind('cancelClicked', this), false);
+        if (closeButton != null) {
+            closeButton.addEventListener('click', ss.bind('closeClicked', this), false);
+        }
         this._okCallback = callback;
     },
 
@@ -62,6 +66,10 @@ var SimpleInput$ = {
     },
 
     cancelClicked: function (e) {
+        this._close();
+    },
+
+    closeClicked: function (e) {
         this._close();
     },
 

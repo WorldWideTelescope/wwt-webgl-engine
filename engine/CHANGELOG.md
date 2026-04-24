@@ -1,3 +1,26 @@
+# @wwtelescope/engine 7.32.0 (2026-04-24)
+
+- Distinguish between 'cancel' and 'close' buttons for closing simple
+  input dialogs to allow fixing a web client issue where only one UI element
+  receives the necessary click handler (#381, @Carifio24).
+- Update screen <--> world conversion methods to allow supporting 3D mode. Due to
+  the non-injective nature of the screen -> world mapping in 3D, add a
+  `getRayForScreenPoint` method to the `WWTControl` for use in 3D mode
+  (#378, @Carifio24).
+- Export `Planets3d` functionality from the engine JavaScript package, but not
+  expose it to TypeScript (#372, @Carifio24).
+- Update screen <--> world conversions and calculation of viewing frustum
+  to also work in planet-like (Earth and Planet) modes (#369, @Carifio24).
+- Fix a bug in the calculation of rise, transit, and set times where RA was
+  not being properly wrapped (#357, @johnarban).
+- Add `pure2D` member to 'TriangleList` to allow drawing triangles directly
+  in clip space (#353, @Carifio24).
+- Fix issues in the behavior of the `splitString` utility function used when
+  parsing coordinates (#352, @Carifio24).
+- Add an option to allow drawing a circle joining tick marks when drawing
+  the ecliptic (#336, @Carifio24).
+
+
 # @wwtelescope/engine 7.31.0 (2025-07-16)
 
 - Add a method for getting a `Place` as XML. This method uses pre-existing engine
@@ -6,7 +29,7 @@
   interface (#329, @Carifio24).
 - Expose the constructor for the `Coordinates` class to TypeScript (#328, @Carifio24).
 - Expose several items from the engine to TypeScript, including the `Vector3d` and
-  `Coordinates` classes, and functionality for obtaining the rise/set/transit 
+  `Coordinates` classes, and functionality for obtaining the rise/set/transit
   time of an object (#324, @Carifio24).
 - Allow adding an optional duration to the slew mover and the various `goto` methods of
   `WWTControl` (#320, @Carifio24). If specified, the movement will have the specified

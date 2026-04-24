@@ -1,3 +1,9 @@
+# @wwtelescope/embed 1.7.3 (2026-04-24)
+
+- No code changes
+- Bump webpack from 5.94.0 to 5.104.1 (#351)
+
+
 # @wwtelescope/embed 1.7.2 (2025-07-16)
 
 - No code changes; update webpack dependency version.

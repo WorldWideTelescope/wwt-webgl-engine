@@ -1,3 +1,8 @@
+# @wwtelescope/astro 0.3.1 (2026-04-24)
+
+- No code changes, just syncing up Cranko with changes in the repository
+
+
 # @wwtelescope/astro 0.3.0 (2025-07-16)
 
 - Expose the previously internal `formatSexagesimal` function and modify its signature

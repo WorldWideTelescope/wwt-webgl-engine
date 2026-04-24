@@ -622,10 +622,14 @@ var SpreadSheetLayer$ = {
         }
         data += '\r\n';
         var $enum2 = ss.enumerate(this.get__table().rows);
+        const planetMode = globalRenderContext.get_backgroundImageset().get_dataSetType() < 2;
         while ($enum2.moveNext()) {
             var row = $enum2.current;
             var ra = parseFloat(row[this.get_lngColumn()]);
             var dec = parseFloat(row[this.get_latColumn()]);
+            if (planetMode) {
+              ra -= 180;
+            }
             var position = Coordinates.geoTo3dDouble(dec, ra);
             if (!this._isPointInFrustum$1(position, globalRenderContext.get_frustum())) {
                 continue;

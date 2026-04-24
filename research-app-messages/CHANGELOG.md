@@ -1,3 +1,11 @@
+# @wwtelescope/research-app-messages 0.19.0 (2026-04-24)
+
+- Add a render type field to research app sources so that we can only show relevant
+  sources in the research app. Additionally, allow a source to be specified by lon/lat
+  as well as RA/Dec to allow point selection in both sky and planet-like modes
+  (#369, @Carifio24).
+
+
 # @wwtelescope/research-app-messages 0.18.1 (2025-07-16)
 
 - Add a new `FinderScopePlaceMessage` to notify clients about the current `Place` that
