@@ -406,6 +406,128 @@ var LineShaderNormalDates$ = {};
 registerType("LineShaderNormalDates", [LineShaderNormalDates, LineShaderNormalDates$, null]);
 
 
+// wwtlib.LineShaderNormalDates2D
+
+export function LineShaderNormalDates2D() { }
+
+LineShaderNormalDates2D.vertLoc = 0;
+LineShaderNormalDates2D.colorLoc = 0;
+LineShaderNormalDates2D.timeLoc = 0;
+LineShaderNormalDates2D.lineColorLoc = 0;
+LineShaderNormalDates2D.jNowLoc = 0;
+LineShaderNormalDates2D.decayLoc = 0;
+LineShaderNormalDates2D.initialized = false;
+LineShaderNormalDates2D._prog = null;
+
+LineShaderNormalDates2D.init = function (renderContext) {
+  var gl = renderContext.gl;
+
+  const fragShaderText = `\
+      precision highp float;
+      uniform vec4 lineColor;
+      varying lowp vec4 vColor;
+
+      void main(void)
+      {
+          gl_FragColor = lineColor * vColor;
+      }
+  `;
+
+  const vertexShaderText = `\
+        attribute vec3 aVertexPosition;
+        attribute vec4 aVertexColor;
+        attribute vec2 aTime;
+        uniform float jNow;
+        uniform float decay;
+
+        varying lowp vec4 vColor;
+
+        void main(void)
+        {
+            gl_Position = vec4(aVertexPosition, 1.0);
+            float dAlpha = 1.0;
+
+            if (decay > 0.0)
+            {
+                    dAlpha = 1.0 - ((jNow - aTime.y) / decay);
+                    if (dAlpha > 1.0 )
+                    {
+                        dAlpha = 1.0;
+                    }
+            }
+
+            if (jNow < aTime.x && decay > 0.0)
+            {
+                vColor = vec4(1, 1, 1, 1);
+            }
+            else
+            {
+                vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, dAlpha * aVertexColor.a);
+            }
+        }
+    `;
+
+    LineShaderNormalDates2D._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
+    gl.shaderSource(LineShaderNormalDates2D._frag, fragShaderText);
+    gl.compileShader(LineShaderNormalDates2D._frag);
+    var stat = gl.getShaderParameter(LineShaderNormalDates2D._frag, WEBGL.COMPILE_STATUS);
+    LineShaderNormalDates2D._vert = gl.createShader(WEBGL.VERTEX_SHADER);
+    gl.shaderSource(LineShaderNormalDates2D._vert, vertexShaderText);
+    gl.compileShader(LineShaderNormalDates2D._vert);
+    var stat1 = gl.getShaderParameter(LineShaderNormalDates2D._vert, WEBGL.COMPILE_STATUS);
+    LineShaderNormalDates2D._prog = gl.createProgram();
+    gl.attachShader(LineShaderNormalDates2D._prog, LineShaderNormalDates2D._vert);
+    gl.attachShader(LineShaderNormalDates2D._prog, LineShaderNormalDates2D._frag);
+    gl.linkProgram(LineShaderNormalDates2D._prog);
+    var errcode = gl.getProgramParameter(LineShaderNormalDates2D._prog, WEBGL.LINK_STATUS);
+    gl.useProgram(LineShaderNormalDates2D._prog);
+    LineShaderNormalDates2D.vertLoc = gl.getAttribLocation(LineShaderNormalDates2D._prog, 'aVertexPosition');
+    LineShaderNormalDates2D.colorLoc = gl.getAttribLocation(LineShaderNormalDates2D._prog, 'aVertexColor');
+    LineShaderNormalDates2D.timeLoc = gl.getAttribLocation(LineShaderNormalDates2D._prog, 'aTime');
+    LineShaderNormalDates2D.lineColorLoc = gl.getUniformLocation(LineShaderNormalDates2D._prog, 'lineColor');
+    LineShaderNormalDates2D.jNowLoc = gl.getUniformLocation(LineShaderNormalDates2D._prog, 'jNow');
+    LineShaderNormalDates2D.decayLoc = gl.getUniformLocation(LineShaderNormalDates2D._prog, 'decay');
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+    LineShaderNormalDates2D.initialized = true;
+}
+
+LineShaderNormalDates2D.use = function (renderContext, vertex, lineColor, zBuffer, jNow, decay) {
+    var gl = renderContext.gl;
+    if (gl != null) {
+        if (!LineShaderNormalDates2D.initialized) {
+            LineShaderNormalDates2D.init(renderContext);
+        }
+        gl.useProgram(LineShaderNormalDates2D._prog);
+        gl.uniform4f(LineShaderNormalDates2D.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
+        gl.uniform1f(LineShaderNormalDates2D.jNowLoc, jNow);
+        gl.uniform1f(LineShaderNormalDates2D.decayLoc, decay);
+        if (zBuffer) {
+            gl.enable(WEBGL.DEPTH_TEST);
+        } else {
+            gl.disable(WEBGL.DEPTH_TEST);
+        }
+        gl.disableVertexAttribArray(0);
+        gl.disableVertexAttribArray(1);
+        gl.disableVertexAttribArray(2);
+        gl.disableVertexAttribArray(3);
+        gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+        gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
+        gl.enableVertexAttribArray(LineShaderNormalDates2D.vertLoc);
+        gl.enableVertexAttribArray(LineShaderNormalDates2D.colorLoc);
+        gl.vertexAttribPointer(LineShaderNormalDates2D.vertLoc, 3, WEBGL.FLOAT, false, 36, 0);
+        gl.vertexAttribPointer(LineShaderNormalDates2D.colorLoc, 4, WEBGL.FLOAT, false, 36, 12);
+        gl.vertexAttribPointer(LineShaderNormalDates2D.timeLoc, 2, WEBGL.FLOAT, false, 36, 28);
+        gl.lineWidth(1);
+        gl.enable(WEBGL.BLEND);
+        gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+    }
+};
+
+var LineShaderNormalDates2D$ = {};
+
+registerType("LineShaderNormalDates2D", [LineShaderNormalDates2D, LineShaderNormalDates2D$, null]);
+
 // wwtlib.TimeSeriesPointSpriteShader
 
 export function TimeSeriesPointSpriteShader() { }

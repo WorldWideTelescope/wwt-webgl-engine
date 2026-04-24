@@ -1,7 +1,14 @@
 # rc: micro bump
 
+- No code changes
+- Fix indentation in ui-components package file.
+
+
+# @wwtelescope/ui-components 0.1.1 (2025-07-18)
+
 - Fix a bug where the Finder Scope's circle annotation could fail to be cleared when
   the component is destroyed (#333, @Carifio24).
+
 
 # @wwtelescope/ui-components 0.1.0 (2025-07-16)
 

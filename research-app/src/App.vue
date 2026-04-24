@@ -52,7 +52,7 @@
               <label>Sources</label>
             </div>
             <source-item
-              v-for="source of sources"
+              v-for="source of sources.filter(src => src.type === wwtBackgroundImageset?.get_dataSetType())"
               v-bind:key="source.name"
               v-bind:source="source"
             />
@@ -377,7 +377,7 @@ import { Source, researchAppStore } from "./store";
 import { wwtEngineNamespace } from "./namespaces";
 
 import { ImageSetType, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Place, Settings } from "@wwtelescope/engine";
+import { Place } from "@wwtelescope/engine";
 
 interface Message {
   event?: string;
@@ -1156,8 +1156,8 @@ class KeyboardControlSettings {
 }
 
 interface RawSourceInfo {
-  ra: number;
-  dec: number;
+  lng: number;
+  lat: number;
   catalogLayer: CatalogLayerInfo;
   colNames: string[];
   values: string[];
@@ -2092,8 +2092,8 @@ const App = defineComponent({
       const needsUpdate =
         closestPt == null ||
         this.lastClosePt == null ||
-        this.lastClosePt.ra != closestPt.ra ||
-        this.lastClosePt.dec != closestPt.dec;
+        this.lastClosePt.lng != closestPt.lng ||
+        this.lastClosePt.lat != closestPt.lat;
       if (needsUpdate) {
         this.lastClosePt = closestPt;
       }
@@ -2149,13 +2149,28 @@ const App = defineComponent({
       for (let i = 0; i < sourceInfo.values.length; i++) {
         obj[sourceInfo.colNames[i]] = sourceInfo.values[i];
       }
-      return {
-        ra: sourceInfo.ra,
-        dec: sourceInfo.dec,
+      const type = this.wwtBackgroundImageset?.get_dataSetType() ?? ImageSetType.sky;
+      const planetLike = [ImageSetType.earth, ImageSetType.planet].includes(type);
+      const baseInfo = {
         catalogLayer: sourceInfo.catalogLayer,
         layerData: obj,
         name: this.nameForSource(obj, sourceInfo.catalogLayer.name),
+        type,
       };
+
+      if (planetLike) {
+        return {
+          ...baseInfo,
+          lng: sourceInfo.lng,
+          lat: sourceInfo.lat,
+        };
+      } else {
+        return {
+          ...baseInfo,
+          ra: sourceInfo.lng,
+          dec: sourceInfo.lat,
+        };
+      }
     },
 
     // ImageSet layers, including FITS layers:
@@ -2562,6 +2577,7 @@ const App = defineComponent({
       const rawLayer = isProxy(layer) ? toRaw(layer): layer;
       return {
         ...rawSource,
+        type: ImageSetType[rawSource.type] as selections.ImageSetType,
         catalogLayer: rawLayer,
       };
     },
@@ -2694,6 +2710,7 @@ const App = defineComponent({
       }
       return {
         ...src,
+        type: ImageSetType[src.type],
         catalogLayer: layer,
       };
     },
@@ -2819,8 +2836,11 @@ const App = defineComponent({
       const rowSeparator = "\r\n";
       const colSeparator = "\t";
 
-      const raDecDeg = this.findRADecForScreenPoint(point);
-      const target = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
+      const coordsDeg = this.findCoordinatesForScreenPoint(point);
+      if (!coordsDeg) {
+        return null;
+      }
+      const target = { lng: D2R * coordsDeg.x, lat: D2R * coordsDeg.y };
 
       for (const layerInfo of this.selectableTableLayers()) {
         const layer = this.spreadSheetLayer(layerInfo);
@@ -2840,14 +2860,14 @@ const App = defineComponent({
 
         for (const row of rows) {
           const values = row.split(colSeparator);
-          const ra = D2R * Number(values[lngCol]);
-          const dec = D2R * Number(values[latCol]);
-          const pt = { ra: ra, dec: dec };
-          const dist = distance(target.ra, target.dec, pt.ra, pt.dec);
+          const lng = D2R * Number(values[lngCol]);
+          const lat = D2R * Number(values[latCol]);
+          const pt = { lng, lat };
+          const dist = distance(target.lng, target.lat, pt.lng, pt.lat);
           if (dist < minDist) {
             closestPt = {
-              ra: ra,
-              dec: dec,
+              lng,
+              lat,
               colNames: colNames,
               values: values,
               catalogLayer: layerInfo,
@@ -2858,8 +2878,8 @@ const App = defineComponent({
       }
 
       if (closestPt !== null) {
-        const closestRADecDeg = { ra: closestPt.ra * R2D, dec: closestPt.dec * R2D };
-        const closestScreenPoint = this.findScreenPointForRADec(closestRADecDeg);
+        const closestLngLatDeg = { x: closestPt.lng * R2D, y: closestPt.lat * R2D };
+        const closestScreenPoint = this.findScreenPointForCoordinates(closestLngLatDeg);
         const pixelDist = Math.sqrt((point.x - closestScreenPoint.x) ** 2 + (point.y - closestScreenPoint.y) ** 2);
         if (!threshold || pixelDist < threshold) {
           return closestPt;

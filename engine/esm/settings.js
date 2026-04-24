@@ -105,6 +105,7 @@ export function Settings() {
     this._showCrosshairs = true;
     this._crosshairsColor = 'white';
     this._showEcliptic = false;
+    this._showEclipticCircle = false;
     this._locationLat = 47.717;
     this._locationLng = -122.0858;
     this._locationAltitude = 100;
@@ -337,6 +338,15 @@ var Settings$ = {
 
     set_showEcliptic: function (value) {
         this._showEcliptic = value;
+        return value;
+    },
+
+    get_showEclipticCircle: function () {
+        return this._showEclipticCircle;
+    },
+
+    set_showEclipticCircle: function (value) {
+        this._showEclipticCircle = value;
         return value;
     },
 

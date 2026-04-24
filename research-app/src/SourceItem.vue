@@ -44,10 +44,10 @@
     <transition-expand>
       <div v-if="isSelected" class="detail-container">
         <div class="detail-row">
-          <span class="prompt">RA:</span><span>{{ raStr }}</span>
+          <span class="prompt">{{ "lng" in source ? "Lon:" : "RA:" }}</span><span>{{ lngStr }}</span>
         </div>
         <div class="detail-row">
-          <span class="prompt">Dec:</span><span>{{ decStr }}</span>
+          <span class="prompt">{{ "lat" in source ? "Lat:" : "Dec:" }}</span><span>{{ latStr }}</span>
         </div>
         <div class="detail-row">
           <span class="prompt">Table:</span
@@ -105,12 +105,12 @@ export default defineComponent({
       wwtDegZoom: "zoomDeg"
     }),
 
-    raStr() {
-      return fmtHours(this.source.ra);
+    lngStr() {
+      return fmtHours(this.sourceLng);
     },
 
-    decStr() {
-      return fmtDegLat(this.source.dec);
+    latStr() {
+      return fmtDegLat(this.sourceLat);
     },
 
     searchRadius() {
@@ -129,11 +129,19 @@ export default defineComponent({
       }
     },
 
+    sourceLng() {
+      return "lng" in this.source ? this.source.lng : this.source.ra;
+    },
+
+    sourceLat() {
+      return "lat" in this.source ? this.source.lat : this.source.dec;
+    },
+
     simbadCoordinatesURL() {
       const baseURL = "http://simbad.u-strasbg.fr/simbad/sim-coo?";
       const params = {
         "output.format": "HTML",
-        Coord: `${this.source.ra * R2D} ${this.source.dec * R2D}`,
+        Coord: `${this.sourceLng * R2D} ${this.sourceLat * R2D}`,
         Radius: String(this.searchRadius),
         "Radius.unit": "arcmin",
       };
@@ -141,13 +149,13 @@ export default defineComponent({
     },
 
     nedCoordinatesURL() {
-      const raString = fmtHours(this.source.ra, "h", "m") + "s";
-      const decString = fmtDegLat(this.source.dec, "d", "m") + "s";
+      const lngString = fmtHours(this.sourceLng, "h", "m") + "s";
+      const latString = fmtDegLat(this.sourceLat, "d", "m") + "s";
       const baseURL = "https://ned.ipac.caltech.edu/conesearch?";
       const params = {
         in_csys: "Equatorial",
         in_equinox: "J2000",
-        coordinates: `${raString} ${decString}`,
+        coordinates: `${lngString} ${latString}`,
         radius: String(this.searchRadius),
         hconst: "67.8",
         omegam: "0.308",
@@ -177,8 +185,8 @@ export default defineComponent({
     handleMarkerClick() {
       this.gotoRADecZoom({
         zoomDeg: this.source.zoomDeg ?? this.wwtDegZoom,
-        raRad: this.source.ra,
-        decRad: this.source.dec,
+        raRad: this.sourceLat,
+        decRad: this.sourceLng,
         instant: false,
       }).catch((err) => console.log(err));
     },

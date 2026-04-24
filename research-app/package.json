@@ -43,14 +43,14 @@
     "typedoc": "0.25.1",
     "typescript": "~4.8.4",
     "vue-template-compiler": "~2.6.11",
-    "webpack": "^5.94.0"
+    "webpack": "^5.104.1"
   },
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "7cb232125428a91bd8fd10be24fec904e3589cce",
-    "@wwtelescope/engine": "thiscommit:2023-09-15:8Z0O5N5",
+    "@wwtelescope/engine": "thiscommit:2026-04-05:ulYu3lE",
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/engine-pinia": "thiscommit:2024-02-07:OwPqq4M",
+    "@wwtelescope/engine-pinia": "thiscommit:2026-04-05:imSNAoM",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/research-app-messages": "thiscommit:2025-07-16:AvbWk1X",
     "@wwtelescope/ui-components": "thiscommit:2025-07-11:6supceo"

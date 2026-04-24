@@ -25,6 +25,7 @@ import {
   SpreadSheetLayer,
   SpreadSheetLayerSettingsInterfaceRO,
   TileCache,
+  Vector3d,
   WWTControl,
 } from "@wwtelescope/engine";
 
@@ -664,6 +665,9 @@ function availableImagesets(): ImagesetInfo[] {
  *
  * - {@link findRADecForScreenPoint}
  * - {@link findScreenPointForRADec}
+ * - {@link findCoordinatesForScreenPoint}
+ * - {@link findScreenPointForCoordinates}
+ * - {@link findRayForScreenPoint}
  *
  * Actions:
  *
@@ -879,6 +883,8 @@ export const engineStore = defineStore('wwt-engine', {
       return (pt: { x: number; y: number }): { ra: number; dec: number } => {
         if (this.$wwt.inst === null)
           throw new Error('cannot findRADecForScreenPoint without linking to WWTInstance');
+        if (this.backgroundImageset?.get_dataSetType() !== ImageSetType.sky)
+          throw new Error('can only ask for RA/Dec when in sky mode');
         const coords = this.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
         return { ra: (15 * coords.x + 720) % 360, dec: coords.y };
       }
@@ -889,7 +895,75 @@ export const engineStore = defineStore('wwt-engine', {
       return (pt: { ra: number; dec: number }): { x: number; y: number } => {
         if (this.$wwt.inst === null)
           throw new Error('cannot findScreenPointForRADec without linking to WWTInstance');
+        if (this.backgroundImageset?.get_dataSetType() !== ImageSetType.sky)
+          throw new Error('can only find screen point for RA/Dec in sky mode');
         return this.$wwt.inst.ctl.getScreenPointForCoordinates(pt.ra / 15, pt.dec);
+      }
+    },
+
+    /** Get the coordinates, in degrees, for x, y coordinates on the screen
+     *
+     * In Sky mode, (x, y) means (RA, Dec)
+     * In planet-like modes (Earth and Planet), (x, y) means (lon, lat)
+     * In Solar System mode, this is the (x, y, z) coordinates
+     */
+    findCoordinatesForScreenPoint(_state) {
+      return (pt: { x: number; y: number; }): { x: number; y: number, z?: number } | null => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot findCoordinatesForScreenPoint without linking to WWTInstance');
+        const coords = this.$wwt.inst.ctl.getCoordinatesForScreenPoint(pt.x, pt.y);
+        const background = this.backgroundImageset;
+        if (coords === null || background === null) {
+          return null;
+        }
+
+        switch (background.get_dataSetType()) {
+          case ImageSetType.sky:
+            return { x: (15 * coords.x + 720) % 360, y: coords.y };
+          case ImageSetType.earth:
+          case ImageSetType.planet:
+            return { x: coords.x, y: coords.y };
+          case ImageSetType.solarSystem:
+            return { x: coords.x, y: coords.y, z: coords.z };
+          default:
+            return null;
+        }
+
+      }
+    },
+
+    /** Given world space coordinates, return the x and y coordinates of the corresponding screen point
+     *
+     * In Sky mode, (x, y) means (RA, Dec)
+     * In planet-like modes (Earth and Planet), (x, y) means (lon, lat)
+     * In Solar System mode, this is the (x, y, z) coordinates
+     */
+    findScreenPointForCoordinates(_state) {
+      return (pt: { x: number; y: number; z?: number }): { x: number; y: number; } => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot findScreenPointForCoordinates without linking to WWTInstance');
+        let x = pt.x;
+        if (this.backgroundImageset?.get_dataSetType() === ImageSetType.sky)
+          x /= 15;
+        return this.$wwt.inst.ctl.getScreenPointForCoordinates(x, pt.y, pt.z ?? 0);
+      }
+    },
+
+    /** This method is for 3D mode only. If used outside of 3D mode, an error is thrown.
+     * It returns a list of two vectors that correspond to the given screen point.
+     * Optionally one can specific z-values for the near and far planes
+     *
+     * The first vector n corresponds to the point on the near plane that corresponds to the screen point.
+     * The second vector v gives the direction of the 3d world space ray defined by the point,
+     * so points along the ray n + v * t with t > 0 will lie at the given screen point.
+     */
+    findRayForScreenPoint(_state) {
+      return (pt: { x: number; y: number; near?: number; far?: number; }): [Vector3d, Vector3d] => {
+        if (this.$wwt.inst === null)
+          throw new Error('cannot findRayForScreenPoint without linking to WWTInstance');
+        if (this.backgroundImageset?.get_dataSetType() !== ImageSetType.solarSystem)
+          throw new Error('can only find ray for screen point in Solar System mode');
+        return this.$wwt.inst.ctl.getRayForScreenPoint(pt.x, pt.y, pt.near ?? -1, pt.far ?? 1); 
       }
     },
 
