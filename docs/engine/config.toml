@@ -13,4 +13,4 @@ stylesheets = ["extras.css"]
 
 # This is temporary - see https://github.com/WorldWideTelescope/wwt-webgl-engine/issues/345
 [link_checker]
-skip_prefixes = ["https://npmjs.com"]
+skip_prefixes = ["https://npmjs.com", "https://www.khronos.org/webgl/"]
