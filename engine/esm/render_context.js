@@ -982,3 +982,4 @@ var RenderContext$ = {
 };
 
 registerType("RenderContext", [RenderContext, RenderContext$, null]);
+

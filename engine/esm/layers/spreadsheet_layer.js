@@ -1965,13 +1965,14 @@ var SpreadSheetLayer$ = {
             this.triangleList.draw(renderContext, opacity * this.get_opacity(), 1);
         }
         if (this.pointList != null) {
-            this.pointList.depthBuffered = false;
+            this.pointList.depthBuffered = true;
             this.pointList.showFarSide = this.get_showFarSide();
             this.pointList.decay = (this.timeSeries) ? this.decay : 0;
             this.pointList.sky = this.get_astronomical();
             this.pointList.timeSeries = this.timeSeries;
             this.pointList.jNow = jNow;
             this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+            renderContext.gl.depthMask(false);
             switch (this._plotType$1) {
                 case 0:
                     this.pointList.draw(renderContext, opacity * this.get_opacity(), false);
@@ -1992,6 +1993,7 @@ var SpreadSheetLayer$ = {
                 default:
                     break;
             }
+            renderContext.gl.depthMask(true);
         }
         if (this.lineList != null) {
             this.lineList.sky = this.get_astronomical();

@@ -868,13 +868,15 @@ var TimeSeriesLayer$ = {
             this.triangleList.draw(renderContext, opacity * this.get_opacity(), 1);
         }
         if (this.pointList != null) {
-            this.pointList.depthBuffered = false;
+            this.pointList.depthBuffered = true;
             this.pointList.decay = this.decay;
             this.pointList.sky = this.get_astronomical();
             this.pointList.timeSeries = this.timeSeries;
             this.pointList.jNow = jNow;
             this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+            renderContext.gl.depthMask(false);
             this.pointList.draw(renderContext, opacity * this.get_opacity(), false);
+            renderContext.gl.depthMask(true);
         }
         if (this.lineList != null) {
             this.lineList.sky = this.get_astronomical();
