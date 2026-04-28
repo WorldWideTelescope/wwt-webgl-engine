@@ -1,4 +1,4 @@
-# @wwtelescope/engine-pinia 0.13.0 (2026-04-28)
+# @wwtelescope/engine-pinia 0.14.0 (2026-04-28)
 
 - Add `findCoordinatesForScreenPoint` and `findScreenPointForCoordinates` methods
   to Pinia store to allow screen <--> world transformations in non-sky modes

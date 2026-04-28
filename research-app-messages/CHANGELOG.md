@@ -1,4 +1,4 @@
-# @wwtelescope/research-app-messages 0.20.0 (2026-04-28)
+# @wwtelescope/research-app-messages 0.21.0 (2026-04-28)
 
 - Add a render type field to research app sources so that we can only show relevant
   sources in the research app. Additionally, allow a source to be specified by lon/lat

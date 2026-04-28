@@ -1,4 +1,4 @@
-# @wwtelescope/research-app 0.20.0 (2026-04-28)
+# @wwtelescope/research-app 0.21.0 (2026-04-28)
 
 - Update the research app to allow selecting sources in either sky or planet-like
   (Earth or Planet) modes (#369, @Carifio24).

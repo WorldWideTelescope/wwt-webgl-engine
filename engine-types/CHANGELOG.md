@@ -1,4 +1,4 @@
-# @wwtelescope/engine-types 0.8.0 (2026-04-28)
+# @wwtelescope/engine-types 0.9.0 (2026-04-28)
 
 - Add a `showEclipticCircle` to `BaseEngineSetting` options. If the ecliptic is being
   drawn, this setting controls whether a circle connecting the ticks is drawn

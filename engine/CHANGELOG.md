@@ -1,4 +1,4 @@
-# @wwtelescope/engine 7.33.0 (2026-04-28)
+# @wwtelescope/engine 7.34.0 (2026-04-28)
 
 - Distinguish between 'cancel' and 'close' buttons for closing simple
   input dialogs to allow fixing a web client issue where only one UI element
