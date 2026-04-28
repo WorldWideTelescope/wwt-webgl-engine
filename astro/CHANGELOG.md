@@ -1,4 +1,4 @@
-# @wwtelescope/astro 0.3.1 (2026-04-24)
+# @wwtelescope/astro 0.3.2 (2026-04-28)
 
 - No code changes, just syncing up Cranko with changes in the repository
 

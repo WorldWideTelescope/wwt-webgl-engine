@@ -1,4 +1,4 @@
-# @wwtelescope/ui-components 0.1.2 (2026-04-24)
+# @wwtelescope/ui-components 0.1.3 (2026-04-28)
 
 - No code changes
 - Fix indentation in ui-components package file.
