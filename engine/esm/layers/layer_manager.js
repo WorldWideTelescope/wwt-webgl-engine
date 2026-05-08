@@ -1196,6 +1196,17 @@ LayerManager.showLayerMenu = function (selected, x, y) {
     }
 };
 
+LayerManager.showGridMenu = function (gridName, x, y) {
+    var position = Vector2d.create(x, y);
+    LayerManager._lastMenuClick = position;
+    LayerManager._selectedGrid = gridName;
+    LayerManager._contextMenu = new ContextMenuStrip();
+    var colorMenu = ToolStripMenuItem.create(Language.getLocalizedText(458, 'Color/Opacity'));
+    colorMenu.click = LayerManager._gridColorMenu_Click;
+    LayerManager._contextMenu.items.push(colorMenu);
+    LayerManager._contextMenu._show(position);
+};
+
 LayerManager._publishMenu_Click = function (sender, e) { };
 
 LayerManager._addGirdLayer_Click = function (sender, e) {
@@ -1342,6 +1353,19 @@ LayerManager._colorMenu_Click = function (sender, e) {
     };
     picker.show(e);
 };
+
+LayerManager._gridColorMenu_Click = function (sender, e) {
+    var grid = LayerManager._selectedGrid;
+    var picker = new ColorPicker();
+    var currentColor = Settings.get_active()[`get_${grid}Color`]();
+    if (currentColor != null) {
+        picker.color = currentColor;
+    }
+    picker.callBack = function () {
+        Settings.get_active()[`set_${grid}Color`](picker.color);
+    };
+    picker.show(e);
+}
 
 LayerManager._addMenu_Click = function (sender, e) { };
 
