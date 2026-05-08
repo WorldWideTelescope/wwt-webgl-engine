@@ -92,6 +92,9 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
             if (ii === 9) {
                 id = 19;
             }
+            if (!(Settings.get_active().get_planetOrbitsFilter() & id)) {
+              continue;
+            }
             var angle = Math.atan2(Planets._planet3dLocations[id].z, Planets._planet3dLocations[id].x);
             Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[id], id, centerPoint, angle, Planets._planet3dLocations[id], fade);
         }
