@@ -1622,7 +1622,8 @@ var WWTControl$ = {
           x += 180;
           cartesian = Coordinates.geoTo3d(y, x);
         } else if (this.get_solarSystemMode()) {
-          cartesian = Vector3d.create(x, y, z); 
+          // In 3D mode, points are displayed with (X, Z, Y) coordinates
+          cartesian = Vector3d.create(x, z, y); 
         } else {
           var pt = Vector2d.create(x, y);
           cartesian = Coordinates.sphericalSkyToCartesian(pt);

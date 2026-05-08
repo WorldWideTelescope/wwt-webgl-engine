@@ -1,5 +1,13 @@
 # rc: minor bump
 
+- Add functionality for displaying a context menu for grids. This is intended to
+  facilitate allowing users to change grid colors in the web client (#385, @Carifio24).
+- Account for WWT's internal left-handed coordinate system when finding a screen
+  point for coordinates in 3D (#383, @Carifio24).
+
+
+# @wwtelescope/engine 7.34.0 (2026-04-28)
+
 - Distinguish between 'cancel' and 'close' buttons for closing simple
   input dialogs to allow fixing a web client issue where only one UI element
   receives the necessary click handler (#381, @Carifio24).
