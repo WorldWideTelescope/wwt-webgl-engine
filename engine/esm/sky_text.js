@@ -81,7 +81,7 @@ var Text3dBatch$ = {
             if (!this._glyphCache.ready) {
                 return;
             }
-            TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2d);
+            TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2d, color)
             renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
         }
     },
