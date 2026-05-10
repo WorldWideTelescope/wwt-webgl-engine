@@ -86,11 +86,16 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
     var fade = Math.min(1, Math.max(Util.log10(distss) - 8.6, 0));
 
     if (Settings.get_active().get_solarSystemOrbits() && fade > 0) {
+        var orbitsFilter = Settings.get_active().get_planetOrbitsFilter();
+
         // Mercury -> Pluto
         for (var ii = 1; ii < 10; ii++) {
             var id = ii;
             if (ii === 9) {
                 id = 19;
+            }
+            if (!(orbitsFilter & Math.pow(2, id))) {
+              continue;
             }
             var angle = Math.atan2(Planets._planet3dLocations[id].z, Planets._planet3dLocations[id].x);
             Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[id], id, centerPoint, angle, Planets._planet3dLocations[id], fade);
@@ -98,7 +103,9 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
 
         // Moon is handled specially
         var mid = 9;
-        Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[mid], mid, centerPoint, 0, Planets._planet3dLocations[mid], fade);
+        if (orbitsFilter & Math.pow(2, mid)) {
+          Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[mid], mid, centerPoint, 0, Planets._planet3dLocations[mid], fade);
+        }
 
         // Galilean satellites. "Compute the positions of the Galilean
         // satellites at two times; we need the second in order to estimate the
@@ -131,7 +138,7 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
             const id = galileans[i];
             const bit = Math.pow(2, id);
 
-            if (!(Settings.get_active().get_planetOrbitsFilter() & bit)) {
+            if (!(orbitsFilter & bit)) {
                 continue;
             }
 
