@@ -1595,6 +1595,8 @@ export class Settings implements EngineSettingsInterface {
   set_constellationBoundryColor(v: string): string;
   get_constellationSelectionColor(): string;
   set_constellationSelectionColor(v: string): string;
+  get_constellationLabelsColor(): string;
+  set_constellationLabelsColor(v: string): string;
   get_showCrosshairs(): boolean;
   set_showCrosshairs(v: boolean): boolean;
   get_smoothPan(): boolean;

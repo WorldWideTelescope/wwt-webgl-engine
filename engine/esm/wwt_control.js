@@ -956,7 +956,7 @@ var WWTControl$ = {
             WWTControl.constellationsBoundries.draw(this.renderContext, Settings.get_active().get_showConstellationSelection(), this.constellation, false);
         }
         if (Settings.get_active().get_showConstellationLabels()) {
-            Constellations.drawConstellationNames(this.renderContext, 1, Colors.get_yellow());
+            Constellations.drawConstellationNames(this.renderContext, 1, Color.load(Settings.get_active().get_constellationLabelsColor()));
         }
     },
 
