@@ -58,6 +58,8 @@ import { VideoOutputType } from "./video_output_type.js";
 import { UiTools } from "./ui_tools.js";
 import { ViewMoverSlew, ViewMoverKenBurnsStyle } from "./view_mover.js";
 
+import { CT } from "./astrocalc/coordinate_transformation.js";
+
 import { TourPlayer } from "./tours/tour_player.js";
 
 import { LayerManager } from "./layers/layer_manager.js";
@@ -676,6 +678,9 @@ var WWTControl$ = {
                     }
                 }
             }
+
+            var equatorial = CT.ec2Eq(-(15 * this.renderContext.viewCamera.get_RA() + 90), -this.renderContext.viewCamera.get_dec(), Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow()));
+            this.constellation = Constellations.containment.findConstellationForPoint(equatorial.x, equatorial.y);
             this._drawSkyOverlays();
             this.renderContext.lighting = lighting;
             this.renderContext.space = false;
