@@ -65,7 +65,7 @@ SimpleLineShader.init = function (renderContext) {
     SimpleLineShader.initialized = true;
 };
 
-SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
+SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth, opacity=1) {
     var gl = renderContext.gl;
     if (gl != null) {
         if (!SimpleLineShader.initialized) {
@@ -75,7 +75,7 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
         var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
         gl.uniformMatrix4fv(SimpleLineShader.mvMatLoc, false, mvMat.floatArray());
         gl.uniformMatrix4fv(SimpleLineShader.projMatLoc, false, renderContext.get_projection().floatArray());
-        gl.uniform4f(SimpleLineShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
+        gl.uniform4f(SimpleLineShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, lineColor.a * opacity / 255);
         if (renderContext.space || !useDepth) {
             gl.disable(WEBGL.DEPTH_TEST);
         } else {
