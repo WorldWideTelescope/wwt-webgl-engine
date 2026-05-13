@@ -139,7 +139,11 @@ export function WWTControl() {
     this._crossHairs = null;
 
     this._opacities = {
-      constellationFigures: { value: 1, getter: Settings.get_showConstellationFigures, start: null },
+      constellationFigures: {
+        value: Number(Settings.get_active().get_showConstellationFigures()),
+        setting: "showConstellationFigures",
+        start: null,
+      },
     };
 
 }
@@ -612,14 +616,17 @@ var WWTControl$ = {
         }
 
         for (var data of Object.values(this._opacities)) {
-          var target = Number(data.getter());
+          var target = Number(Settings.get_active()[`get_${data.setting}`]());
+          console.log(`Value: ${data.value}, target: ${target}`);
+          console.log(data.start);
           if (data.value == target) {
             data.start = null;
           } else if (data.start == null) {
             data.start = Date.now();
           } else {
             var elapsed = Date.now() - data.start;
-            data.value = Math.min(1, Math.max(0, elapsed * Math.sign(target - data.value) / (data.duration || 400)));
+            data.value = Math.min(1, Math.max(0, data.value + elapsed * Math.sign(target - data.value) / (data.duration || 1000)));
+            console.log(data.value);
           }
         }
 
@@ -918,9 +925,9 @@ var WWTControl$ = {
 
     _drawSkyOverlays: function () {
         if (Settings.get_active().get_showConstellationPictures() && !this.freestandingMode) {
-            Constellations.drawArtwork(this.renderContext, 100 * this._opacities.constellationFigures);
+            Constellations.drawArtwork(this.renderContext, 100 * this._opacities.constellationFigures.value);
         }
-        if (Settings.get_active().get_showConstellationFigures()) {
+        if (this._opacities.constellationFigures.value > 0) {
             if (WWTControl.constellationsFigures == null) {
                 WWTControl.constellationsFigures = Constellations.create(
                     'Constellations',
@@ -930,7 +937,7 @@ var WWTControl$ = {
                     false,  // "resource"
                 );
             }
-            WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false, this._opacities.constellationFigures);
+            WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false, this._opacities.constellationFigures.value);
         }
         if (Settings.get_active().get_showEclipticGrid()) {
             Grids.drawEclipticGrid(this.renderContext, 1, Settings.get_active().get_eclipticGridColor());
@@ -975,10 +982,10 @@ var WWTControl$ = {
                     false,  // "resource"
                 );
             }
-            WWTControl.constellationsBoundries.draw(this.renderContext, Settings.get_active().get_showConstellationSelection(), this.constellation, false, this._opacities.constellationFigures);
+            WWTControl.constellationsBoundries.draw(this.renderContext, Settings.get_active().get_showConstellationSelection(), this.constellation, false, this._opacities.constellationFigures.value);
         }
         if (Settings.get_active().get_showConstellationLabels()) {
-            Constellations.drawConstellationNames(this.renderContext, this._opacities.constellationFigures, Color.load(Settings.get_active().get_constellationLabelsColor()));
+            Constellations.drawConstellationNames(this.renderContext, this._opacities.constellationFigures.value, Color.load(Settings.get_active().get_constellationLabelsColor()));
         }
     },
 
