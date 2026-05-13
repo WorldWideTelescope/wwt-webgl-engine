@@ -159,7 +159,7 @@ Constellations.initializeConstellationNames = function () {
 // The WWTControl driver will not (and should not) call this function in
 // "freestanding mode", because the functionality depends on a
 // worldwidetelescope.org API.
-Constellations.drawArtwork = function (renderContext) {
+Constellations.drawArtwork = function (renderContext, opacity=100) {
     if (Constellations.artwork == null) {
         if (Constellations._artFile == null) {
             Constellations._artFile = makeNewFolder();
@@ -179,7 +179,7 @@ Constellations.drawArtwork = function (renderContext) {
             if (centroid != null) {
                 var pos = Coordinates.raDecTo3d((reverse) ? -centroid.get_RA() - 6 : centroid.get_RA(), (reverse) ? centroid.get_dec() : centroid.get_dec());
                 if (Vector3d.dot(renderContext.get_viewPoint(), pos) > Constellations._maxSeperation) {
-                    renderContext.drawImageSet(place.get_studyImageset(), 100);
+                    renderContext.drawImageSet(place.get_studyImageset(), opacity);
                 }
             }
         }
@@ -354,7 +354,7 @@ var Constellations$ = {
         }
     },
 
-    draw: function (renderContext, showOnlySelected, focusConsteallation, clearExisting) {
+    draw: function (renderContext, showOnlySelected, focusConsteallation, clearExisting, opacity=1) {
         Constellations._maxSeperation = Math.max(0.6, Math.cos((renderContext.get_fovAngle() * 2) / 180 * Math.PI));
         this._drawCount = 0;
         var lsSelected = null;
@@ -369,11 +369,11 @@ var Constellations$ = {
                 lsSelected = ls;
             }
             else if (!showOnlySelected || !this._boundry) {
-                this._drawSingleConstellation(renderContext, ls, 1);
+                this._drawSingleConstellation(renderContext, ls, opacity);
             }
         }
         if (lsSelected != null) {
-            this._drawSingleConstellation(renderContext, lsSelected, 1);
+            this._drawSingleConstellation(renderContext, lsSelected, opacity);
         }
     },
 
