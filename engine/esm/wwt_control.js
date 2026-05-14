@@ -637,6 +637,8 @@ var WWTControl$ = {
             this._crossHairs = null;
         }
 
+        // We use `Date.now()` rather than `performance.now()` in what follows
+        // for compatibility with Internet Explorer
         for (var data of Object.values(this._fadeInfo)) {
           var target = Number(Settings.get_active()[`get_${data.setting}`]());
           if (data.opacity == target) {
