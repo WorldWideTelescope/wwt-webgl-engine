@@ -2267,7 +2267,7 @@ TextShader.init = function (renderContext) {
     TextShader.initialized = true;
 };
 
-TextShader.use = function (renderContext, vertex, texture, color) {
+TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
     if (texture == null) {
         texture = Texture.getEmpty();
     }
@@ -2295,7 +2295,7 @@ TextShader.use = function (renderContext, vertex, texture, color) {
         gl.enableVertexAttribArray(TextShader.textureLoc);
         gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
         gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
-        gl.uniform4f(TextShader.colorLoc, color.r / 255, color.g / 255, color.b / 255, color.a / 255);
+        gl.uniform4f(TextShader.colorLoc, color.r / 255, color.g / 255, color.b / 255, color.a * opacity / 255);
         gl.activeTexture(WEBGL.TEXTURE0);
         gl.bindTexture(WEBGL.TEXTURE_2D, texture);
         gl.enable(WEBGL.BLEND);
