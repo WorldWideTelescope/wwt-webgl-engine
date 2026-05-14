@@ -617,16 +617,16 @@ var WWTControl$ = {
 
         for (var data of Object.values(this._opacities)) {
           var target = Number(Settings.get_active()[`get_${data.setting}`]());
-          console.log(`Value: ${data.value}, target: ${target}`);
-          console.log(data.start);
           if (data.value == target) {
             data.start = null;
           } else if (data.start == null) {
             data.start = Date.now();
           } else {
+
+            // NB: This assumes that we are always going from 0 -> 1 or 1 -> 0
+            // It will need slight tweaking if we eventually make this not the case
             var elapsed = Date.now() - data.start;
-            data.value = Math.min(1, Math.max(0, data.value + elapsed * Math.sign(target - data.value) / (data.duration || 1000)));
-            console.log(data.value);
+            data.value = Math.min(1, Math.max(0, 1 - target + elapsed * Math.sign(target - data.value) / (data.duration || 400)));
           }
         }
 
