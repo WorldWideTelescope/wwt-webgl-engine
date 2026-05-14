@@ -44,6 +44,7 @@ import { Annotation } from "./annotation.js";
 import { CameraParameters, SolarSystemObjects } from "./camera_parameters.js";
 import { Constellations } from "./constellations.js";
 import { Coordinates } from "./coordinates.js";
+import { FadeState } from "./fade_state.js";
 import { Grids } from "./grids.js";
 import { BandPass, ProjectionType, ImageSetType, Imageset } from "./imageset.js";
 import { MinorPlanets } from "./minor_planets.js";
@@ -138,13 +139,9 @@ export function WWTControl() {
     this.tourEdit = null;
     this._crossHairs = null;
   
-    this._fadeInfo = {};
+    this._fadeStates = {};
     for (var setting of WWTControl.fadeSettings) {
-      this._fadeInfo[setting] = {
-        opacity: Number(Settings.get_active()[`get_${setting}`]()),
-        setting,
-        start: null,
-      };
+      this._fadeStates[setting] = FadeState.fromSetting(setting);
     }
 
 }
@@ -637,21 +634,9 @@ var WWTControl$ = {
             this._crossHairs = null;
         }
 
-        // We use `Date.now()` rather than `performance.now()` in what follows
-        // for compatibility with Internet Explorer
-        for (var data of Object.values(this._fadeInfo)) {
-          var target = Number(Settings.get_active()[`get_${data.setting}`]());
-          if (data.opacity == target) {
-            data.start = null;
-          } else if (data.start == null) {
-            data.start = Date.now();
-          } else {
 
-            // NB: This assumes that we are always going from 0 -> 1 or 1 -> 0
-            // It will need slight tweaking if we eventually make this not the case
-            var elapsed = Date.now() - data.start;
-            data.opacity = Math.min(1, Math.max(0, 1 - target + elapsed * Math.sign(target - data.opacity) / (data.duration || 400)));
-          }
+        for (var state of Object.values(this._fadeStates)) {
+          state.update();
         }
 
         Tile.lastDeepestLevel = Tile.deepestLevel;
@@ -839,8 +824,8 @@ var WWTControl$ = {
         var worldSave = this.renderContext.get_world();
         var viewSave = this.renderContext.get_view();
         var projSave = this.renderContext.get_projection();
-        if (this._fadeInfo.showCrosshairs.opacity > 0) {
-            this._drawCrosshairs(this.renderContext, this._fadeInfo.showCrosshairs.opacity);
+        if (this._fadeStates.showCrosshairs.opacity > 0) {
+            this._drawCrosshairs(this.renderContext, this._fadeStates.showCrosshairs.opacity);
         }
         if (this.uiController != null) {
             this.uiController.render(this.renderContext);
@@ -948,10 +933,10 @@ var WWTControl$ = {
     },
 
     _drawSkyOverlays: function () {
-        if (this._fadeInfo.showConstellationPictures.opacity > 0 && !this.freestandingMode) {
-            Constellations.drawArtwork(this.renderContext, this._fadeInfo.showConstellationPictures.opacity);
+        if (this._fadeStates.showConstellationPictures.opacity > 0 && !this.freestandingMode) {
+            Constellations.drawArtwork(this.renderContext, this._fadeStates.showConstellationPictures.opacity);
         }
-        if (this._fadeInfo.showConstellationFigures.opacity > 0) {
+        if (this._fadeStates.showConstellationFigures.opacity > 0) {
             if (WWTControl.constellationsFigures == null) {
                 WWTControl.constellationsFigures = Constellations.create(
                     'Constellations',
@@ -961,42 +946,42 @@ var WWTControl$ = {
                     false,  // "resource"
                 );
             }
-            WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false, this._fadeInfo.showConstellationFigures.opacity);
+            WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false, this._fadeStates.showConstellationFigures.opacity);
         }
-        if (this._fadeInfo.showEclipticGrid.opacity > 0) {
-            Grids.drawEclipticGrid(this.renderContext, this._fadeInfo.showEclipticGrid.opacity, Settings.get_active().get_eclipticGridColor());
-            if (this._fadeInfo.showEclipticGridText.opacity > 0) {
-                Grids.drawEclipticGridText(this.renderContext, this._fadeInfo.showEclipticGridText.opacity, Settings.get_active().get_eclipticGridColor());
+        if (this._fadeStates.showEclipticGrid.opacity > 0) {
+            Grids.drawEclipticGrid(this.renderContext, this._fadeStates.showEclipticGrid.opacity, Settings.get_active().get_eclipticGridColor());
+            if (this._fadeStates.showEclipticGridText.opacity > 0) {
+                Grids.drawEclipticGridText(this.renderContext, this._fadeStates.showEclipticGridText.opacity, Settings.get_active().get_eclipticGridColor());
             }
         }
-        if (this._fadeInfo.showGalacticGrid.opacity > 0) {
-            Grids.drawGalacticGrid(this.renderContext, this._fadeInfo.showGalacticGrid.opacity, Settings.get_active().get_galacticGridColor());
-            if (this._fadeInfo.showGalacticGridText.opacity > 0) {
-                Grids.drawGalacticGridText(this.renderContext, this._fadeInfo.showGalacticGridText.opacity, Settings.get_active().get_galacticGridColor());
+        if (this._fadeStates.showGalacticGrid.opacity > 0) {
+            Grids.drawGalacticGrid(this.renderContext, this._fadeStates.showGalacticGrid.opacity, Settings.get_active().get_galacticGridColor());
+            if (this._fadeStates.showGalacticGridText.opacity > 0) {
+                Grids.drawGalacticGridText(this.renderContext, this._fadeStates.showGalacticGridText.opacity, Settings.get_active().get_galacticGridColor());
             }
         }
-        if (this._fadeInfo.showAltAzGrid.opacity > 0) {
-            Grids.drawAltAzGrid(this.renderContext, this._fadeInfo.showAltAzGrid.opacity, Settings.get_active().get_altAzGridColor());
-            if (this._fadeInfo.showAltAzGridText.opacity > 0) {
-                Grids.drawAltAzGridText(this.renderContext, this._fadeInfo.showAltAzGridText.opacity, Settings.get_active().get_altAzGridColor());
+        if (this._fadeStates.showAltAzGrid.opacity > 0) {
+            Grids.drawAltAzGrid(this.renderContext, this._fadeStates.showAltAzGrid.opacity, Settings.get_active().get_altAzGridColor());
+            if (this._fadeStates.showAltAzGridText.opacity > 0) {
+                Grids.drawAltAzGridText(this.renderContext, this._fadeStates.showAltAzGridText.opacity, Settings.get_active().get_altAzGridColor());
             }
         }
-        if (this._fadeInfo.showPrecessionChart.opacity > 0) {
-            Grids.drawPrecessionChart(this.renderContext, this._fadeInfo.showPrecessionChart.opacity, Settings.get_active().get_precessionChartColor());
+        if (this._fadeStates.showPrecessionChart.opacity > 0) {
+            Grids.drawPrecessionChart(this.renderContext, this._fadeStates.showPrecessionChart.opacity, Settings.get_active().get_precessionChartColor());
         }
-        if (this._fadeInfo.showEcliptic.opacity > 0) {
-            Grids.drawEcliptic(this.renderContext, this._fadeInfo.showEcliptic.opacity, Settings.get_active().get_eclipticColor(), Settings.get_active().get_showEclipticCircle());
-            if (this._fadeInfo.showEclipticOverviewText.opacity > 0) {
-                Grids.drawEclipticText(this.renderContext, this._fadeInfo.showEclipticOverviewText.opacity, Settings.get_active().get_eclipticColor());
+        if (this._fadeStates.showEcliptic.opacity > 0) {
+            Grids.drawEcliptic(this.renderContext, this._fadeStates.showEcliptic.opacity, Settings.get_active().get_eclipticColor(), Settings.get_active().get_showEclipticCircle());
+            if (this._fadeStates.showEclipticOverviewText.opacity > 0) {
+                Grids.drawEclipticText(this.renderContext, this._fadeStates.showEclipticOverviewText.opacity, Settings.get_active().get_eclipticColor());
             }
         }
-        if (this._fadeInfo.showGrid.opacity > 0) {
-            Grids.drawEquitorialGrid(this.renderContext, this._fadeInfo.showGrid.opacity, Settings.get_active().get_equatorialGridColor());
-            if (this._fadeInfo.showEquatorialGridText.opacity > 0) {
-                Grids.drawEquitorialGridText(this.renderContext, this._fadeInfo.showEquatorialGridText.opacity, Settings.get_active().get_equatorialGridColor());
+        if (this._fadeStates.showGrid.opacity > 0) {
+            Grids.drawEquitorialGrid(this.renderContext, this._fadeStates.showGrid.opacity, Settings.get_active().get_equatorialGridColor());
+            if (this._fadeStates.showEquatorialGridText.opacity > 0) {
+                Grids.drawEquitorialGridText(this.renderContext, this._fadeStates.showEquatorialGridText.opacity, Settings.get_active().get_equatorialGridColor());
             }
         }
-        if (this._fadeInfo.showConstellationBoundries.opacity > 0) {
+        if (this._fadeStates.showConstellationBoundries.opacity > 0) {
             if (WWTControl.constellationsBoundries == null) {
                 WWTControl.constellationsBoundries = Constellations.create(
                     'Constellations',
@@ -1006,10 +991,10 @@ var WWTControl$ = {
                     false,  // "resource"
                 );
             }
-            WWTControl.constellationsBoundries.draw(this.renderContext, Settings.get_active().get_showConstellationSelection(), this.constellation, false, this._fadeInfo.showConstellationBoundries.opacity);
+            WWTControl.constellationsBoundries.draw(this.renderContext, Settings.get_active().get_showConstellationSelection(), this.constellation, false, this._fadeStates.showConstellationBoundries.opacity);
         }
-        if (this._fadeInfo.showConstellationLabels.opacity > 0) {
-            Constellations.drawConstellationNames(this.renderContext, this._fadeInfo.showConstellationLabels.opacity, Color.load(Settings.get_active().get_constellationLabelsColor()));
+        if (this._fadeStates.showConstellationLabels.opacity > 0) {
+            Constellations.drawConstellationNames(this.renderContext, this._fadeStates.showConstellationLabels.opacity, Color.load(Settings.get_active().get_constellationLabelsColor()));
         }
     },
 

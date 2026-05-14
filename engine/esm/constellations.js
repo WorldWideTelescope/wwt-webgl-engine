@@ -159,7 +159,7 @@ Constellations.initializeConstellationNames = function () {
 // The WWTControl driver will not (and should not) call this function in
 // "freestanding mode", because the functionality depends on a
 // worldwidetelescope.org API.
-Constellations.drawArtwork = function (renderContext, opacity=100) {
+Constellations.drawArtwork = function (renderContext, opacity=1) {
     if (Constellations.artwork == null) {
         if (Constellations._artFile == null) {
             Constellations._artFile = makeNewFolder();
@@ -179,7 +179,7 @@ Constellations.drawArtwork = function (renderContext, opacity=100) {
             if (centroid != null) {
                 var pos = Coordinates.raDecTo3d((reverse) ? -centroid.get_RA() - 6 : centroid.get_RA(), (reverse) ? centroid.get_dec() : centroid.get_dec());
                 if (Vector3d.dot(renderContext.get_viewPoint(), pos) > Constellations._maxSeperation) {
-                    renderContext.drawImageSet(place.get_studyImageset(), opacity);
+                    renderContext.drawImageSet(place.get_studyImageset(), 100 * opacity);
                 }
             }
         }
