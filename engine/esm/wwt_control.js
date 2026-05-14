@@ -175,6 +175,7 @@ WWTControl.fadeSettings = [
   "showEclipticCircle",
   "showEclipticOverviewText",
   "showPrecessionChart",
+  "showCrosshairs",
 ];
 
 
@@ -836,8 +837,8 @@ var WWTControl$ = {
         var worldSave = this.renderContext.get_world();
         var viewSave = this.renderContext.get_view();
         var projSave = this.renderContext.get_projection();
-        if (Settings.get_current().get_showCrosshairs()) {
-            this._drawCrosshairs(this.renderContext);
+        if (this._fadeOpacities.showCrosshairs.value > 0) {
+            this._drawCrosshairs(this.renderContext, this._fadeOpacities.showCrosshairs.value);
         }
         if (this.uiController != null) {
             this.uiController.render(this.renderContext);
@@ -2260,7 +2261,7 @@ var WWTControl$ = {
         }
     },
 
-    _drawCrosshairs: function (context) {
+    _drawCrosshairs: function (context, opacity=1) {
         if (context.gl == null) {
             var ctx = context.device;
             ctx.save();
@@ -2288,7 +2289,7 @@ var WWTControl$ = {
                 this._crossHairs.addLine(Vector3d.create(-halfWidth, 0, 0), Vector3d.create(halfWidth, 0, 0));
                 this._crossHairs.addLine(Vector3d.create(0, -halfHeight, 0), Vector3d.create(0, halfHeight, 0));
             }
-            this._crossHairs.drawLines(context, 1, Color.load(Settings.get_current().get_crosshairsColor()));
+            this._crossHairs.drawLines(context, opacity, Color.load(Settings.get_current().get_crosshairsColor()));
         }
     },
 
