@@ -949,7 +949,7 @@ var WWTControl$ = {
 
     _drawSkyOverlays: function () {
         if (this._fadeInfo.showConstellationPictures.opacity > 0 && !this.freestandingMode) {
-            Constellations.drawArtwork(this.renderContext, 100 * this._fadeInfo.showConstellationPictures.opacity);
+            Constellations.drawArtwork(this.renderContext, this._fadeInfo.showConstellationPictures.opacity);
         }
         if (this._fadeInfo.showConstellationFigures.opacity > 0) {
             if (WWTControl.constellationsFigures == null) {
