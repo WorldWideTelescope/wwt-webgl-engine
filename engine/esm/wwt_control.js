@@ -944,8 +944,8 @@ var WWTControl$ = {
     },
 
     _drawSkyOverlays: function () {
-        if (this._fadeOpacities.showConstellationPictures > 0 && !this.freestandingMode) {
-            Constellations.drawArtwork(this.renderContext, 100 * this._fadeOpacities.constellationPictures.value);
+        if (this._fadeOpacities.showConstellationPictures.value > 0 && !this.freestandingMode) {
+            Constellations.drawArtwork(this.renderContext, 100 * this._fadeOpacities.showConstellationPictures.value);
         }
         if (this._fadeOpacities.showConstellationFigures.value > 0) {
             if (WWTControl.constellationsFigures == null) {
