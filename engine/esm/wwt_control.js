@@ -138,27 +138,8 @@ export function WWTControl() {
     this.tourEdit = null;
     this._crossHairs = null;
   
-    var fadeSettings = [
-      "showConstellationFigures",
-      "showConstellationBoundries",
-      "showConstellationPictures",
-      "showConstellationLabels",
-      "showEclipticGrid",
-      "showEclipticGridText",
-      "showGalacticGrid",
-      "showGalacticGridText",
-      "showAltAzGrid",
-      "showAltAzGridText",
-      "showGrid",
-      "showEquatorialGridText",
-      "showEcliptic",
-      "showEclipticCircle",
-      "showEclipticOverviewText",
-      "showPrecessionChart",
-    ];
-
     this._fadeOpacities = {};
-    for (var setting of fadeSettings) {
+    for (var setting of WWTControl.fadeSettings) {
       this._fadeOpacities[setting] = {
         value: Number(Settings.get_active()[`get_${setting}`]()),
         setting,
@@ -177,6 +158,26 @@ WWTControl._renderNeeded = false;
 WWTControl.constellationsFigures = null;
 WWTControl.constellationsBoundries = null;
 WWTControl.solarSystemObjectsNames = ['Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Moon', 'Io', 'Europa', 'Ganymede', 'Callisto', 'IoShadow', 'EuropaShadow', 'GanymedeShadow', 'CallistoShadow', 'SunEclipsed', 'Earth', 'Custom', 'Undefined'];
+WWTControl.fadeSettings = [
+  "showConstellationFigures",
+  "showConstellationBoundries",
+  "showConstellationPictures",
+  "showConstellationLabels",
+  "showEclipticGrid",
+  "showEclipticGridText",
+  "showGalacticGrid",
+  "showGalacticGridText",
+  "showAltAzGrid",
+  "showAltAzGridText",
+  "showGrid",
+  "showEquatorialGridText",
+  "showEcliptic",
+  "showEclipticCircle",
+  "showEclipticOverviewText",
+  "showPrecessionChart",
+];
+
+
 
 WWTControl.addImageSetToRepository = function (imagesetToAdd) {
     var $enum1 = ss.enumerate(WWTControl.imageSets);
@@ -980,8 +981,8 @@ var WWTControl$ = {
         if (this._fadeOpacities.showPrecessionChart.value > 0) {
             Grids.drawPrecessionChart(this.renderContext, this._fadeOpacities.showPrecessionChart.value, Settings.get_active().get_precessionChartColor());
         }
-        if (this._fadeOpacities.showPrecessionChart.value > 0) {
-            Grids.drawEcliptic(this.renderContext, this._fadeOpacities.showPrecessionChart.value, Settings.get_active().get_eclipticColor(), Settings.get_active().get_showEclipticCircle());
+        if (this._fadeOpacities.showEcliptic.value > 0) {
+            Grids.drawEcliptic(this.renderContext, this._fadeOpacities.showEcliptic.value, Settings.get_active().get_eclipticColor(), Settings.get_active().get_showEclipticCircle());
             if (this._fadeOpacities.showEclipticOverviewText.value > 0) {
                 Grids.drawEclipticText(this.renderContext, this._fadeOpacities.showEclipticOverviewText.value, Settings.get_active().get_eclipticColor());
             }

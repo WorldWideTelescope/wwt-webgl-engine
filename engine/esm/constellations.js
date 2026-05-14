@@ -368,7 +368,7 @@ var Constellations$ = {
             if (Constellations._constToDraw === ls.get_name() && this._boundry) {
                 lsSelected = ls;
             }
-            else if (!showOnlySelected || !this._boundry) {
+            else if (!(showOnlySelected && this._boundry)) {
                 this._drawSingleConstellation(renderContext, ls, opacity);
             }
         }
