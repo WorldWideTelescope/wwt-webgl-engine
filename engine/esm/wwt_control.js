@@ -141,7 +141,7 @@ export function WWTControl() {
   
     this._fadeStates = {};
     for (var setting of WWTControl.fadeSettings) {
-      this._fadeStates[setting] = FadeState.fromSetting(setting);
+      this._fadeStates[setting] = FadeState.forSetting(setting);
     }
 
 }

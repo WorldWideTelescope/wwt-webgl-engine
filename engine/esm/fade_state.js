@@ -2,38 +2,54 @@ import { registerType } from "./typesystem.js";
 
 import { Settings } from "./settings.js";
 
-export function FadeState(getter, duration) {
-    this.getter = getter;
-    this.opacity = getter();
-    this.start = null;
-    this.duration = duration || 400;
+export function FadeState(options) {
+    this.target = options.target;
+    this.start = ("start" in options) ? options.start : options.target();
+    this.opacity = this.start;
+    this.startTimestamp = null;
+    this.duration = options.duration || 400;
+    this.onFinish = options.onFinish;
+    this.finished = true;
 }
 
-FadeState.fromSetting = function(setting, duration) {
+FadeState.forSetting = function(setting, duration) {
     function getter() {
       return Number(Settings.get_active()[`get_${setting}`]());
     }
-    return new FadeState(getter, duration);
+    function onFinish(state) {
+      state.start = state.target();
+    }
+    
+    return new FadeState({ target: getter, start: getter(), duration: duration, onFinish: onFinish });
 }
 
 var FadeState$ = {
-    reset: function() {
-        this.start = null;
+    finish: function() {
+        this.startTimestamp = null;
+        if (this.onFinish) {
+            this.onFinish(this);
+        }
+        this.finished = true;
+    },
+
+    set_target: function(target) {
+        this.target = target;
     },
 
     // We use `Date.now()` rather than `performance.now()` in what follows
     // for compatibility with Internet Explorer
     update: function() {
-      var target = this.getter();
+      var target = (typeof this.target === "function") ? this.target() : this.target;
       if (this.opacity == target) {
-          this.reset();
-      } else if (this.start == null) {
-          this.start = Date.now();
+          if (!this.finished) { this.finish(); }
+      } else if (this.startTimestamp == null) {
+          this.finished = false;
+          this.startTimestamp = Date.now();
       } else {
-          // NB: This assumes that we are always going from 0 -> 1 or 1 -> 0
-          // It will need slight tweaking if we eventually make this not the case
-          var elapsed = Date.now() - this.start;
-          this.opacity = Math.min(1, Math.max(0, 1 - target + elapsed * Math.sign(target - this.opacity) / this.duration));
+          var elapsed = Date.now() - this.startTimestamp;
+          var upper = Math.max(this.start, target);
+          var lower = Math.min(this.start, target);
+          this.opacity = Math.min(upper, Math.max(lower, this.start + elapsed * (target - this.start) / this.duration));
       }
     }
 };
