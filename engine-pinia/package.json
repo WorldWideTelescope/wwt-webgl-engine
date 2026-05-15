@@ -21,7 +21,7 @@
     "@vue/cli-plugin-typescript": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
     "@vue/eslint-config-typescript": "^11.0.2",
-    "eslint": "^8.24.0",
+    "eslint": "^9.26.0",
     "eslint-plugin-vue": "^9.5.1",
     "rimraf": "^3",
     "typedoc": "0.25.1",
