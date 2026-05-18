@@ -16,6 +16,7 @@ import {
   Annotation,
   EngineSetting,
   Folder,
+  FrameCallback,
   Guid,
   Imageset,
   ImageSetLayer,
@@ -1552,6 +1553,20 @@ export const engineStore = defineStore('wwt-engine', {
           }
         });
       }
+    },
+
+    /** Add a callback that runs on each frame render */
+    addFrameCallback(callback: FrameCallback): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot addFrameCallback without linking to WWTInstance');
+      this.$wwt.inst.addFrameCallback(callback);
+    },
+
+    /** Remove a callback that runs on each frame render */
+    removeFrameCallback(callback: FrameCallback): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeFrameCallback without linking to WWTInstance');
+      this.$wwt.inst.removeFrameCallback(callback);
     },
 
     /** Command the view to steer to a specific configuration.
