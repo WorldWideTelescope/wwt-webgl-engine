@@ -892,7 +892,7 @@ var WWTControl$ = {
 
         for (var callback of this._frameCallbacks) {
             try {
-                callback();
+                callback(WWTControl.scriptInterface);
             } catch (error) {
                 console.error("Error while running WWT callback:\n", error);
             }

@@ -1324,7 +1324,7 @@ export interface ReadyEventCallback {
 
 export interface FrameCallback {
   /** A function that can be called on each frame */
-  (): void;
+  (si: ScriptInterface): void;
 }
 
 /** The core state of the WWT rendering engine.
