@@ -1380,6 +1380,7 @@ LayerManager._gridColorMenu_Click = function (sender, e) {
 
 LayerManager._constellationSettingColorMenu_Click = function (sender, e) {
     var constellationSetting = LayerManager._selectedConstellationSetting;
+    constellationSetting = constellationSetting.replace("Boundries", "Boundry").replace("Figures", "Figure");
     var picker = new ColorPicker();
     var currentColor = Settings.get_active()[`get_${constellationSetting}Color`]();
     if (currentColor != null) {
