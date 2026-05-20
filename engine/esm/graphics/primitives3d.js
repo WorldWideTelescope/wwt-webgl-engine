@@ -159,10 +159,10 @@ var SimpleLineList$ = {
             while ($enum1.moveNext()) {
                 var lineBuffer = $enum1.current;
                 if (this.pure2D) {
-                    SimpleLineShader2D.use(renderContext, lineBuffer.vertexBuffer, color, this._zBuffer);
+                    SimpleLineShader2D.use(renderContext, lineBuffer.vertexBuffer, color, this._zBuffer, opacity);
                 }
                 else {
-                    SimpleLineShader.use(renderContext, lineBuffer.vertexBuffer, color, this._zBuffer);
+                    SimpleLineShader.use(renderContext, lineBuffer.vertexBuffer, color, this._zBuffer, opacity);
                 }
                 renderContext.gl.drawArrays(WEBGL.LINES, 0, lineBuffer.count);
             }

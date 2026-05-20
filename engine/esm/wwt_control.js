@@ -137,6 +137,14 @@ export function WWTControl() {
     this.tour = null;
     this.tourEdit = null;
     this._crossHairs = null;
+  
+    this._fadeStates = {};
+    for (var i = 0; i < WWTControl.fadeSettings.length; i++) {
+      var setting = WWTControl.fadeSettings[i];
+      var initialValue = Number(Settings.get_active()[`get_${setting}`]());
+      this._fadeStates[setting] = BlendState.create(initialValue, 400);
+    }
+
 }
 
 // Note: these fields must remain public because there is JS code in the
@@ -148,6 +156,27 @@ WWTControl._renderNeeded = false;
 WWTControl.constellationsFigures = null;
 WWTControl.constellationsBoundries = null;
 WWTControl.solarSystemObjectsNames = ['Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Moon', 'Io', 'Europa', 'Ganymede', 'Callisto', 'IoShadow', 'EuropaShadow', 'GanymedeShadow', 'CallistoShadow', 'SunEclipsed', 'Earth', 'Custom', 'Undefined'];
+WWTControl.fadeSettings = [
+  "showConstellationFigures",
+  "showConstellationBoundries",
+  "showConstellationPictures",
+  "showConstellationLabels",
+  "showEclipticGrid",
+  "showEclipticGridText",
+  "showGalacticGrid",
+  "showGalacticGridText",
+  "showAltAzGrid",
+  "showAltAzGridText",
+  "showGrid",
+  "showEquatorialGridText",
+  "showEcliptic",
+  "showEclipticCircle",
+  "showEclipticOverviewText",
+  "showPrecessionChart",
+  "showCrosshairs",
+];
+
+
 
 WWTControl.addImageSetToRepository = function (imagesetToAdd) {
     var $enum1 = ss.enumerate(WWTControl.imageSets);
@@ -606,6 +635,14 @@ var WWTControl$ = {
             this._crossHairs = null;
         }
 
+        // We use `Date.now()` rather than `performance.now()` in what follows
+        // for compatibility with Internet Explorer
+        for (var setting in this._fadeStates) {
+          var state = this._fadeStates[setting];
+          var target = Number(Settings.get_active()[`get_${setting}`]());
+          state.set_targetState(target);
+        }
+
         Tile.lastDeepestLevel = Tile.deepestLevel;
         RenderTriangle.width = this.renderContext.width = this.canvas.width;
         RenderTriangle.height = this.renderContext.height = this.canvas.height;
@@ -791,8 +828,8 @@ var WWTControl$ = {
         var worldSave = this.renderContext.get_world();
         var viewSave = this.renderContext.get_view();
         var projSave = this.renderContext.get_projection();
-        if (Settings.get_current().get_showCrosshairs()) {
-            this._drawCrosshairs(this.renderContext);
+        if (this._fadeStates.showCrosshairs.get_opacity() > 0) {
+            this._drawCrosshairs(this.renderContext, this._fadeStates.showCrosshairs.get_opacity());
         }
         if (this.uiController != null) {
             this.uiController.render(this.renderContext);
@@ -900,10 +937,12 @@ var WWTControl$ = {
     },
 
     _drawSkyOverlays: function () {
-        if (Settings.get_active().get_showConstellationPictures() && !this.freestandingMode) {
-            Constellations.drawArtwork(this.renderContext);
+        var constellationPicturesOpacity = this._fadeStates.showConstellationPictures.get_opacity();
+        if (constellationPicturesOpacity > 0 && !this.freestandingMode) {
+            Constellations.drawArtwork(this.renderContext, constellationPicturesOpacity);
         }
-        if (Settings.get_active().get_showConstellationFigures()) {
+        var constellationFiguresOpacity = this._fadeStates.showConstellationFigures.get_opacity();
+        if (constellationFiguresOpacity > 0) {
             if (WWTControl.constellationsFigures == null) {
                 WWTControl.constellationsFigures = Constellations.create(
                     'Constellations',
@@ -913,42 +952,54 @@ var WWTControl$ = {
                     false,  // "resource"
                 );
             }
-            WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false);
+            WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false, constellationFiguresOpacity);
         }
-        if (Settings.get_active().get_showEclipticGrid()) {
-            Grids.drawEclipticGrid(this.renderContext, 1, Settings.get_active().get_eclipticGridColor());
-            if (Settings.get_active().get_showEclipticGridText()) {
-                Grids.drawEclipticGridText(this.renderContext, 1, Settings.get_active().get_eclipticGridColor());
+        var eclipticGridOpacity = this._fadeStates.showEclipticGrid.get_opacity();
+        if (eclipticGridOpacity > 0) {
+            Grids.drawEclipticGrid(this.renderContext, eclipticGridOpacity, Settings.get_active().get_eclipticGridColor());
+            var eclipticGridTextOpacity = this._fadeStates.showEclipticGridText.get_opacity() * eclipticGridOpacity;
+            if (eclipticGridTextOpacity > 0) {
+                Grids.drawEclipticGridText(this.renderContext, eclipticGridTextOpacity, Settings.get_active().get_eclipticGridColor());
             }
         }
-        if (Settings.get_active().get_showGalacticGrid()) {
-            Grids.drawGalacticGrid(this.renderContext, 1, Settings.get_active().get_galacticGridColor());
-            if (Settings.get_active().get_showGalacticGridText()) {
-                Grids.drawGalacticGridText(this.renderContext, 1, Settings.get_active().get_galacticGridColor());
+        var galacticGridOpacity = this._fadeStates.showGalacticGrid.get_opacity();
+        if (galacticGridOpacity > 0) {
+            Grids.drawGalacticGrid(this.renderContext, galacticGridOpacity, Settings.get_active().get_galacticGridColor());
+            var galacticGridTextOpacity = this._fadeStates.showGalacticGridText.get_opacity() * galacticGridOpacity;
+            if (galacticGridTextOpacity > 0) {
+                Grids.drawGalacticGridText(this.renderContext, galacticGridTextOpacity, Settings.get_active().get_galacticGridColor());
             }
         }
-        if (Settings.get_active().get_showAltAzGrid()) {
-            Grids.drawAltAzGrid(this.renderContext, 1, Settings.get_active().get_altAzGridColor());
-            if (Settings.get_active().get_showAltAzGridText()) {
-                Grids.drawAltAzGridText(this.renderContext, 1, Settings.get_active().get_altAzGridColor());
+        var altAzGridOpacity = this._fadeStates.showAltAzGrid.get_opacity();
+        if (altAzGridOpacity > 0) {
+            Grids.drawAltAzGrid(this.renderContext, altAzGridOpacity, Settings.get_active().get_altAzGridColor());
+            var altAzGridTextOpacity = this._fadeStates.showAltAzGridText.get_opacity() * altAzGridOpacity;
+            if (altAzGridTextOpacity > 0) {
+                Grids.drawAltAzGridText(this.renderContext, altAzGridTextOpacity, Settings.get_active().get_altAzGridColor());
             }
         }
-        if (Settings.get_active().get_showPrecessionChart()) {
-            Grids.drawPrecessionChart(this.renderContext, 1, Settings.get_active().get_precessionChartColor());
+        var precessionChartOpacity = this._fadeStates.showPrecessionChart.get_opacity();
+        if (precessionChartOpacity > 0) {
+            Grids.drawPrecessionChart(this.renderContext, precessionChartOpacity, Settings.get_active().get_precessionChartColor());
         }
-        if (Settings.get_active().get_showEcliptic()) {
-            Grids.drawEcliptic(this.renderContext, 1, Settings.get_active().get_eclipticColor(), Settings.get_active().get_showEclipticCircle());
-            if (Settings.get_active().get_showEclipticOverviewText()) {
-                Grids.drawEclipticText(this.renderContext, 1, Settings.get_active().get_eclipticColor());
+        var eclipticOpacity = this._fadeStates.showEcliptic.get_opacity();
+        if (eclipticOpacity > 0) {
+            Grids.drawEcliptic(this.renderContext, eclipticOpacity, Settings.get_active().get_eclipticColor(), Settings.get_active().get_showEclipticCircle());
+            var eclipticOverviewTextOpacity = this._fadeStates.showEclipticOverviewText.get_opacity() * eclipticOpacity;
+            if (eclipticOverviewTextOpacity > 0) {
+                Grids.drawEclipticText(this.renderContext, eclipticOverviewTextOpacity, Settings.get_active().get_eclipticColor());
             }
         }
-        if (Settings.get_active().get_showGrid()) {
-            Grids.drawEquitorialGrid(this.renderContext, 1, Settings.get_active().get_equatorialGridColor());
-            if (Settings.get_active().get_showEquatorialGridText()) {
-                Grids.drawEquitorialGridText(this.renderContext, 1, Settings.get_active().get_equatorialGridColor());
+        var gridOpacity = this._fadeStates.showGrid.get_opacity();
+        if (gridOpacity > 0) {
+            Grids.drawEquitorialGrid(this.renderContext, gridOpacity, Settings.get_active().get_equatorialGridColor());
+            var equatorialGridTextOpacity = this._fadeStates.showEquatorialGridText.get_opacity() * gridOpacity;
+            if (equatorialGridTextOpacity > 0) {
+                Grids.drawEquitorialGridText(this.renderContext, equatorialGridTextOpacity, Settings.get_active().get_equatorialGridColor());
             }
         }
-        if (Settings.get_active().get_showConstellationBoundries()) {
+        var constellationBoundriesOpacity = this._fadeStates.showConstellationBoundries.get_opacity();
+        if (constellationBoundriesOpacity > 0) {
             if (WWTControl.constellationsBoundries == null) {
                 WWTControl.constellationsBoundries = Constellations.create(
                     'Constellations',
@@ -958,10 +1009,11 @@ var WWTControl$ = {
                     false,  // "resource"
                 );
             }
-            WWTControl.constellationsBoundries.draw(this.renderContext, Settings.get_active().get_showConstellationSelection(), this.constellation, false);
+            WWTControl.constellationsBoundries.draw(this.renderContext, Settings.get_active().get_showConstellationSelection(), this.constellation, false, constellationBoundriesOpacity);
         }
-        if (Settings.get_active().get_showConstellationLabels()) {
-            Constellations.drawConstellationNames(this.renderContext, 1, Color.load(Settings.get_active().get_constellationLabelsColor()));
+        var constellationLabelsOpacity = this._fadeStates.showConstellationLabels.get_opacity();
+        if (constellationLabelsOpacity > 0) {
+            Constellations.drawConstellationNames(this.renderContext, constellationLabelsOpacity, Color.load(Settings.get_active().get_constellationLabelsColor()));
         }
     },
 
@@ -2215,7 +2267,7 @@ var WWTControl$ = {
         }
     },
 
-    _drawCrosshairs: function (context) {
+    _drawCrosshairs: function (context, opacity=1) {
         if (context.gl == null) {
             var ctx = context.device;
             ctx.save();
@@ -2243,7 +2295,7 @@ var WWTControl$ = {
                 this._crossHairs.addLine(Vector3d.create(-halfWidth, 0, 0), Vector3d.create(halfWidth, 0, 0));
                 this._crossHairs.addLine(Vector3d.create(0, -halfHeight, 0), Vector3d.create(0, halfHeight, 0));
             }
-            this._crossHairs.drawLines(context, 1, Color.load(Settings.get_current().get_crosshairsColor()));
+            this._crossHairs.drawLines(context, opacity, Color.load(Settings.get_current().get_crosshairsColor()));
         }
     },
 
