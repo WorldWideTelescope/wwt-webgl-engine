@@ -1207,6 +1207,17 @@ LayerManager.showGridMenu = function (gridName, x, y) {
     LayerManager._contextMenu._show(position);
 };
 
+LayerManager.showConstellationSettingMenu = function (constellationSetting, x, y) {
+    var position = Vector2d.create(x, y);
+    LayerManager._lastMenuClick = position;
+    LayerManager._selectedConstellationSetting = constellationSetting;
+    LayerManager._contextMenu = new ContextMenuStrip();
+    var colorMenu = ToolStripMenuItem.create(Language.getLocalizedText(458, 'Color/Opacity'));
+    colorMenu.click = LayerManager._constellationSettingColorMenu_Click;
+    LayerManager._contextMenu.items.push(colorMenu);
+    LayerManager._contextMenu._show(position);
+};
+
 LayerManager._publishMenu_Click = function (sender, e) { };
 
 LayerManager._addGirdLayer_Click = function (sender, e) {
@@ -1366,6 +1377,20 @@ LayerManager._gridColorMenu_Click = function (sender, e) {
     };
     picker.show(e);
 }
+
+LayerManager._constellationSettingColorMenu_Click = function (sender, e) {
+    var constellationSetting = LayerManager._selectedConstellationSetting;
+    var picker = new ColorPicker();
+    var currentColor = Settings.get_active()[`get_${constellationSetting}Color`]();
+    if (currentColor != null) {
+        picker.color = currentColor;
+    }
+    picker.callBack = function () {
+        Settings.get_active()[`set_${constellationSetting}Color`](picker.color);
+    };
+    picker.show(e);
+}
+
 
 LayerManager._addMenu_Click = function (sender, e) { };
 
