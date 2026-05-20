@@ -957,7 +957,7 @@ var WWTControl$ = {
         var eclipticGridOpacity = this._fadeStates.showEclipticGrid.get_opacity();
         if (eclipticGridOpacity > 0) {
             Grids.drawEclipticGrid(this.renderContext, eclipticGridOpacity, Settings.get_active().get_eclipticGridColor());
-            var eclipticGridTextOpacity = this._fadeStates.showEclipticGridText.get_opacity();
+            var eclipticGridTextOpacity = this._fadeStates.showEclipticGridText.get_opacity() * eclipticGridOpacity;
             if (eclipticGridTextOpacity > 0) {
                 Grids.drawEclipticGridText(this.renderContext, eclipticGridTextOpacity, Settings.get_active().get_eclipticGridColor());
             }
@@ -965,7 +965,7 @@ var WWTControl$ = {
         var galacticGridOpacity = this._fadeStates.showGalacticGrid.get_opacity();
         if (galacticGridOpacity > 0) {
             Grids.drawGalacticGrid(this.renderContext, galacticGridOpacity, Settings.get_active().get_galacticGridColor());
-            var galacticGridTextOpacity = this._fadeStates.showGalacticGridText.get_opacity();
+            var galacticGridTextOpacity = this._fadeStates.showGalacticGridText.get_opacity() * galacticGridOpacity;
             if (galacticGridTextOpacity > 0) {
                 Grids.drawGalacticGridText(this.renderContext, galacticGridTextOpacity, Settings.get_active().get_galacticGridColor());
             }
@@ -973,7 +973,7 @@ var WWTControl$ = {
         var altAzGridOpacity = this._fadeStates.showAltAzGrid.get_opacity();
         if (altAzGridOpacity > 0) {
             Grids.drawAltAzGrid(this.renderContext, altAzGridOpacity, Settings.get_active().get_altAzGridColor());
-            var altAzGridTextOpacity = this._fadeStates.showAltAzGridText.get_opacity();
+            var altAzGridTextOpacity = this._fadeStates.showAltAzGridText.get_opacity() * altAzGridOpacity;
             if (altAzGridTextOpacity > 0) {
                 Grids.drawAltAzGridText(this.renderContext, altAzGridTextOpacity, Settings.get_active().get_altAzGridColor());
             }
@@ -985,7 +985,7 @@ var WWTControl$ = {
         var eclipticOpacity = this._fadeStates.showEcliptic.get_opacity();
         if (eclipticOpacity > 0) {
             Grids.drawEcliptic(this.renderContext, eclipticOpacity, Settings.get_active().get_eclipticColor(), Settings.get_active().get_showEclipticCircle());
-            var eclipticOverviewTextOpacity = this._fadeStates.showEclipticOverviewText.get_opacity();
+            var eclipticOverviewTextOpacity = this._fadeStates.showEclipticOverviewText.get_opacity() * eclipticOpacity;
             if (eclipticOverviewTextOpacity > 0) {
                 Grids.drawEclipticText(this.renderContext, eclipticOverviewTextOpacity, Settings.get_active().get_eclipticColor());
             }
@@ -993,7 +993,7 @@ var WWTControl$ = {
         var gridOpacity = this._fadeStates.showGrid.get_opacity();
         if (gridOpacity > 0) {
             Grids.drawEquitorialGrid(this.renderContext, gridOpacity, Settings.get_active().get_equatorialGridColor());
-            var equatorialGridTextOpacity = this._fadeStates.showEquatorialGridText.get_opacity();
+            var equatorialGridTextOpacity = this._fadeStates.showEquatorialGridText.get_opacity() * gridOpacity;
             if (equatorialGridTextOpacity > 0) {
                 Grids.drawEquitorialGridText(this.renderContext, equatorialGridTextOpacity, Settings.get_active().get_equatorialGridColor());
             }
