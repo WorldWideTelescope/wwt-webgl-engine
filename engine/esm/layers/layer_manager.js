@@ -1384,10 +1384,10 @@ LayerManager._constellationSettingColorMenu_Click = function (sender, e) {
     var picker = new ColorPicker();
     var currentColor = Settings.get_active()[`get_${constellationSetting}Color`]();
     if (currentColor != null) {
-        picker.color = currentColor;
+        picker.color = Color.load(currentColor);
     }
     picker.callBack = function () {
-        Settings.get_active()[`set_${constellationSetting}Color`](picker.color);
+        Settings.get_active()[`set_${constellationSetting}Color`](picker.color.toString());
     };
     picker.show(e);
 }
