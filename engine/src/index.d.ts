@@ -1322,6 +1322,11 @@ export interface ReadyEventCallback {
   (si: ScriptInterface): void;
 }
 
+export interface FrameCallback {
+  /** A function that can be called on each frame */
+  (si: ScriptInterface): void;
+}
+
 /** The core state of the WWT rendering engine.
  *
  * This class contains most of the information about the WWT camera, view
@@ -1483,6 +1488,12 @@ export class ScriptInterface {
 
   /** Deregister a "ready" callback. */
   remove_ready(callback: ReadyEventCallback): void;
+
+  /** Register a callback to be run on each frame */
+  add_on_frame(callback: FrameCallback): void;
+
+  /** Deregister a "frame" callback */
+  remove_on_frame(callback: FrameCallback): void;
 
   /** Register a callback to be called when {@link WWTControl.loadTour} or
    * {@link WWTControl.playTour} have finished loading a tour.

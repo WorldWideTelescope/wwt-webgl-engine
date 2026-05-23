@@ -145,6 +145,7 @@ export function WWTControl() {
       this._fadeStates[setting] = BlendState.create(initialValue, 400);
     }
 
+    this._frameCallbacks = [];
 }
 
 // Note: these fields must remain public because there is JS code in the
@@ -886,6 +887,14 @@ var WWTControl$ = {
                 SpaceTimeController.frameDumping = false;
                 SpaceTimeController.cancelFrameDump = false;
                 this.capturingVideo = false;
+            }
+        }
+
+        for (var callback of this._frameCallbacks) {
+            try {
+                callback(WWTControl.scriptInterface);
+            } catch (error) {
+                console.error("Error while running WWT callback:\n", error);
             }
         }
     },
@@ -2378,6 +2387,17 @@ var WWTControl$ = {
     clampZooms: function (rc) {
         rc.viewCamera.zoom = DoubleUtilities.clamp(rc.viewCamera.zoom, this.get_zoomMin(), this.get_zoomMax());
         rc.targetCamera.zoom = DoubleUtilities.clamp(rc.targetCamera.zoom, this.get_zoomMin(), this.get_zoomMax());
+    },
+
+    addFrameCallback(callback) {
+        this._frameCallbacks.push(callback);
+    },
+
+    removeFrameCallback(callback) {
+        var index = this._frameCallbacks.indexOf(callback);
+        if (index > -1) {
+            this._frameCallbacks.splice(index, 1);
+        }
     }
 };
 

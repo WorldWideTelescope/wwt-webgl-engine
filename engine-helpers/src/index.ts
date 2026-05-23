@@ -27,6 +27,7 @@ import {
   SpaceTimeController,
   SpreadSheetLayer,
   SpreadSheetLayerSetting,
+  FrameCallback,
 } from "@wwtelescope/engine";
 
 import {
@@ -468,6 +469,16 @@ export class WWTInstance {
         this.readyPromises.push(new SavedPromise(null, resolve, reject));
       }
     });
+  }
+
+  // Manage callbacks executed on each frame
+
+  addFrameCallback(callback: FrameCallback): void {
+    this.si.add_on_frame(callback);
+  }
+
+  removeFrameCallback(callback: FrameCallback): void {
+      this.si.remove_on_frame(callback);
   }
 
   // Arrival promises
