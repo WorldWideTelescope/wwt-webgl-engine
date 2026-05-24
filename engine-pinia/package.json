@@ -31,8 +31,8 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "thiscommit:2022-11-29:pfBFAzl",
-    "@wwtelescope/engine": "thiscommit:2026-04-05:HUxvZre",
-    "@wwtelescope/engine-helpers": "thiscommit:2023-06-08:51W7HwZ",
+    "@wwtelescope/engine": "thiscommit:2026-05-24:Dk7FcU7",
+    "@wwtelescope/engine-helpers": "thiscommit:2026-05-24:rHytw25",
     "@wwtelescope/engine-types": "thiscommit:2022-11-29:OIQ6vzL"
   },
   "keywords": [
