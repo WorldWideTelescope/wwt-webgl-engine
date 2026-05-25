@@ -65,7 +65,7 @@ SimpleLineShader.init = function (renderContext) {
     SimpleLineShader.initialized = true;
 };
 
-SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
+SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth, opacity=1) {
     var gl = renderContext.gl;
     if (gl != null) {
         if (!SimpleLineShader.initialized) {
@@ -75,7 +75,7 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth) {
         var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
         gl.uniformMatrix4fv(SimpleLineShader.mvMatLoc, false, mvMat.floatArray());
         gl.uniformMatrix4fv(SimpleLineShader.projMatLoc, false, renderContext.get_projection().floatArray());
-        gl.uniform4f(SimpleLineShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
+        gl.uniform4f(SimpleLineShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, lineColor.a * opacity / 255);
         if (renderContext.space || !useDepth) {
             gl.disable(WEBGL.DEPTH_TEST);
         } else {
@@ -149,7 +149,7 @@ SimpleLineShader2D.init = function (renderContext) {
     SimpleLineShader2D.initialized = true;
 };
 
-SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth) {
+SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth, opacity=1) {
     var gl = renderContext.gl;
     if (gl != null) {
         if (!SimpleLineShader2D.initialized) {
@@ -157,7 +157,7 @@ SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth) {
         }
         gl.useProgram(SimpleLineShader2D._prog);
         var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
-        gl.uniform4f(SimpleLineShader2D.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, 1);
+        gl.uniform4f(SimpleLineShader2D.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, lineColor.a * opacity / 255);
         if (renderContext.space || !useDepth) {
             gl.disable(WEBGL.DEPTH_TEST);
         } else {
@@ -2214,11 +2214,14 @@ TextShader.init = function (renderContext) {
         precision mediump float;
 
         varying vec2 vTextureCoord;
+        uniform vec4 uColor;
 
         uniform sampler2D uSampler;
 
         void main(void) {
-            gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+           vec4 texColor;
+           texColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+           gl_FragColor = uColor * texColor;
         }
     `;
 
@@ -2256,6 +2259,7 @@ TextShader.init = function (renderContext) {
     TextShader.projMatLoc = gl.getUniformLocation(TextShader._prog, 'uPMatrix');
     TextShader.mvMatLoc = gl.getUniformLocation(TextShader._prog, 'uMVMatrix');
     TextShader.sampLoc = gl.getUniformLocation(TextShader._prog, 'uSampler');
+    TextShader.colorLoc = gl.getUniformLocation(TextShader._prog, 'uColor');
     set_tileUvMultiple(1);
     set_tileDemEnabled(true);
     gl.enable(WEBGL.BLEND);
@@ -2263,7 +2267,7 @@ TextShader.init = function (renderContext) {
     TextShader.initialized = true;
 };
 
-TextShader.use = function (renderContext, vertex, texture) {
+TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
     if (texture == null) {
         texture = Texture.getEmpty();
     }
@@ -2291,6 +2295,7 @@ TextShader.use = function (renderContext, vertex, texture) {
         gl.enableVertexAttribArray(TextShader.textureLoc);
         gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
         gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
+        gl.uniform4f(TextShader.colorLoc, color.r / 255, color.g / 255, color.b / 255, color.a * opacity / 255);
         gl.activeTexture(WEBGL.TEXTURE0);
         gl.bindTexture(WEBGL.TEXTURE_2D, texture);
         gl.enable(WEBGL.BLEND);

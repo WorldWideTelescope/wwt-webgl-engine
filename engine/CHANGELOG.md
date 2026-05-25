@@ -1,5 +1,21 @@
 # rc: minor bump
 
+- Add functionality for displaying a context menu for the constellation settings (except
+  for the constellation images). This is intended to facilitate allowing users to change
+  the colors and opacities of these items in the web client (#398, @Carifio24).
+- Allow adding callbacks that run on each WWT render frame. Just like ready callbacks,
+  these callbacks receive the WWT script interface as an argument (#397, @Carifio24).
+- Add fade in/out transition for several engine display settings. These settings include
+  constellation items (images, figures, boundaries, and names), grids and their texts,
+  the ecliptic and the precession chart, and the reticle crosshairs (#390, @Carifio24).
+- Allow rendering text in any color, and add setting to set the color of constellation
+  labels (#389, @Carifio24).
+- Update the currently focused constellation in 3D mode (#388, @Carifio24).
+- Respect orbits filter for planets when rendering in 3D mode (#386, @Carifio24).
+
+
+# @wwtelescope/engine 7.35.0 (2026-05-08)
+
 - Add functionality for displaying a context menu for grids. This is intended to
   facilitate allowing users to change grid colors in the web client (#385, @Carifio24).
 - Account for WWT's internal left-handed coordinate system when finding a screen

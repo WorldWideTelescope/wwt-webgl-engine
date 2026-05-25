@@ -99,6 +99,7 @@ export function Settings() {
     this._constellationBoundryColor = 'blue';
     this._constellationSelectionColor = 'yellow';
     this._constellationFigureColor = 'red';
+    this._constellationLabelsColor = 'white';
     this._showConstellationFigures = true;
     this._showConstellationBoundries = true;
     this._showConstellationSelection = true;
@@ -223,6 +224,15 @@ var Settings$ = {
 
     set_constellationSelectionColor: function (value) {
         this._constellationSelectionColor = value;
+        return value;
+    },
+
+    get_constellationLabelsColor: function () {
+        return this._constellationLabelsColor;
+    },
+
+    set_constellationLabelsColor: function (value) {
+        this._constellationLabelsColor = value;
         return value;
     },
 

@@ -10960,8 +10960,8 @@ __metadata:
   linkType: hard
 
 "tar@npm:^6.1.11, tar@npm:^6.1.2":
-  version: 6.2.0
-  resolution: "tar@npm:6.2.0"
+  version: 6.2.1
+  resolution: "tar@npm:6.2.1"
   dependencies:
     chownr: ^2.0.0
     fs-minipass: ^2.0.0
@@ -10969,7 +10969,7 @@ __metadata:
     minizlib: ^2.1.1
     mkdirp: ^1.0.3
     yallist: ^4.0.0
-  checksum: db4d9fe74a2082c3a5016630092c54c8375ff3b280186938cfd104f2e089c4fd9bad58688ef6be9cf186a889671bf355c7cda38f09bbf60604b281715ca57f5c
+  checksum: f1322768c9741a25356c11373bce918483f40fa9a25c69c59410c8a1247632487edef5fe76c5f12ac51a6356d2f1829e96d2bc34098668a2fc34d76050ac2b6c
   languageName: node
   linkType: hard
 
@@ -11642,14 +11642,14 @@ __metadata:
   linkType: hard
 
 "vm2@npm:^3.9.17":
-  version: 3.11.2
-  resolution: "vm2@npm:3.11.2"
+  version: 3.11.3
+  resolution: "vm2@npm:3.11.3"
   dependencies:
     acorn: ^8.15.0
     acorn-walk: ^8.3.4
   bin:
     vm2: bin/vm2
-  checksum: 8f2064b207d6d97d11be472b1b4365b19546d9a2fc9f3bbade4bb19f70779dd24c2a2cf4afde136bda7e1d2b1bf131fe47187c6417247609de5722dad6d33db6
+  checksum: 9696d3ec64a95a4b7c390cf94ef1bb7b324d03788827e38a98c0bf69c70c4ce86a754a87caf8e1c1f880f5a90f534dcbca7775509c5d6e66359da9f7fa4dc17b
   languageName: node
   linkType: hard
 
@@ -12309,8 +12309,8 @@ __metadata:
   linkType: hard
 
 "ws@npm:^8.13.0":
-  version: 8.16.0
-  resolution: "ws@npm:8.16.0"
+  version: 8.20.1
+  resolution: "ws@npm:8.20.1"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ">=5.0.2"
@@ -12319,7 +12319,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: feb3eecd2bae82fa8a8beef800290ce437d8b8063bdc69712725f21aef77c49cb2ff45c6e5e7fce622248f9c7abaee506bae0a9064067ffd6935460c7357321b
+  checksum: e639c83de2f58430a8f5d3ffea49711d37a766822e2e7ec8f131e5b890a95314203f1f83ee124de5c0185849907c9ab19db0210a723f2c03a99eaf448589d2f9
   languageName: node
   linkType: hard
 

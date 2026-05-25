@@ -143,6 +143,8 @@ export const WWTAwareComponent = defineComponent({
       "closeTourPlayer",
       "viewAsTourXml",
       "waitForReady",
+      "addFrameCallback",
+      "removeFrameCallback",
       // Formerly mutations
       "addAnnotation",
       "applyFitsLayerSettings",
