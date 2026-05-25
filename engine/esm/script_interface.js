@@ -361,6 +361,14 @@ var ScriptInterface$ = {
         this.__timeScrubberHook = ss.bindSub(this.__timeScrubberHook, value);
     },
 
+    add_on_frame: function (value) {
+        globalWWTControl.addFrameCallback(value);
+    },
+
+    remove_on_frame: function (value) {
+        globalWWTControl.removeFrameCallback(value);
+    },
+
     setTimeScrubberPosition: function (posLeft) {
         LayerManager.setTimeSliderValue(posLeft);
     },

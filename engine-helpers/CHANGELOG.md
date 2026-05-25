@@ -1,3 +1,8 @@
+# @wwtelescope/engine-helpers 0.18.0 (2026-05-25)
+
+- Expose the engine's new render frame callback functionality (#397, @Carifio24).
+
+
 # @wwtelescope/engine-helpers 0.17.0 (2025-07-16)
 
 - Add an optional `duration` parameter to the `GotoTargetOptions` interface, whose value

@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@wwtelescope/astro": "workspace:>=0.1.0",
-    "@wwtelescope/engine": "workspace:^7.29.1",
+    "@wwtelescope/engine": "workspace:^7.36.0",
     "@wwtelescope/engine-types": "workspace:>=0.6.0"
   },
   "description": "Helpful extensions to the WorldWide Telescope engine.",
@@ -21,7 +21,7 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "manual:workspace:>=0.1.0",
-    "@wwtelescope/engine": "thiscommit:2023-09-15:QN4FSax",
+    "@wwtelescope/engine": "thiscommit:2026-05-24:rEeWJ98",
     "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2"
   },
   "keywords": [
@@ -42,5 +42,5 @@
   },
   "type": "module",
   "types": "./dist/src/index.d.ts",
-  "version": "0.17.0"
+  "version": "0.18.0"
 }

@@ -1,3 +1,9 @@
+# @wwtelescope/engine-pinia 0.15.0 (2026-05-25)
+
+- Add `addFrameCallback` and `removeFrameCallback` methods to Pinia store to allow
+  adding callbacks that run on each WWT frame render (#397, @Carifio24).
+
+
 # @wwtelescope/engine-pinia 0.14.0 (2026-04-28)
 
 - Add `findCoordinatesForScreenPoint` and `findScreenPointForCoordinates` methods
