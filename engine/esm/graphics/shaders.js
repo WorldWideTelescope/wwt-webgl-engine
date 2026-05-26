@@ -1611,7 +1611,7 @@ FitsShader.init = function (renderContext) {
                         break;
                 }
                 vec4 colorFromColorMapper = texture(colorSampler, vec2(physicalValue, 0.5));
-                fragmentColor = vec4(colorFromColorMapper.rgb, opacity);
+                fragmentColor = vec4(colorFromColorMapper.rgb, colorFromColorMapper.a * opacity);
             }
         }
     `;

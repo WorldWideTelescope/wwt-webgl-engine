@@ -109,7 +109,7 @@ ColorMapContainer._initColorTexture = function (gl, colorMapContainer) {
     gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
     gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_T, WEBGL.CLAMP_TO_EDGE);
     var colorBuffer = ColorMapContainer._extractColorArray(colorMapContainer.colors);
-    gl.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGB8, colorBuffer.length / 3, 1, 0, WEBGL.RGB, WEBGL.UNSIGNED_BYTE, colorBuffer);
+    gl.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGB8, colorBuffer.length / 4, 1, 0, WEBGL.RGB, WEBGL.UNSIGNED_BYTE, colorBuffer);
     gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, WEBGL.NEAREST);
     gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MAG_FILTER, WEBGL.NEAREST);
     return colorTexture;
@@ -117,13 +117,14 @@ ColorMapContainer._initColorTexture = function (gl, colorMapContainer) {
 
 ColorMapContainer._extractColorArray = function (colors) {
     var index = 0;
-    var colorBuffer = new Uint8Array(colors.length * 3);
+    var colorBuffer = new Uint8Array(colors.length * 4);
     var $enum1 = ss.enumerate(colors);
     while ($enum1.moveNext()) {
         var color = $enum1.current;
         colorBuffer[index++] = color.r;
         colorBuffer[index++] = color.g;
         colorBuffer[index++] = color.b;
+        colorBuffer[index++] = color.a;
     }
     return colorBuffer;
 };
