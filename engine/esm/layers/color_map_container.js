@@ -44,42 +44,17 @@ ColorMapContainer.fromStringList = function (color_list) {
     return temp;
 };
 
-// Names are chosen to match matplotlib (which explains why some are
-// less-than-ideal).
 ColorMapContainer.fromNamedColormap = function (name) {
     if (name == null) {
         return null;
     }
-    switch (name.toLowerCase()) {
-        case 'viridis':
-            return ColorMapContainer.viridis;
-        case 'plasma':
-            return ColorMapContainer.plasma;
-        case 'inferno':
-            return ColorMapContainer.inferno;
-        case 'magma':
-            return ColorMapContainer.magma;
-        case 'cividis':
-            return ColorMapContainer.cividis;
-        case 'greys': // this is 0=>white, 1=>black
-            return ColorMapContainer.greys;
-        case 'gray': // this is 0=>black, 1=>white
-            return ColorMapContainer.gray;
-        case 'purples':
-            return ColorMapContainer.purples;
-        case 'blues':
-            return ColorMapContainer.blues;
-        case 'greens':
-            return ColorMapContainer.greens;
-        case 'oranges':
-            return ColorMapContainer.oranges;
-        case 'reds':
-            return ColorMapContainer.reds;
-        case 'rdylbu':
-            return ColorMapContainer.rdYlBu;
-    }
-    return null;
+    var cmap = ColorMapContainer._namedColormaps[name.toLowerCase()];
+    return cmap != null ? cmap : null;
 };
+
+ColorMapContainer.registerNamedColormap = function (name, colormap) {
+  ColorMapContainer._namedColormaps[name] = colormap;
+}
 
 ColorMapContainer._getTextureFromName = function (gl, name) {
     var texture = ColorMapContainer.colorTextures[name];
@@ -637,3 +612,21 @@ ColorMapContainer.rdYlBu = ColorMapContainer.fromStringList([
     '#3d5ba7', '#3c59a6', '#3b56a5', '#3a54a4', '#3a51a2', '#394fa1', '#384ca0', '#374a9f',
     '#36479e', '#36459c', '#35429b', '#34409a', '#333d99', '#333b97', '#323896', '#313695'
 ]);
+
+// Names are chosen to match matplotlib (which explains why some are
+// less-than-ideal).
+ColorMapContainer._namedColormaps = {
+  "viridis": ColorMapContainer.viridis,
+  "plasma": ColorMapContainer.plasma,
+  "inferno": ColorMapContainer.inferno,
+  "magma": ColorMapContainer.magma,
+  "cividis": ColorMapContainer.cividis,
+  "greys": ColorMapContainer.greys,  // this is 0=>white, 1=>black
+  "gray": ColorMapContainer.gray,  // this is 0=>black, 1=>white
+  "purples": ColorMapContainer.purples,
+  "blues": ColorMapContainer.blues,
+  "greens": ColorMapContainer.greens,
+  "oranges": ColorMapContainer.oranges,
+  "reds": ColorMapContainer.reds,
+  "rdylbu": ColorMapContainer.rdYlBu
+};

@@ -624,7 +624,7 @@ export namespace ColorMapContainer {
 
   /** Create a new ColorMapContainer from the named preset value.
    *
-   * The presets are extracted from Matplotlib. Accepted values include:
+   * The presets are extracted from Matplotlib. Accepted built-in values include:
    *
    * - viridis
    * - plasma
@@ -641,6 +641,8 @@ export namespace ColorMapContainer {
    * - rdylbu
    */
   export function fromNamedColormap(name: string): ColorMapContainer;
+
+  export function registerNamedColormap(name: string, colormap: ColorMapContainer): void;
 }
 
 /** A class describing rise/set/transit details */
