@@ -84,7 +84,7 @@ ColorMapContainer._initColorTexture = function (gl, colorMapContainer) {
     gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
     gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_T, WEBGL.CLAMP_TO_EDGE);
     var colorBuffer = ColorMapContainer._extractColorArray(colorMapContainer.colors);
-    gl.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGB8, colorBuffer.length / 4, 1, 0, WEBGL.RGB, WEBGL.UNSIGNED_BYTE, colorBuffer);
+    gl.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA8, colorBuffer.length / 4, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, colorBuffer);
     gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, WEBGL.NEAREST);
     gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MAG_FILTER, WEBGL.NEAREST);
     return colorTexture;
