@@ -642,6 +642,12 @@ export namespace ColorMapContainer {
    */
   export function fromNamedColormap(name: string): ColorMapContainer;
 
+  /** Register a new named colormap. This colormap can then be retrieved from `fromNamedColormap`.
+   *
+   * Note that if you use an existing colormap name (including one of the defaults) as the
+   * value of `name`, this will overwrite that entry in the colormap registry (and it will
+   * no longer be accessible via `fromNamedColormap`).
+   */
   export function registerNamedColormap(name: string, colormap: ColorMapContainer): void;
 }
 
