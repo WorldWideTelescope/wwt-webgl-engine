@@ -1968,7 +1968,7 @@ __metadata:
   dependencies:
     "@types/jsdom": ^21.1.0
     "@types/nightwatch": ^2.3.12
-    axios: ^1.15
+    axios: ^1.16
     browserstack-local: ^1.4.8
     chromedriver: ^119.0.1
     edgedriver: ^4.17134.1
@@ -2510,7 +2510,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.15, axios@npm:^1.6.0":
+"axios@npm:^1.16":
+  version: 1.16.0
+  resolution: "axios@npm:1.16.0"
+  dependencies:
+    follow-redirects: ^1.16.0
+    form-data: ^4.0.5
+    proxy-from-env: ^2.1.0
+  checksum: 93e810968167fea59750d28f458e6860973a573c14bd60fe57ee07b5241f4c16991b149ae9ce65d79765081e3004743c9e158c438edba75af6f4612197e6834b
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.6.0":
   version: 1.15.2
   resolution: "axios@npm:1.15.2"
   dependencies:
@@ -5121,7 +5132,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.11":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.11, follow-redirects@npm:^1.16.0":
   version: 1.16.0
   resolution: "follow-redirects@npm:1.16.0"
   peerDependenciesMeta:
