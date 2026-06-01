@@ -102,7 +102,7 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
 
     if (fade > 0) {
         const orbitsFilter = Settings.get_active().get_planetOrbitsFilter();
-        const orbitsFlag = Settings.get_active().get_solarSystemOrbits();
+        const orbitsFlag = Number(Settings.get_active().get_solarSystemOrbits());
 
         // Mercury -> Pluto
         for (var ii = 1; ii < 10; ii++) {
