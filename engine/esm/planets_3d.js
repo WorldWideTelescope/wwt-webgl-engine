@@ -100,8 +100,9 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
     //var moonFade = Math.min(1, Math.max(Util.log10(distss) - 7.3, 0));
     var fade = Math.min(1, Math.max(Util.log10(distss) - 8.6, 0));
 
-    if (Settings.get_active().get_solarSystemOrbits() && fade > 0) {
+    if (fade > 0) {
         const orbitsFilter = Settings.get_active().get_planetOrbitsFilter();
+        const orbitsFlag = Settings.get_active().get_solarSystemOrbits();
 
         // Mercury -> Pluto
         for (var ii = 1; ii < 10; ii++) {
@@ -112,7 +113,7 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
             }
 
             const blendState = Planets3d._orbitBlendStates[id];
-            blendState.set_targetState(Planets3d._planetBit(orbitsFilter, id));
+            blendState.set_targetState(orbitsFlag && Planets3d._planetBit(orbitsFilter, id));
             const alpha = blendState.get_opacity();
             if (alpha > 0) {
                 const angle = Math.atan2(Planets._planet3dLocations[id].z, Planets._planet3dLocations[id].x);
