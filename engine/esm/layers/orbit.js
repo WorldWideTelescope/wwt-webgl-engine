@@ -89,35 +89,41 @@ export function EllipseRenderer() { }
 // In order to match exactly the position at which a planet is drawn, the planet's position at the current time
 // must be passed as a parameter. positionNow is in the current coordinate system of the render context, not the
 // translated and rotated system of the orbital plane.
-EllipseRenderer.drawEllipseWithPosition = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix, positionNow) {
+EllipseRenderer.drawEllipseWithPosition = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix, positionNow, opacity) {
     if (EllipseRenderer._ellipseShader == null) {
         EllipseRenderer._ellipseShader = new EllipseShader();
     }
     if (EllipseRenderer._ellipseVertexBuffer == null) {
         EllipseRenderer._ellipseVertexBuffer = EllipseRenderer.createEllipseVertexBuffer(500);
     }
+    if (opacity == null) {
+        opacity = 1;
+    }
     var savedWorld = renderContext.get_world();
     renderContext.set_world(worldMatrix);
     renderContext.gl.bindBuffer(WEBGL.ARRAY_BUFFER, EllipseRenderer._ellipseVertexBuffer.vertexBuffer);
     renderContext.gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
-    EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, 1, savedWorld, positionNow);
+    EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, opacity, savedWorld, positionNow);
     renderContext.gl.drawArrays(WEBGL.LINE_STRIP, 0, EllipseRenderer._ellipseVertexBuffer.count);
     renderContext.set_world(savedWorld);
 };
 
 // This version of DrawEllipse works without a 'head' point
-EllipseRenderer.drawEllipse = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix) {
+EllipseRenderer.drawEllipse = function (renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, worldMatrix, opacity) {
     if (EllipseRenderer._ellipseShader == null) {
         EllipseRenderer._ellipseShader = new EllipseShader();
     }
     if (EllipseRenderer._ellipseWithoutStartPointVertexBuffer == null) {
         EllipseRenderer._ellipseWithoutStartPointVertexBuffer = EllipseRenderer.createEllipseVertexBufferWithoutStartPoint(360);
     }
+    if (opacity == null) {
+        opacity = 1;
+    }
     var savedWorld = renderContext.get_world();
     renderContext.set_world(worldMatrix);
     renderContext.gl.bindBuffer(WEBGL.ARRAY_BUFFER, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.vertexBuffer);
     renderContext.gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
-    EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, 1, savedWorld, Vector3d.create(0, 0, 0));
+    EllipseShader.use(renderContext, semiMajorAxis, eccentricity, eccentricAnomaly, color, opacity, savedWorld, Vector3d.create(0, 0, 0));
     renderContext.gl.drawArrays(WEBGL.LINE_STRIP, 0, EllipseRenderer._ellipseWithoutStartPointVertexBuffer.count - 1);
     renderContext.set_world(savedWorld);
 };

@@ -17,6 +17,7 @@ import { Texture } from "./graphics/texture.js";
 import { TileShader } from "./graphics/shaders.js";
 import { Util } from "./baseutil.js";
 import { BasePlanets } from "./baseplanets.js";
+import { BlendState } from "./blend_state.js";
 import { SolarSystemObjects } from "./camera_parameters.js";
 import { globalWWTControl } from "./data_globals.js";
 import { Color, Colors } from "./color.js";
@@ -76,7 +77,21 @@ Planets3d.getImageSetNameNameFrom3dId = function (id) {
     }
 };
 
-Planets3d.initPlanetResources = function (renderContext) { };
+Planets3d.initPlanetResources = function (renderContext) {
+    const orbitFilter = Settings.get_active().get_planetOrbitsFilter();
+    if (Planets3d._orbitBlendStates === null) {
+        Planets3d._orbitBlendStates = [];
+        for (let id = 0; id < 20; id++) {
+            Planets3d._orbitBlendStates.push(BlendState.create(Planets3d._planetBit(orbitFilter, id), 400));
+        }
+    }
+};
+
+Planets3d._orbitBlendStates = null;
+
+Planets3d._planetBit = function (filter, id) {
+  return filter & Math.pow(2, id);
+}
 
 Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
     Planets3d.initPlanetResources(renderContext);
@@ -85,26 +100,34 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
     //var moonFade = Math.min(1, Math.max(Util.log10(distss) - 7.3, 0));
     var fade = Math.min(1, Math.max(Util.log10(distss) - 8.6, 0));
 
-    if (Settings.get_active().get_solarSystemOrbits() && fade > 0) {
-        var orbitsFilter = Settings.get_active().get_planetOrbitsFilter();
+    if (fade > 0) {
+        const orbitsFilter = Settings.get_active().get_planetOrbitsFilter();
+        const orbitsFlag = Number(Settings.get_active().get_solarSystemOrbits());
 
         // Mercury -> Pluto
         for (var ii = 1; ii < 10; ii++) {
+
             var id = ii;
             if (ii === 9) {
                 id = 19;
             }
-            if (!(orbitsFilter & Math.pow(2, id))) {
-              continue;
+
+            const blendState = Planets3d._orbitBlendStates[id];
+            blendState.set_targetState(orbitsFlag && Planets3d._planetBit(orbitsFilter, id));
+            const alpha = blendState.get_opacity();
+            if (alpha > 0) {
+                const angle = Math.atan2(Planets._planet3dLocations[id].z, Planets._planet3dLocations[id].x);
+                Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[id], id, centerPoint, angle, Planets._planet3dLocations[id], fade * alpha);
             }
-            var angle = Math.atan2(Planets._planet3dLocations[id].z, Planets._planet3dLocations[id].x);
-            Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[id], id, centerPoint, angle, Planets._planet3dLocations[id], fade);
         }
 
         // Moon is handled specially
-        var mid = 9;
-        if (orbitsFilter & Math.pow(2, mid)) {
-          Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[mid], mid, centerPoint, 0, Planets._planet3dLocations[mid], fade);
+        const mid = 9;
+        const moonBlendState = Planets3d._orbitBlendStates[9];
+        moonBlendState.set_targetState(Planets3d._planetBit(orbitsFilter, 9));
+        const moonAlpha = moonBlendState.get_opacity();
+        if (moonAlpha > 0) {
+          Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[mid], mid, centerPoint, 0, Planets._planet3dLocations[mid], fade * moonAlpha);
         }
 
         // Galilean satellites. "Compute the positions of the Galilean
@@ -136,10 +159,12 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
 
         for (var i = 0; i < 4; i++) {
             const id = galileans[i];
-            const bit = Math.pow(2, id);
+            const blendState = Planets3d._orbitBlendStates[id];
+            blendState.set_targetState(Planets3d._planetBit(orbitsFilter, id));
+            const alpha = blendState.get_opacity();
 
-            if (!(orbitsFilter & bit)) {
-                continue;
+            if (alpha <= 0) {
+              continue;
             }
 
             const p0 = position0[i];
@@ -155,7 +180,8 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
                 centerPoint,
                 0.0,
                 Planets._planet3dLocations[id],
-                elements
+                elements,
+                alpha
             );
         }
 
@@ -263,7 +289,7 @@ Planets3d._drawSingleOrbit = function (renderContext, eclipticColor, id, centerP
             for (var i = 0; i < count; i++) {
                 var pnt = Planets._orbits[id][i].copy();
                 var angle = (Math.atan2(pnt.z, pnt.x) + Math.PI * 2 - startAngle) % (Math.PI * 2);
-                var alpha = ss.truncate((angle / (Math.PI * 2) * 255));
+                var alpha = opacity * ss.truncate((angle / (Math.PI * 2) * 255));
                 var alphaD = alpha / 255;
                 var color = Color.fromArgb(alpha, eclipticColor.r, eclipticColor.g, eclipticColor.b);
                 if (alpha < 2 && !planetDropped && !firstPoint) {
@@ -311,12 +337,14 @@ Planets3d._drawSingleOrbit = function (renderContext, eclipticColor, id, centerP
             var r1 = Planets.getPlanetPositionDirect(id, Planets._jNow - deltaT);
             var v = Vector3d.scale(Vector3d.subtractVectors(r0, r1), 1 / deltaT);
             var elements = Planets._stateVectorToKeplerian(r0, v, mu);
-            Planets3d._drawSingleOrbitElements(renderContext, eclipticColor, id, centerPoint, startAngle, planetNow, elements);
+            const color = eclipticColor._clone();
+            color.a = color.a * opacity;
+            Planets3d._drawSingleOrbitElements(renderContext, color, id, centerPoint, startAngle, planetNow, elements);
         }
     }
 };
 
-Planets3d._drawSingleOrbitElements = function (renderContext, eclipticColor, id, centerPoint, xstartAngle, planetNow, el) {
+Planets3d._drawSingleOrbitElements = function (renderContext, eclipticColor, id, centerPoint, xstartAngle, planetNow, el, opacity) {
     var scaleFactor;
     switch (id) {
         case 9:
@@ -346,7 +374,7 @@ Planets3d._drawSingleOrbitElements = function (renderContext, eclipticColor, id,
     }
     var currentPosition = Vector3d.subtractVectors(planetNow, centerPoint);
     var worldMatrix = Matrix3d.multiplyMatrix(Matrix3d.multiplyMatrix(el.orientation, Matrix3d.translation(translation)), renderContext.get_world());
-    EllipseRenderer.drawEllipseWithPosition(renderContext, el.a / 149598000 * scaleFactor, el.e, el.ea, eclipticColor, worldMatrix, currentPosition);
+    EllipseRenderer.drawEllipseWithPosition(renderContext, el.a / 149598000 * scaleFactor, el.e, el.ea, eclipticColor, worldMatrix, currentPosition, opacity);
 };
 
 Planets3d.isPlanetInFrustum = function (renderContext, rad) {
