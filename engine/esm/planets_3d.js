@@ -160,7 +160,7 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
         for (var i = 0; i < 4; i++) {
             const id = galileans[i];
             const blendState = Planets3d._orbitBlendStates[id];
-            blendState.set_targetState(Planets3d._planetBit(orbitsFilter, id));
+            blendState.set_targetState(orbitsFlag && Planets3d._planetBit(orbitsFilter, id));
             const alpha = blendState.get_opacity();
 
             if (alpha <= 0) {
