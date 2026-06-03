@@ -1,5 +1,14 @@
 # rc: minor bump
 
+- Respect the overall Solar System orbits setting flag for the Moon and Galilean moons
+  (#407, @Carifio24).
+- Fade planetary orbits in/out when the relevant display settings change (#406, @Carifio24).
+- Allow registering named colormaps in the engine. Update colormap rendering to allow
+  using opacity (#402, @Carifio24).
+
+
+# @wwtelescope/engine 7.36.0 (2026-05-25)
+
 - Add functionality for displaying a context menu for the constellation settings (except
   for the constellation images). This is intended to facilitate allowing users to change
   the colors and opacities of these items in the web client (#398, @Carifio24).

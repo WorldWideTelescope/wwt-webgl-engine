@@ -994,13 +994,16 @@ EllipseShader.use = function (renderContext, semiMajorAxis, eccentricity, eccent
         if (!EllipseShader.initialized) {
             EllipseShader.init(renderContext);
         }
+        if (opacity == null) {
+            opacity = 1;
+        }
         gl.useProgram(EllipseShader._prog);
         var WVPPos = Matrix3d.multiplyMatrix(Matrix3d.multiplyMatrix(world, renderContext.get_view()), renderContext.get_projection());
         var WVP = Matrix3d.multiplyMatrix(Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view()), renderContext.get_projection());
         gl.uniformMatrix4fv(EllipseShader.matWVPLoc, false, WVP.floatArray());
         gl.uniformMatrix4fv(EllipseShader.matPositionLoc, false, WVPPos.floatArray());
         gl.uniform3f(EllipseShader.positionNowLoc, positionNow.x, positionNow.y, positionNow.z);
-        gl.uniform4f(EllipseShader.colorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, lineColor.a / 255);
+        gl.uniform4f(EllipseShader.colorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, opacity * lineColor.a / 255);
         gl.uniform1f(EllipseShader.semiMajorAxisLoc, semiMajorAxis);
         gl.uniform1f(EllipseShader.eccentricityLoc, eccentricity);
         gl.uniform1f(EllipseShader.eccentricAnomalyLoc, eccentricAnomaly);
@@ -1611,7 +1614,7 @@ FitsShader.init = function (renderContext) {
                         break;
                 }
                 vec4 colorFromColorMapper = texture(colorSampler, vec2(physicalValue, 0.5));
-                fragmentColor = vec4(colorFromColorMapper.rgb, opacity);
+                fragmentColor = vec4(colorFromColorMapper.rgb, colorFromColorMapper.a * opacity);
             }
         }
     `;
