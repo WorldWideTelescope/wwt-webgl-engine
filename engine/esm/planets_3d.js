@@ -124,7 +124,7 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
         // Moon is handled specially
         const mid = 9;
         const moonBlendState = Planets3d._orbitBlendStates[9];
-        moonBlendState.set_targetState(Planets3d._planetBit(orbitsFilter, 9));
+        moonBlendState.set_targetState(orbitsFlag && Planets3d._planetBit(orbitsFilter, 9));
         const moonAlpha = moonBlendState.get_opacity();
         if (moonAlpha > 0) {
           Planets3d._drawSingleOrbit(renderContext, Planets.planetColors[mid], mid, centerPoint, 0, Planets._planet3dLocations[mid], fade * moonAlpha);
@@ -160,7 +160,7 @@ Planets3d.drawPlanets3D = function (renderContext, opacity, centerPoint) {
         for (var i = 0; i < 4; i++) {
             const id = galileans[i];
             const blendState = Planets3d._orbitBlendStates[id];
-            blendState.set_targetState(Planets3d._planetBit(orbitsFilter, id));
+            blendState.set_targetState(orbitsFlag && Planets3d._planetBit(orbitsFilter, id));
             const alpha = blendState.get_opacity();
 
             if (alpha <= 0) {
