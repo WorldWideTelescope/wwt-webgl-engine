@@ -1581,7 +1581,7 @@ FitsShader.init = function (renderContext) {
             // See https://stackoverflow.com/questions/9446888/best-way-to-detect-nans-in-opengl-shaders
             // PKGW also finds that we need "value != value" on his Dell laptop running
             // Chrome on Linux.
-            return (value != value) || !(value < 0.0 || 0.0 < value || value == 0.0);
+            return (value != value) || !(value < 0.0 || 0.0 < value || value == 0.0) || isnan(value);
         }
 
         void main(void) {
