@@ -1584,7 +1584,11 @@ FitsShader.init = function (renderContext) {
             // See https://stackoverflow.com/questions/9446888/best-way-to-detect-nans-in-opengl-shaders
             // PKGW also finds that we need "value != value" on his Dell laptop running
             // Chrome on Linux.
-            return (value != value) || !(value < 0.0 || 0.0 < value || value == 0.0);
+            // isnan is supposed to be implemented in WebGL but but apparently isn't always.
+            // so then check the bit pattern to see if is nan. 
+            // https://sakibsaikia.github.io/graphics/2022/01/04/Nan-Checks-In-HLSL.html
+            highp uint bits = floatBitsToUint(value);
+            return (value != value) || !(value < 0.0 || 0.0 < value || value == 0.0) || ((bits & 0x7fffffffu) > 0x7f800000u);
         }
 
         void main(void) {
