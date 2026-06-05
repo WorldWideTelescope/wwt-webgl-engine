@@ -1,4 +1,9 @@
-# rc: minor bump
+# rc: micro bump
+
+- Improve robustness of NaN detection in the FITS image shader (#409, @johnarban).
+
+
+# @wwtelescope/engine 7.37.0 (2026-06-03)
 
 - Respect the overall Solar System orbits setting flag for the Moon and Galilean moons
   (#407, @Carifio24).
