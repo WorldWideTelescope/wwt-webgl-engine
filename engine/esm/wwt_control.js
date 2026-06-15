@@ -1618,7 +1618,13 @@ var WWTControl$ = {
       var pt = Vector2d.create(x, y);
       var pointFar = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, far);
       var pointNear = this.transformPickPointToWorldSpace(pt, this.renderContext.width, this.renderContext.height, false, near);
-      var diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+      var diff;
+      if (this.get_solarSystemMode()) {
+        pointNear = Vector3d.create(pointNear.x, pointNear.z, pointNear.y);
+        diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.z - pointNear.z, pointFar.y - pointNear.y);
+      } else {
+        diff = Vector3d.create(pointFar.x - pointNear.x, pointFar.y - pointNear.y, pointFar.z - pointNear.z);
+      }
       
       return [pointNear, diff];
     },

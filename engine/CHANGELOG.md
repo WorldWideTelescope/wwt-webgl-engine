@@ -1,3 +1,12 @@
+# @wwtelescope/engine 7.37.2 (2026-06-15)
+
+- Respect alpha component of layer color when rendering table layers. Pass a clone
+  of the layer's `Color` instance, rather than the layer's instance itself, when
+  creating a color picker for the layer (#411, @Carifio24).
+- Update ray-finding method to account for WWT's internal left-handed
+  coordinate system (#413, @Carifio24).
+
+
 # @wwtelescope/engine 7.37.1 (2026-06-05)
 
 - Improve robustness of NaN detection in the FITS image shader (#409, @johnarban).
