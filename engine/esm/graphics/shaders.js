@@ -595,7 +595,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
             }
             else
             {
-                vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, dAlpha);
+                vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
             }
 
             float lSize = scale;

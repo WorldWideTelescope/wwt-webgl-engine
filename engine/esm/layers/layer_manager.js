@@ -1357,7 +1357,7 @@ LayerManager._colorMenu_Click = function (sender, e) {
     var layer = LayerManager._selectedLayer;
     var picker = new ColorPicker();
     if (layer.get_color() != null) {
-        picker.color = layer.get_color();
+        picker.color = layer.get_color()._clone();
     }
     picker.callBack = function () {
         layer.set_color(picker.color);
