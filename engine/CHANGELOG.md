@@ -1,3 +1,11 @@
+# @wwtelescope/engine 7.38.0 (2026-06-16)
+
+- Use the same definition for the galactic rotation matrices in the `Coordinates`
+  class and inside the WWT render context. This fixes an issue where the camera would
+  be slightly (but noticeably if zoomed in enough) offset when moving to a location in
+  galactic plane mode (#416, @Carifio24).
+
+
 # @wwtelescope/engine 7.37.2 (2026-06-15)
 
 - Respect alpha component of layer color when rendering table layers. Pass a clone
