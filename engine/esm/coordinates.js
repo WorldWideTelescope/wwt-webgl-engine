@@ -465,6 +465,8 @@ Coordinates.galacticTo3dDouble = function (l, b) {
 };
 
 Coordinates._initializeGalacticRotationMatrix = function () {
+    // The values used here are taken from the Hipparcos-Gaia matrix
+    // https://gea.esac.esa.int/archive/documentation/GDR1/Data_processing/chap_cu3ast/sec_cu3ast_intro.html#SS7
     Coordinates._rotationMatrix = new Array(3);
     Coordinates._rotationMatrix[0] = [-0.0548755604, -0.8734370902, -0.4838350155];
     Coordinates._rotationMatrix[1] = [0.4941094279, -0.44482963, 0.7469822445];
