@@ -442,10 +442,7 @@ Coordinates.meanObliquityOfEcliptic = function (JD) {
 Coordinates.j2000toGalactic = function (J2000RA, J2000DEC) {
     var J2000pos = [Math.cos(J2000RA / 180 * Math.PI) * Math.cos(J2000DEC / 180 * Math.PI), Math.sin(J2000RA / 180 * Math.PI) * Math.cos(J2000DEC / 180 * Math.PI), Math.sin(J2000DEC / 180 * Math.PI)];
     if (Coordinates._rotationMatrix == null) {
-        Coordinates._rotationMatrix = new Array(3);
-        Coordinates._rotationMatrix[0] = [-0.0548755604, -0.8734370902, -0.4838350155];
-        Coordinates._rotationMatrix[1] = [0.4941094279, -0.44482963, 0.7469822445];
-        Coordinates._rotationMatrix[2] = [-0.867666149, -0.1980763734, 0.4559837762];
+        Coordinates._initializeGalacticRotationMatrix();
     }
     var Galacticpos = new Array(3);
     for (var i = 0; i < 3; i++) {
@@ -467,13 +464,27 @@ Coordinates.galacticTo3dDouble = function (l, b) {
     return Coordinates.raDecTo3dAu(result[0] / 15, result[1], 1);
 };
 
+Coordinates._initializeGalacticRotationMatrix = function () {
+    // The values used here are taken from the Hipparcos-Gaia matrix
+    // https://gea.esac.esa.int/archive/documentation/GDR1/Data_processing/chap_cu3ast/sec_cu3ast_intro.html#SS7
+    Coordinates._rotationMatrix = new Array(3);
+    Coordinates._rotationMatrix[0] = [-0.0548755604, -0.8734370902, -0.4838350155];
+    Coordinates._rotationMatrix[1] = [0.4941094279, -0.44482963, 0.7469822445];
+    Coordinates._rotationMatrix[2] = [-0.867666149, -0.1980763734, 0.4559837762];
+}
+
+Coordinates.get_galacticRotationMatrix = function () {
+    if (Coordinates._rotationMatrix == null) {
+        Coordinates._initializeGalacticRotationMatrix();
+    }
+
+    return Coordinates._rotationMatrix;
+}
+
 Coordinates.galactictoJ2000 = function (GalacticL2, GalacticB2) {
     var Galacticpos = [Math.cos(GalacticL2 / 180 * Math.PI) * Math.cos(GalacticB2 / 180 * Math.PI), Math.sin(GalacticL2 / 180 * Math.PI) * Math.cos(GalacticB2 / 180 * Math.PI), Math.sin(GalacticB2 / 180 * Math.PI)];
     if (Coordinates._rotationMatrix == null) {
-        Coordinates._rotationMatrix = new Array(3);
-        Coordinates._rotationMatrix[0] = [-0.0548755604, -0.8734370902, -0.4838350155];
-        Coordinates._rotationMatrix[1] = [0.4941094279, -0.44482963, 0.7469822445];
-        Coordinates._rotationMatrix[2] = [-0.867666149, -0.1980763734, 0.4559837762];
+       Coordinates._initializeGalacticRotationMatrix();
     }
     var J2000pos = new Array(3);
     for (var i = 0; i < 3; i++) {
