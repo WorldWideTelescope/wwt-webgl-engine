@@ -575,7 +575,7 @@ var RenderContext$ = {
     setupMatricesSpace3d: function (canvasWidth, canvasHeight) {
         this.lighting = false;
         if (!this._firstTimeInit) {
-            var mat = Coordinates.get_galactionRotationMatrix();
+            var mat = Coordinates.get_galacticRotationMatrix();
             this._galacticMatrix = Matrix3d.create(
               mat[1][0], mat[2][0], -mat[0][0], 0,
               mat[1][2], mat[2][2], -mat[0][2], 0,
