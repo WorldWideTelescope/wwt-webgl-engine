@@ -615,7 +615,6 @@ var TriangleList$ = {
                 }
                 renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, triBuffer.count);
             }
-            renderContext.gl.depthMask(originalDepthMask);
         }
     }
 };
@@ -865,7 +864,7 @@ var PointList$ = {
             }
             renderContext.device.restore();
         } else {
-            var originalDepthMask = renderContext.gl.getParameter(gl.DEPTH_WRITEMASK);
+            var originalDepthMask = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK);
             renderContext.gl.depthMask(depthMask);
             var zero = new Vector3d();
             var matInv = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
@@ -889,7 +888,7 @@ var PointList$ = {
         matInv.invert();
         var cam = Vector3d._transformCoordinate(zero, matInv);
         var $enum1 = ss.enumerate(this._pointBuffers);
-        var originalDepthMask = renderContext.gl.getParameter(gl.DEPTH_WRITEMASK);
+        var originalDepthMask = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK);
         renderContext.gl.depthMask(depthMask);
         while ($enum1.moveNext()) {
             var pointBuffer = $enum1.current;
