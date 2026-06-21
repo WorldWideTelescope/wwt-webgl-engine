@@ -237,6 +237,10 @@ export function SpreadSheetLayer() {
     this.pointScaleType = 1;
     this.positions = [];
     this.bufferIsFlat = false;
+
+    this._filter = null;
+    this._filterDynamic = false;
+
     this.baseDate = new Date(2010, 0, 1, 12, 0, 0);
     this.dirty = true;
     this.lastVersion = 0;
@@ -1932,6 +1936,25 @@ var SpreadSheetLayer$ = {
         return value;
     },
 
+    _createMask: function () {
+        var count = this._table$1.rows.length;
+        var mask = new Array(count);
+        for (let i = 0; i < count; i++) {
+            mask[i] = this._filter(this._table$1.rows[i], this._table$1.header, this);
+        }
+        return mask;
+    },
+
+    set_filter: function (filter, dynamic) {
+        this._filter = filter;
+        this._filterDynamic = dynamic;
+        if (!this._filterDynamic) {
+            // TODO: Do we need to check whether the point list is non-null?
+            // and if so, how would we deal with that?
+            this.pointList.set_mask(this._createMask());
+        }
+    },
+
     draw: function (renderContext, opacity, flat) {
         var device = renderContext;
         if (this.version !== this.lastVersion) {
@@ -1941,7 +1964,8 @@ var SpreadSheetLayer$ = {
         if (this.bufferIsFlat !== flat) {
             this.cleanUp();
             this.bufferIsFlat = flat;
-        }
+        } 
+
         if (this.dirty) {
             this.prepVertexBuffer(device, opacity);
         }
@@ -1972,6 +1996,11 @@ var SpreadSheetLayer$ = {
             this.pointList.timeSeries = this.timeSeries;
             this.pointList.jNow = jNow;
             this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+
+            if (this._filter != null && this._filterDynamic) {
+                this.pointList.set_mask(this._createMask());
+            }
+
             switch (this._plotType$1) {
                 case 0:
                     this.pointList.draw(renderContext, opacity * this.get_opacity(), false);

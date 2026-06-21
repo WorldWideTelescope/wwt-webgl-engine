@@ -561,6 +561,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
         attribute vec4 aVertexColor;
         attribute vec2 aTime;
         attribute float aPointSize;
+        attribute bool aShow;
         uniform mat4 uMVMatrix;
         uniform mat4 uPMatrix;
         uniform float jNow;
@@ -578,9 +579,9 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
             float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
             float dist = distance(aVertexPosition, cameraPosition);
             gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-            float dAlpha = 1.0;
+            float dAlpha = int(aShow);
 
-            if ( decay > 0.0)
+            if ( dAlpha > 0.0 && decay > 0.0 )
             {
                     dAlpha = 1.0 - ((jNow - aTime.y) / decay);
                     if (dAlpha > 1.0 )
@@ -629,6 +630,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
     TimeSeriesPointSpriteShader.colorLoc = gl.getAttribLocation(TimeSeriesPointSpriteShader._prog, 'aVertexColor');
     TimeSeriesPointSpriteShader.pointSizeLoc = gl.getAttribLocation(TimeSeriesPointSpriteShader._prog, 'aPointSize');
     TimeSeriesPointSpriteShader.timeLoc = gl.getAttribLocation(TimeSeriesPointSpriteShader._prog, 'aTime');
+    TimeSeriesPointSpriteShader.showLoc = gl.getAttribLocation(TimeSeriesPointSpriteShader._prog, 'aShow');
     TimeSeriesPointSpriteShader.projMatLoc = gl.getUniformLocation(TimeSeriesPointSpriteShader._prog, 'uPMatrix');
     TimeSeriesPointSpriteShader.mvMatLoc = gl.getUniformLocation(TimeSeriesPointSpriteShader._prog, 'uMVMatrix');
     TimeSeriesPointSpriteShader.sampLoc = gl.getUniformLocation(TimeSeriesPointSpriteShader._prog, 'uSampler');
@@ -644,7 +646,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
     TimeSeriesPointSpriteShader.initialized = true;
 };
 
-TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, lineColor, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky) {
+TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, lineColor, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, mask) {
     if (texture == null) {
         texture = Texture.getEmpty();
     }
@@ -685,6 +687,16 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
         gl.vertexAttribPointer(TimeSeriesPointSpriteShader.colorLoc, 4, WEBGL.FLOAT, false, 40, 12);
         gl.vertexAttribPointer(TimeSeriesPointSpriteShader.pointSizeLoc, 1, WEBGL.FLOAT, false, 40, 36);
         gl.vertexAttribPointer(TimeSeriesPointSpriteShader.timeLoc, 2, WEBGL.FLOAT, false, 40, 28);
+
+        if (mask != null) {
+          gl.bindBuffer(WEBGL.ARRAY_BUFFER, mask);
+          gl.enableVertexAttribArray(TimeSeriesPointSpriteShader.showLoc);
+          gl.vertexAttribPointer(TimeSeriesPointSpriteShader.showLoc, 1, WEBGL.BOOL, false, 0, 0);
+        } else {
+          gl.disableVertexAttribArray(TimeSeriesPointSpriteShader.showLoc);
+          gl.vertexAttribI1ui(TimeSeriesPointSpriteShader.showLoc, 1);
+        }
+
         gl.activeTexture(WEBGL.TEXTURE0);
         gl.bindTexture(WEBGL.TEXTURE_2D, texture);
         gl.lineWidth(1);

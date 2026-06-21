@@ -41,6 +41,25 @@ var IndexBuffer$ = {
 registerType("IndexBuffer", [IndexBuffer, IndexBuffer$, null, ss.IDisposable]);
 
 
+// wwtlib.MaskBuffer
+
+export function MaskBuffer(mask) {
+    this.buffer = tilePrepDevice.createBuffer();
+    tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.buffer);
+    tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, mask, WEBGL.STATIC_DRAW);
+}
+
+var MaskBuffer$ = {
+    dispose: function () {
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, null);
+        tilePrepDevice.deleteBuffer(this.buffer);
+        this.buffer = null;
+    }
+};
+
+registerType("MaskBuffer", [MaskBuffer, MaskBuffer$, null, ss.IDisposable]);
+
+
 // wwtlib.VertexBufferBase
 
 export function VertexBufferBase() { }
