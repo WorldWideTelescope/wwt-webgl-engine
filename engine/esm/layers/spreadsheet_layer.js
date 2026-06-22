@@ -1951,9 +1951,9 @@ var SpreadSheetLayer$ = {
     set_filter: function (filter, dynamic) {
         this._filter = filter;
         this._filterDynamic = dynamic;
-        if (this._filter == null || !this._filterDynamic) {
-            // TODO: Do we need to check whether the point list is non-null?
-            // and if so, how would we deal with that?
+        // Don't set the mask if the data is dirty
+        // since then we'll do it on the next draw call anywas
+        if (!this.dirty && this.pointList != null && (this._filter == null || !this._filterDynamic)) {
             this.pointList.set_mask(this._createMask());
         }
     },
@@ -1977,6 +1977,7 @@ var SpreadSheetLayer$ = {
 
         if (this.dirty) {
             this.prepVertexBuffer(device, opacity);
+            this.pointList.set_mask(this._createMask());
         }
         var jNow = SpaceTimeController.get_jNow() - SpaceTimeController.utcToJulian(this.baseDate);
         var adjustedScale = this.scaleFactor * 3;

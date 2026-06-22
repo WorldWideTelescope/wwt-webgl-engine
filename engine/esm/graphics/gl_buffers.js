@@ -68,8 +68,12 @@ var MaskBuffer$ = {
     },
 
     update: function (values) {
+        var needNewBuffer = this.buffer == null || this.mask.length != values.length;
         this.mask = values;
-        if (this.buffer == null) {
+        if (needNewBuffer) {
+            if (this.buffer != null) {
+                this.dispose();
+            }
             this.unlock();
             return;
         }
