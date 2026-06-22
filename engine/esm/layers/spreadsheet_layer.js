@@ -1958,6 +1958,12 @@ var SpreadSheetLayer$ = {
         }
     },
 
+    remove_filter: function () {
+        this._filter = null;
+        this._filterDynamic = false;
+        this.pointList.set_mask(null);
+    },
+
     draw: function (renderContext, opacity, flat) {
         var device = renderContext;
         if (this.version !== this.lastVersion) {
