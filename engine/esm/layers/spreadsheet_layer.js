@@ -1942,8 +1942,8 @@ var SpreadSheetLayer$ = {
         }
         var count = this._table$1.rows.length;
         var mask = new Array(count);
-        for (let i = 0; i < count; i++) {
-            mask[i] = this._filter(this._table$1.rows[i], this._table$1.header, this);
+        for (let index = 0; index < count; index++) {
+            mask[index] = this._filter(this._table$1.rows[index], this._table$1.header, index, this);
         }
         return mask;
     },
