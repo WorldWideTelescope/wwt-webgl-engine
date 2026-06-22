@@ -753,8 +753,6 @@ var PointList$ = {
     },
 
     set_mask: function (value) {
-        console.log(value);
-        console.log(value?.length ?? null);
         this._mask = this._createMaskBuffer(value);
         if (this._mask != null) {
             this._mask.unlock();
