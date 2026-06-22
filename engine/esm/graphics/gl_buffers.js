@@ -52,14 +52,30 @@ var MaskBuffer$ = {
         return this.mask;
     },
 
+    _createMaskArray(mask) {
+        var maskArray = new Uint8Array(mask);
+        for (let i = 0; i < this.mask.length; i++) {
+            maskArray[i] = Number(mask[i]);
+        }
+        return maskArray;
+    },
+
     unlock: function () {
         this.buffer = tilePrepDevice.createBuffer();
         tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.buffer);
-        var maskArray = new Uint8Array(this.mask.length);
-        for (let i = 0; i < this.mask.length; i++) {
-            maskArray[i] = Number(this.mask[i]);
-        }
+        var maskArray = this._createMaskArray(this.mask);
         tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, maskArray, WEBGL.STATIC_DRAW);
+    },
+
+    update: function (values) {
+        this.mask = values;
+        if (this.buffer == null) {
+            this.unlock();
+            return;
+        }
+
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.buffer);
+        tilePrepDevice.bufferSubData(WEBGL.ARRAY_BUFFER, 0, this._createMaskArray(this.mask));
     },
     
     dispose: function () {
