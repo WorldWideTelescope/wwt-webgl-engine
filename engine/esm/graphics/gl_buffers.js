@@ -55,12 +55,10 @@ var MaskBuffer$ = {
     unlock: function () {
         this.buffer = tilePrepDevice.createBuffer();
         tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.buffer);
-        var maskArray = new Float32Array(this.mask.length);
+        var maskArray = new Uint8Array(this.mask.length);
         for (let i = 0; i < this.mask.length; i++) {
             maskArray[i] = Number(this.mask[i]);
         }
-        console.log(this.mask);
-        console.log(maskArray);
         tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, maskArray, WEBGL.STATIC_DRAW);
     },
     

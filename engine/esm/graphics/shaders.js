@@ -692,7 +692,7 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
         if (mask != null) {
           gl.bindBuffer(WEBGL.ARRAY_BUFFER, mask);
           gl.enableVertexAttribArray(TimeSeriesPointSpriteShader.showLoc);
-          gl.vertexAttribPointer(TimeSeriesPointSpriteShader.showLoc, 1, WEBGL.FLOAT, false, 0, 0);
+          gl.vertexAttribPointer(TimeSeriesPointSpriteShader.showLoc, 1, WEBGL.UNSIGNED_BYTE, false, 0, 0);
         } else {
           gl.disableVertexAttribArray(TimeSeriesPointSpriteShader.showLoc);
           gl.vertexAttrib1f(TimeSeriesPointSpriteShader.showLoc, 1.0);
