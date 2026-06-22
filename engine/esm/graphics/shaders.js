@@ -561,7 +561,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
         attribute vec4 aVertexColor;
         attribute vec2 aTime;
         attribute float aPointSize;
-        attribute bool aShow;
+        attribute float aShow;
         uniform mat4 uMVMatrix;
         uniform mat4 uPMatrix;
         uniform float jNow;
@@ -579,7 +579,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
             float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
             float dist = distance(aVertexPosition, cameraPosition);
             gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-            float dAlpha = int(aShow);
+            float dAlpha = aShow;
 
             if ( dAlpha > 0.0 && decay > 0.0 )
             {
@@ -677,6 +677,7 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
         gl.disableVertexAttribArray(1);
         gl.disableVertexAttribArray(2);
         gl.disableVertexAttribArray(3);
+        gl.disableVertexAttribArray(4);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
         gl.enableVertexAttribArray(TimeSeriesPointSpriteShader.vertLoc);
@@ -691,10 +692,10 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
         if (mask != null) {
           gl.bindBuffer(WEBGL.ARRAY_BUFFER, mask);
           gl.enableVertexAttribArray(TimeSeriesPointSpriteShader.showLoc);
-          gl.vertexAttribPointer(TimeSeriesPointSpriteShader.showLoc, 1, WEBGL.BOOL, false, 0, 0);
+          gl.vertexAttribPointer(TimeSeriesPointSpriteShader.showLoc, 1, WEBGL.FLOAT, false, 0, 0);
         } else {
           gl.disableVertexAttribArray(TimeSeriesPointSpriteShader.showLoc);
-          gl.vertexAttribI1ui(TimeSeriesPointSpriteShader.showLoc, 1);
+          gl.vertexAttrib1f(TimeSeriesPointSpriteShader.showLoc, 1.0);
         }
 
         gl.activeTexture(WEBGL.TEXTURE0);

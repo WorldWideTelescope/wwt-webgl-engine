@@ -1937,6 +1937,9 @@ var SpreadSheetLayer$ = {
     },
 
     _createMask: function () {
+        if (this._filter == null) {
+            return null;
+        }
         var count = this._table$1.rows.length;
         var mask = new Array(count);
         for (let i = 0; i < count; i++) {
@@ -1948,7 +1951,7 @@ var SpreadSheetLayer$ = {
     set_filter: function (filter, dynamic) {
         this._filter = filter;
         this._filterDynamic = dynamic;
-        if (!this._filterDynamic) {
+        if (this._filter == null || !this._filterDynamic) {
             // TODO: Do we need to check whether the point list is non-null?
             // and if so, how would we deal with that?
             this.pointList.set_mask(this._createMask());

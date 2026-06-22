@@ -44,12 +44,26 @@ registerType("IndexBuffer", [IndexBuffer, IndexBuffer$, null, ss.IDisposable]);
 // wwtlib.MaskBuffer
 
 export function MaskBuffer(mask) {
-    this.buffer = tilePrepDevice.createBuffer();
-    tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.buffer);
-    tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, mask, WEBGL.STATIC_DRAW);
+    this.mask = mask;
 }
 
 var MaskBuffer$ = {
+    lock: function () {
+        return this.mask;
+    },
+
+    unlock: function () {
+        this.buffer = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.buffer);
+        var maskArray = new Float32Array(this.mask.length);
+        for (let i = 0; i < this.mask.length; i++) {
+            maskArray[i] = Number(this.mask[i]);
+        }
+        console.log(this.mask);
+        console.log(maskArray);
+        tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, maskArray, WEBGL.STATIC_DRAW);
+    },
+    
     dispose: function () {
         tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, null);
         tilePrepDevice.deleteBuffer(this.buffer);

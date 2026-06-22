@@ -753,6 +753,8 @@ var PointList$ = {
     },
 
     set_mask: function (value) {
+        console.log(value);
+        console.log(value?.length ?? null);
         this._mask = this._createMaskBuffer(value);
         if (this._mask != null) {
             this._mask.unlock();
@@ -889,7 +891,7 @@ var PointList$ = {
             var $enum2 = ss.enumerate(this._pointBuffers);
             while ($enum2.moveNext()) {
                 var pointBuffer = $enum2.current;
-                TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, PointList.starTexture.texture2d, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._mask);
+                TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, PointList.starTexture.texture2d, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._mask ? this._mask.buffer : null);
                 renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
             }
             renderContext.gl.depthMask(originalDepthMask);
@@ -908,7 +910,7 @@ var PointList$ = {
         renderContext.gl.depthMask(depthMask);
         while ($enum1.moveNext()) {
             var pointBuffer = $enum1.current;
-            TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, texture, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, this.decay, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._mask);
+            TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, texture, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, this.decay, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._mask ? this._mask.buffer : null);
             renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
         }
         renderContext.gl.depthMask(originalDepthMask);
