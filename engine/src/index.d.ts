@@ -1864,6 +1864,16 @@ export namespace SpaceTimeController {
  * {@link SpaceTimeController} namespace. */
 export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
+
+/**
+ * A type defining the function signature for a filter function to be used in {@link SpreadSheetLayer.set_filter}.
+ *
+ * @param row An array of string values representing the current item. The order matches the order of columns in the table data.
+ * @param header The header row (column names) for the layer's data
+ * @param index The index of the row in the table layer data.
+ * @param layer A reference to the layer.
+ * @returns Whether the point should be displayed.
+ */
 export type SpreadSheetLayerFilter = (row: string[], header: string[], index: number, layer: SpreadSheetLayer) => boolean;
 
 /** A tabular data layer. */
