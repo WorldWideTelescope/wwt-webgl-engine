@@ -1865,6 +1865,17 @@ export namespace SpaceTimeController {
 export type SpaceTimeControllerObject = typeof SpaceTimeController;
 
 
+/**
+ * A type defining the function signature for a filter function to be used in {@link SpreadSheetLayer.set_filter}.
+ *
+ * @param row An array of string values representing the current item. The order matches the order of columns in the table data.
+ * @param header The header row (column names) for the layer's data
+ * @param index The index of the row in the table layer data.
+ * @param layer A reference to the layer.
+ * @returns Whether the point should be displayed.
+ */
+export type SpreadSheetLayerFilter = (row: string[], header: string[], index: number, layer: SpreadSheetLayer) => boolean;
+
 /** A tabular data layer. */
 export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsInterface {
   colorMapperName: string;
@@ -1986,6 +1997,22 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
   guessHeaderAssignmentsFromVoTable(votable: VoTable): void;
 
   updateData(data: string, purgeOld: boolean, purgeAll: boolean, hasHeader: boolean): boolean;
+
+  /**
+   * Set a filter to allow masking a subset of the layer's points.
+   * At a low level, setting a filter writes to a separate WebGL buffer that stores the layer's mask.
+   * This means that setting a filter does not involve re-creating the primary buffer.
+   *
+   * @param filter The filter function that determines which points are rendered. Only points for
+   * which the filter returns true are rendered.
+   * @param dynamic Whether the filter should be evaluated once when set (false) or on each frame (true)
+   */
+  set_filter(filter: SpreadSheetLayerFilter, dynamic: boolean): void;
+
+  /**
+   * Unset the filter for the layer. This is the same as calling `set_filter(null, false)`.
+   */
+  remove_filter(): void;
 }
 
 /** The full SpreadSheetLayerSetting type, which augments engine-types'

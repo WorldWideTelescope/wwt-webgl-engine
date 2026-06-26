@@ -10,6 +10,7 @@ import { Color } from "../color.js";
 import { URLHelpers } from "../url_helpers.js";
 import { WEBGL } from "./webgl_constants.js";
 import {
+    MaskBuffer,
     PositionVertexBuffer,
     PositionColoredVertexBuffer,
     TimeSeriesLineVertexBuffer,
@@ -713,6 +714,8 @@ export function PointList(device) {
     this._colors = [];
     this._dates = [];
     this._sizes = [];
+    this._mask = null;
+    this._masked = false;
     this.timeSeries = false;
     this.showFarSide = false;
     this.sky = false;
@@ -748,6 +751,21 @@ var PointList$ = {
         this._dates.length = 0;
         this._sizes.length = 0;
         this._emptyPointBuffer();
+        this._emptyMaskBuffer();
+    },
+
+    set_mask: function (value) {
+        if (value == null) {
+            this._masked = false;
+            return;
+        }
+        this._masked = true;
+        if (this._mask == null) {
+          this._mask = this._createMaskBuffer(value);
+          this._mask.unlock();
+        } else {
+            this._mask.update(value);
+        }
     },
 
     _emptyPointBuffer: function () {
@@ -758,6 +776,12 @@ var PointList$ = {
         }
         this._pointBuffers.length = 0;
         this._init = false;
+    },
+
+    _emptyMaskBuffer: function () {
+        if (this._mask != null) {
+            this._mask.dispose();
+        }
     },
 
     _initBuffer: function (renderContext) {
@@ -831,6 +855,10 @@ var PointList$ = {
         }
     },
 
+    _createMaskBuffer: function (values) {
+        return new MaskBuffer(values); 
+    },
+
     draw: function (renderContext, opacity, cull, depthMask=false) {
         this._initBuffer(renderContext);
         if (renderContext.gl == null) {
@@ -873,7 +901,7 @@ var PointList$ = {
             var $enum2 = ss.enumerate(this._pointBuffers);
             while ($enum2.moveNext()) {
                 var pointBuffer = $enum2.current;
-                TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, PointList.starTexture.texture2d, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky);
+                TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, PointList.starTexture.texture2d, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._masked ? this._mask.buffer : null);
                 renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
             }
             renderContext.gl.depthMask(originalDepthMask);
@@ -892,7 +920,7 @@ var PointList$ = {
         renderContext.gl.depthMask(depthMask);
         while ($enum1.moveNext()) {
             var pointBuffer = $enum1.current;
-            TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, texture, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, this.decay, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky);
+            TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, texture, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, this.decay, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._masked ? this._mask.buffer : null);
             renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
         }
         renderContext.gl.depthMask(originalDepthMask);

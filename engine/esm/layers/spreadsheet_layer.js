@@ -237,6 +237,10 @@ export function SpreadSheetLayer() {
     this.pointScaleType = 1;
     this.positions = [];
     this.bufferIsFlat = false;
+
+    this._filter = null;
+    this._filterDynamic = false;
+
     this.baseDate = new Date(2010, 0, 1, 12, 0, 0);
     this.dirty = true;
     this.lastVersion = 0;
@@ -1932,6 +1936,34 @@ var SpreadSheetLayer$ = {
         return value;
     },
 
+    _createMask: function () {
+        if (this._filter == null) {
+            return null;
+        }
+        var count = this._table$1.rows.length;
+        var mask = new Array(count);
+        for (let index = 0; index < count; index++) {
+            mask[index] = this._filter(this._table$1.rows[index], this._table$1.header, index, this);
+        }
+        return mask;
+    },
+
+    set_filter: function (filter, dynamic) {
+        this._filter = filter;
+        this._filterDynamic = dynamic;
+        // Don't set the mask if the data is dirty
+        // since then we'll do it on the next draw call anywas
+        if (!this.dirty && this.pointList != null && (this._filter == null || !this._filterDynamic)) {
+            this.pointList.set_mask(this._createMask());
+        }
+    },
+
+    remove_filter: function () {
+        this._filter = null;
+        this._filterDynamic = false;
+        this.pointList.set_mask(null);
+    },
+
     draw: function (renderContext, opacity, flat) {
         var device = renderContext;
         if (this.version !== this.lastVersion) {
@@ -1941,9 +1973,11 @@ var SpreadSheetLayer$ = {
         if (this.bufferIsFlat !== flat) {
             this.cleanUp();
             this.bufferIsFlat = flat;
-        }
+        } 
+
         if (this.dirty) {
             this.prepVertexBuffer(device, opacity);
+            this.pointList.set_mask(this._createMask());
         }
         var jNow = SpaceTimeController.get_jNow() - SpaceTimeController.utcToJulian(this.baseDate);
         var adjustedScale = this.scaleFactor * 3;
@@ -1972,6 +2006,11 @@ var SpreadSheetLayer$ = {
             this.pointList.timeSeries = this.timeSeries;
             this.pointList.jNow = jNow;
             this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+
+            if (this._filter != null && this._filterDynamic) {
+                this.pointList.set_mask(this._createMask());
+            }
+
             switch (this._plotType$1) {
                 case 0:
                     this.pointList.draw(renderContext, opacity * this.get_opacity(), false);

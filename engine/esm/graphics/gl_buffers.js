@@ -41,6 +41,57 @@ var IndexBuffer$ = {
 registerType("IndexBuffer", [IndexBuffer, IndexBuffer$, null, ss.IDisposable]);
 
 
+// wwtlib.MaskBuffer
+
+export function MaskBuffer(mask) {
+    this.mask = mask;
+}
+
+var MaskBuffer$ = {
+    lock: function () {
+        return this.mask;
+    },
+
+    _createMaskArray(mask) {
+        var maskArray = new Uint8Array(mask);
+        for (let i = 0; i < this.mask.length; i++) {
+            maskArray[i] = Number(mask[i]);
+        }
+        return maskArray;
+    },
+
+    unlock: function () {
+        this.buffer = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.buffer);
+        var maskArray = this._createMaskArray(this.mask);
+        tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, maskArray, WEBGL.STATIC_DRAW);
+    },
+
+    update: function (values) {
+        var needNewBuffer = this.buffer == null || this.mask.length != values.length;
+        this.mask = values;
+        if (needNewBuffer) {
+            if (this.buffer != null) {
+                this.dispose();
+            }
+            this.unlock();
+            return;
+        }
+
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.buffer);
+        tilePrepDevice.bufferSubData(WEBGL.ARRAY_BUFFER, 0, this._createMaskArray(this.mask));
+    },
+    
+    dispose: function () {
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, null);
+        tilePrepDevice.deleteBuffer(this.buffer);
+        this.buffer = null;
+    }
+};
+
+registerType("MaskBuffer", [MaskBuffer, MaskBuffer$, null, ss.IDisposable]);
+
+
 // wwtlib.VertexBufferBase
 
 export function VertexBufferBase() { }
