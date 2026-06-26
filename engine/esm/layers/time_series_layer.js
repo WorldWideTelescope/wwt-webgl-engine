@@ -868,7 +868,7 @@ var TimeSeriesLayer$ = {
             this.triangleList.draw(renderContext, opacity * this.get_opacity(), 1);
         }
         if (this.pointList != null) {
-            this.pointList.depthBuffered = false;
+            this.pointList.depthBuffered = true;
             this.pointList.decay = this.decay;
             this.pointList.sky = this.get_astronomical();
             this.pointList.timeSeries = this.timeSeries;
