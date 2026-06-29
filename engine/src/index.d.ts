@@ -2002,6 +2002,8 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
    * Set a filter to allow masking a subset of the layer's points.
    * At a low level, setting a filter writes to a separate WebGL buffer that stores the layer's mask.
    * This means that setting a filter does not involve re-creating the primary buffer.
+   * Due to the practical impossibility of serializing an arbitrary JavaScript function,
+   * the filter will not be serialized with the layer.
    *
    * @param filter The filter function that determines which points are rendered. Only points for
    * which the filter returns true are rendered.
