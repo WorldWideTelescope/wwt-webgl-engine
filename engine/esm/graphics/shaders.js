@@ -2231,31 +2231,36 @@ TextShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
     const fragShaderText = `\
+        #version 300 es
         precision mediump float;
+        precision mediump sampler2DArray;
 
-        varying vec2 vTextureCoord;
-        varying uint aTextureLayer;
+        in vec2 vTextureCoord;
+        in float vTextureLayer;
         uniform vec4 uColor;
+
+        out vec4 fragColor;
 
         uniform sampler2DArray uSamplerArray;
 
         void main(void) {
            vec4 texColor;
-           texColor = texture(uSamplerArray, vec3(vTextureCoord.s, vTextureCoord.t, aTextureLayer));
-           gl_FragColor = uColor * texColor;
+           texColor = texture(uSamplerArray, vec3(vTextureCoord.s, vTextureCoord.t, vTextureLayer));
+           fragColor = uColor * texColor;
         }
     `;
 
     const vertexShaderText = `\
-        attribute vec3 aVertexPosition;
-        attribute vec2 aTextureCoord;
-        attribute uint aTextureIndex;
+        #version 300 es
+        in vec3 aVertexPosition;
+        in vec2 aTextureCoord;
+        in float aTextureLayer;
 
         uniform mat4 uMVMatrix;
         uniform mat4 uPMatrix;
 
-        varying vec2 vTextureCoord;
-        varying uint aTextureLayer;
+        out vec2 vTextureCoord;
+        out float vTextureLayer;
 
         void main(void) {
             gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
@@ -2268,15 +2273,22 @@ TextShader.init = function (renderContext) {
     gl.shaderSource(TextShader._frag, fragShaderText);
     gl.compileShader(TextShader._frag);
     var stat = gl.getShaderParameter(TextShader._frag, WEBGL.COMPILE_STATUS);
+    console.log(stat);
+    var log = gl.getShaderInfoLog(TextShader._frag);
+    console.log(log);
     TextShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
     gl.shaderSource(TextShader._vert, vertexShaderText);
     gl.compileShader(TextShader._vert);
     var stat1 = gl.getShaderParameter(TextShader._vert, WEBGL.COMPILE_STATUS);
+    console.log(stat1);
     TextShader._prog = gl.createProgram();
     gl.attachShader(TextShader._prog, TextShader._vert);
     gl.attachShader(TextShader._prog, TextShader._frag);
     gl.linkProgram(TextShader._prog);
     var errcode = gl.getProgramParameter(TextShader._prog, WEBGL.LINK_STATUS);
+    console.log(errcode);
+    var info = gl.getProgramInfoLog(TextShader._prog);
+    console.log(info);
     gl.useProgram(TextShader._prog);
     TextShader.vertLoc = gl.getAttribLocation(TextShader._prog, 'aVertexPosition');
     TextShader.textureLoc = gl.getAttribLocation(TextShader._prog, 'aTextureCoord');
@@ -2305,7 +2317,7 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
         var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
         gl.uniformMatrix4fv(TextShader.mvMatLoc, false, mvMat.floatArray());
         gl.uniformMatrix4fv(TextShader.projMatLoc, false, renderContext.get_projection().floatArray());
-        gl.uniform1i(TextShader.sampLoc, 0);
+        gl.uniform1i(TextShader.sampLoc, 2);
         if (renderContext.space) {
             gl.disable(WEBGL.DEPTH_TEST);
         } else {
@@ -2318,11 +2330,11 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(TextShader.vertLoc);
         gl.enableVertexAttribArray(TextShader.textureLoc);
-        gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 21, 0);
-        gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 21, 12);
-        gl.vertexAttribPointer(TextShader.layerLoc, 1, WEBGL.UNSIGNED_BYTE, false, 21, 20);
+        gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 24, 0);
+        gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 24, 12);
+        gl.vertexAttribPointer(TextShader.layerLoc, 1, WEBGL.FLOAT, false, 24, 20);
         gl.uniform4f(TextShader.colorLoc, color.r / 255, color.g / 255, color.b / 255, color.a * opacity / 255);
-        gl.activeTexture(WEBGL.TEXTURE0);
+        gl.activeTexture(WEBGL.TEXTURE2);
         gl.bindTexture(WEBGL.TEXTURE_2D_ARRAY, texture);
         gl.enable(WEBGL.BLEND);
         gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);

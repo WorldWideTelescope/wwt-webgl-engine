@@ -16,6 +16,7 @@ export function downloadImageData(url, onLoad, onError) {
     }, false);
     imageElement.crossOrigin = 'anonymous';
     imageElement.src = url;
+    return imageElement;
 }
 
 export function isPowerOfTwo(value) {

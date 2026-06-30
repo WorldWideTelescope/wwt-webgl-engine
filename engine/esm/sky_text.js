@@ -5,11 +5,11 @@
 
 import { ss } from "./ss.js";
 import { registerType, registerEnum } from "./typesystem.js";
-import { Vector2d, Vector3d, Matrix3d, PositionTexture } from "./double3d.js";
+import { Vector2d, Vector3d, Matrix3d, PositionTextureArray } from "./double3d.js";
 import { Util } from "./baseutil.js";
 import { Colors } from "./color.js";
 import { WEBGL } from "./graphics/webgl_constants.js";
-import { PositionTextureVertexBuffer } from "./graphics/gl_buffers.js";
+import { PositionTextureArrayVertexBuffer } from "./graphics/gl_buffers.js";
 import { TextShader } from "./graphics/shaders.js";
 import { TextObject } from "./tours/text_object.js";
 import { URLHelpers } from "./url_helpers.js";
@@ -81,7 +81,7 @@ var Text3dBatch$ = {
             if (!this._glyphCache.ready) {
                 return;
             }
-            TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2d, color, opacity);
+            TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2dArray, color, opacity);
             renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
         }
     },
@@ -127,7 +127,7 @@ var Text3dBatch$ = {
             }
         }
         this._vertCount = verts.length;
-        this._vertexBuffer = new PositionTextureVertexBuffer(this._vertCount);
+        this._vertexBuffer = new PositionTextureArrayVertexBuffer(this._vertCount);
         var vertBuf = this._vertexBuffer.lock();
         for (var i = 0; i < this._vertCount; i++) {
             vertBuf[i] = verts[i];
@@ -194,6 +194,7 @@ registerType("GlyphItem", [GlyphItem, GlyphItem$, null]);
 export function GlyphCache(height) {
     this._cellHeight = 128;
     this._gridSize = 8;
+    this._readyFlags = 0;
     this.ready = false;
     this._glyphItems = {};
     this.textObject = new TextObject();
@@ -242,10 +243,11 @@ var GlyphCache$ = {
         var $enum1 = ss.enumerate(filesNode.childNodes);
         var $this = this;
         var index = 0;
+        this._count = 0;
         while ($enum1.moveNext()) {
             var glyphFile = $enum1.current;
             if (glyphFile.nodeName == 'GlyphFile') {
-                var index = parseInt(glyphFile.attributes.getNamedItem('Index').nodeValue);
+                this._count += 1;
                 var $enum2 = ss.enumerate(glyphFile.childNodes);
                 while ($enum2.moveNext()) {
                     var item = $enum2.current;
@@ -254,26 +256,26 @@ var GlyphCache$ = {
                     }
                 }
                 var imagePath = glyphFile.attributes.getNamedItem('ImagePath').nodeValue;
-                imagePaths.push(imagePath);
+                imagePaths.push(URLHelpers.singleton.engineAssetUrl(imagePath));
                 var xmlPath = glyphFile.attributes.getNamedItem('XMLPath').nodeValue;
                 var webFile = new WebFile(URLHelpers.singleton.engineAssetUrl(xmlPath));
-                this._webFiles.push(webFile);
+                webFile.index = index;
                 webFile.onStateChange = function () {
-                    $this._glyphXmlReady(webFile, index);
-                }.bind(this);
+                    $this._glyphXmlReady(this, this.index);
+                }.bind(webFile);
                 webFile.send();
+                index += 1;
             }
-            index += 1;
         }
 
         this._texture = TextureArray.fromUrls(imagePaths);
     },
 
-    _glyphXmlReady: function (webFile) {
+    _glyphXmlReady: function (webFile, index) {
         if (webFile.get_state() === 2) {
             alert(webFile.get_message());
         } else if (webFile.get_state() === 1) {
-            this._loadXmlGlyph(webFile.getXml());
+            this._loadXmlGlyph(webFile.getXml(), index);
         }
     },
 
@@ -289,7 +291,14 @@ var GlyphCache$ = {
                 GlyphCache._allGlyphs = GlyphCache._allGlyphs + item.glyph;
             }
         }
-        this.ready = true;
+        this._readyFlags = this._readyFlags | Math.pow(2, index);
+        if (this._readyFlags == Math.pow(2, this._count) - 1) {
+            this.ready = true;
+        }
+    },
+
+    get_texture: function () {
+        return this._texture;
     },
 
     _makeTexture: function () {
@@ -381,7 +390,7 @@ var Text3d$ = {
     addGlyphPoints: function (pointList, size, position, uv, index) {
         var points = new Array(6);
         for (var i = 0; i < 6; i++) {
-            points[i] = new PositionTexture();
+            points[i] = new PositionTextureArray();
         }
         var left = Vector3d.cross(this.center, this.up);
         var right = Vector3d.cross(this.up, this.center);
