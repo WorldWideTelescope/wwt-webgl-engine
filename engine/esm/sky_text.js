@@ -199,10 +199,10 @@ export function GlyphCache(height) {
     this._textureDirty = true;
     this._version = 0;
     this._cellHeight = height;
-    this._texture = Texture.fromUrl(URLHelpers.singleton.engineAssetUrl('glyphs1.png'));
-    this._webFile = new WebFile(URLHelpers.singleton.engineAssetUrl('glyphs1.xml'));
-    this._webFile.onStateChange = ss.bind('_glyphXmlReady', this);
-    this._webFile.send();
+    this._summaryWebFile = new WebFile(URLHelpers.singleton.engineAssetUrl('glyphs2_summary.xml'));
+    this._summaryWebFile.onStateChange = this._glyphSummaryReady.bind(this);
+    this._fileCharacters = {};
+    this._summaryWebFile.send();
 }
 
 GlyphCache._caches = {};
@@ -224,11 +224,48 @@ var GlyphCache$ = {
         return this._cellHeight;
     },
 
-    _glyphXmlReady: function () {
-        if (this._webFile.get_state() === 2) {
-            alert(this._webFile.get_message());
-        } else if (this._webFile.get_state() === 1) {
-            this._loadXmlGlyph(this._webFile.getXml());
+    _glyphSummaryReady: function () {
+        if (this._summaryWebFile.get_state() == 2) {
+            alert(this._summaryWebFile.get_message());
+        } else if (this._summaryWebFile.get_state() == 1) {
+            this._loadGlyphFiles(this._summaryWebFile.getXml());
+        }
+    },
+
+    _loadGlyphFiles: function (xml) {
+        var filesNode = Util.selectSingleNode(xml, 'GlyphFiles');
+        this._textures = [];
+        this._webFiles = [];
+        var $enum1 = ss.enumerate(filesNode.childNodes);
+        while ($enum1.moveNext()) {
+            var glyphFile = $enum1.current;
+            if (glyphFile.nodeName == 'GlyphFile') {
+                var index = Number(glyphFile.attributes.getNamedItem('Index').nodeValue);
+                var $enum2 = ss.enumerate(glyphFile.childNodes);
+                while ($enum2.moveNext()) {
+                    var item = $enum2.current;
+                    if (item.nodeName == 'Glyph') {
+                       var character = item.attributes.getNamedItem('Character').nodeValue;
+                    }
+                }
+                var imagePath = glyphFile.attributes.getNamedItem('ImagePath').nodeValue;
+                var xmlPath = glyphFile.attributes.getNamedItem('XMLPath').nodeValue;
+                this._textures.push(Texture.fromUrl(URLHelpers.singleton.engineAssetUrl(imagePath)));
+                var webFile = new WebFile(URLHelpers.singleton.engineAssetUrl(xmlPath));
+                this._webFiles.push(webFile);
+                webFile.onStateChange = function () {
+                    this._glyphXmlReady(webFile);
+                }.bind(this);
+                webFile.send();
+            }
+        }
+    },
+
+    _glyphXmlReady: function (webFile) {
+        if (webFile.get_state() === 2) {
+            alert(webFile.get_message());
+        } else if (webFile.get_state() === 1) {
+            this._loadXmlGlyph(webFile.getXml());
         }
     },
 
@@ -244,10 +281,6 @@ var GlyphCache$ = {
             }
         }
         this.ready = true;
-    },
-
-    get_texture: function () {
-        return this._texture;
     },
 
     _makeTexture: function () {
