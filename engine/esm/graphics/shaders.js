@@ -1679,7 +1679,11 @@ FitsShader.init = function (renderContext) {
     gl.attachShader(FitsShader._prog, FitsShader._vert);
     gl.attachShader(FitsShader._prog, FitsShader._frag);
     gl.linkProgram(FitsShader._prog);
-    var errcode = gl.getProgramParameter(FitsShader._prog, WEBGL.LINK_STATUS);
+    var linkSuccess = gl.getProgramParameter(FitsShader._prog, WEBGL.LINK_STATUS);
+    if (!linkSuccess) {
+        var errorP = gl.getProgramInfoLog(FitsShader._prog);
+        console.log(errorP);
+    }
     gl.useProgram(FitsShader._prog);
     FitsShader.vertLoc = gl.getAttribLocation(FitsShader._prog, 'aVertexPosition');
     FitsShader.textureLoc = gl.getAttribLocation(FitsShader._prog, 'aTextureCoord');
@@ -2273,22 +2277,27 @@ TextShader.init = function (renderContext) {
     gl.shaderSource(TextShader._frag, fragShaderText);
     gl.compileShader(TextShader._frag);
     var stat = gl.getShaderParameter(TextShader._frag, WEBGL.COMPILE_STATUS);
-    console.log(stat);
-    var log = gl.getShaderInfoLog(TextShader._frag);
-    console.log(log);
+    if (!stat) {
+        var errorF = gl.getShaderInfoLog(TextShader._frag);
+        console.log(errorF);
+    }
     TextShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
     gl.shaderSource(TextShader._vert, vertexShaderText);
     gl.compileShader(TextShader._vert);
     var stat1 = gl.getShaderParameter(TextShader._vert, WEBGL.COMPILE_STATUS);
-    console.log(stat1);
+    if (!stat1) {
+        var errorV = gl.getShaderInfoLog(TextShader._vert);
+        console.log(errorV);
+    }
     TextShader._prog = gl.createProgram();
     gl.attachShader(TextShader._prog, TextShader._vert);
     gl.attachShader(TextShader._prog, TextShader._frag);
     gl.linkProgram(TextShader._prog);
-    var errcode = gl.getProgramParameter(TextShader._prog, WEBGL.LINK_STATUS);
-    console.log(errcode);
-    var info = gl.getProgramInfoLog(TextShader._prog);
-    console.log(info);
+    var linkSuccess = gl.getProgramParameter(TextShader._prog, WEBGL.LINK_STATUS);
+    if (!linkSuccess) {
+        var errorP = gl.getProgramInfoLog(TextShader._prog);
+        console.log(errorP);
+    }
     gl.useProgram(TextShader._prog);
     TextShader.vertLoc = gl.getAttribLocation(TextShader._prog, 'aVertexPosition');
     TextShader.textureLoc = gl.getAttribLocation(TextShader._prog, 'aTextureCoord');
