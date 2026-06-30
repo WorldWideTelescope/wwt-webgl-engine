@@ -8,6 +8,7 @@ import { ss } from "../ss.js";
 import { tilePrepDevice } from "../render_globals.js";
 import { URLHelpers } from "../url_helpers.js";
 import { WEBGL } from "./webgl_constants.js";
+import { resizeToPowerOfTwo } from "./texture_utils.js";
 
 
 // wwtlib.Texture
@@ -37,18 +38,6 @@ Texture.fromUrl = function (url) {
     var tex = new Texture();
     tex.load(url);
     return tex;
-};
-
-Texture.isPowerOfTwo = function (val) {
-    return !(val & (val - 1));
-};
-
-Texture.fitPowerOfTwo = function (val) {
-    val--;
-    for (var i = 1; i < 32; i <<= 1) {
-        val = val | val >> i;
-    }
-    return val + 1;
 };
 
 var Texture$ = {
@@ -101,16 +90,8 @@ var Texture$ = {
                 tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, this.texture2d);
                 var image = this.imageElement;
 
-                // Before we bind resize to a power of two if nessesary so we can MIPMAP
-                if ((!Texture.isPowerOfTwo(this.imageElement.height) | !Texture.isPowerOfTwo(this.imageElement.width)) === 1) {
-                    var temp = document.createElement('canvas');
-                    temp.height = Texture.fitPowerOfTwo(image.height);
-                    temp.width = Texture.fitPowerOfTwo(image.width);
-                    var ctx = temp.getContext('2d');
-                    ctx.drawImage(image, 0, 0, temp.width, temp.height);
-                    //Substitute the resized image
-                    image = temp;
-                }
+                // Before we bind resize to a power of two if necessary so we can MIPMAP
+                image = resizeToPowerOfTwo(image);
 
                 tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
                 tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_T, WEBGL.CLAMP_TO_EDGE);
