@@ -8,7 +8,7 @@ import { ss } from "../ss.js";
 import { tilePrepDevice } from "../render_globals.js";
 import { URLHelpers } from "../url_helpers.js";
 import { WEBGL } from "./webgl_constants.js";
-import { resizeToPowerOfTwo } from "./texture_utils.js";
+import { downloadImageData, resizeToPowerOfTwo } from "./texture_utils.js";
 
 
 // wwtlib.TextureArray
@@ -16,9 +16,8 @@ import { resizeToPowerOfTwo } from "./texture_utils.js";
 export function TextureArray() {
     this.texture3d = null;
     this.URLs = [];
-    this._imageElements = [];
+    this._imageElements = null;
     this._downloading = false;
-    this._urlsLoading = null;
 }
 
 TextureArray.fromUrls = function (urls) {
@@ -30,6 +29,7 @@ TextureArray.fromUrls = function (urls) {
 var TextureArray$ = {
     cleanUp: function () {
         tilePrepDevice.deleteTexture(this.texture3d);
+        this.imageElements = null;
     },
 
     dispose: function () {
@@ -38,9 +38,22 @@ var TextureArray$ = {
 
     load: function (urls) {
         this.URLs = urls;
+        var $this = this;
+        this._loadingFlags = 0;
         if (typeof document === "undefined") { return; }
         if (!this._downloading) {
             this._downloading = true;
+            for (let index = 0; index < this.URLs.length; index++) {
+                downloadImageData(this.URLs[index],
+                  function () {
+                    $this._loadingFlags = $this._loadingFlags | Math.exp(2, index);
+                    if ($this._loadingFlags == Math.exp(2, $this.URLs.length - 1)) {
+                        $this.makeTexture();
+                    }
+                  },
+                  function (_error) { $this._errored = true; }
+                );
+            }
         }
     },
 

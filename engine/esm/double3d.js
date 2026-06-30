@@ -69,6 +69,7 @@ export function PositionTexture() {
     this.tu = 0;
     this.tv = 0;
     this.position = new Vector3d();
+    this.index = 0;
 }
 
 // Summary:
@@ -86,27 +87,30 @@ export function PositionTexture() {
 //   v:
 //     Floating-point value that represents the Microsoft.DirectX.Direct3D.CustomVertex.PositionTextured.#ctor()
 //     component of the texture coordinate.
-PositionTexture.createPos = function (pos, u, v) {
+PositionTexture.createPos = function (pos, u, v, index=0) {
     var temp = new PositionTexture();
     temp.tu = u * tileUvMultiple;
     temp.tv = v * tileUvMultiple;
     temp.position = pos;
+    temp.index = index;
     return temp;
 };
 
-PositionTexture.createPosRaw = function (pos, u, v) {
+PositionTexture.createPosRaw = function (pos, u, v, index=0) {
     var temp = new PositionTexture();
     temp.tu = u;
     temp.tv = v;
     temp.position = pos;
+    temp.index = index;
     return temp;
 };
 
-PositionTexture.createPosSize = function (pos, u, v, width, height) {
+PositionTexture.createPosSize = function (pos, u, v, width, height, index=0) {
     var temp = new PositionTexture();
     temp.tu = u * width;
     temp.tv = v * height;
     temp.position = pos;
+    temp.index = index;
     return temp;
 };
 
@@ -131,11 +135,12 @@ PositionTexture.createPosSize = function (pos, u, v, width, height) {
 //   v:
 //     Floating-point value that represents the Microsoft.DirectX.Direct3D.CustomVertex.PositionTextured.#ctor()
 //     component of the texture coordinate.
-PositionTexture.create = function (xvalue, yvalue, zvalue, u, v) {
+PositionTexture.create = function (xvalue, yvalue, zvalue, u, v, index=0) {
     var temp = new PositionTexture();
     temp.position = Vector3d.create(xvalue, yvalue, zvalue);
     temp.tu = u * tileUvMultiple;
     temp.tv = v * tileUvMultiple;
+    temp.index = index;
     return temp;
 };
 
@@ -145,11 +150,12 @@ var PositionTexture$ = {
         temp.position = Vector3d.makeCopy(this.position);
         temp.tu = this.tu;
         temp.tv = this.tv;
+        temp.index = index;
         return temp;
     },
 
     toString: function () {
-        return ss.format('{0}, {1}, {2}, {3}, {4}', this.position.x, this.position.y, this.position.z, this.tu, this.tv);
+        return ss.format('{0}, {1}, {2}, {3}, {4}, {5}', this.position.x, this.position.y, this.position.z, this.tu, this.tv, this.index);
     }
 };
 
@@ -163,6 +169,7 @@ export function PositionColoredTextured() {
     this.tv = 0;
     this.color = new Color();
     this.position = new Vector3d();
+    this.index = 0;
 }
 
 // Summary:
@@ -180,27 +187,30 @@ export function PositionColoredTextured() {
 //   v:
 //     Floating-point value that represents the Microsoft.DirectX.Direct3D.CustomVertex.PositionTextured.#ctor()
 //     component of the texture coordinate.
-PositionColoredTextured.createPos = function (pos, u, v) {
+PositionColoredTextured.createPos = function (pos, u, v, index=0) {
     var temp = new PositionColoredTextured();
     temp.tu = u * tileUvMultiple;
     temp.tv = v * tileUvMultiple;
     temp.position = pos;
+    temp.index = index;
     return temp;
 };
 
-PositionColoredTextured.createPosRaw = function (pos, u, v) {
+PositionColoredTextured.createPosRaw = function (pos, u, v, index=0) {
     var temp = new PositionColoredTextured();
     temp.tu = u;
     temp.tv = v;
     temp.position = pos;
+    temp.index = index;
     return temp;
 };
 
-PositionColoredTextured.createPosSize = function (pos, u, v, width, height) {
+PositionColoredTextured.createPosSize = function (pos, u, v, width, height, index=0) {
     var temp = new PositionColoredTextured();
     temp.tu = u * width;
     temp.tv = v * height;
     temp.position = pos;
+    temp.index = index;
     return temp;
 };
 
@@ -227,11 +237,12 @@ PositionColoredTextured.createPosSize = function (pos, u, v, width, height) {
 //   v:
 //     Floating-point value that represents the Microsoft.DirectX.Direct3D.CustomVertex.PositionTextured.#ctor()
 //     component of the texture coordinate.
-PositionColoredTextured.create = function (xvalue, yvalue, zvalue, u, v) {
+PositionColoredTextured.create = function (xvalue, yvalue, zvalue, u, v, index=0) {
     var temp = new PositionTexture();
     temp.position = Vector3d.create(xvalue, yvalue, zvalue);
     temp.tu = u * tileUvMultiple;
     temp.tv = v * tileUvMultiple;
+    temp.index = index;
     return temp;
 };
 
@@ -241,10 +252,11 @@ var PositionColoredTextured$ = {
         temp.position = Vector3d.makeCopy(this.position);
         temp.tu = this.tu;
         temp.tv = this.tv;
+        temp.index = this.index;
         return temp;
     },
     toString: function () {
-        return ss.format('{0}, {1}, {2}, {3}, {4}', this.position.x, this.position.y, this.position.z, this.tu, this.tv);
+        return ss.format('{0}, {1}, {2}, {3}, {4}, {5}', this.position.x, this.position.y, this.position.z, this.tu, this.tv, this.index);
     }
 };
 

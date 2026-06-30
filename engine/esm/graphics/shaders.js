@@ -2234,13 +2234,14 @@ TextShader.init = function (renderContext) {
         precision mediump float;
 
         varying vec2 vTextureCoord;
+        varying uint aTextureLayer;
         uniform vec4 uColor;
 
-        uniform sampler2D uSampler;
+        uniform sampler2DArray uSamplerArray;
 
         void main(void) {
            vec4 texColor;
-           texColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+           texColor = texture(uSamplerArray, vec3(vTextureCoord.s, vTextureCoord.t, aTextureLayer));
            gl_FragColor = uColor * texColor;
         }
     `;
@@ -2248,15 +2249,18 @@ TextShader.init = function (renderContext) {
     const vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
+        attribute uint aTextureIndex;
 
         uniform mat4 uMVMatrix;
         uniform mat4 uPMatrix;
 
         varying vec2 vTextureCoord;
+        varying uint aTextureLayer;
 
         void main(void) {
             gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
             vTextureCoord = aTextureCoord;
+            vTextureLayer = aTextureLayer;
         }
     `;
 
@@ -2276,9 +2280,10 @@ TextShader.init = function (renderContext) {
     gl.useProgram(TextShader._prog);
     TextShader.vertLoc = gl.getAttribLocation(TextShader._prog, 'aVertexPosition');
     TextShader.textureLoc = gl.getAttribLocation(TextShader._prog, 'aTextureCoord');
+    TextShader.layerLoc = gl.getAttribLocation(TextShader._prog, 'aTextureLayer');
     TextShader.projMatLoc = gl.getUniformLocation(TextShader._prog, 'uPMatrix');
     TextShader.mvMatLoc = gl.getUniformLocation(TextShader._prog, 'uMVMatrix');
-    TextShader.sampLoc = gl.getUniformLocation(TextShader._prog, 'uSampler');
+    TextShader.sampLoc = gl.getUniformLocation(TextShader._prog, 'uSamplerArray');
     TextShader.colorLoc = gl.getUniformLocation(TextShader._prog, 'uColor');
     set_tileUvMultiple(1);
     set_tileDemEnabled(true);
@@ -2313,11 +2318,12 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(TextShader.vertLoc);
         gl.enableVertexAttribArray(TextShader.textureLoc);
-        gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 20, 0);
-        gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 20, 12);
+        gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 21, 0);
+        gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 21, 12);
+        gl.vertexAttribPointer(TextShader.layerLoc, 1, WEBGL.UNSIGNED_BYTE, false, 21, 20);
         gl.uniform4f(TextShader.colorLoc, color.r / 255, color.g / 255, color.b / 255, color.a * opacity / 255);
         gl.activeTexture(WEBGL.TEXTURE0);
-        gl.bindTexture(WEBGL.TEXTURE_2D, texture);
+        gl.bindTexture(WEBGL.TEXTURE_2D_ARRAY, texture);
         gl.enable(WEBGL.BLEND);
         gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     }

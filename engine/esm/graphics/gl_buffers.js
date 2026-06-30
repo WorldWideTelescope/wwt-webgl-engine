@@ -178,6 +178,7 @@ var PositionTextureVertexBuffer$ = {
             buffer[index++] = pt.position.z;
             buffer[index++] = pt.tu;
             buffer[index++] = pt.tv;
+            buffer[index++] = pt.index;
         }
         tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
     }
