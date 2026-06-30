@@ -2339,6 +2339,7 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(TextShader.vertLoc);
         gl.enableVertexAttribArray(TextShader.textureLoc);
+        gl.enableVertexAttribArray(TextShader.layerLoc);
         gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 24, 0);
         gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 24, 12);
         gl.vertexAttribPointer(TextShader.layerLoc, 1, WEBGL.FLOAT, false, 24, 20);
