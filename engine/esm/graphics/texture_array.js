@@ -72,7 +72,8 @@ var TextureArray$ = {
                 // after the power of two resizing
                 var firstElement = this._imageElements[0];
                 firstElement = resizeToPowerOfTwo(firstElement);
-                tilePrepDevice.texStorage3D(WEBGL.TEXTURE_2D_ARRAY, 1, WEBGL.RGBA8, firstElement.width, firstElement.height, this._imageElements.length);
+                var mipLevels = 1 + Math.floor(Math.log2(Math.max(firstElement.width, firstElement.height)));
+                tilePrepDevice.texStorage3D(WEBGL.TEXTURE_2D_ARRAY, mipLevels, WEBGL.RGBA8, firstElement.width, firstElement.height, this._imageElements.length);
 
                 for (let index = 0; index < this._imageElements.length; index++) {
                     var image = this._imageElements[index];
