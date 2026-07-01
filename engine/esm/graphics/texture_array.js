@@ -5,7 +5,7 @@
 
 import { registerType } from "../typesystem.js";
 import { ss } from "../ss.js";
-import { tilePrepDevice } from "../render_globals.js";
+import { tilePrepDevice, useGlVersion2 } from "../render_globals.js";
 import { WEBGL } from "./webgl_constants.js";
 import { downloadImageData, resizeToPowerOfTwo } from "./texture_utils.js";
 
@@ -60,33 +60,50 @@ var TextureArray$ = {
     makeTexture: function () {
         if (tilePrepDevice != null) {
             try {
-                this.texture2dArray = tilePrepDevice.createTexture();
-                tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, this.texture2dArray);
-                console.log(tilePrepDevice.getParameter(WEBGL.TEXTURE_BINDING_2D_ARRAY));
+                var target = useGlVersion2 ? WEBGL.TEXTURE_2D_ARRAY : WEBGL.TEXTURE_2D;
                 
-                tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D_ARRAY, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
-                tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D_ARRAY, WEBGL.TEXTURE_WRAP_T, WEBGL.CLAMP_TO_EDGE);
 
-                // Allocate the storage for the texture array
+
                 // We're making the implicit assumption here that each image has the same size
                 // after the power of two resizing
                 var firstElement = this._imageElements[0];
                 firstElement = resizeToPowerOfTwo(firstElement);
                 var mipLevels = 1 + Math.floor(Math.log2(Math.max(firstElement.width, firstElement.height)));
-                tilePrepDevice.texStorage3D(WEBGL.TEXTURE_2D_ARRAY, mipLevels, WEBGL.RGBA8, firstElement.width, firstElement.height, this._imageElements.length);
 
-                for (let index = 0; index < this._imageElements.length; index++) {
-                    var image = this._imageElements[index];
+                if (useGlVersion2) {
+                    this.texture2dArray = tilePrepDevice.createTexture();
+                    tilePrepDevice.bindTexture(target, this.texture2dArray);
+                    tilePrepDevice.texParameteri(target, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
+                    tilePrepDevice.texParameteri(target, WEBGL.TEXTURE_WRAP_T, WEBGL.CLAMP_TO_EDGE);
 
-                    // Before we bind resize to a power of two if necessary so we can MIPMAP
-                    image = resizeToPowerOfTwo(image);
-                    
-                    tilePrepDevice.texSubImage3D(WEBGL.TEXTURE_2D_ARRAY, 0, 0, 0, index, image.width, image.height, 1, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, image);
+                    // Allocate the storage for the texture array
+                    tilePrepDevice.texStorage3D(target, mipLevels, WEBGL.RGBA8, firstElement.width, firstElement.height, this._imageElements.length);
+
+                    for (let index = 0; index < this._imageElements.length; index++) {
+                        var image = this._imageElements[index];
+
+                        // Before we bind resize to a power of two if necessary so we can MIPMAP
+                        image = resizeToPowerOfTwo(image);
+                        tilePrepDevice.texSubImage3D(target, 0, 0, 0, index, image.width, image.height, 1, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, image);
+                    }
+                } else {
+                    this.texture2dArray = []; 
+                    for (let index = 0; index < this._imageElements.length; index++) {
+                        var image = this._imageElements[index];
+                        var texture = tilePrepDevice.createTexture();
+                        tilePrepDevice.bindTexture(target, texture);
+                        tilePrepDevice.texParameteri(target, WEBGL.TEXTURE_WRAP_S, WEBGL.CLAMP_TO_EDGE);
+                        tilePrepDevice.texParameteri(target, WEBGL.TEXTURE_WRAP_T, WEBGL.CLAMP_TO_EDGE);
+
+                        // Before we bind resize to a power of two if necessary so we can MIPMAP
+                        image = resizeToPowerOfTwo(image);
+                        tilePrepDevice.texImage2D(target, 0, WEBGL.RGBA, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, this._imageElements[index]);
+                    }
                 }
 
-                tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D_ARRAY, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
-                tilePrepDevice.generateMipmap(WEBGL.TEXTURE_2D_ARRAY); 
-                tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, null);
+                tilePrepDevice.texParameteri(target, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
+                tilePrepDevice.generateMipmap(target); 
+                tilePrepDevice.bindTexture(target, null);
             } catch (error) {
                 this._errored = true;
             }

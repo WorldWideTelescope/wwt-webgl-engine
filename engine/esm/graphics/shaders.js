@@ -6,7 +6,7 @@
 import { registerType } from "../typesystem.js";
 import { Matrix3d, Vector3d } from "../double3d.js";
 import { Color } from "../color.js";
-import { set_tileUvMultiple, set_tileDemEnabled } from "../render_globals.js";
+import { set_tileUvMultiple, set_tileDemEnabled, useGlVersion2 } from "../render_globals.js";
 import { WEBGL } from "./webgl_constants.js";
 import { Texture } from "./texture.js";
 
@@ -2230,27 +2230,34 @@ TextShader.vertLoc = 0;
 TextShader.textureLoc = 0;
 TextShader.initialized = false;
 TextShader._prog = null;
+TextShader.imageCount = 1;
 
 TextShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `\
-        #version 300 es
-        precision mediump float;
-        precision mediump sampler2DArray;
+    var header = useGlVersion2 ?
+        `#version 300 es
+        precision mediump sampler2DArray;`
+        : "";
+    var samplerType = useGlVersion2 ? "sampler2DArray" : `sampler2D[${TextShader.imageCount}]`;
+    var inKeyword = useGlVersion2 ? "in" : "varying";
 
-        in vec2 vTextureCoord;
-        in float vTextureLayer;
+    const fragShaderText = `\
+        ${header}
+        precision mediump float;
+
+        ${inKeyword} vec2 vTextureCoord;
+        ${inKeyword} float vTextureLayer;
         uniform vec4 uColor;
 
-        out vec4 fragColor;
+        ${useGlVersion2 ? 'out vec4 fragColor;' : ''}
 
-        uniform sampler2DArray uSamplerArray;
+        uniform ${samplerType} uSampler;
 
         void main(void) {
            vec4 texColor;
-           texColor = texture(uSamplerArray, vec3(vTextureCoord.s, vTextureCoord.t, vTextureLayer));
-           fragColor = uColor * texColor;
+           texColor = texture(uSampler, vec3(vTextureCoord.s, vTextureCoord.t, vTextureLayer));
+           ${useGlVersion2 ? 'fragColor' : 'gl_FragColor'} = uColor * texColor;
         }
     `;
 
@@ -2304,7 +2311,14 @@ TextShader.init = function (renderContext) {
     TextShader.layerLoc = gl.getAttribLocation(TextShader._prog, 'aTextureLayer');
     TextShader.projMatLoc = gl.getUniformLocation(TextShader._prog, 'uPMatrix');
     TextShader.mvMatLoc = gl.getUniformLocation(TextShader._prog, 'uMVMatrix');
-    TextShader.sampLoc = gl.getUniformLocation(TextShader._prog, 'uSamplerArray');
+    if (useGlVersion2) {
+        TextShader.sampLoc = gl.getUniformLocation(TextShader._prog, 'uSampler');
+    } else {
+        TextShader.sampLocs = [];
+        for (var i = 0; i < TextShader.imageCount; i++) {
+            TextShader.sampLocs.push(gl.getUniformLocation(TextShader._prog, `uSampler[${i}]`));
+        }
+    }
     TextShader.colorLoc = gl.getUniformLocation(TextShader._prog, 'uColor');
     set_tileUvMultiple(1);
     set_tileDemEnabled(true);
@@ -2312,6 +2326,15 @@ TextShader.init = function (renderContext) {
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     TextShader.initialized = true;
 };
+
+TextShader.set_imageCount = function (number) {
+    TextShader.imageCount = number;
+    // The condition below is not a typo - we only need to re-initialize on
+    // an update if we've already initialized
+    if (TextShader.initialized) {
+        TextShader.init();
+    }
+}
 
 TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
     if (texture == null) {
@@ -2326,7 +2349,7 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
         var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
         gl.uniformMatrix4fv(TextShader.mvMatLoc, false, mvMat.floatArray());
         gl.uniformMatrix4fv(TextShader.projMatLoc, false, renderContext.get_projection().floatArray());
-        gl.uniform1i(TextShader.sampLoc, 2);
+        gl.uniform4f(TextShader.colorLoc, color.r / 255, color.g / 255, color.b / 255, color.a * opacity / 255);
         if (renderContext.space) {
             gl.disable(WEBGL.DEPTH_TEST);
         } else {
@@ -2343,9 +2366,18 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
         gl.vertexAttribPointer(TextShader.vertLoc, 3, WEBGL.FLOAT, false, 24, 0);
         gl.vertexAttribPointer(TextShader.textureLoc, 2, WEBGL.FLOAT, false, 24, 12);
         gl.vertexAttribPointer(TextShader.layerLoc, 1, WEBGL.FLOAT, false, 24, 20);
-        gl.uniform4f(TextShader.colorLoc, color.r / 255, color.g / 255, color.b / 255, color.a * opacity / 255);
-        gl.activeTexture(WEBGL.TEXTURE2);
-        gl.bindTexture(WEBGL.TEXTURE_2D_ARRAY, texture);
+        if (useGlVersion2) {
+            gl.uniform1i(TextShader.sampLoc, 2);
+            gl.activeTexture(WEBGL.TEXTURE2);
+            gl.bindTexture(WEBGL.TEXTURE_2D_ARRAY, texture);
+        } else {
+            for (var i = 0; i < TextShader.imageCount; i++) {
+                var textureIndex = 2 + i;
+                gl.activeTexture(WEBGL[`TEXTURE${textureIndex}`]);
+                gl.bindTexture(WEBGL.TEXTURE_2D, texture[i]);
+                gl.uniform1i(TextShader.sampLocs[i], textureIndex);
+            }
+        }
         gl.enable(WEBGL.BLEND);
         gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     }
