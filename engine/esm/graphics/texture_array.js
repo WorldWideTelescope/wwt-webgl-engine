@@ -61,8 +61,6 @@ var TextureArray$ = {
         if (tilePrepDevice != null) {
             try {
                 var target = useGlVersion2 ? WEBGL.TEXTURE_2D_ARRAY : WEBGL.TEXTURE_2D;
-                
-
 
                 // We're making the implicit assumption here that each image has the same size
                 // after the power of two resizing
@@ -97,13 +95,15 @@ var TextureArray$ = {
 
                         // Before we bind resize to a power of two if necessary so we can MIPMAP
                         image = resizeToPowerOfTwo(image);
-                        tilePrepDevice.texImage2D(target, 0, WEBGL.RGBA, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, this._imageElements[index]);
+                        tilePrepDevice.texImage2D(target, 0, WEBGL.RGBA, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, image);
+                        tilePrepDevice.generateMipmap(target);
+                        tilePrepDevice.texParameteri(target, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
+                        tilePrepDevice.bindTexture(target, null);
+
+                        this.texture2dArray.push(texture);
                     }
                 }
 
-                tilePrepDevice.texParameteri(target, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
-                tilePrepDevice.generateMipmap(target); 
-                tilePrepDevice.bindTexture(target, null);
             } catch (error) {
                 this._errored = true;
             }

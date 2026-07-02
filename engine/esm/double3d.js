@@ -179,7 +179,6 @@ export function PositionColoredTextured() {
     this.tv = 0;
     this.color = new Color();
     this.position = new Vector3d();
-    this.index = 0;
 }
 
 // Summary:

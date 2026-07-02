@@ -2262,7 +2262,7 @@ TextShader.init = function (renderContext) {
 
         var sampleTextureText = `vec4 sampleTexture(int index, vec2 coords) {\n`;
         for (let i = 0; i < TextShader.imageCount; i++) {
-            sampleTextureText += `if (index == ${i}) return texture2D(uSampler[${i}], coords);\n`;
+            sampleTextureText += `        if (index == ${i}) return texture2D(uSampler[${i}], coords);\n`;
         }
         sampleTextureText += "return texture2D(uSampler[0], coords); }";
 
@@ -2302,8 +2302,6 @@ TextShader.init = function (renderContext) {
         }
     `;
 
-    console.log(fragShaderText);
-
     TextShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
     gl.shaderSource(TextShader._frag, fragShaderText);
     gl.compileShader(TextShader._frag);
@@ -2335,14 +2333,7 @@ TextShader.init = function (renderContext) {
     TextShader.layerLoc = gl.getAttribLocation(TextShader._prog, 'aTextureLayer');
     TextShader.projMatLoc = gl.getUniformLocation(TextShader._prog, 'uPMatrix');
     TextShader.mvMatLoc = gl.getUniformLocation(TextShader._prog, 'uMVMatrix');
-    if (useGlVersion2) {
-        TextShader.sampLoc = gl.getUniformLocation(TextShader._prog, 'uSampler');
-    } else {
-        TextShader.sampLocs = [];
-        for (var i = 0; i < TextShader.imageCount; i++) {
-            TextShader.sampLocs.push(gl.getUniformLocation(TextShader._prog, `uSampler[${i}]`));
-        }
-    }
+    TextShader.sampLoc = gl.getUniformLocation(TextShader._prog, 'uSampler');
     TextShader.colorLoc = gl.getUniformLocation(TextShader._prog, 'uColor');
     set_tileUvMultiple(1);
     set_tileDemEnabled(true);
@@ -2395,12 +2386,14 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
             gl.activeTexture(WEBGL.TEXTURE2);
             gl.bindTexture(WEBGL.TEXTURE_2D_ARRAY, texture);
         } else {
-            for (var i = 0; i < TextShader.imageCount; i++) {
+            var sampValues = [];
+            for (let i = 0; i < TextShader.imageCount; i++) {
                 var textureIndex = 2 + i;
-                gl.uniform1i(TextShader.sampLocs[i], textureIndex);
                 gl.activeTexture(WEBGL[`TEXTURE${textureIndex}`]);
                 gl.bindTexture(WEBGL.TEXTURE_2D, texture[i]);
+                sampValues.push(textureIndex);
             }
+            gl.uniform1iv(TextShader.sampLoc, sampValues);
         }
         gl.enable(WEBGL.BLEND);
         gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
