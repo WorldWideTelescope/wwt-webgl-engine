@@ -19,6 +19,16 @@ export function TextureArray() {
     this._downloading = false;
 }
 
+TextureArray.getEmpty = function () {
+    if (TextureArray.empty == null) {
+        TextureArray.empty = tilePrepDevice.createTexture();
+        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, TextureArray.empty);
+        tilePrepDevice.texImage3D(WEBGL.TEXTURE_2D_ARRAY, 0, WEBGL.RGBA, 1, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, null);
+    }
+    return TextureArray.empty;
+};
+
 TextureArray.fromUrls = function (urls) {
     var arr = new TextureArray();
     arr.load(urls);
@@ -27,7 +37,14 @@ TextureArray.fromUrls = function (urls) {
 
 var TextureArray$ = {
     cleanUp: function () {
-        tilePrepDevice.deleteTexture(this.texture2dArray);
+        if (useGlVersion2) {
+          tilePrepDevice.deleteTexture(this.texture2dArray);
+        } else {
+            for (var i = 0; i < this.texture2dArray.length; i++) {
+                tilePrepDevice.deleteTexture(this.texture2dArray[i]);
+            }
+            this.texture2dArray.length = 0;
+        }
         this.imageElements.length = 0;
     },
 
@@ -84,6 +101,9 @@ var TextureArray$ = {
                         image = resizeToPowerOfTwo(image);
                         tilePrepDevice.texSubImage3D(target, 0, 0, 0, index, image.width, image.height, 1, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, image);
                     }
+                    tilePrepDevice.generateMipmap(target);
+                    tilePrepDevice.texParameteri(target, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
+                    tilePrepDevice.bindTexture(target, null);
                 } else {
                     this.texture2dArray = []; 
                     for (let index = 0; index < this._imageElements.length; index++) {

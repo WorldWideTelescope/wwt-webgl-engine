@@ -9,6 +9,7 @@ import { Color } from "../color.js";
 import { set_tileUvMultiple, set_tileDemEnabled, useGlVersion2 } from "../render_globals.js";
 import { WEBGL } from "./webgl_constants.js";
 import { Texture } from "./texture.js";
+import { TextureArray } from "./texture_array.js";
 
 
 // wwtlib.SimpleLineShader
@@ -2353,7 +2354,7 @@ TextShader.set_imageCount = function (number) {
 
 TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
     if (texture == null) {
-        texture = Texture.getEmpty();
+        texture = TextureArray.getEmpty();
     }
     var gl = renderContext.gl;
     if (gl != null) {
