@@ -27,11 +27,11 @@ TextureArray.getEmpty = function () {
             tilePrepDevice.texImage3D(WEBGL.TEXTURE_2D_ARRAY, 0, WEBGL.RGBA, 1, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
             tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, null);
         } else {
-          var texture = tilePrepDevice.createTexture();
-          tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, texture);
-          tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-          tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
-          TextureArray.empty = [texture];
+            var texture = tilePrepDevice.createTexture();
+            tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, texture);
+            tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+            tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
+            TextureArray.empty = [texture];
         }
     }
     return TextureArray.empty;
