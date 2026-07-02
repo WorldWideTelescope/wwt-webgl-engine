@@ -5,17 +5,17 @@
 
 import { ss } from "./ss.js";
 import { registerType, registerEnum } from "./typesystem.js";
-import { Vector2d, Vector3d, Matrix3d, PositionTexture } from "./double3d.js";
+import { Vector2d, Vector3d, Matrix3d, PositionTextureArray } from "./double3d.js";
 import { Util } from "./baseutil.js";
 import { Colors } from "./color.js";
 import { WEBGL } from "./graphics/webgl_constants.js";
-import { PositionTextureVertexBuffer } from "./graphics/gl_buffers.js";
-import { Texture } from "./graphics/texture.js";
+import { PositionTextureArrayVertexBuffer } from "./graphics/gl_buffers.js";
 import { TextShader } from "./graphics/shaders.js";
 import { TextObject } from "./tours/text_object.js";
 import { URLHelpers } from "./url_helpers.js";
 import { Rectangle } from "./util.js";
 import { WebFile } from "./web_file.js";
+import { TextureArray } from "./graphics/texture_array.js";
 
 
 // wwtlib.Alignment
@@ -81,7 +81,7 @@ var Text3dBatch$ = {
             if (!this._glyphCache.ready) {
                 return;
             }
-            TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2d, color, opacity);
+            TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2dArray, color, opacity);
             renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
         }
     },
@@ -122,12 +122,12 @@ var Text3dBatch$ = {
                 if (item != null) {
                     var position = Rectangle.create(left * t3d.scale * factor, 0 * t3d.scale * factor, item.extents.x * fntAdjust * t3d.scale * factor, item.extents.y * fntAdjust * t3d.scale * factor);
                     left += (item.extents.x * fntAdjust);
-                    t3d.addGlyphPoints(verts, item.size, position, item.uvRect);
+                    t3d.addGlyphPoints(verts, item.size, position, item.uvRect, item.index);
                 }
             }
         }
         this._vertCount = verts.length;
-        this._vertexBuffer = new PositionTextureVertexBuffer(this._vertCount);
+        this._vertexBuffer = new PositionTextureArrayVertexBuffer(this._vertCount);
         var vertBuf = this._vertexBuffer.lock();
         for (var i = 0; i < this._vertCount; i++) {
             vertBuf[i] = verts[i];
@@ -152,15 +152,17 @@ export function GlyphItem(glyph) {
     this.referenceCount = 0;
     this.glyph = glyph;
     this.uvRect = new Rectangle();
+    this.index = 0;
     this.size = new Vector2d();
     this.referenceCount = 1;
 }
 
-GlyphItem.create = function (glyph, uv, size, extents) {
+GlyphItem.create = function (glyph, uv, size, extents, index) {
     var temp = new GlyphItem(glyph);
     temp.glyph = glyph;
     temp.uvRect = uv;
     temp.size = size;
+    temp.index = index;
     temp.extents = extents;
     temp.referenceCount = 1;
     return temp;
@@ -192,6 +194,7 @@ registerType("GlyphItem", [GlyphItem, GlyphItem$, null]);
 export function GlyphCache(height) {
     this._cellHeight = 128;
     this._gridSize = 8;
+    this._readyFlags = 0;
     this.ready = false;
     this._glyphItems = {};
     this.textObject = new TextObject();
@@ -199,10 +202,11 @@ export function GlyphCache(height) {
     this._textureDirty = true;
     this._version = 0;
     this._cellHeight = height;
-    this._texture = Texture.fromUrl(URLHelpers.singleton.engineAssetUrl('glyphs1.png'));
-    this._webFile = new WebFile(URLHelpers.singleton.engineAssetUrl('glyphs1.xml'));
-    this._webFile.onStateChange = ss.bind('_glyphXmlReady', this);
-    this._webFile.send();
+    this._texture = null;
+    this._summaryWebFile = new WebFile(URLHelpers.singleton.engineAssetUrl('glyphs2_summary.xml'));
+    this._summaryWebFile.onStateChange = this._glyphSummaryReady.bind(this);
+    this._fileCharacters = {};
+    this._summaryWebFile.send();
 }
 
 GlyphCache._caches = {};
@@ -224,26 +228,74 @@ var GlyphCache$ = {
         return this._cellHeight;
     },
 
-    _glyphXmlReady: function () {
-        if (this._webFile.get_state() === 2) {
-            alert(this._webFile.get_message());
-        } else if (this._webFile.get_state() === 1) {
-            this._loadXmlGlyph(this._webFile.getXml());
+    _glyphSummaryReady: function () {
+        if (this._summaryWebFile.get_state() == 2) {
+            alert(this._summaryWebFile.get_message());
+        } else if (this._summaryWebFile.get_state() == 1) {
+            this._loadGlyphFiles(this._summaryWebFile.getXml());
         }
     },
 
-    _loadXmlGlyph: function (xml) {
+    _loadGlyphFiles: function (xml) {
+        var filesNode = Util.selectSingleNode(xml, 'GlyphFiles');
+        this._webFiles = [];
+        var imagePaths = [];
+        var $enum1 = ss.enumerate(filesNode.childNodes);
+        var $this = this;
+        var index = 0;
+        this._count = 0;
+        while ($enum1.moveNext()) {
+            var glyphFile = $enum1.current;
+            if (glyphFile.nodeName == 'GlyphFile') {
+                this._count += 1;
+                var $enum2 = ss.enumerate(glyphFile.childNodes);
+                while ($enum2.moveNext()) {
+                    var item = $enum2.current;
+                    if (item.nodeName == 'Glyph') {
+                       var character = item.attributes.getNamedItem('Character').nodeValue;
+                    }
+                }
+                var imagePath = glyphFile.attributes.getNamedItem('ImagePath').nodeValue;
+                imagePaths.push(URLHelpers.singleton.engineAssetUrl(imagePath));
+                var xmlPath = glyphFile.attributes.getNamedItem('XMLPath').nodeValue;
+                var webFile = new WebFile(URLHelpers.singleton.engineAssetUrl(xmlPath));
+                webFile.index = index;
+                webFile.onStateChange = function () {
+                    $this._glyphXmlReady(this, this.index);
+                }.bind(webFile);
+                webFile.send();
+                index += 1;
+            }
+        }
+
+        TextShader.set_imageCount(this._count);
+        this._texture = TextureArray.fromUrls(imagePaths);
+    },
+
+    _glyphXmlReady: function (webFile, index) {
+        if (webFile.get_state() === 2) {
+            alert(webFile.get_message());
+        } else if (webFile.get_state() === 1) {
+            this._loadXmlGlyph(webFile.getXml(), index);
+        }
+    },
+
+    _loadXmlGlyph: function (xml, index) {
         var nodes = Util.selectSingleNode(xml, 'GlyphItems');
         var $enum1 = ss.enumerate(nodes.childNodes);
         while ($enum1.moveNext()) {
             var glyphItem = $enum1.current;
             if (glyphItem.nodeName === 'GlyphItem') {
                 var item = GlyphItem._fromXML(glyphItem);
+                item.index = index;
                 this._glyphItems[item.glyph] = item;
                 GlyphCache._allGlyphs = GlyphCache._allGlyphs + item.glyph;
             }
         }
-        this.ready = true;
+        this._readyFlags = this._readyFlags | Math.pow(2, index);
+        if (this._readyFlags == Math.pow(2, this._count) - 1) {
+            this.ready = true;
+        }
     },
 
     get_texture: function () {
@@ -336,10 +388,10 @@ export function Text3d(center, up, text, fontsize, scale) {
 }
 
 var Text3d$ = {
-    addGlyphPoints: function (pointList, size, position, uv) {
+    addGlyphPoints: function (pointList, size, position, uv, index) {
         var points = new Array(6);
         for (var i = 0; i < 6; i++) {
-            points[i] = new PositionTexture();
+            points[i] = new PositionTextureArray();
         }
         var left = Vector3d.cross(this.center, this.up);
         var right = Vector3d.cross(this.up, this.center);
@@ -405,6 +457,12 @@ var Text3d$ = {
         points[4].tu = uv.get_left();
         points[4].tv = uv.get_bottom();
         points[4].position = ll.copy();
+        points[0].index = index;
+        points[1].index = index;
+        points[2].index = index;
+        points[3].index = index;
+        points[4].index = index;
+        points[5].index = index;
         if (!!this.rotation || !!this.tilt || !!this.bank) {
             if (!this._matInit) {
                 var lookAt = Matrix3d.lookAtLH(this.center, new Vector3d(), this.up);

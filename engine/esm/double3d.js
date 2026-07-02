@@ -156,6 +156,22 @@ var PositionTexture$ = {
 registerType("PositionTexture", [PositionTexture, PositionTexture$, null]);
 
 
+// wwtlib.PositionTextureArray
+export function PositionTextureArray() {
+    this.index = 0;
+    PositionTexture.call(this);
+}
+
+
+var PositionTextureArray$ = {
+    toString: function () {
+        return ss.format('{0}, {1}, {2}, {3}, {4}, {5}', this.position.x, this.position.y, this.position.z, this.tu, this.tv, this.index);
+    }
+};
+
+registerType("PositionTextureArray", [PositionTextureArray, PositionTextureArray$, null]);
+
+
 // wwtlib.PositionColoredTextured
 
 export function PositionColoredTextured() {
