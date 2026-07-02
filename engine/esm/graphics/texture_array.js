@@ -21,10 +21,18 @@ export function TextureArray() {
 
 TextureArray.getEmpty = function () {
     if (TextureArray.empty == null) {
-        TextureArray.empty = tilePrepDevice.createTexture();
-        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, TextureArray.empty);
-        tilePrepDevice.texImage3D(WEBGL.TEXTURE_2D_ARRAY, 0, WEBGL.RGBA, 1, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, null);
+        if (useGlVersion2) {
+            TextureArray.empty = tilePrepDevice.createTexture();
+            tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, TextureArray.empty);
+            tilePrepDevice.texImage3D(WEBGL.TEXTURE_2D_ARRAY, 0, WEBGL.RGBA, 1, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+            tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D_ARRAY, null);
+        } else {
+          var texture = tilePrepDevice.createTexture();
+          tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, texture);
+          tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+          tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
+          TextureArray.empty = [texture];
+        }
     }
     return TextureArray.empty;
 };
