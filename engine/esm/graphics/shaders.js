@@ -2235,43 +2235,65 @@ TextShader.imageCount = 1;
 TextShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    var header = useGlVersion2 ?
-        `#version 300 es
-        precision mediump sampler2DArray;`
-        : "";
-    var samplerType = useGlVersion2 ? "sampler2DArray" : `sampler2D[${TextShader.imageCount}]`;
-    var inKeyword = useGlVersion2 ? "in" : "varying";
+    var versionDeclaration = useGlVersion2 ? "#version 300 es" : "";
+    var vertexInKeyword = useGlVersion2 ? "in" : "attribute";
+    var vertexOutKeyword = useGlVersion2 ? "out" : "varying";
 
-    const fragShaderText = `\
-        ${header}
-        precision mediump float;
+    let fragShaderText;
+    if (useGlVersion2) {
+        fragShaderText = 
+          `#version 300 es
+          precision mediump sampler2DArray;
+          precision mediump float;
 
-        ${inKeyword} vec2 vTextureCoord;
-        ${inKeyword} float vTextureLayer;
-        uniform vec4 uColor;
+          in vec2 vTextureCoord;
+          in float vTextureLayer;
+          uniform vec4 uColor;
+          uniform sampler2DArray uSampler;
 
-        ${useGlVersion2 ? 'out vec4 fragColor;' : ''}
+          out vec4 fragColor;
 
-        uniform ${samplerType} uSampler;
+          void main(void) {
+              vec4 texColor = texture(uSampler, vec3(vTextureCoord.s, vTextureCoord.t, vTextureLayer));
+              fragColor = uColor * texColor;
+          }
+        `;
+    } else {
 
-        void main(void) {
-           vec4 texColor;
-           texColor = texture(uSampler, vec3(vTextureCoord.s, vTextureCoord.t, vTextureLayer));
-           ${useGlVersion2 ? 'fragColor' : 'gl_FragColor'} = uColor * texColor;
+        var sampleTextureText = `vec4 sampleTexture(int index, vec2 coords) {\n`;
+        for (let i = 0; i < TextShader.imageCount; i++) {
+            sampleTextureText += `if (index == ${i}) return texture2D(uSampler[${i}], coords);\n`;
         }
-    `;
+        sampleTextureText += "return texture2D(uSampler[0], coords); }";
+
+        fragShaderText = `
+          precision mediump float;
+
+          varying vec2 vTextureCoord;
+          varying float vTextureLayer;
+          uniform vec4 uColor;
+          uniform sampler2D uSampler[${TextShader.imageCount}];
+
+          ${sampleTextureText}
+
+          void main(void) {
+              vec4 texColor = sampleTexture(int(vTextureLayer), vTextureCoord);
+              gl_FragColor = uColor * texColor;
+          }
+        `;
+    }
 
     const vertexShaderText = `\
-        #version 300 es
-        in vec3 aVertexPosition;
-        in vec2 aTextureCoord;
-        in float aTextureLayer;
+        ${versionDeclaration}
+        ${vertexInKeyword} vec3 aVertexPosition;
+        ${vertexInKeyword} vec2 aTextureCoord;
+        ${vertexInKeyword} float aTextureLayer;
 
         uniform mat4 uMVMatrix;
         uniform mat4 uPMatrix;
 
-        out vec2 vTextureCoord;
-        out float vTextureLayer;
+        ${vertexOutKeyword} vec2 vTextureCoord;
+        ${vertexOutKeyword} float vTextureLayer;
 
         void main(void) {
             gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
@@ -2279,6 +2301,8 @@ TextShader.init = function (renderContext) {
             vTextureLayer = aTextureLayer;
         }
     `;
+
+    console.log(fragShaderText);
 
     TextShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
     gl.shaderSource(TextShader._frag, fragShaderText);
@@ -2373,9 +2397,9 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
         } else {
             for (var i = 0; i < TextShader.imageCount; i++) {
                 var textureIndex = 2 + i;
+                gl.uniform1i(TextShader.sampLocs[i], textureIndex);
                 gl.activeTexture(WEBGL[`TEXTURE${textureIndex}`]);
                 gl.bindTexture(WEBGL.TEXTURE_2D, texture[i]);
-                gl.uniform1i(TextShader.sampLocs[i], textureIndex);
             }
         }
         gl.enable(WEBGL.BLEND);
