@@ -268,7 +268,7 @@ var GlyphCache$ = {
             }
         }
 
-        TextShader.set_imageCount(this._count);
+        TextShader.set_textureCount(this._count);
         this._texture = TextureArray.fromUrls(imagePaths);
     },
 

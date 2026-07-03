@@ -2231,7 +2231,7 @@ TextShader.vertLoc = 0;
 TextShader.textureLoc = 0;
 TextShader.initialized = false;
 TextShader._prog = null;
-TextShader.imageCount = 1;
+TextShader.textureCount = 1;
 
 TextShader.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -2262,7 +2262,7 @@ TextShader.init = function (renderContext) {
     } else {
 
         var sampleTextureText = `vec4 sampleTexture(int index, vec2 coords) {\n`;
-        for (let i = 0; i < TextShader.imageCount; i++) {
+        for (let i = 0; i < TextShader.textureCount; i++) {
             sampleTextureText += `        if (index == ${i}) return texture2D(uSampler[${i}], coords);\n`;
         }
         sampleTextureText += "return texture2D(uSampler[0], coords); }";
@@ -2273,7 +2273,7 @@ TextShader.init = function (renderContext) {
           varying vec2 vTextureCoord;
           varying float vTextureLayer;
           uniform vec4 uColor;
-          uniform sampler2D uSampler[${TextShader.imageCount}];
+          uniform sampler2D uSampler[${TextShader.textureCount}];
 
           ${sampleTextureText}
 
@@ -2343,8 +2343,12 @@ TextShader.init = function (renderContext) {
     TextShader.initialized = true;
 };
 
-TextShader.set_imageCount = function (number) {
-    TextShader.imageCount = number;
+TextShader.set_textureCount = function (number) {
+    if (TextShader.textureCount == number) {
+        return;
+    }
+
+    TextShader.textureCount = number;
     // The condition below is not a typo - we only need to re-initialize on
     // an update if we've already initialized
     if (TextShader.initialized) {
@@ -2388,7 +2392,7 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
             gl.bindTexture(WEBGL.TEXTURE_2D_ARRAY, texture);
         } else {
             var sampValues = [];
-            for (let i = 0; i < TextShader.imageCount; i++) {
+            for (let i = 0; i < TextShader.textureCount; i++) {
                 var textureIndex = 2 + i;
                 gl.activeTexture(WEBGL[`TEXTURE${textureIndex}`]);
                 gl.bindTexture(WEBGL.TEXTURE_2D, texture[i]);
