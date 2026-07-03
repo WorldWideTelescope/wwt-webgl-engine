@@ -82,6 +82,7 @@ export function WWTControl() {
 
     this.uiController = null;
     this._annotations = [];
+    this._textBatches = {};
     this._hoverText = '';
     this._hoverTextPoint = new Vector2d();
     this._lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
@@ -435,6 +436,26 @@ var WWTControl$ = {
     _clearAnnotations: function () {
         this._annotations.length = 0;
         Annotation.batchDirty = true;
+    },
+
+    _addTextBatch: function (batch, name) {
+        this._textBatches[name] = batch;
+    },
+
+    _removeTextBatch: function (batch) {
+        for (var name in this._textBatches) {
+            if (this._textBatches[name] == batch) {
+                delete this._textBatches[name];
+            }
+        }
+    },
+
+    _removeTextBatchByName: function (name) {
+        delete this._textBatches[name];
+    },
+
+    _clearTextBatches: function () {
+        this._textBatches = {};
     },
 
     _annotationclicked: function (ra, dec, x, y) {
