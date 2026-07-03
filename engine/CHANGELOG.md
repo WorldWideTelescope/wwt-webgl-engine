@@ -1,5 +1,19 @@
 # rc: minor bump
 
+- Add the ability to filter table layer points. The filtration condition is specified
+  by an arbitrary JavaScript function and can be specified as static (runs once) or 
+  dynamic (runs every frame). Updating the filter writes to a specific masking WebGL
+  buffer without touching the primary data buffer for the layer (#418, #424, @Carifio24).
+- Update how depth is handled for table layers in 3D mode. This is accomplished by
+  using the depth test when drawing points (but not writing to the depth buffer as
+  much of the point texture is transparent) (#377, @Carifio24).
+- Fix a bug in the calculation of the X scale from the CD matrix in an image's WCS.
+  This bug could cause the camera to move to the incorrect location when targeting
+  the image (#420, @Carifio24).
+
+
+# @wwtelescope/engine 7.38.0 (2026-06-16)
+
 - Use the same definition for the galactic rotation matrices in the `Coordinates`
   class and inside the WWT render context. This fixes an issue where the camera would
   be slightly (but noticeably if zoomed in enough) offset when moving to a location in
