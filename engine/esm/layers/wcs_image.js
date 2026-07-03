@@ -225,7 +225,7 @@ var WcsImage$ = {
     },
 
     calculateScaleFromCD: function () {
-        this.scaleX = (Math.sqrt(this.cd1_1 * this.cd1_1 + this.cd2_1 * this.cd2_1) * (this.cd1_1 * this.cd2_2 - this.cd1_2 * this.cd2_1) < 0) ? -1 : 1;
+        this.scaleX = Math.sqrt(this.cd1_1 * this.cd1_1 + this.cd2_1 * this.cd2_1) * ((this.cd1_1 * this.cd2_2 - this.cd1_2 * this.cd2_1) < 0 ? -1 : 1);
         this.scaleY = Math.sqrt(this.cd1_2 * this.cd1_2 + this.cd2_2 * this.cd2_2);
     },
 
