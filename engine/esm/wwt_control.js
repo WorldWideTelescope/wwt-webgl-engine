@@ -243,7 +243,6 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
             gl = canvas.getContext('webgl');
         }
 
-        // var gl = canvas.getContext('webgl');
         if (gl == null) {
             gl = canvas.getContext('experimental-webgl');
         }
