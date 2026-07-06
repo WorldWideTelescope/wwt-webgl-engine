@@ -197,7 +197,7 @@ Constellations._loadArtList = function () {
 // Repeated invocations of this function are OK.
 Constellations.initializeConstellations = function () {
     if (Constellations.containment == null) {
-        var url = URLHelpers.singleton.engineAssetUrl('ConstellationNamePositions_EN.txt');
+        var url = URLHelpers.singleton.engineAssetUrl('ConstellationNamePositions_v2_EN.txt');
         Constellations._webFileConstNames = new WebFile(url);
         Constellations._webFileConstNames.onStateChange = Constellations._loadNames;
         Constellations._webFileConstNames.send();
