@@ -2033,6 +2033,23 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
  */
 export type SpreadSheetLayerSetting = LayerSetting | BaseSpreadSheetLayerSetting;
 
+export class Text3d {
+    constructor(center: Vector3d, up: Vector3d, text: string, fontsize?: number, scale?: number);
+
+    center: Vector3d;
+    up: Vector3d;
+    text: string;
+}
+
+export class Text3dBatch {
+    constructor(height: number);
+
+    add(item: Text3d): void;
+    draw(renderContext: RenderContext, opacity: number, color: Color): void;
+    prepareBatch(): void;
+    cleanUp(): void;
+}
+
 /** A class that represents the current cache of loaded tiles. */
 export class TileCache {
   /** Clear the current cache of tiles */
