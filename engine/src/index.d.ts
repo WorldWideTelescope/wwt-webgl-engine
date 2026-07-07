@@ -1617,7 +1617,7 @@ export class ScriptInterface {
   setTextBatchColor(name: string, color: Color): void;
   setTextBatchSize(name: string, size: number): void;
 
-  addText(text: string, position: Vector3d, up: Vector3d, scale: number, batchName: string): Text3d | null;
+  addText(text: string, position: Vector3d, up: Vector3d, scale: number, batch: string | Text3dBatch): Text3d | null;
   removeText(text3d: Text3dBatch, batchName: string): void;
 }
 

@@ -733,9 +733,9 @@ var ScriptInterface$ = {
         }
     },
 
-    addText: function (text, position, up, scale, batchName) {
-        if (position != null && up != null && batchName != null && globalWWTControl != null) {
-            return globalWWTControl._addText(text, position, up, scale, batchName);
+    addText: function (text, position, up, scale, batchOrName) {
+        if (position != null && up != null && batchOrName != null && globalWWTControl != null) {
+            return globalWWTControl._addText(text, position, up, scale, batchOrName);
         }
         return null;
     },

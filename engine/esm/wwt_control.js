@@ -474,9 +474,19 @@ var WWTControl$ = {
         this._textBatches = {};
     },
 
-    _addText(text, position, up, scale, batchName) {
-        var batch = this._textBatches[batchName];
-        if (batch != null) {
+    _addText(text, position, up, scale, batchOrName) {
+        var data, batch;
+        if (typeof batchOrName === "string") {
+            data = this._textBatches[batchOrName];
+        } else {
+            for (var name in this._textBatches) {
+                if (this._textBatches[name].batch == batchOrName) {
+                    data = this._textBatches[name];
+                }
+            }
+        }
+        if (data != null) {
+            var batch = data.batch;
             var text3d = new Text3d(position, up, text, 1, scale);
             batch.add(text3d);
             return text3d;

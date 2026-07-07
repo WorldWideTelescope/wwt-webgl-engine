@@ -158,6 +158,8 @@ export const WWTAwareComponent = defineComponent({
       "clearAnnotations",
       "deleteLayer",
       "removeAnnotation",
+      "createTextBatch",
+      "createText",
       "removeCatalogHipsByName",
       "seekToTourTimecode",
       "setBackgroundImageByName",

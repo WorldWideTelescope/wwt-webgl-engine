@@ -32,7 +32,10 @@ registerEnum("Alignment", Alignment);
 // wwtlib.Text3dBatch
 
 export function Text3dBatch(height) {
-    this.height = 128;
+    if (height == null) {
+      height = 128;
+    }
+    this.height = height;
     this.items = [];
     this._glyphVersion = -1;
     this.viewTransform = Matrix3d.get_identity();
@@ -136,6 +139,7 @@ var Text3dBatch$ = {
         }
         this._vertexBuffer.unlock();
         this._glyphVersion = this._glyphCache.get_version();
+        this._dirty = false;
     },
 
     cleanUp: function () {

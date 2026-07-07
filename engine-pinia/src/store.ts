@@ -219,7 +219,7 @@ export interface CreateTextBatchOptions {
 export interface AddTextOptions {
   text: string;
   position: Vector3d | { raDeg: number; decDeg: number };
-  batch: string;
+  batch: string | Text3dBatch;
   up?: Vector3d;
   scale?: number;
 }
@@ -2038,7 +2038,7 @@ export const engineStore = defineStore('wwt-engine', {
     createTextBatch(options: CreateTextBatchOptions): Text3dBatch {
       if (this.$wwt.inst === null)
         throw new Error('cannot createTextBatch without linking to WWTInstance');
-      const batch = new Text3dBatch(options.size ?? 1);
+      const batch = new Text3dBatch((options.size ?? 2) / 250);
       this.$wwt.inst.si.addTextBatch(batch, options.name);
       if (options.color) {
         this.$wwt.inst.si.setTextBatchColor(options.name, Color.load(options.color));
