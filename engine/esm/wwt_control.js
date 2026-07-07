@@ -451,19 +451,19 @@ var WWTControl$ = {
         }
     },
 
-    _setBatchSetting(name, settingName, settingValue) {
+    _setTextBatchSetting(name, settingName, settingValue) {
         if (name in this._textBatches) {
             this._textBatches[name][settingName] = settingValue;
             this._textBatches[name].batch.markDirty();
         }
     },
 
-    _setBatchColor: function (name, color) {
-        this._setBatchSetting(name, "color", color);
+    _setTextBatchColor: function (name, color) {
+        this._setTextBatchSetting(name, "color", color);
     },
 
-    _setBatchSize: function (name, size) {
-        this._setBatchSetting(name, "size", size);
+    _setTextBatchSize: function (name, size) {
+        this._setTextBatchSetting(name, "size", size);
     },
 
     _removeTextBatchByName: function (name) {
@@ -474,10 +474,10 @@ var WWTControl$ = {
         this._textBatches = {};
     },
 
-    _addText(text, position, up, batchName) {
+    _addText(text, position, up, scale, batchName) {
         var batch = this._textBatches[batchName];
         if (batch != null) {
-            var text3d = new Text3d(position, up, text);
+            var text3d = new Text3d(position, up, text, 1, scale);
             batch.add(text3d);
             return text3d;
         }

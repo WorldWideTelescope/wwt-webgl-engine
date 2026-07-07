@@ -22,6 +22,7 @@ import { ImageSetLayer } from "./layers/imageset_layer.js";
 import { LayerManager } from "./layers/layer_manager.js";
 import { Folder } from "./folder.js";
 import { Text3d, Text3dBatch } from "./sky_text.js";
+import { Color } from "./color.js";
 
 
 // wwtlib.SlideChangedEventArgs
@@ -720,9 +721,21 @@ var ScriptInterface$ = {
         }
     },
 
-    addText: function (text, position, up, batchName) {
+    setTextBatchColor: function (name, color) {
+        if (name != null && color != null && ss.canCast(color, Color) && globalWWTControl != null) {
+            globalWWTControl._setTextBatchColor(name, color);
+        }
+    },
+
+    setTextBatchSize: function (name, size) {
+        if (name != null && size != null && globalWWTControl != null) {
+            globalWWTControl._setTextBatchSize(name, size);
+        }
+    },
+
+    addText: function (text, position, up, scale, batchName) {
         if (position != null && up != null && batchName != null && globalWWTControl != null) {
-            return globalWWTControl._addText(text, position, up, batchName);
+            return globalWWTControl._addText(text, position, up, scale, batchName);
         }
         return null;
     },

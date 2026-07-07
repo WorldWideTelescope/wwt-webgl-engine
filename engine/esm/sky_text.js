@@ -213,9 +213,12 @@ export function GlyphCache() {
     this._summaryWebFile.send();
 }
 
-GlyphCache._cache = new GlyphCache();
+GlyphCache._cache = null;
 
 GlyphCache.getCache = function () {
+    if (GlyphCache._cache == null) {
+        GlyphCache._cache = new GlyphCache();
+    }
     return GlyphCache._cache;
 };
 

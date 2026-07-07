@@ -1614,8 +1614,10 @@ export class ScriptInterface {
   removeTextBatch(batch: Text3dBatch): void;
   removeTextBatchByName(name: string): void;
   clearTextBatches(): void;
+  setTextBatchColor(name: string, color: Color): void;
+  setTextBatchSize(name: string, size: number): void;
 
-  addText(text: string, position: Vector3d, up: Vector3d, batchName: string): Text3d | null;
+  addText(text: string, position: Vector3d, up: Vector3d, scale: number, batchName: string): Text3d | null;
   removeText(text3d: Text3dBatch, batchName: string): void;
 }
 
