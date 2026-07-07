@@ -39,11 +39,13 @@ export function Text3dBatch(height) {
     this._textObject = new TextObject();
     this._vertCount = 0;
     this.height = (height * 3);
+    this._dirty = false;
 }
 
 var Text3dBatch$ = {
     add: function (newItem) {
         this.items.push(newItem);
+        this._dirty = true;
     },
 
     draw: function (renderContext, opacity, color) {
@@ -75,7 +77,7 @@ var Text3dBatch$ = {
                 ctx.restore();
             }
         } else {
-            if (this._glyphCache == null || this._glyphCache.get_version() > this._glyphVersion) {
+            if (this._dirty || this._glyphCache == null || this._glyphCache.get_version() > this._glyphVersion) {
                 this.prepareBatch();
             }
             if (!this._glyphCache.ready) {

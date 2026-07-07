@@ -52,6 +52,7 @@ import { Planets } from "./planets.js";
 import { Settings } from "./settings.js";
 import { SpaceTimeController } from "./space_time_controller.js";
 import { RenderTriangle } from "./render_triangle.js";
+import { Text3d } from "./sky_text.js";
 import { Tile } from "./tile.js";
 import { TileCache } from "./tile_cache.js";
 import { VideoOutputType } from "./video_output_type.js";
@@ -442,6 +443,10 @@ var WWTControl$ = {
         this._textBatches[name] = batch;
     },
 
+    _getTextBatch: function (name) {
+        return this._textBatches[name];
+    },
+
     _removeTextBatch: function (batch) {
         for (var name in this._textBatches) {
             if (this._textBatches[name] == batch) {
@@ -456,6 +461,23 @@ var WWTControl$ = {
 
     _clearTextBatches: function () {
         this._textBatches = {};
+    },
+
+    _addText(text, position, up, batchName) {
+        var batch = this._textBatches[batchName];
+        if (batch != null) {
+            var text3d = new Text3d(position, up, text);
+            batch.add(text3d);
+            return text3d;
+        }
+        return null;
+    },
+
+    _removeText(text3d, batchName) {
+        var batch = this._textBatches[batchName];
+        if (batch != null) {
+            ss.remove(batch.items, text3d);
+        }
     },
 
     _annotationclicked: function (ra, dec, x, y) {
