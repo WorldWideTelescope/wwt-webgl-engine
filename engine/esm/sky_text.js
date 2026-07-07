@@ -88,7 +88,7 @@ var Text3dBatch$ = {
 
     prepareBatch: function () {
         if (this._glyphCache == null) {
-            this._glyphCache = GlyphCache.getCache(this.height);
+            this._glyphCache = GlyphCache.getCache();
         }
         if (!this._glyphCache.ready) {
             return;
@@ -191,8 +191,7 @@ registerType("GlyphItem", [GlyphItem, GlyphItem$, null]);
 
 // wwtlib.GlyphCache
 
-export function GlyphCache(height) {
-    this._cellHeight = 128;
+export function GlyphCache() {
     this._gridSize = 8;
     this._readyFlags = 0;
     this.ready = false;
@@ -201,7 +200,6 @@ export function GlyphCache(height) {
     this._dirty = true;
     this._textureDirty = true;
     this._version = 0;
-    this._cellHeight = height;
     this._texture = null;
     this._summaryWebFile = new WebFile(URLHelpers.singleton.engineAssetUrl('glyphs2_summary.xml'));
     this._summaryWebFile.onStateChange = this._glyphSummaryReady.bind(this);
@@ -209,25 +207,13 @@ export function GlyphCache(height) {
     this._summaryWebFile.send();
 }
 
-GlyphCache._caches = {};
-GlyphCache._allGlyphs = '';
+GlyphCache._cache = new GlyphCache();
 
-GlyphCache.getCache = function (height) {
-    if (!ss.keyExists(GlyphCache._caches, height)) {
-        GlyphCache._caches[height] = new GlyphCache(height);
-    }
-    return GlyphCache._caches[height];
-};
-
-GlyphCache.cleanUpAll = function () {
-    ss.clearKeys(GlyphCache._caches);
+GlyphCache.getCache = function () {
+    return GlyphCache._cache;
 };
 
 var GlyphCache$ = {
-    get_height: function () {
-        return this._cellHeight;
-    },
-
     _glyphSummaryReady: function () {
         if (this._summaryWebFile.get_state() == 2) {
             alert(this._summaryWebFile.get_message());
