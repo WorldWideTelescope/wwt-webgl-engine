@@ -15,6 +15,7 @@ import {
 import {
   Annotation,
   ColorMapContainer,
+  Coordinates,
   EngineSetting,
   Folder,
   FrameCallback,
@@ -26,6 +27,8 @@ import {
   LayerMap,
   SpreadSheetLayer,
   SpreadSheetLayerSettingsInterfaceRO,
+  Text3d,
+  Text3dBatch,
   TileCache,
   Vector3d,
   WWTControl,
@@ -204,6 +207,18 @@ export class ImageSetLayerState {
   getGuid(): string {
     return this.guidText;
   }
+}
+
+export interface CreateTextBatchOptions {
+  name: string;
+  fontSize: number;
+}
+
+export interface AddTextOptions {
+  text: string;
+  position: Vector3d | { raDeg: number; decDeg: number };
+  up?: Vector3d;
+  batch: string;
 }
 
 /** This interface expresses the properties exposed by the WWT Engine’s Pinia
@@ -2015,6 +2030,24 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot clearAnnotations without linking to WWTInstance');
       this.$wwt.inst.si.clearAnnotations();
+    },
+
+    createTextBatch(options: CreateTextBatchOptions): Text3dBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createTextBatch without linking to WWTInstance');
+      const batch = new Text3dBatch(options.fontSize);
+      this.$wwt.inst.si.addTextBatch(batch, options.name);
+      return batch;
+    },
+
+    createText(options: AddTextOptions): Text3d | null {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createText without linking to WWTInstance');
+      const position: Vector3d = options.position instanceof Vector3d ?
+        options.position :
+        Coordinates.raDecTo3d(options.position.raDeg / 15, options.position.decDeg);
+      const up = options.up != undefined ? options.up : Vector3d.create(0, 1, 0); 
+      return this.$wwt.inst.si.addText(options.text, position, up, options.batch);
     },
 
     // Capturing the current display
