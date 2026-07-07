@@ -143,6 +143,10 @@ var Text3dBatch$ = {
             this._vertexBuffer = null;
         }
         this.items.length = 0;
+    },
+
+    markDirty: function () {
+        this._dirty = true;
     }
 };
 

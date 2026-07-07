@@ -722,8 +722,9 @@ var ScriptInterface$ = {
 
     addText: function (text, position, up, batchName) {
         if (position != null && up != null && batchName != null && globalWWTControl != null) {
-            globalWWTControl._addText(text, position, up, batchName);
+            return globalWWTControl._addText(text, position, up, batchName);
         }
+        return null;
     },
 
     removeText: function (text3d, batchName) {

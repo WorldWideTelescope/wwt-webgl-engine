@@ -440,19 +440,30 @@ var WWTControl$ = {
     },
 
     _addTextBatch: function (batch, name) {
-        this._textBatches[name] = batch;
-    },
-
-    _getTextBatch: function (name) {
-        return this._textBatches[name];
+        this._textBatches[name] = { batch: batch };
     },
 
     _removeTextBatch: function (batch) {
         for (var name in this._textBatches) {
-            if (this._textBatches[name] == batch) {
+            if (this._textBatches[name].batch == batch) {
                 delete this._textBatches[name];
             }
         }
+    },
+
+    _setBatchSetting(name, settingName, settingValue) {
+        if (name in this._textBatches) {
+            this._textBatches[name][settingName] = settingValue;
+            this._textBatches[name].batch.markDirty();
+        }
+    },
+
+    _setBatchColor: function (name, color) {
+        this._setBatchSetting(name, "color", color);
+    },
+
+    _setBatchSize: function (name, size) {
+        this._setBatchSetting(name, "size", size);
     },
 
     _removeTextBatchByName: function (name) {
@@ -1067,6 +1078,13 @@ var WWTControl$ = {
         var constellationLabelsOpacity = this._fadeStates.showConstellationLabels.get_opacity();
         if (constellationLabelsOpacity > 0) {
             Constellations.drawConstellationNames(this.renderContext, constellationLabelsOpacity, Color.load(Settings.get_active().get_constellationLabelsColor()));
+        }
+
+        for (var key in this._textBatches) {
+          var data = this._textBatches[key];
+          var size = data.size != null ? data.size : 1;
+          var color = data.color != null ? data.color : Colors.get_white();
+         data.batch.draw(this.renderContext, size, color);
         }
     },
 
