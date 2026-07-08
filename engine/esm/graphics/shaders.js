@@ -2261,11 +2261,20 @@ TextShader.init = function (renderContext) {
         `;
     } else {
 
-        var sampleTextureText = `vec4 sampleTexture(int index, vec2 coords) {\n`;
+        // J. Carifio notes:
+        // WebGL 1 doesn't allow dynamic indexing of uniform arrays
+        // The obvious thing to do (frequently suggested online) is to do repeated if-elses on the layer index
+        // i.e. manually unroll a loop.
+        // However, while this seems to work well on MacOS, on Windows and Linux this led to mixing of textures
+        // for non-zero indices, seemingly due to issues with the ANGLE compiler
+        // Thus the workaround is to sample all four textures and only use the index for Kronecker delta functions
+        var sampleTextureText = "";
         for (let i = 0; i < TextShader.textureCount; i++) {
-            sampleTextureText += `        if (index == ${i}) return texture2D(uSampler[${i}], coords);\n`;
+            sampleTextureText += `delta(vTextureLayer, ${i}.0, 0.1) * texture2D(uSampler[${i}], vTextureCoord)`;
+            if (i != TextShader.textureCount - 1) {
+                sampleTextureText += " + ";
+            }
         }
-        sampleTextureText += "return texture2D(uSampler[0], coords); }";
 
         fragShaderText = `
           precision mediump float;
@@ -2275,10 +2284,13 @@ TextShader.init = function (renderContext) {
           uniform vec4 uColor;
           uniform sampler2D uSampler[${TextShader.textureCount}];
 
-          ${sampleTextureText}
+          float delta(float x, float target, float epsilon) {
+              return step(target - epsilon, x) * step(x, target + epsilon);
+          }
 
           void main(void) {
-              vec4 texColor = sampleTexture(int(vTextureLayer), vTextureCoord);
+              int index = int(vTextureLayer);
+              vec4 texColor = ${sampleTextureText};
               gl_FragColor = uColor * texColor;
           }
         `;
