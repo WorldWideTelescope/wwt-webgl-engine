@@ -2266,14 +2266,11 @@ TextShader.init = function (renderContext) {
         // The obvious thing to do (frequently suggested online) is to do repeated if-elses on the layer index
         // i.e. manually unroll a loop.
         // However, while this seems to work well on MacOS, on Windows and Linux this led to mixing of textures
-        // for non-zero indices, seemingly due to issues with the ANGLE compiler
-        // Thus the workaround is to sample all four textures and only use the index for Kronecker delta functions
+        // for non-zero indices, seemingly due to issues with the ANGLE compiler.
+        // Thus the workaround is to use the index in a Kronecker delta (with a bit of leeway) to only sample the relevant texture 
         var sampleTextureText = "";
         for (let i = 0; i < TextShader.textureCount; i++) {
-            sampleTextureText += `delta(vTextureLayer, ${i}.0, 0.1) * texture2D(uSampler[${i}], vTextureCoord)`;
-            if (i != TextShader.textureCount - 1) {
-                sampleTextureText += " + ";
-            }
+            sampleTextureText += `if (delta(vTextureLayer, ${i}.0, 0.1) > 0.0) {\n    texColor += texture2D(uSampler[${i}], vTextureCoord);\n}\n`;
         }
 
         fragShaderText = `
@@ -2290,10 +2287,12 @@ TextShader.init = function (renderContext) {
 
           void main(void) {
               int index = int(vTextureLayer);
-              vec4 texColor = ${sampleTextureText};
+              vec4 texColor = vec4(0.0);
+              ${sampleTextureText};
               gl_FragColor = uColor * texColor;
           }
         `;
+        console.log(fragShaderText);
     }
 
     const vertexShaderText = `\
