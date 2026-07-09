@@ -233,6 +233,7 @@ WWTControl.initControl6 = function (DivId, startRenderLoop, startLat, startLng, 
         WWTControl.scriptInterface.settings = Settings.get_current();
         set_globalScriptInterface(WWTControl.scriptInterface);
         var canvas = WWTControl._createCanvasElement(DivId);
+
         var gl = canvas.getContext('webgl2');
 
         if (gl != null) {
