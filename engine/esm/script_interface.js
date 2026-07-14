@@ -695,6 +695,13 @@ var ScriptInterface$ = {
         }
     },
 
+    textBatches: function () {
+        if (globalWWTControl != null) {
+          return globalWWTControl._textBatches;
+        }
+        return {};
+    },
+
     addTextBatch: function (batch, name) {
         if (batch != null && ss.canCast(batch, Text3dBatch)) {
             if (globalWWTControl != null) {
@@ -740,9 +747,9 @@ var ScriptInterface$ = {
         return null;
     },
 
-    removeText: function (text3d, batchName) {
-        if (text3d != null && ss.canCast(text3d, Text3d) && batchName != null && globalWWTControl != null) {
-           globalWWTControl._removeText(text3d, batchName);
+    removeText: function (text3d, batchOrName) {
+        if (text3d != null && ss.canCast(text3d, Text3d) && (typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch)) && globalWWTControl != null) {
+           globalWWTControl._removeText(text3d, batchOrName);
         }
     },
 

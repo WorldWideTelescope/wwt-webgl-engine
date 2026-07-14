@@ -474,17 +474,20 @@ var WWTControl$ = {
         this._textBatches = {};
     },
 
-    _addText(text, position, up, scale, batchOrName) {
-        var data, batch;
+    _getTextBatchData: function (batchOrName) {
         if (typeof batchOrName === "string") {
-            data = this._textBatches[batchOrName];
+            return this._textBatches[batchOrName];
         } else {
             for (var name in this._textBatches) {
                 if (this._textBatches[name].batch == batchOrName) {
-                    data = this._textBatches[name];
+                    return this._textBatches[name];
                 }
             }
         }
+    },
+
+    _addText: function (text, position, up, scale, batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
         if (data != null) {
             var batch = data.batch;
             var text3d = new Text3d(position, up, text, 1, scale);
@@ -494,11 +497,26 @@ var WWTControl$ = {
         return null;
     },
 
-    _removeText(text3d, batchName) {
-        var batch = this._textBatches[batchName];
+    _removeText: function (text3d, batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
+        var batch = data != null ? data.batch : null;
         if (batch != null) {
             ss.remove(batch.items, text3d);
+            return true;
         }
+        return false;
+    },
+
+    _textItems: function (batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
+        var batch = data != null ? data.batch : null;
+        var items = [];
+        if (batch != null) {
+            for (var i = 0; i < batch.items.length; i++) {
+                items.push(batch.items[i]);
+            }
+        }
+        return items;
     },
 
     _annotationclicked: function (ra, dec, x, y) {

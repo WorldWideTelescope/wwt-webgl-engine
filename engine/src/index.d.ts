@@ -1458,6 +1458,12 @@ export class RenderContext {
   onTarget(place: Place): boolean;
 }
 
+export interface TextBatchData {
+  batch: Text3dBatch;
+  color?: string;
+  size?: string;
+}
+
 export class ScriptInterface {
   /** The rendering settings associated with the viewer. */
   settings: Settings;
@@ -1610,15 +1616,17 @@ export class ScriptInterface {
   /** Remove all annotations from the renderer. */
   clearAnnotations(): void;
 
+  textBatches(): Record<string, TextBatchData>;
   addTextBatch(batch: Text3dBatch, name: string): void;
   removeTextBatch(batch: Text3dBatch): void;
   removeTextBatchByName(name: string): void;
   clearTextBatches(): void;
   setTextBatchColor(name: string, color: Color): void;
   setTextBatchSize(name: string, size: number): void;
+  textItems(batch: string | Text3dBatch): Text3d[];
 
   addText(text: string, position: Vector3d, up: Vector3d, scale: number, batch: string | Text3dBatch): Text3d | null;
-  removeText(text3d: Text3dBatch, batchName: string): void;
+  removeText(text3d: Text3dBatch, batch: string | Text3dBatch): void;
 }
 
 /** A generic {@link ScriptInterface} callback. */

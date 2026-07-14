@@ -224,6 +224,11 @@ export interface AddTextOptions {
   scale?: number;
 }
 
+export interface RemoveTextOptions {
+  text: Text3d;
+  batch?: string | Text3dBatch;
+}
+
 /** This interface expresses the properties exposed by the WWT Engine’s Pinia
  * store module. These are re-exposed by {@link WWTAwareComponent} with their
  * names prefixed with `wwt`.
@@ -2057,6 +2062,13 @@ export const engineStore = defineStore('wwt-engine', {
         Coordinates.raDecTo3d(options.position.raDeg / 15, options.position.decDeg);
       const up = options.up != undefined ? options.up : Vector3d.create(0, 1, 0); 
       return this.$wwt.inst.si.addText(options.text, position, up, options.scale ?? 1, options.batch);
+    },
+
+    removeText(options: RemoveTextOptions): boolean {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeText without linking to WWTInstance');
+      let batch = options.batch;
+
     },
 
     // Capturing the current display
