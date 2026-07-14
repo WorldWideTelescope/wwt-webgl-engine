@@ -1625,7 +1625,7 @@ export class ScriptInterface {
   getTextItems(batch: string | Text3dBatch): Text3d[];
 
   addText(text: string, position: Vector3d, up: Vector3d, scale: number, batch: string | Text3dBatch): Text3d | null;
-  removeText(text3d: Text3dBatch, batch: string | Text3dBatch): void;
+  removeText(text3d: Text3d, batch: string | Text3dBatch): void;
 }
 
 /** A generic {@link ScriptInterface} callback. */
