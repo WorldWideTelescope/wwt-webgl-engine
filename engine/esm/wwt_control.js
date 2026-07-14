@@ -503,9 +503,7 @@ var WWTControl$ = {
         var batch = data != null ? data.batch : null;
         if (batch != null) {
             ss.remove(batch.items, text3d);
-            return true;
         }
-        return false;
     },
 
     _get_textItems: function (batchOrName) {

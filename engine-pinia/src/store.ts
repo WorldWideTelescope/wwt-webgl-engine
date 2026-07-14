@@ -226,7 +226,8 @@ export interface AddTextOptions {
 
 export interface RemoveTextOptions {
   text: Text3d;
-  batch?: string | Text3dBatch;
+  // TODO: Make this optional
+  batch: string | Text3dBatch;
 }
 
 /** This interface expresses the properties exposed by the WWT Engine’s Pinia
@@ -2054,6 +2055,12 @@ export const engineStore = defineStore('wwt-engine', {
       return batch;
     },
 
+    removeTextBatch(batch: string | Text3dBatch) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeTextBatch without linking to WWTInstance');
+      this.$wwt.inst.si.removeTextBatch(batch);
+    },
+
     createText(options: AddTextOptions): Text3d | null {
       if (this.$wwt.inst === null)
         throw new Error('cannot createText without linking to WWTInstance');
@@ -2064,11 +2071,10 @@ export const engineStore = defineStore('wwt-engine', {
       return this.$wwt.inst.si.addText(options.text, position, up, options.scale ?? 1, options.batch);
     },
 
-    removeText(options: RemoveTextOptions): boolean {
+    removeText(options: RemoveTextOptions) {
       if (this.$wwt.inst === null)
         throw new Error('cannot removeText without linking to WWTInstance');
-      let batch = options.batch;
-
+      return this.$wwt.inst.si.removeText(options.text, options.batch);
     },
 
     // Capturing the current display
