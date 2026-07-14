@@ -30,6 +30,7 @@ import {
   SpreadSheetLayerSettingsInterfaceRO,
   Text3d,
   Text3dBatch,
+  TextBatchSetting,
   TileCache,
   Vector3d,
   WWTControl,
@@ -214,6 +215,12 @@ export interface CreateTextBatchOptions {
   name: string;
   size?: number;
   color?: string;
+  opacity?: number;
+}
+
+export interface ApplyTextBatchSettingOptions {
+  batch: string | Text3dBatch;
+  setting: TextBatchSetting;
 }
 
 export interface AddTextOptions {
@@ -2047,12 +2054,18 @@ export const engineStore = defineStore('wwt-engine', {
       const batch = new Text3dBatch((options.size ?? 2) / 250);
       this.$wwt.inst.si.addTextBatch(batch, options.name);
       if (options.color) {
-        this.$wwt.inst.si.setTextBatchColor(options.name, Color.load(options.color));
+        this.$wwt.inst.si.applyTextBatchSetting(options.name, ["color", Color.load(options.color)]);
       }
-      if (options.size != null) {
-        this.$wwt.inst.si.setTextBatchSize(options.name, options.size);
+      if (options.opacity != null) {
+        this.$wwt.inst.si.applyTextBatchSetting(options.name, ["opacity", options.opacity]);
       }
       return batch;
+    },
+
+    applyTextBatchSetting(batch: string | Text3dBatch, setting: TextBatchSetting) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot applyTextBatchSetting without linking to WWTInstance');
+      this.$wwt.inst.si.applyTextBatchSetting(batch, setting);
     },
 
     removeTextBatch(batch: string | Text3dBatch) {

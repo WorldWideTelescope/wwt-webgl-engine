@@ -722,15 +722,9 @@ var ScriptInterface$ = {
         }
     },
 
-    setTextBatchColor: function (batchOrName, color) {
-        if ((typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch)) && color != null && ss.canCast(color, Color) && globalWWTControl != null) {
-            globalWWTControl._setTextBatchColor(batchOrName, color);
-        }
-    },
-
-    setTextBatchSize: function (batchOrName, size) {
-        if ((typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch)) && size != null && globalWWTControl != null) {
-            globalWWTControl._setTextBatchSize(batchOrName, size);
+    applyTextBatchSetting: function (batchOrName, setting) {
+        if (globalWWTControl != null && setting != null) {
+            globalWWTControl._applyTextBatchSetting(batchOrName, setting[0], setting[1]);
         }
     },
 
@@ -738,7 +732,6 @@ var ScriptInterface$ = {
         if (position != null && up != null && batchOrName != null && globalWWTControl != null) {
             return globalWWTControl._addText(text, position, up, scale, batchOrName);
         }
-        return null;
     },
 
     removeText: function (text3d, batchOrName) {

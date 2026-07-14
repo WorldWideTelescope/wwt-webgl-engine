@@ -33,7 +33,7 @@ registerEnum("Alignment", Alignment);
 
 export function Text3dBatch(height) {
     if (height == null) {
-      height = 128;
+        height = 128;
     }
     this.height = height;
     this.items = [];

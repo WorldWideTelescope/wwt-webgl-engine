@@ -455,20 +455,16 @@ var WWTControl$ = {
         }
     },
 
-    _setTextBatchSetting(batchOrName, settingName, settingValue) {
+    _applyTextBatchSetting(batchOrName, settingName, settingValue) {
         var data = this._getTextBatchData(batchOrName);
         if (data != null) {
-            data[settingName] = settingValue;
+            if (settingName == "size") {
+                data.batch.height = settingValue;
+            } else {
+                data[settingName] = settingValue;
+            }
             data.batch.markDirty();
         }
-    },
-
-    _setTextBatchColor: function (nameOrBatch, color) {
-        this._setTextBatchSetting(nameOrBatch, "color", color);
-    },
-
-    _setTextBatchSize: function (nameOrBatch, size) {
-        this._setTextBatchSetting(nameOrBatch, "size", size);
     },
 
     _clearTextBatches: function () {
@@ -1111,7 +1107,8 @@ var WWTControl$ = {
           var data = this._textBatches[key];
           var size = data.size != null ? data.size : 1;
           var color = data.color != null ? data.color : Colors.get_white();
-         data.batch.draw(this.renderContext, size, color);
+          var opacity = data.opacity != null ? data.opacity : 1;
+          data.batch.draw(this.renderContext, opacity, color);
         }
     },
 

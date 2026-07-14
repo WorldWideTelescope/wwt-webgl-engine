@@ -1464,6 +1464,8 @@ export interface TextBatchData {
   size?: string;
 }
 
+export type TextBatchSetting = ["size", number] | ["color", Color] | ["opacity", number];
+
 export class ScriptInterface {
   /** The rendering settings associated with the viewer. */
   settings: Settings;
@@ -1619,8 +1621,7 @@ export class ScriptInterface {
   addTextBatch(batch: Text3dBatch, name: string): void;
   removeTextBatch(batch: string | Text3dBatch): void;
   clearTextBatches(): void;
-  setTextBatchColor(batch: string | Text3dBatch, color: Color): void;
-  setTextBatchSize(batch: string | Text3dBatch, size: number): void;
+  applyTextBatchSetting(batch: string | Text3dBatch, setting: TextBatchSetting): void;
   getTextBatches(): Record<string, TextBatchData>;
   getTextItems(batch: string | Text3dBatch): Text3d[];
 
