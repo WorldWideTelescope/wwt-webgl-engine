@@ -695,7 +695,7 @@ var ScriptInterface$ = {
         }
     },
 
-    textBatches: function () {
+    getTextBatches: function () {
         if (globalWWTControl != null) {
           return globalWWTControl._textBatches;
         }
@@ -710,15 +710,9 @@ var ScriptInterface$ = {
         }
     },
 
-    removeTextBatch: function (batch) {
+    removeTextBatch: function (batchOrName) {
         if (batch != null && globalWWTControl != null) {
-            globalWWTControl._removeTextBatch(batch);
-        }
-    },
-
-    removeTextBatchByName: function (name) {
-        if (name != null && globalWWTControl != null) {
-            globalWWTControl._removeTextBatchByName(name);
+            globalWWTControl._removeTextBatch(batchOrName);
         }
     },
 
@@ -728,15 +722,15 @@ var ScriptInterface$ = {
         }
     },
 
-    setTextBatchColor: function (name, color) {
-        if (name != null && color != null && ss.canCast(color, Color) && globalWWTControl != null) {
-            globalWWTControl._setTextBatchColor(name, color);
+    setTextBatchColor: function (batchOrName, color) {
+        if ((typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch)) && color != null && ss.canCast(color, Color) && globalWWTControl != null) {
+            globalWWTControl._setTextBatchColor(batchOrName, color);
         }
     },
 
-    setTextBatchSize: function (name, size) {
-        if (name != null && size != null && globalWWTControl != null) {
-            globalWWTControl._setTextBatchSize(name, size);
+    setTextBatchSize: function (batchOrName, size) {
+        if ((typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch)) && size != null && globalWWTControl != null) {
+            globalWWTControl._setTextBatchSize(batchOrName, size);
         }
     },
 
@@ -751,6 +745,13 @@ var ScriptInterface$ = {
         if (text3d != null && ss.canCast(text3d, Text3d) && (typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch)) && globalWWTControl != null) {
            globalWWTControl._removeText(text3d, batchOrName);
         }
+    },
+
+    getTextItems: function (batchOrName) {
+        if (globalWWTControl != null && (typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch))) {
+            return globalWWTControl._get_textItems(batchOrName);
+        }
+        return [];
     },
 
     get_smoothAnimation: function () {

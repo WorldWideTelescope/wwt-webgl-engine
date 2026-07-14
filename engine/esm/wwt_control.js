@@ -443,31 +443,32 @@ var WWTControl$ = {
         this._textBatches[name] = { batch: batch };
     },
 
-    _removeTextBatch: function (batch) {
-        for (var name in this._textBatches) {
-            if (this._textBatches[name].batch == batch) {
-                delete this._textBatches[name];
+    _removeTextBatch: function (batchOrName) {
+        if (typeof batchOrName === "string") {
+            delete this._textBatches[batchOrName];
+        } else {
+            for (var name in this._textBatches) {
+                if (this._textBatches[name].batch == batch) {
+                    delete this._textBatches[name];
+                }
             }
         }
     },
 
-    _setTextBatchSetting(name, settingName, settingValue) {
-        if (name in this._textBatches) {
-            this._textBatches[name][settingName] = settingValue;
-            this._textBatches[name].batch.markDirty();
+    _setTextBatchSetting(batchOrName, settingName, settingValue) {
+        var data = this._getTextBatchData(batchOrName);
+        if (data != null) {
+            data[settingName] = settingValue;
+            data.batch.markDirty();
         }
     },
 
-    _setTextBatchColor: function (name, color) {
-        this._setTextBatchSetting(name, "color", color);
+    _setTextBatchColor: function (nameOrBatch, color) {
+        this._setTextBatchSetting(nameOrBatch, "color", color);
     },
 
-    _setTextBatchSize: function (name, size) {
-        this._setTextBatchSetting(name, "size", size);
-    },
-
-    _removeTextBatchByName: function (name) {
-        delete this._textBatches[name];
+    _setTextBatchSize: function (nameOrBatch, size) {
+        this._setTextBatchSetting(nameOrBatch, "size", size);
     },
 
     _clearTextBatches: function () {
@@ -507,7 +508,7 @@ var WWTControl$ = {
         return false;
     },
 
-    _textItems: function (batchOrName) {
+    _get_textItems: function (batchOrName) {
         var data = this._getTextBatchData(batchOrName);
         var batch = data != null ? data.batch : null;
         var items = [];

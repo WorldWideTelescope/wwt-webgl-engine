@@ -1616,14 +1616,13 @@ export class ScriptInterface {
   /** Remove all annotations from the renderer. */
   clearAnnotations(): void;
 
-  textBatches(): Record<string, TextBatchData>;
   addTextBatch(batch: Text3dBatch, name: string): void;
-  removeTextBatch(batch: Text3dBatch): void;
-  removeTextBatchByName(name: string): void;
+  removeTextBatch(batch: string | Text3dBatch): void;
   clearTextBatches(): void;
-  setTextBatchColor(name: string, color: Color): void;
-  setTextBatchSize(name: string, size: number): void;
-  textItems(batch: string | Text3dBatch): Text3d[];
+  setTextBatchColor(batch: string | Text3dBatch, color: Color): void;
+  setTextBatchSize(batch: string | Text3dBatch, size: number): void;
+  getTextBatches(): Record<string, TextBatchData>;
+  getTextItems(batch: string | Text3dBatch): Text3d[];
 
   addText(text: string, position: Vector3d, up: Vector3d, scale: number, batch: string | Text3dBatch): Text3d | null;
   removeText(text3d: Text3dBatch, batch: string | Text3dBatch): void;
