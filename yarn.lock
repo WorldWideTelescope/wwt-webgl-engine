@@ -1961,7 +1961,7 @@ __metadata:
   dependencies:
     "@types/jsdom": ^21.1.0
     "@types/nightwatch": ^2.3.12
-    axios: ^1.16
+    axios: ^1.18
     browserstack-local: ^1.5.13
     chromedriver: ^119.0.1
     edgedriver: ^4.17134.1
@@ -2503,7 +2503,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.16, axios@npm:^1.6.0":
+"axios@npm:^1.18":
+  version: 1.18.0
+  resolution: "axios@npm:1.18.0"
+  dependencies:
+    follow-redirects: ^1.16.0
+    form-data: ^4.0.5
+    https-proxy-agent: ^5.0.1
+    proxy-from-env: ^2.1.0
+  checksum: 87e66c8583f69f3aec2d03d2840e4074d71c67d0e06a5c33de8926b0f11c9d31a8509adc6814167cc1fc470bc3f24f99a10fcb6632843192126567340dd1a8ce
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.6.0":
   version: 1.16.1
   resolution: "axios@npm:1.16.1"
   dependencies:
