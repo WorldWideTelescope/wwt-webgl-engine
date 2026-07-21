@@ -56,6 +56,10 @@ ColorMapContainer.registerNamedColormap = function (name, colormap) {
   ColorMapContainer._namedColormaps[name] = colormap;
 }
 
+ColorMapContainer.deregisterNamedColormap = function (name) {
+  delete ColorMapContainer._namedColormaps[name];
+}
+
 ColorMapContainer._getTextureFromName = function (gl, name) {
     var texture = ColorMapContainer.colorTextures[name];
     if (texture == null) {
