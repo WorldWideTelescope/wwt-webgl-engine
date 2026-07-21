@@ -14,6 +14,8 @@ import {
 
 import {
   Annotation,
+  Color,
+  ColorMapContainer,
   EngineSetting,
   Folder,
   FrameCallback,
@@ -521,6 +523,18 @@ export interface LoadImageCollectionParams {
   url: string;
   /** Optional, Recursively load any child folders. Defaults to false*/
   loadChildFolders?: boolean;
+}
+
+/** The parameters for the {{@link engineStore.createColormap} action. */
+export interface CreateColormapOptions {
+  /** The colormap's name. Some WWT APIs (like FITS image properties) reference colormaps by name */
+  name: string;
+
+  /**
+   * A list of colors to define the map, as a list of either
+   * - [A, R, G, B] lists (with values integers between 0 and 255),
+   * - String values that can be understood by Color.load */
+  colors: ([number, number, number, number] | string)[];
 }
 
 /** This function creates the list of currently active layers.
@@ -1528,6 +1542,16 @@ export const engineStore = defineStore('wwt-engine', {
           resolve(tourXml);
         }
       });
+    },
+
+    createColormap(options: CreateColormapOptions) {
+      let colormap: ColorMapContainer;
+      if (options.colors.every(item => typeof item === "string")) {
+        colormap = ColorMapContainer.fromStringList(options.colors as string[]);
+      } else {
+        colormap = ColorMapContainer.fromArgbList(options.colors as [number, number, number, number][]);
+      }
+      ColorMapContainer.registerNamedColormap(options.name, colormap);
     },
 
     /** Wait for the WWT engine to become ready for usage.
