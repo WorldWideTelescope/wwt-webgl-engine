@@ -205,3 +205,9 @@ export function isMultiModifyAnnotationMessage(o: any): o is MultiModifyAnnotati
     typeof o.settings === 'object' &&
     typeof o.values === 'object';
 }
+
+export interface CreateColormapMessage {
+  event: "create_colormap";
+  name: string;
+  colors: ([number, number, number, number] | string)[];
+}
