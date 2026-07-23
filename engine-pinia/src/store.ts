@@ -532,9 +532,9 @@ export interface CreateColormapOptions {
 
   /**
    * A list of colors to define the map, as a list of either
-   * - [A, R, G, B] lists (with values integers between 0 and 255),
+   * - [A, R, G, B] or [R, G, B] lists (with values integers between 0 and 255),
    * - String values that can be understood by Color.load */
-  colors: ([number, number, number, number] | string)[];
+  colors: ([number, number, number, number?] | string)[];
 }
 
 /** This function creates the list of currently active layers.
@@ -1549,7 +1549,11 @@ export const engineStore = defineStore('wwt-engine', {
       if (options.colors.every(item => typeof item === "string")) {
         colormap = ColorMapContainer.fromStringList(options.colors as string[]);
       } else {
-        colormap = ColorMapContainer.fromArgbList(options.colors as [number, number, number, number][]);
+        const colors = options.colors.map(color => {
+          if (colors.length === 4) { return color };
+          return [1, ...color];
+        });
+        colormap = ColorMapContainer.fromArgbList(colors as [number, number, number, number][]);
       }
       ColorMapContainer.registerNamedColormap(options.name, colormap);
     },
