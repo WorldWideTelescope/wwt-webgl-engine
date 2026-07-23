@@ -1550,7 +1550,7 @@ export const engineStore = defineStore('wwt-engine', {
         colormap = ColorMapContainer.fromStringList(options.colors as string[]);
       } else {
         const colors = options.colors.map(color => {
-          if (colors.length === 4) { return color };
+          if (colors.length === 4) { return color }
           return [1, ...color];
         });
         colormap = ColorMapContainer.fromArgbList(colors as [number, number, number, number][]);
