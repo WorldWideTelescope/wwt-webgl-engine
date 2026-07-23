@@ -145,6 +145,8 @@ export const WWTAwareComponent = defineComponent({
       "waitForReady",
       "addFrameCallback",
       "removeFrameCallback",
+      "createColormap",
+      "deleteColormap",
       // Formerly mutations
       "addAnnotation",
       "applyFitsLayerSettings",
