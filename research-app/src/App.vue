@@ -1256,6 +1256,10 @@ const App = defineComponent({
       appTableLayers: store => store.tableLayers,
       spreadsheetLayers: store => store.tableLayers()
     }),
+    ...mapActions(researchAppStore, [
+      "addNamedColormap",
+      "removeNamedColormap",
+    ]),
 
     curAvailableImageryData(): ImagesetInfo[] {
       if (this.wwtAvailableImagesets == null) return [];
@@ -1881,6 +1885,9 @@ const App = defineComponent({
         this.handleGetHipsCatalogDataInView
       );
 
+      this.messageHandlers.set("create_colormap", this.handleCreateColormap);
+      this.messageHandlers.set("delete_colormap", this.handleDeleteColormap);
+
       this.messageHandlers.set("annotation_create", this.handleCreateAnnotation);
       this.messageHandlers.set("annotation_set", this.handleModifyAnnotation);
       this.messageHandlers.set(
@@ -2047,6 +2054,22 @@ const App = defineComponent({
       if (!isClearTileCacheMessage(msg)) return false;
 
       this.clearTileCache();
+      return true;
+    },
+
+    handleCreateColormap(msg: any): boolean {
+      if (!layers.isCreateColormapMessage(msg)) return false;
+
+      this.createColormap(msg);
+      this.addNamedColormap(msg.name);
+      return true;
+    },
+
+    handleDeleteColormap(msg: any): boolean {
+      if (!layers.isDeleteColormapMessage(msg)) return false;
+
+      this.deleteColormap(msg.name);
+      this.removeNamedColormap(msg.name);
       return true;
     },
 
