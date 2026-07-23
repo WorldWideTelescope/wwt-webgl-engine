@@ -228,7 +228,7 @@ export interface CreateColormapMessage {
 }
 
 /** A type-guard function for {@link CreateColormapMessage}. */
-export function CreateColormapMessage(o: any): o is CreateColormapMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+export function isCreateColormapMessage(o: any): o is CreateColormapMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event === "create_colormap" &&
     typeof o.name === "string" &&
     Array.isArray(o.colors) &&
@@ -253,7 +253,7 @@ export interface DeleteColormapMessage {
 }
 
 /** A type-guard function for {@link DeleteColormapMessage} */
-export function DeleteColormapMessage(o: any): o is DeleteColormapMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+export function isDeleteColormapMessage(o: any): o is DeleteColormapMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
   return o.event === "delete_colormap" &&
     typeof o.name === "string";
 }
