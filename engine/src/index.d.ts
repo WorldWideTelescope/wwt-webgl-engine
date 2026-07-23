@@ -649,6 +649,12 @@ export namespace ColorMapContainer {
    * no longer be accessible via `fromNamedColormap`).
    */
   export function registerNamedColormap(name: string, colormap: ColorMapContainer): void;
+
+  /** Deregister the colormap with the given name, if one exists.
+   *
+   * Note that it is possible to deregister one of the build-in colormaps from the registry.
+   */
+  export function deregisterNamedColormap(name: string): void;
 }
 
 /** A class describing rise/set/transit details */

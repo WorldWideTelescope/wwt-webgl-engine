@@ -1558,11 +1558,15 @@ export const engineStore = defineStore('wwt-engine', {
       ColorMapContainer.registerNamedColormap(options.name, colormap);
     },
 
+    deleteColormap(name: string) {
+      ColorMapContainer.deregisterNamedColormap(name);
+    },
+
     /** Wait for the WWT engine to become ready for usage.
      *
      * You should invoke this action and wait for is completion before trying to
      * do anything else with a WWT-aware component. The action resolves when the
-     * WWT engine has completed its initialization, which involes the download of
+     * WWT engine has completed its initialization, which involves the download of
      * some supporting data files.
      */
     async waitForReady(): Promise<void> {
