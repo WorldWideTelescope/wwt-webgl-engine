@@ -225,10 +225,7 @@ export const researchAppStore = defineStore('wwt-research-app', {
     },
 
     removeNamedColormap(name: string) {
-      const index = this.colormaps.findIndex(info => info.wwt === name);
-      if (index > -1) {
-        this.colormaps.splice(index, 1);
-      }
+      removeFromArray(this.colormaps, { wwt: name, desc: name });
     },
 
   }

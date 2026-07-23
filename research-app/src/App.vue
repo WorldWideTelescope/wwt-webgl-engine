@@ -1256,10 +1256,6 @@ const App = defineComponent({
       appTableLayers: store => store.tableLayers,
       spreadsheetLayers: store => store.tableLayers()
     }),
-    ...mapActions(researchAppStore, [
-      "addNamedColormap",
-      "removeNamedColormap",
-    ]),
 
     curAvailableImageryData(): ImagesetInfo[] {
       if (this.wwtAvailableImagesets == null) return [];
@@ -1378,8 +1374,10 @@ const App = defineComponent({
 
   methods: {
     ...mapActions(researchAppStore, [
+      "addNamedColormap",
       'addResearchAppTableLayer',
       'addSource',
+      "removeNamedColormap",
       'removeResearchAppTableLayer',
       'setResearchAppTableLayerSelectability',
     ]),
