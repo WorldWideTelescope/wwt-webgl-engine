@@ -605,6 +605,10 @@ export namespace Color {
 
 /** A mapping from scalar values to colors. */
 export class ColorMapContainer {
+  
+  /** The list of colors that define the colormap */
+  colors: Color[];
+
   /** Find the color in this map closest to the input scalar.
    *
    * The input value should be between 0 and 1. Zero maps to the first color in

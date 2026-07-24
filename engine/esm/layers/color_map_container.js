@@ -53,11 +53,11 @@ ColorMapContainer.fromNamedColormap = function (name) {
 };
 
 ColorMapContainer.registerNamedColormap = function (name, colormap) {
-  ColorMapContainer._namedColormaps[name] = colormap;
+  ColorMapContainer._namedColormaps[name.toLowerCase()] = colormap;
 }
 
 ColorMapContainer.deregisterNamedColormap = function (name) {
-  delete ColorMapContainer._namedColormaps[name];
+  delete ColorMapContainer._namedColormaps[name.toLowerCase()];
 }
 
 ColorMapContainer._getTextureFromName = function (gl, name) {
