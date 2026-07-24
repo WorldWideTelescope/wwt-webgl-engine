@@ -1764,15 +1764,23 @@ const App = defineComponent({
         });
       }
 
-      const colormapMessages: CreateColormapMessage[] = this.modifiedColormaps.map(name => ({
-        event: "create_colormap",
-        name,
-      }));
+      const colormapMessages: CreateColormapMessage[] = [];
+      this.modifiedColormaps.forEach(name => {
+        const cmap = this.getNamedColormap(name);
+        if (cmap != null) {
+          colormapMessages.push({
+            event: "create_colormap",
+            name,
+            colors: cmap.colors.map(color => color.toSimpleHex()),
+          });
+        }
+      });
 
       const messageStrings = [
         coordinatesMessage,
         backgroundMessage,
         foregroundMessage,
+        ...colormapMessages,
         ...loadCatalogsMessages,
         ...catalogSettingsMessages,
         ...loadWtmlMessages,

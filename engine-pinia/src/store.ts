@@ -1213,7 +1213,7 @@ export const engineStore = defineStore('wwt-engine', {
 
     getNamedColormap(_state) {
       return (name: string): ColorMapContainer | null => {
-        return ColorMapContainer.fromNamedColormap(name);
+        return ColorMapContainer.fromNamedColormap(name) ?? null;
       }
     },
   },
