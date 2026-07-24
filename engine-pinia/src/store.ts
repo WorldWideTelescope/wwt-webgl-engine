@@ -14,7 +14,6 @@ import {
 
 import {
   Annotation,
-  Color,
   ColorMapContainer,
   EngineSetting,
   Folder,
@@ -1210,7 +1209,13 @@ export const engineStore = defineStore('wwt-engine', {
         const key = this.catalogLayerKey(catalog);
         return state.spreadSheetLayers[key] || null;
       }
-    }
+    },
+
+    getNamedColormap(_state) {
+      return (name: string): ColorMapContainer | null => {
+        return ColorMapContainer.fromNamedColormap(name);
+      }
+    },
   },
 
   actions: {

@@ -112,6 +112,7 @@ export const WWTAwareComponent = defineComponent({
       "findCoordinatesForScreenPoint",
       "findScreenPointForCoordinates",
       "findRayForScreenPoint",
+      "getNamedColormap",
       "layerById",
       "imagesetForLayer",
       "imagesetLayerById",

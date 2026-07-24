@@ -443,6 +443,7 @@ import {
   convertSpreadSheetLayerSetting,
 } from "./settings";
 import { defineComponent, isProxy, toRaw } from "vue";
+import { CreateColormapMessage } from "@wwtelescope/research-app-messages/src/layers";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1248,13 +1249,14 @@ const App = defineComponent({
     ...mapState(researchAppStore, [
       'catalogNameMappings',
       'hipsCatalogs',
+      'modifiedColormaps',
       'selectableTableLayers',
       'sources',
       'visibleTableLayers'
     ]),
     ...mapState(researchAppStore, {
       appTableLayers: store => store.tableLayers,
-      spreadsheetLayers: store => store.tableLayers()
+      spreadsheetLayers: store => store.tableLayers(),
     }),
 
     curAvailableImageryData(): ImagesetInfo[] {
@@ -1761,6 +1763,11 @@ const App = defineComponent({
           values: layerSettings.map((s) => s[1]),
         });
       }
+
+      const colormapMessages: CreateColormapMessage[] = this.modifiedColormaps.map(name => ({
+        event: "create_colormap",
+        name,
+      }));
 
       const messageStrings = [
         coordinatesMessage,

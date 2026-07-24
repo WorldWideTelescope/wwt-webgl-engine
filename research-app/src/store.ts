@@ -106,6 +106,7 @@ interface WWTResearchAppPiniaState {
   catalogNameMappings: { [catalogName: string]: [string, string] };
   sources: Source[];
   colormaps: UiColorMap[];
+  _modifiedColormaps: Set<string>;
 }
 
 export const researchAppStore = defineStore('wwt-research-app', {
@@ -137,6 +138,7 @@ export const researchAppStore = defineStore('wwt-research-app', {
       { wwt: "oranges", desc: "White-to-Orange" },
       { wwt: "reds", desc: "White-to-Red" },
     ],
+    _modifiedColormaps: new Set(),
   }),
   
   getters: {
@@ -179,7 +181,12 @@ export const researchAppStore = defineStore('wwt-research-app', {
         }
         return status.selectable;
       }
-    }
+    },
+
+    modifiedColormaps(state): string[] {
+      return [...state._modifiedColormaps];
+    },
+
   },
 
   actions: {
@@ -222,12 +229,13 @@ export const researchAppStore = defineStore('wwt-research-app', {
     // Not sure that there's a good way to give a nice display name for a custom colormap
     addNamedColormap(name: string) {
       this.colormaps.push({ wwt: name, desc: name });
+      this._modifiedColormaps.add(name);
     },
 
     removeNamedColormap(name: string) {
       removeFromArray(this.colormaps, { wwt: name, desc: name });
+      this._modifiedColormaps.delete(name);
     },
-
   }
   
 });
