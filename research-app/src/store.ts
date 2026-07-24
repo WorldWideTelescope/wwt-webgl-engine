@@ -233,7 +233,7 @@ export const researchAppStore = defineStore('wwt-research-app', {
     },
 
     removeNamedColormap(name: string) {
-      removeFromArray(this.colormaps, { wwt: name, desc: name });
+      removeFromArray(this.colormaps, { wwt: name, desc: name }, (cmapInfo1, cmapInfo2) => cmapInfo1.wwt == cmapInfo2.wwt);
       this._modifiedColormaps.delete(name);
     },
   }
