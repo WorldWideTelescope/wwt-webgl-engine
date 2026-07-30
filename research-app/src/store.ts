@@ -96,10 +96,17 @@ function getFilteredLayers(statusMap: { [id: string]: TableLayerStatus | undefin
   return filtered;
 }
 
+export interface UiColorMap {
+  wwt: string;
+  desc: string;
+}
+
 interface WWTResearchAppPiniaState {
   _tableLayers: { [id: string]: TableLayerStatus | undefined };
   catalogNameMappings: { [catalogName: string]: [string, string] };
   sources: Source[];
+  colormaps: UiColorMap[];
+  _modifiedColormaps: Set<string>;
 }
 
 export const researchAppStore = defineStore('wwt-research-app', {
@@ -115,7 +122,23 @@ export const researchAppStore = defineStore('wwt-research-app', {
       "The SDSS Photometric Catalogue, Release 12 (Alam+, 2015) (sdss12)": ["SDSS12", "SDSS12"],
       "The Pan-STARRS release 1 (PS1) Survey - DR1 (Chambers+, 2016) (ps1)": ["f_objID", "PAN-Starrs ID"],
     },
-    sources: []
+    sources: [],
+    colormaps: [
+      { wwt: "viridis", desc: "Viridis" },
+      { wwt: "plasma", desc: "Plasma" },
+      { wwt: "inferno", desc: "Inferno" },
+      { wwt: "magma", desc: "Magma" },
+      { wwt: "cividis", desc: "Cividis" },
+      { wwt: "rdylbu", desc: "Thermal (Red-Yellow-Blue)" },
+      { wwt: "gray", desc: "Black-to-White" },
+      { wwt: "greys", desc: "White-to-Black" },
+      { wwt: "purples", desc: "White-to-Purple" },
+      { wwt: "blues", desc: "White-to-Blue" },
+      { wwt: "greens", desc: "White-to-Green" },
+      { wwt: "oranges", desc: "White-to-Orange" },
+      { wwt: "reds", desc: "White-to-Red" },
+    ],
+    _modifiedColormaps: new Set(),
   }),
   
   getters: {
@@ -158,7 +181,12 @@ export const researchAppStore = defineStore('wwt-research-app', {
         }
         return status.selectable;
       }
-    }
+    },
+
+    modifiedColormaps(state): string[] {
+      return [...state._modifiedColormaps];
+    },
+
   },
 
   actions: {
@@ -196,8 +224,18 @@ export const researchAppStore = defineStore('wwt-research-app', {
 
     removeSource(source: Source) {
       removeFromArray(this.sources, source);
-    }
+    },
 
+    // Not sure that there's a good way to give a nice display name for a custom colormap
+    addNamedColormap(name: string) {
+      this.colormaps.push({ wwt: name, desc: name });
+      this._modifiedColormaps.add(name);
+    },
+
+    removeNamedColormap(name: string) {
+      removeFromArray(this.colormaps, { wwt: name, desc: name }, (cmapInfo1, cmapInfo2) => cmapInfo1.wwt == cmapInfo2.wwt);
+      this._modifiedColormaps.delete(name);
+    },
   }
   
 });

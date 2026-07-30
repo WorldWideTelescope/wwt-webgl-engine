@@ -605,6 +605,10 @@ export namespace Color {
 
 /** A mapping from scalar values to colors. */
 export class ColorMapContainer {
+  
+  /** The list of colors that define the colormap */
+  colors: Color[];
+
   /** Find the color in this map closest to the input scalar.
    *
    * The input value should be between 0 and 1. Zero maps to the first color in
@@ -649,6 +653,12 @@ export namespace ColorMapContainer {
    * no longer be accessible via `fromNamedColormap`).
    */
   export function registerNamedColormap(name: string, colormap: ColorMapContainer): void;
+
+  /** Deregister the colormap with the given name, if one exists.
+   *
+   * Note that it is possible to deregister one of the build-in colormaps from the registry.
+   */
+  export function deregisterNamedColormap(name: string): void;
 }
 
 /** A class describing rise/set/transit details */

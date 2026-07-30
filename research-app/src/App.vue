@@ -443,6 +443,7 @@ import {
   convertSpreadSheetLayerSetting,
 } from "./settings";
 import { defineComponent, isProxy, toRaw } from "vue";
+import { CreateColormapMessage } from "@wwtelescope/research-app-messages/src/layers";
 
 const D2R = Math.PI / 180.0;
 const R2D = 180.0 / Math.PI;
@@ -1248,13 +1249,14 @@ const App = defineComponent({
     ...mapState(researchAppStore, [
       'catalogNameMappings',
       'hipsCatalogs',
+      'modifiedColormaps',
       'selectableTableLayers',
       'sources',
       'visibleTableLayers'
     ]),
     ...mapState(researchAppStore, {
       appTableLayers: store => store.tableLayers,
-      spreadsheetLayers: store => store.tableLayers()
+      spreadsheetLayers: store => store.tableLayers(),
     }),
 
     curAvailableImageryData(): ImagesetInfo[] {
@@ -1374,8 +1376,10 @@ const App = defineComponent({
 
   methods: {
     ...mapActions(researchAppStore, [
+      "addNamedColormap",
       'addResearchAppTableLayer',
       'addSource',
+      "removeNamedColormap",
       'removeResearchAppTableLayer',
       'setResearchAppTableLayerSelectability',
     ]),
@@ -1760,10 +1764,23 @@ const App = defineComponent({
         });
       }
 
+      const colormapMessages: CreateColormapMessage[] = [];
+      this.modifiedColormaps.forEach(name => {
+        const cmap = this.getNamedColormap(name);
+        if (cmap != null) {
+          colormapMessages.push({
+            event: "create_colormap",
+            name,
+            colors: cmap.colors.map(color => color.toSimpleHex()),
+          });
+        }
+      });
+
       const messageStrings = [
         coordinatesMessage,
         backgroundMessage,
         foregroundMessage,
+        ...colormapMessages,
         ...loadCatalogsMessages,
         ...catalogSettingsMessages,
         ...loadWtmlMessages,
@@ -1880,6 +1897,9 @@ const App = defineComponent({
         "layer_hipscat_datainview",
         this.handleGetHipsCatalogDataInView
       );
+
+      this.messageHandlers.set("create_colormap", this.handleCreateColormap);
+      this.messageHandlers.set("delete_colormap", this.handleDeleteColormap);
 
       this.messageHandlers.set("annotation_create", this.handleCreateAnnotation);
       this.messageHandlers.set("annotation_set", this.handleModifyAnnotation);
@@ -2047,6 +2067,22 @@ const App = defineComponent({
       if (!isClearTileCacheMessage(msg)) return false;
 
       this.clearTileCache();
+      return true;
+    },
+
+    handleCreateColormap(msg: any): boolean {
+      if (!layers.isCreateColormapMessage(msg)) return false;
+
+      this.createColormap(msg);
+      this.addNamedColormap(msg.name);
+      return true;
+    },
+
+    handleDeleteColormap(msg: any): boolean {
+      if (!layers.isDeleteColormapMessage(msg)) return false;
+
+      this.deleteColormap(msg.name);
+      this.removeNamedColormap(msg.name);
       return true;
     },
 

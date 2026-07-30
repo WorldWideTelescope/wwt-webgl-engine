@@ -56,7 +56,7 @@
           <span class="prompt">Colormap:</span
           ><select v-model="twoWayColorMapperName">
             <option
-              v-for="x in uiColorMaps"
+              v-for="x in colormaps"
               v-bind:value="x.wwt"
               v-bind:key="x.desc"
             >
@@ -128,28 +128,9 @@ import {
   engineStore,
 } from "@wwtelescope/engine-pinia";
 
+import { researchAppStore } from "./store";
+
 import { defineComponent } from "@vue/runtime-core";
-
-interface UiColorMaps {
-  wwt: string;
-  desc: string;
-}
-
-const uiColorMaps: UiColorMaps[] = [
-  { wwt: "viridis", desc: "Viridis" },
-  { wwt: "plasma", desc: "Plasma" },
-  { wwt: "inferno", desc: "Inferno" },
-  { wwt: "magma", desc: "Magma" },
-  { wwt: "cividis", desc: "Cividis" },
-  { wwt: "rdylbu", desc: "Thermal (Red-Yellow-Blue)" },
-  { wwt: "gray", desc: "Black-to-White" },
-  { wwt: "greys", desc: "White-to-Black" },
-  { wwt: "purples", desc: "White-to-Purple" },
-  { wwt: "blues", desc: "White-to-Blue" },
-  { wwt: "greens", desc: "White-to-Green" },
-  { wwt: "oranges", desc: "White-to-Orange" },
-  { wwt: "reds", desc: "White-to-Red" },
-];
 
 interface UiScaleTypes {
   wwt: ScaleTypes;
@@ -174,7 +155,6 @@ export default defineComponent({
 
   data() {
     return {
-      uiColorMaps,
       uiScaleTypes,
       hasFocus: false,
       isSelected: false
@@ -186,6 +166,7 @@ export default defineComponent({
     ...mapState(engineStore, {
       wwtZoomDeg: "zoomDeg"
     }),
+    ...mapState(researchAppStore, ["colormaps"]),
 
     twoWayOpacity: {
       get(): number {
