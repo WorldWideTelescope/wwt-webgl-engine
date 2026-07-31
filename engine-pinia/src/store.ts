@@ -2050,7 +2050,7 @@ export const engineStore = defineStore('wwt-engine', {
     createTextBatch(options: CreateTextBatchOptions) {
       if (this.$wwt.inst === null)
         throw new Error('cannot createTextBatch without linking to WWTInstance');
-      const batch = new Text3dBatch((options.size ?? 2) / 250);
+      const batch = new Text3dBatch((options.size ?? 2) / 500);
       this.$wwt.inst.si.addTextBatch(batch, options.name);
       if (options.color) {
         this.$wwt.inst.si.applyTextBatchSetting(options.name, ["color", Color.load(options.color)]);
