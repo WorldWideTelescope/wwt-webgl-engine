@@ -711,7 +711,7 @@ var ScriptInterface$ = {
     },
 
     removeTextBatch: function (batchOrName) {
-        if (batch != null && globalWWTControl != null) {
+        if (batchOrName != null && globalWWTControl != null) {
             globalWWTControl._removeTextBatch(batchOrName);
         }
     },

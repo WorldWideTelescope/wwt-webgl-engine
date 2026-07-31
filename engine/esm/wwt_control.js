@@ -448,7 +448,7 @@ var WWTControl$ = {
             delete this._textBatches[batchOrName];
         } else {
             for (var name in this._textBatches) {
-                if (this._textBatches[name].batch == batch) {
+                if (this._textBatches[name].batch == batchOrName) {
                     delete this._textBatches[name];
                 }
             }
