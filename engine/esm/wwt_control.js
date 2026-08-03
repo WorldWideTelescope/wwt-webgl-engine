@@ -52,6 +52,7 @@ import { Planets } from "./planets.js";
 import { Settings } from "./settings.js";
 import { SpaceTimeController } from "./space_time_controller.js";
 import { RenderTriangle } from "./render_triangle.js";
+import { Text3d } from "./sky_text.js";
 import { Tile } from "./tile.js";
 import { TileCache } from "./tile_cache.js";
 import { VideoOutputType } from "./video_output_type.js";
@@ -82,6 +83,7 @@ export function WWTControl() {
 
     this.uiController = null;
     this._annotations = [];
+    this._textBatches = {};
     this._hoverText = '';
     this._hoverTextPoint = new Vector2d();
     this._lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
@@ -435,6 +437,81 @@ var WWTControl$ = {
     _clearAnnotations: function () {
         this._annotations.length = 0;
         Annotation.batchDirty = true;
+    },
+
+    _addTextBatch: function (batch, name) {
+        this._textBatches[name] = { batch: batch };
+    },
+
+    _removeTextBatch: function (batchOrName) {
+        if (typeof batchOrName === "string") {
+            delete this._textBatches[batchOrName];
+        } else {
+            for (var name in this._textBatches) {
+                if (this._textBatches[name].batch == batchOrName) {
+                    delete this._textBatches[name];
+                }
+            }
+        }
+    },
+
+    _applyTextBatchSetting(batchOrName, settingName, settingValue) {
+        var data = this._getTextBatchData(batchOrName);
+        if (data != null) {
+            if (settingName == "size") {
+                data.batch.height = settingValue;
+            } else {
+                data[settingName] = settingValue;
+            }
+            data.batch.markDirty();
+        }
+    },
+
+    _clearTextBatches: function () {
+        this._textBatches = {};
+    },
+
+    _getTextBatchData: function (batchOrName) {
+        if (typeof batchOrName === "string") {
+            return this._textBatches[batchOrName];
+        } else {
+            for (var name in this._textBatches) {
+                if (this._textBatches[name].batch == batchOrName) {
+                    return this._textBatches[name];
+                }
+            }
+        }
+    },
+
+    _addText: function (text, position, up, scale, batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
+        if (data != null) {
+            var batch = data.batch;
+            var text3d = new Text3d(position, up, text, 1, scale);
+            batch.add(text3d);
+            return text3d;
+        }
+        return null;
+    },
+
+    _removeText: function (text3d, batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
+        var batch = data != null ? data.batch : null;
+        if (batch != null) {
+            ss.remove(batch.items, text3d);
+        }
+    },
+
+    _get_textItems: function (batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
+        var batch = data != null ? data.batch : null;
+        var items = [];
+        if (batch != null) {
+            for (var i = 0; i < batch.items.length; i++) {
+                items.push(batch.items[i]);
+            }
+        }
+        return items;
     },
 
     _annotationclicked: function (ra, dec, x, y) {
@@ -1024,6 +1101,14 @@ var WWTControl$ = {
         var constellationLabelsOpacity = this._fadeStates.showConstellationLabels.get_opacity();
         if (constellationLabelsOpacity > 0) {
             Constellations.drawConstellationNames(this.renderContext, constellationLabelsOpacity, Color.load(Settings.get_active().get_constellationLabelsColor()));
+        }
+
+        for (var key in this._textBatches) {
+          var data = this._textBatches[key];
+          var size = data.size != null ? data.size : 1;
+          var color = data.color != null ? data.color : Colors.get_white();
+          var opacity = data.opacity != null ? data.opacity : 1;
+          data.batch.draw(this.renderContext, opacity, color);
         }
     },
 

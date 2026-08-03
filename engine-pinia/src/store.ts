@@ -15,6 +15,8 @@ import {
 import {
   Annotation,
   ColorMapContainer,
+  Color,
+  Coordinates,
   EngineSetting,
   Folder,
   FrameCallback,
@@ -26,6 +28,9 @@ import {
   LayerMap,
   SpreadSheetLayer,
   SpreadSheetLayerSettingsInterfaceRO,
+  Text3d,
+  Text3dBatch,
+  TextBatchSetting,
   TileCache,
   Vector3d,
   WWTControl,
@@ -204,6 +209,31 @@ export class ImageSetLayerState {
   getGuid(): string {
     return this.guidText;
   }
+}
+
+export interface CreateTextBatchOptions {
+  name: string;
+  size?: number;
+  color?: string;
+  opacity?: number;
+}
+
+export interface ApplyTextBatchSettingOptions {
+  batch: string | Text3dBatch;
+  setting: TextBatchSetting;
+}
+
+export interface AddTextOptions {
+  text: string;
+  position: Vector3d | { raDeg: number; decDeg: number };
+  batchId: string;
+  up?: Vector3d;
+  scale?: number;
+}
+
+export interface RemoveTextOptions {
+  text: Text3d;
+  batchId: string;
 }
 
 /** This interface expresses the properties exposed by the WWT Engine’s Pinia
@@ -2015,6 +2045,47 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot clearAnnotations without linking to WWTInstance');
       this.$wwt.inst.si.clearAnnotations();
+    },
+
+    createTextBatch(options: CreateTextBatchOptions) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createTextBatch without linking to WWTInstance');
+      const batch = new Text3dBatch((options.size ?? 1) / 100);
+      this.$wwt.inst.si.addTextBatch(batch, options.name);
+      if (options.color) {
+        this.$wwt.inst.si.applyTextBatchSetting(options.name, ["color", Color.load(options.color)]);
+      }
+      if (options.opacity != null) {
+        this.$wwt.inst.si.applyTextBatchSetting(options.name, ["opacity", options.opacity]);
+      }
+    },
+
+    applyTextBatchSetting(batch: string | Text3dBatch, setting: TextBatchSetting) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot applyTextBatchSetting without linking to WWTInstance');
+      this.$wwt.inst.si.applyTextBatchSetting(batch, setting);
+    },
+
+    removeTextBatch(batch: string | Text3dBatch) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeTextBatch without linking to WWTInstance');
+      this.$wwt.inst.si.removeTextBatch(batch);
+    },
+
+    createText(options: AddTextOptions): Text3d | null {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createText without linking to WWTInstance');
+      const position: Vector3d = options.position instanceof Vector3d ?
+        options.position :
+        Coordinates.raDecTo3d(options.position.raDeg / 15, options.position.decDeg);
+      const up = options.up != undefined ? options.up : Vector3d.create(0, 1, 0); 
+      return this.$wwt.inst.si.addText(options.text, position, up, options.scale ?? 1, options.batchId);
+    },
+
+    removeText(options: RemoveTextOptions) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeText without linking to WWTInstance');
+      return this.$wwt.inst.si.removeText(options.text, options.batchId);
     },
 
     // Capturing the current display

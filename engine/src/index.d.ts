@@ -1458,6 +1458,14 @@ export class RenderContext {
   onTarget(place: Place): boolean;
 }
 
+export interface TextBatchData {
+  batch: Text3dBatch;
+  color?: string;
+  size?: string;
+}
+
+export type TextBatchSetting = ["size", number] | ["color", Color] | ["opacity", number];
+
 export class ScriptInterface {
   /** The rendering settings associated with the viewer. */
   settings: Settings;
@@ -1609,6 +1617,16 @@ export class ScriptInterface {
 
   /** Remove all annotations from the renderer. */
   clearAnnotations(): void;
+
+  addTextBatch(batch: Text3dBatch, name: string): void;
+  removeTextBatch(batch: string | Text3dBatch): void;
+  clearTextBatches(): void;
+  applyTextBatchSetting(batch: string | Text3dBatch, setting: TextBatchSetting): void;
+  getTextBatches(): Record<string, TextBatchData>;
+  getTextItems(batch: string | Text3dBatch): Text3d[];
+
+  addText(text: string, position: Vector3d, up: Vector3d, scale: number, batch: string | Text3dBatch): Text3d | null;
+  removeText(text3d: Text3d, batch: string | Text3dBatch): void;
 }
 
 /** A generic {@link ScriptInterface} callback. */
@@ -2032,6 +2050,24 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
  * engine itself.
  */
 export type SpreadSheetLayerSetting = LayerSetting | BaseSpreadSheetLayerSetting;
+
+export class Text3d {
+    constructor(center: Vector3d, up: Vector3d, text: string, fontsize?: number, scale?: number);
+
+    center: Vector3d;
+    up: Vector3d;
+    text: string;
+}
+
+export class Text3dBatch {
+    constructor(height: number);
+
+    add(item: Text3d): void;
+    draw(renderContext: RenderContext, opacity: number, color: Color): void;
+    prepareBatch(): void;
+    cleanUp(): void;
+    markDirty(): void;
+}
 
 /** A class that represents the current cache of loaded tiles. */
 export class TileCache {
