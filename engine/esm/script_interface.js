@@ -14,7 +14,7 @@ import { registerType } from "./typesystem.js";
 import { Util } from "./util.js";
 import { globalRenderContext, useGlVersion2 } from "./render_globals.js";
 import { globalWWTControl, layerManagerGetAllMaps, loadWtmlFile } from "./data_globals.js";
-import { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
+import { Annotation, AnnotationBatch, Circle, Poly, PolyLine } from "./annotation.js";
 import { FitsImage } from "./layers/fits_image.js";
 import { FitsImageJs } from "./layers/fits_image_js.js";
 import { Imageset } from "./imageset.js";
@@ -671,25 +671,37 @@ var ScriptInterface$ = {
         return c;
     },
 
-    addAnnotation: function (annotation) {
+    addAnnotationBatch: function (batch, name) {
+        if (batch!= null && ss.canCast(batch, AnnotationBatch) && globalWWTControl != null) {
+            globalWWTControl._addAnnotationBatch(batch, name);
+        }
+    },
+
+    removeAnnotationBatch: function (batchOrName) {
+        if ((globalWWTControl != null) && (typeof batchOrName === "string" || ss.canCast(batchOrName, AnnotationBatch))) {
+            globalWWTControl._removeAnnotationBatch(batchOrName); 
+        }
+    },
+
+    addAnnotation: function (annotation, batch) {
         if (annotation != null && ss.canCast(annotation, Annotation)) {
             if (globalWWTControl != null) {
-                globalWWTControl._addAnnotation(annotation);
+                globalWWTControl._addAnnotation(annotation, batch);
             }
         }
     },
 
-    removeAnnotation: function (annotation) {
+    removeAnnotation: function (annotation, batch) {
         if (annotation != null) {
             if (globalWWTControl != null) {
-                globalWWTControl._removeAnnotation(annotation);
+                globalWWTControl._removeAnnotation(annotation, batch);
             }
         }
     },
 
-    clearAnnotations: function () {
+    clearAnnotations: function (batch) {
         if (globalWWTControl != null) {
-            globalWWTControl._clearAnnotations();
+            globalWWTControl._clearAnnotations(batch);
         }
     },
 

@@ -9,11 +9,82 @@
 
 import { registerType } from "./typesystem.js";
 import { ss } from "./ss.js";
-import { Vector3d } from "./double3d.js";
+import { Matrix3d, Vector3d } from "./double3d.js";
 import { Dates, LineList, TriangleList, TriangleFanList, PointList } from "./graphics/primitives3d.js";
 import { Tessellator } from "./graphics/tessellator.js";
 import { Color, Colors } from "./color.js";
 import { Coordinates } from "./coordinates.js";
+
+
+// wwtlib.AnnotationBatch
+
+export function AnnotationBatch() {
+  this.items = [];
+  this.pointList = null;
+  this.lineList = null;
+  this.triangleFanPointList = null;
+  this.triangleList = null;
+  this.viewTransform = null;
+  this._dirty = true;
+}
+
+var AnnotationBatch$ = {
+    add: function (annotation) {
+        this.items.push(annotation);
+        this.markDirty(true); 
+    },
+
+    remove: function (annotation) {
+        ss.remove(this.items, annotation);
+        this.markDirty(true); 
+    },
+
+    prepBatch: function (renderContext) {
+        if (this.pointList == null || this._dirty) {
+            this.pointList = new PointList(renderContext);
+            this.lineList = new LineList();
+            this.triangleFanPointList = new TriangleFanList();
+            this.triangleList = new TriangleList();
+            this.lineList.set_depthBuffered(false);
+            this.triangleList.depthBuffered = false;
+        }
+        this.markDirty(false);
+    },
+
+    _drawCommands: function (renderContext) {
+        if (this.pointList != null) {
+            this.pointList.draw(renderContext, 1, false);
+        }
+        if (this.lineList != null) {
+            this.lineList.drawLines(renderContext, 1);
+        }
+        if (this.triangleFanPointList != null) {
+            this.triangleFanPointList.draw(renderContext, 1);
+        }
+        if (this.triangleList != null) {
+            this.triangleList.draw(renderContext, 1, 0);
+        }
+    },
+
+    drawBatch: function (renderContext) {
+        this.markDirty(false);
+        for (var i = 0; i < this.items.length; i++) {
+            this.items[i].draw(renderContext, this);
+        }
+        if (this.viewTransform != null) {
+            var matrix = this.viewTransform instanceof Matrix3d ? this.viewTransform : this.viewTransform(renderContext);
+            renderContext.executeWithWorldTransform(matrix, this._drawCommands);
+        } else {
+            this._drawCommands(renderContext);
+        }
+    },
+
+    markDirty: function (dirty) {
+        this._dirty = dirty;
+    },
+};
+
+registerType("AnnotationBatch", [AnnotationBatch, AnnotationBatch$, null]);
 
 
 // wwtlib.Annotation
@@ -24,42 +95,6 @@ export function Annotation() {
     this._opacity = 1;
     this._showHoverLabel = false;
 }
-
-Annotation.pointList = null;
-Annotation.lineList = null;
-Annotation.triangleFanPointList = null;
-Annotation.triangleList = null;
-Annotation.batchDirty = true;
-
-Annotation.prepBatch = function (renderContext) {
-    if (Annotation.pointList == null || Annotation.batchDirty) {
-        Annotation.pointList = new PointList(renderContext);
-        Annotation.lineList = new LineList();
-        Annotation.triangleFanPointList = new TriangleFanList();
-        Annotation.triangleList = new TriangleList();
-        Annotation.lineList.set_depthBuffered(false);
-        Annotation.triangleList.depthBuffered = false;
-    }
-};
-
-Annotation.drawBatch = function (renderContext) {
-    Annotation.batchDirty = false;
-    if (renderContext.gl == null) {
-        return;
-    }
-    if (Annotation.pointList != null) {
-        Annotation.pointList.draw(renderContext, 1, false);
-    }
-    if (Annotation.lineList != null) {
-        Annotation.lineList.drawLines(renderContext, 1);
-    }
-    if (Annotation.triangleFanPointList != null) {
-        Annotation.triangleFanPointList.draw(renderContext, 1);
-    }
-    if (Annotation.triangleList != null) {
-        Annotation.triangleList.draw(renderContext, 1, 0);
-    }
-};
 
 Annotation.separation = function (Alpha1, Delta1, Alpha2, Delta2) {
     Delta1 = Delta1 / 180 * Math.PI;
@@ -86,14 +121,14 @@ Annotation.colorToUintAlpha = function (col, opacity) {
 };
 
 var Annotation$ = {
-    draw: function (renderContext) { },
+    draw: function (renderContext, batch) { },
 
     get_opacity: function () {
         return this._opacity;
     },
 
     set_opacity: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._opacity = value;
         return value;
     },
@@ -143,9 +178,14 @@ var Annotation$ = {
     },
 
     set_center: function (value) {
+        this.markDirty(true);
         this.center = value;
         return value;
-    }
+    },
+
+    markDirty: function (dirty) {
+        this.annotationDirty = dirty;
+    },
 };
 
 registerType("Annotation", [Annotation, Annotation$, null]);
@@ -160,8 +200,8 @@ export function Circle() {
     this._radius$1 = 10;
     this._lineColor$1 = Colors.get_white();
     this._fillColor$1 = Colors.get_white();
-    this._ra$1 = 0;
-    this._dec$1 = 0;
+    this._x$1 = 0;
+    this._y$1 = 0;
     Annotation.call(this);
 }
 
@@ -171,7 +211,7 @@ var Circle$ = {
     },
 
     set_fill: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._fill$1 = value;
         return value;
     },
@@ -181,7 +221,7 @@ var Circle$ = {
     },
 
     set_skyRelative: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._skyRelative$1 = value;
         return value;
     },
@@ -191,7 +231,7 @@ var Circle$ = {
     },
 
     set_lineWidth: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._strokeWidth$1 = value;
         return value;
     },
@@ -201,7 +241,7 @@ var Circle$ = {
     },
 
     set_radius: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._radius$1 = value;
         return value;
     },
@@ -211,7 +251,7 @@ var Circle$ = {
     },
 
     set_lineColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._lineColor$1 = Color.load(value);
         return value;
     },
@@ -221,19 +261,19 @@ var Circle$ = {
     },
 
     set_fillColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._fillColor$1 = Color.fromName(value);
         return value;
     },
 
-    setCenter: function (ra, dec) {
-        Annotation.batchDirty = true;
-        this._ra$1 = ra / 15;
-        this._dec$1 = dec;
+    setCenter: function (x, y) {
+        this.markDirty(true);
+        this._x$1 = x / 15;
+        this._y$1 = y;
         this.center = Coordinates.raDecTo3d(this._ra$1, this._dec$1);
     },
 
-    draw: function (renderContext) {
+    draw: function (renderContext, batch) {
         var onScreen = true;
 
         var rad = this._radius$1;
@@ -251,14 +291,15 @@ var Circle$ = {
         }
 
         if (renderContext.gl != null) {
-            if (Annotation.batchDirty || this.annotationDirty) {
+            if (this.annotationDirty) {
+                batch.markDirty(true);
                 var up = Vector3d.create(0, 1, 0);
                 var xNormal = Vector3d.cross(this.center, up);
                 var yNormal = Vector3d.cross(this.center, xNormal);
 
                 // Here we guard, lamely, against div-by-0; circles at decs of
                 // +-90 will surely not render well.
-                var cosdec = Math.cos(this._dec$1 * Math.PI / 180)
+                var cosdec = Math.cos(this._y$1 * Math.PI / 180)
                 cosdec = Math.max(cosdec, 1e-5);
                 var r = this._radius$1 * Math.PI / (180 * cosdec);
 
@@ -283,7 +324,7 @@ var Circle$ = {
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
 
                     for (var i = 0; i < vertexList.length - 1; i++) {
-                        Annotation.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
+                        batch.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
                 }
 
@@ -292,7 +333,7 @@ var Circle$ = {
                     fillColorWithOpacity.a = Math.round(fillColorWithOpacity.a * this.get_opacity());
                     var pos = Vector3d.create(this.center.x, this.center.y, this.center.z);
                     vertexList.splice(0, 0, pos);
-                    Annotation.triangleFanPointList.addShape(vertexList, fillColorWithOpacity, new Dates(0, 1));
+                    batch.triangleFanPointList.addShape(vertexList, fillColorWithOpacity, new Dates(0, 1));
                 }
 
                 this.annotationDirty = false;
@@ -325,7 +366,7 @@ var Circle$ = {
         if (!this._skyRelative$1) {
             rad *= renderContext.get_fovScale() / 3600;
         }
-        return Annotation.separation(RA, dec, this._ra$1, this._dec$1) < rad;
+        return Annotation.separation(RA, dec, this._x$1, this._y$1) < rad;
     }
 };
 
@@ -345,7 +386,7 @@ export function Poly() {
 
 var Poly$ = {
     addPoint: function (x, y) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._points$1.push(Coordinates.raDecTo3d(x / 15, y));
     },
 
@@ -354,7 +395,7 @@ var Poly$ = {
     },
 
     set_fill: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._fill$1 = value;
         return value;
     },
@@ -364,7 +405,7 @@ var Poly$ = {
     },
 
     set_lineWidth: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._strokeWidth$1 = value;
         return value;
     },
@@ -374,7 +415,7 @@ var Poly$ = {
     },
 
     set_lineColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._lineColor$1 = Color.fromName(value);
         return value;
     },
@@ -384,14 +425,15 @@ var Poly$ = {
     },
 
     set_fillColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._fillColor$1 = Color.fromName(value);
         return value;
     },
 
-    draw: function (renderContext) {
+    draw: function (renderContext, batch) {
         if (renderContext.gl != null) {
-            if (Annotation.batchDirty || this.annotationDirty) {
+            if (this.annotationDirty) {
+                batch.markDirty(true);
                 //todo can we save this work for later?
                 var vertexList = this._points$1;
 
@@ -399,16 +441,16 @@ var Poly$ = {
                     var lineColorWithOpacity = this._lineColor$1._clone();
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
                     for (var i = 0; i < (this._points$1.length - 1); i++) {
-                        Annotation.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
+                        batch.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
-                    Annotation.lineList.addLine(vertexList[this._points$1.length - 1], vertexList[0], lineColorWithOpacity, new Dates(0, 1));
+                    batch.lineList.addLine(vertexList[this._points$1.length - 1], vertexList[0], lineColorWithOpacity, new Dates(0, 1));
                 }
                 if (this._fill$1) {
                     var fillColorWithOpacity = this._fillColor$1._clone();
                     fillColorWithOpacity.a = Math.round(fillColorWithOpacity.a * this.get_opacity());
                     var indexes = Tessellator.tesselateSimplePoly(vertexList);
                     for (var i = 0; i < indexes.length; i += 3) {
-                        Annotation.triangleList.addSubdividedTriangles(vertexList[indexes[i]], vertexList[indexes[i + 1]], vertexList[indexes[i + 2]], fillColorWithOpacity, new Dates(0, 1), 2);
+                        batch.triangleList.addSubdividedTriangles(vertexList[indexes[i]], vertexList[indexes[i + 1]], vertexList[indexes[i + 2]], fillColorWithOpacity, new Dates(0, 1), 2);
                     }
                 }
                 this.annotationDirty = false;
@@ -467,7 +509,7 @@ export function PolyLine() {
 
 var PolyLine$ = {
     addPoint: function (x, y) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._points$1.push(Coordinates.raDecTo3d(x / 15, y));
     },
 
@@ -476,7 +518,7 @@ var PolyLine$ = {
     },
 
     set_lineWidth: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._strokeWidth$1 = value;
         return value;
     },
@@ -486,21 +528,22 @@ var PolyLine$ = {
     },
 
     set_lineColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._lineColor$1 = Color.fromName(value);
         return value;
     },
 
-    draw: function (renderContext) {
+    draw: function (renderContext, batch) {
         if (renderContext.gl != null) {
-            if (Annotation.batchDirty || this.annotationDirty) {
+            if (this.annotationDirty) {
+                batch.markDirty(true);
                 //todo can we save this work for later?
                 var vertexList = this._points$1;
                 if (this._strokeWidth$1 > 0) {
                     var lineColorWithOpacity = this._lineColor$1._clone();
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
                     for (var i = 0; i < (this._points$1.length - 1); i++) {
-                        Annotation.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
+                        batch.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
                 }
                 this.annotationDirty = false;

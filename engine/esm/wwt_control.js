@@ -40,7 +40,7 @@ import {
 import { SimpleLineList } from "./graphics/primitives3d.js";
 import { Sprite2d } from "./graphics/sprite2d.js";
 
-import { Annotation } from "./annotation.js";
+import { AnnotationBatch } from "./annotation.js";
 import { CameraParameters, SolarSystemObjects } from "./camera_parameters.js";
 import { Constellations } from "./constellations.js";
 import { Coordinates } from "./coordinates.js";
@@ -81,7 +81,7 @@ export function WWTControl() {
     this.freestandingMode = false;
 
     this.uiController = null;
-    this._annotations = [];
+    this._annotations = {};
     this._hoverText = '';
     this._hoverTextPoint = new Vector2d();
     this._lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
@@ -422,32 +422,71 @@ WWTControl.showLayers = function (show) {
 };
 
 var WWTControl$ = {
-    _addAnnotation: function (annotation) {
-        this._annotations.push(annotation);
-        Annotation.batchDirty = true;
+
+    _addAnnotationBatch: function (batch, name) {
+        this._annotations[name] = batch;
     },
 
-    _removeAnnotation: function (annotation) {
-        ss.remove(this._annotations, annotation);
-        Annotation.batchDirty = true;
+    _removeAnnotationBatch: function (batchOrName) {
+        if (typeof batchOrName === "string") {
+            delete this._annotations[name];
+        } else {
+            for (var name in this._annotations) {
+                if (this._annotations[name] === batchOrName) {
+                    delete this._annotations[name];
+                }
+            }
+        }
     },
 
-    _clearAnnotations: function () {
-        this._annotations.length = 0;
-        Annotation.batchDirty = true;
+    _addAnnotation: function (annotation, batchOrName) {
+        if (batchOrName == null) {
+            batchOrName = "equatorial";
+        }
+
+        var batch = typeof batchOrName === "string" ? this._annotations[batchOrName] : batchOrName;
+        batch.add(annotation);
+    },
+
+    _removeAnnotation: function (annotation, batchOrName) {
+        if (batchOrName == null) {
+            batchOrName = "equatorial";
+        }
+
+        var batch = typeof batchOrName === "string" ? this._annotations[batchOrName] : batchOrName;
+        batch.remove(annotation);
+    },
+
+    _clearAnnotations: function (batchOrName) {
+        if (batchOrName != null) {
+            if (typeof batchOrName === "string") {
+                delete this._annotations[batchOrName];
+            } else {
+                for (var name in this._annotations) {
+                    if (this._annotations[name] === batchOrName) {
+                        delete this._annotations[name];
+                    }
+                }
+            }
+        } else {
+            this._annotations = {};
+        }
     },
 
     _annotationclicked: function (ra, dec, x, y) {
         if (this._annotations != null && this._annotations.length > 0) {
             var index = 0;
-            var $enum1 = ss.enumerate(this._annotations);
-            while ($enum1.moveNext()) {
-                var note = $enum1.current;
-                if (note.hitTest(this.renderContext, ra, dec, x, y)) {
-                    globalScriptInterface._fireAnnotationclicked(ra, dec, note.get_id());
-                    return true;
+            for (var batchKey of this._annotations) {
+                var batch = this._annotations[batchKey];
+                var $enum1 = ss.enumerate(batch.items);
+                while ($enum1.moveNext()) {
+                    var note = $enum1.current;
+                    if (note.hitTest(this.renderContext, ra, dec, x, y)) {
+                        globalScriptInterface._fireAnnotationclicked(ra, dec, note.get_id());
+                        return true;
+                    }
+                    index++;
                 }
-                index++;
             }
         }
         return false;
@@ -456,15 +495,18 @@ var WWTControl$ = {
     _annotationHover: function (ra, dec, x, y) {
         if (this._annotations != null && this._annotations.length > 0) {
             var index = 0;
-            var $enum1 = ss.enumerate(this._annotations);
-            while ($enum1.moveNext()) {
-                var note = $enum1.current;
-                if (note.hitTest(this.renderContext, ra, dec, x, y)) {
-                    this._hoverText = note.get_label();
-                    this._hoverTextPoint = Vector2d.create(x, y);
-                    return true;
+            for (var batchKey of this._annotations) {
+                var batch = this._annotations[batchKey];
+                var $enum1 = ss.enumerate(batch.items);
+                while ($enum1.moveNext()) {
+                    var note = $enum1.current;
+                    if (note.hitTest(this.renderContext, ra, dec, x, y)) {
+                        this._hoverText = note.get_label();
+                        this._hoverTextPoint = Vector2d.create(x, y);
+                        return true;
+                    }
+                    index++;
                 }
-                index++;
             }
         }
         return false;
@@ -643,6 +685,20 @@ var WWTControl$ = {
           var state = this._fadeStates[setting];
           var target = Number(Settings.get_active()[`get_${setting}`]());
           state.set_targetState(target);
+        }
+
+        if (!("horizon" in this._annotations)) {
+          var horizonAnnotations = new AnnotationBatch();
+          horizonAnnotations.viewTransform = function (_renderContext) {
+              var zenithAltAz = new Coordinates(0, 0);
+              var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
+              var raPart = -((zenith.get_RA() + 6) / 24 * (Math.PI * 2));
+              var decPart = -(zenith.get_dec() / 360 * (Math.PI * 2));
+              var mat = Matrix3d._rotationY(-raPart);
+              mat._multiply(Matrix3d._rotationX(decPart));
+              mat.invert();
+              return mat;
+          }
         }
 
         Tile.lastDeepestLevel = Tile.deepestLevel;
@@ -836,15 +892,11 @@ var WWTControl$ = {
         if (this.uiController != null) {
             this.uiController.render(this.renderContext);
         } else {
-            var index = 0;
-            Annotation.prepBatch(this.renderContext);
-            var $enum2 = ss.enumerate(this._annotations);
-            while ($enum2.moveNext()) {
-                var item = $enum2.current;
-                item.draw(this.renderContext);
-                index++;
+            for (var batchKey in this._annotations) {
+               var batch = this._annotations[batchKey];
+                batch.prepareBatch(this.renderContext);
+                batch.drawBatch(this.renderContext);
             }
-            Annotation.drawBatch(this.renderContext);
             if ((ss.now() - this._lastMouseMove) > 400) {
                 var ptDown = this.getCoordinatesForScreenPoint(this._hoverTextPoint.x, this._hoverTextPoint.y);
                 if (ptDown) {
