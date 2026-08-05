@@ -451,6 +451,9 @@ export class Annotation implements AnnotationSettingsInterface {
 export class AnnotationBatch {
     items: Annotation[];
     viewTransform: Matrix3d | ((rc: RenderContext) => Matrix3d);
+
+    add(annotation: Annotation): void;
+    remove(annotation: Annotation): void;
 }
 
 /** Possible settings that can be applied to generic annotations.

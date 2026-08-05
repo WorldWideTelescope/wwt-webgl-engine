@@ -82,6 +82,7 @@ export function WWTControl() {
 
     this.uiController = null;
     this._annotations = {};
+    this._setupHorizonAnnotations();
     this._hoverText = '';
     this._hoverTextPoint = new Vector2d();
     this._lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
@@ -423,6 +424,23 @@ WWTControl.showLayers = function (show) {
 
 var WWTControl$ = {
 
+    _setupHorizonAnnotations: function () {
+        if (!("horizon" in this._annotations)) {
+            var horizonAnnotations = new AnnotationBatch();
+            horizonAnnotations.viewTransform = function (_renderContext) {
+                var zenithAltAz = new Coordinates(0, 0);
+                var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
+                var raPart = -((zenith.get_RA() + 6) / 24 * (Math.PI * 2));
+                var decPart = -(zenith.get_dec() / 360 * (Math.PI * 2));
+                var mat = Matrix3d._rotationY(-raPart);
+                mat._multiply(Matrix3d._rotationX(decPart));
+                mat.invert();
+                return mat;
+            }
+            this._annotations["horizon"] = horizonAnnotations;
+        }
+    },
+
     _addAnnotationBatch: function (batch, name) {
         this._annotations[name] = batch;
     },
@@ -687,19 +705,7 @@ var WWTControl$ = {
           state.set_targetState(target);
         }
 
-        if (!("horizon" in this._annotations)) {
-          var horizonAnnotations = new AnnotationBatch();
-          horizonAnnotations.viewTransform = function (_renderContext) {
-              var zenithAltAz = new Coordinates(0, 0);
-              var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
-              var raPart = -((zenith.get_RA() + 6) / 24 * (Math.PI * 2));
-              var decPart = -(zenith.get_dec() / 360 * (Math.PI * 2));
-              var mat = Matrix3d._rotationY(-raPart);
-              mat._multiply(Matrix3d._rotationX(decPart));
-              mat.invert();
-              return mat;
-          }
-        }
+        this._setupHorizonAnnotations();
 
         Tile.lastDeepestLevel = Tile.deepestLevel;
         RenderTriangle.width = this.renderContext.width = this.canvas.width;

@@ -19,13 +19,13 @@ import { Coordinates } from "./coordinates.js";
 // wwtlib.AnnotationBatch
 
 export function AnnotationBatch() {
-  this.items = [];
-  this.pointList = null;
-  this.lineList = null;
-  this.triangleFanPointList = null;
-  this.triangleList = null;
-  this.viewTransform = null;
-  this._dirty = true;
+    this.items = [];
+    this.pointList = null;
+    this.lineList = null;
+    this.triangleFanPointList = null;
+    this.triangleList = null;
+    this.viewTransform = null;
+    this._dirty = true;
 }
 
 var AnnotationBatch$ = {
@@ -39,7 +39,7 @@ var AnnotationBatch$ = {
         this.markDirty(true); 
     },
 
-    prepBatch: function (renderContext) {
+    prepareBatch: function (renderContext) {
         if (this.pointList == null || this._dirty) {
             this.pointList = new PointList(renderContext);
             this.lineList = new LineList();
@@ -67,16 +67,16 @@ var AnnotationBatch$ = {
     },
 
     drawBatch: function (renderContext) {
-        this.markDirty(false);
         for (var i = 0; i < this.items.length; i++) {
             this.items[i].draw(renderContext, this);
         }
         if (this.viewTransform != null) {
             var matrix = this.viewTransform instanceof Matrix3d ? this.viewTransform : this.viewTransform(renderContext);
-            renderContext.executeWithWorldTransform(matrix, this._drawCommands);
+            renderContext.executeWithWorldTransform(matrix, this._drawCommands.bind(this));
         } else {
             this._drawCommands(renderContext);
         }
+        this.markDirty(false);
     },
 
     markDirty: function (dirty) {

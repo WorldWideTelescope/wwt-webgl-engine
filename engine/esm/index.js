@@ -177,7 +177,7 @@ export {
     ISettings,
     IUndoStep,
 } from "./interfaces.js";
-export { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
+export { AnnotationBatch, Annotation, Circle, Poly, PolyLine } from "./annotation.js";
 export { SolarSystemObjects, InterpolationType, CameraParameters } from "./camera_parameters.js";
 export { ConstellationFilter } from "./constellation_filter.js";
 export { FitsProperties, ScaleTypes } from "./fits_properties.js";

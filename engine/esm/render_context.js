@@ -957,7 +957,7 @@ var RenderContext$ = {
         this._setMatrixes();
     },
 
-    executeWithWithWorldTransform: function (matrix, callable) {
+    executeWithWorldTransform: function (matrix, callable) {
         var matOldWorld = this.get_world().clone();
         var matOldWorldBase = this.get_worldBase().clone();
         this.set_worldBase(Matrix3d.multiplyMatrix(matrix, this.get_world()));
