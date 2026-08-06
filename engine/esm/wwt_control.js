@@ -82,7 +82,6 @@ export function WWTControl() {
 
     this.uiController = null;
     this._annotations = {};
-    this._setupHorizonAnnotations();
     this._hoverText = '';
     this._hoverTextPoint = new Vector2d();
     this._lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
@@ -462,6 +461,10 @@ var WWTControl$ = {
             batchOrName = "equatorial";
         }
 
+        if (batchOrName === "horizon") {
+            this._setupHorizonAnnotations();
+        }
+
         var batch = typeof batchOrName === "string" ? this._annotations[batchOrName] : batchOrName;
         batch.add(annotation);
     },
@@ -704,8 +707,6 @@ var WWTControl$ = {
           var target = Number(Settings.get_active()[`get_${setting}`]());
           state.set_targetState(target);
         }
-
-        this._setupHorizonAnnotations();
 
         Tile.lastDeepestLevel = Tile.deepestLevel;
         RenderTriangle.width = this.renderContext.width = this.canvas.width;

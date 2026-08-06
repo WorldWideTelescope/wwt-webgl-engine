@@ -582,7 +582,6 @@ Grids.drawAltAzGrid = function (renderContext, opacity, drawColor) {
     var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
     var raPart = -((zenith.get_RA() + 6) / 24 * (Math.PI * 2));
     var decPart = -(zenith.get_dec() / 360 * (Math.PI * 2));
-    var raText = Coordinates.formatDMS(zenith.get_RA());
     var mat = Matrix3d._rotationY(-raPart);
     mat._multiply(Matrix3d._rotationX(decPart));
     mat.invert();
@@ -632,10 +631,10 @@ Grids.drawAltAzGrid = function (renderContext, opacity, drawColor) {
         }
     }
 
-    renderContext.executeWithWorldTransform(mat, function () {
-        Grids._altAzLineList.viewTransform = Matrix3d.invertMatrix(mat);
+    Grids._altAzLineList.viewTransform = Matrix3d.invertMatrix(mat);
+    renderContext.executeWithWorldTransform(mat, function (renderContext) {
         Grids._altAzLineList.drawLines(renderContext, opacity, drawColor);
-    }, mat);
+    });
     return true;
 };
 
@@ -649,8 +648,8 @@ Grids.drawAltAzGridText = function (renderContext, opacity, drawColor) {
     mat.invert();
     Grids._makeAltAzGridText();
     
-    renderContext.executeWithWorldTransform(mat, function () {
-        Grids._altAzTextBatch.viewTransform = Matrix3d.invertMatrix(mat);
+    Grids._altAzTextBatch.viewTransform = Matrix3d.invertMatrix(mat);
+    renderContext.executeWithWorldTransform(mat, function (renderContext) {
         Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
     });
     return true;
