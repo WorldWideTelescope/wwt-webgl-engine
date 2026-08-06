@@ -40,7 +40,7 @@ import {
 import { SimpleLineList } from "./graphics/primitives3d.js";
 import { Sprite2d } from "./graphics/sprite2d.js";
 
-import { AnnotationBatch } from "./annotation.js";
+import { AnnotationBatch, Annotation } from "./annotation.js";
 import { CameraParameters, SolarSystemObjects } from "./camera_parameters.js";
 import { Constellations } from "./constellations.js";
 import { Coordinates } from "./coordinates.js";
@@ -81,7 +81,7 @@ export function WWTControl() {
     this.freestandingMode = false;
 
     this.uiController = null;
-    this._annotations = {};
+    this._clearAnnotations();
     this._hoverText = '';
     this._hoverTextPoint = new Vector2d();
     this._lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
@@ -501,7 +501,9 @@ var WWTControl$ = {
                 }
             }
         } else {
-            this._annotations = {};
+            this._annotations = {
+                equatorial: new AnnotationBatch(),
+            };
         }
     },
 
