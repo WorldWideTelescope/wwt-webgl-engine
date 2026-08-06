@@ -440,6 +440,13 @@ var WWTControl$ = {
         }
     },
 
+    _setupGalacticAnnotation: function (annotation) {
+        if (!("galactic" in this._annotations)) {
+            this._annotations["galactic"] = new AnnotationBatch();
+        }
+        annotation._coordinateTransform = Annotation.galacticCoordinateTransform;
+    },
+
     _addAnnotationBatch: function (batch, name) {
         this._annotations[name] = batch;
     },
@@ -463,6 +470,10 @@ var WWTControl$ = {
 
         if (batchOrName === "horizon") {
             this._setupHorizonAnnotations();
+        }
+
+        if (batchOrName == "galactic") {
+            this._setupGalacticAnnotation(annotation);
         }
 
         var batch = typeof batchOrName === "string" ? this._annotations[batchOrName] : batchOrName;

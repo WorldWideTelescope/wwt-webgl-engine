@@ -94,7 +94,14 @@ export function Annotation() {
     this.annotationDirty = true;
     this._opacity = 1;
     this._showHoverLabel = false;
+    this._coordinateTransform = Annotation.defaultCoordinateTransform;
 }
+
+Annotation.defaultCoordinateTransform = function (x, y) {
+    return Coordinates.raDecTo3d(x / 15, y);
+}
+
+Annotation.galacticCoordinateTransform = Coordinates.galacticTo3dDouble;
 
 Annotation.separation = function (Alpha1, Delta1, Alpha2, Delta2) {
     Delta1 = Delta1 / 180 * Math.PI;
@@ -202,6 +209,7 @@ export function Circle() {
     this._fillColor$1 = Colors.get_white();
     this._x$1 = 0;
     this._y$1 = 0;
+    this._coordinateTransform = Coordinates.raDecTo3d;
     Annotation.call(this);
 }
 
@@ -270,7 +278,7 @@ var Circle$ = {
         this.markDirty(true);
         this._x$1 = x / 15;
         this._y$1 = y;
-        this.center = Coordinates.raDecTo3d(this._ra$1, this._dec$1);
+        this.center = this._coordinateTransform(this._x$1, this._y$1);
     },
 
     draw: function (renderContext, batch) {
@@ -387,7 +395,7 @@ export function Poly() {
 var Poly$ = {
     addPoint: function (x, y) {
         this.markDirty(true);
-        this._points$1.push(Coordinates.raDecTo3d(x / 15, y));
+        this._points$1.push(this._coordinateTransform(x, y));
     },
 
     get_fill: function () {
@@ -510,7 +518,7 @@ export function PolyLine() {
 var PolyLine$ = {
     addPoint: function (x, y) {
         this.markDirty(true);
-        this._points$1.push(Coordinates.raDecTo3d(x / 15, y));
+        this._points$1.push(this._coordinateTransform(x, y));
     },
 
     get_lineWidth: function () {
