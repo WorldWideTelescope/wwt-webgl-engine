@@ -957,6 +957,20 @@ var RenderContext$ = {
         this._setMatrixes();
     },
 
+    executeWithWorldTransform: function (matrix, callable) {
+        var matOldWorld = this.get_world().clone();
+        var matOldWorldBase = this.get_worldBase().clone();
+        this.set_worldBase(Matrix3d.multiplyMatrix(matrix, this.get_world()));
+        this.set_world(this.get_worldBase().clone());
+        this.makeFrustum();
+         
+        callable(this);
+
+        this.set_worldBase(matOldWorldBase);
+        this.set_world(matOldWorld);
+        this.makeFrustum();
+    },
+
     _initGL: function () {
         if (this.gl == null) {
             return;
