@@ -211,7 +211,7 @@ export class ImageSetLayerState {
 
 export type AnnotationTransform =
   "equatorial" |
-  "horizon"    |
+  "horizontal" |
   Matrix3d     |
   ((rc: RenderContext) => Matrix3d);
 

@@ -423,10 +423,10 @@ WWTControl.showLayers = function (show) {
 
 var WWTControl$ = {
 
-    _setupHorizonAnnotations: function () {
-        if (!("horizon" in this._annotations)) {
-            var horizonAnnotations = new AnnotationBatch();
-            horizonAnnotations.viewTransform = function (_renderContext) {
+    _setupHorizontalAnnotations: function () {
+        if (!("horizontal" in this._annotations)) {
+            var horizontalAnnotations = new AnnotationBatch();
+            horizontalAnnotations.viewTransform = function (_renderContext) {
                 var zenithAltAz = new Coordinates(0, 0);
                 var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
                 var raPart = -((zenith.get_RA() + 6) / 24 * (Math.PI * 2));
@@ -436,7 +436,7 @@ var WWTControl$ = {
                 mat.invert();
                 return mat;
             }
-            this._annotations["horizon"] = horizonAnnotations;
+            this._annotations["horizontal"] = horizontalAnnotations;
         }
     },
 
@@ -468,8 +468,8 @@ var WWTControl$ = {
             batchOrName = "equatorial";
         }
 
-        if (batchOrName === "horizon") {
-            this._setupHorizonAnnotations();
+        if (batchOrName === "horizontal") {
+            this._setupHorizontalAnnotations();
         }
 
         if (batchOrName == "galactic") {
