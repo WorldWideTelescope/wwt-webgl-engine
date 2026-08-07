@@ -444,7 +444,7 @@ var WWTControl$ = {
         if (!("galactic" in this._annotations)) {
             this._annotations["galactic"] = new AnnotationBatch();
         }
-        annotation._coordinateTransform = Annotation.galacticCoordinateTransform;
+        annotation.coordinateTransform = Annotation.galacticCoordinateTransform;
     },
 
     _addAnnotationBatch: function (batch, name) {

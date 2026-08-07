@@ -94,7 +94,7 @@ export function Annotation() {
     this.annotationDirty = true;
     this._opacity = 1;
     this._showHoverLabel = false;
-    this._coordinateTransform = Annotation.defaultCoordinateTransform;
+    this.coordinateTransform = Annotation.defaultCoordinateTransform;
 }
 
 Annotation.defaultCoordinateTransform = function (x, y) {
@@ -190,6 +190,15 @@ var Annotation$ = {
         return value;
     },
 
+    get_coordinateTransform: function() {
+        return this.coordinateTransform;
+    },
+
+    set_coordinateTransform: function(transform) {
+        this.coordinateTransform = transform;
+        this.markDirty(true);
+    },
+
     markDirty: function (dirty) {
         this.annotationDirty = dirty;
     },
@@ -209,7 +218,7 @@ export function Circle() {
     this._fillColor$1 = Colors.get_white();
     this._x$1 = 0;
     this._y$1 = 0;
-    this._coordinateTransform = Coordinates.raDecTo3d;
+    this.coordinateTransform = Coordinates.raDecTo3d;
     Annotation.call(this);
 }
 
@@ -274,11 +283,17 @@ var Circle$ = {
         return value;
     },
 
+    set_coordinateTransform: function (transform) {
+        this.coordinateTransform = transform;
+        this.center = this.coordinateTransform(this._x$1, this._y$1);
+        this.markDirty(true);
+    },
+
     setCenter: function (x, y) {
         this.markDirty(true);
-        this._x$1 = x / 15;
+        this._x$1 = x;
         this._y$1 = y;
-        this.center = this._coordinateTransform(this._x$1, this._y$1);
+        this.center = this.coordinateTransform(this._x$1, this._y$1);
     },
 
     draw: function (renderContext, batch) {
@@ -395,7 +410,7 @@ export function Poly() {
 var Poly$ = {
     addPoint: function (x, y) {
         this.markDirty(true);
-        this._points$1.push(this._coordinateTransform(x, y));
+        this._points$1.push([x, y]);
     },
 
     get_fill: function () {
@@ -438,20 +453,29 @@ var Poly$ = {
         return value;
     },
 
+    set_coordinateTransform: function (transform) {
+        this.coordinateTransform = transform;
+        this.markDirty(true);
+    },
+
     draw: function (renderContext, batch) {
         if (renderContext.gl != null) {
             if (this.annotationDirty) {
                 batch.markDirty(true);
                 //todo can we save this work for later?
-                var vertexList = this._points$1;
+                var vertexList = new Array(this._points$1);
+                for (let i = 0; i < this._points$1.length; i++) {
+                    var point = this._points$1[i];
+                    vertexList[i] = this.coordinateTransform(point[0], point[1]);
+                }
 
-                if (this._strokeWidth$1 > 0 && this._points$1.length > 1) {
+                if (this._strokeWidth$1 > 0 && vertexList.length > 1) {
                     var lineColorWithOpacity = this._lineColor$1._clone();
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
-                    for (var i = 0; i < (this._points$1.length - 1); i++) {
+                    for (var i = 0; i < (vertexList.length - 1); i++) {
                         batch.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
-                    batch.lineList.addLine(vertexList[this._points$1.length - 1], vertexList[0], lineColorWithOpacity, new Dates(0, 1));
+                    batch.lineList.addLine(vertexList[vertexList.length - 1], vertexList[0], lineColorWithOpacity, new Dates(0, 1));
                 }
                 if (this._fill$1) {
                     var fillColorWithOpacity = this._fillColor$1._clone();
@@ -518,7 +542,7 @@ export function PolyLine() {
 var PolyLine$ = {
     addPoint: function (x, y) {
         this.markDirty(true);
-        this._points$1.push(this._coordinateTransform(x, y));
+        this._points$1.push([x, y]);
     },
 
     get_lineWidth: function () {
@@ -546,11 +570,15 @@ var PolyLine$ = {
             if (this.annotationDirty) {
                 batch.markDirty(true);
                 //todo can we save this work for later?
-                var vertexList = this._points$1;
+                var vertexList = new Array(this._points$1);
+                for (let i = 0; i < this._points$1.length; i++) {
+                    var point = this._points$1[i];
+                    vertexList[i] = this.coordinateTransform(point[0], point[1]);
+                }
                 if (this._strokeWidth$1 > 0) {
                     var lineColorWithOpacity = this._lineColor$1._clone();
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
-                    for (var i = 0; i < (this._points$1.length - 1); i++) {
+                    for (var i = 0; i < (vertexList.length - 1); i++) {
                         batch.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
                 }
