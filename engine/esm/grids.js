@@ -16,7 +16,7 @@ import { Texture } from "./graphics/texture.js";
 import { ImageShader } from "./graphics/shaders.js";
 import { Colors } from "./color.js";
 import { freestandingMode } from "./data_globals.js";
-import { globalRenderContext, tilePrepDevice } from "./render_globals.js";
+import { globalRenderContext, tilePrepDevice, useGlVersion2 } from "./render_globals.js";
 import { BinaryReader } from "./utilities/binary_reader.js";
 import { Coordinates } from "./coordinates.js";
 import { Text3d, Text3dBatch } from "./sky_text.js";
@@ -648,16 +648,16 @@ Grids.drawAltAzGridText = function (renderContext, opacity, drawColor) {
     mat.invert();
     Grids._makeAltAzGridText();
 
-    Grids._altAzTextBatch.viewTransform = Matrix3d.invertMatrix(mat);
-    renderContext.executeWithWorldTransform(mat, function (renderContext) {
-        Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
-    });
+    if (useGlVersion2) {
+      Grids._altAzTextBatch.viewTransform = mat;
+    } else {
+      Grids._altAzTextBatch.viewTransform = Matrix3d.invertMatrix(mat);
+    }
     Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
     return true;
 };
 
 Grids._makeAltAzGridText = function () {
-    var drawColor = Colors.get_white();
     var index = 0;
     if (Grids._altAzTextBatch == null) {
         Grids._altAzTextBatch = new Text3dBatch(30);
