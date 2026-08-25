@@ -186,6 +186,43 @@ var PositionTextureVertexBuffer$ = {
 registerType("PositionTextureVertexBuffer", [PositionTextureVertexBuffer, PositionTextureVertexBuffer$, VertexBufferBase]);
 
 
+// wwtlib.PositionTextureArrayVertexBuffer
+
+export function PositionTextureArrayVertexBuffer(count) {
+    PositionTextureVertexBuffer.call(this, count);
+}
+
+PositionTextureArrayVertexBuffer.create = PositionTextureVertexBuffer.create;
+
+var PositionTextureArrayVertexBuffer$ = {
+    lock: function () {
+        this._verts$1 = new Array(this.count);
+        return this._verts$1;
+    },
+
+    unlock: function () {
+        this.vertexBuffer = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.vertexBuffer);
+        var f32array = new Float32Array(this.count * 6);
+        var buffer = f32array;
+        var index = 0;
+        var $enum1 = ss.enumerate(this._verts$1);
+        while ($enum1.moveNext()) {
+            var pt = $enum1.current;
+            buffer[index++] = pt.position.x;
+            buffer[index++] = pt.position.y;
+            buffer[index++] = pt.position.z;
+            buffer[index++] = pt.tu;
+            buffer[index++] = pt.tv;
+            buffer[index++] = pt.index;
+        }
+        tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
+    }
+};
+
+registerType("PositionTextureArrayVertexBuffer", [PositionTextureArrayVertexBuffer, PositionTextureArrayVertexBuffer$, PositionTextureVertexBuffer]);
+
+
 // wwtlib.PositionNormalTexturedVertexBuffer
 
 export function PositionNormalTexturedVertexBuffer(count) {

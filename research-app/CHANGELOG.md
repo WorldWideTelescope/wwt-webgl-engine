@@ -1,3 +1,9 @@
+# @wwtelescope/research-app 0.22.0 (2026-08-25)
+
+- Allow registering and deregistering custom colormaps via the research app
+  (#433, @Carifio24).
+
+
 # @wwtelescope/research-app 0.21.0 (2026-04-28)
 
 - Update the research app to allow selecting sources in either sky or planet-like

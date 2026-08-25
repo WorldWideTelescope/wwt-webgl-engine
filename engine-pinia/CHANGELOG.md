@@ -1,3 +1,9 @@
+# @wwtelescope/engine-pinia 0.16.0 (2026-08-25)
+
+- Add methods to the Pinia store for creating, fetching, and deleting named colormaps
+  (#433, @Carifio24).
+
+
 # @wwtelescope/engine-pinia 0.15.0 (2026-05-25)
 
 - Add `addFrameCallback` and `removeFrameCallback` methods to Pinia store to allow

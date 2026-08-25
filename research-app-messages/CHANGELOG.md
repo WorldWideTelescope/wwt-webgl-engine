@@ -1,3 +1,9 @@
+# @wwtelescope/research-app-messages 0.22.0 (2026-08-25)
+
+- Add new message types (and corresponding type guard functions) allowing for the 
+  creation and deletion of custom colormaps (#433, @Carifio24).
+
+
 # @wwtelescope/research-app-messages 0.21.0 (2026-04-28)
 
 - Add a render type field to research app sources so that we can only show relevant

@@ -112,6 +112,7 @@ export const WWTAwareComponent = defineComponent({
       "findCoordinatesForScreenPoint",
       "findScreenPointForCoordinates",
       "findRayForScreenPoint",
+      "getNamedColormap",
       "layerById",
       "imagesetForLayer",
       "imagesetLayerById",
@@ -145,6 +146,8 @@ export const WWTAwareComponent = defineComponent({
       "waitForReady",
       "addFrameCallback",
       "removeFrameCallback",
+      "createColormap",
+      "deleteColormap",
       // Formerly mutations
       "addAnnotation",
       "applyFitsLayerSettings",

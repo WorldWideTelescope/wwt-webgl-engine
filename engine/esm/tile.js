@@ -20,7 +20,7 @@ import {
 } from "./render_globals.js";
 import { freestandingMode } from "./data_globals.js";
 import { WEBGL } from "./graphics/webgl_constants.js";
-import { Texture } from "./graphics/texture.js";
+import { fitPowerOfTwo, isPowerOfTwo } from "./graphics/texture_utils.js";
 import { FitsShader, TileShader } from "./graphics/shaders.js";
 import { getTileKey } from "./util.js";
 import { BlendState } from "./blend_state.js";
@@ -143,10 +143,10 @@ var Tile$ = {
                 else {
                     var image = this.texture;
                     // Before we bind resize to a power of two if nessesary so we can MIPMAP
-                    if ((!Texture.isPowerOfTwo(this.texture.height) | !Texture.isPowerOfTwo(this.texture.width)) === 1) {
+                    if ((!isPowerOfTwo(this.texture.height) | !isPowerOfTwo(this.texture.width)) === 1) {
                         var temp = document.createElement('canvas');
-                        temp.height = Texture.fitPowerOfTwo(image.height);
-                        temp.width = Texture.fitPowerOfTwo(image.width);
+                        temp.height = fitPowerOfTwo(image.height);
+                        temp.width = fitPowerOfTwo(image.width);
                         var ctx = temp.getContext('2d');
                         ctx.drawImage(image, 0, 0, temp.width, temp.height);
                         //Substitute the resized image

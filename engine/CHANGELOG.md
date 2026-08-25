@@ -1,3 +1,20 @@
+# @wwtelescope/engine 7.40.0 (2026-08-25)
+
+- Add static methods for adding 2D and 3D matrices (#443, @Carifio24).
+- Expose the `Matrix3d` class and some of its functionality to TypeScript
+  (#441, @Carifio24).
+- Add render context methods allowing for executing code with transformed world, view,
+  and projection matrices. Use this functionality for drawing the alt/az grid and its
+  text (#440, #444, @Carifio24).
+- Allow deregistering a named colormap from the engine, and expose this functionality
+  to TypeScript (#433, @Carifio24).
+- Update glyph rendering to use new set of spritesheets, significantly expanding the
+  set of characters available to the engine. This is achieved by modifying the text
+  rendering scheme to allow using multiple spritesheets. In WebGL 2 this is handled
+  in the shader with a texture array; for WebGL 1 we fall back to using an array of
+  2D samplers and only sampling the relevant texture (#425, @Carifio24).
+
+
 # @wwtelescope/engine 7.39.0 (2026-07-03)
 
 - Add the ability to filter table layer points. The filtration condition is specified

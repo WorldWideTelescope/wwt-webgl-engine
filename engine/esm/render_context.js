@@ -957,6 +957,33 @@ var RenderContext$ = {
         this._setMatrixes();
     },
 
+    executeWithTransforms: function (transforms, callable) {
+        var oldWorld = this.get_world().clone();
+        var oldWorldBase = this.get_worldBase().clone();
+        var oldView = this.get_view().clone();
+        var oldProjection = this.get_projection().clone();
+      
+        if (transforms.world) {
+          this.set_worldBase(Matrix3d.multiplyMatrix(transforms.world, this.get_world()));
+          this.set_world(this.get_worldBase().clone());
+        }
+        if (transforms.view) {
+          this.set_view(Matrix3d.multiplyMatrix(transforms.view, this.get_view()));
+        }
+        if (transforms.projection) {
+          this.set_projection(Matrix3d.multiplyMatrix(transforms.projection, this.get_projection()));
+        }
+        this.makeFrustum();
+      
+        callable(this);
+      
+        this.set_worldBase(oldWorldBase);
+        this.set_world(oldWorld);
+        this.set_view(oldView);
+        this.set_projection(oldProjection);
+        this.makeFrustum();
+    },
+
     _initGL: function () {
         if (this.gl == null) {
             return;
