@@ -582,7 +582,6 @@ Grids.drawAltAzGrid = function (renderContext, opacity, drawColor) {
     var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
     var raPart = -((zenith.get_RA() + 6) / 24 * (Math.PI * 2));
     var decPart = -(zenith.get_dec() / 360 * (Math.PI * 2));
-    var raText = Coordinates.formatDMS(zenith.get_RA());
     var mat = Matrix3d._rotationY(-raPart);
     mat._multiply(Matrix3d._rotationX(decPart));
     mat.invert();
@@ -631,16 +630,14 @@ Grids.drawAltAzGrid = function (renderContext, opacity, drawColor) {
             }
         }
     }
-    var matOldWorld = renderContext.get_world().clone();
-    var matOldWorldBase = renderContext.get_worldBase().clone();
-    renderContext.set_worldBase(Matrix3d.multiplyMatrix(mat, renderContext.get_world()));
-    renderContext.set_world(renderContext.get_worldBase().clone());
-    renderContext.makeFrustum();
+
     Grids._altAzLineList.viewTransform = Matrix3d.invertMatrix(mat);
-    Grids._altAzLineList.drawLines(renderContext, opacity, drawColor);
-    renderContext.set_worldBase(matOldWorldBase);
-    renderContext.set_world(matOldWorld);
-    renderContext.makeFrustum();
+    renderContext.executeWithTransforms(
+      { world: mat },
+      function (renderContext) {
+        Grids._altAzLineList.drawLines(renderContext, opacity, drawColor);
+      }
+    );
     return true;
 };
 
@@ -649,21 +646,18 @@ Grids.drawAltAzGridText = function (renderContext, opacity, drawColor) {
     var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
     var raPart = -((zenith.get_RA() - 6) / 24 * (Math.PI * 2));
     var decPart = -(zenith.get_dec() / 360 * (Math.PI * 2));
-    var raText = Coordinates.formatDMS(zenith.get_RA());
     var mat = Matrix3d._rotationY(-raPart - Math.PI);
     mat._multiply(Matrix3d._rotationX(decPart));
     mat.invert();
     Grids._makeAltAzGridText();
-    var matOldWorld = renderContext.get_world().clone();
-    var matOldWorldBase = renderContext.get_worldBase().clone();
-    renderContext.set_worldBase(Matrix3d.multiplyMatrix(mat, renderContext.get_world()));
-    renderContext.set_world(renderContext.get_worldBase().clone());
-    renderContext.makeFrustum();
+
     Grids._altAzTextBatch.viewTransform = Matrix3d.invertMatrix(mat);
-    Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
-    renderContext.set_worldBase(matOldWorldBase);
-    renderContext.set_world(matOldWorld);
-    renderContext.makeFrustum();
+    renderContext.executeWithTransforms(
+      { world: mat },
+      function (renderContext) {
+        Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
+      }
+    );
     return true;
 };
 

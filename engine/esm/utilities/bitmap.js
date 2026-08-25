@@ -6,7 +6,7 @@
 import { registerType } from "../typesystem.js";
 import { tilePrepDevice } from "../render_globals.js";
 import { WEBGL } from "../graphics/webgl_constants.js";
-import { Texture } from "../graphics/texture.js";
+import { fitPowerOfTwo } from "../graphics/texture_utils.js";
 
 
 // wwtlib.Bitmap
@@ -17,8 +17,8 @@ export function Bitmap() {
 }
 
 Bitmap.create = function (width, height) {
-    height = Texture.fitPowerOfTwo(height);
-    width = Texture.fitPowerOfTwo(width);
+    height = fitPowerOfTwo(height);
+    width = fitPowerOfTwo(width);
     var bmp = new Bitmap();
     bmp.height = height;
     bmp.width = width;

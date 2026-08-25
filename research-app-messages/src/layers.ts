@@ -205,3 +205,55 @@ export function isMultiModifyAnnotationMessage(o: any): o is MultiModifyAnnotati
     typeof o.settings === 'object' &&
     typeof o.values === 'object';
 }
+
+/** A command to create a colormap and register it in the engine.
+ *
+ * This interface does not validate that values represent valid colors.
+ */
+export interface CreateColormapMessage {
+  /** The tag identifying this message type */
+  event: "create_colormap";
+
+  /** The name with which the created colormap will be registered in the engine.
+   *
+   * If a colormap with this name already exists, this new registration will override
+   * the existing one.
+   */
+  name: string;
+  /** The list of colors defining the colormap.
+  *
+  * Colors can be given as strings, or [A, R, G, B] or [R, G, B] lists with integer values between 0 and 255.
+  * */
+  colors: ([number, number, number, number?] | string)[];
+}
+
+/** A type-guard function for {@link CreateColormapMessage}. */
+export function isCreateColormapMessage(o: any): o is CreateColormapMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return o.event === "create_colormap" &&
+    typeof o.name === "string" &&
+    Array.isArray(o.colors) &&
+    (
+      o.colors.every((c: unknown) => typeof c === "string") ||
+      o.colors.every((c: unknown) => Array.isArray(c) && c.length === 4 && c.every(x => typeof x === "number"))
+    );
+}
+
+/** A command to delete a named colormap.
+ *
+ * Note that it is possible to delete one of the built-in colormaps.
+ * If no colormap with the given name is registered in the engine, this command
+ * will have no effect.
+ */
+export interface DeleteColormapMessage {
+  /** The tag identifying this message type */
+  event: "delete_colormap";
+
+  /** The name of the colormap to delete. */
+  name: string;
+}
+
+/** A type-guard function for {@link DeleteColormapMessage} */
+export function isDeleteColormapMessage(o: any): o is DeleteColormapMessage {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  return o.event === "delete_colormap" &&
+    typeof o.name === "string";
+}
