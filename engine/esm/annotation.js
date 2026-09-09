@@ -58,7 +58,7 @@ AnnotationBatch.horizontalWorldTransform = function (_renderContext) {
 };
 
 AnnotationBatch.overlayWorldTransform = function (position) {
-  var overlayWorldInitial = Matrix3d.rotationYawPitchRoll(-(position.get_RA() - 12) * Coordinates.RCRA, -position.get_dec() * Coordinates.RC, 0);
+  var overlayWorldInitial = Matrix3d.rotationYawPitchRoll(-(position.get_RA() - 6) * Coordinates.RCRA, -position.get_dec() * Coordinates.RC, 0);
   return function (renderContext) {
     var world = renderContext.get_world().clone();
     world.invert();
@@ -70,7 +70,7 @@ AnnotationBatch.overlayViewTransform = function (rotation) {
   var overlayViewInitial = Matrix3d.lookAtLH(
     Vector3d.create(0, 0, 0),
     Vector3d.create(0, 0, -1),
-    Vector3d.create(Math.sin(rotation, Math.cos(rotation), 0)),
+    Vector3d.create(Math.sin(rotation), Math.cos(rotation), 0),
   );
   return function (renderContext) {
     var view = renderContext.get_view().clone();
@@ -90,7 +90,20 @@ var AnnotationBatch$ = {
         this.markDirty(true); 
     },
 
+    _anyChildDirty: function () {
+        for (var i = 0; i < this.items.length; i++) {
+            if (this.items[i].get_dirty()) {
+                return true;
+            }
+        }
+        return false;
+    }, 
+
     prepareBatch: function (renderContext) {
+        var dirty = this.get_dirty() || this._anyChildDirty();
+        if (dirty) {
+          this.markDirty(true);
+        }
         if (this.pointList == null || this._dirty) {
             this.pointList = new PointList(renderContext);
             this.lineList = new LineList();
@@ -99,7 +112,6 @@ var AnnotationBatch$ = {
             this.lineList.set_depthBuffered(false);
             this.triangleList.depthBuffered = false;
         }
-        this.markDirty(false);
     },
 
     _drawCommands: function (renderContext) {
@@ -155,7 +167,11 @@ var AnnotationBatch$ = {
     },
 
     markDirty: function (dirty) {
-        this._dirty = dirty;
+        this._dirty = dirty; 
+    },
+
+    get_dirty: function() {
+        return this._dirty;
     },
 };
 
@@ -283,6 +299,14 @@ var Annotation$ = {
     markDirty: function (dirty) {
         this.annotationDirty = dirty;
     },
+
+    get_dirty: function () {
+        return this.annotationDirty;
+    },
+
+    _needsDraw: function(batch) {
+        return this.annotationDirty || batch.get_dirty();
+    },
 };
 
 registerType("Annotation", [Annotation, Annotation$, null]);
@@ -395,8 +419,7 @@ var Circle$ = {
         }
 
         if (renderContext.gl != null) {
-            if (this.annotationDirty) {
-                batch.markDirty(true);
+            if (this._needsDraw(batch)) {
                 var up = Vector3d.create(0, 1, 0);
                 var xNormal = Vector3d.cross(this.center, up);
                 var yNormal = Vector3d.cross(this.center, xNormal);
@@ -535,8 +558,7 @@ var Poly$ = {
 
     draw: function (renderContext, batch) {
         if (renderContext.gl != null) {
-            if (this.annotationDirty) {
-                batch.markDirty(true);
+            if (this._needsDraw(batch)) {
                 //todo can we save this work for later?
                 var vertexList = new Array(this._points$1);
                 for (let i = 0; i < this._points$1.length; i++) {
@@ -642,8 +664,7 @@ var PolyLine$ = {
 
     draw: function (renderContext, batch) {
         if (renderContext.gl != null) {
-            if (this.annotationDirty) {
-                batch.markDirty(true);
+            if (this._needsDraw(batch)) {
                 //todo can we save this work for later?
                 var vertexList = new Array(this._points$1);
                 for (let i = 0; i < this._points$1.length; i++) {
