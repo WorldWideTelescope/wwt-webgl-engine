@@ -524,8 +524,8 @@ export class Annotation implements AnnotationSettingsInterface {
 
 export class AnnotationBatch {
     static readonly horizontalWorldTransform: BatchTransform;
-    static readonly overlayWorldTransform: BatchTransform;
-    static readonly overlayViewTransform: BatchTransform;
+    static overlayWorldTransform(position: Coordinates): BatchTransform;
+    static overlayViewTransform(rotation: number): BatchTransform;
 
     readonly items: Annotation[];
     get_viewTransform(): BatchTransform;
