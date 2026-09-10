@@ -9,11 +9,173 @@
 
 import { registerType } from "./typesystem.js";
 import { ss } from "./ss.js";
-import { Vector3d } from "./double3d.js";
+import { Matrix3d, Vector3d } from "./double3d.js";
 import { Dates, LineList, TriangleList, TriangleFanList, PointList } from "./graphics/primitives3d.js";
 import { Tessellator } from "./graphics/tessellator.js";
 import { Color, Colors } from "./color.js";
 import { Coordinates } from "./coordinates.js";
+import { SpaceTimeController } from "./space_time_controller.js";
+
+
+// wwtlib.AnnotationBatch
+
+export function AnnotationBatch() {
+    this.items = [];
+    this.pointList = null;
+    this.lineList = null;
+    this.triangleFanPointList = null;
+    this.triangleList = null;
+    this.viewTransform = null;
+    this.worldTransform = null;
+    this.projectionTransform = null;
+    this._dirty = true;
+}
+
+// Without this matrix, converting from RA/Dec gives
+// (RA, Dec) -> (270 - Az, Alt)
+// This is a previously known problem - for example, the alt/az grid text
+// explicitly offsets by 6 hours = 90 degrees to account for this
+// This matrix provides the correct transformation.
+// It's done in homogeneous coordinates, but we're just flipping x + z
+// and reversing the sign of both
+AnnotationBatch._horizontalWorldAdjustment = Matrix3d.create(
+    0, 0, -1, 0,
+    0, 1, 0, 0,
+    -1, 0, 0, 0,
+    0, 0, 0, 1,
+);
+
+AnnotationBatch.horizontalWorldTransform = function (_renderContext) {
+    var zenithAltAz = new Coordinates(0, 0);
+    var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
+    var raPart = -((zenith.get_RA() + 6) / 24 * (Math.PI * 2));
+    var decPart = -(zenith.get_dec() / 360 * (Math.PI * 2));
+    var mat = Matrix3d._rotationY(-raPart);
+    mat._multiply(Matrix3d._rotationX(decPart));
+    mat.invert();
+    mat = Matrix3d.multiplyMatrix(AnnotationBatch._horizontalWorldAdjustment, mat);
+    return mat;
+};
+
+AnnotationBatch.overlayWorldTransform = function (position) {
+  var overlayWorldInitial = Matrix3d.rotationYawPitchRoll(-(position.get_RA() - 6) * Coordinates.RCRA, -position.get_dec() * Coordinates.RC, 0);
+  return function (renderContext) {
+    var world = renderContext.get_world().clone();
+    world.invert();
+    return Matrix3d.multiplyMatrix(overlayWorldInitial, world); 
+  }
+};
+
+AnnotationBatch.overlayViewTransform = function (rotation) {
+  var overlayViewInitial = Matrix3d.lookAtLH(
+    Vector3d.create(0, 0, 0),
+    Vector3d.create(0, 0, -1),
+    Vector3d.create(Math.sin(rotation), Math.cos(rotation), 0),
+  );
+  return function (renderContext) {
+    var view = renderContext.get_view().clone();
+    view.invert();
+    return Matrix3d.multiplyMatrix(overlayViewInitial, view);
+  }
+};
+
+var AnnotationBatch$ = {
+    add: function (annotation) {
+        this.items.push(annotation);
+        this.markDirty(true); 
+    },
+
+    remove: function (annotation) {
+        ss.remove(this.items, annotation);
+        this.markDirty(true); 
+    },
+
+    _anyChildDirty: function () {
+        for (var i = 0; i < this.items.length; i++) {
+            if (this.items[i].get_dirty()) {
+                return true;
+            }
+        }
+        return false;
+    }, 
+
+    prepareBatch: function (renderContext) {
+        var dirty = this.get_dirty() || this._anyChildDirty();
+        if (dirty) {
+          this.markDirty(true);
+        }
+        if (this.pointList == null || this._dirty) {
+            this.pointList = new PointList(renderContext);
+            this.lineList = new LineList();
+            this.triangleFanPointList = new TriangleFanList();
+            this.triangleList = new TriangleList();
+            this.lineList.set_depthBuffered(false);
+            this.triangleList.depthBuffered = false;
+        }
+    },
+
+    _drawCommands: function (renderContext) {
+        if (this.pointList != null) {
+            this.pointList.draw(renderContext, 1, false);
+        }
+        if (this.lineList != null) {
+            this.lineList.drawLines(renderContext, 1);
+        }
+        if (this.triangleFanPointList != null) {
+            this.triangleFanPointList.draw(renderContext, 1);
+        }
+        if (this.triangleList != null) {
+            this.triangleList.draw(renderContext, 1, 0);
+        }
+    },
+
+    drawBatch: function (renderContext) {
+        for (var i = 0; i < this.items.length; i++) {
+            this.items[i].draw(renderContext, this);
+        }
+        var transforms = {
+            world: (!this.worldTransform || this.worldTransform instanceof Matrix3d) ? this.worldTransform : this.worldTransform(renderContext),
+            view: (!this.viewTransform || this.viewTransform instanceof Matrix3d) ? this.viewTransform : this.viewTransform(renderContext),
+            projection: (!this.projectionTransform || this.projectionTransform instanceof Matrix3d) ? this.projectionTransform : this.projectionTransform(renderContext),
+        };
+        renderContext.executeWithTransforms(transforms, this._drawCommands.bind(this));
+        this.markDirty(false);
+    },
+
+    get_viewTransform: function () {
+        return this.viewTransform;
+    },
+
+    set_viewTransform: function (transform) {
+        this.viewTransform = transform;
+    },
+
+    get_worldTransform: function () {
+        return this.worldTransform;
+    },
+
+    set_worldTransform: function (transform) {
+        this.worldTransform = transform;
+    },
+
+    get_projectionTransform: function () {
+        return this.projectionTransform;
+    },
+
+    set_projectionTransform: function (transform) {
+        this.projectionTransform = transform;
+    },
+
+    markDirty: function (dirty) {
+        this._dirty = dirty; 
+    },
+
+    get_dirty: function() {
+        return this._dirty;
+    },
+};
+
+registerType("AnnotationBatch", [AnnotationBatch, AnnotationBatch$, null]);
 
 
 // wwtlib.Annotation
@@ -23,43 +185,14 @@ export function Annotation() {
     this.annotationDirty = true;
     this._opacity = 1;
     this._showHoverLabel = false;
+    this.coordinateTransform = Annotation.defaultCoordinateTransform;
 }
 
-Annotation.pointList = null;
-Annotation.lineList = null;
-Annotation.triangleFanPointList = null;
-Annotation.triangleList = null;
-Annotation.batchDirty = true;
+Annotation.defaultCoordinateTransform = function (x, y) {
+    return Coordinates.raDecTo3d(x / 15, y);
+}
 
-Annotation.prepBatch = function (renderContext) {
-    if (Annotation.pointList == null || Annotation.batchDirty) {
-        Annotation.pointList = new PointList(renderContext);
-        Annotation.lineList = new LineList();
-        Annotation.triangleFanPointList = new TriangleFanList();
-        Annotation.triangleList = new TriangleList();
-        Annotation.lineList.set_depthBuffered(false);
-        Annotation.triangleList.depthBuffered = false;
-    }
-};
-
-Annotation.drawBatch = function (renderContext) {
-    Annotation.batchDirty = false;
-    if (renderContext.gl == null) {
-        return;
-    }
-    if (Annotation.pointList != null) {
-        Annotation.pointList.draw(renderContext, 1, false);
-    }
-    if (Annotation.lineList != null) {
-        Annotation.lineList.drawLines(renderContext, 1);
-    }
-    if (Annotation.triangleFanPointList != null) {
-        Annotation.triangleFanPointList.draw(renderContext, 1);
-    }
-    if (Annotation.triangleList != null) {
-        Annotation.triangleList.draw(renderContext, 1, 0);
-    }
-};
+Annotation.galacticCoordinateTransform = Coordinates.galacticTo3dDouble;
 
 Annotation.separation = function (Alpha1, Delta1, Alpha2, Delta2) {
     Delta1 = Delta1 / 180 * Math.PI;
@@ -77,6 +210,12 @@ Annotation.separation = function (Alpha1, Delta1, Alpha2, Delta2) {
     return vvalue;
 };
 
+Annotation.separationCartesian = function (u, v) {
+  var dot = Vector3d.dot(u, v);
+  var cross = Vector3d.cross(u, v).length();
+  return Math.atan2(cross, dot);
+}
+
 Annotation.colorToUint = function (col) {
     return (col.a) << 24 | (col.r << 16) | (col.g) << 8 | col.b;
 };
@@ -86,14 +225,14 @@ Annotation.colorToUintAlpha = function (col, opacity) {
 };
 
 var Annotation$ = {
-    draw: function (renderContext) { },
+    draw: function (renderContext, batch) { },
 
     get_opacity: function () {
         return this._opacity;
     },
 
     set_opacity: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._opacity = value;
         return value;
     },
@@ -143,9 +282,31 @@ var Annotation$ = {
     },
 
     set_center: function (value) {
+        this.markDirty(true);
         this.center = value;
         return value;
-    }
+    },
+
+    get_coordinateTransform: function() {
+        return this.coordinateTransform;
+    },
+
+    set_coordinateTransform: function(transform) {
+        this.coordinateTransform = transform;
+        this.markDirty(true);
+    },
+
+    markDirty: function (dirty) {
+        this.annotationDirty = dirty;
+    },
+
+    get_dirty: function () {
+        return this.annotationDirty;
+    },
+
+    _needsDraw: function(batch) {
+        return this.annotationDirty || batch.get_dirty();
+    },
 };
 
 registerType("Annotation", [Annotation, Annotation$, null]);
@@ -160,8 +321,9 @@ export function Circle() {
     this._radius$1 = 10;
     this._lineColor$1 = Colors.get_white();
     this._fillColor$1 = Colors.get_white();
-    this._ra$1 = 0;
-    this._dec$1 = 0;
+    this._x$1 = 0;
+    this._y$1 = 0;
+    this.coordinateTransform = Coordinates.raDecTo3d;
     Annotation.call(this);
 }
 
@@ -171,7 +333,7 @@ var Circle$ = {
     },
 
     set_fill: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._fill$1 = value;
         return value;
     },
@@ -181,7 +343,7 @@ var Circle$ = {
     },
 
     set_skyRelative: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._skyRelative$1 = value;
         return value;
     },
@@ -191,7 +353,7 @@ var Circle$ = {
     },
 
     set_lineWidth: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._strokeWidth$1 = value;
         return value;
     },
@@ -201,7 +363,7 @@ var Circle$ = {
     },
 
     set_radius: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._radius$1 = value;
         return value;
     },
@@ -211,7 +373,7 @@ var Circle$ = {
     },
 
     set_lineColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._lineColor$1 = Color.load(value);
         return value;
     },
@@ -221,19 +383,25 @@ var Circle$ = {
     },
 
     set_fillColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._fillColor$1 = Color.fromName(value);
         return value;
     },
 
-    setCenter: function (ra, dec) {
-        Annotation.batchDirty = true;
-        this._ra$1 = ra / 15;
-        this._dec$1 = dec;
-        this.center = Coordinates.raDecTo3d(this._ra$1, this._dec$1);
+    set_coordinateTransform: function (transform) {
+        this.coordinateTransform = transform;
+        this.center = this.coordinateTransform(this._x$1, this._y$1);
+        this.markDirty(true);
     },
 
-    draw: function (renderContext) {
+    setCenter: function (x, y) {
+        this.markDirty(true);
+        this._x$1 = x;
+        this._y$1 = y;
+        this.center = this.coordinateTransform(this._x$1, this._y$1);
+    },
+
+    draw: function (renderContext, batch) {
         var onScreen = true;
 
         var rad = this._radius$1;
@@ -251,14 +419,14 @@ var Circle$ = {
         }
 
         if (renderContext.gl != null) {
-            if (Annotation.batchDirty || this.annotationDirty) {
+            if (this._needsDraw(batch)) {
                 var up = Vector3d.create(0, 1, 0);
                 var xNormal = Vector3d.cross(this.center, up);
                 var yNormal = Vector3d.cross(this.center, xNormal);
 
                 // Here we guard, lamely, against div-by-0; circles at decs of
                 // +-90 will surely not render well.
-                var cosdec = Math.cos(this._dec$1 * Math.PI / 180)
+                var cosdec = Math.cos(this._y$1 * Math.PI / 180)
                 cosdec = Math.max(cosdec, 1e-5);
                 var r = this._radius$1 * Math.PI / (180 * cosdec);
 
@@ -283,7 +451,7 @@ var Circle$ = {
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
 
                     for (var i = 0; i < vertexList.length - 1; i++) {
-                        Annotation.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
+                        batch.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
                 }
 
@@ -292,7 +460,7 @@ var Circle$ = {
                     fillColorWithOpacity.a = Math.round(fillColorWithOpacity.a * this.get_opacity());
                     var pos = Vector3d.create(this.center.x, this.center.y, this.center.z);
                     vertexList.splice(0, 0, pos);
-                    Annotation.triangleFanPointList.addShape(vertexList, fillColorWithOpacity, new Dates(0, 1));
+                    batch.triangleFanPointList.addShape(vertexList, fillColorWithOpacity, new Dates(0, 1));
                 }
 
                 this.annotationDirty = false;
@@ -318,14 +486,8 @@ var Circle$ = {
     },
 
     hitTest: function (renderContext, RA, dec, x, y) {
-        if (ss.emptyString(this.get_id())) {
-            return false;
-        }
-        var rad = this._radius$1;
-        if (!this._skyRelative$1) {
-            rad *= renderContext.get_fovScale() / 3600;
-        }
-        return Annotation.separation(RA, dec, this._ra$1, this._dec$1) < rad;
+        var test = Coordinates.raDecTo3d(RA, dec);
+        return Annotation.separationCartesian(this.center, test) < (this._radius$1 * Math.PI / 180);
     }
 };
 
@@ -345,8 +507,8 @@ export function Poly() {
 
 var Poly$ = {
     addPoint: function (x, y) {
-        Annotation.batchDirty = true;
-        this._points$1.push(Coordinates.raDecTo3d(x / 15, y));
+        this.markDirty(true);
+        this._points$1.push([x, y]);
     },
 
     get_fill: function () {
@@ -354,7 +516,7 @@ var Poly$ = {
     },
 
     set_fill: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._fill$1 = value;
         return value;
     },
@@ -364,7 +526,7 @@ var Poly$ = {
     },
 
     set_lineWidth: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._strokeWidth$1 = value;
         return value;
     },
@@ -374,7 +536,7 @@ var Poly$ = {
     },
 
     set_lineColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._lineColor$1 = Color.fromName(value);
         return value;
     },
@@ -384,31 +546,40 @@ var Poly$ = {
     },
 
     set_fillColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._fillColor$1 = Color.fromName(value);
         return value;
     },
 
-    draw: function (renderContext) {
-        if (renderContext.gl != null) {
-            if (Annotation.batchDirty || this.annotationDirty) {
-                //todo can we save this work for later?
-                var vertexList = this._points$1;
+    set_coordinateTransform: function (transform) {
+        this.coordinateTransform = transform;
+        this.markDirty(true);
+    },
 
-                if (this._strokeWidth$1 > 0 && this._points$1.length > 1) {
+    draw: function (renderContext, batch) {
+        if (renderContext.gl != null) {
+            if (this._needsDraw(batch)) {
+                //todo can we save this work for later?
+                var vertexList = new Array(this._points$1);
+                for (let i = 0; i < this._points$1.length; i++) {
+                    var point = this._points$1[i];
+                    vertexList[i] = this.coordinateTransform(point[0], point[1]);
+                }
+
+                if (this._strokeWidth$1 > 0 && vertexList.length > 1) {
                     var lineColorWithOpacity = this._lineColor$1._clone();
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
-                    for (var i = 0; i < (this._points$1.length - 1); i++) {
-                        Annotation.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
+                    for (var i = 0; i < (vertexList.length - 1); i++) {
+                        batch.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
-                    Annotation.lineList.addLine(vertexList[this._points$1.length - 1], vertexList[0], lineColorWithOpacity, new Dates(0, 1));
+                    batch.lineList.addLine(vertexList[vertexList.length - 1], vertexList[0], lineColorWithOpacity, new Dates(0, 1));
                 }
                 if (this._fill$1) {
                     var fillColorWithOpacity = this._fillColor$1._clone();
                     fillColorWithOpacity.a = Math.round(fillColorWithOpacity.a * this.get_opacity());
                     var indexes = Tessellator.tesselateSimplePoly(vertexList);
                     for (var i = 0; i < indexes.length; i += 3) {
-                        Annotation.triangleList.addSubdividedTriangles(vertexList[indexes[i]], vertexList[indexes[i + 1]], vertexList[indexes[i + 2]], fillColorWithOpacity, new Dates(0, 1), 2);
+                        batch.triangleList.addSubdividedTriangles(vertexList[indexes[i]], vertexList[indexes[i + 1]], vertexList[indexes[i + 2]], fillColorWithOpacity, new Dates(0, 1), 2);
                     }
                 }
                 this.annotationDirty = false;
@@ -467,8 +638,8 @@ export function PolyLine() {
 
 var PolyLine$ = {
     addPoint: function (x, y) {
-        Annotation.batchDirty = true;
-        this._points$1.push(Coordinates.raDecTo3d(x / 15, y));
+        this.markDirty(true);
+        this._points$1.push([x, y]);
     },
 
     get_lineWidth: function () {
@@ -476,7 +647,7 @@ var PolyLine$ = {
     },
 
     set_lineWidth: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._strokeWidth$1 = value;
         return value;
     },
@@ -486,21 +657,25 @@ var PolyLine$ = {
     },
 
     set_lineColor: function (value) {
-        Annotation.batchDirty = true;
+        this.markDirty(true);
         this._lineColor$1 = Color.fromName(value);
         return value;
     },
 
-    draw: function (renderContext) {
+    draw: function (renderContext, batch) {
         if (renderContext.gl != null) {
-            if (Annotation.batchDirty || this.annotationDirty) {
+            if (this._needsDraw(batch)) {
                 //todo can we save this work for later?
-                var vertexList = this._points$1;
+                var vertexList = new Array(this._points$1);
+                for (let i = 0; i < this._points$1.length; i++) {
+                    var point = this._points$1[i];
+                    vertexList[i] = this.coordinateTransform(point[0], point[1]);
+                }
                 if (this._strokeWidth$1 > 0) {
                     var lineColorWithOpacity = this._lineColor$1._clone();
                     lineColorWithOpacity.a = Math.round(lineColorWithOpacity.a * this.get_opacity());
-                    for (var i = 0; i < (this._points$1.length - 1); i++) {
-                        Annotation.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
+                    for (var i = 0; i < (vertexList.length - 1); i++) {
+                        batch.lineList.addLine(vertexList[i], vertexList[i + 1], lineColorWithOpacity, new Dates(0, 1));
                     }
                 }
                 this.annotationDirty = false;

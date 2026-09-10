@@ -40,7 +40,7 @@ import {
 import { SimpleLineList } from "./graphics/primitives3d.js";
 import { Sprite2d } from "./graphics/sprite2d.js";
 
-import { Annotation } from "./annotation.js";
+import { AnnotationBatch } from "./annotation.js";
 import { CameraParameters, SolarSystemObjects } from "./camera_parameters.js";
 import { Constellations } from "./constellations.js";
 import { Coordinates } from "./coordinates.js";
@@ -81,7 +81,7 @@ export function WWTControl() {
     this.freestandingMode = false;
 
     this.uiController = null;
-    this._annotations = [];
+    this._clearAnnotations();
     this._hoverText = '';
     this._hoverTextPoint = new Vector2d();
     this._lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
@@ -421,33 +421,86 @@ WWTControl.showLayers = function (show) {
     WWTControl.showDataLayers = show;
 };
 
+WWTControl._defaultAnnotationBatchName = "6518e545-97a3-407a-9f4f-d33a08554f13";
+
 var WWTControl$ = {
-    _addAnnotation: function (annotation) {
-        this._annotations.push(annotation);
-        Annotation.batchDirty = true;
+
+    _addAnnotationBatch: function (batch, name) {
+        this._annotations[name] = batch;
     },
 
-    _removeAnnotation: function (annotation) {
-        ss.remove(this._annotations, annotation);
-        Annotation.batchDirty = true;
-    },
-
-    _clearAnnotations: function () {
-        this._annotations.length = 0;
-        Annotation.batchDirty = true;
-    },
-
-    _annotationclicked: function (ra, dec, x, y) {
-        if (this._annotations != null && this._annotations.length > 0) {
-            var index = 0;
-            var $enum1 = ss.enumerate(this._annotations);
-            while ($enum1.moveNext()) {
-                var note = $enum1.current;
-                if (note.hitTest(this.renderContext, ra, dec, x, y)) {
-                    globalScriptInterface._fireAnnotationclicked(ra, dec, note.get_id());
-                    return true;
+    _removeAnnotationBatch: function (batchOrName) {
+        if (typeof batchOrName === "string") {
+            delete this._annotations[name];
+        } else {
+            for (var name in this._annotations) {
+                if (this._annotations[name] === batchOrName) {
+                    delete this._annotations[name];
                 }
-                index++;
+            }
+        }
+    },
+
+    _addAnnotation: function (annotation, batchOrName) {
+        if (batchOrName == null) {
+            batchOrName = WWTControl._defaultAnnotationBatchName;
+        }
+
+        var batch = typeof batchOrName === "string" ? this._annotations[batchOrName] : batchOrName;
+        batch.add(annotation);
+    },
+
+    _removeAnnotation: function (annotation, batchOrName) {
+        if (batchOrName == null) {
+            batchOrName = WWTControl._defaultAnnotationBatchName;
+        }
+
+        var batch = typeof batchOrName === "string" ? this._annotations[batchOrName] : batchOrName;
+        batch.remove(annotation);
+    },
+
+    _clearAnnotations: function (batchOrName) {
+        if (batchOrName != null) {
+            if (typeof batchOrName === "string") {
+                delete this._annotations[batchOrName];
+            } else {
+                for (var name in this._annotations) {
+                    if (this._annotations[name] === batchOrName) {
+                        delete this._annotations[name];
+                    }
+                }
+            }
+        } else {
+            this._annotations = {
+                [WWTControl._defaultAnnotationBatchName]: new AnnotationBatch(),
+            };
+        }
+    },
+
+    _annotationInBatchClicked: function (renderContext, batch, x, y) {
+        var $enum1 = ss.enumerate(batch.items);
+        var coordinatesDown = this.getCoordinatesForScreenPoint(x, y);
+        var ra = coordinatesDown.x;
+        var dec = coordinatesDown.y;
+        while ($enum1.moveNext()) {
+            var note = $enum1.current;
+            if (note.hitTest(renderContext, ra, dec, x, y)) {
+                globalScriptInterface._fireAnnotationclicked(ra, dec, note.get_id());
+                return true;
+            }
+        }
+    },
+
+    _annotationclicked: function (x, y) {
+        var control = this;
+        if (this._annotations != null) {
+            for (var batchKey in this._annotations) {
+                var batch = this._annotations[batchKey];
+                this.renderContext.executeWithTransforms({
+                    world: batch.get_worldTransform(),
+                    view: batch.get_viewTransform(),
+                    projection: batch.get_projectionTransform(),
+                }, function (renderContext) { this._annotationInBatchClicked(renderContext, batch, x, y); }.bind(control));
             }
         }
         return false;
@@ -455,16 +508,17 @@ var WWTControl$ = {
 
     _annotationHover: function (ra, dec, x, y) {
         if (this._annotations != null && this._annotations.length > 0) {
-            var index = 0;
-            var $enum1 = ss.enumerate(this._annotations);
-            while ($enum1.moveNext()) {
-                var note = $enum1.current;
-                if (note.hitTest(this.renderContext, ra, dec, x, y)) {
-                    this._hoverText = note.get_label();
-                    this._hoverTextPoint = Vector2d.create(x, y);
-                    return true;
+            for (var batchKey of this._annotations) {
+                var batch = this._annotations[batchKey];
+                var $enum1 = ss.enumerate(batch.items);
+                while ($enum1.moveNext()) {
+                    var note = $enum1.current;
+                    if (note.hitTest(this.renderContext, ra, dec, x, y)) {
+                        this._hoverText = note.get_label();
+                        this._hoverTextPoint = Vector2d.create(x, y);
+                        return true;
+                    }
                 }
-                index++;
             }
         }
         return false;
@@ -836,15 +890,11 @@ var WWTControl$ = {
         if (this.uiController != null) {
             this.uiController.render(this.renderContext);
         } else {
-            var index = 0;
-            Annotation.prepBatch(this.renderContext);
-            var $enum2 = ss.enumerate(this._annotations);
-            while ($enum2.moveNext()) {
-                var item = $enum2.current;
-                item.draw(this.renderContext);
-                index++;
+            for (var batchKey in this._annotations) {
+               var batch = this._annotations[batchKey];
+                batch.prepareBatch(this.renderContext);
+                batch.drawBatch(this.renderContext);
             }
-            Annotation.drawBatch(this.renderContext);
             if ((ss.now() - this._lastMouseMove) > 400) {
                 var ptDown = this.getCoordinatesForScreenPoint(this._hoverTextPoint.x, this._hoverTextPoint.y);
                 if (ptDown) {
@@ -1507,11 +1557,13 @@ var WWTControl$ = {
             }
         }
         if (this._mouseDown && !this._moved) {
-            var raDecDown = this.getCoordinatesForScreenPoint(Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e));
+            var x = Mouse.offsetX(this.canvas, e);
+            var y = Mouse.offsetY(this.canvas, e);
+            var raDecDown = this.getCoordinatesForScreenPoint(x, y);
             if (raDecDown) {
-              if (!this._annotationclicked(raDecDown.x, raDecDown.y, Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e))) {
-                  globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
-              }
+                if (!this._annotationclicked(x, y)) {
+                    globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
+                }
             }
         }
         this._mouseDown = false;

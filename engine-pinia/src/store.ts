@@ -14,6 +14,8 @@ import {
 
 import {
   Annotation,
+  AnnotationBatch,
+  BatchTransform,
   ColorMapContainer,
   EngineSetting,
   Folder,
@@ -204,6 +206,15 @@ export class ImageSetLayerState {
   getGuid(): string {
     return this.guidText;
   }
+}
+
+export interface CreateAnnotationBatchOptions {
+  name: string;
+  transforms?: {
+    world?: BatchTransform,
+    projection?: BatchTransform,
+    view?: BatchTransform,
+  };
 }
 
 /** This interface expresses the properties exposed by the WWT Engine’s Pinia
@@ -1996,25 +2007,51 @@ export const engineStore = defineStore('wwt-engine', {
 
     // Annotations
 
+    createAnnotationBatch(options: CreateAnnotationBatchOptions): AnnotationBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createAnnotationBatch without linking to WWTInstance');
+      const batch = new AnnotationBatch();
+      const transforms = options.transforms;
+      if (transforms) {
+        if (transforms.world) {
+          batch.set_worldTransform(transforms.world);
+        }
+        if (transforms.view) {
+          batch.set_viewTransform(transforms.view);
+        }
+        if (transforms.projection) {
+          batch.set_projectionTransform(transforms.projection);
+        }
+      }
+      this.$wwt.inst.si.addAnnotationBatch(batch, options.name);
+      return batch;
+    },
+
+    removeAnnotationBatch(batch: string | AnnotationBatch): void {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeAnnotationBatch without linking to WWTInstance');
+      this.$wwt.inst.si.removeAnnotationBatch(batch);
+    },
+
     /** Add an [Annotation](../../engine/classes/Annotation.html) to the view. */
-    addAnnotation(ann: Annotation): void {
+    addAnnotation(ann: Annotation, batch?: string | AnnotationBatch): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot addAnnotation without linking to WWTInstance');
-      this.$wwt.inst.si.addAnnotation(ann);
+      this.$wwt.inst.si.addAnnotation(ann, batch);
     },
 
     /** Remove the specified [Annotation](../../engine/classes/Annotation.html) from the view. */
-    removeAnnotation(ann: Annotation): void {
+    removeAnnotation(ann: Annotation, batch?: string | AnnotationBatch): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot removeAnnotation without linking to WWTInstance');
-      this.$wwt.inst.si.removeAnnotation(ann);
+      this.$wwt.inst.si.removeAnnotation(ann, batch);
     },
 
     /** Clear all [Annotations](../../engine/classes/Annotation.html) from the view. */
-    clearAnnotations(): void {
+    clearAnnotations(batch?: string | AnnotationBatch): void {
       if (this.$wwt.inst === null)
         throw new Error('cannot clearAnnotations without linking to WWTInstance');
-      this.$wwt.inst.si.clearAnnotations();
+      this.$wwt.inst.si.clearAnnotations(batch);
     },
 
     // Capturing the current display

@@ -220,6 +220,7 @@ export class Matrix3d {
   static invertMatrix(matrix: Matrix3d): Matrix3d;
   static translation(vector: Vector3d): Matrix3d;
   static addMatrices(matrix1: Matrix3d, matrix2: Matrix3d): Matrix3d;
+  static lookAtLH(cameraPosition: Vector3d, cameraTarget: Vector3d, cameraUpVector: Vector3d): Matrix3d;
 
   clone(): Matrix3d;
   setIdentity(): void;
@@ -500,6 +501,9 @@ export interface Action {
 
 /** A visual annotation in the WWT view. */
 export class Annotation implements AnnotationSettingsInterface {
+  static readonly defaultCoordinateTransform: AnnotationCoordinateTransform;
+  static readonly galacticCoordinateTransform: AnnotationCoordinateTransform;
+
   //get_center
   get_id(): string;
   set_id(v: string): string;
@@ -512,9 +516,30 @@ export class Annotation implements AnnotationSettingsInterface {
   set_showHoverLabel(v: boolean): boolean;
   get_tag(): string;
   set_tag(v: string): string;
+  get_coordinateTransform(): AnnotationCoordinateTransform;
+  set_coordinateTransform(transform: AnnotationCoordinateTransform): void;
 
   hitTest(renderContext: RenderContext, ra: number, dec: number, x: number, y: number): boolean;
 }
+
+export class AnnotationBatch {
+    static readonly horizontalWorldTransform: BatchTransform;
+    static overlayWorldTransform(position: Coordinates): BatchTransform;
+    static overlayViewTransform(rotation: number): BatchTransform;
+
+    readonly items: Annotation[];
+    get_viewTransform(): BatchTransform;
+    set_viewTransform(transform: BatchTransform): void;
+    get_worldTransform(): BatchTransform;
+    set_worldTransform(transform: BatchTransform): void;
+    get_projectionTransform(): BatchTransform;
+    set_projectionTransform(transform: BatchTransform): void;
+
+    add(annotation: Annotation): void;
+    remove(annotation: Annotation): void;
+}
+
+export type AnnotationCoordinateTransform = (x: number, y: number) => Vector3d;
 
 /** Possible settings that can be applied to generic annotations.
  *
@@ -543,6 +568,8 @@ export interface ArrivedEventCallback {
   /** Called when the WWT view has arrived at a commanded position. */
   (si: ScriptInterface, args: ArrivedEventArgs): void;
 }
+
+export type BatchTransform = Matrix3d | ((rc: RenderContext) => Matrix3d);
 
 export class CameraParameters {
   lat: number;
@@ -583,7 +610,7 @@ export class Circle extends Annotation implements CircleAnnotationSettingsInterf
   set_skyRelative(v: boolean): boolean;
 
   /** Set the position of this circle's center. */
-  setCenter(raDeg: number, decDeg: number): void;
+  setCenter(xDeg: number, yDeg: number): void;
 }
 
 /** Possible settings that can be applied to Circle annotations. */
@@ -1370,7 +1397,7 @@ export class Poly extends Annotation implements PolyAnnotationSettingsInterface 
   set_lineWidth(v: number): number;
 
   /** Add a point to this annotation's definition. */
-  addPoint(raDeg: number, decDeg: number): void;
+  addPoint(xDeg: number, yDeg: number): void;
 }
 
 /** Possible settings that can be applied to Poly annotations. */
@@ -1393,7 +1420,7 @@ export class PolyLine extends Annotation implements PolyLineAnnotationSettingsIn
   set_lineWidth(v: number): number;
 
   /** Add a point to this annotation's definition. */
-  addPoint(raDeg: number, decDeg: number): void;
+  addPoint(xDeg: number, yDeg: number): void;
 }
 
 /** Possible settings that can be applied to PolyLine annotations. */
@@ -1524,6 +1551,10 @@ export class RenderContext {
     viewLong: number
   ): number;
   onTarget(place: Place): boolean;
+
+  get_view(): Matrix3d;
+  get_world(): Matrix3d;
+  get_projection(): Matrix3d;
 }
 
 export class ScriptInterface {
@@ -1669,14 +1700,23 @@ export class ScriptInterface {
    */
   createPolyLine(unused: boolean): PolyLine;
 
+  /** Add an annotation batch to the renderer */
+  addAnnotationBatch(batch: AnnotationBatch, name: string): void;
+
+  /** Remove an annotation batch from the renderer */
+  removeAnnotationBatch(batch: string | AnnotationBatch): void;
+
   /** Add an annotation to the renderer. */
-  addAnnotation(ann: Annotation): void;
+  addAnnotation(ann: Annotation, batch?: string | AnnotationBatch): void;
 
   /** Remove an annotation from the renderer. */
-  removeAnnotation(ann: Annotation): void;
+  removeAnnotation(ann: Annotation, batch?: string | AnnotationBatch): void;
 
-  /** Remove all annotations from the renderer. */
-  clearAnnotations(): void;
+  /** Remove annotations from the renderer. 
+    * If a batch is specified, only the annotations from that batch are removed.
+    * Otherwise, all annotations are removed.
+    */
+  clearAnnotations(batch?: string | AnnotationBatch): void;
 }
 
 /** A generic {@link ScriptInterface} callback. */

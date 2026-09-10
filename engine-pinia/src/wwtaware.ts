@@ -148,6 +148,8 @@ export const WWTAwareComponent = defineComponent({
       "removeFrameCallback",
       "createColormap",
       "deleteColormap",
+      "createAnnotationBatch",
+      "removeAnnotationBatch",
       // Formerly mutations
       "addAnnotation",
       "applyFitsLayerSettings",
