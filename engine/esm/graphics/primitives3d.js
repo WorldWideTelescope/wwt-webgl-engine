@@ -24,6 +24,7 @@ import {
     LineShaderNormalDates,
     LineShaderNormalDates2D,
     TimeSeriesPointSpriteShader,
+    FilledCircleShader,
 } from "./shaders.js";
 
 
@@ -865,6 +866,11 @@ var PointList$ = {
         };
     },
 
+    _useFilledCircleShader: function (pointBuffer, renderContext, opacity, cull, _color, cam) {
+        this.depthBuffered = false;
+        FilledCircleShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this._masked ? this._mask.buffer : null);
+    },
+
     _drawWithShader: function (renderContext, useShader, opacity, cull, color, depthMask=false) {
         this._initBuffer(renderContext);
         var originalDepthMask = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK);
@@ -916,12 +922,16 @@ var PointList$ = {
             }
             renderContext.device.restore();
         } else {
-            this._drawWithShader(renderContext, this._useTimeSeriesPointSpriteShader(PointList.starTexture.texture2d), opacity, cull, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
+            this._drawWithShader(renderContext, this._useTimeSeriesPointSpriteShader(PointList.starTexture.texture2d).bind(this), opacity, cull, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
         }
     },
 
     drawTextured: function (renderContext, texture, opacity, depthMask=false) {
-        this._drawWithShader(renderContext, this._useTimeSeriesPointSpriteShader(texture), opacity, false, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
+        this._drawWithShader(renderContext, this._useTimeSeriesPointSpriteShader(texture).bind(this), opacity, false, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
+    },
+
+    drawFilledCircle: function (renderContext, opacity, depthMask=false) {
+        this._drawWithShader(renderContext, this._useFilledCircleShader.bind(this), opacity, false, null, depthMask);
     },
 };
 
