@@ -2028,6 +2028,9 @@ var SpreadSheetLayer$ = {
                 case 4:
                     this.pointList.drawTextured(renderContext, PushPin.getPushPinTexture(this._markerIndex$1), opacity * this.get_opacity());
                     break;
+                case 6:
+                    this.pointList.drawFilledCircle(renderContext, opacity * this.get_opacity());
+                    break;
                 default:
                     break;
             }
