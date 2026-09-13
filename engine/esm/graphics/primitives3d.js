@@ -730,6 +730,7 @@ export function PointList(device) {
     this._imageReady = false;
     this._init = false;
     this.minSize = 2;
+    this.bordered = false;
     this._pointBuffers = [];
     this._pointBufferCounts = [];
     this._device = device;
@@ -868,7 +869,7 @@ var PointList$ = {
 
     _useFilledCircleShader: function (pointBuffer, renderContext, opacity, cull, _color, cam) {
         this.depthBuffered = false;
-        FilledCircleShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this._masked ? this._mask.buffer : null);
+        FilledCircleShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
     },
 
     _drawWithShader: function (renderContext, useShader, opacity, cull, color, depthMask=false) {

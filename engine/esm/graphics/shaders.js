@@ -2448,6 +2448,7 @@ FilledCircleShader.scaleLoc = 0;
 FilledCircleShader.minSizeLoc = 0;
 FilledCircleShader.skyLoc = 0;
 FilledCircleShader.showFarSideLoc = 0;
+FilledCircleShader.borderLoc = 0;
 
 FilledCircleShader.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -2468,6 +2469,8 @@ FilledCircleShader.init = function (renderContext) {
         ${fragInKeyword} vec4 vColor;
         ${fragOutDeclaration}
         uniform float opacity;
+        uniform float border;
+        uniform vec4 borderColor;
 
         void main() {
           vec2 p = gl_PointCoord - vec2(0.5);
@@ -2476,9 +2479,17 @@ FilledCircleShader.init = function (renderContext) {
 
           float core = smoothstep(0.50, 0.30, r);
           vec3 col = vColor.rgb * mix(0.85, 1.15, core);
-          float borderMix = smoothstep(0.40 - borderWidth, 0.40 + borderWidth, r);
-          col = mix(col, vec3(0.0), borderMix);
-          float alpha = 1.0 - smoothstep(0.50 - borderWidth, 0.50 + borderWidth, r);
+          float alpha = 1.0;
+          if (border > 0.5)
+          {
+              float borderMix = smoothstep(0.40 - borderWidth, 0.40 + borderWidth, r);
+              col = mix(col, vec3(0.0), borderMix);
+              alpha = 1.0 - smoothstep(0.50 - borderWidth, 0.50 + borderWidth, r);
+          }
+          else
+          {
+              alpha = smoothstep(0.50, 0.46, r);
+          }
 
           ${fragOutVar} = vec4(col, opacity * alpha * vColor.a);
         }
@@ -2585,12 +2596,13 @@ FilledCircleShader.init = function (renderContext) {
     FilledCircleShader.skyLoc = gl.getUniformLocation(FilledCircleShader._prog, "sky");
     FilledCircleShader.showFarSideLoc = gl.getUniformLocation(FilledCircleShader._prog, "showFarSide");
     FilledCircleShader.opacityLoc = gl.getUniformLocation(FilledCircleShader._prog, "opacity");
+    FilledCircleShader.borderLoc = gl.getUniformLocation(FilledCircleShader._prog, "border");
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     FilledCircleShader.initialized = true;
 };
 
-FilledCircleShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, mask) {
+FilledCircleShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, border, mask) {
     if (!FilledCircleShader.initialized) {
         FilledCircleShader.init(renderContext);
     }
@@ -2606,6 +2618,7 @@ FilledCircleShader.use = function (renderContext, vertex, opacity, zBuffer, jNow
     gl.uniform1f(FilledCircleShader.showFarSideLoc, showFarSide ? 1 : 0);
     gl.uniform1f(FilledCircleShader.skyLoc, sky ? -1 : 1);
     gl.uniform1f(FilledCircleShader.opacityLoc, opacity);
+    gl.uniform1f(FilledCircleShader.borderLoc, border);
     gl.uniform3f(FilledCircleShader.cameraPosLoc, camera.x, camera.y, camera.z);
 
     if (zBuffer) {
