@@ -157,6 +157,7 @@ export function SpreadSheetLayer() {
     this.latColumn = -1;
     this.fixedSize = 1;
     this.decay = 16;
+    this.bordered = false;
     this.timeSeries = false;
     this._dynamicData$1 = false;
     this._autoUpdate$1 = false;
@@ -1956,6 +1957,15 @@ var SpreadSheetLayer$ = {
         return value;
     },
 
+    get_bordered: function () {
+        return this.bordered;
+    },
+
+    set_bordered: function (value) {
+        this.bordered = value;
+        return value;
+    },
+
     _createMask: function () {
         if (this._filter == null) {
             return null;
@@ -2029,6 +2039,7 @@ var SpreadSheetLayer$ = {
             this.pointList.timeSeries = this.timeSeries;
             this.pointList.jNow = jNow;
             this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+            this.pointList.bordered = this.bordered;
 
             if (this._filter != null && this._filterDynamic) {
                 this.pointList.set_mask(this._createMask());
