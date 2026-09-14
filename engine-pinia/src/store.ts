@@ -3,7 +3,7 @@
 
 import { defineStore } from 'pinia';
 
-import { D2R, H2R } from "@wwtelescope/astro";
+import { D2R, H2R, R2D, R2H } from "@wwtelescope/astro";
 
 import {
   AltUnits,
@@ -17,6 +17,7 @@ import {
   AnnotationBatch,
   BatchTransform,
   ColorMapContainer,
+  Coordinates,
   EngineSetting,
   Folder,
   FrameCallback,
@@ -2031,6 +2032,22 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot removeAnnotationBatch without linking to WWTInstance');
       this.$wwt.inst.si.removeAnnotationBatch(batch);
+    },
+
+    createHorizontalAnnotationBatch(): AnnotationBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createHorizontalAnnotationBatch without linking to WWTInstance');
+      return AnnotationBatch.createHorizontalBatch();
+    },
+
+    createOverlayAnnotationBatch(position: { raRad: number; decRad: number; rollRad: number }, rollWithCamera?: boolean): AnnotationBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createOverlayAnnotationBatch without linking to WWTInstance');
+      return AnnotationBatch.createOverlayBatch(
+        Coordinates.fromRaDec(position.raRad * R2H, position.decRad * R2D), 
+        position.rollRad * R2D,
+        rollWithCamera ?? false,
+      );
     },
 
     /** Add an [Annotation](../../engine/classes/Annotation.html) to the view. */
