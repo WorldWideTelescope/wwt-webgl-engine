@@ -45,7 +45,7 @@ AnnotationBatch._horizontalWorldAdjustment = Matrix3d.create(
     0, 0, 0, 1,
 );
 
-AnnotationBatch.horizontalWorldTransform = function (_renderContext) {
+AnnotationBatch.horizontalToEquatorialWorldTransform = function (_renderContext) {
     var zenithAltAz = new Coordinates(0, 0);
     var zenith = Coordinates.horizonToEquitorial(zenithAltAz, SpaceTimeController.get_location(), SpaceTimeController.get_now());
     var raPart = -((zenith.get_RA() + 6) / 24 * (Math.PI * 2));
@@ -57,7 +57,7 @@ AnnotationBatch.horizontalWorldTransform = function (_renderContext) {
     return mat;
 };
 
-AnnotationBatch.overlayWorldTransform = function (position) {
+AnnotationBatch.overlayToEquatorialWorldTransform = function (position) {
   var overlayWorldInitial = Matrix3d.rotationYawPitchRoll(-(position.get_RA() - 6) * Coordinates.RCRA, -position.get_dec() * Coordinates.RC, 0);
   return function (renderContext) {
     var world = renderContext.get_world().clone();
@@ -66,7 +66,7 @@ AnnotationBatch.overlayWorldTransform = function (position) {
   }
 };
 
-AnnotationBatch.overlayViewTransform = function (rotation) {
+AnnotationBatch.overlayToEquatorialViewTransform = function (rotation) {
   var overlayViewInitial = Matrix3d.lookAtLH(
     Vector3d.create(0, 0, 0),
     Vector3d.create(0, 0, -1),
@@ -77,6 +77,21 @@ AnnotationBatch.overlayViewTransform = function (rotation) {
     view.invert();
     return Matrix3d.multiplyMatrix(overlayViewInitial, view);
   }
+};
+
+AnnotationBatch.createHorizontalBatch = function () {
+    var batch = new AnnotationBatch();
+    batch.set_worldTransform(AnnotationBatch.horizontalToEquatorialWorldTransform);
+    return batch;
+};
+
+AnnotationBatch.createOverlayBatch = function (position, roll, rollWithCamera) {
+    var batch = new AnnotationBatch();
+    batch.set_worldTransform(AnnotationBatch.overlayToEquatorialWorldTransform(position));
+    if (!!rollWithCamera) {
+        batch.set_viewTransform(AnnotationBatch.overlayToEquatorialViewTransform(roll));
+    }
+    return batch;
 };
 
 var AnnotationBatch$ = {
@@ -192,7 +207,7 @@ Annotation.defaultCoordinateTransform = function (x, y) {
     return Coordinates.raDecTo3d(x / 15, y);
 }
 
-Annotation.galacticCoordinateTransform = Coordinates.galacticTo3dDouble;
+Annotation.galacticToEquatorialCoordinateTransform = Coordinates.galacticTo3dDouble;
 
 Annotation.separation = function (Alpha1, Delta1, Alpha2, Delta2) {
     Delta1 = Delta1 / 180 * Math.PI;

@@ -527,6 +527,9 @@ export class AnnotationBatch {
     static overlayWorldTransform(position: Coordinates): BatchTransform;
     static overlayViewTransform(rotation: number): BatchTransform;
 
+    static createHorizontalBatch(): AnnotationBatch;
+    static createOverlayBatch(position: Coordinates, roll: number, rollWithCamera: boolean): AnnotationBatch;
+
     readonly items: Annotation[];
     get_viewTransform(): BatchTransform;
     set_viewTransform(transform: BatchTransform): void;
