@@ -19,6 +19,26 @@ import { SpaceTimeController } from "./space_time_controller.js";
 
 // wwtlib.AnnotationBatch
 
+/**
+ * An annotation batch is a container for a set of annotations, which will all be
+ * "batched" and send to the GPU together. This improves performance
+ * by reducing the number of draw calls.
+ * Annotation batches all share a set of supporting primitives. Each time any
+ * annotation in the batch changes, they must be regenerated if they have been
+ * drawn already. It is best to group annotations that are likely to change together
+ * into the same batch.
+ *
+ * Annotation batches support "transforms" which modify the current value of the render
+ * context when drawing. This allows us to specify annotations in coordinates other than
+ * equatorial (e.g. in alt/az) and only need to do this transformation once for the batch.
+ * These transforms can either be static matrices, or functions with the signature
+ * (context: RenderContext) => Matrix3d
+ * to facilitate coordinate frames that are time-varying relative to equatorial, such as
+ * horizontal coordinates.
+ * We provide convenience functions for generating annotation batches in horizontal coordinates,
+ * and for drawing annotations that are world-space "overlays", meaning that their position is
+ * static relative to the viewport center, but their sizing is zoom-aware.
+ */
 export function AnnotationBatch() {
     this.items = [];
     this.pointList = null;
@@ -195,19 +215,30 @@ registerType("AnnotationBatch", [AnnotationBatch, AnnotationBatch$, null]);
 
 // wwtlib.Annotation
 
+
+/**
+ * The base class for WWT annotations.
+ * Annotations are draw by being added to an AnnotationBatch. Note that a given annotation
+ * can be included in multiple annotation batches, though each batch will then create its own
+ * set of graphics primitives for that annotation.
+ *
+ * Annotations have a `coordinateTransform` field which define how their (2D) coordinates are mapped
+ * into 3D space. By default, annotations assume that they have equatorial coordinates (RA/Dec).
+ * For convenience, we provide the transform for drawing annotations in galactic coordinates.
+ */
 export function Annotation() {
     this.addedToPrimitives = false;
     this.annotationDirty = true;
     this._opacity = 1;
     this._showHoverLabel = false;
-    this.coordinateTransform = Annotation.defaultCoordinateTransform;
+    this.coordinateTransform = Annotation.equatorialTo3dTransform;
 }
 
-Annotation.defaultCoordinateTransform = function (x, y) {
+Annotation.equatorialTo3dTransform = function (x, y) {
     return Coordinates.raDecTo3d(x / 15, y);
 }
 
-Annotation.galacticToEquatorialCoordinateTransform = Coordinates.galacticTo3dDouble;
+Annotation.galacticTo3dTransform = Coordinates.galacticTo3dDouble;
 
 Annotation.separation = function (Alpha1, Delta1, Alpha2, Delta2) {
     Delta1 = Delta1 / 180 * Math.PI;
