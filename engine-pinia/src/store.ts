@@ -218,6 +218,16 @@ export interface CreateAnnotationBatchOptions {
   };
 }
 
+export interface CreateOverlayAnnotationBatchOptions {
+  name: string;
+  position: {
+    raRad: number;
+    decRad: number;
+    rollRad?: number;
+  };
+  rollWithCamera?: boolean;
+}
+
 /** This interface expresses the properties exposed by the WWT Engine’s Pinia
  * store module. These are re-exposed by {@link WWTAwareComponent} with their
  * names prefixed with `wwt`.
@@ -2034,20 +2044,24 @@ export const engineStore = defineStore('wwt-engine', {
       this.$wwt.inst.si.removeAnnotationBatch(batch);
     },
 
-    createHorizontalAnnotationBatch(): AnnotationBatch {
+    createHorizontalAnnotationBatch(name: string): AnnotationBatch {
       if (this.$wwt.inst === null)
         throw new Error('cannot createHorizontalAnnotationBatch without linking to WWTInstance');
-      return AnnotationBatch.createHorizontalBatch();
+      const batch = AnnotationBatch.createHorizontalBatch();
+      this.$wwt.inst.si.addAnnotationBatch(batch, name);
+      return batch;
     },
 
-    createOverlayAnnotationBatch(position: { raRad: number; decRad: number; rollRad: number }, rollWithCamera?: boolean): AnnotationBatch {
+    createOverlayAnnotationBatch(options: CreateOverlayAnnotationBatchOptions): AnnotationBatch {
       if (this.$wwt.inst === null)
         throw new Error('cannot createOverlayAnnotationBatch without linking to WWTInstance');
-      return AnnotationBatch.createOverlayBatch(
-        Coordinates.fromRaDec(position.raRad * R2H, position.decRad * R2D), 
-        position.rollRad * R2D,
-        rollWithCamera ?? false,
+      const batch = AnnotationBatch.createOverlayBatch(
+        Coordinates.fromRaDec(options.position.raRad * R2H, options.position.decRad * R2D), 
+        (options.position.rollRad ?? 0) * R2D,
+        options.rollWithCamera ?? false,
       );
+      this.$wwt.inst.si.addAnnotationBatch(batch, options.name);
+      return batch;
     },
 
     /** Add an [Annotation](../../engine/classes/Annotation.html) to the view. */

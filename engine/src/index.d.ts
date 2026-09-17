@@ -501,8 +501,8 @@ export interface Action {
 
 /** A visual annotation in the WWT view. */
 export class Annotation implements AnnotationSettingsInterface {
-  static readonly defaultCoordinateTransform: AnnotationCoordinateTransform;
-  static readonly galacticCoordinateTransform: AnnotationCoordinateTransform;
+  static readonly equatorialTo3dTransform: AnnotationCoordinateTransform;
+  static readonly galacticTo3dTransform: AnnotationCoordinateTransform;
 
   //get_center
   get_id(): string;
