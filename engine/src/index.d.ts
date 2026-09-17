@@ -499,7 +499,16 @@ export interface Action {
   (): void;
 }
 
-/** A visual annotation in the WWT view. */
+/**
+ * The base class for WWT annotations.
+ * Annotations are draw by being added to an AnnotationBatch. Note that a given annotation
+ * can be included in multiple annotation batches, though each batch will then create its own
+ * set of graphics primitives for that annotation.
+ *
+ * Annotations have a `coordinateTransform` field which define how their (2D) coordinates are mapped
+ * into 3D space. By default, annotations assume that they have equatorial coordinates (RA/Dec).
+ * For convenience, we provide the transform for drawing annotations in galactic coordinates.
+ */
 export class Annotation implements AnnotationSettingsInterface {
   static readonly equatorialTo3dTransform: AnnotationCoordinateTransform;
   static readonly galacticTo3dTransform: AnnotationCoordinateTransform;
@@ -522,6 +531,26 @@ export class Annotation implements AnnotationSettingsInterface {
   hitTest(renderContext: RenderContext, ra: number, dec: number, x: number, y: number): boolean;
 }
 
+/**
+ * An annotation batch is a container for a set of annotations, which will all be
+ * "batched" and send to the GPU together. This improves performance
+ * by reducing the number of draw calls.
+ * Annotation batches all share a set of supporting primitives. Each time any
+ * annotation in the batch changes, they must be regenerated if they have been
+ * drawn already. It is best to group annotations that are likely to change together
+ * into the same batch.
+ *
+ * Annotation batches support "transforms" which modify the current value of the render
+ * context when drawing. This allows us to specify annotations in coordinates other than
+ * equatorial (e.g. in alt/az) and only need to do this transformation once for the batch.
+ * These transforms can either be static matrices, or functions with the signature
+ * (context: RenderContext) => Matrix3d
+ * to facilitate coordinate frames that are time-varying relative to equatorial, such as
+ * horizontal coordinates.
+ * We provide convenience functions for generating annotation batches in horizontal coordinates,
+ * and for drawing annotations that are world-space "overlays", meaning that their position is
+ * static relative to the viewport center, but their sizing is zoom-aware.
+ */
 export class AnnotationBatch {
     static readonly horizontalWorldTransform: BatchTransform;
     static overlayWorldTransform(position: Coordinates): BatchTransform;
