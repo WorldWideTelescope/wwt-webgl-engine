@@ -552,9 +552,9 @@ export class Annotation implements AnnotationSettingsInterface {
  * static relative to the viewport center, but their sizing is zoom-aware.
  */
 export class AnnotationBatch {
-    static readonly horizontalWorldTransform: BatchTransform;
-    static overlayWorldTransform(position: Coordinates): BatchTransform;
-    static overlayViewTransform(rotation: number): BatchTransform;
+    static readonly horizontalToEquatorialWorldTransform: BatchTransform;
+    static overlayToEquatorialWorldTransform(position: Coordinates): BatchTransform;
+    static overlayToEquatorialViewTransform(rotation: number): BatchTransform;
 
     static createHorizontalBatch(): AnnotationBatch;
     static createOverlayBatch(position: Coordinates, roll: number, rollWithCamera: boolean): AnnotationBatch;
