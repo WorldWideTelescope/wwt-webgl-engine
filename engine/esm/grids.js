@@ -662,7 +662,6 @@ Grids.drawAltAzGridText = function (renderContext, opacity, drawColor) {
 };
 
 Grids._makeAltAzGridText = function () {
-    var drawColor = Colors.get_white();
     var index = 0;
     if (Grids._altAzTextBatch == null) {
         Grids._altAzTextBatch = new Text3dBatch(30);
@@ -758,7 +757,6 @@ Grids.drawEclipticGridText = function (renderContext, opacity, drawColor) {
 };
 
 Grids._makeEclipticGridText = function () {
-    var drawColor = Colors.get_white();
     var obliquity = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow());
     var mat = Matrix3d._rotationX((-obliquity / 360 * (Math.PI * 2)));
     if (Grids._eclipticTextBatch == null) {
