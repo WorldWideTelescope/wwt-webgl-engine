@@ -632,9 +632,12 @@ Grids.drawAltAzGrid = function (renderContext, opacity, drawColor) {
     }
 
     Grids._altAzLineList.viewTransform = Matrix3d.invertMatrix(mat);
-    renderContext.executeWithWorldTransform(mat, function (renderContext) {
+    renderContext.executeWithTransforms(
+      { world: mat },
+      function (renderContext) {
         Grids._altAzLineList.drawLines(renderContext, opacity, drawColor);
-    });
+      }
+    );
     return true;
 };
 
@@ -650,10 +653,17 @@ Grids.drawAltAzGridText = function (renderContext, opacity, drawColor) {
 
     if (useGlVersion2) {
       Grids._altAzTextBatch.viewTransform = mat;
+      renderContext.executeWithTransforms(
+        { world: mat },
+        function (renderContext) {
+          Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
+        }
+      );
     } else {
       Grids._altAzTextBatch.viewTransform = Matrix3d.invertMatrix(mat);
+      Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
     }
-    Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
+
     return true;
 };
 
@@ -753,7 +763,6 @@ Grids.drawEclipticGridText = function (renderContext, opacity, drawColor) {
 };
 
 Grids._makeEclipticGridText = function () {
-    var drawColor = Colors.get_white();
     var obliquity = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow());
     var mat = Matrix3d._rotationX((-obliquity / 360 * (Math.PI * 2)));
     if (Grids._eclipticTextBatch == null) {

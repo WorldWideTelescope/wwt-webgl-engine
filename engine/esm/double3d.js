@@ -919,6 +919,30 @@ Matrix3d.getMapMatrix = function (center, fieldWidth, fieldHeight, rotation) {
     return Matrix3d.fromMatrix2d(mat);
 };
 
+Matrix3d.addMatrices = function (matrix1, matrix2) {
+    return Matrix3d.create(
+        matrix1._m11 + matrix2._m11,
+        matrix1._m12 + matrix2._m12,
+        matrix1._m13 + matrix2._m13,
+        matrix1._m14 + matrix2._m14,
+
+        matrix1._m21 + matrix2._m21,
+        matrix1._m22 + matrix2._m22,
+        matrix1._m23 + matrix2._m23,
+        matrix1._m24 + matrix2._m24,
+
+        matrix1._m31 + matrix2._m31,
+        matrix1._m32 + matrix2._m32,
+        matrix1._m33 + matrix2._m33,
+        matrix1._m34 + matrix2._m34,
+
+        matrix1._offsetX + matrix2._offsetX,
+        matrix1._offsetY + matrix2._offsetY,
+        matrix1._offsetZ + matrix2._offsetZ,
+        matrix1._m44 + matrix2._m44,
+    );
+};
+
 var Matrix3d$ = {
     clone: function () {
         var tmp = new Matrix3d();
@@ -1741,6 +1765,22 @@ Matrix2d.rotateAt = function (angle, pnt) {
     var matR = Matrix2d.rotation(angle);
     var matT1 = Matrix2d.translation(pnt.x, pnt.y);
     return Matrix2d.multiply(Matrix2d.multiply(matT0, matR), matT1);
+};
+
+Matrix2d.addMatrices = function (matrix1, matrix2) {
+    return Matrix2d.create(
+        matrix1._m11 + matrix2._m11,
+        matrix1._m12 + matrix2._m12,
+        matrix1._m13 + matrix2._m13,
+
+        matrix1._m21 + matrix2._m21,
+        matrix1._m22 + matrix2._m22,
+        matrix1._m23 + matrix2._m23,
+
+        matrix1._m31 + matrix2._m31,
+        matrix1._m32 + matrix2._m32,
+        matrix1._m33 + matrix2._m33,
+    );
 };
 
 var Matrix2d$ = {

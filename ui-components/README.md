@@ -7,8 +7,10 @@ Some of these components are inspired by UI elements of the [WWT webclient][webc
 The WWT Research App [@wwtelescope/research-app] uses the Finder Scope component
 provided by this package. Learn more about WWT [here][wwt-home].
 
+[@wwtelescope/ui-components]: https://www.npmjs.com/package/@wwtelescope/ui-components
 [@wwtelescope/engine-pinia]: https://www.npmjs.com/package/@wwtelescope/engine-pinia
 [@wwtelescope/research-app]: https://www.npmjs.com/package/@wwtelescope/research-app
+[Pinia]: https://pinia.vuejs.org/
 [webclient]: https://worldwidetelescope.org/webclient/
 [wwt-home]: https://worldwidetelescope.org/home/
 

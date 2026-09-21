@@ -957,17 +957,33 @@ var RenderContext$ = {
         this._setMatrixes();
     },
 
-    executeWithWorldTransform: function (matrix, callable) {
-        var matOldWorld = this.get_world().clone();
-        var matOldWorldBase = this.get_worldBase().clone();
-        this.set_worldBase(Matrix3d.multiplyMatrix(matrix, this.get_world()));
-        this.set_world(this.get_worldBase().clone());
+    executeWithTransforms: function (transforms, callable) {
+        var oldWorld = this.get_world().clone();
+        var oldWorldBase = this.get_worldBase().clone();
+        var oldView = this.get_view().clone();
+        var oldProjection = this.get_projection().clone();
+      
+        if (transforms.world) {
+          var worldMatrix = transforms.world instanceof Matrix3d ? transforms.world : transforms.world(this);
+          this.set_worldBase(Matrix3d.multiplyMatrix(worldMatrix, this.get_world()));
+          this.set_world(this.get_worldBase().clone());
+        }
+        if (transforms.view) {
+          var viewMatrix = transforms.view instanceof Matrix3d ? transforms.view : transforms.view(this);
+          this.set_view(Matrix3d.multiplyMatrix(viewMatrix, this.get_view()));
+        }
+        if (transforms.projection) {
+          var projectionMatrix = transforms.projection instanceof Matrix3d ? transforms.projection : transforms.projection(this);
+          this.set_projection(Matrix3d.multiplyMatrix(projectionMatrix, this.get_projection()));
+        }
         this.makeFrustum();
-         
+      
         callable(this);
-
-        this.set_worldBase(matOldWorldBase);
-        this.set_world(matOldWorld);
+      
+        this.set_worldBase(oldWorldBase);
+        this.set_world(oldWorld);
+        this.set_view(oldView);
+        this.set_projection(oldProjection);
         this.makeFrustum();
     },
 

@@ -48,9 +48,9 @@
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
     "@wwtelescope/astro": "7cb232125428a91bd8fd10be24fec904e3589cce",
-    "@wwtelescope/engine": "thiscommit:2026-04-05:ulYu3lE",
+    "@wwtelescope/engine": "thiscommit:2026-08-25:GxLIUjF",
     "@wwtelescope/engine-helpers": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
-    "@wwtelescope/engine-pinia": "thiscommit:2026-04-05:imSNAoM",
+    "@wwtelescope/engine-pinia": "thiscommit:2026-08-25:aZsj1Qh",
     "@wwtelescope/engine-types": "263bedcc26dd2d13d03ba68daece76aa5e16f145",
     "@wwtelescope/research-app-messages": "thiscommit:2025-07-16:AvbWk1X",
     "@wwtelescope/ui-components": "thiscommit:2025-07-11:6supceo"

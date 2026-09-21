@@ -2025,6 +2025,7 @@ export function SpriteShader() { }
 SpriteShader.vertLoc = 0;
 SpriteShader.textureLoc = 0;
 SpriteShader.colorLoc = 0;
+SpriteShader.opacityLoc = 0;
 SpriteShader.initialized = false;
 SpriteShader._prog = null;
 
@@ -2037,9 +2038,11 @@ SpriteShader.init = function (renderContext) {
         varying vec2 vTextureCoord;
         varying lowp vec4 vColor;
         uniform sampler2D uSampler;
+        uniform float uOpacity;
 
         void main(void) {
-            gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)) * vColor;
+            vec4 color = vec4(vColor.rgb, vColor.a * uOpacity);
+            gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)) * color;
         }
     `;
 
@@ -2081,6 +2084,7 @@ SpriteShader.init = function (renderContext) {
     SpriteShader.projMatLoc = gl.getUniformLocation(SpriteShader._prog, 'uPMatrix');
     SpriteShader.mvMatLoc = gl.getUniformLocation(SpriteShader._prog, 'uMVMatrix');
     SpriteShader.sampLoc = gl.getUniformLocation(SpriteShader._prog, 'uSampler');
+    SpriteShader.opacityLoc = gl.getUniformLocation(SpriteShader._prog, 'uOpacity');
     set_tileUvMultiple(1);
     set_tileDemEnabled(true);
     gl.enable(WEBGL.BLEND);
@@ -2088,7 +2092,7 @@ SpriteShader.init = function (renderContext) {
     SpriteShader.initialized = true;
 };
 
-SpriteShader.use = function (renderContext, vertex, texture) {
+SpriteShader.use = function (renderContext, vertex, texture, opacity=1) {
     if (texture == null) {
         texture = Texture.getEmpty();
     }
@@ -2102,6 +2106,7 @@ SpriteShader.use = function (renderContext, vertex, texture) {
         gl.uniformMatrix4fv(SpriteShader.mvMatLoc, false, mvMat.floatArray());
         gl.uniformMatrix4fv(SpriteShader.projMatLoc, false, renderContext.get_projection().floatArray());
         gl.uniform1i(SpriteShader.sampLoc, 0);
+        gl.uniform1f(SpriteShader.opacityLoc, opacity);
         gl.disable(WEBGL.DEPTH_TEST);
         gl.disableVertexAttribArray(0);
         gl.disableVertexAttribArray(1);
@@ -2134,6 +2139,7 @@ export function ShapeSpriteShader() { }
 ShapeSpriteShader.vertLoc = 0;
 ShapeSpriteShader.textureLoc = 0;
 ShapeSpriteShader.colorLoc = 0;
+ShapeSpriteShader.opacityLoc = 0;
 ShapeSpriteShader.initialized = false;
 ShapeSpriteShader._prog = null;
 
@@ -2144,9 +2150,10 @@ ShapeSpriteShader.init = function (renderContext) {
         precision mediump float;
 
         varying lowp vec4 vColor;
+        uniform float uOpacity;
 
         void main(void) {
-            gl_FragColor =  vColor;
+            gl_FragColor = vec4(vColor.rgb, vColor.a * uOpacity);
         }
     `;
 
@@ -2182,6 +2189,7 @@ ShapeSpriteShader.init = function (renderContext) {
     gl.useProgram(ShapeSpriteShader._prog);
     ShapeSpriteShader.vertLoc = gl.getAttribLocation(ShapeSpriteShader._prog, 'aVertexPosition');
     ShapeSpriteShader.colorLoc = gl.getAttribLocation(ShapeSpriteShader._prog, 'aColor');
+    ShapeSpriteShader.opacityLoc = gl.getUniformLocation(ShapeSpriteShader._prog, 'uOpacity');
     ShapeSpriteShader.projMatLoc = gl.getUniformLocation(ShapeSpriteShader._prog, 'uPMatrix');
     ShapeSpriteShader.mvMatLoc = gl.getUniformLocation(ShapeSpriteShader._prog, 'uMVMatrix');
     gl.disable(WEBGL.DEPTH_TEST);
@@ -2190,7 +2198,7 @@ ShapeSpriteShader.init = function (renderContext) {
     ShapeSpriteShader.initialized = true;
 };
 
-ShapeSpriteShader.use = function (renderContext, vertex) {
+ShapeSpriteShader.use = function (renderContext, vertex, opacity=1) {
     var gl = renderContext.gl;
     if (gl != null) {
         if (!ShapeSpriteShader.initialized) {
@@ -2201,6 +2209,7 @@ ShapeSpriteShader.use = function (renderContext, vertex) {
         gl.uniformMatrix4fv(ShapeSpriteShader.mvMatLoc, false, mvMat.floatArray());
         gl.uniformMatrix4fv(ShapeSpriteShader.projMatLoc, false, renderContext.get_projection().floatArray());
         gl.uniform1i(ShapeSpriteShader.sampLoc, 0);
+        gl.uniform1f(ShapeSpriteShader.opacityLoc, opacity);
         gl.disable(WEBGL.DEPTH_TEST);
         gl.disableVertexAttribArray(0);
         gl.disableVertexAttribArray(1);

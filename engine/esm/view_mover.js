@@ -115,13 +115,18 @@ export function ViewMoverSlew() {
 ViewMoverSlew.create = function (from, to, duration) {
     var temp = new ViewMoverSlew();
     temp.init(from, to);
-    if (duration) {
+    if (duration != null) {
       const originalTargetTime = temp._toTargetTime;
-      const upFraction = temp._upTargetTime / originalTargetTime;
-      const downFraction = temp._downTargetTime / originalTargetTime;
-      temp._upTargetTime = duration * upFraction;
-      temp._downTargetTime = duration * downFraction;
-      temp._toTargetTime = duration; 
+      if (originalTargetTime != 0) {
+        const upFraction = temp._upTargetTime / originalTargetTime;
+        const downFraction = temp._downTargetTime / originalTargetTime;
+        temp._upTargetTime = duration * upFraction;
+        temp._downTargetTime = duration * downFraction;
+      } else {
+        temp._upTargetTime = 0.5 * duration;
+        temp._downTargetTime = 0.5 * duration;
+      }
+      temp._toTargetTime = duration;
     }
     return temp;
 };
