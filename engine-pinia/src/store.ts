@@ -15,6 +15,7 @@ import {
 import {
   Annotation,
   AnnotationBatch,
+  BatchTransform,
   ColorMapContainer,
   Color,
   Coordinates,
@@ -35,7 +36,6 @@ import {
   TileCache,
   Vector3d,
   WWTControl,
-  BatchViewTransform,
 } from "@wwtelescope/engine";
 
 import {
@@ -213,13 +213,12 @@ export class ImageSetLayerState {
   }
 }
 
-<<<<<<< HEAD
 export interface CreateTextBatchOptions {
   name: string;
   size?: number;
   color?: string;
   opacity?: number;
-  viewTransform?: BatchViewTransform;
+  viewTransform?: BatchTransform;
 }
 
 export interface ApplyTextBatchSettingOptions {
