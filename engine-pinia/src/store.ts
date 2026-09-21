@@ -213,16 +213,26 @@ export class ImageSetLayerState {
   }
 }
 
-export interface CreateTextBatchOptions {
+export interface BaseCreateTextBatchOptions {
   name: string;
   size?: number;
   color?: string;
   opacity?: number;
+}
+
+export interface CreateTextBatchOptions extends BaseCreateTextBatchOptions {
   transforms?: {
     world?: BatchTransform,
     projection?: BatchTransform,
     view?: BatchTransform,
   };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CreateHorizontalTextBatchOptions extends BaseCreateTextBatchOptions {}
+
+export interface CreateOverlayTextBatchOptions extends BaseCreateTextBatchOptions {
+  rollWithCamera?: boolean;
 }
 
 export interface ApplyTextBatchSettingOptions {
@@ -2137,10 +2147,10 @@ export const engineStore = defineStore('wwt-engine', {
         }
       }
       if (options.color) {
-        this.$wwt.inst.si.applyTextBatchSetting(options.name, ["color", Color.load(options.color)]);
+        this.applyTextBatchSetting(batch, ["color", Color.load(options.color)]);
       }
       if (options.opacity != null) {
-        this.$wwt.inst.si.applyTextBatchSetting(options.name, ["opacity", options.opacity]);
+        this.applyTextBatchSetting(batch, ["opacity", options.opacity]);
       }
       return batch;
     },
@@ -2172,6 +2182,39 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot removeText without linking to WWTInstance');
       return this.$wwt.inst.si.removeText(options.text, options.batch);
+    },
+
+    createHorizontalTextBatch(options: CreateHorizontalTextBatchOptions): Text3dBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createHorizontalTextBatch without linking to WWTInstance');
+      const batch = Text3dBatch.createHorizontalBatch((options.size ?? 1) / 100);
+      this.$wwt.inst.si.addTextBatch(batch, options.name);
+      if (options.color) {
+        this.applyTextBatchSetting(batch, ["color", Color.load(options.color)]);
+      }
+      if (options.opacity != null) {
+        this.applyTextBatchSetting(batch, ["opacity", options.opacity]);
+      }
+      return batch;
+    },
+
+    createOverlayTextBatch(options: CreateOverlayTextBatchOptions): Text3dBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createOverlayTextBatch without linking to WWTInstance');
+      const batch = Text3dBatch.createOverlayBatch(
+        (options.size ?? 1) / 100,
+        Coordinates.fromRaDec(0, 0),
+        0,
+        options.rollWithCamera ?? false,
+      );
+      this.$wwt.inst.si.addTextBatch(batch, options.name);
+      if (options.color) {
+        this.applyTextBatchSetting(batch, ["color", Color.load(options.color)]);
+      }
+      if (options.opacity != null) {
+        this.applyTextBatchSetting(batch, ["opacity", options.opacity]);
+      }
+      return batch;
     },
 
     // Capturing the current display

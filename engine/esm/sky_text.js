@@ -16,6 +16,7 @@ import { URLHelpers } from "./url_helpers.js";
 import { Rectangle } from "./util.js";
 import { WebFile } from "./web_file.js";
 import { TextureArray } from "./graphics/texture_array.js";
+import { Transforms } from "./transforms.js";
 
 
 // wwtlib.Alignment
@@ -46,6 +47,21 @@ export function Text3dBatch(height) {
     this.height = (height * 3);
     this._dirty = false;
 }
+
+Text3dBatch.createHorizontalBatch = function (height) {
+    var batch = new Text3dBatch(height);
+    batch.set_worldTransform(Transforms.horizontalToEquatorialWorldTransform);
+    return batch;
+};
+
+Text3dBatch.createOverlayBatch = function (height, position, roll, rollWithCamera) {
+    var batch = new Text3dBatch(height);
+    batch.set_worldTransform(Transforms.overlayToEquatorialWorldTransform(position));
+    if (!!rollWithCamera) {
+        batch.set_viewTransform(Transforms.overlayToEquatorialViewTransform(roll));
+    }
+    return batch;
+};
 
 var Text3dBatch$ = {
     add: function (newItem) {
@@ -94,19 +110,15 @@ var Text3dBatch$ = {
             if (!this._glyphCache.ready) {
                 return;
             }
-            if (this.viewTransform != null) {
-                var transforms = {
-                    world: (!this.worldTransform || this.worldTransform instanceof Matrix3d) ? this.worldTransform : this.worldTransform(renderContext),
-                    view: (!this.viewTransform || this.viewTransform instanceof Matrix3d) ? this.viewTransform : this.viewTransform(renderContext),
-                    projection: (!this.projectionTransform || this.projectionTransform instanceof Matrix3d) ? this.projectionTransform : this.projectionTransform(renderContext),
-                };
-                function drawCommands(renderContext) {
-                    this._drawCommands(renderContext, color, opacity);
-                }
-                renderContext.executeWithTransforms(transforms, drawCommands.bind(this));
-            } else {
+            var transforms = {
+                world: (!this.worldTransform || this.worldTransform instanceof Matrix3d) ? this.worldTransform : this.worldTransform(renderContext),
+                view: (!this.viewTransform || this.viewTransform instanceof Matrix3d) ? this.viewTransform : this.viewTransform(renderContext),
+                projection: (!this.projectionTransform || this.projectionTransform instanceof Matrix3d) ? this.projectionTransform : this.projectionTransform(renderContext),
+            };
+            function drawCommands(renderContext) {
                 this._drawCommands(renderContext, color, opacity);
             }
+            renderContext.executeWithTransforms(transforms, drawCommands.bind(this));
         }
     },
 

@@ -16,7 +16,7 @@ import { Texture } from "./graphics/texture.js";
 import { ImageShader } from "./graphics/shaders.js";
 import { Colors } from "./color.js";
 import { freestandingMode } from "./data_globals.js";
-import { globalRenderContext, tilePrepDevice, useGlVersion2 } from "./render_globals.js";
+import { globalRenderContext, tilePrepDevice, useGl } from "./render_globals.js";
 import { BinaryReader } from "./utilities/binary_reader.js";
 import { Coordinates } from "./coordinates.js";
 import { Text3d, Text3dBatch } from "./sky_text.js";
@@ -24,6 +24,7 @@ import { Planets } from "./planets.js";
 import { SpaceTimeController } from "./space_time_controller.js";
 import { Star, Galaxy } from "./star.js";
 import { WebFile } from "./web_file.js";
+import { Transforms } from "./transforms.js";
 
 
 // wwtlib.Grids
@@ -651,18 +652,12 @@ Grids.drawAltAzGridText = function (renderContext, opacity, drawColor) {
     mat.invert();
     Grids._makeAltAzGridText();
 
-    if (useGlVersion2) {
-      Grids._altAzTextBatch.viewTransform = mat;
-      renderContext.executeWithTransforms(
-        { world: mat },
-        function (renderContext) {
-          Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
-        }
-      );
+    if (useGl) {
+      Grids._altAzTextBatch.set_worldTransform(Transforms.horizontalToEquatorialWorldTransform);
     } else {
-      Grids._altAzTextBatch.viewTransform = Matrix3d.invertMatrix(mat);
-      Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
+      Grids._altAzTextBatch.set_viewTransform(Matrix3d.invertMatrix(mat));
     }
+    Grids._altAzTextBatch.draw(renderContext, opacity, drawColor);
 
     return true;
 };

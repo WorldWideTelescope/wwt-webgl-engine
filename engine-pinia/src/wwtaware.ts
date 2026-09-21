@@ -164,6 +164,8 @@ export const WWTAwareComponent = defineComponent({
       "removeAnnotation",
       "createTextBatch",
       "removeTextBatch",
+      "createHorizontalTextBatch",
+      "createOverlayTextBatch",
       "createText",
       "removeText",
       "removeCatalogHipsByName",

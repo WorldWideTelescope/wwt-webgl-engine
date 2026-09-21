@@ -552,10 +552,6 @@ export class Annotation implements AnnotationSettingsInterface {
  * static relative to the viewport center, but their sizing is zoom-aware.
  */
 export class AnnotationBatch {
-    static readonly horizontalToEquatorialWorldTransform: BatchTransform;
-    static overlayToEquatorialWorldTransform(position: Coordinates): BatchTransform;
-    static overlayToEquatorialViewTransform(rotation: number): BatchTransform;
-
     static createHorizontalBatch(): AnnotationBatch;
     static createOverlayBatch(position: Coordinates, roll: number, rollWithCamera: boolean): AnnotationBatch;
 
@@ -1589,14 +1585,6 @@ export class RenderContext {
   get_projection(): Matrix3d;
 }
 
-export interface TextBatchData {
-  batch: Text3dBatch;
-  color?: string;
-  size?: string;
-}
-
-export type TextBatchSetting = ["size", number] | ["color", Color] | ["opacity", number];
-
 export class ScriptInterface {
   /** The rendering settings associated with the viewer. */
   settings: Settings;
@@ -2201,6 +2189,8 @@ export class Text3d {
 
 export class Text3dBatch {
     constructor(height: number);
+    static createHorizontalBatch(height: number): Text3dBatch;
+    static createOverlayBatch(height: number, position: Coordinates, roll: number, rollWithCamera: boolean): Text3dBatch;
 
     get_viewTransform(): BatchTransform;
     set_viewTransform(transform: BatchTransform): void;
@@ -2213,6 +2203,14 @@ export class Text3dBatch {
     draw(renderContext: RenderContext, opacity: number, color: Color): void;
     clear(): void;
 }
+
+export interface TextBatchData {
+  batch: Text3dBatch;
+  color?: string;
+  size?: string;
+}
+
+export type TextBatchSetting = ["size", number] | ["color", Color] | ["opacity", number];
 
 /** A class that represents the current cache of loaded tiles. */
 export class TileCache {
@@ -2499,6 +2497,11 @@ export class TourStop implements SettingsInterface {
   get_solarSystemStars(): boolean;
 }
 
+export class Transforms {
+    static readonly horizontalToEquatorialWorldTransform: BatchTransform;
+    static overlayToEquatorialWorldTransform(position: Coordinates): BatchTransform;
+    static overlayToEquatorialViewTransform(rotation: number): BatchTransform;
+}
 
 /** Items implementing IUiController in WWT can, well, control the UI. It's
  * implemented by Object3d, TourEditor, and TourPlayer.
