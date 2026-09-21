@@ -2204,6 +2204,10 @@ export class Text3dBatch {
 
     get_viewTransform(): BatchTransform;
     set_viewTransform(transform: BatchTransform): void;
+    get_worldTransform(): BatchTransform;
+    set_worldTransform(transform: BatchTransform): void;
+    get_projectionTransform(): BatchTransform;
+    set_projectionTransform(transform: BatchTransform): void;
 
     add(item: Text3d): void;
     draw(renderContext: RenderContext, opacity: number, color: Color): void;

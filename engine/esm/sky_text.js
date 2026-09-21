@@ -38,7 +38,9 @@ export function Text3dBatch(height) {
     this.height = height;
     this.items = [];
     this._glyphVersion = -1;
-    this.viewTransform = Matrix3d.get_identity();
+    this.viewTransform = null;
+    this.worldTransform = null;
+    this.projectionTransform = null;
     this._textObject = new TextObject();
     this._vertCount = 0;
     this.height = (height * 3);
@@ -58,7 +60,8 @@ var Text3dBatch$ = {
 
     draw: function (renderContext, opacity, color) {
         if (renderContext.gl == null) {
-            var viewPoint = Vector3d._transformCoordinate(renderContext.get_viewPoint(), this.viewTransform);
+            var transform = this.viewTransform != null ? this.viewTransform : Matrix3d.get_identity();
+            var viewPoint = Vector3d._transformCoordinate(renderContext.get_viewPoint(), transform);
             var drawHeight = (this.height / renderContext.get_fovAngle()) * renderContext.height / 180;
             var $enum1 = ss.enumerate(this.items);
             while ($enum1.moveNext()) {
@@ -92,11 +95,15 @@ var Text3dBatch$ = {
                 return;
             }
             if (this.viewTransform != null) {
-                var matrix = this.viewTransform instanceof Matrix3d ? this.viewTransform : this.viewTransform(renderContext);
+                var transforms = {
+                    world: (!this.worldTransform || this.worldTransform instanceof Matrix3d) ? this.worldTransform : this.worldTransform(renderContext),
+                    view: (!this.viewTransform || this.viewTransform instanceof Matrix3d) ? this.viewTransform : this.viewTransform(renderContext),
+                    projection: (!this.projectionTransform || this.projectionTransform instanceof Matrix3d) ? this.projectionTransform : this.projectionTransform(renderContext),
+                };
                 function drawCommands(renderContext) {
                     this._drawCommands(renderContext, color, opacity);
                 }
-                renderContext.executeWithWorldTransform(matrix, drawCommands.bind(this));
+                renderContext.executeWithTransforms(transforms, drawCommands.bind(this));
             } else {
                 this._drawCommands(renderContext, color, opacity);
             }
@@ -158,8 +165,24 @@ var Text3dBatch$ = {
         return this.viewTransform;
     },
 
-    get_viewTransform: function (transform) {
+    set_viewTransform: function (transform) {
         this.viewTransform = transform;
+    },
+
+    get_worldTransform: function () {
+        return this.worldTransform;
+    },
+
+    set_worldTransform: function (transform) {
+        this.worldTransform = transform;
+    },
+
+    get_projectionTransform: function () {
+        return this.projectionTransform;
+    },
+
+    set_projectionTransform: function (transform) {
+        this.projectionTransform = transform;
     },
 
     cleanUp: function () {

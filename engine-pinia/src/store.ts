@@ -218,7 +218,11 @@ export interface CreateTextBatchOptions {
   size?: number;
   color?: string;
   opacity?: number;
-  viewTransform?: BatchTransform;
+  transforms?: {
+    world?: BatchTransform,
+    projection?: BatchTransform,
+    view?: BatchTransform,
+  };
 }
 
 export interface ApplyTextBatchSettingOptions {
@@ -229,8 +233,8 @@ export interface ApplyTextBatchSettingOptions {
 export interface AddTextOptions {
   text: string;
   position: Vector3d | { raDeg: number; decDeg: number };
+  rotationDeg: number;
   batch: Text3dBatch | string;
-  up?: Vector3d;
   scale?: number;
 }
 
@@ -2120,6 +2124,18 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot createTextBatch without linking to WWTInstance');
       const batch = new Text3dBatch((options.size ?? 1) / 100);
       this.$wwt.inst.si.addTextBatch(batch, options.name);
+      const transforms = options.transforms;
+      if (transforms) {
+        if (transforms.world) {
+          batch.set_worldTransform(transforms.world);
+        }
+        if (transforms.view) {
+          batch.set_viewTransform(transforms.view);
+        }
+        if (transforms.projection) {
+          batch.set_projectionTransform(transforms.projection);
+        }
+      }
       if (options.color) {
         this.$wwt.inst.si.applyTextBatchSetting(options.name, ["color", Color.load(options.color)]);
       }
@@ -2147,7 +2163,8 @@ export const engineStore = defineStore('wwt-engine', {
       const position: Vector3d = options.position instanceof Vector3d ?
         options.position :
         Coordinates.raDecTo3d(options.position.raDeg / 15, options.position.decDeg);
-      const up = options.up != undefined ? options.up : Vector3d.create(0, 1, 0); 
+      const rotation = options.rotationDeg ? options.rotationDeg * D2R : 0;
+      const up = Vector3d.create(0, Math.cos(rotation), Math.sin(rotation));
       return this.$wwt.inst.si.addText(options.text, position, up, options.scale ?? 1, options.batch);
     },
 
