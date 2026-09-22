@@ -125,6 +125,7 @@ export {
     SpriteShader,
     ShapeSpriteShader,
     TextShader,
+    FilledCircleShader,
 } from "./graphics/shaders.js";
 
 export {
