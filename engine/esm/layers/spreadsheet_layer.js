@@ -2039,6 +2039,7 @@ var SpreadSheetLayer$ = {
             this.pointList.timeSeries = this.timeSeries;
             this.pointList.jNow = jNow;
             this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+            this.pointList.set_quads(this._markerScale$1 === 1);
             this.pointList.bordered = this.bordered;
 
             if (this._filter != null && this._filterDynamic) {
