@@ -15,6 +15,7 @@ import {
     PositionColoredVertexBuffer,
     TimeSeriesLineVertexBuffer,
     TimeSeriesPointVertexBuffer,
+    ShortIndexBuffer,
 } from "./gl_buffers.js";
 import { Texture } from "./texture.js";
 import {
@@ -25,7 +26,9 @@ import {
     LineShaderNormalDates2D,
     TimeSeriesPointSpriteShader,
     FilledCircleShader,
+    FilledCircleQuadShader,
 } from "./shaders.js";
+import { useGlVersion2 } from "../render_globals.js";
 
 
 // wwtlib.CullMode
@@ -733,10 +736,13 @@ export function PointList(device) {
     this.bordered = false;
     this._pointBuffers = [];
     this._pointBufferCounts = [];
+    this._indexBuffers = [];
     this._device = device;
+    this._drawAsQuads = false;
 }
 
 PointList.starTexture = null;
+PointList._geometry = [0, 1, 3, 1, 2, 3];
 
 var PointList$ = {
     addPoint: function (v1, color, date, size) {
@@ -839,14 +845,30 @@ var PointList$ = {
                             this._pointBufferCounts.push(thisCount);
                             counter = 0;
                         }
-                        pointList[counter] = new TimeSeriesPointVertex();
-                        pointList[counter].position = point;
-                        pointList[counter].pointSize = this._sizes[index];
-                        pointList[counter].tu = this._dates[index].startDate;
-                        pointList[counter].tv = this._dates[index].endDate;
-                        pointList[counter].set_color(this._colors[index]);
-                        index++;
-                        counter++;
+                        if (this._drawAsQuads) {
+                            for (let i = 0; i < PointList._geometry.length; i++) {
+                                var index = PointList._geometry[i];
+                                pointList[counter] = new TimeSeriesPointQuadVertex();
+                                pointList[counter].position = point;
+                                pointList[counter].pointSize = this._sizes[index];
+                                pointList[counter].s = (index == 1 || index == 2) ? 1 : 0;
+                                pointList[counter].t = index >= 2 ? 1 : 0;
+                                pointList[counter].tu = this._dates[index].startDate;
+                                pointList[counter].tv = this._dates[index].endDate;
+                                pointList[counter].set_color(this._colors[index]);
+                                index++;
+                                counter++;
+                            }
+                        } else {
+                            pointList[counter] = new TimeSeriesPointVertex();
+                            pointList[counter].position = point;
+                            pointList[counter].pointSize = this._sizes[index];
+                            pointList[counter].tu = this._dates[index].startDate;
+                            pointList[counter].tv = this._dates[index].endDate;
+                            pointList[counter].set_color(this._colors[index]);
+                            index++;
+                            counter++;
+                        }
                     }
                     if (pointBuffer != null) {
                         pointBuffer.unlock();
@@ -872,6 +894,11 @@ var PointList$ = {
         FilledCircleShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
     },
 
+    _useFilledCircleQuadShader: function (pointBuffer, renderContext, opacity, cull, _color, cam) {
+        this.depthBuffered = true;
+        FilledCircleQuadShader.use(renderContext, pointBuffer.vertexBuffer, PointList._indexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
+    },
+
     _drawWithShader: function (renderContext, useShader, opacity, cull, color, depthMask=false) {
         this._initBuffer(renderContext);
         var originalDepthMask = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK);
@@ -884,7 +911,8 @@ var PointList$ = {
         while ($enum2.moveNext()) {
             var pointBuffer = $enum2.current;
             useShader(pointBuffer, renderContext, opacity, cull, color, cam);
-            renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
+            var mode = this._drawAsQuads ? WEBGL.TRIANGLES : WEBGL.POINTS;
+            renderContext.gl.drawArrays(mode, 0, pointBuffer.count);
         }
         renderContext.gl.depthMask(originalDepthMask);
     },
@@ -1002,3 +1030,39 @@ var TimeSeriesPointVertex$ = {
 };
 
 registerType("TimeSeriesPointVertex", [TimeSeriesPointVertex, TimeSeriesPointVertex$, null]);
+
+
+// wwtlib.TimeSeriesPointQuadVertex
+
+export function TimeSeriesPointQuadVertex() {
+    this.pointSize = 0;
+    this.s = 0;
+    this.t = 0;
+    this.tu = 0;
+    this.tv = 0;
+}
+
+TimeSeriesPointQuadVertex.create = function (position, texCoord, size, time, color) {
+    var tmp = new TimeSeriesPointQuadVertex();
+    tmp.position = position;
+    tmp.pointSize = size;
+    tmp.s = texCoord[0];
+    tmp.t = texCoord[1];
+    tmp.tu = time;
+    tmp.tv = 0;
+    tmp.color = color;
+    return tmp;
+}
+
+var TimeSeriesPointQuadVertex$ = {
+    get_color: function () {
+        return this.color;
+    },
+
+    set_color: function (value) {
+        this.color = value;
+        return value;
+    },
+};
+
+registerType("TimeSeriesPointQuadVertex", [TimeSeriesPointQuadVertex, TimeSeriesPointQuadVertex$, null]);

@@ -466,6 +466,56 @@ var TimeSeriesPointVertexBuffer$ = {
 registerType("TimeSeriesPointVertexBuffer", [TimeSeriesPointVertexBuffer, TimeSeriesPointVertexBuffer$, VertexBufferBase]);
 
 
+// wwtlib.TimeSeriesPointQuadBuffer
+
+export function TimeSeriesPointQuadBuffer(count) {
+    this._verts$1 = null;
+    VertexBufferBase.call(this);
+    this.count = count;
+}
+
+var TimeSeriesPointQuadBuffer$ = {
+    lock: function() {
+        this._verts$1 = new Array(this.count);
+        return this._verts$1;
+    },
+
+    unlock: function () {
+        this.vertexBuffer = tilePrepDevice.createBuffer();
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, this.vertexBuffer);
+        var f32array = new Float32Array(this.count * 12);
+        var buffer = f32array;
+        var index = 0;
+        var $enum1 = ss.enumerate(this._verts$1);
+        while ($enum1.moveNext()) {
+            var pt = $enum1.current;
+            buffer[index++] = pt.position.x;
+            buffer[index++] = pt.position.y;
+            buffer[index++] = pt.position.z;
+            buffer[index++] = pt.position.s;
+            buffer[index++] = pt.position.t;
+            buffer[index++] = pt.get_color().r / 255;
+            buffer[index++] = pt.get_color().g / 255;
+            buffer[index++] = pt.get_color().b / 255;
+            buffer[index++] = pt.get_color().a / 255;
+            buffer[index++] = pt.tu;
+            buffer[index++] = pt.tv;
+            buffer[index++] = pt.pointSize;
+        }
+        tilePrepDevice.bufferData(WEBGL.ARRAY_BUFFER, f32array, WEBGL.STATIC_DRAW);
+    },
+
+    dispose: function () {
+        tilePrepDevice.bindBuffer(WEBGL.ARRAY_BUFFER, null);
+        tilePrepDevice.deleteBuffer(this.vertexBuffer);
+        this.vertexBuffer = null;
+    },
+};
+
+registerType("TimeSeriesPointQuadBuffer", [TimeSeriesPointQuadBuffer, TimeSeriesPointQuadBuffer$, VertexBufferBase]);
+
+
+
 // wwtlib.PositionColoredVertexBuffer
 
 export function PositionColoredVertexBuffer(count) {
