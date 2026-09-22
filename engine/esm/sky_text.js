@@ -72,11 +72,6 @@ var Text3dBatch$ = {
     },
 
     _drawCommands: function (renderContext, color, opacity) {
-        var needMirrored = renderContext.get_world().get_determinant() < 0;
-        if (needMirrored != this._mirrored) {
-            this._mirrored = needMirrored;
-            this.prepareBatch();
-        }
         TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2dArray, color, opacity);
         renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
     },
@@ -111,17 +106,24 @@ var Text3dBatch$ = {
                 ctx.restore();
             }
         } else {
+            var transforms = {
+                world: (!this.worldTransform || this.worldTransform instanceof Matrix3d) ? this.worldTransform : this.worldTransform(renderContext),
+                view: (!this.viewTransform || this.viewTransform instanceof Matrix3d) ? this.viewTransform : this.viewTransform(renderContext),
+                projection: (!this.projectionTransform || this.projectionTransform instanceof Matrix3d) ? this.projectionTransform : this.projectionTransform(renderContext),
+            };
+            if (transforms.world) {
+                var needMirrored = transforms.world.get_determinant() < 0;
+                if (needMirrored != this._mirrored) {
+                    this._mirrored = needMirrored;
+                    this.markDirty();
+                }
+            }
             if (this._dirty || this._glyphCache == null || this._glyphCache.get_version() > this._glyphVersion) {
                 this.prepareBatch();
             }
             if (!this._glyphCache.ready) {
                 return;
             }
-            var transforms = {
-                world: (!this.worldTransform || this.worldTransform instanceof Matrix3d) ? this.worldTransform : this.worldTransform(renderContext),
-                view: (!this.viewTransform || this.viewTransform instanceof Matrix3d) ? this.viewTransform : this.viewTransform(renderContext),
-                projection: (!this.projectionTransform || this.projectionTransform instanceof Matrix3d) ? this.projectionTransform : this.projectionTransform(renderContext),
-            };
             function drawCommands(renderContext) {
                 this._drawCommands(renderContext, color, opacity);
             }
