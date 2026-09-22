@@ -2654,3 +2654,7 @@ FilledCircleShader.use = function (renderContext, vertex, opacity, zBuffer, jNow
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
 };
+
+var FilledCircleShader$ = {};
+
+registerType("FilledCircleShader", [FilledCircleShader, FilledCircleShader$, null]);
