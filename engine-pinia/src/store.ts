@@ -240,7 +240,7 @@ export interface ApplyTextBatchSettingOptions {
   setting: TextBatchSetting;
 }
 
-export interface AddTextOptions {
+export interface CreateTextOptions {
   text: string;
   position: Vector3d | { lonDeg: number; latDeg: number };
   rotationDeg: number;
@@ -2167,7 +2167,7 @@ export const engineStore = defineStore('wwt-engine', {
       this.$wwt.inst.si.removeTextBatch(batch);
     },
 
-    createText(options: AddTextOptions): Text3d | null {
+    createText(options: CreateTextOptions): Text3d | null {
       if (this.$wwt.inst === null)
         throw new Error('cannot createText without linking to WWTInstance');
       const position: Vector3d = options.position instanceof Vector3d ?
