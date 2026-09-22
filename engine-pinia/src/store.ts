@@ -242,7 +242,7 @@ export interface ApplyTextBatchSettingOptions {
 
 export interface AddTextOptions {
   text: string;
-  position: Vector3d | { raDeg: number; decDeg: number };
+  position: Vector3d | { lonDeg: number; latDeg: number };
   rotationDeg: number;
   batch: Text3dBatch | string;
   scale?: number;
@@ -2102,7 +2102,7 @@ export const engineStore = defineStore('wwt-engine', {
       const batch = AnnotationBatch.createOverlayBatch(
         Coordinates.fromRaDec(options.position.raRad * R2H, options.position.decRad * R2D), 
         (options.position.rollRad ?? 0) * R2D,
-        options.rollWithCamera ?? false,
+        options.rollWithCamera ?? true,
       );
       this.$wwt.inst.si.addAnnotationBatch(batch, options.name);
       return batch;
@@ -2172,7 +2172,7 @@ export const engineStore = defineStore('wwt-engine', {
         throw new Error('cannot createText without linking to WWTInstance');
       const position: Vector3d = options.position instanceof Vector3d ?
         options.position :
-        Coordinates.raDecTo3d(options.position.raDeg / 15, options.position.decDeg);
+        Coordinates.raDecTo3d(options.position.lonDeg / 15, options.position.latDeg);
       const rotation = options.rotationDeg ? options.rotationDeg * D2R : 0;
       const up = Vector3d.create(0, Math.cos(rotation), Math.sin(rotation));
       return this.$wwt.inst.si.addText(options.text, position, up, options.scale ?? 1, options.batch);
@@ -2205,7 +2205,7 @@ export const engineStore = defineStore('wwt-engine', {
         (options.size ?? 1) / 100,
         Coordinates.fromRaDec(0, 0),
         0,
-        options.rollWithCamera ?? false,
+        options.rollWithCamera ?? true,
       );
       this.$wwt.inst.si.addTextBatch(batch, options.name);
       if (options.color) {

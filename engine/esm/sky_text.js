@@ -46,11 +46,13 @@ export function Text3dBatch(height) {
     this._vertCount = 0;
     this.height = (height * 3);
     this._dirty = false;
+    this._mirrored = false;
 }
 
 Text3dBatch.createHorizontalBatch = function (height) {
     var batch = new Text3dBatch(height);
     batch.set_worldTransform(Transforms.horizontalToEquatorialWorldTransform);
+    batch._mirrored = true;
     return batch;
 };
 
@@ -70,6 +72,11 @@ var Text3dBatch$ = {
     },
 
     _drawCommands: function (renderContext, color, opacity) {
+        var needMirrored = renderContext.get_world().get_determinant() < 0;
+        if (needMirrored != this._mirrored) {
+            this._mirrored = needMirrored;
+            this.prepareBatch();
+        }
         TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2dArray, color, opacity);
         renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
     },
@@ -158,7 +165,7 @@ var Text3dBatch$ = {
                 if (item != null) {
                     var position = Rectangle.create(left * t3d.scale * factor, 0 * t3d.scale * factor, item.extents.x * fntAdjust * t3d.scale * factor, item.extents.y * fntAdjust * t3d.scale * factor);
                     left += (item.extents.x * fntAdjust);
-                    t3d.addGlyphPoints(verts, item.size, position, item.uvRect, item.index);
+                    t3d.addGlyphPoints(verts, item.size, position, item.uvRect, item.index, this._mirrored);
                 }
             }
         }
@@ -447,18 +454,30 @@ export function Text3d(center, up, text, fontsize, scale) {
 }
 
 var Text3d$ = {
-    addGlyphPoints: function (pointList, size, position, uv, index) {
+    addGlyphPoints: function (pointList, size, position, uv, index, mirrored=false) {
         var points = new Array(6);
         for (var i = 0; i < 6; i++) {
             points[i] = new PositionTextureArray();
         }
-        var left = Vector3d.cross(this.center, this.up);
-        var right = Vector3d.cross(this.up, this.center);
+
+        var up = this.up.copy();
+        if (mirrored) {
+            up.z *= -1;
+        }
+        var left = Vector3d.cross(this.center, up);
+        var right = Vector3d.cross(up, this.center);
         left.normalize();
         right.normalize();
-        this.up.normalize();
+        up.normalize();
         var upTan = Vector3d.cross(this.center, right);
         upTan.normalize();
+
+        if (mirrored) {
+            var tmp = left;
+            left = right;
+            right = tmp;
+        }
+
         if (!this.alignment) {
             left.multiply(this.width - position.get_left() * 2);
             right.multiply(this.width - ((this.width * 2) - position.get_right() * 2));

@@ -653,7 +653,7 @@ Grids.drawAltAzGridText = function (renderContext, opacity, drawColor) {
     Grids._makeAltAzGridText();
 
     if (useGl) {
-      Grids._altAzTextBatch.set_worldTransform(Transforms.horizontalToEquatorialWorldTransform);
+      Grids._altAzTextBatch.set_worldTransform(mat);
     } else {
       Grids._altAzTextBatch.set_viewTransform(Matrix3d.invertMatrix(mat));
     }
