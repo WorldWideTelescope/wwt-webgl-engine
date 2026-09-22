@@ -15,7 +15,6 @@ import {
     PositionColoredVertexBuffer,
     TimeSeriesLineVertexBuffer,
     TimeSeriesPointVertexBuffer,
-    ShortIndexBuffer,
 } from "./gl_buffers.js";
 import { Texture } from "./texture.js";
 import {
@@ -28,7 +27,6 @@ import {
     FilledCircleShader,
     FilledCircleQuadShader,
 } from "./shaders.js";
-import { useGlVersion2 } from "../render_globals.js";
 
 
 // wwtlib.CullMode
@@ -742,7 +740,8 @@ export function PointList(device) {
 }
 
 PointList.starTexture = null;
-PointList._geometry = [0, 1, 3, 1, 2, 3];
+// PointList._geometry = [0, 1, 3, 1, 2, 3];
+PointList._geometry = [0, 3, 1, 2, 1, 3];
 
 var PointList$ = {
     addPoint: function (v1, color, date, size) {
@@ -754,6 +753,7 @@ var PointList$ = {
     },
 
     clear: function () {
+        console.log("Clearing!");
         this._colors.length = 0;
         this._points.length = 0;
         this._dates.length = 0;
@@ -928,6 +928,9 @@ var PointList$ = {
             var pointBuffer = $enum2.current;
             useShader(pointBuffer, renderContext, opacity, cull, color, cam);
             var mode = this._drawAsQuads ? WEBGL.TRIANGLES : WEBGL.POINTS;
+            if (this._drawAsQuads) {
+                console.log("QUADS!");
+            }
             renderContext.gl.drawArrays(mode, 0, pointBuffer.count);
         }
         renderContext.gl.depthMask(originalDepthMask);
@@ -976,7 +979,8 @@ var PointList$ = {
     },
 
     drawFilledCircle: function (renderContext, opacity, depthMask=false) {
-        this._drawWithShader(renderContext, this._useFilledCircleShader.bind(this), opacity, false, null, depthMask);
+        var useShader = this._drawAsQuads ? this._useFilledCircleQuadShader.bind(this) : this._useFilledCircleShader.bind(this);
+        this._drawWithShader(renderContext, useShader, opacity, false, null, depthMask);
     },
 };
 
