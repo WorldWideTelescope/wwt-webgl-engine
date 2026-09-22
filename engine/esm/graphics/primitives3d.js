@@ -776,6 +776,19 @@ var PointList$ = {
         }
     },
 
+    get_quads: function () {
+        return this._drawAsQuads;
+    },
+
+    set_quads: function (value) {
+        // Don't rebuffer if we don't need to!
+        if (this._drawAsQuads != value) {
+            this._drawAsQuads = value;
+            this.clear();
+        }
+        return value;
+    },
+
     _emptyPointBuffer: function () {
         var $enum1 = ss.enumerate(this._pointBuffers);
         while ($enum1.moveNext()) {
@@ -846,6 +859,9 @@ var PointList$ = {
                             counter = 0;
                         }
                         if (this._drawAsQuads) {
+                            // In order to get the correct pixel size on the screen,
+                            // we use the texture coordinates to perturb the position inside the vertex shader.
+                            // So passing in the same position here each time is deliberate.
                             for (let i = 0; i < PointList._geometry.length; i++) {
                                 var index = PointList._geometry[i];
                                 pointList[counter] = new TimeSeriesPointQuadVertex();
