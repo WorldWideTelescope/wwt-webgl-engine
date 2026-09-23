@@ -784,7 +784,7 @@ var PointList$ = {
         // Don't rebuffer if we don't need to!
         if (this._drawAsQuads != value) {
             this._drawAsQuads = value;
-            this.clear();
+            this._emptyPointBuffer();
         }
         return value;
     },
@@ -863,18 +863,19 @@ var PointList$ = {
                             // we use the texture coordinates to perturb the position inside the vertex shader.
                             // So passing in the same position here each time is deliberate.
                             for (let i = 0; i < PointList._geometry.length; i++) {
-                                var index = PointList._geometry[i];
+                                var geomIndex = PointList._geometry[i];
                                 pointList[counter] = new TimeSeriesPointQuadVertex();
                                 pointList[counter].position = point;
                                 pointList[counter].pointSize = this._sizes[index];
-                                pointList[counter].s = (index == 1 || index == 2) ? 1 : 0;
-                                pointList[counter].t = index >= 2 ? 1 : 0;
+                                pointList[counter].s = (geomIndex == 1 || geomIndex == 2) ? 1 : 0;
+                                pointList[counter].t = geomIndex >= 2 ? 1 : 0;
+                                console.log(index, pointList[counter].s, pointList[counter].t);
                                 pointList[counter].tu = this._dates[index].startDate;
                                 pointList[counter].tv = this._dates[index].endDate;
                                 pointList[counter].set_color(this._colors[index]);
-                                index++;
                                 counter++;
                             }
+                            index++;
                         } else {
                             pointList[counter] = new TimeSeriesPointVertex();
                             pointList[counter].position = point;
