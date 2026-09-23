@@ -740,8 +740,8 @@ export function PointList(device) {
 }
 
 PointList.starTexture = null;
-// PointList._geometry = [0, 1, 3, 1, 2, 3];
-PointList._geometry = [0, 3, 1, 2, 1, 3];
+PointList._geometry = [0, 1, 3, 1, 2, 3];
+// PointList._geometry = [0, 3, 1, 2, 1, 3];
 
 var PointList$ = {
     addPoint: function (v1, color, date, size) {
@@ -838,6 +838,9 @@ var PointList$ = {
                         PointList.starTexture = Texture.fromUrl(URLHelpers.singleton.engineAssetUrl('StarProfileAlpha.png'));
                     }
                     var count = this._points.length;
+                    if (this._drawAsQuads) {
+                        count *= PointList._geometry.length;
+                    }
                     var pointBuffer = null;
                     var pointList = null;
                     var countLeft = count;
@@ -929,9 +932,6 @@ var PointList$ = {
             var pointBuffer = $enum2.current;
             useShader(pointBuffer, renderContext, opacity, cull, color, cam);
             var mode = this._drawAsQuads ? WEBGL.TRIANGLES : WEBGL.POINTS;
-            if (this._drawAsQuads) {
-                console.log("QUADS!");
-            }
             renderContext.gl.drawArrays(mode, 0, pointBuffer.count);
         }
         renderContext.gl.depthMask(originalDepthMask);

@@ -2682,7 +2682,7 @@ FilledCircleQuadShader.skyLoc = 0;
 FilledCircleQuadShader.showFarSideLoc = 0;
 FilledCircleQuadShader.borderLoc = 0;
 
-FilledCircleQuadShader._itemSize = 12 * 40;
+FilledCircleQuadShader._itemSize = 12 * 4;
 
 FilledCircleQuadShader.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -2759,7 +2759,7 @@ FilledCircleQuadShader.init = function (renderContext) {
       {
           float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
           float dist = distance(aVertexPosition, cameraPosition);
-          vec2 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+          vec4 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
           float dAlpha = aShow;
 
           if ( dAlpha > 0.0 && decay > 0.0 )
@@ -2789,7 +2789,7 @@ FilledCircleQuadShader.init = function (renderContext) {
           }
 
           float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
-          gl_Position = vec2(position.x + sideLength * (aTextureCoord.x - 0.5), position.y + sideLength * (aTextureCoord.y - 0.5));
+          gl_Position = vec4(position.x + sideLength * (aTextureCoord.x - 0.5), position.y + sideLength * (aTextureCoord.y - 0.5), position.z, 1.0);
 
           vTextureCoord = aTextureCoord;
       }
