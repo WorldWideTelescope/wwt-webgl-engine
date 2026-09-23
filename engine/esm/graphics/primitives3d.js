@@ -916,7 +916,7 @@ var PointList$ = {
 
     _useFilledCircleQuadShader: function (pointBuffer, renderContext, opacity, cull, _color, cam) {
         this.depthBuffered = true;
-        FilledCircleQuadShader.use(renderContext, pointBuffer.vertexBuffer, PointList._indexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
+        FilledCircleQuadShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
     },
 
     _drawWithShader: function (renderContext, useShader, opacity, cull, color, depthMask=false) {

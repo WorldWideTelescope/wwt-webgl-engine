@@ -2843,7 +2843,7 @@ FilledCircleQuadShader.init = function (renderContext) {
     FilledCircleQuadShader.initialized = true;
 };
 
-FilledCircleQuadShader.use = function (renderContext, vertex, index, opacity, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, border, mask) {
+FilledCircleQuadShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, border, mask) {
     if (!FilledCircleQuadShader.initialized) {
         FilledCircleQuadShader.init(renderContext);
     }
@@ -2873,7 +2873,7 @@ FilledCircleQuadShader.use = function (renderContext, vertex, index, opacity, zB
     gl.disableVertexAttribArray(2);
     gl.disableVertexAttribArray(3);
     gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
-    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enableVertexAttribArray(FilledCircleQuadShader.vertLoc);
     gl.enableVertexAttribArray(FilledCircleQuadShader.colorLoc);
     gl.enableVertexAttribArray(FilledCircleQuadShader.pointSizeLoc);
