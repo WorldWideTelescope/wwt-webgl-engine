@@ -146,6 +146,7 @@ const uiPlotTypes: UiPlotTypes[] = [
   { wwt: PlotTypes.pushPin, desc: "Push-pin" },
   { wwt: PlotTypes.point, desc: "Point" },
   { wwt: PlotTypes.square, desc: "Square" },
+  { wwt: PlotTypes.filledCircle, desc: "Filled Circle" },
   // "custom": handled same as push-pin in the engine
 ];
 
@@ -205,7 +206,7 @@ export default defineComponent({
       set(value: Color) {
         this.applySettings([
           ["color", value],
-          ["opacity", value.a],
+          ["opacity", value.a / 255],
         ]);
       }
     },
