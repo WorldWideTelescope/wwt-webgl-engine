@@ -15,6 +15,7 @@ import {
     PositionColoredVertexBuffer,
     TimeSeriesLineVertexBuffer,
     TimeSeriesPointVertexBuffer,
+    TimeSeriesPointQuadBuffer,
 } from "./gl_buffers.js";
 import { Texture } from "./texture.js";
 import {
@@ -763,17 +764,35 @@ var PointList$ = {
     },
 
     set_mask: function (value) {
+        this._maskValues = value;
         if (value == null) {
             this._masked = false;
             return;
         }
         this._masked = true;
+        var values = this._maskValuesForDrawMode(value);
         if (this._mask == null) {
-          this._mask = this._createMaskBuffer(value);
+          this._mask = this._createMaskBuffer(values);
           this._mask.unlock();
         } else {
-            this._mask.update(value);
+            this._mask.update(values);
         }
+    },
+
+    // In quad mode each point is made of several vertices, and the mask
+    // attribute is read per vertex, so repeat each point's value accordingly.
+    _maskValuesForDrawMode: function (values) {
+        if (!this._drawAsQuads) {
+            return values;
+        }
+        var n = PointList._geometry.length;
+        var expanded = new Array(values.length * n);
+        for (var i = 0; i < values.length; i++) {
+            for (var j = 0; j < n; j++) {
+                expanded[i * n + j] = values[i];
+            }
+        }
+        return expanded;
     },
 
     get_quads: function () {
@@ -785,6 +804,9 @@ var PointList$ = {
         if (this._drawAsQuads != value) {
             this._drawAsQuads = value;
             this._emptyPointBuffer();
+            if (this._masked && this._maskValues != null) {
+                this.set_mask(this._maskValues);
+            }
         }
         return value;
     },
@@ -796,6 +818,7 @@ var PointList$ = {
             pointBuffer.dispose();
         }
         this._pointBuffers.length = 0;
+        this._pointBufferCounts.length = 0;
         this._init = false;
     },
 
@@ -838,9 +861,12 @@ var PointList$ = {
                         PointList.starTexture = Texture.fromUrl(URLHelpers.singleton.engineAssetUrl('StarProfileAlpha.png'));
                     }
                     var count = this._points.length;
-                    if (this._drawAsQuads) {
-                        count *= PointList._geometry.length;
-                    }
+                    var vertsPerPoint = this._drawAsQuads ? PointList._geometry.length : 1;
+                    count *= vertsPerPoint;
+                    // We need to be sure to keep each buffer's capacity a whole number of points
+                    // so that a point's vertices never straddle two buffers
+                    var maxVerts = Math.floor(100000 / vertsPerPoint) * vertsPerPoint;
+                    var BufferType = this._drawAsQuads ? TimeSeriesPointQuadBuffer : TimeSeriesPointVertexBuffer;
                     var pointBuffer = null;
                     var pointList = null;
                     var countLeft = count;
@@ -849,13 +875,13 @@ var PointList$ = {
                     var $enum2 = ss.enumerate(this._points);
                     while ($enum2.moveNext()) {
                         var point = $enum2.current;
-                        if (counter >= 100000 || pointList == null) {
+                        if (counter >= maxVerts || pointList == null) {
                             if (pointBuffer != null) {
                                 pointBuffer.unlock();
                             }
-                            var thisCount = Math.min(100000, countLeft);
+                            var thisCount = Math.min(maxVerts, countLeft);
                             countLeft -= thisCount;
-                            pointBuffer = new TimeSeriesPointVertexBuffer(thisCount);
+                            pointBuffer = new BufferType(thisCount);
                             pointList = pointBuffer.lock(); // Lock the buffer (which will return our structs)
                             this._pointBuffers.push(pointBuffer);
                             this._pointBufferCounts.push(thisCount);
@@ -872,7 +898,6 @@ var PointList$ = {
                                 pointList[counter].pointSize = this._sizes[index];
                                 pointList[counter].s = (geomIndex == 1 || geomIndex == 2) ? 1 : 0;
                                 pointList[counter].t = geomIndex >= 2 ? 1 : 0;
-                                console.log(index, pointList[counter].s, pointList[counter].t);
                                 pointList[counter].tu = this._dates[index].startDate;
                                 pointList[counter].tv = this._dates[index].endDate;
                                 pointList[counter].set_color(this._colors[index]);
