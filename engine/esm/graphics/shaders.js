@@ -736,6 +736,7 @@ TimeSeriesPointQuadShader.init = function (renderContext) {
 
     var vertexShaderText = `\
         attribute vec3 aVertexPosition;
+        attribute vec2 aTextureCoord;
         attribute vec4 aVertexColor;
         attribute vec2 aTime;
         attribute float aPointSize;
@@ -753,12 +754,13 @@ TimeSeriesPointQuadShader.init = function (renderContext) {
         uniform float viewportWidth;
 
         varying lowp vec4 vColor;
+        varying vec2 vTextureCoord;
 
         void main(void)
         {
             float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
             float dist = distance(aVertexPosition, cameraPosition);
-            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+            vec4 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
             float dAlpha = aShow;
 
             if ( dAlpha > 0.0 && decay > 0.0 )
@@ -855,7 +857,7 @@ TimeSeriesPointQuadShader.use = function (renderContext, vertex, texture, lineCo
     var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
     gl.uniformMatrix4fv(TimeSeriesPointQuadShader.mvMatrixLoc, false, mvMat.floatArray());
     gl.uniformMatrix4fv(TimeSeriesPointQuadShader.pMatrixLoc, false, renderContext.get_projection().floatArray());
-    gl.uniform1i(TimeSeriesPointSpriteShader.sampLoc, 0);
+    gl.uniform1i(TimeSeriesPointQuadShader.sampLoc, 0);
     gl.uniform1f(TimeSeriesPointQuadShader.nowLoc, jNow);
     gl.uniform1f(TimeSeriesPointQuadShader.decayLoc, decay);
     gl.uniform1f(TimeSeriesPointQuadShader.scaleLoc, scale);
