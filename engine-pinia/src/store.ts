@@ -17,6 +17,7 @@ import {
   AnnotationBatch,
   BatchTransform,
   ColorMapContainer,
+  Color,
   Coordinates,
   EngineSetting,
   Folder,
@@ -29,6 +30,9 @@ import {
   LayerMap,
   SpreadSheetLayer,
   SpreadSheetLayerSettingsInterfaceRO,
+  Text3d,
+  Text3dBatch,
+  TextBatchSetting,
   TileCache,
   Vector3d,
   WWTControl,
@@ -207,6 +211,46 @@ export class ImageSetLayerState {
   getGuid(): string {
     return this.guidText;
   }
+}
+
+export interface BaseCreateTextBatchOptions {
+  name: string;
+  size?: number;
+  color?: string;
+  opacity?: number;
+}
+
+export interface CreateTextBatchOptions extends BaseCreateTextBatchOptions {
+  transforms?: {
+    world?: BatchTransform,
+    projection?: BatchTransform,
+    view?: BatchTransform,
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CreateHorizontalTextBatchOptions extends BaseCreateTextBatchOptions {}
+
+export interface CreateOverlayTextBatchOptions extends BaseCreateTextBatchOptions {
+  rollWithCamera?: boolean;
+}
+
+export interface ApplyTextBatchSettingOptions {
+  batch: string | Text3dBatch;
+  setting: TextBatchSetting;
+}
+
+export interface CreateTextOptions {
+  text: string;
+  position: Vector3d | { lonDeg: number; latDeg: number };
+  rotationDeg: number;
+  batch: Text3dBatch | string;
+  scale?: number;
+}
+
+export interface RemoveTextOptions {
+  text: Text3d;
+  batch: Text3dBatch | string;
 }
 
 export interface CreateAnnotationBatchOptions {
@@ -2058,7 +2102,7 @@ export const engineStore = defineStore('wwt-engine', {
       const batch = AnnotationBatch.createOverlayBatch(
         Coordinates.fromRaDec(options.position.raRad * R2H, options.position.decRad * R2D), 
         (options.position.rollRad ?? 0) * R2D,
-        options.rollWithCamera ?? false,
+        options.rollWithCamera ?? true,
       );
       this.$wwt.inst.si.addAnnotationBatch(batch, options.name);
       return batch;
@@ -2083,6 +2127,94 @@ export const engineStore = defineStore('wwt-engine', {
       if (this.$wwt.inst === null)
         throw new Error('cannot clearAnnotations without linking to WWTInstance');
       this.$wwt.inst.si.clearAnnotations(batch);
+    },
+
+    createTextBatch(options: CreateTextBatchOptions): Text3dBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createTextBatch without linking to WWTInstance');
+      const batch = new Text3dBatch((options.size ?? 1) / 100);
+      this.$wwt.inst.si.addTextBatch(batch, options.name);
+      const transforms = options.transforms;
+      if (transforms) {
+        if (transforms.world) {
+          batch.set_worldTransform(transforms.world);
+        }
+        if (transforms.view) {
+          batch.set_viewTransform(transforms.view);
+        }
+        if (transforms.projection) {
+          batch.set_projectionTransform(transforms.projection);
+        }
+      }
+      if (options.color) {
+        this.applyTextBatchSetting(batch, ["color", Color.load(options.color)]);
+      }
+      if (options.opacity != null) {
+        this.applyTextBatchSetting(batch, ["opacity", options.opacity]);
+      }
+      return batch;
+    },
+
+    applyTextBatchSetting(batch: string | Text3dBatch, setting: TextBatchSetting) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot applyTextBatchSetting without linking to WWTInstance');
+      this.$wwt.inst.si.applyTextBatchSetting(batch, setting);
+    },
+
+    removeTextBatch(batch: string | Text3dBatch) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeTextBatch without linking to WWTInstance');
+      this.$wwt.inst.si.removeTextBatch(batch);
+    },
+
+    createText(options: CreateTextOptions): Text3d | null {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createText without linking to WWTInstance');
+      const position: Vector3d = options.position instanceof Vector3d ?
+        options.position :
+        Coordinates.raDecTo3d(options.position.lonDeg / 15, options.position.latDeg);
+      const rotation = options.rotationDeg ? options.rotationDeg * D2R : 0;
+      const up = Vector3d.create(0, Math.cos(rotation), Math.sin(rotation));
+      return this.$wwt.inst.si.addText(options.text, position, up, options.scale ?? 1, options.batch);
+    },
+
+    removeText(options: RemoveTextOptions) {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot removeText without linking to WWTInstance');
+      return this.$wwt.inst.si.removeText(options.text, options.batch);
+    },
+
+    createHorizontalTextBatch(options: CreateHorizontalTextBatchOptions): Text3dBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createHorizontalTextBatch without linking to WWTInstance');
+      const batch = Text3dBatch.createHorizontalBatch((options.size ?? 1) / 100);
+      this.$wwt.inst.si.addTextBatch(batch, options.name);
+      if (options.color) {
+        this.applyTextBatchSetting(batch, ["color", Color.load(options.color)]);
+      }
+      if (options.opacity != null) {
+        this.applyTextBatchSetting(batch, ["opacity", options.opacity]);
+      }
+      return batch;
+    },
+
+    createOverlayTextBatch(options: CreateOverlayTextBatchOptions): Text3dBatch {
+      if (this.$wwt.inst === null)
+        throw new Error('cannot createOverlayTextBatch without linking to WWTInstance');
+      const batch = Text3dBatch.createOverlayBatch(
+        (options.size ?? 1) / 100,
+        Coordinates.fromRaDec(0, 0),
+        0,
+        options.rollWithCamera ?? true,
+      );
+      this.$wwt.inst.si.addTextBatch(batch, options.name);
+      if (options.color) {
+        this.applyTextBatchSetting(batch, ["color", Color.load(options.color)]);
+      }
+      if (options.opacity != null) {
+        this.applyTextBatchSetting(batch, ["opacity", options.opacity]);
+      }
+      return batch;
     },
 
     // Capturing the current display

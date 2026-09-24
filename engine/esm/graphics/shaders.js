@@ -2301,7 +2301,6 @@ TextShader.init = function (renderContext) {
               gl_FragColor = uColor * texColor;
           }
         `;
-        console.log(fragShaderText);
     }
 
     const vertexShaderText = `\

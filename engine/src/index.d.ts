@@ -552,10 +552,6 @@ export class Annotation implements AnnotationSettingsInterface {
  * static relative to the viewport center, but their sizing is zoom-aware.
  */
 export class AnnotationBatch {
-    static readonly horizontalToEquatorialWorldTransform: BatchTransform;
-    static overlayToEquatorialWorldTransform(position: Coordinates): BatchTransform;
-    static overlayToEquatorialViewTransform(rotation: number): BatchTransform;
-
     static createHorizontalBatch(): AnnotationBatch;
     static createOverlayBatch(position: Coordinates, roll: number, rollWithCamera: boolean): AnnotationBatch;
 
@@ -1749,6 +1745,16 @@ export class ScriptInterface {
     * Otherwise, all annotations are removed.
     */
   clearAnnotations(batch?: string | AnnotationBatch): void;
+
+  addTextBatch(batch: Text3dBatch, name: string): void;
+  removeTextBatch(batch: string | Text3dBatch): void;
+  clearTextBatches(): void;
+  applyTextBatchSetting(batch: string | Text3dBatch, setting: TextBatchSetting): void;
+  getTextBatches(): Record<string, TextBatchData>;
+  getTextItems(batch: string | Text3dBatch): Text3d[];
+
+  addText(text: string, position: Vector3d, up: Vector3d, scale: number, batch: string | Text3dBatch): Text3d | null;
+  removeText(text3d: Text3d, batch: string | Text3dBatch): void;
 }
 
 /** A generic {@link ScriptInterface} callback. */
@@ -2173,6 +2179,39 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
  */
 export type SpreadSheetLayerSetting = LayerSetting | BaseSpreadSheetLayerSetting;
 
+export class Text3d {
+    constructor(center: Vector3d, up: Vector3d, text: string, fontsize?: number, scale?: number);
+
+    center: Vector3d;
+    up: Vector3d;
+    text: string;
+}
+
+export class Text3dBatch {
+    constructor(height: number);
+    static createHorizontalBatch(height: number): Text3dBatch;
+    static createOverlayBatch(height: number, position: Coordinates, roll: number, rollWithCamera: boolean): Text3dBatch;
+
+    get_viewTransform(): BatchTransform;
+    set_viewTransform(transform: BatchTransform): void;
+    get_worldTransform(): BatchTransform;
+    set_worldTransform(transform: BatchTransform): void;
+    get_projectionTransform(): BatchTransform;
+    set_projectionTransform(transform: BatchTransform): void;
+
+    add(item: Text3d): void;
+    draw(renderContext: RenderContext, opacity: number, color: Color): void;
+    clear(): void;
+}
+
+export interface TextBatchData {
+  batch: Text3dBatch;
+  color?: string;
+  size?: string;
+}
+
+export type TextBatchSetting = ["size", number] | ["color", Color] | ["opacity", number];
+
 /** A class that represents the current cache of loaded tiles. */
 export class TileCache {
   /** Clear the current cache of tiles */
@@ -2458,6 +2497,11 @@ export class TourStop implements SettingsInterface {
   get_solarSystemStars(): boolean;
 }
 
+export class Transforms {
+    static readonly horizontalToEquatorialWorldTransform: BatchTransform;
+    static overlayToEquatorialWorldTransform(position: Coordinates): BatchTransform;
+    static overlayToEquatorialViewTransform(rotation: number): BatchTransform;
+}
 
 /** Items implementing IUiController in WWT can, well, control the UI. It's
  * implemented by Object3d, TourEditor, and TourPlayer.
