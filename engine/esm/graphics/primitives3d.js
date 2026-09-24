@@ -755,7 +755,6 @@ var PointList$ = {
     },
 
     clear: function () {
-        console.log("Clearing!");
         this._colors.length = 0;
         this._points.length = 0;
         this._dates.length = 0;
@@ -942,12 +941,10 @@ var PointList$ = {
     },
 
     _useFilledCircleShader: function (pointBuffer, renderContext, opacity, cull, _color, cam) {
-        this.depthBuffered = false;
         FilledCircleShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
     },
 
     _useFilledCircleQuadShader: function (pointBuffer, renderContext, opacity, cull, _color, cam) {
-        this.depthBuffered = true;
         FilledCircleQuadShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
     },
 
