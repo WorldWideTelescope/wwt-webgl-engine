@@ -124,7 +124,7 @@ var Text3dBatch$ = {
             if (!this._glyphCache.ready) {
                 return;
             }
-            function drawCommands(renderContext) {
+            var drawCommands = function (renderContext) {
                 this._drawCommands(renderContext, color, opacity);
             }
             renderContext.executeWithTransforms(transforms, drawCommands.bind(this));
