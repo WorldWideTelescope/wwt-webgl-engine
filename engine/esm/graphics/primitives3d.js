@@ -25,6 +25,7 @@ import {
     LineShaderNormalDates,
     LineShaderNormalDates2D,
     TimeSeriesPointSpriteShader,
+    TimeSeriesPointQuadShader,
     FilledCircleShader,
     FilledCircleQuadShader,
 } from "./shaders.js";
@@ -934,6 +935,12 @@ var PointList$ = {
         };
     },
 
+    _useTimeSeriesPointQuadShader: function (texture) {
+        return function (pointBuffer, renderContext, opacity, cull, color, cam) {
+            TimeSeriesPointQuadShader.use(renderContext, pointBuffer.vertexBuffer, texture, color, this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._masked ? this._mask.buffer : null);
+        };
+    },
+
     _useFilledCircleShader: function (pointBuffer, renderContext, opacity, cull, _color, cam) {
         this.depthBuffered = false;
         FilledCircleShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
@@ -996,12 +1003,14 @@ var PointList$ = {
             }
             renderContext.device.restore();
         } else {
-            this._drawWithShader(renderContext, this._useTimeSeriesPointSpriteShader(PointList.starTexture.texture2d).bind(this), opacity, cull, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
+            this.drawTextured(renderContext, PointList.starTexture.texture2d, opacity, depthMask);
         }
     },
 
     drawTextured: function (renderContext, texture, opacity, depthMask=false) {
-        this._drawWithShader(renderContext, this._useTimeSeriesPointSpriteShader(texture).bind(this), opacity, false, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
+        var useShaderFactory = this._drawAsQuads ? this._useTimeSeriesPointQuadShader : this._useTimeSeriesPointSpriteShader;
+        var useShader = useShaderFactory(texture).bind(this);
+        this._drawWithShader(renderContext, useShader, opacity, false, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
     },
 
     drawFilledCircle: function (renderContext, opacity, depthMask=false) {

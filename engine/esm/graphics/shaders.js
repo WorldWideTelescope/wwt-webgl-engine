@@ -535,7 +535,7 @@ TimeSeriesPointSpriteShader._prog = null;
 TimeSeriesPointSpriteShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    const fragShaderText = `\
+    var fragShaderText = `\
         precision mediump float;
         uniform vec4 lineColor;
         varying lowp vec4 vColor;
@@ -549,7 +549,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
         }
     `;
 
-    const vertexShaderText = `\
+    var vertexShaderText = `\
         attribute vec3 aVertexPosition;
         attribute vec4 aVertexColor;
         attribute vec2 aTime;
@@ -698,6 +698,208 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
 var TimeSeriesPointSpriteShader$ = {};
 
 registerType("TimeSeriesPointSpriteShader", [TimeSeriesPointSpriteShader, TimeSeriesPointSpriteShader$, null]);
+
+// wwtlib.TimeSeriesPointQuadShader
+
+export function TimeSeriesPointQuadShader() { }
+
+TimeSeriesPointQuadShader._prog = null;
+TimeSeriesPointQuadShader.initialized = false;
+TimeSeriesPointQuadShader.vertLoc = 0;
+TimeSeriesPointQuadShader.texLoc = 0;
+TimeSeriesPointQuadShader.sampLoc = 0;
+TimeSeriesPointQuadShader.colorLoc = 0;
+TimeSeriesPointQuadShader.pointSizeLoc = 0;
+TimeSeriesPointQuadShader.lineColorLoc = 0;
+TimeSeriesPointQuadShader.timeLoc = 0;
+TimeSeriesPointQuadShader.viewportHeightLoc = 0;
+TimeSeriesPointQuadShader.viewportHeightLoc = 0;
+
+TimeSeriesPointQuadShader._itemSize = 12 * 4;
+
+TimeSeriesPointQuadShader.init = function (renderContext) {
+    var gl = renderContext.gl;
+
+    var fragShaderText = `\
+        precision mediump float;
+        uniform vec4 lineColor;
+        varying lowp vec4 vColor;
+        varying vec2 vTextureCoord;
+        uniform sampler2D uSampler;
+
+        void main(void)
+        {
+            vec4 texColor = texture2D(uSampler, vTextureCoord);
+            gl_FragColor = lineColor * vColor * texColor;
+        }
+    `;
+
+    var vertexShaderText = `\
+        attribute vec3 aVertexPosition;
+        attribute vec4 aVertexColor;
+        attribute vec2 aTime;
+        attribute float aPointSize;
+        attribute float aShow;
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
+        uniform float jNow;
+        uniform vec3 cameraPosition;
+        uniform float decay;
+        uniform float scale;
+        uniform float minSize;
+        uniform float sky;
+        uniform float showFarSide;
+        uniform float viewportHeight;
+        uniform float viewportWidth;
+
+        varying lowp vec4 vColor;
+
+        void main(void)
+        {
+            float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
+            float dist = distance(aVertexPosition, cameraPosition);
+            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+            float dAlpha = aShow;
+
+            if ( dAlpha > 0.0 && decay > 0.0 )
+            {
+                    dAlpha = 1.0 - ((jNow - aTime.y) / decay);
+                    if (dAlpha > 1.0 )
+                    {
+                        dAlpha = 1.0;
+                    }
+            }
+
+            if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
+            {
+                vColor = vec4(0.0, 0.0, 0.0, 0.0);
+            }
+            else
+            {
+                vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
+            }
+
+            float lSize = scale;
+
+            if (scale < 0.0)
+            {
+                lSize = -scale;
+                dist = 1.0;
+            }
+
+            float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
+            gl_Position = vec4(position.x + 2.0 * sideLength * (aTextureCoord.x - 0.5) / viewportWidth, position.y + 2.0 * sideLength * (aTextureCoord.y - 0.5) / viewportHeight, position.z, 1.0);
+  
+            vTextureCoord = aTextureCoord;
+        }
+    `;
+
+    TimeSeriesPointQuadShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
+    gl.shaderSource(TimeSeriesPointQuadShader._frag, fragShaderText);
+    gl.compileShader(TimeSeriesPointQuadShader._frag);
+    var fragStat = gl.getShaderParameter(TimeSeriesPointQuadShader._frag, WEBGL.COMPILE_STATUS);
+    if (!fragStat) {
+        var errorF = gl.getShaderInfoLog(TimeSeriesPointQuadShader._frag);
+        console.log(errorF);
+    }
+    TimeSeriesPointQuadShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
+    gl.shaderSource(TimeSeriesPointQuadShader._vert, vertexShaderText);
+    gl.compileShader(TimeSeriesPointQuadShader._vert);
+    var vertStat = gl.getShaderParameter(TimeSeriesPointQuadShader._vert, WEBGL.COMPILE_STATUS);
+    if (!vertStat) {
+        var errorV = gl.getShaderInfoLog(TimeSeriesPointQuadShader._vert);
+        console.log(errorV);
+    }
+    TimeSeriesPointQuadShader._prog = gl.createProgram();
+    gl.attachShader(TimeSeriesPointQuadShader._prog, TimeSeriesPointQuadShader._vert);
+    gl.attachShader(TimeSeriesPointQuadShader._prog, TimeSeriesPointQuadShader._frag);
+    gl.linkProgram(TimeSeriesPointQuadShader._prog);
+    var linkSuccess = gl.getProgramParameter(TimeSeriesPointQuadShader._prog, WEBGL.LINK_STATUS);
+    if (!linkSuccess) {
+        var errorP = gl.getProgramInfoLog(TimeSeriesPointQuadShader._prog);
+        console.log(errorP);
+    }
+    gl.useProgram(TimeSeriesPointQuadShader._prog);
+    TimeSeriesPointQuadShader.vertLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aVertexPosition");
+    TimeSeriesPointQuadShader.texLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aVertexColor");
+    TimeSeriesPointQuadShader.pointSizeLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aPointSize");
+
+    TimeSeriesPointQuadShader.lineColorLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "lineColor");
+    TimeSeriesPointQuadShader.timeLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aTime");
+    TimeSeriesPointQuadShader.showLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aShow");
+    TimeSeriesPointQuadShader.mvMatrixLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "uMVMatrix");
+    TimeSeriesPointQuadShader.pMatrixLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "uPMatrix");
+    TimeSeriesPointQuadShader.sampLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "uSampler");
+    TimeSeriesPointQuadShader.nowLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "jNow");
+    TimeSeriesPointQuadShader.cameraPosLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "cameraPosition");
+    TimeSeriesPointQuadShader.decayLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "decay");
+    TimeSeriesPointQuadShader.scaleLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "scale");
+    TimeSeriesPointQuadShader.minSizeLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "minSize");
+    TimeSeriesPointQuadShader.skyLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "sky");
+    TimeSeriesPointQuadShader.showFarSideLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "showFarSide");
+    TimeSeriesPointQuadShader.opacityLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "opacity");
+    TimeSeriesPointQuadShader.viewportHeightLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "viewportHeight");
+    TimeSeriesPointQuadShader.viewportWidthLoc = gl.getUniformLocation(TimeSeriesPointQuadShader._prog, "viewportWidth");
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+    TimeSeriesPointQuadShader.initialized = true;
+};
+
+TimeSeriesPointQuadShader.use = function (renderContext, vertex, texture, lineColor, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, mask) {
+    if (!TimeSeriesPointQuadShader.initialized) {
+        TimeSeriesPointQuadShader.init(renderContext);
+    }
+
+    var gl = renderContext.gl;
+    gl.useProgram(TimeSeriesPointQuadShader._prog);
+    var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
+    gl.uniformMatrix4fv(TimeSeriesPointQuadShader.mvMatrixLoc, false, mvMat.floatArray());
+    gl.uniformMatrix4fv(TimeSeriesPointQuadShader.pMatrixLoc, false, renderContext.get_projection().floatArray());
+    gl.uniform1i(TimeSeriesPointSpriteShader.sampLoc, 0);
+    gl.uniform1f(TimeSeriesPointQuadShader.nowLoc, jNow);
+    gl.uniform1f(TimeSeriesPointQuadShader.decayLoc, decay);
+    gl.uniform1f(TimeSeriesPointQuadShader.scaleLoc, scale);
+    gl.uniform1f(TimeSeriesPointQuadShader.minSizeLoc, minSize);
+    gl.uniform4f(TimeSeriesPointQuadShader.lineColorLoc, lineColor.r / 255, lineColor.g / 255, lineColor.b / 255, lineColor.a / 255);
+    gl.uniform1f(TimeSeriesPointQuadShader.showFarSideLoc, showFarSide ? 1 : 0);
+    gl.uniform1f(TimeSeriesPointQuadShader.skyLoc, sky ? -1 : 1);
+    gl.uniform1f(TimeSeriesPointQuadShader.viewportHeightLoc, renderContext.height);
+    gl.uniform1f(TimeSeriesPointQuadShader.viewportWidthLoc, renderContext.width);
+    gl.uniform3f(TimeSeriesPointQuadShader.cameraPosLoc, camera.x, camera.y, camera.z);
+
+    if (zBuffer) {
+        gl.enable(WEBGL.DEPTH_TEST);
+    } else {
+        gl.disable(WEBGL.DEPTH_TEST);
+    }
+    disableVertexAttribArrays(gl);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
+    gl.vertexAttribPointer(TimeSeriesPointQuadShader.vertLoc, 3, WEBGL.FLOAT, false, TimeSeriesPointQuadShader._itemSize, 0);
+    gl.vertexAttribPointer(TimeSeriesPointQuadShader.texLoc, 2, WEBGL.FLOAT, false, TimeSeriesPointQuadShader._itemSize, 12);
+    gl.vertexAttribPointer(TimeSeriesPointQuadShader.colorLoc, 4, WEBGL.FLOAT, false, TimeSeriesPointQuadShader._itemSize, 20);
+    gl.vertexAttribPointer(TimeSeriesPointQuadShader.timeLoc, 2, WEBGL.FLOAT, false, TimeSeriesPointQuadShader._itemSize, 36);
+    gl.vertexAttribPointer(TimeSeriesPointQuadShader.pointSizeLoc, 1, WEBGL.FLOAT, false, TimeSeriesPointQuadShader._itemSize, 44);
+
+    if (mask != null) {
+        gl.bindBuffer(WEBGL.ARRAY_BUFFER, mask);
+        gl.enableVertexAttribArray(TimeSeriesPointQuadShader.showLoc);
+        gl.vertexAttribPointer(TimeSeriesPointQuadShader.showLoc, 1, WEBGL.UNSIGNED_BYTE, false, 0, 0);
+    } else {
+        gl.disableVertexAttribArray(TimeSeriesPointQuadShader.showLoc);
+        gl.vertexAttrib1f(TimeSeriesPointQuadShader.showLoc, 1.0);
+    }
+
+    gl.activeTexture(WEBGL.TEXTURE0);
+    gl.bindTexture(WEBGL.TEXTURE_2D, texture);
+    gl.lineWidth(1);
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+}
+
+var TimeSeriesPointQuadShader$ = {};
+
+registerType("TimeSeriesPointQuadShader", [TimeSeriesPointQuadShader, TimeSeriesPointQuadShader$, null]);
 
 // wwtlib.KeplerPointSpriteShader
 
