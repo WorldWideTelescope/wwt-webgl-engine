@@ -12,6 +12,13 @@ import { Texture } from "./texture.js";
 import { TextureArray } from "./texture_array.js";
 
 
+function disableVertexAttribArrays(gl, count=6) {
+    for (var i = 0; i < count; i++) {
+        gl.disableVertexAttribArray(i);
+    }
+}
+
+
 // wwtlib.SimpleLineShader
 
 export function SimpleLineShader() { }
@@ -82,10 +89,7 @@ SimpleLineShader.use = function (renderContext, vertex, lineColor, useDepth, opa
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.enableVertexAttribArray(SimpleLineShader.vertLoc);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
@@ -164,10 +168,7 @@ SimpleLineShader2D.use = function (renderContext, vertex, lineColor, useDepth, o
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.enableVertexAttribArray(SimpleLineShader2D.vertLoc);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
@@ -259,10 +260,7 @@ OrbitLineShader.use = function (renderContext, vertex, lineColor) {
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
         gl.enableVertexAttribArray(OrbitLineShader.vertLoc);
@@ -385,10 +383,7 @@ LineShaderNormalDates.use = function (renderContext, vertex, lineColor, zBuffer,
         } else {
             gl.disable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
         gl.enableVertexAttribArray(LineShaderNormalDates.vertLoc);
@@ -508,10 +503,7 @@ LineShaderNormalDates2D.use = function (renderContext, vertex, lineColor, zBuffe
         } else {
             gl.disable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
         gl.enableVertexAttribArray(LineShaderNormalDates2D.vertLoc);
@@ -674,11 +666,7 @@ TimeSeriesPointSpriteShader.use = function (renderContext, vertex, texture, line
         } else {
             gl.disable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
-        gl.disableVertexAttribArray(4);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
         gl.enableVertexAttribArray(TimeSeriesPointSpriteShader.vertLoc);
@@ -890,10 +878,7 @@ KeplerPointSpriteShader.use = function (renderContext, worldView, vertex, textur
         } else {
             gl.disable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
         gl.enableVertexAttribArray(KeplerPointSpriteShader.abcLoc);
@@ -1022,10 +1007,7 @@ EllipseShader.use = function (renderContext, semiMajorAxis, eccentricity, eccent
         gl.uniform1f(EllipseShader.eccentricityLoc, eccentricity);
         gl.uniform1f(EllipseShader.eccentricAnomalyLoc, eccentricAnomaly);
         gl.disable(WEBGL.DEPTH_TEST);
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.enableVertexAttribArray(EllipseShader.angleLoc);
         gl.vertexAttribPointer(EllipseShader.angleLoc, 3, WEBGL.FLOAT, false, 0, 0);
         gl.lineWidth(1);
@@ -1176,10 +1158,7 @@ ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDe
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(ModelShader.vertLoc);
         gl.enableVertexAttribArray(ModelShader.normalLoc);
@@ -1341,10 +1320,7 @@ ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, n
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(ModelShaderTan.vertLoc);
         gl.enableVertexAttribArray(ModelShaderTan.normalLoc);
@@ -1527,10 +1503,7 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(TileShader.vertLoc);
         gl.enableVertexAttribArray(TileShader.textureLoc);
@@ -1748,10 +1721,7 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(FitsShader.vertLoc);
         gl.enableVertexAttribArray(FitsShader.textureLoc);
@@ -1870,10 +1840,7 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(ImageShader.vertLoc);
         gl.enableVertexAttribArray(ImageShader.textureLoc);
@@ -1992,10 +1959,7 @@ ImageShader2.use = function (renderContext, vertex, index, texture, opacity, noD
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(ImageShader2.vertLoc);
         gl.enableVertexAttribArray(ImageShader2.textureLoc);
@@ -2108,10 +2072,7 @@ SpriteShader.use = function (renderContext, vertex, texture, opacity=1) {
         gl.uniform1i(SpriteShader.sampLoc, 0);
         gl.uniform1f(SpriteShader.opacityLoc, opacity);
         gl.disable(WEBGL.DEPTH_TEST);
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(SpriteShader.vertLoc);
         gl.enableVertexAttribArray(SpriteShader.textureLoc);
@@ -2211,10 +2172,7 @@ ShapeSpriteShader.use = function (renderContext, vertex, opacity=1) {
         gl.uniform1i(ShapeSpriteShader.sampLoc, 0);
         gl.uniform1f(ShapeSpriteShader.opacityLoc, opacity);
         gl.disable(WEBGL.DEPTH_TEST);
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(ShapeSpriteShader.vertLoc);
         gl.enableVertexAttribArray(ShapeSpriteShader.textureLoc);
@@ -2395,10 +2353,7 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
         } else {
             gl.enable(WEBGL.DEPTH_TEST);
         }
-        gl.disableVertexAttribArray(0);
-        gl.disableVertexAttribArray(1);
-        gl.disableVertexAttribArray(2);
-        gl.disableVertexAttribArray(3);
+        disableVertexAttribArrays(gl);
         gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
         gl.enableVertexAttribArray(TextShader.vertLoc);
         gl.enableVertexAttribArray(TextShader.textureLoc);
@@ -2626,10 +2581,7 @@ FilledCircleShader.use = function (renderContext, vertex, opacity, zBuffer, jNow
     } else {
         gl.disable(WEBGL.DEPTH_TEST);
     }
-    gl.disableVertexAttribArray(0);
-    gl.disableVertexAttribArray(1);
-    gl.disableVertexAttribArray(2);
-    gl.disableVertexAttribArray(3);
+    disableVertexAttribArrays(gl);
     gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enableVertexAttribArray(FilledCircleShader.vertLoc);
@@ -2664,7 +2616,7 @@ export function FilledCircleQuadShader() { }
 
 FilledCircleQuadShader.initialized = false;
 FilledCircleQuadShader._prog = null;
-FilledCircleQuadShader.posLoc = 0;
+FilledCircleQuadShader.vertLoc = 0;
 FilledCircleQuadShader.texLoc = 0;
 FilledCircleQuadShader.colorLoc = 0;
 FilledCircleQuadShader.opacityLoc = 0;
@@ -2681,6 +2633,8 @@ FilledCircleQuadShader.minSizeLoc = 0;
 FilledCircleQuadShader.skyLoc = 0;
 FilledCircleQuadShader.showFarSideLoc = 0;
 FilledCircleQuadShader.borderLoc = 0;
+FilledCircleQuadShader.viewportHeightLoc = 0;
+FilledCircleQuadShader.viewportWidthLoc = 0;
 
 FilledCircleQuadShader._itemSize = 12 * 4;
 
@@ -2751,6 +2705,8 @@ FilledCircleQuadShader.init = function (renderContext) {
       uniform float minSize;
       uniform float sky;
       uniform float showFarSide;
+      uniform float viewportHeight;
+      uniform float viewportWidth;
 
       ${vertexOutKeyword} lowp vec4 vColor;
       ${vertexOutKeyword} vec2 vTextureCoord;
@@ -2789,7 +2745,7 @@ FilledCircleQuadShader.init = function (renderContext) {
           }
 
           float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
-          gl_Position = vec4(position.x + sideLength * (aTextureCoord.x - 0.5), position.y + sideLength * (aTextureCoord.y - 0.5), position.z, 1.0);
+          gl_Position = vec4(position.x + 2.0 * sideLength * (aTextureCoord.x - 0.5) / viewportWidth, position.y + 2.0 * sideLength * (aTextureCoord.y - 0.5) / viewportHeight, position.z, 1.0);
 
           vTextureCoord = aTextureCoord;
       }
@@ -2821,7 +2777,7 @@ FilledCircleQuadShader.init = function (renderContext) {
         console.log(errorP);
     }
     gl.useProgram(FilledCircleQuadShader._prog);
-    FilledCircleQuadShader.posLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aVertexPosition");
+    FilledCircleQuadShader.vertLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aVertexPosition");
     FilledCircleQuadShader.texLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aTextureCoord");
     FilledCircleQuadShader.colorLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aVertexColor");
     FilledCircleQuadShader.pointSizeLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aPointSize");
@@ -2838,6 +2794,8 @@ FilledCircleQuadShader.init = function (renderContext) {
     FilledCircleQuadShader.showFarSideLoc = gl.getUniformLocation(FilledCircleQuadShader._prog, "showFarSide");
     FilledCircleQuadShader.opacityLoc = gl.getUniformLocation(FilledCircleQuadShader._prog, "opacity");
     FilledCircleQuadShader.borderLoc = gl.getUniformLocation(FilledCircleQuadShader._prog, "border");
+    FilledCircleQuadShader.viewportHeightLoc = gl.getUniformLocation(FilledCircleQuadShader._prog, "viewportHeight");
+    FilledCircleQuadShader.viewportWidthLoc = gl.getUniformLocation(FilledCircleQuadShader._prog, "viewportWidth");
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     FilledCircleQuadShader.initialized = true;
@@ -2861,6 +2819,8 @@ FilledCircleQuadShader.use = function (renderContext, vertex, opacity, zBuffer, 
     gl.uniform1f(FilledCircleQuadShader.skyLoc, sky ? -1 : 1);
     gl.uniform1f(FilledCircleQuadShader.opacityLoc, opacity);
     gl.uniform1f(FilledCircleQuadShader.borderLoc, border);
+    gl.uniform1f(FilledCircleQuadShader.viewportHeightLoc, renderContext.height);
+    gl.uniform1f(FilledCircleQuadShader.viewportWidthLoc, renderContext.width);
     gl.uniform3f(FilledCircleQuadShader.cameraPosLoc, camera.x, camera.y, camera.z);
 
     if (zBuffer) {
@@ -2868,10 +2828,7 @@ FilledCircleQuadShader.use = function (renderContext, vertex, opacity, zBuffer, 
     } else {
         gl.disable(WEBGL.DEPTH_TEST);
     }
-    gl.disableVertexAttribArray(0);
-    gl.disableVertexAttribArray(1);
-    gl.disableVertexAttribArray(2);
-    gl.disableVertexAttribArray(3);
+    disableVertexAttribArrays(gl);
     gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
     gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
     gl.enableVertexAttribArray(FilledCircleQuadShader.vertLoc);
