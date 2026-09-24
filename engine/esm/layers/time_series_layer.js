@@ -69,7 +69,8 @@ export var PlotTypes = {
     circle: 2,
     square: 3,
     pushPin: 4,
-    custom: 5
+    custom: 5,
+    filledCircle: 6,
 };
 
 registerType("PlotTypes", PlotTypes);
@@ -290,6 +291,9 @@ var TimeSeriesLayer$ = {
             case 'PushPin':
                 this.set_plotType(4);
                 break;
+            case 'FilledCircle':
+              this.set_plotType(6);
+              break;
             default:
                 break;
         }
