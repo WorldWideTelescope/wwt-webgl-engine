@@ -597,7 +597,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
             if (scale < 0.0)
             {
                 lSize = -scale;
-                dist = 1.0;
+                dist = max(1.0, dist);
             }
 
             gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));
