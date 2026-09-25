@@ -877,7 +877,9 @@ var TimeSeriesLayer$ = {
             this.pointList.sky = this.get_astronomical();
             this.pointList.timeSeries = this.timeSeries;
             this.pointList.jNow = jNow;
-            this.pointList.scale = (this._markerScale$1 === 1) ? adjustedScale : -adjustedScale;
+            var worldScale = this._markerScale$1 === 1;
+            this.pointList.scale = worldScale ? adjustedScale : -adjustedScale;
+            this.pointList.set_quads(worldScale);
             this.pointList.draw(renderContext, opacity * this.get_opacity(), false);
         }
         if (this.lineList != null) {
