@@ -316,6 +316,7 @@ export interface SpreadSheetLayerSettingsInterfaceRO extends LayerSettingsInterf
   get_colorMapperName(): string;
   get_coordinatesType(): CoordinatesType;
   get_decay(): number;
+  get_depthBuffered(): boolean | null;
   get_dynamicColor(): boolean;
   get_dynamicData(): boolean;
   get_endDateColumn(): number;
@@ -368,6 +369,8 @@ export interface SpreadSheetLayerSettingsInterface extends LayerSettingsInterfac
   set_coordinatesType(v: CoordinatesType): CoordinatesType;
   set_decay(v: number): number;
   set_dynamicColor(v: boolean): boolean;
+  get_depthBuffered(): boolean | null;
+  set_depthBuffered(v: boolean | null): boolean | null;
   set_dynamicData(v: boolean): boolean;
   set_endDateColumn(v: number): number;
   set_endRange(v: Date): Date;

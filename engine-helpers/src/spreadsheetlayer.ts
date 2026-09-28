@@ -42,6 +42,7 @@ const justSpreadSheetLayerSettingNames = [
   "colorMapperName",
   "coordinatesType",
   "decay",
+  "depthBuffered",
   "dynamicColor",
   "dynamicData",
   "endDateColumn",
