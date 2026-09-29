@@ -2427,3 +2427,233 @@ TextShader.use = function (renderContext, vertex, texture, color, opacity=1) {
 var TextShader$ = {};
 
 registerType("TextShader", [TextShader, TextShader$, null]);
+
+export function FilledCircleShader() { }
+
+FilledCircleShader.initialized = false;
+FilledCircleShader._prog = null;
+FilledCircleShader.posLoc = 0;
+FilledCircleShader.colorLoc = 0;
+FilledCircleShader.opacityLoc = 0;
+FilledCircleShader.pointSizeLoc = 0;
+FilledCircleShader.timeLoc = 0;
+FilledCircleShader.showLoc = 0;
+FilledCircleShader.mvMatrixLoc = 0;
+FilledCircleShader.pMatrixLoc = 0;
+FilledCircleShader.nowLoc = 0;
+FilledCircleShader.cameraPosLoc = 0;
+FilledCircleShader.decayLoc = 0;
+FilledCircleShader.scaleLoc = 0;
+FilledCircleShader.minSizeLoc = 0;
+FilledCircleShader.skyLoc = 0;
+FilledCircleShader.showFarSideLoc = 0;
+FilledCircleShader.borderLoc = 0;
+
+FilledCircleShader.init = function (renderContext) {
+    var gl = renderContext.gl;
+    var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
+    var borderWidth = derivatives ? "fwidth(r)" : "0.012";
+    var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
+    var versionDeclaration = useGlVersion2 ? "#version 300 es" : "";
+    var fragInKeyword = useGlVersion2 ? "in" : "varying";
+    var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : "";
+    var fragOutVar = useGlVersion2 ? "fragColor" : "gl_FragColor";
+    var vertexInKeyword = useGlVersion2 ? "in" : "attribute";
+    var vertexOutKeyword = useGlVersion2 ? "out" : "varying";
+
+    var fragShaderText = `\
+        ${versionDeclaration}
+        ${extensionDeclaration}
+        precision mediump float;
+        ${fragInKeyword} vec4 vColor;
+        ${fragOutDeclaration}
+        uniform float opacity;
+        uniform float border;
+        uniform vec4 borderColor;
+
+        void main() {
+          vec2 p = gl_PointCoord - vec2(0.5);
+          float r = length(p);
+          float borderWidth = ${borderWidth};
+
+          float core = smoothstep(0.50, 0.30, r);
+          vec3 col = vColor.rgb * mix(0.85, 1.15, core);
+          float alpha = 1.0;
+          if (border > 0.5)
+          {
+              float borderMix = smoothstep(0.40 - borderWidth, 0.40 + borderWidth, r);
+              col = mix(col, vec3(0.0), borderMix);
+              alpha = 1.0 - smoothstep(0.50 - borderWidth, 0.50 + borderWidth, r);
+          }
+          else
+          {
+              alpha = smoothstep(0.50, 0.46, r);
+          }
+
+          ${fragOutVar} = vec4(col, opacity * alpha * vColor.a);
+        }
+      `;
+
+    // TODO: Aside from the version considerations necessitated by the fragment shader,
+    // this is the same as the TimeSeriesPointSpriteShader vertex shader.
+    // Maybe this can be extracted into a function that returns the shader text
+   // based on a (passed-in) version flag
+    var vertShaderText = `\
+      ${versionDeclaration}
+      ${vertexInKeyword} vec3 aVertexPosition;
+      ${vertexInKeyword} vec4 aVertexColor;
+      ${vertexInKeyword} vec2 aTime;
+      ${vertexInKeyword} float aPointSize;
+      ${vertexInKeyword} float aShow;
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      uniform float jNow;
+      uniform vec3 cameraPosition;
+      uniform float decay;
+      uniform float scale;
+      uniform float minSize;
+      uniform float sky;
+      uniform float showFarSide;
+
+      ${vertexOutKeyword} lowp vec4 vColor;
+
+      void main(void)
+      {
+          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
+          float dist = distance(aVertexPosition, cameraPosition);
+          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+          float dAlpha = aShow;
+
+          if ( dAlpha > 0.0 && decay > 0.0 )
+          {
+                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
+                  if (dAlpha > 1.0 )
+                  {
+                      dAlpha = 1.0;
+                  }
+          }
+
+          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
+          {
+              vColor = vec4(0.0, 0.0, 0.0, 0.0);
+          }
+          else
+          {
+              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
+          }
+
+          float lSize = scale;
+
+          if (scale < 0.0)
+          {
+              lSize = -scale;
+              dist = 1.0;
+          }
+
+          gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));
+      }
+    `;
+
+    FilledCircleShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
+    gl.shaderSource(FilledCircleShader._frag, fragShaderText);
+    gl.compileShader(FilledCircleShader._frag);
+    var fragStat = gl.getShaderParameter(FilledCircleShader._frag, WEBGL.COMPILE_STATUS);
+    if (!fragStat) {
+        var errorF = gl.getShaderInfoLog(FilledCircleShader._frag);
+        console.log(errorF);
+    }
+    FilledCircleShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
+    gl.shaderSource(FilledCircleShader._vert, vertShaderText);
+    gl.compileShader(FilledCircleShader._vert);
+    var vertStat = gl.getShaderParameter(FilledCircleShader._vert, WEBGL.COMPILE_STATUS);
+    if (!vertStat) {
+        var errorV = gl.getShaderInfoLog(FilledCircleShader._vert);
+        console.log(errorV);
+    }
+    FilledCircleShader._prog = gl.createProgram();
+    gl.attachShader(FilledCircleShader._prog, FilledCircleShader._vert);
+    gl.attachShader(FilledCircleShader._prog, FilledCircleShader._frag);
+    gl.linkProgram(FilledCircleShader._prog);
+    var linkSuccess = gl.getProgramParameter(FilledCircleShader._prog, WEBGL.LINK_STATUS);
+    if (!linkSuccess) {
+        var errorP = gl.getProgramInfoLog(FilledCircleShader._prog);
+        console.log(errorP);
+    }
+    gl.useProgram(FilledCircleShader._prog);
+    FilledCircleShader.posLoc = gl.getAttribLocation(FilledCircleShader._prog, "aVertexPosition");
+    FilledCircleShader.colorLoc = gl.getAttribLocation(FilledCircleShader._prog, "aVertexColor");
+    FilledCircleShader.pointSizeLoc = gl.getAttribLocation(FilledCircleShader._prog, "aPointSize");
+    FilledCircleShader.timeLoc = gl.getAttribLocation(FilledCircleShader._prog, "aTime");
+    FilledCircleShader.showLoc = gl.getAttribLocation(FilledCircleShader._prog, "aShow");
+    FilledCircleShader.mvMatrixLoc = gl.getUniformLocation(FilledCircleShader._prog, "uMVMatrix");
+    FilledCircleShader.pMatrixLoc = gl.getUniformLocation(FilledCircleShader._prog, "uPMatrix");
+    FilledCircleShader.nowLoc = gl.getUniformLocation(FilledCircleShader._prog, "jNow");
+    FilledCircleShader.cameraPosLoc = gl.getUniformLocation(FilledCircleShader._prog, "cameraPosition");
+    FilledCircleShader.decayLoc = gl.getUniformLocation(FilledCircleShader._prog, "decay");
+    FilledCircleShader.scaleLoc = gl.getUniformLocation(FilledCircleShader._prog, "scale");
+    FilledCircleShader.minSizeLoc = gl.getUniformLocation(FilledCircleShader._prog, "minSize");
+    FilledCircleShader.skyLoc = gl.getUniformLocation(FilledCircleShader._prog, "sky");
+    FilledCircleShader.showFarSideLoc = gl.getUniformLocation(FilledCircleShader._prog, "showFarSide");
+    FilledCircleShader.opacityLoc = gl.getUniformLocation(FilledCircleShader._prog, "opacity");
+    FilledCircleShader.borderLoc = gl.getUniformLocation(FilledCircleShader._prog, "border");
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+    FilledCircleShader.initialized = true;
+};
+
+FilledCircleShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, border, mask) {
+    if (!FilledCircleShader.initialized) {
+        FilledCircleShader.init(renderContext);
+    }
+    var gl = renderContext.gl;
+    gl.useProgram(FilledCircleShader._prog);
+    var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
+    gl.uniformMatrix4fv(FilledCircleShader.mvMatrixLoc, false, mvMat.floatArray());
+    gl.uniformMatrix4fv(FilledCircleShader.pMatrixLoc, false, renderContext.get_projection().floatArray());
+    gl.uniform1f(FilledCircleShader.nowLoc, jNow);
+    gl.uniform1f(FilledCircleShader.decayLoc, decay);
+    gl.uniform1f(FilledCircleShader.scaleLoc, scale);
+    gl.uniform1f(FilledCircleShader.minSizeLoc, minSize);
+    gl.uniform1f(FilledCircleShader.showFarSideLoc, showFarSide ? 1 : 0);
+    gl.uniform1f(FilledCircleShader.skyLoc, sky ? -1 : 1);
+    gl.uniform1f(FilledCircleShader.opacityLoc, opacity);
+    gl.uniform1f(FilledCircleShader.borderLoc, border);
+    gl.uniform3f(FilledCircleShader.cameraPosLoc, camera.x, camera.y, camera.z);
+
+    if (zBuffer) {
+        gl.enable(WEBGL.DEPTH_TEST);
+    } else {
+        gl.disable(WEBGL.DEPTH_TEST);
+    }
+    gl.disableVertexAttribArray(0);
+    gl.disableVertexAttribArray(1);
+    gl.disableVertexAttribArray(2);
+    gl.disableVertexAttribArray(3);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
+    gl.enableVertexAttribArray(FilledCircleShader.vertLoc);
+    gl.enableVertexAttribArray(FilledCircleShader.colorLoc);
+    gl.enableVertexAttribArray(FilledCircleShader.pointSizeLoc);
+    gl.enableVertexAttribArray(FilledCircleShader.timeLoc);
+    gl.vertexAttribPointer(FilledCircleShader.vertLoc, 3, WEBGL.FLOAT, false, 40, 0);
+    gl.vertexAttribPointer(FilledCircleShader.colorLoc, 4, WEBGL.FLOAT, false, 40, 12);
+    gl.vertexAttribPointer(FilledCircleShader.pointSizeLoc, 1, WEBGL.FLOAT, false, 40, 36);
+    gl.vertexAttribPointer(FilledCircleShader.timeLoc, 2, WEBGL.FLOAT, false, 40, 28);
+
+    if (mask != null) {
+        gl.bindBuffer(WEBGL.ARRAY_BUFFER, mask);
+        gl.enableVertexAttribArray(FilledCircleShader.showLoc);
+        gl.vertexAttribPointer(FilledCircleShader.showLoc, 1, WEBGL.UNSIGNED_BYTE, false, 0, 0);
+    } else {
+        gl.disableVertexAttribArray(FilledCircleShader.showLoc);
+        gl.vertexAttrib1f(FilledCircleShader.showLoc, 1.0);
+    }
+
+    gl.lineWidth(1);
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+};
+
+var FilledCircleShader$ = {};
+
+registerType("FilledCircleShader", [FilledCircleShader, FilledCircleShader$, null]);

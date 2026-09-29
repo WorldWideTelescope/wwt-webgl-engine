@@ -2046,6 +2046,12 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
   set_barChartBitmask(v: number): number;
   get_beginRange(): Date;
   set_beginRange(v: Date): Date;
+  /** 
+    * Note: borders are only supported by the "filled circle" plot type.
+    * When using other plot types, this setting will have no effect
+    */
+  get_bordered(): boolean;
+  set_bordered(v: boolean): boolean;
   get_cartesianCustomScale(): number;
   set_cartesianCustomScale(v: number): number;
   get_cartesianScale(): AltUnits;

@@ -24,6 +24,7 @@ import {
     LineShaderNormalDates,
     LineShaderNormalDates2D,
     TimeSeriesPointSpriteShader,
+    FilledCircleShader,
 } from "./shaders.js";
 
 
@@ -729,6 +730,7 @@ export function PointList(device) {
     this._imageReady = false;
     this._init = false;
     this.minSize = 2;
+    this.bordered = false;
     this._pointBuffers = [];
     this._pointBufferCounts = [];
     this._device = device;
@@ -859,6 +861,35 @@ var PointList$ = {
         return new MaskBuffer(values); 
     },
 
+    _useTimeSeriesPointSpriteShader: function (texture) {
+        return function (pointBuffer, renderContext, opacity, cull, color, cam) {
+            TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, texture, color, this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._masked ? this._mask.buffer : null);
+        };
+    },
+
+    _useFilledCircleShader: function (pointBuffer, renderContext, opacity, cull, _color, cam) {
+        this.depthBuffered = false;
+        FilledCircleShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null);
+    },
+
+    _drawWithShader: function (renderContext, useShader, opacity, cull, color, depthMask=false) {
+        this._initBuffer(renderContext);
+        var originalDepthMask = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK);
+        renderContext.gl.depthMask(depthMask);
+        var zero = new Vector3d();
+        var matInv = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
+        matInv.invert();
+        var cam = Vector3d._transformCoordinate(zero, matInv);
+        var $enum2 = ss.enumerate(this._pointBuffers);
+        while ($enum2.moveNext()) {
+            var pointBuffer = $enum2.current;
+            useShader(pointBuffer, renderContext, opacity, cull, color, cam);
+            renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
+        }
+        renderContext.gl.depthMask(originalDepthMask);
+    },
+
+
     draw: function (renderContext, opacity, cull, depthMask=false) {
         this._initBuffer(renderContext);
         if (renderContext.gl == null) {
@@ -892,39 +923,17 @@ var PointList$ = {
             }
             renderContext.device.restore();
         } else {
-            var originalDepthMask = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK);
-            renderContext.gl.depthMask(depthMask);
-            var zero = new Vector3d();
-            var matInv = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
-            matInv.invert();
-            var cam = Vector3d._transformCoordinate(zero, matInv);
-            var $enum2 = ss.enumerate(this._pointBuffers);
-            while ($enum2.moveNext()) {
-                var pointBuffer = $enum2.current;
-                TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, PointList.starTexture.texture2d, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, (this.timeSeries) ? this.decay : 0, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._masked ? this._mask.buffer : null);
-                renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
-            }
-            renderContext.gl.depthMask(originalDepthMask);
+            this._drawWithShader(renderContext, this._useTimeSeriesPointSpriteShader(PointList.starTexture.texture2d).bind(this), opacity, cull, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
         }
     },
 
     drawTextured: function (renderContext, texture, opacity, depthMask=false) {
+        this._drawWithShader(renderContext, this._useTimeSeriesPointSpriteShader(texture).bind(this), opacity, false, Color.fromArgb(opacity * 255, 255, 255, 255), depthMask);
+    },
 
-        this._initBuffer(renderContext);
-        var zero = new Vector3d();
-        var matInv = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
-        matInv.invert();
-        var cam = Vector3d._transformCoordinate(zero, matInv);
-        var $enum1 = ss.enumerate(this._pointBuffers);
-        var originalDepthMask = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK);
-        renderContext.gl.depthMask(depthMask);
-        while ($enum1.moveNext()) {
-            var pointBuffer = $enum1.current;
-            TimeSeriesPointSpriteShader.use(renderContext, pointBuffer.vertexBuffer, texture, Color.fromArgb(255 * opacity, 255, 255, 255), this.depthBuffered, this.jNow, this.decay, cam, (this.scale * (renderContext.height / 960)), this.minSize, this.showFarSide, this.sky, this._masked ? this._mask.buffer : null);
-            renderContext.gl.drawArrays(WEBGL.POINTS, 0, pointBuffer.count);
-        }
-        renderContext.gl.depthMask(originalDepthMask);
-    }
+    drawFilledCircle: function (renderContext, opacity, depthMask=false) {
+        this._drawWithShader(renderContext, this._useFilledCircleShader.bind(this), opacity, false, null, depthMask);
+    },
 };
 
 registerType("PointList", [PointList, PointList$, null]);

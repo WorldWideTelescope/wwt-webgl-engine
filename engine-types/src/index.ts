@@ -149,6 +149,7 @@ export enum PlotTypes {
   square = 3,
   pushPin = 4,
   custom = 5,
+  filledCircle = 6,
 }
 
 export enum PointScaleTypes {
