@@ -537,6 +537,8 @@ export type BaseSpreadSheetLayerSetting =
   ["colorMapperName", string] |
   ["coordinatesType", CoordinatesType] |
   ["decay", number] |
+  ["depthBuffered", boolean] |
+  ["depthBuffered", null] |
   ["dynamicColor", boolean] |
   ["dynamicData", boolean] |
   ["endDateColumn", number] |
@@ -587,6 +589,8 @@ const baseSpreadSheetLayerSettingTypeInfo: { [k: string]: string } = {
   "colorMapperName/string": "",
   "coordinatesType/number": "CoordinatesType",
   "decay/number": "",
+  "depthBuffered/boolean": "",
+  "depthBuffered/null": "",
   "dynamicColor/boolean": "",
   "dynamicData/boolean": "",
   "endDateColumn/number": "",
@@ -623,13 +627,23 @@ const baseSpreadSheetLayerSettingTypeInfo: { [k: string]: string } = {
   "zAxisReverse/boolean": "",
 };
 
+  // We want to be able to properly recognize Date objects and null values
+function typeKey(obj: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (obj === null) {
+    return "null";
+  }
+  if (obj instanceof Date) {
+    return "Date";
+  }
+  return typeof obj;
+}
+
 /** Type guard function for BaseSpreadSheetLayerSetting. */
 export function isBaseSpreadSheetLayerSetting(obj: [string, any]): obj is BaseSpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
   if (isBaseLayerSetting(obj))
     return true;
 
-  // We want to be able to properly recognize Date objects
-  const type = obj[1] instanceof Date ? 'Date' : typeof obj[1];
+  const type = typeKey(obj[1]);
   const key = obj[0] + "/" + type;
   const enumType = baseSpreadSheetLayerSettingTypeInfo[key];
 
