@@ -1482,7 +1482,7 @@ TileShader.init = function (renderContext) {
     TileShader.initialized = true;
 };
 
-TileShader.use = function (renderContext, vertex, index, texture, opacity, noDepth, centerWorld) {
+TileShader.use = function (renderContext, vertex, index, texture, opacity, noDepth, centerWorld, smooth=true) {
     if (texture == null) {
         texture = Texture.getEmpty();
     }
@@ -1539,6 +1539,8 @@ TileShader.use = function (renderContext, vertex, index, texture, opacity, noDep
         gl.activeTexture(WEBGL.TEXTURE0);
         gl.bindTexture(WEBGL.TEXTURE_2D, texture);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
+        gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, smooth ? WEBGL.LINEAR_MIPMAP_NEAREST : WEBGL.NEAREST_MIPMAP_NEAREST);
+        gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MAG_FILTER, smooth ? WEBGL.LINEAR : WEBGL.NEAREST);
         gl.enable(WEBGL.BLEND);
         if (noDepth) {
             gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
@@ -1709,7 +1711,7 @@ FitsShader.init = function (renderContext) {
     FitsShader.initialized = true;
 };
 
-FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDepth, centerWorld) {
+FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDepth, centerWorld, smooth=true) {
     if (texture == null) {
         texture = Texture.getEmpty();
     }
@@ -1760,6 +1762,8 @@ FitsShader.use = function (renderContext, vertex, index, texture, opacity, noDep
         gl.activeTexture(WEBGL.TEXTURE0);
         gl.bindTexture(WEBGL.TEXTURE_2D, texture);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
+        gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, smooth ? WEBGL.LINEAR_MIPMAP_NEAREST : WEBGL.NEAREST_MIPMAP_NEAREST);
+        gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MAG_FILTER, smooth ? WEBGL.LINEAR : WEBGL.NEAREST);
         gl.enable(WEBGL.BLEND);
         if (noDepth) {
             gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);
@@ -1850,7 +1854,7 @@ ImageShader.init = function (renderContext) {
     ImageShader.initialized = true;
 };
 
-ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDepth) {
+ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDepth, smooth=true) {
     if (texture == null) {
         texture = Texture.getEmpty();
     }
@@ -1882,6 +1886,8 @@ ImageShader.use = function (renderContext, vertex, index, texture, opacity, noDe
         gl.activeTexture(WEBGL.TEXTURE0);
         gl.bindTexture(WEBGL.TEXTURE_2D, texture);
         gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, index);
+        gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, smooth ? WEBGL.LINEAR_MIPMAP_NEAREST : WEBGL.NEAREST_MIPMAP_NEAREST);
+        gl.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MAG_FILTER, smooth ? WEBGL.LINEAR : WEBGL.NEAREST);
         gl.enable(WEBGL.BLEND);
         if (noDepth) {
             gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE);

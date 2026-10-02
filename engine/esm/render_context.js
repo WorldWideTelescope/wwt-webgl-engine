@@ -474,14 +474,14 @@ var RenderContext$ = {
         }
     },
 
-    drawImageSet: function (imageset, opacity) {
+    drawImageSet: function (imageset, opacity, smooth=true) {
         var maxX = RenderContext.getTilesXForLevel(imageset, imageset.get_baseLevel());
         var maxY = RenderContext.getTilesYForLevel(imageset, imageset.get_baseLevel());
         for (var x = 0; x < maxX; x++) {
             for (var y = 0; y < maxY; y++) {
                 var tile = tileCacheGetTile(imageset.get_baseLevel(), x, y, imageset, null);
                 if (tile != null) {
-                    tile.draw3D(this, opacity);
+                    tile.draw3D(this, opacity, smooth);
                 }
             }
         }

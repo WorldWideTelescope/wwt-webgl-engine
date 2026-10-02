@@ -154,6 +154,7 @@ var Tile$ = {
                     }
                     tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, image);
                     tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
+                    tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MAG_FILTER, WEBGL.LINEAR);
                     tilePrepDevice.generateMipmap(WEBGL.TEXTURE_2D);
                 }
                 tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
@@ -362,7 +363,7 @@ var Tile$ = {
         }
     },
 
-    draw3D: function (renderContext, opacity) {
+    draw3D: function (renderContext, opacity, smooth=true) {
         this.renderedGeneration = Tile.currentRenderGeneration;
         Tile.tilesTouched++;
         this.accessCount = inc_tileCacheAccessID();
@@ -394,7 +395,7 @@ var Tile$ = {
                     if (this.children[childIndex].isTileInFrustum(renderContext.get_frustum())) {
                         this.inViewFrustum = true;
                         if (this.children[childIndex].isTileBigEnough(renderContext)) {
-                            this.renderChildPart[childIndex].set_targetState(!this.children[childIndex].draw3D(renderContext, opacity));
+                            this.renderChildPart[childIndex].set_targetState(!this.children[childIndex].draw3D(renderContext, opacity, smooth));
                             if (this.renderChildPart[childIndex].get_targetState()) {
                                 childRendered = true;
                             }
@@ -435,7 +436,7 @@ var Tile$ = {
         this.accomidation = this._computeAccomidation();
         for (var i = 0; i < 4; i++) {
             if (this.renderChildPart[i].get_targetState()) {
-                this.renderPart(renderContext, i, (opacity / 100), false);
+                this.renderPart(renderContext, i, (opacity / 100), false, smooth);
             }
         }
         return true;
@@ -465,7 +466,7 @@ var Tile$ = {
         return accVal;
     },
 
-    renderPart: function (renderContext, part, opacity, combine) {
+    renderPart: function (renderContext, part, opacity, combine, smooth=true) {
         if (tilePrepDevice == null) {
             var lighting = renderContext.lighting && renderContext.get_sunPosition() != null;
             var $enum1 = ss.enumerate(this._renderTriangleLists[part]);
@@ -509,7 +510,7 @@ var Tile$ = {
                 FitsShader.use(renderContext, this._vertexBuffer, this.getIndexBuffer(part, this.accomidation), this.texture2d, opacity, false, this.globalCenter);
             }
             else {
-                TileShader.use(renderContext, this._vertexBuffer, this.getIndexBuffer(part, this.accomidation), this.texture2d, opacity, false, this.globalCenter);
+                TileShader.use(renderContext, this._vertexBuffer, this.getIndexBuffer(part, this.accomidation), this.texture2d, opacity, false, this.globalCenter, smooth);
             }
             renderContext.gl.drawElements(WEBGL.TRIANGLES, this.triangleCount * 3, WEBGL.UNSIGNED_SHORT, 0);
         }
