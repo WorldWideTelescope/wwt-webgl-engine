@@ -900,7 +900,7 @@ var WWTControl$ = {
             else {
                 this.renderContext.setupMatricesSpace3d(this.renderContext.width, this.renderContext.height);
             }
-            this.renderContext.drawImageSet(this.renderContext.get_backgroundImageset(), 100);
+            this.renderContext.drawImageSet(this.renderContext.get_backgroundImageset(), 100, Settings.get_active().get_renderBackgroundSmooth());
             if (this.renderContext.get_foregroundImageset() != null) {
                 if (this.renderContext.get_foregroundImageset().get_dataSetType() !== this.renderContext.get_backgroundImageset().get_dataSetType()) {
                     this.renderContext.set_foregroundImageset(null);
@@ -914,7 +914,7 @@ var WWTControl$ = {
                         var saveDevice = this.renderContext.device;
                         this._fgDevice.clearRect(0, 0, this.renderContext.width, this.renderContext.height);
                         this.renderContext.device = this._fgDevice;
-                        this.renderContext.drawImageSet(this.renderContext.get_foregroundImageset(), 100);
+                        this.renderContext.drawImageSet(this.renderContext.get_foregroundImageset(), 100, Settings.get_active().get_renderForegroundSmooth());
                         this.renderContext.device = saveDevice;
                         this.renderContext.device.save();
                         this.renderContext.device.globalAlpha = this.renderContext.viewCamera.opacity / 100;
@@ -922,7 +922,7 @@ var WWTControl$ = {
                         this.renderContext.device.restore();
                     }
                     else {
-                        this.renderContext.drawImageSet(this.renderContext.get_foregroundImageset(), this.renderContext.viewCamera.opacity);
+                        this.renderContext.drawImageSet(this.renderContext.get_foregroundImageset(), this.renderContext.viewCamera.opacity, Settings.get_active().get_renderForegroundSmooth());
                     }
                 }
             }
