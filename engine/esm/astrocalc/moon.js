@@ -24,6 +24,9 @@ import { CT } from "./coordinate_transformation.js";
 import { CAAEarth } from "./earth.js";
 import { CAANutation } from "./nutation.js";
 
+import { Earth } from "aa-js";
+
+const Moon = Earth.Moon;
 
 // MoonCoefficient1
 
@@ -70,51 +73,27 @@ const g_MoonCoefficients4 = [5128122, 280602, 277693, 173237, 55413, 46271, 3257
 export function CAAMoon() { }
 
 CAAMoon.meanLongitude = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    var T4 = Tcubed * T;
-    return CT.m360(218.3164477 + 481267.88123421 * T - 0.0015786 * Tsquared + Tcubed / 538841 - T4 / 65194000);
+    return Moon.getMeanLongitude(JD);
 };
 
 CAAMoon.meanElongation = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    var T4 = Tcubed * T;
-    return CT.m360(297.8501921 + 445267.1114034 * T - 0.0018819 * Tsquared + Tcubed / 545868 - T4 / 113065000);
+    return Moon.getMeanElongation(JD);
 };
 
 CAAMoon.meanAnomaly = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    var T4 = Tcubed * T;
-    return CT.m360(134.9633964 + 477198.8675055 * T + 0.0087414 * Tsquared + Tcubed / 69699 - T4 / 14712000);
+    return Moon.getMeanAnomaly(JD);
 };
 
 CAAMoon.argumentOfLatitude = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    var T4 = Tcubed * T;
-    return CT.m360(93.272095 + 483202.0175233 * T - 0.0036539 * Tsquared - Tcubed / 3526000 + T4 / 863310000);
+    return Moon.getArgumentOfLatitude(JD);
 };
 
 CAAMoon.meanLongitudeAscendingNode = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    var T4 = Tcubed * T;
-    return CT.m360(125.0445479 - 1934.1362891 * T + 0.0020754 * Tsquared + Tcubed / 467441 - T4 / 60616000);
+    return Moon.getMeanLongitudeAscendingNode(JD);
 };
 
 CAAMoon.meanLongitudePerigee = function (JD) {
-    var T = (JD - 2451545) / 36525;
-    var Tsquared = T * T;
-    var Tcubed = Tsquared * T;
-    var T4 = Tcubed * T;
-    return CT.m360(83.3532465 + 4069.0137287 * T - 0.01032 * Tsquared - Tcubed / 80053 + T4 / 18999000);
+    return Moon.getMeanLongitudePerigee(JD);
 };
 
 CAAMoon.trueLongitudeAscendingNode = function (JD) {
