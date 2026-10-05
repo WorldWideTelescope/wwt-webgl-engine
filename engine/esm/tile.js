@@ -507,7 +507,7 @@ var Tile$ = {
                 FitsShader.bScale = this.dataset.get_fitsProperties().bScale;
                 FitsShader.scaleType = this.dataset.get_fitsProperties().scaleType;
                 FitsShader.transparentBlack = this.dataset.get_fitsProperties().transparentBlack;
-                FitsShader.use(renderContext, this._vertexBuffer, this.getIndexBuffer(part, this.accomidation), this.texture2d, opacity, false, this.globalCenter);
+                FitsShader.use(renderContext, this._vertexBuffer, this.getIndexBuffer(part, this.accomidation), this.texture2d, opacity, false, this.globalCenter, smooth);
             }
             else {
                 TileShader.use(renderContext, this._vertexBuffer, this.getIndexBuffer(part, this.accomidation), this.texture2d, opacity, false, this.globalCenter, smooth);

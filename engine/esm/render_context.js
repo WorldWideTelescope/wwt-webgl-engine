@@ -992,6 +992,7 @@ var RenderContext$ = {
             return;
         }
         var uints_for_indices = this.gl.getExtension('OES_element_index_uint');
+        this._floatLinear = !!this.gl.getExtension("OES_texture_float_linear");
         set_tileUvMultiple(1);
         set_tileDemEnabled(true);
         TileShader.init(this);
