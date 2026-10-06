@@ -864,7 +864,7 @@ var Settings$ = {
         return this._renderForegroundSmooth;
     },
 
-    set_renderForedgroundSmooth: function (value) {
+    set_renderForegroundSmooth: function (value) {
         this._renderForegroundSmooth = value;
         return value;
     },

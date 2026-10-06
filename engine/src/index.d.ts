@@ -114,6 +114,8 @@ export interface EngineSettingsInterface extends EngineSettingsInterfaceRO {
   set_milkyWayModel(v: boolean): boolean;
   set_minorPlanetsFilter(v: number): number;
   set_planetOrbitsFilter(v: number): number;
+  set_renderBackgroundSmooth(v: boolean): boolean;
+  set_renderForegroundSmooth(v: boolean): boolean;
   set_showAltAzGrid(v: boolean): boolean;
   set_showAltAzGridText(v: boolean): boolean;
   set_showConstellationBoundries(v: boolean): boolean;
@@ -1914,6 +1916,10 @@ export class Settings implements EngineSettingsInterface {
   set_planetOrbitsFilter(v: number): number;
   get_constellations(): boolean;
   set_constellations(v: boolean): boolean;
+  get_renderBackgroundSmooth(): boolean;
+  set_renderBackgroundSmooth(v: boolean): boolean;
+  get_renderForegroundSmooth(): boolean;
+  set_renderForegroundSmooth(v: boolean): boolean;
 
   static get_active(): Settings;
 }
