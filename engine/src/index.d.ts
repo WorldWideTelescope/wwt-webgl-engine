@@ -1162,6 +1162,8 @@ export class ImageSetLayer extends Layer implements ImageSetLayerSettingsInterfa
   set_imageSet(v: Imageset): Imageset;
   get_overrideDefaultLayer(): boolean;
   set_overrideDefaultLayer(v: boolean): boolean;
+  get_renderSmooth(): boolean;
+  set_renderSmooth(v: boolean): boolean;
 
   getFitsImage(): FitsImage | null;
   setImageScalePhysical(st: ScaleTypes, min: number, max: number): void;
