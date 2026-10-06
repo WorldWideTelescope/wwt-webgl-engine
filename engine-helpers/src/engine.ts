@@ -809,4 +809,26 @@ export class EngineState implements EngineSettingsInterface {
     this.solarSystemMinorOrbits = v;
     return v;
   }
+
+  renderBackgroundSmooth!: boolean;
+
+  get_renderBackgroundSmooth(): boolean {
+    return this.renderBackgroundSmooth;
+  }
+
+  set_renderBackgroundSmooth(v: boolean): boolean {
+    this.renderBackgroundSmooth = v;
+    return v;
+  }
+
+  renderForegroundSmooth!: boolean;
+
+  get_renderForegroundSmooth(): boolean {
+    return this.renderForegroundSmooth;
+  }
+  
+  set_renderForegroundSmooth(v: boolean): boolean {
+    this.renderForegroundSmooth = v;
+    return v;
+  }
 }
