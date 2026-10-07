@@ -324,7 +324,9 @@ export type BaseEngineSetting =
   ["solarSystemStars", boolean] |
   ["minorPlanetsFilter", number] |
   ["planetOrbitsFilter", number] |
-  ["solarSystemScale", number];
+  ["solarSystemScale", number] |
+  ["renderBackgroundSmooth", boolean] |
+  ["renderForegroundSmooth", boolean];
 
 // I'm not aware of any smart TypeScripty way to automate the construction of this table :-(
 const baseEngineSettingTypeInfo = {
@@ -392,6 +394,8 @@ const baseEngineSettingTypeInfo = {
   "minorPlanetsFilter/number": true,
   "planetOrbitsFilter/number": true,
   "solarSystemScale/number": true,
+  "renderBackgroundSmooth/boolean": true,
+  "renderForegroundSmooth/boolean": true,
 }
 
 /** Type guard function for BaseEngineSetting. */

@@ -97,6 +97,7 @@ var Texture$ = {
                 tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_WRAP_T, WEBGL.CLAMP_TO_EDGE);
                 tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, image);
                 tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MIN_FILTER, WEBGL.LINEAR_MIPMAP_NEAREST);
+                tilePrepDevice.texParameteri(WEBGL.TEXTURE_2D, WEBGL.TEXTURE_MAG_FILTER, WEBGL.LINEAR);
                 tilePrepDevice.generateMipmap(WEBGL.TEXTURE_2D);
                 tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
             } catch ($e1) {
