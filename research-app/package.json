@@ -16,7 +16,7 @@
     "@wwtelescope/engine-types": "workspace:>=0.6.1",
     "@wwtelescope/research-app-messages": "workspace:>=0.18.1",
     "@wwtelescope/ui-components": "workspace:>=0.1.0",
-    "moment": "^2.29.1",
+    "moment": "^2.31.0",
     "screenfull": "^5",
     "vue": "^3",
     "vue-color-kit": "^1.0.5",
@@ -71,5 +71,5 @@
     "lint": "vue-cli-service lint src",
     "serve": "vue-cli-service serve"
   },
-  "version": "0.22.0"
+  "version": "0.22.1"
 }

@@ -22,12 +22,14 @@ export function ImageSetLayer() {
     this._extension$1 = '.txt';
     this._overrideDefaultLayer$1 = false;
     this._loaded$1 = false;
+    this._renderSmooth = true;
     Layer.call(this);
 }
 
 ImageSetLayer.create = function (set) {
     var isl = new ImageSetLayer();
     isl._imageSet$1 = set;
+    isl._renderSmooth = set.get_extension().toLowerCase().indexOf('fits') == -1;
     return isl;
 };
 
@@ -47,6 +49,15 @@ var ImageSetLayer$ = {
 
     set_overrideDefaultLayer: function (value) {
         this._overrideDefaultLayer$1 = value;
+        return value;
+    },
+
+    get_renderSmooth: function () {
+        return this._renderSmooth;
+    },
+
+    set_renderSmooth: function(value) {
+        this._renderSmooth = value;
         return value;
     },
 
@@ -97,7 +108,7 @@ var ImageSetLayer$ = {
         renderContext.set_worldBase(renderContext.get_world());
         renderContext.set_viewBase(renderContext.get_view());
         renderContext.makeFrustum();
-        renderContext.drawImageSet(this._imageSet$1, this.get_opacity() * opacity * 100);
+        renderContext.drawImageSet(this._imageSet$1, this.get_opacity() * opacity * 100, this._renderSmooth);
         return true;
     },
 

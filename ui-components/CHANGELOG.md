@@ -1,3 +1,9 @@
+# @wwtelescope/ui-components 0.1.5 (2026-10-09)
+
+- No code changes
+- Fix missing links in the README (#450, @Carifio24).
+
+
 # @wwtelescope/ui-components 0.1.4 (2026-04-28)
 
 - No code changes

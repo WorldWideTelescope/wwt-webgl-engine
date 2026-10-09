@@ -1,3 +1,11 @@
+# @wwtelescope/engine-helpers 0.19.0 (2026-10-09)
+
+- Update `EngineState` data class with new settings that allow toggling smooth
+  rendering for background/foreground imagesets (#462, @Carifio24).
+- Update spreadsheet layer settings to account for new depth buffering option 
+  (#459, @Carifio24).
+
+
 # @wwtelescope/engine-helpers 0.18.0 (2026-05-25)
 
 - Expose the engine's new render frame callback functionality (#397, @Carifio24).

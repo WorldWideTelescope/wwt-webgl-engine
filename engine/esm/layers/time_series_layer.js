@@ -69,7 +69,8 @@ export var PlotTypes = {
     circle: 2,
     square: 3,
     pushPin: 4,
-    custom: 5
+    custom: 5,
+    filledCircle: 6,
 };
 
 registerType("PlotTypes", PlotTypes);
@@ -151,6 +152,7 @@ export function TimeSeriesLayer() {
     this.baseDate = new Date(2010, 0, 1, 12, 0, 0);
     this.dirty = true;
     this.lastVersion = 0;
+    this._depthBuffered = null;
     Layer.call(this);
 }
 
@@ -290,6 +292,9 @@ var TimeSeriesLayer$ = {
             case 'PushPin':
                 this.set_plotType(4);
                 break;
+            case 'FilledCircle':
+              this.set_plotType(6);
+              break;
             default:
                 break;
         }
@@ -434,6 +439,24 @@ var TimeSeriesLayer$ = {
 
     getDomainValues: function (column) {
         return [];
+    },
+
+    get_depthBuffered: function () {
+        return this._depthBuffered;
+    },
+
+    set_depthBuffered: function (value) {
+        this._depthBuffered = value;
+        return value;
+    },
+
+    _depthBufferedToUse: function (renderContext) {
+        if (this._depthBuffered !== null) {
+            return this._depthBuffered;
+        }
+        
+        var renderType = renderContext.get_backgroundImageset().get_dataSetType();
+        return renderType == 4;
     },
 
     get_decay: function () {
@@ -853,11 +876,13 @@ var TimeSeriesLayer$ = {
         if (flat && this.astronomical && (this._markerScale$1 === 1)) {
             adjustedScale = (this.scaleFactor / (renderContext.viewCamera.zoom / 360));
         }
+        var depthBuffered = this._depthBufferedToUse(renderContext);
         if (this.triangleList2d != null) {
             this.triangleList2d.decay = this.decay;
             this.triangleList2d.sky = this.get_astronomical();
             this.triangleList2d.timeSeries = this.timeSeries;
             this.triangleList2d.jNow = jNow;
+            this.triangleList2d.set_depthBuffered(depthBuffered);
             this.triangleList2d.draw(renderContext, opacity * this.get_opacity(), 1);
         }
         if (this.triangleList != null) {
@@ -865,10 +890,11 @@ var TimeSeriesLayer$ = {
             this.triangleList.sky = this.get_astronomical();
             this.triangleList.timeSeries = this.timeSeries;
             this.triangleList.jNow = jNow;
+            this.triangleList.set_depthBuffered(depthBuffered);
             this.triangleList.draw(renderContext, opacity * this.get_opacity(), 1);
         }
         if (this.pointList != null) {
-            this.pointList.depthBuffered = true;
+            this.pointList.depthBuffered = depthBuffered;
             this.pointList.decay = this.decay;
             this.pointList.sky = this.get_astronomical();
             this.pointList.timeSeries = this.timeSeries;
@@ -881,6 +907,7 @@ var TimeSeriesLayer$ = {
             this.lineList.decay = this.decay;
             this.lineList.timeSeries = this.timeSeries;
             this.lineList.jNow = jNow;
+            this.lineList.set_depthBuffered(depthBuffered);
             this.lineList.drawLines(renderContext, opacity * this.get_opacity());
         }
         if (this.lineList2d != null) {
@@ -889,6 +916,7 @@ var TimeSeriesLayer$ = {
             this.lineList2d.timeSeries = this.timeSeries;
             this.lineList2d.showFarSide = this.get_showFarSide();
             this.lineList2d.jNow = jNow;
+            this.lineList2d.set_depthBuffered(depthBuffered);
             this.lineList2d.drawLines(renderContext, opacity * this.get_opacity());
         }
         return true;

@@ -6,7 +6,7 @@
     "url": "https://github.com/WorldWideTelescope/wwt-webgl-engine/issues"
   },
   "dependencies": {
-    "@wwtelescope/engine-types": "workspace:>=0.6.0",
+    "@wwtelescope/engine-types": "workspace:>=0.10.0",
     "pako": "^1.0.11",
     "uuid": "^14.0.0"
   },
@@ -33,7 +33,7 @@
   ],
   "homepage": "https://worldwidetelescope.org/home/",
   "internalDepVersions": {
-    "@wwtelescope/engine-types": "57d0450658d758832a11f628e890c061ad331ec2"
+    "@wwtelescope/engine-types": "thiscommit:2026-10-09:wM9Ov3O"
   },
   "keywords": [
     "WorldWide Telescope"
@@ -56,5 +56,5 @@
     "tscheck": "tsc"
   },
   "types": "./src/index.d.ts",
-  "version": "7.40.0"
+  "version": "7.41.0"
 }

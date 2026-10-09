@@ -1,3 +1,10 @@
+# @wwtelescope/engine-types 0.10.0 (2026-10-09)
+
+- Add options for smooth rendering of background/foreground imagesets to 
+  engine settings (#462, @Carifio24).
+- Add filled circle plot type (#457, @Carifio24).
+
+
 # @wwtelescope/engine-types 0.9.0 (2026-04-28)
 
 - Add a `showEclipticCircle` to `BaseEngineSetting` options. If the ecliptic is being

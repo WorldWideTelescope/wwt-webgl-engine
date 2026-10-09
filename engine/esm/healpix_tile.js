@@ -245,7 +245,7 @@ var HealpixTile$ = {
         this.topRight = Fxyf.create(xc + dc, yc - dc, xyf.face).toVec3();
     },
 
-    draw3D: function (renderContext, opacity) {
+    draw3D: function (renderContext, opacity, smooth=true) {
         if (this.isCatalogTile) {
             this.drawCatalogTile(renderContext, opacity);
             return true;
@@ -281,7 +281,7 @@ var HealpixTile$ = {
                     if (this.children[childIndex].isTileInFrustum(renderContext.get_frustum())) {
                         this.inViewFrustum = true;
                         if (this.children[childIndex].isTileBigEnough(renderContext) || onlyDrawChildren) {
-                            this.renderChildPart[childIndex].set_targetState(!this.children[childIndex].draw3D(renderContext, opacity));
+                            this.renderChildPart[childIndex].set_targetState(!this.children[childIndex].draw3D(renderContext, opacity, smooth));
                             if (this.renderChildPart[childIndex].get_targetState()) {
                                 childRendered = true;
                             }
@@ -321,7 +321,7 @@ var HealpixTile$ = {
         Tile.tilesInView++;
         for (var i = 0; i < 4; i++) {
             if (this.renderChildPart[i].get_targetState()) {
-                this.renderPart(renderContext, i, opacity / 100, false);
+                this.renderPart(renderContext, i, opacity / 100, false, smooth);
             }
         }
         return true;

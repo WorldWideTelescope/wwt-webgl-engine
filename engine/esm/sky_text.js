@@ -16,6 +16,7 @@ import { URLHelpers } from "./url_helpers.js";
 import { Rectangle } from "./util.js";
 import { WebFile } from "./web_file.js";
 import { TextureArray } from "./graphics/texture_array.js";
+import { Transforms } from "./transforms.js";
 
 
 // wwtlib.Alignment
@@ -32,23 +33,53 @@ registerEnum("Alignment", Alignment);
 // wwtlib.Text3dBatch
 
 export function Text3dBatch(height) {
-    this.height = 128;
+    if (height == null) {
+        height = 128;
+    }
+    this.height = height;
     this.items = [];
     this._glyphVersion = -1;
-    this.viewTransform = Matrix3d.get_identity();
+    this.viewTransform = null;
+    this.worldTransform = null;
+    this.projectionTransform = null;
     this._textObject = new TextObject();
     this._vertCount = 0;
     this.height = (height * 3);
+    this._dirty = false;
+    this._mirrored = false;
 }
+
+Text3dBatch.createHorizontalBatch = function (height) {
+    var batch = new Text3dBatch(height);
+    batch.set_worldTransform(Transforms.horizontalToEquatorialWorldTransform);
+    batch._mirrored = true;
+    return batch;
+};
+
+Text3dBatch.createOverlayBatch = function (height, position, roll, rollWithCamera) {
+    var batch = new Text3dBatch(height);
+    batch.set_worldTransform(Transforms.overlayToEquatorialWorldTransform(position));
+    if (!!rollWithCamera) {
+        batch.set_viewTransform(Transforms.overlayToEquatorialViewTransform(roll));
+    }
+    return batch;
+};
 
 var Text3dBatch$ = {
     add: function (newItem) {
         this.items.push(newItem);
+        this._dirty = true;
+    },
+
+    _drawCommands: function (renderContext, color, opacity) {
+        TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2dArray, color, opacity);
+        renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
     },
 
     draw: function (renderContext, opacity, color) {
         if (renderContext.gl == null) {
-            var viewPoint = Vector3d._transformCoordinate(renderContext.get_viewPoint(), this.viewTransform);
+            var transform = this.viewTransform != null ? this.viewTransform : Matrix3d.get_identity();
+            var viewPoint = Vector3d._transformCoordinate(renderContext.get_viewPoint(), transform);
             var drawHeight = (this.height / renderContext.get_fovAngle()) * renderContext.height / 180;
             var $enum1 = ss.enumerate(this.items);
             while ($enum1.moveNext()) {
@@ -75,20 +106,34 @@ var Text3dBatch$ = {
                 ctx.restore();
             }
         } else {
-            if (this._glyphCache == null || this._glyphCache.get_version() > this._glyphVersion) {
+            var transforms = {
+                world: (!this.worldTransform || this.worldTransform instanceof Matrix3d) ? this.worldTransform : this.worldTransform(renderContext),
+                view: (!this.viewTransform || this.viewTransform instanceof Matrix3d) ? this.viewTransform : this.viewTransform(renderContext),
+                projection: (!this.projectionTransform || this.projectionTransform instanceof Matrix3d) ? this.projectionTransform : this.projectionTransform(renderContext),
+            };
+            if (transforms.world) {
+                var needMirrored = transforms.world.get_determinant() < 0;
+                if (needMirrored != this._mirrored) {
+                    this._mirrored = needMirrored;
+                    this.markDirty();
+                }
+            }
+            if (this._dirty || this._glyphCache == null || this._glyphCache.get_version() > this._glyphVersion) {
                 this.prepareBatch();
             }
             if (!this._glyphCache.ready) {
                 return;
             }
-            TextShader.use(renderContext, this._vertexBuffer.vertexBuffer, this._glyphCache.get_texture().texture2dArray, color, opacity);
-            renderContext.gl.drawArrays(WEBGL.TRIANGLES, 0, this._vertexBuffer.count);
+            var drawCommands = function (renderContext) {
+                this._drawCommands(renderContext, color, opacity);
+            }
+            renderContext.executeWithTransforms(transforms, drawCommands.bind(this));
         }
     },
 
     prepareBatch: function () {
         if (this._glyphCache == null) {
-            this._glyphCache = GlyphCache.getCache(this.height);
+            this._glyphCache = GlyphCache.getCache();
         }
         if (!this._glyphCache.ready) {
             return;
@@ -122,7 +167,7 @@ var Text3dBatch$ = {
                 if (item != null) {
                     var position = Rectangle.create(left * t3d.scale * factor, 0 * t3d.scale * factor, item.extents.x * fntAdjust * t3d.scale * factor, item.extents.y * fntAdjust * t3d.scale * factor);
                     left += (item.extents.x * fntAdjust);
-                    t3d.addGlyphPoints(verts, item.size, position, item.uvRect, item.index);
+                    t3d.addGlyphPoints(verts, item.size, position, item.uvRect, item.index, this._mirrored);
                 }
             }
         }
@@ -134,6 +179,31 @@ var Text3dBatch$ = {
         }
         this._vertexBuffer.unlock();
         this._glyphVersion = this._glyphCache.get_version();
+        this._dirty = false;
+    },
+
+    get_viewTransform: function () {
+        return this.viewTransform;
+    },
+
+    set_viewTransform: function (transform) {
+        this.viewTransform = transform;
+    },
+
+    get_worldTransform: function () {
+        return this.worldTransform;
+    },
+
+    set_worldTransform: function (transform) {
+        this.worldTransform = transform;
+    },
+
+    get_projectionTransform: function () {
+        return this.projectionTransform;
+    },
+
+    set_projectionTransform: function (transform) {
+        this.projectionTransform = transform;
     },
 
     cleanUp: function () {
@@ -141,6 +211,15 @@ var Text3dBatch$ = {
             this._vertexBuffer = null;
         }
         this.items.length = 0;
+    },
+
+    clear: function () {
+        this.items.length = 0;
+        this.markDirty(true);
+    },
+
+    markDirty: function () {
+        this._dirty = true;
     }
 };
 
@@ -191,8 +270,7 @@ registerType("GlyphItem", [GlyphItem, GlyphItem$, null]);
 
 // wwtlib.GlyphCache
 
-export function GlyphCache(height) {
-    this._cellHeight = 128;
+export function GlyphCache() {
     this._gridSize = 8;
     this._readyFlags = 0;
     this.ready = false;
@@ -201,7 +279,6 @@ export function GlyphCache(height) {
     this._dirty = true;
     this._textureDirty = true;
     this._version = 0;
-    this._cellHeight = height;
     this._texture = null;
     this._summaryWebFile = new WebFile(URLHelpers.singleton.engineAssetUrl('glyphs2_summary.xml'));
     this._summaryWebFile.onStateChange = this._glyphSummaryReady.bind(this);
@@ -209,25 +286,16 @@ export function GlyphCache(height) {
     this._summaryWebFile.send();
 }
 
-GlyphCache._caches = {};
-GlyphCache._allGlyphs = '';
+GlyphCache._cache = null;
 
-GlyphCache.getCache = function (height) {
-    if (!ss.keyExists(GlyphCache._caches, height)) {
-        GlyphCache._caches[height] = new GlyphCache(height);
+GlyphCache.getCache = function () {
+    if (GlyphCache._cache == null) {
+        GlyphCache._cache = new GlyphCache();
     }
-    return GlyphCache._caches[height];
-};
-
-GlyphCache.cleanUpAll = function () {
-    ss.clearKeys(GlyphCache._caches);
+    return GlyphCache._cache;
 };
 
 var GlyphCache$ = {
-    get_height: function () {
-        return this._cellHeight;
-    },
-
     _glyphSummaryReady: function () {
         if (this._summaryWebFile.get_state() == 2) {
             alert(this._summaryWebFile.get_message());
@@ -388,18 +456,30 @@ export function Text3d(center, up, text, fontsize, scale) {
 }
 
 var Text3d$ = {
-    addGlyphPoints: function (pointList, size, position, uv, index) {
+    addGlyphPoints: function (pointList, size, position, uv, index, mirrored=false) {
         var points = new Array(6);
         for (var i = 0; i < 6; i++) {
             points[i] = new PositionTextureArray();
         }
-        var left = Vector3d.cross(this.center, this.up);
-        var right = Vector3d.cross(this.up, this.center);
+
+        var up = this.up.copy();
+        if (mirrored) {
+            up.z *= -1;
+        }
+        var left = Vector3d.cross(this.center, up);
+        var right = Vector3d.cross(up, this.center);
         left.normalize();
         right.normalize();
-        this.up.normalize();
+        up.normalize();
         var upTan = Vector3d.cross(this.center, right);
         upTan.normalize();
+
+        if (mirrored) {
+            var tmp = left;
+            left = right;
+            right = tmp;
+        }
+
         if (!this.alignment) {
             left.multiply(this.width - position.get_left() * 2);
             right.multiply(this.width - ((this.width * 2) - position.get_right() * 2));

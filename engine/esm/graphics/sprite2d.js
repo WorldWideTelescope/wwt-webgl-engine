@@ -24,10 +24,10 @@ var Sprite2d$ = {
             this.update(points);
         }
         if (texture == null) {
-            ShapeSpriteShader.use(renderContext, this.vertexBuffer);
+            ShapeSpriteShader.use(renderContext, this.vertexBuffer, opacity);
             renderContext.gl.drawArrays(triangleStrips ? WEBGL.TRIANGLE_STRIP : WEBGL.TRIANGLES, 0, points.length);
         } else {
-            SpriteShader.use(renderContext, this.vertexBuffer, (texture != null) ? texture.texture2d : null);
+            SpriteShader.use(renderContext, this.vertexBuffer, (texture != null) ? texture.texture2d : null, opacity);
             renderContext.gl.drawArrays(triangleStrips ? WEBGL.TRIANGLE_STRIP : WEBGL.TRIANGLES, 0, points.length);
         }
     },

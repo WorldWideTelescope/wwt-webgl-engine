@@ -42,6 +42,7 @@ const justSpreadSheetLayerSettingNames = [
   "colorMapperName",
   "coordinatesType",
   "decay",
+  "depthBuffered",
   "dynamicColor",
   "dynamicData",
   "endDateColumn",
@@ -246,6 +247,17 @@ export class SpreadSheetLayerState extends LayerState implements SpreadSheetLaye
 
   set_decay(v: number): number {
     this.decay = v;
+    return v;
+  }
+
+  depthBuffered!: boolean | null;
+
+  get_depthBuffered(): boolean | null {
+      return this.depthBuffered;
+  }
+
+  set_depthBuffered(v: boolean | null): boolean | null {
+    this.depthBuffered = v;
     return v;
   }
 

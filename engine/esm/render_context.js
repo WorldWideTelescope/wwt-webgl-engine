@@ -474,14 +474,14 @@ var RenderContext$ = {
         }
     },
 
-    drawImageSet: function (imageset, opacity) {
+    drawImageSet: function (imageset, opacity, smooth=true) {
         var maxX = RenderContext.getTilesXForLevel(imageset, imageset.get_baseLevel());
         var maxY = RenderContext.getTilesYForLevel(imageset, imageset.get_baseLevel());
         for (var x = 0; x < maxX; x++) {
             for (var y = 0; y < maxY; y++) {
                 var tile = tileCacheGetTile(imageset.get_baseLevel(), x, y, imageset, null);
                 if (tile != null) {
-                    tile.draw3D(this, opacity);
+                    tile.draw3D(this, opacity, smooth);
                 }
             }
         }
@@ -964,14 +964,17 @@ var RenderContext$ = {
         var oldProjection = this.get_projection().clone();
       
         if (transforms.world) {
-          this.set_worldBase(Matrix3d.multiplyMatrix(transforms.world, this.get_world()));
+          var worldMatrix = transforms.world instanceof Matrix3d ? transforms.world : transforms.world(this);
+          this.set_worldBase(Matrix3d.multiplyMatrix(worldMatrix, this.get_world()));
           this.set_world(this.get_worldBase().clone());
         }
         if (transforms.view) {
-          this.set_view(Matrix3d.multiplyMatrix(transforms.view, this.get_view()));
+          var viewMatrix = transforms.view instanceof Matrix3d ? transforms.view : transforms.view(this);
+          this.set_view(Matrix3d.multiplyMatrix(viewMatrix, this.get_view()));
         }
         if (transforms.projection) {
-          this.set_projection(Matrix3d.multiplyMatrix(transforms.projection, this.get_projection()));
+          var projectionMatrix = transforms.projection instanceof Matrix3d ? transforms.projection : transforms.projection(this);
+          this.set_projection(Matrix3d.multiplyMatrix(projectionMatrix, this.get_projection()));
         }
         this.makeFrustum();
       
@@ -989,6 +992,7 @@ var RenderContext$ = {
             return;
         }
         var uints_for_indices = this.gl.getExtension('OES_element_index_uint');
+        this._floatLinear = !!this.gl.getExtension("OES_texture_float_linear");
         set_tileUvMultiple(1);
         set_tileDemEnabled(true);
         TileShader.init(this);

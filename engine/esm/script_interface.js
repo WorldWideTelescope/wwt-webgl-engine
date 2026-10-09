@@ -14,13 +14,15 @@ import { registerType } from "./typesystem.js";
 import { Util } from "./util.js";
 import { globalRenderContext, useGlVersion2 } from "./render_globals.js";
 import { globalWWTControl, layerManagerGetAllMaps, loadWtmlFile } from "./data_globals.js";
-import { Annotation, Circle, Poly, PolyLine } from "./annotation.js";
+import { Annotation, AnnotationBatch, Circle, Poly, PolyLine } from "./annotation.js";
 import { FitsImage } from "./layers/fits_image.js";
 import { FitsImageJs } from "./layers/fits_image_js.js";
 import { Imageset } from "./imageset.js";
 import { ImageSetLayer } from "./layers/imageset_layer.js";
 import { LayerManager } from "./layers/layer_manager.js";
 import { Folder } from "./folder.js";
+import { Text3d, Text3dBatch } from "./sky_text.js";
+import { Color } from "./color.js";
 
 
 // wwtlib.SlideChangedEventArgs
@@ -671,26 +673,90 @@ var ScriptInterface$ = {
         return c;
     },
 
-    addAnnotation: function (annotation) {
+    addAnnotationBatch: function (batch, name) {
+        if (batch!= null && ss.canCast(batch, AnnotationBatch) && globalWWTControl != null) {
+            globalWWTControl._addAnnotationBatch(batch, name);
+        }
+    },
+
+    removeAnnotationBatch: function (batchOrName) {
+        if ((globalWWTControl != null) && (typeof batchOrName === "string" || ss.canCast(batchOrName, AnnotationBatch))) {
+            globalWWTControl._removeAnnotationBatch(batchOrName); 
+        }
+    },
+
+    addAnnotation: function (annotation, batch) {
         if (annotation != null && ss.canCast(annotation, Annotation)) {
             if (globalWWTControl != null) {
-                globalWWTControl._addAnnotation(annotation);
+                globalWWTControl._addAnnotation(annotation, batch);
             }
         }
     },
 
-    removeAnnotation: function (annotation) {
+    removeAnnotation: function (annotation, batch) {
         if (annotation != null) {
             if (globalWWTControl != null) {
-                globalWWTControl._removeAnnotation(annotation);
+                globalWWTControl._removeAnnotation(annotation, batch);
             }
         }
     },
 
-    clearAnnotations: function () {
+    clearAnnotations: function (batch) {
         if (globalWWTControl != null) {
-            globalWWTControl._clearAnnotations();
+            globalWWTControl._clearAnnotations(batch);
         }
+    },
+
+    getTextBatches: function () {
+        if (globalWWTControl != null) {
+          return globalWWTControl._textBatches;
+        }
+        return {};
+    },
+
+    addTextBatch: function (batch, name) {
+        if (batch != null && ss.canCast(batch, Text3dBatch)) {
+            if (globalWWTControl != null) {
+                globalWWTControl._addTextBatch(batch, name);
+            }
+        }
+    },
+
+    removeTextBatch: function (batchOrName) {
+        if (batchOrName != null && globalWWTControl != null) {
+            globalWWTControl._removeTextBatch(batchOrName);
+        }
+    },
+
+    clearTextBatches: function () {
+        if (globalWWTControl != null) {
+            globalWWTControl._clearTextBatches();
+        }
+    },
+
+    applyTextBatchSetting: function (batchOrName, setting) {
+        if (globalWWTControl != null && setting != null) {
+            globalWWTControl._applyTextBatchSetting(batchOrName, setting[0], setting[1]);
+        }
+    },
+
+    addText: function (text, position, up, scale, batchOrName) {
+        if (position != null && up != null && batchOrName != null && globalWWTControl != null) {
+            return globalWWTControl._addText(text, position, up, scale, batchOrName);
+        }
+    },
+
+    removeText: function (text3d, batchOrName) {
+        if (text3d != null && ss.canCast(text3d, Text3d) && (typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch)) && globalWWTControl != null) {
+           globalWWTControl._removeText(text3d, batchOrName);
+        }
+    },
+
+    getTextItems: function (batchOrName) {
+        if (globalWWTControl != null && (typeof batchOrName === "string" || ss.canCast(batchOrName, Text3dBatch))) {
+            return globalWWTControl._get_textItems(batchOrName);
+        }
+        return [];
     },
 
     get_smoothAnimation: function () {

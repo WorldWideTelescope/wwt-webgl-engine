@@ -1,3 +1,8 @@
+# @wwtelescope/research-app-messages 0.23.0 (2026-10-09)
+
+- Add settings for depth buffering to pywwt spreadsheet layer settings (#459, @Carifio24).
+
+
 # @wwtelescope/research-app-messages 0.22.0 (2026-08-25)
 
 - Add new message types (and corresponding type guard functions) allowing for the 

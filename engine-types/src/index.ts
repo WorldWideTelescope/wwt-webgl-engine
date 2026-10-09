@@ -149,6 +149,7 @@ export enum PlotTypes {
   square = 3,
   pushPin = 4,
   custom = 5,
+  filledCircle = 6,
 }
 
 export enum PointScaleTypes {
@@ -323,7 +324,9 @@ export type BaseEngineSetting =
   ["solarSystemStars", boolean] |
   ["minorPlanetsFilter", number] |
   ["planetOrbitsFilter", number] |
-  ["solarSystemScale", number];
+  ["solarSystemScale", number] |
+  ["renderBackgroundSmooth", boolean] |
+  ["renderForegroundSmooth", boolean];
 
 // I'm not aware of any smart TypeScripty way to automate the construction of this table :-(
 const baseEngineSettingTypeInfo = {
@@ -391,6 +394,8 @@ const baseEngineSettingTypeInfo = {
   "minorPlanetsFilter/number": true,
   "planetOrbitsFilter/number": true,
   "solarSystemScale/number": true,
+  "renderBackgroundSmooth/boolean": true,
+  "renderForegroundSmooth/boolean": true,
 }
 
 /** Type guard function for BaseEngineSetting. */
@@ -536,6 +541,8 @@ export type BaseSpreadSheetLayerSetting =
   ["colorMapperName", string] |
   ["coordinatesType", CoordinatesType] |
   ["decay", number] |
+  ["depthBuffered", boolean] |
+  ["depthBuffered", null] |
   ["dynamicColor", boolean] |
   ["dynamicData", boolean] |
   ["endDateColumn", number] |
@@ -586,6 +593,8 @@ const baseSpreadSheetLayerSettingTypeInfo: { [k: string]: string } = {
   "colorMapperName/string": "",
   "coordinatesType/number": "CoordinatesType",
   "decay/number": "",
+  "depthBuffered/boolean": "",
+  "depthBuffered/null": "",
   "dynamicColor/boolean": "",
   "dynamicData/boolean": "",
   "endDateColumn/number": "",
@@ -622,13 +631,23 @@ const baseSpreadSheetLayerSettingTypeInfo: { [k: string]: string } = {
   "zAxisReverse/boolean": "",
 };
 
+  // We want to be able to properly recognize Date objects and null values
+function typeKey(obj: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (obj === null) {
+    return "null";
+  }
+  if (obj instanceof Date) {
+    return "Date";
+  }
+  return typeof obj;
+}
+
 /** Type guard function for BaseSpreadSheetLayerSetting. */
 export function isBaseSpreadSheetLayerSetting(obj: [string, any]): obj is BaseSpreadSheetLayerSetting {  // eslint-disable-line @typescript-eslint/no-explicit-any
   if (isBaseLayerSetting(obj))
     return true;
 
-  // We want to be able to properly recognize Date objects
-  const type = obj[1] instanceof Date ? 'Date' : typeof obj[1];
+  const type = typeKey(obj[1]);
   const key = obj[0] + "/" + type;
   const enumType = baseSpreadSheetLayerSettingTypeInfo[key];
 
