@@ -114,6 +114,8 @@ export interface EngineSettingsInterface extends EngineSettingsInterfaceRO {
   set_milkyWayModel(v: boolean): boolean;
   set_minorPlanetsFilter(v: number): number;
   set_planetOrbitsFilter(v: number): number;
+  set_renderBackgroundSmooth(v: boolean): boolean;
+  set_renderForegroundSmooth(v: boolean): boolean;
   set_showAltAzGrid(v: boolean): boolean;
   set_showAltAzGridText(v: boolean): boolean;
   set_showConstellationBoundries(v: boolean): boolean;
@@ -220,6 +222,7 @@ export class Matrix3d {
   static invertMatrix(matrix: Matrix3d): Matrix3d;
   static translation(vector: Vector3d): Matrix3d;
   static addMatrices(matrix1: Matrix3d, matrix2: Matrix3d): Matrix3d;
+  static lookAtLH(cameraPosition: Vector3d, cameraTarget: Vector3d, cameraUpVector: Vector3d): Matrix3d;
 
   clone(): Matrix3d;
   setIdentity(): void;
@@ -315,6 +318,7 @@ export interface SpreadSheetLayerSettingsInterfaceRO extends LayerSettingsInterf
   get_colorMapperName(): string;
   get_coordinatesType(): CoordinatesType;
   get_decay(): number;
+  get_depthBuffered(): boolean | null;
   get_dynamicColor(): boolean;
   get_dynamicData(): boolean;
   get_endDateColumn(): number;
@@ -367,6 +371,8 @@ export interface SpreadSheetLayerSettingsInterface extends LayerSettingsInterfac
   set_coordinatesType(v: CoordinatesType): CoordinatesType;
   set_decay(v: number): number;
   set_dynamicColor(v: boolean): boolean;
+  get_depthBuffered(): boolean | null;
+  set_depthBuffered(v: boolean | null): boolean | null;
   set_dynamicData(v: boolean): boolean;
   set_endDateColumn(v: number): number;
   set_endRange(v: Date): Date;
@@ -498,8 +504,20 @@ export interface Action {
   (): void;
 }
 
-/** A visual annotation in the WWT view. */
+/**
+ * The base class for WWT annotations.
+ * Annotations are draw by being added to an AnnotationBatch. Note that a given annotation
+ * can be included in multiple annotation batches, though each batch will then create its own
+ * set of graphics primitives for that annotation.
+ *
+ * Annotations have a `coordinateTransform` field which define how their (2D) coordinates are mapped
+ * into 3D space. By default, annotations assume that they have equatorial coordinates (RA/Dec).
+ * For convenience, we provide the transform for drawing annotations in galactic coordinates.
+ */
 export class Annotation implements AnnotationSettingsInterface {
+  static readonly equatorialTo3dTransform: AnnotationCoordinateTransform;
+  static readonly galacticTo3dTransform: AnnotationCoordinateTransform;
+
   //get_center
   get_id(): string;
   set_id(v: string): string;
@@ -512,9 +530,49 @@ export class Annotation implements AnnotationSettingsInterface {
   set_showHoverLabel(v: boolean): boolean;
   get_tag(): string;
   set_tag(v: string): string;
+  get_coordinateTransform(): AnnotationCoordinateTransform;
+  set_coordinateTransform(transform: AnnotationCoordinateTransform): void;
 
   hitTest(renderContext: RenderContext, ra: number, dec: number, x: number, y: number): boolean;
 }
+
+/**
+ * An annotation batch is a container for a set of annotations, which will all be
+ * "batched" and send to the GPU together. This improves performance
+ * by reducing the number of draw calls.
+ * Annotation batches all share a set of supporting primitives. Each time any
+ * annotation in the batch changes, they must be regenerated if they have been
+ * drawn already. It is best to group annotations that are likely to change together
+ * into the same batch.
+ *
+ * Annotation batches support "transforms" which modify the current value of the render
+ * context when drawing. This allows us to specify annotations in coordinates other than
+ * equatorial (e.g. in alt/az) and only need to do this transformation once for the batch.
+ * These transforms can either be static matrices, or functions with the signature
+ * (context: RenderContext) => Matrix3d
+ * to facilitate coordinate frames that are time-varying relative to equatorial, such as
+ * horizontal coordinates.
+ * We provide convenience functions for generating annotation batches in horizontal coordinates,
+ * and for drawing annotations that are world-space "overlays", meaning that their position is
+ * static relative to the viewport center, but their sizing is zoom-aware.
+ */
+export class AnnotationBatch {
+    static createHorizontalBatch(): AnnotationBatch;
+    static createOverlayBatch(position: Coordinates, roll: number, rollWithCamera: boolean): AnnotationBatch;
+
+    readonly items: Annotation[];
+    get_viewTransform(): BatchTransform;
+    set_viewTransform(transform: BatchTransform): void;
+    get_worldTransform(): BatchTransform;
+    set_worldTransform(transform: BatchTransform): void;
+    get_projectionTransform(): BatchTransform;
+    set_projectionTransform(transform: BatchTransform): void;
+
+    add(annotation: Annotation): void;
+    remove(annotation: Annotation): void;
+}
+
+export type AnnotationCoordinateTransform = (x: number, y: number) => Vector3d;
 
 /** Possible settings that can be applied to generic annotations.
  *
@@ -543,6 +601,8 @@ export interface ArrivedEventCallback {
   /** Called when the WWT view has arrived at a commanded position. */
   (si: ScriptInterface, args: ArrivedEventArgs): void;
 }
+
+export type BatchTransform = Matrix3d | ((rc: RenderContext) => Matrix3d);
 
 export class CameraParameters {
   lat: number;
@@ -583,7 +643,7 @@ export class Circle extends Annotation implements CircleAnnotationSettingsInterf
   set_skyRelative(v: boolean): boolean;
 
   /** Set the position of this circle's center. */
-  setCenter(raDeg: number, decDeg: number): void;
+  setCenter(xDeg: number, yDeg: number): void;
 }
 
 /** Possible settings that can be applied to Circle annotations. */
@@ -1104,6 +1164,8 @@ export class ImageSetLayer extends Layer implements ImageSetLayerSettingsInterfa
   set_imageSet(v: Imageset): Imageset;
   get_overrideDefaultLayer(): boolean;
   set_overrideDefaultLayer(v: boolean): boolean;
+  get_renderSmooth(): boolean;
+  set_renderSmooth(v: boolean): boolean;
 
   getFitsImage(): FitsImage | null;
   setImageScalePhysical(st: ScaleTypes, min: number, max: number): void;
@@ -1370,7 +1432,7 @@ export class Poly extends Annotation implements PolyAnnotationSettingsInterface 
   set_lineWidth(v: number): number;
 
   /** Add a point to this annotation's definition. */
-  addPoint(raDeg: number, decDeg: number): void;
+  addPoint(xDeg: number, yDeg: number): void;
 }
 
 /** Possible settings that can be applied to Poly annotations. */
@@ -1393,7 +1455,7 @@ export class PolyLine extends Annotation implements PolyLineAnnotationSettingsIn
   set_lineWidth(v: number): number;
 
   /** Add a point to this annotation's definition. */
-  addPoint(raDeg: number, decDeg: number): void;
+  addPoint(xDeg: number, yDeg: number): void;
 }
 
 /** Possible settings that can be applied to PolyLine annotations. */
@@ -1524,6 +1586,10 @@ export class RenderContext {
     viewLong: number
   ): number;
   onTarget(place: Place): boolean;
+
+  get_view(): Matrix3d;
+  get_world(): Matrix3d;
+  get_projection(): Matrix3d;
 }
 
 export class ScriptInterface {
@@ -1669,14 +1735,33 @@ export class ScriptInterface {
    */
   createPolyLine(unused: boolean): PolyLine;
 
+  /** Add an annotation batch to the renderer */
+  addAnnotationBatch(batch: AnnotationBatch, name: string): void;
+
+  /** Remove an annotation batch from the renderer */
+  removeAnnotationBatch(batch: string | AnnotationBatch): void;
+
   /** Add an annotation to the renderer. */
-  addAnnotation(ann: Annotation): void;
+  addAnnotation(ann: Annotation, batch?: string | AnnotationBatch): void;
 
   /** Remove an annotation from the renderer. */
-  removeAnnotation(ann: Annotation): void;
+  removeAnnotation(ann: Annotation, batch?: string | AnnotationBatch): void;
 
-  /** Remove all annotations from the renderer. */
-  clearAnnotations(): void;
+  /** Remove annotations from the renderer. 
+    * If a batch is specified, only the annotations from that batch are removed.
+    * Otherwise, all annotations are removed.
+    */
+  clearAnnotations(batch?: string | AnnotationBatch): void;
+
+  addTextBatch(batch: Text3dBatch, name: string): void;
+  removeTextBatch(batch: string | Text3dBatch): void;
+  clearTextBatches(): void;
+  applyTextBatchSetting(batch: string | Text3dBatch, setting: TextBatchSetting): void;
+  getTextBatches(): Record<string, TextBatchData>;
+  getTextItems(batch: string | Text3dBatch): Text3d[];
+
+  addText(text: string, position: Vector3d, up: Vector3d, scale: number, batch: string | Text3dBatch): Text3d | null;
+  removeText(text3d: Text3d, batch: string | Text3dBatch): void;
 }
 
 /** A generic {@link ScriptInterface} callback. */
@@ -1831,6 +1916,10 @@ export class Settings implements EngineSettingsInterface {
   set_planetOrbitsFilter(v: number): number;
   get_constellations(): boolean;
   set_constellations(v: boolean): boolean;
+  get_renderBackgroundSmooth(): boolean;
+  set_renderBackgroundSmooth(v: boolean): boolean;
+  get_renderForegroundSmooth(): boolean;
+  set_renderForegroundSmooth(v: boolean): boolean;
 
   static get_active(): Settings;
 }
@@ -1968,6 +2057,12 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
   set_barChartBitmask(v: number): number;
   get_beginRange(): Date;
   set_beginRange(v: Date): Date;
+  /** 
+    * Note: borders are only supported by the "filled circle" plot type.
+    * When using other plot types, this setting will have no effect
+    */
+  get_bordered(): boolean;
+  set_bordered(v: boolean): boolean;
   get_cartesianCustomScale(): number;
   set_cartesianCustomScale(v: number): number;
   get_cartesianScale(): AltUnits;
@@ -1982,6 +2077,8 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
   set_coordinatesType(v: CoordinatesType): CoordinatesType;
   get_decay(): number;
   set_decay(v: number): number;
+  get_depthBuffered(): boolean | null;
+  set_depthBuffered(v: boolean | null): boolean | null;
   get_dynamicColor(): boolean;
   set_dynamicColor(v: boolean): boolean;
   get_dynamicData(): boolean;
@@ -2100,6 +2197,39 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
  * engine itself.
  */
 export type SpreadSheetLayerSetting = LayerSetting | BaseSpreadSheetLayerSetting;
+
+export class Text3d {
+    constructor(center: Vector3d, up: Vector3d, text: string, fontsize?: number, scale?: number);
+
+    center: Vector3d;
+    up: Vector3d;
+    text: string;
+}
+
+export class Text3dBatch {
+    constructor(height: number);
+    static createHorizontalBatch(height: number): Text3dBatch;
+    static createOverlayBatch(height: number, position: Coordinates, roll: number, rollWithCamera: boolean): Text3dBatch;
+
+    get_viewTransform(): BatchTransform;
+    set_viewTransform(transform: BatchTransform): void;
+    get_worldTransform(): BatchTransform;
+    set_worldTransform(transform: BatchTransform): void;
+    get_projectionTransform(): BatchTransform;
+    set_projectionTransform(transform: BatchTransform): void;
+
+    add(item: Text3d): void;
+    draw(renderContext: RenderContext, opacity: number, color: Color): void;
+    clear(): void;
+}
+
+export interface TextBatchData {
+  batch: Text3dBatch;
+  color?: string;
+  size?: string;
+}
+
+export type TextBatchSetting = ["size", number] | ["color", Color] | ["opacity", number];
 
 /** A class that represents the current cache of loaded tiles. */
 export class TileCache {
@@ -2386,6 +2516,11 @@ export class TourStop implements SettingsInterface {
   get_solarSystemStars(): boolean;
 }
 
+export class Transforms {
+    static readonly horizontalToEquatorialWorldTransform: BatchTransform;
+    static overlayToEquatorialWorldTransform(position: Coordinates): BatchTransform;
+    static overlayToEquatorialViewTransform(rotation: number): BatchTransform;
+}
 
 /** Items implementing IUiController in WWT can, well, control the UI. It's
  * implemented by Object3d, TourEditor, and TourPlayer.

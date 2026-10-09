@@ -1,5 +1,30 @@
 # rc: minor bump
 
+- Allow drawing imagesets with or without WebGL linear smoothing. Before this, FITS imagesets
+  were always drawn without smoothing, and non-FITS imagesets with. These are retained as the
+  default behaviors. This is exposed on both imageset layers, and as engine settings for the
+  background/foreground imagesets (#462, @Carifio24).
+- Only depth-buffer layers by default in 3D mode (#459, @Carifio24).
+- Draw world-sized spreadsheet layers using quads rather than using WebGL points. This fixes
+  a bug where world-sizing for points broke down at a certain zoom due to the maximum value
+  for `gl_PointSize` (#458, @Carifio24).
+- Add a new plot mode for rendering spreadsheet layers using filled circles. Additionally,
+  add an option to render a spreadsheet layer glyph with a border, an option which is only
+  respected by this new plot mode (#457, @Carifio24).
+- Fix a bug where promises not tagged as instant would never resolve if they were to the
+  current camera location (#449, @Carifio24).
+- Allow setting opacity when drawing sprites (#447, @Carifio24).
+- Add new functionality to allow drawing annotations in different coordinate frames.
+  The coordinate transforms are attached to an annotation batch. (#438, @Carifio24).
+- Add new APIs to allow adding, manipulating, and removing custom text batches and items.
+  Text batches can be drawn in different coordinates by setting the relevant transforms
+  on the batch (#436, @Carifio24).
+- Expose the `Matrix3d` class and some of its static and instance methods to TypeScript
+  ( #441, @Carifio24).
+
+
+# @wwtelescope/engine 7.40.0 (2026-08-25)
+
 - Add static methods for adding 2D and 3D matrices (#443, @Carifio24).
 - Expose the `Matrix3d` class and some of its functionality to TypeScript
   (#441, @Carifio24).

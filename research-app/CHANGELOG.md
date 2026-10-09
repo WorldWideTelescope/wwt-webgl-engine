@@ -1,4 +1,10 @@
-# rc: minor bump
+# rc: micro bump
+
+- Fix an issue with setting the alpha value for the layer color from the research app
+  UI (#457, @Carifio24).
+
+
+# @wwtelescope/research-app 0.22.0 (2026-08-25)
 
 - Allow registering and deregistering custom colormaps via the research app
   (#433, @Carifio24).

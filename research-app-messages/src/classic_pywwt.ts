@@ -848,6 +848,8 @@ export type PywwtSpreadSheetLayerSetting =
   ["colorMapperName", string] |
   ["coordinatesType", string] | // pywwt customization
   ["decay", number] |
+  ["depthBuffered", boolean] |
+  ["depthBuffered", null] |
   ["dynamicColor", boolean] |
   ["dynamicData", boolean] |
   ["enabled", boolean] |

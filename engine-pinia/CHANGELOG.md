@@ -1,5 +1,13 @@
 # rc: minor bump
 
+- Add methods to the Pinia store and WWT-aware component for drawing annotations in
+  different coordinate frames (#438, @Carifio24).
+- Add methods to the Pinia store and WWT-aware component for creating, manipulating,
+  and deleting text batches and items (#436, @Carifio24).
+
+
+# @wwtelescope/engine-pinia 0.16.0 (2026-08-25)
+
 - Add methods to the Pinia store for creating, fetching, and deleting named colormaps
   (#433, @Carifio24).
 

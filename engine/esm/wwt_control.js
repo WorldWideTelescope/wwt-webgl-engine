@@ -40,7 +40,7 @@ import {
 import { SimpleLineList } from "./graphics/primitives3d.js";
 import { Sprite2d } from "./graphics/sprite2d.js";
 
-import { Annotation } from "./annotation.js";
+import { AnnotationBatch } from "./annotation.js";
 import { CameraParameters, SolarSystemObjects } from "./camera_parameters.js";
 import { Constellations } from "./constellations.js";
 import { Coordinates } from "./coordinates.js";
@@ -52,6 +52,7 @@ import { Planets } from "./planets.js";
 import { Settings } from "./settings.js";
 import { SpaceTimeController } from "./space_time_controller.js";
 import { RenderTriangle } from "./render_triangle.js";
+import { Text3d } from "./sky_text.js";
 import { Tile } from "./tile.js";
 import { TileCache } from "./tile_cache.js";
 import { VideoOutputType } from "./video_output_type.js";
@@ -81,7 +82,8 @@ export function WWTControl() {
     this.freestandingMode = false;
 
     this.uiController = null;
-    this._annotations = [];
+    this._textBatches = {};
+    this._clearAnnotations();
     this._hoverText = '';
     this._hoverTextPoint = new Vector2d();
     this._lastMouseMove = new Date(1900, 1, 0, 0, 0, 0, 0);
@@ -421,33 +423,161 @@ WWTControl.showLayers = function (show) {
     WWTControl.showDataLayers = show;
 };
 
+WWTControl._defaultAnnotationBatchName = "6518e545-97a3-407a-9f4f-d33a08554f13";
+
 var WWTControl$ = {
-    _addAnnotation: function (annotation) {
-        this._annotations.push(annotation);
-        Annotation.batchDirty = true;
+
+    _addAnnotationBatch: function (batch, name) {
+        this._annotations[name] = batch;
     },
 
-    _removeAnnotation: function (annotation) {
-        ss.remove(this._annotations, annotation);
-        Annotation.batchDirty = true;
+    _addTextBatch: function (batch, name) {
+        this._textBatches[name] = { batch: batch };
     },
 
-    _clearAnnotations: function () {
-        this._annotations.length = 0;
-        Annotation.batchDirty = true;
-    },
-
-    _annotationclicked: function (ra, dec, x, y) {
-        if (this._annotations != null && this._annotations.length > 0) {
-            var index = 0;
-            var $enum1 = ss.enumerate(this._annotations);
-            while ($enum1.moveNext()) {
-                var note = $enum1.current;
-                if (note.hitTest(this.renderContext, ra, dec, x, y)) {
-                    globalScriptInterface._fireAnnotationclicked(ra, dec, note.get_id());
-                    return true;
+    _removeTextBatch: function (batchOrName) {
+        if (typeof batchOrName === "string") {
+            delete this._textBatches[batchOrName];
+        } else {
+            for (var name in this._textBatches) {
+                if (this._textBatches[name].batch == batchOrName) {
+                    delete this._textBatches[name];
                 }
-                index++;
+            }
+        }
+    },
+
+    _applyTextBatchSetting(batchOrName, settingName, settingValue) {
+        var data = this._getTextBatchData(batchOrName);
+        if (data != null) {
+            if (settingName == "size") {
+                data.batch.height = settingValue;
+            } else {
+                data[settingName] = settingValue;
+            }
+            data.batch.markDirty();
+        }
+    },
+
+    _clearTextBatches: function () {
+        this._textBatches = {};
+    },
+
+    _getTextBatchData: function (batchOrName) {
+        if (typeof batchOrName === "string") {
+            return this._textBatches[batchOrName];
+        } else {
+            for (var name in this._textBatches) {
+                if (this._textBatches[name].batch == batchOrName) {
+                    return this._textBatches[name];
+                }
+            }
+        }
+    },
+
+    _addText: function (text, position, up, scale, batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
+        if (data != null) {
+            var batch = data.batch;
+            var text3d = new Text3d(position, up, text, 1, scale);
+            batch.add(text3d);
+            return text3d;
+        }
+        return null;
+    },
+
+    _removeText: function (text3d, batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
+        var batch = data != null ? data.batch : null;
+        if (batch != null) {
+            ss.remove(batch.items, text3d);
+        }
+    },
+
+    _get_textItems: function (batchOrName) {
+        var data = this._getTextBatchData(batchOrName);
+        var batch = data != null ? data.batch : null;
+        var items = [];
+        if (batch != null) {
+            for (var i = 0; i < batch.items.length; i++) {
+                items.push(batch.items[i]);
+            }
+        }
+        return items;
+    },
+
+    _removeAnnotationBatch: function (batchOrName) {
+        if (typeof batchOrName === "string") {
+            delete this._annotations[name];
+        } else {
+            for (var name in this._annotations) {
+                if (this._annotations[name] === batchOrName) {
+                    delete this._annotations[name];
+                }
+            }
+        }
+    },
+
+    _addAnnotation: function (annotation, batchOrName) {
+        if (batchOrName == null) {
+            batchOrName = WWTControl._defaultAnnotationBatchName;
+        }
+
+        var batch = typeof batchOrName === "string" ? this._annotations[batchOrName] : batchOrName;
+        batch.add(annotation);
+    },
+
+    _removeAnnotation: function (annotation, batchOrName) {
+        if (batchOrName == null) {
+            batchOrName = WWTControl._defaultAnnotationBatchName;
+        }
+
+        var batch = typeof batchOrName === "string" ? this._annotations[batchOrName] : batchOrName;
+        batch.remove(annotation);
+    },
+
+    _clearAnnotations: function (batchOrName) {
+        if (batchOrName != null) {
+            if (typeof batchOrName === "string") {
+                delete this._annotations[batchOrName];
+            } else {
+                for (var name in this._annotations) {
+                    if (this._annotations[name] === batchOrName) {
+                        delete this._annotations[name];
+                    }
+                }
+            }
+        } else {
+            this._annotations = {
+                [WWTControl._defaultAnnotationBatchName]: new AnnotationBatch(),
+            };
+        }
+    },
+
+    _annotationInBatchClicked: function (renderContext, batch, x, y) {
+        var $enum1 = ss.enumerate(batch.items);
+        var coordinatesDown = this.getCoordinatesForScreenPoint(x, y);
+        var ra = coordinatesDown.x;
+        var dec = coordinatesDown.y;
+        while ($enum1.moveNext()) {
+            var note = $enum1.current;
+            if (note.hitTest(renderContext, ra, dec, x, y)) {
+                globalScriptInterface._fireAnnotationclicked(ra, dec, note.get_id());
+                return true;
+            }
+        }
+    },
+
+    _annotationclicked: function (x, y) {
+        var control = this;
+        if (this._annotations != null) {
+            for (var batchKey in this._annotations) {
+                var batch = this._annotations[batchKey];
+                this.renderContext.executeWithTransforms({
+                    world: batch.get_worldTransform(),
+                    view: batch.get_viewTransform(),
+                    projection: batch.get_projectionTransform(),
+                }, function (renderContext) { this._annotationInBatchClicked(renderContext, batch, x, y); }.bind(control));
             }
         }
         return false;
@@ -455,16 +585,17 @@ var WWTControl$ = {
 
     _annotationHover: function (ra, dec, x, y) {
         if (this._annotations != null && this._annotations.length > 0) {
-            var index = 0;
-            var $enum1 = ss.enumerate(this._annotations);
-            while ($enum1.moveNext()) {
-                var note = $enum1.current;
-                if (note.hitTest(this.renderContext, ra, dec, x, y)) {
-                    this._hoverText = note.get_label();
-                    this._hoverTextPoint = Vector2d.create(x, y);
-                    return true;
+            for (var batchKey of this._annotations) {
+                var batch = this._annotations[batchKey];
+                var $enum1 = ss.enumerate(batch.items);
+                while ($enum1.moveNext()) {
+                    var note = $enum1.current;
+                    if (note.hitTest(this.renderContext, ra, dec, x, y)) {
+                        this._hoverText = note.get_label();
+                        this._hoverTextPoint = Vector2d.create(x, y);
+                        return true;
+                    }
                 }
-                index++;
             }
         }
         return false;
@@ -769,7 +900,7 @@ var WWTControl$ = {
             else {
                 this.renderContext.setupMatricesSpace3d(this.renderContext.width, this.renderContext.height);
             }
-            this.renderContext.drawImageSet(this.renderContext.get_backgroundImageset(), 100);
+            this.renderContext.drawImageSet(this.renderContext.get_backgroundImageset(), 100, Settings.get_active().get_renderBackgroundSmooth());
             if (this.renderContext.get_foregroundImageset() != null) {
                 if (this.renderContext.get_foregroundImageset().get_dataSetType() !== this.renderContext.get_backgroundImageset().get_dataSetType()) {
                     this.renderContext.set_foregroundImageset(null);
@@ -783,7 +914,7 @@ var WWTControl$ = {
                         var saveDevice = this.renderContext.device;
                         this._fgDevice.clearRect(0, 0, this.renderContext.width, this.renderContext.height);
                         this.renderContext.device = this._fgDevice;
-                        this.renderContext.drawImageSet(this.renderContext.get_foregroundImageset(), 100);
+                        this.renderContext.drawImageSet(this.renderContext.get_foregroundImageset(), 100, Settings.get_active().get_renderForegroundSmooth());
                         this.renderContext.device = saveDevice;
                         this.renderContext.device.save();
                         this.renderContext.device.globalAlpha = this.renderContext.viewCamera.opacity / 100;
@@ -791,7 +922,7 @@ var WWTControl$ = {
                         this.renderContext.device.restore();
                     }
                     else {
-                        this.renderContext.drawImageSet(this.renderContext.get_foregroundImageset(), this.renderContext.viewCamera.opacity);
+                        this.renderContext.drawImageSet(this.renderContext.get_foregroundImageset(), this.renderContext.viewCamera.opacity, Settings.get_active().get_renderForegroundSmooth());
                     }
                 }
             }
@@ -836,15 +967,11 @@ var WWTControl$ = {
         if (this.uiController != null) {
             this.uiController.render(this.renderContext);
         } else {
-            var index = 0;
-            Annotation.prepBatch(this.renderContext);
-            var $enum2 = ss.enumerate(this._annotations);
-            while ($enum2.moveNext()) {
-                var item = $enum2.current;
-                item.draw(this.renderContext);
-                index++;
+            for (var batchKey in this._annotations) {
+               var batch = this._annotations[batchKey];
+                batch.prepareBatch(this.renderContext);
+                batch.drawBatch(this.renderContext);
             }
-            Annotation.drawBatch(this.renderContext);
             if ((ss.now() - this._lastMouseMove) > 400) {
                 var ptDown = this.getCoordinatesForScreenPoint(this._hoverTextPoint.x, this._hoverTextPoint.y);
                 if (ptDown) {
@@ -1024,6 +1151,14 @@ var WWTControl$ = {
         var constellationLabelsOpacity = this._fadeStates.showConstellationLabels.get_opacity();
         if (constellationLabelsOpacity > 0) {
             Constellations.drawConstellationNames(this.renderContext, constellationLabelsOpacity, Color.load(Settings.get_active().get_constellationLabelsColor()));
+        }
+
+        for (var key in this._textBatches) {
+          var data = this._textBatches[key];
+          var size = data.size != null ? data.size : 1;
+          var color = data.color != null ? data.color : Colors.get_white();
+          var opacity = data.opacity != null ? data.opacity : 1;
+          data.batch.draw(this.renderContext, opacity, color);
         }
     },
 
@@ -1507,11 +1642,13 @@ var WWTControl$ = {
             }
         }
         if (this._mouseDown && !this._moved) {
-            var raDecDown = this.getCoordinatesForScreenPoint(Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e));
+            var x = Mouse.offsetX(this.canvas, e);
+            var y = Mouse.offsetY(this.canvas, e);
+            var raDecDown = this.getCoordinatesForScreenPoint(x, y);
             if (raDecDown) {
-              if (!this._annotationclicked(raDecDown.x, raDecDown.y, Mouse.offsetX(this.canvas, e), Mouse.offsetY(this.canvas, e))) {
-                  globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
-              }
+                if (!this._annotationclicked(x, y)) {
+                    globalScriptInterface._fireClick(raDecDown.x, raDecDown.y);
+                }
             }
         }
         this._mouseDown = false;
@@ -1994,7 +2131,10 @@ var WWTControl$ = {
                 }
             }
         }
-        if (instant || this._tooCloseForSlewMove(cameraParams)) {
+        if (this._tooCloseForSlewMove(cameraParams)) {
+          cameraParams = this.renderContext.viewCamera.copy();
+        }
+        if (instant) {
             this.set__mover(null);
             this.renderContext.targetCamera = cameraParams.copy();
             this.renderContext.viewCamera = this.renderContext.targetCamera.copy();

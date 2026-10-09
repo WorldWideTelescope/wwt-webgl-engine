@@ -170,6 +170,8 @@ export function Settings() {
     this._minorPlanetsFilter = 255;
     this._planetOrbitsFilter = 2147483647;
     this._constellations = true;
+    this._renderBackgroundSmooth = true;
+    this._renderForegroundSmooth = true;
 }
 
 Settings._active = null;
@@ -846,6 +848,24 @@ var Settings$ = {
 
     set_constellations: function (value) {
         this._constellations = value;
+        return value;
+    },
+
+    get_renderBackgroundSmooth: function () {
+        return this._renderBackgroundSmooth;
+    },
+
+    set_renderBackgroundSmooth: function (value) {
+        this._renderBackgroundSmooth = value;
+        return value;
+    },
+
+    get_renderForegroundSmooth: function () {
+        return this._renderForegroundSmooth;
+    },
+
+    set_renderForegroundSmooth: function (value) {
+        this._renderForegroundSmooth = value;
         return value;
     },
 
