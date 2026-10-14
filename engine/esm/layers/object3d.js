@@ -15,7 +15,7 @@ import {
     SphereHull,
     ConvexHull,
 } from "../double3d.js";
-import { globalRenderContext } from "../render_globals.js";
+import { globalRenderContext, tilePrepDevice } from "../render_globals.js";
 import { WEBGL } from "../graphics/webgl_constants.js";
 import { Dates, LineList, TriangleList } from "../graphics/primitives3d.js";
 import { IndexBuffer, PositionNormalTexturedVertexBuffer, PositionNormalTexturedTangentVertexBuffer } from "../graphics/gl_buffers.js";
@@ -257,12 +257,37 @@ Object3dLayer._initRotateUI$1 = function () {
     }
 };
 
+Object3dLayer.fromUrl = function (url, format) {
+    if (!format) {
+        var path = new URL(url, window.location.href).pathname.toLowerCase();
+        format = ss.endsWith(path, '.obj') ? 'obj' : '3ds';
+    }
+    var mainName = 'model.' + format;
+    var layer = new Object3dLayer();
+    layer.objType = (format === 'obj');
+    layer.object3d = new Object3d(
+        new Object3dUrlSource(url, mainName), mainName,
+        layer.get_flipV(), layer._flipHandedness$1, true, layer.get_color());
+    return layer;
+};
+
 var Object3dLayer$ = {
     getPrimaryUI: function () {
         if (this._primaryUI$1 == null) {
             this._primaryUI$1 = new Object3dLayerUI(this);
         }
         return this._primaryUI$1;
+    },
+
+    set_color: function (value) {
+        if (this.color !== value) {
+            this.color = value;
+            this.version++;
+        }
+        if (this.object3d != null) {
+            this.object3d.set_color(value);
+        }
+        return value;
     },
 
     get_flipV: function () {
@@ -778,20 +803,6 @@ var Object3dLayer$ = {
     }
 };
 
-Object3dLayer.fromUrl = function (url, format) {
-    if (!format) {
-        var path = new URL(url, window.location.href).pathname.toLowerCase();
-        format = ss.endsWith(path, '.obj') ? 'obj' : '3ds';
-    }
-    var mainName = 'model.' + format;
-    var layer = new Object3dLayer();
-    layer.objType = (format === 'obj');
-    layer.object3d = new Object3d(
-        new Object3dUrlSource(url, mainName), mainName,
-        layer.get_flipV(), layer._flipHandedness$1, true, layer.get_color());
-    return layer;
-};
-
 registerType("Object3dLayer", [Object3dLayer, Object3dLayer$, Layer, IUiController]);
 
 
@@ -1044,6 +1055,7 @@ export function Object3d(doc, filename, flipV, flipHandedness, smooth, color) {
     this.useCurrentAmbient = false;
     this._dirty = true;
     this.color = color;
+    this._colorTexture = Texture.fromColor(color);
     this.smooth = smooth;
     this.flipV = flipV;
     this.flipHandedness = flipHandedness;
@@ -1124,6 +1136,17 @@ Object3d._disposeTextureList = function (textures) {
 };
 
 var Object3d$ = {
+
+    get_color: function () {
+        return this.color;
+    },
+
+    set_color: function (value) {
+        this.color = value;
+        this._colorTexture = Texture.fromColor(value); 
+        return value;
+    },
+
     _reload: function () {
         if (!this.issLayer) {
             this.dispose();
@@ -2568,10 +2591,10 @@ var Object3d$ = {
                 // Set the material and texture for this subset
                 renderContext.setMaterial(this._meshMaterials[i], this._meshTextures[i], this._meshSpecularTextures[i], this._meshNormalMaps[i], opacity);
                 if (this._mesh.vertexBuffer != null) {
-                    ModelShader.use(renderContext, this._mesh.vertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : Texture.getWhite(), opacity, false, 32);
+                    ModelShader.use(renderContext, this._mesh.vertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : this._colorTexture, opacity, false, 32);
                 }
                 else {
-                    ModelShader.use(renderContext, this._mesh.tangentVertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : Texture.getWhite(), opacity, false, 44);
+                    ModelShader.use(renderContext, this._mesh.tangentVertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : this._colorTexture, opacity, false, 44);
                 }
                 renderContext.preDraw();
                 this._mesh.drawSubset(renderContext, i);
@@ -2582,10 +2605,10 @@ var Object3d$ = {
                 if (this._meshTextures[i] != null) {
                     renderContext.set_mainTexture(this._meshTextures[i]);
                     if (this._mesh.vertexBuffer != null) {
-                        ModelShader.use(renderContext, this._mesh.vertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : Texture.getWhite(), opacity, false, 32);
+                        ModelShader.use(renderContext, this._mesh.vertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : this._colorTexture, opacity, false, 32);
                     }
                     else {
-                        ModelShader.use(renderContext, this._mesh.tangentVertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : Texture.getWhite(), opacity, false, 44);
+                        ModelShader.use(renderContext, this._mesh.tangentVertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : this._colorTexture, opacity, false, 44);
                     }
                 }
                 renderContext.preDraw();
