@@ -15,7 +15,7 @@ import {
     SphereHull,
     ConvexHull,
 } from "../double3d.js";
-import { globalRenderContext, tilePrepDevice } from "../render_globals.js";
+import { globalRenderContext } from "../render_globals.js";
 import { WEBGL } from "../graphics/webgl_constants.js";
 import { Dates, LineList, TriangleList } from "../graphics/primitives3d.js";
 import { IndexBuffer, PositionNormalTexturedVertexBuffer, PositionNormalTexturedTangentVertexBuffer } from "../graphics/gl_buffers.js";
