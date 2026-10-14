@@ -952,6 +952,7 @@ export function Object3dUrlSource(url, name) {
     this._blobs = {};
     this._textures = {};
     this._pending = {};
+    this.preserveRelativePaths = true;
 }
 
 var Object3dUrlSource$ = {
@@ -1020,14 +1021,13 @@ var Object3dUrlSource$ = {
         request(url, false);
     },
 
+    // Unlike `TourDocument`, this doesn't cache textures.
+    // Object3d keeps its own per-load cache and disposes those textures when it reloads,
+    // so a cached copy here would hand back deleted GL textures after a reload.
     getCachedTexture2d: function (name) {
-        var url = this._resolve(name);
-        if (!(url in this._textures)) {
-            var tex = new Texture();
-            tex.load(url);
-            this._textures[url] = tex;
-        }
-        return this._textures[url];
+        var tex = new Texture();
+        tex.load(this._resolve(name));
+        return tex;
     }
 };
 
@@ -1849,13 +1849,23 @@ var Object3d$ = {
                             currentMaterial.ambient = Color.fromArgb(255, Math.min(parseFloat(parts[1]) * 255, 255), Math.min(parseFloat(parts[2]) * 255, 255), Math.min(parseFloat(parts[3]) * 255, 255));
                             break;
                         case 'map_Kd':
-                            //ENDURE TEXTURES ARE NOT BLACK!
+                            //ENSURE TEXTURES ARE NOT BLACK!
                             currentMaterial.diffuse = Colors.get_white();
                             var textureFilename = parts[1];
                             for (var i = 2; i < parts.length; i++) {
                                 textureFilename += ' ' + parts[i];
                             }
-                            var path = this.filename.substring(0, this.filename.lastIndexOf('\\') + 1);
+                            if (this._document.preserveRelativePaths) {
+                                // For e.g. a URL source: keep "textures/foo.png",
+                                // so it resolves relative to the model's location.
+                                textureFilename = ss.replaceString(textureFilename, '\\', '/');
+                            } else {
+                                // Tour cabinets are flat, so we drop any directories.
+                                textureFilename = ss.replaceString(textureFilename, '/', '\\');
+                                if (textureFilename.indexOf('\\') !== -1) {
+                                    textureFilename = textureFilename.substring(textureFilename.lastIndexOf('\\') + 1);
+                                }
+                            }
                             textureFilename = ss.replaceString(textureFilename, '/', '\\');
                             if (textureFilename.indexOf('\\') !== -1) {
                                 textureFilename = textureFilename.substring(textureFilename.lastIndexOf('\\') + 1);
