@@ -441,6 +441,7 @@ var Object3dLayer$ = {
         xmlWriter._writeAttributeString('Translate', this.get_translate().toString());
         xmlWriter._writeAttributeString('LightID', this.get_lightID().toString());
         xmlWriter._writeAttributeString('Obj', this.objType.toString());
+        xmlWriter._writeAttributeString('Color', this.get_color());
     },
 
     getParams: function () {
@@ -530,6 +531,9 @@ var Object3dLayer$ = {
         this.set_translate(Vector3d.parse(node.attributes.getNamedItem('Translate').nodeValue));
         if (node.attributes.getNamedItem('LightID') != null) {
             this.set_lightID(parseInt(node.attributes.getNamedItem('LightID').nodeValue));
+        }
+        if (node.attributes.getNamedItem('Color') != null) {
+            this.set_color(Color.load(node.attributes.getNamedItem('Color').nodeValue));
         }
     },
 
