@@ -20,10 +20,12 @@ import { WEBGL } from "../graphics/webgl_constants.js";
 import { Dates, LineList, TriangleList } from "../graphics/primitives3d.js";
 import { IndexBuffer, PositionNormalTexturedVertexBuffer, PositionNormalTexturedTangentVertexBuffer } from "../graphics/gl_buffers.js";
 import { ModelShader } from "../graphics/shaders.js";
+import { Texture } from "../graphics/texture.js";
 import { BinaryReader } from "../utilities/binary_reader.js";
 import { BasePlanets } from "../baseplanets.js";
 import { IUiController } from "../interfaces.js";
 import { Settings } from "../settings.js";
+import { URLHelpers } from "../url_helpers.js";
 import { Cursor, Cursors } from "../util.js";
 import { Layer } from "./layer.js";
 import { LayerUI, LayerUITreeNode } from "./layer_ui.js";
@@ -255,12 +257,37 @@ Object3dLayer._initRotateUI$1 = function () {
     }
 };
 
+Object3dLayer.fromUrl = function (url, format) {
+    if (!format) {
+        var path = new URL(url, window.location.href).pathname.toLowerCase();
+        format = ss.endsWith(path, '.obj') ? 'obj' : '3ds';
+    }
+    var mainName = 'model.' + format;
+    var layer = new Object3dLayer();
+    layer.objType = (format === 'obj');
+    layer.object3d = new Object3d(
+        new Object3dUrlSource(url, mainName), mainName,
+        layer.get_flipV(), layer._flipHandedness$1, true, layer.get_color());
+    return layer;
+};
+
 var Object3dLayer$ = {
     getPrimaryUI: function () {
         if (this._primaryUI$1 == null) {
             this._primaryUI$1 = new Object3dLayerUI(this);
         }
         return this._primaryUI$1;
+    },
+
+    set_color: function (value) {
+        if (this.color !== value) {
+            this.color = value;
+            this.version++;
+        }
+        if (this.object3d != null) {
+            this.object3d.set_color(value);
+        }
+        return value;
     },
 
     get_flipV: function () {
@@ -414,6 +441,7 @@ var Object3dLayer$ = {
         xmlWriter._writeAttributeString('Translate', this.get_translate().toString());
         xmlWriter._writeAttributeString('LightID', this.get_lightID().toString());
         xmlWriter._writeAttributeString('Obj', this.objType.toString());
+        xmlWriter._writeAttributeString('Color', this.get_color());
     },
 
     getParams: function () {
@@ -503,6 +531,9 @@ var Object3dLayer$ = {
         this.set_translate(Vector3d.parse(node.attributes.getNamedItem('Translate').nodeValue));
         if (node.attributes.getNamedItem('LightID') != null) {
             this.set_lightID(parseInt(node.attributes.getNamedItem('LightID').nodeValue));
+        }
+        if (node.attributes.getNamedItem('Color') != null) {
+            this.set_color(Color.load(node.attributes.getNamedItem('Color').nodeValue));
         }
     },
 
@@ -913,9 +944,99 @@ var VertexPosition$ = {};
 registerType("VertexPosition", [VertexPosition, VertexPosition$, null]);
 
 
+// wwtlib.Object3dUrlSource
+
+export function Object3dUrlSource(url, name) {
+    this._modelUrl = url;
+    this._name = name;
+    this._blobs = {};
+    this._textures = {};
+    this._pending = {};
+    this.preserveRelativePaths = true;
+}
+
+var Object3dUrlSource$ = {
+    _resolve: function (name) {
+        if (name == this._name) {
+            return this._modelUrl;
+        }
+        // Resolve material files and textures relative to the model URL
+        return new URL(name.replace(/\\/g, '/'), this._modelUrl).toString();
+    },
+
+    getFileBlobAsync: function (name, callback) {
+        var url = this._resolve(name);
+
+        if (url in this._blobs) {
+            callback(this._blobs[url]);
+            return;
+        }
+        if (url in this._pending) {
+            this._pending[url].push(callback);
+            return;
+        }
+        this._pending[url] = [callback];
+
+        var $this = this;
+        var finish = function (blob) {
+            var callbacks = $this._pending[url];
+            delete $this._pending[url];
+            if (blob != null) {
+                $this._blobs[url] = blob;
+            }
+            for (var i = 0; i < callbacks.length; i++) {
+                callbacks[i](blob);
+            }
+        };
+
+        var request = function (u, triedProxy) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', u, true);
+            xhr.responseType = 'blob';
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    finish(xhr.response);
+                } else {
+                    retryOrFail(triedProxy);
+                }
+            };
+            xhr.onerror = function () {
+                retryOrFail(triedProxy);
+            };
+            xhr.send();
+        };
+
+        var retryOrFail = function (triedProxy) {
+            if (!triedProxy) {
+                var proxied = URLHelpers.singleton.activateProxy(url);
+                if (proxied != null) {
+                    request(proxied, true);
+                    return;
+                }
+            }
+            console.error('Failed to download model file: ' + url);
+            finish(null);
+        };
+    
+        request(url, false);
+    },
+
+    // Unlike `TourDocument`, this doesn't cache textures.
+    // Object3d keeps its own per-load cache and disposes those textures when it reloads,
+    // so a cached copy here would hand back deleted GL textures after a reload.
+    getCachedTexture2d: function (name) {
+        var tex = new Texture();
+        tex.load(this._resolve(name));
+        return tex;
+    }
+};
+
+registerType("Object3dUrlSource", [Object3dUrlSource, Object3dUrlSource$, null]);
+
+
 // wwtlib.Object3d
 
-export function Object3d(tourDoc, filename, flipV, flipHandedness, smooth, color) {
+export function Object3d(doc, filename, flipV, flipHandedness, smooth, color) {
     this.flipHandedness = false;
     this.flipV = true;
     this.smooth = true;
@@ -932,21 +1053,22 @@ export function Object3d(tourDoc, filename, flipV, flipHandedness, smooth, color
     this.objects = [];
     this._matLib = {};
     this._textureLib = {};
-    this._tourDocument = null;
+    this._document = null;
     this.issLayer = false;
     this._readyToRender = false;
     this.useCurrentAmbient = false;
     this._dirty = true;
     this.color = color;
+    this._colorTexture = Texture.fromColor(color);
     this.smooth = smooth;
     this.flipV = flipV;
     this.flipHandedness = flipHandedness;
     this.filename = filename;
     if (ss.endsWith(this.filename.toLowerCase(), '.obj')) {
-        this._loadMeshFromObj(tourDoc, this.filename);
+        this._loadMeshFromObj(doc, this.filename);
     }
     else {
-        this._loadMeshFrom3ds(tourDoc, this.filename, 1);
+        this._loadMeshFrom3ds(doc, this.filename, 1);
     }
 }
 
@@ -1018,14 +1140,25 @@ Object3d._disposeTextureList = function (textures) {
 };
 
 var Object3d$ = {
+
+    get_color: function () {
+        return this.color;
+    },
+
+    set_color: function (value) {
+        this.color = value;
+        this._colorTexture = Texture.fromColor(value); 
+        return value;
+    },
+
     _reload: function () {
         if (!this.issLayer) {
             this.dispose();
             if (ss.endsWith(this.filename.toLowerCase(), '.obj')) {
-                this._loadMeshFromObj(this._tourDocument, this.filename);
+                this._loadMeshFromObj(this._document, this.filename);
             }
             else {
-                this._loadMeshFrom3ds(this._tourDocument, this.filename, 1);
+                this._loadMeshFrom3ds(this._document, this.filename, 1);
             }
         }
     },
@@ -1388,23 +1521,47 @@ var Object3d$ = {
         return percentage;
     },
 
+    _readFile: function (filename, asText, onLoaded) {
+        var doc = this._document;
+
+        var withBlob = function (blob) {
+            if (blob == null) {
+                console.error('Missing model file: ' + filename);
+                return;
+            }
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                if (reader.error != null) {
+                    console.error('Error reading model file ' + filename + ': ' + reader.error);
+                    return;
+                }
+                onLoaded(reader.result);
+            };
+            if (asText) {
+                reader.readAsText(blob);
+            } else {
+                reader.readAsArrayBuffer(blob);
+            }
+        };
+
+        if (doc.getFileBlobAsync != null) {
+            doc.getFileBlobAsync(filename, withBlob);
+        } else {
+            withBlob(doc.getFileBlob(filename));
+        }
+    },
+
     _loadMeshFromObj: function (doc, filename) {
         var $this = this;
 
+        var $this = this;
         this.filename = filename;
-        this._tourDocument = doc;
-        var blob = doc.getFileBlob(filename);
-        var chunck = new FileReader();
-        chunck.onloadend = function (e) {
-            $this._matFiles = $this._readObjMaterialsFromBin(ss.safeCast(chunck.result, String));
+        this._document = doc;
+        this._readFile(filename, true, function (text) {
+            $this._matFiles = $this._readObjMaterialsFromBin(text);
             $this._matFileIndex = 0;
-
-            // pass data to LoadMatLib. It will chain load all the material
-            // files, then load the obj from this data - hack for having no
-            // synchronous blob reading in javascript
-            $this._loadMatLib(ss.safeCast(chunck.result, String));
-        };
-        chunck.readAsText(blob);
+            $this._loadMatLib(text);
+        });
     },
 
     _readObjMaterialsFromBin: function (data) {
@@ -1496,7 +1653,7 @@ var Object3d$ = {
                                     try {
                                         if (!ss.keyExists(this._textureCache, this._textureLib[materialName])) {
                                             var path = this.filename.substring(0, this.filename.lastIndexOf('\\') + 1);
-                                            var tex = this._tourDocument.getCachedTexture2d(path + this._textureLib[materialName]);
+                                            var tex = this._document.getCachedTexture2d(path + this._textureLib[materialName]);
                                             if (tex != null) {
                                                 this.meshFilenames.push(this._textureLib[materialName]);
                                                 this._textureCache[this._textureLib[materialName]] = tex;
@@ -1653,13 +1810,10 @@ var Object3d$ = {
 
         if (this._matFileIndex < this._matFiles.length) {
             var filename = this._matFiles[this._matFileIndex++];
-            var blob = this._tourDocument.getFileBlob(filename);
-            var chunck = new FileReader();
-            chunck.onloadend = function (e) {
-                $this._readMatLibFromBin(ss.safeCast(chunck.result, String));
+            this._readFile(filename, true, function (text) {
+                $this._readMatLibFromBin(text);
                 $this._loadMatLib(data);
-            };
-            chunck.readAsText(blob);
+            }); 
         } else {
             this._readObjFromBin(data);
         }
@@ -1695,13 +1849,23 @@ var Object3d$ = {
                             currentMaterial.ambient = Color.fromArgb(255, Math.min(parseFloat(parts[1]) * 255, 255), Math.min(parseFloat(parts[2]) * 255, 255), Math.min(parseFloat(parts[3]) * 255, 255));
                             break;
                         case 'map_Kd':
-                            //ENDURE TEXTURES ARE NOT BLACK!
+                            //ENSURE TEXTURES ARE NOT BLACK!
                             currentMaterial.diffuse = Colors.get_white();
                             var textureFilename = parts[1];
                             for (var i = 2; i < parts.length; i++) {
                                 textureFilename += ' ' + parts[i];
                             }
-                            var path = this.filename.substring(0, this.filename.lastIndexOf('\\') + 1);
+                            if (this._document.preserveRelativePaths) {
+                                // For e.g. a URL source: keep "textures/foo.png",
+                                // so it resolves relative to the model's location.
+                                textureFilename = ss.replaceString(textureFilename, '\\', '/');
+                            } else {
+                                // Tour cabinets are flat, so we drop any directories.
+                                textureFilename = ss.replaceString(textureFilename, '/', '\\');
+                                if (textureFilename.indexOf('\\') !== -1) {
+                                    textureFilename = textureFilename.substring(textureFilename.lastIndexOf('\\') + 1);
+                                }
+                            }
                             textureFilename = ss.replaceString(textureFilename, '/', '\\');
                             if (textureFilename.indexOf('\\') !== -1) {
                                 textureFilename = textureFilename.substring(textureFilename.lastIndexOf('\\') + 1);
@@ -1746,7 +1910,7 @@ var Object3d$ = {
 
     _getIndexies: function (data) {
         var parts = ss.trim(data).split('/');
-        var indecies = new Array(3);
+        var indecies = [0, 0, 0];
         if (ss.emptyString(data)) {
             return indecies;
         }
@@ -1769,14 +1933,10 @@ var Object3d$ = {
 
     _loadMeshFrom3ds: function (doc, filename, scale) {
         var $this = this;
-
         this._tourDocument = doc;
-        var blob = doc.getFileBlob(filename);
-        var chunck = new FileReader();
-        chunck.onloadend = function (e) {
-            $this._read3dsFromBin(new BinaryReader(new Uint8Array(chunck.result)), scale);
-        };
-        chunck.readAsArrayBuffer(blob);
+        this._readFile(filename, false, function (buf) {
+            $this._read3dsFromBin(new BinaryReader(new Uint8Array(buf)), scale);
+        });
     },
 
     _read3dsFromBin: function (br, scale) {
@@ -1993,7 +2153,7 @@ var Object3d$ = {
                     } while (!!b2);
                     var path = this.filename.substring(0, this.filename.lastIndexOf('\\') + 1);
                     try {
-                        var tex = this._tourDocument.getCachedTexture2d(path + textureFilename);
+                        var tex = this._document.getCachedTexture2d(path + textureFilename);
                         if (tex != null) {
                             this._meshTextures.push(tex);
                             this.meshFilenames.push(textureFilename);
@@ -2028,7 +2188,7 @@ var Object3d$ = {
                     } while (!!b2);
                     var path = this.filename.substring(0, this.filename.lastIndexOf('\\') + 1);
                     try {
-                        var tex = this._tourDocument.getCachedTexture2d(path + textureFilename);
+                        var tex = this._document.getCachedTexture2d(path + textureFilename);
                         if (tex != null) {
                             this._meshNormalMaps.push(tex);
                             this.meshFilenames.push(textureFilename);
@@ -2061,7 +2221,7 @@ var Object3d$ = {
                     } while (!!b2);
                     var path = this.filename.substring(0, this.filename.lastIndexOf('\\') + 1);
                     try {
-                        var tex = this._tourDocument.getCachedTexture2d(path + textureFilename);
+                        var tex = this._document.getCachedTexture2d(path + textureFilename);
                         if (tex != null) {
                             this._meshSpecularTextures.push(tex);
                             this.meshFilenames.push(textureFilename);
@@ -2445,10 +2605,10 @@ var Object3d$ = {
                 // Set the material and texture for this subset
                 renderContext.setMaterial(this._meshMaterials[i], this._meshTextures[i], this._meshSpecularTextures[i], this._meshNormalMaps[i], opacity);
                 if (this._mesh.vertexBuffer != null) {
-                    ModelShader.use(renderContext, this._mesh.vertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : null, opacity, false, 32);
+                    ModelShader.use(renderContext, this._mesh.vertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : this._colorTexture, opacity, false, 32);
                 }
                 else {
-                    ModelShader.use(renderContext, this._mesh.tangentVertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : null, opacity, false, 44);
+                    ModelShader.use(renderContext, this._mesh.tangentVertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : this._colorTexture, opacity, false, 44);
                 }
                 renderContext.preDraw();
                 this._mesh.drawSubset(renderContext, i);
@@ -2459,10 +2619,10 @@ var Object3d$ = {
                 if (this._meshTextures[i] != null) {
                     renderContext.set_mainTexture(this._meshTextures[i]);
                     if (this._mesh.vertexBuffer != null) {
-                        ModelShader.use(renderContext, this._mesh.vertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : null, opacity, false, 32);
+                        ModelShader.use(renderContext, this._mesh.vertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : this._colorTexture, opacity, false, 32);
                     }
                     else {
-                        ModelShader.use(renderContext, this._mesh.tangentVertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : null, opacity, false, 44);
+                        ModelShader.use(renderContext, this._mesh.tangentVertexBuffer.vertexBuffer, this._mesh.indexBuffer.buffer, (this._meshTextures[i] != null) ? this._meshTextures[i].texture2d : this._colorTexture, opacity, false, 44);
                     }
                 }
                 renderContext.preDraw();
