@@ -30,6 +30,8 @@ import { Cursor, Cursors } from "../util.js";
 import { Layer } from "./layer.js";
 import { LayerUI, LayerUITreeNode } from "./layer_ui.js";
 
+import { WebIO } from "@gltf-transform/core";
+
 
 // wwtlib.Material
 //
@@ -1064,10 +1066,13 @@ export function Object3d(doc, filename, flipV, flipHandedness, smooth, color) {
     this.flipV = flipV;
     this.flipHandedness = flipHandedness;
     this.filename = filename;
-    if (ss.endsWith(this.filename.toLowerCase(), '.obj')) {
+
+    var filenameLC = this.filename.toLowerCase();
+    if (ss.endsWith(filenameLC, '.obj')) {
         this._loadMeshFromObj(doc, this.filename);
-    }
-    else {
+    } else if (ss.endsWith(filenameLC, '.gltf') || ss.endsWith(filenameLC, '.glb')) {
+      this._loadMeshFromGLTF(doc, this.filename);
+    } else {
         this._loadMeshFrom3ds(doc, this.filename, 1);
     }
 }
@@ -1551,10 +1556,140 @@ var Object3d$ = {
         }
     },
 
+    _loadMeshFromGLTF: function (doc, filename) {
+        var $this = this;
+
+        this.filename = filename;
+        this._document = doc;
+        this._readFile(filename, false, function (buffer) {
+            new WebIO().readBinary(buffer).then(
+              function (document) {
+                  $this._readGLTFToMesh(document);
+              },
+              function (error) {
+                // TODO: Implement this
+              }
+            );
+        });
+    },
+
+    _readGLTFToMesh: function (doc) {
+        var root = doc.getRoot();
+        if (root == null) {
+            return;
+        }
+        // For now, assume that we have one scene
+        var scene = root.getDefaultScene();
+        if (scene == null) {
+            return;
+        }
+
+        var handednessMultiplier = this.get_flipHandedness() ? -1 : 1;
+
+        var positions = [];
+        var normals = [];
+        var texcoord0s = [];
+        var indexList = [];
+
+        var vertexIndexOffsetForPrimitives = [];
+        var vertexCountForPrimitives = [];
+
+        var objectFound = false;
+        var objects = [];
+        var currentObject = null;
+        var currentIndex = 0;
+
+        var map = {};
+
+        var nodes = root.listChildren();
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            currentObject = new ObjectNode();
+            currentObject.name = node.getName();
+            var mat = node.getMatrix();
+            currentObject.localMat = Matrix3d.create(
+              mat[0], mat[1], mat[2], mat[3],
+              mat[5], mat[6], mat[7], mat[8],
+              mat[9], mat[10], mat[11], mat[12],
+              mat[13], mat[14], mat[15], mat[16],
+            );
+
+            // If the primitive has a mesh, add its geometry
+            var mesh = node.getMesh();
+            if (mesh != null) {
+                var primitives = mesh.getPrimitives();
+                
+                for (var j = 0; j < primitives.length; j++) {
+                    var primitive = primitives[j];
+                    var indices = primitive.getIndices();
+                    var normalAttr = primitive.getAttribute("NORMAL");
+                    var positionAttr = primitive.getAttribute("POSITION");
+                    var texcoord0Attr = primitive.getAttribute("TEXCOORD_0");
+
+                    // These are TypedArrays
+                    var indicesBuffer = indices.getArray();
+                    var normalBuffer = normalAttr.getArray();
+                    var positionBuffer = positionAttr.getArray();
+                    var texCoord0Buffer = texcoord0Attr.getArray();
+
+                    // Populate vertex list
+                    var vertexIndexOffset = normals.length;
+                    var vertexCount = normalAttr.getCount();
+                    for (var k = 0; k < vertexCount; k++) {
+                        var start = 3 * k;
+                        positions.push(Vector3d.create(positionBuffer[start], positionBuffer[start + 1], positionBuffer[start + 2]));
+                        normals.push(Vector3d.create(handednessMultiplier * normalBuffer[start], normalBuffer[start + 1], normalBuffer[start + 2]));
+                        var texStart = 2 * k;
+                        var t = texCoord0Buffer[texStart + 1];
+                        if (this.get_flipV()) {
+                            t = 1 - t;
+                        }
+                        texcoord0s.push(Vector2d.create(texCoord0Buffer[texStart], t));
+                    }
+
+                    // Populate index list
+                    var indicesCount = indicesAttr.getCount();
+                    var polygonCount = indicesCount / 3;
+                    for (var k = 0; i < polygonCount; k++) {
+                        var start = 3 * k;
+                        var indices = this.get_flipHandedness() ? [start, start + 2, start + 1] : [start, start + 1, start + 2];
+                        for (var l = 0; l < 3; l++) {
+                            indexList.push(indicesBuffer[indices[l]]);
+                        }
+                    }
+
+                    // Create and add group
+                    var group = new Group(); 
+                    group.startIndex = currentIndex;
+                    group.indexCount = indicesCount;
+
+                    // TODO: Can there ever not be a material?
+                    var material = primitive.getMaterial();
+                    var materialIndex = root.listMaterials().indexOf(material);
+                    group.materialIndex = materialIndex;
+
+                    currentObject.drawGroup.push(group);
+                    currentIndex += group.indexCount;
+                }
+            }
+
+            map[i] = currentObject;
+
+        }
+
+        var sceneChildren = scene.listChildren();
+        for (var i = 0; i < sceneChildren.length; i++) {
+            var rootNode = children[i];
+            var rootObjectNode = map[i];
+            rootObjectNode.level = 0;
+            
+        }
+        
+    },
+
     _loadMeshFromObj: function (doc, filename) {
         var $this = this;
 
-        var $this = this;
         this.filename = filename;
         this._document = doc;
         this._readFile(filename, true, function (text) {
@@ -1933,7 +2068,7 @@ var Object3d$ = {
 
     _loadMeshFrom3ds: function (doc, filename, scale) {
         var $this = this;
-        this._tourDocument = doc;
+        this._document = doc;
         this._readFile(filename, false, function (buf) {
             $this._read3dsFromBin(new BinaryReader(new Uint8Array(buf)), scale);
         });
