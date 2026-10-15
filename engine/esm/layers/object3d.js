@@ -1933,7 +1933,7 @@ var Object3d$ = {
 
     _loadMeshFrom3ds: function (doc, filename, scale) {
         var $this = this;
-        this._tourDocument = doc;
+        this._document = doc;
         this._readFile(filename, false, function (buf) {
             $this._read3dsFromBin(new BinaryReader(new Uint8Array(buf)), scale);
         });
