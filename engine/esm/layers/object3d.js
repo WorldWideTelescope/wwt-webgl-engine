@@ -30,6 +30,7 @@ import { Cursor, Cursors } from "../util.js";
 import { Layer } from "./layer.js";
 import { LayerUI, LayerUITreeNode } from "./layer_ui.js";
 
+import { v4 } from "uuid";
 import { WebIO } from "@gltf-transform/core";
 
 
@@ -1591,8 +1592,10 @@ var Object3d$ = {
         var texcoord0s = [];
         var indexList = [];
 
+        var topLevelObjects = [];
         var vertexIndexOffsetForPrimitives = [];
         var vertexCountForPrimitives = [];
+        var nodesWithMesh = [];
 
         var objectFound = false;
         var objects = [];
@@ -1673,18 +1676,54 @@ var Object3d$ = {
                 }
             }
 
-            map[i] = currentObject;
+           // We want WWT to still support IE, so we can't use a JS Map.
+            // Nodes don't have a built-in ID, so let's do it ourselves
+            // We use the node's `extras` member to store a UUID
+            var uuid = v4();
+            node.setExtras({ id: uuid });
+            map[uuid] = currentObject;
 
         }
 
         var sceneChildren = scene.listChildren();
         for (var i = 0; i < sceneChildren.length; i++) {
-            var rootNode = children[i];
-            var rootObjectNode = map[i];
+            var rootNode = nodes[i];
+            var rootObjectNode = map[rootNode.getExtras().id];
             rootObjectNode.level = 0;
-            
+            this._setGLTFLevel(map, rootNode, nodes, rootObjectNode.level); 
+            topLevelObjects.push(rootObjectNode);
+        }
+
+        var nodesWithMeshCount = nodesWithMesh.length;
+        for (var nodeId = 0; nodeId < nodesWithMeshCount; nodeId++) {
+            currentObject = nodesWithMesh[nodeId];
         }
         
+    },
+
+    _getTransformMatrixToWorld: function (node) {
+        if (node == null) {
+            return Matrix3d.get_identity();
+        } else {
+            return Matrix3d.multiplyMatrix(node.localMat * this._getTransformMatrixToWorld(node.parent));
+        }
+    },
+
+    _setGLTFLevel: function (map, parent, nodes, parentLevel) {
+        var parentObjectNode = map[parent.getExtras().id];
+        var children = parent.listChildren();
+        if (children.length > 0) {
+            var childLevel = parentLevel + 1;
+            for (let n = 0; n < children.length; n++) {
+                var child = children[n];
+                var childObjectNode = map[child.getExtras().id];
+                parentObjectNode.children.push(childObjectNode);
+                childObjectNode.parent = parentObjectNode;
+                childObjectNode.level = childLevel;
+
+                this._setGLTFLevel(map, child, nodes, childLevel);
+            }
+        }
     },
 
     _loadMeshFromObj: function (doc, filename) {
