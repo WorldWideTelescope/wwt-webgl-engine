@@ -1649,6 +1649,9 @@ var Object3d$ = {
                         }
                         texcoord0s.push(Vector2d.create(texCoord0Buffer[texStart], t));
                     }
+                    vertexIndexOffsetForPrimitives.push(vertexIndexOffset);
+                    vertexCountForPrimitives.push(vertexCount);
+                    nodesWithMesh.push(currentObject);
 
                     // Populate index list
                     var indicesCount = indicesAttr.getCount();
@@ -1697,6 +1700,18 @@ var Object3d$ = {
         var nodesWithMeshCount = nodesWithMesh.length;
         for (var nodeId = 0; nodeId < nodesWithMeshCount; nodeId++) {
             currentObject = nodesWithMesh[nodeId];
+            var transformToWorld = this._getTransformMatrixToWorld(currentObject);
+            var startId = vertexIndexOffsetForPrimitives[nodeId];
+            var endId = startId + vertexCountForPrimitives[nodeId];
+            for (var i = startId; i < endId; i++) {
+                var transformedPosition = transformToWorld.transform(positions[i]);
+                transformedPosition.x *= handednessMultiplier;
+                var positionNormalTextured = PositionNormalTextured.create(
+                  transformedPosition,
+                  normals[i],
+                  texcoord0s[i],
+                );
+            }
         }
         
     },
