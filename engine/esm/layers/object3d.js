@@ -273,7 +273,8 @@ Object3d._format = function (path) {
 
 Object3dLayer.fromUrl = function (url, format) {
     if (!format) {
-        format = Object3d._format(url);
+        var path = new URL(url, window.location.href).pathname.toLowerCase();
+        format = Object3d._format(path);
     }
     var mainName = 'model.' + format;
     var layer = new Object3dLayer();
@@ -1566,8 +1567,15 @@ var Object3d$ = {
         return percentage;
     },
 
-    _readFile: function (filename, asText, onLoaded) {
+    _readFile: function (filename, asText, onLoaded, onError) {
         var doc = this._document;
+
+        var fail = function (message) {
+            console.error(message);
+            if (onError != null) {
+                onError(message);
+            }
+        }
 
         var withBlob = function (blob) {
             if (blob == null) {
@@ -1577,7 +1585,7 @@ var Object3d$ = {
             var reader = new FileReader();
             reader.onloadend = function () {
                 if (reader.error != null) {
-                    console.error('Error reading model file ' + filename + ': ' + reader.error);
+                    fail('Error reading model file ' + filename + ': ' + reader.error);
                     return;
                 }
                 onLoaded(reader.result);
@@ -1744,6 +1752,9 @@ var Object3d$ = {
 
         var map = {};
 
+        var materials = root.listMaterials();
+        var materialsCount = materials.length;
+
         var nodes = root.listNodes();
         for (var i = 0; i < nodes.length; i++) {
             var node = nodes[i];
@@ -1781,7 +1792,7 @@ var Object3d$ = {
                     for (var k = 0; k < vertexCount; k++) {
                         var start = 3 * k;
                         positions.push(Vector3d.create(positionBuffer[start], positionBuffer[start + 1], positionBuffer[start + 2]));
-                        normals.push(Vector3d.create(handednessMultiplier * normalBuffer[start], normalBuffer[start + 1], normalBuffer[start + 2]));
+                        normals.push(Vector3d.create(normalBuffer[start], normalBuffer[start + 1], normalBuffer[start + 2]));
                         var texStart = 2 * k;
                         var t = texCoord0Buffer[texStart + 1];
                         if (!this.flipV) {
@@ -1809,7 +1820,6 @@ var Object3d$ = {
                     group.startIndex = currentIndex;
                     group.indexCount = indicesCount;
 
-                    // TODO: Can there ever not be a material?
                     var material = primitive.getMaterial();
                     var materialIndex = root.listMaterials().indexOf(material);
                     group.materialIndex = materialIndex;
@@ -1846,9 +1856,17 @@ var Object3d$ = {
             for (var i = startId; i < endId; i++) {
                 var transformedPosition = transformToWorld.transform(positions[i]);
                 transformedPosition.x *= handednessMultiplier;
+                var normal = normals[i];
+                var transformedNormal = Vector3d.create(
+                    normal.x * transformToWorld.get_m11() + normal.y * transformToWorld.get_m21() + normal.z * transformToWorld.get_m31(),
+                    normal.x * transformToWorld.get_m12() + normal.y * transformToWorld.get_m22() + normal.z * transformToWorld.get_m32(),
+                    normal.x * transformToWorld.get_m13() + normal.y * transformToWorld.get_m23() + normal.z * transformToWorld.get_m33(),
+                );
+                transformedNormal.normalize();
+                transformedNormal.x *= handednessMultiplier;
                 var positionNormalTextured = PositionNormalTextured.createUV(
                   transformedPosition,
-                  normals[i],
+                  transformedNormal,
                   texcoord0s[i],
                 );
                 vertexList.push(positionNormalTextured);
@@ -1857,15 +1875,14 @@ var Object3d$ = {
 
         // Texture
       
-        var materials = root.listMaterials();
-        var materialsCount = materials.length;
-        let wwtNormTex = null;
-        let wwtBaseTex = null;
+
+        var wwtNormTex = null;
+        var wwtBaseTex = null;
         for (var i = 0; i < materialsCount; i++) {
 
             // Reset textures
             wwtNormTex = null;
-            wwtBaseTex = Object3d._textureFromColor(this.color);
+            wwtBaseTex = null;
 
             var material = materials[i];
             currentMaterial = this._createDefaultMaterial();
@@ -1894,7 +1911,10 @@ var Object3d$ = {
                 if (normTex) {
                     wwtNormTex = this._textureFromGLTFTexture(normTex);
                 }
+            } else {
+                wwtBaseTex = Object3d._textureFromColor(this.color);
             }
+
             this._meshTextures.push(wwtBaseTex);
             this._meshNormalMaps.push(wwtNormTex);
             this._meshSpecularTextures.push(null);
@@ -1933,7 +1953,7 @@ var Object3d$ = {
         var children = parent.listChildren();
         if (children.length > 0) {
             var childLevel = parentLevel + 1;
-            for (let n = 0; n < children.length; n++) {
+            for (var n = 0; n < children.length; n++) {
                 var child = children[n];
                 var childObjectNode = map[child.getExtras().id];
                 parentObjectNode.children.push(childObjectNode);
