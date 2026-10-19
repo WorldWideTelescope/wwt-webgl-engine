@@ -1167,6 +1167,12 @@ Object3d._textureFromColor = function (color) {
     return texture;
 };
 
+Object3d._isGLB = function (bytes) {
+    // The first 4 bytes of a glB file represent the ASCII characters for "glTF"
+    // https://filesignature.org/glb
+    bytes[0] === 0x67 && bytes[1] === 0x6C && bytes[2] === 0x54 && bytes[3] === 0x46;
+};
+
 var Object3d$ = {
 
     get_color: function () {
@@ -1597,16 +1603,35 @@ var Object3d$ = {
 
         this.filename = filename;
         this._document = doc;
+
+        var onError = function (error) {
+            console.error('Error loading glTF model ' + filename + ': ' + error);
+        };
+
         this._readFile(filename, false, function (buffer) {
-            new WebIO().readBinary(new Uint8Array(buffer)).then(
-              function (document) {
-                  $this._readGLTFToMesh.bind($this)(document);
-              },
-              function (error) {
-                console.error(error);
-                // TODO: Implement this
-              }
-            );
+            var bytes = new Uint8Array(buffer);
+            var io = new WebIO();
+
+            var onDocument = function (document) {
+                $this._readGLTFToMesh.bind($this)(document);
+            };
+            
+            if (Object3d._isGLB(bytes)) {
+                io.readBinary(bytes).then(onDocument, onError);
+                return;
+            }
+
+            var json;
+            try {
+                json = JSON.parse(new TextDecoder().decode(bytes));
+            } catch (error) {
+                onError(error);
+                return;
+            }
+
+            $this._loadGLTFResources(json, function (resources) {
+                io.readJSON({ json: json, resources: resources }).then(onDocument, onError);
+            }, onError);
         });
     },
     
@@ -1616,8 +1641,79 @@ var Object3d$ = {
     },
 
     _linearToSrgb: function (c) {
-      var s = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
-      return Math.round(Math.min(Math.max(s, 0), 1) * 255);
+        var s = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+        return Math.round(Math.min(Math.max(s, 0), 1) * 255);
+    },
+
+    _gltfResourcePath: function (uri) {
+        // For e.g. a URL source: keep "textures/foo.png",
+        // so it resolves relative to the model's location.
+        if (this._document.preserveRelativePaths) {
+            return uri;
+        }
+
+        // Tour cabinets are flat, so we drop any directories.
+        var name = ss.replaceString(decodeURIComponent(uri), '/', '\\');
+        name = name.substring(name.lastIndexOf('\\') + 1);
+        var path = this.filename.substring(0, this.filename.lastIndexOf('\\') + 1);
+        return path + name;
+    },
+
+    _loadGLTFResources: function (json, onLoaded, onError) {
+        var uris = [];
+        // This is really just a `Set`, but we can't use that in IE
+        var alreadySeen = {};
+        var lists = [
+            json.buffers || [],
+            json.images || [],
+        ];
+
+        // Gather up all of the URIs whose data we need to fetch
+        for (var i = 0; i < lists.length; i++) {
+            var list = lists[i];
+            for (var j = 0; j < list.length; j++) {
+                var uri = list[j];
+                // Images stored in buffer views don't have a URI
+                // `data` URIs are decoded by gltf-transform
+                if (uri == null || ss.startsWith(uri, 'data:') || ss.keyExists(alreadySeen, uri)) {
+                    continue;
+                }
+                alreadySeen[uri] = true;
+                uris.push(uri);
+            }
+        }
+
+        var resources = {};
+        var pending = uris.length;
+        var failed = false;
+        if (!pending) {
+            onLoaded(resources);
+            return;
+        }
+
+        var $this = this;
+        var fetchURI = function (uri) {
+            $this._readFile($this._gltfResourcePath(uri), false, function (buffer) {
+                if (failed) {
+                    return;
+                }
+
+                resources[uri] = new Uint8Array(buffer);
+                pending -= 1;
+                if (pending == 0) {
+                    onLoaded(resources);
+                }
+            }, function (error) {
+                if (!failed) {
+                    failed = true;
+                    onError('Missing glTF resource ' + uri + ': ' + error);
+                }
+            });
+        };
+
+        for (var k = 0; k < uris.length; k++) {
+            fetchURI(uris[k]);
+        }
     },
 
     _readGLTFToMesh: function (doc) {
