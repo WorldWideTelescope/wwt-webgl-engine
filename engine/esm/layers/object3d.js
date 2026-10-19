@@ -1722,6 +1722,76 @@ var Object3d$ = {
         }
     },
 
+    _dataForGLTFPrimitive: function (primitive) {
+        // For now, we're only drawing triangles
+        if (primitive.getMode() !== 4) {
+            return null;
+        }
+        
+        var positionAttr = primitive.getAttribute("POSITION");
+        if (positionAttr == null) {
+            return null;
+        }
+
+        var count = positionAttr.getCount();
+        var positions = positionAttr.getrray();
+        var normalAttr = primitive.getAttribute("NORMAL");
+        var texCoordAttr = primitive.getAttribute("TEXCOORD_0");
+        var normals = normalAttr ? normalAttr.getArray() : null;
+        var texCoords = texCoordAttr ? texCoordAttr.getArray() : new Float32Array(2 * count);
+
+        var indices;
+        var indexAccessor = primitive.getIndices();
+        if (indexAccessor != null) {
+            indices = indexAccessor.getArray();
+        } else {
+            indices = new Uint32Array(count);
+            for (var i = 0; i < count; i++) {
+                indices[i] = i;
+            }
+        }
+
+        if (normals == null) {
+            var vertexList = new Array(count);
+            for (var i = 0; i < count; i++) {
+                vertexList[i] = PositionNormalTextured._create(
+                    positions[3 * i], positions[3 * i + 1], positions[3 * i + 2],
+                    0, 0, 0,
+                    uvs[2 * i], uvs[2 * i + 1]
+                );
+            }
+
+            var n = indices.length - (indices.length % 3);
+            var creaseAngleRad = (this.smooth ? 70 : 0) * Math.PI / 180;
+            var vertexNormals = this._calculateVertexNormalsMerged(vertexList, indices.subarray(0, n), creaseAngleRad);
+
+            // The result has one normal per index entry, so give each index its own vertex
+            var flatPositions = new Float32Array(3 * n);
+            var flatNormals = new Float32Array(3 * n);
+            var flatTexCoords = new Float32Array(2 * n);
+            var flatIndices = new Uint32Array(n);
+            for (var dst = 0; dst < n; dst++) {
+                var src = indices[dst];
+                flatPositions[3 * dst] = positions[3 * src];
+                flatPositions[3 * dst + 1] = positions[3 * src + 1];
+                flatPositions[3 * dst + 2] = positions[3 * src + 2];
+                flatNormals[3 * dst] = vertexNormals[dst].x;
+                flatNormals[3 * dst + 1] = vertexNormals[dst].y;
+                flatNormals[3 * dst + 2] = vertexNormals[dst].z;
+                flatTexCoords[2 * dst] = uvs[2 * src];
+                flatTexCoords[2 * dst + 1] = uvs[2 * src + 1];
+                flatIndices[dst] = dst;
+            }
+            positions = flatPositions;
+            normals = flatNormals;
+            texCoords = flatTexCoords;
+            indices = flatIndices;
+            count = n;
+        }
+
+        return { positions: positions, normals: normals, texCoords: texCoords, indices: indices, count: count };
+    },
+
     _readGLTFToMesh: function (doc) {
         var root = doc.getRoot();
         if (root == null) {
@@ -1749,6 +1819,7 @@ var Object3d$ = {
         var currentObject = null;
         var currentMaterial = null;
         var currentIndex = 0;
+        var needsDefaultMaterial = false;
 
         var map = {};
 
@@ -1775,30 +1846,24 @@ var Object3d$ = {
                 
                 for (var j = 0; j < primitives.length; j++) {
                     var primitive = primitives[j];
-                    var indices = primitive.getIndices();
-                    var normalAttr = primitive.getAttribute("NORMAL");
-                    var positionAttr = primitive.getAttribute("POSITION");
-                    var texcoord0Attr = primitive.getAttribute("TEXCOORD_0");
-
-                    // These are TypedArrays
-                    var indicesBuffer = indices.getArray();
-                    var normalBuffer = normalAttr.getArray();
-                    var positionBuffer = positionAttr.getArray();
-                    var texCoord0Buffer = texcoord0Attr.getArray();
+                    var data = this._dataForGLTFPrimitive(primitive);
+                    if (data == null) {
+                        continue;
+                    }
 
                     // Populate vertex list
                     var vertexIndexOffset = normals.length;
                     var vertexCount = normalAttr.getCount();
                     for (var k = 0; k < vertexCount; k++) {
                         var start = 3 * k;
-                        positions.push(Vector3d.create(positionBuffer[start], positionBuffer[start + 1], positionBuffer[start + 2]));
-                        normals.push(Vector3d.create(normalBuffer[start], normalBuffer[start + 1], normalBuffer[start + 2]));
+                        positions.push(Vector3d.create(data.positions[p], data.positions[p + 1], data.positions[p + 2]));
+                        normals.push(Vector3d.create(data.normals[p], data.normals[p + 1], data.normals[p + 2]));
                         var texStart = 2 * k;
-                        var t = texCoord0Buffer[texStart + 1];
+                        var t = data.texCoords[texStart + 1];
                         if (!this.flipV) {
                             t = 1 - t;
                         }
-                        texcoord0s.push(Vector2d.create(texCoord0Buffer[texStart], t));
+                        texcoord0s.push(Vector2d.create(data.texCoords[texStart], t));
                     }
                     vertexIndexOffsetForPrimitives.push(vertexIndexOffset);
                     vertexCountForPrimitives.push(vertexCount);
@@ -1821,8 +1886,12 @@ var Object3d$ = {
                     group.indexCount = indicesCount;
 
                     var material = primitive.getMaterial();
-                    var materialIndex = root.listMaterials().indexOf(material);
-                    group.materialIndex = materialIndex;
+                    if (material == null) {
+                        group.materialIndex = defaultMaterialIndex;
+                        needsDefaultMaterial = true;
+                    } else {
+                        group.materialIndex = root.listMaterials().indexOf(material);
+                    }
 
                     currentObject.drawGroup.push(group);
                     currentIndex += group.indexCount;
@@ -1874,51 +1943,41 @@ var Object3d$ = {
         }
 
         // Texture
-      
 
-        var wwtNormTex = null;
-        var wwtBaseTex = null;
         for (var i = 0; i < materialsCount; i++) {
-
-            // Reset textures
-            wwtNormTex = null;
-            wwtBaseTex = null;
-
             var material = materials[i];
             currentMaterial = this._createDefaultMaterial();
-            if (material != null) {
-                var color = material.getBaseColorFactor();
-                var wwtColor = Color.fromArgb(
-                    color[3] * 255,
-                    this._linearToSrgb(color[0]),
-                    this._linearToSrgb(color[1]),
-                    this._linearToSrgb(color[2]),
-                );
-                currentMaterial.diffuse = wwtColor;
-                currentMaterial.ambient = wwtColor;
-                currentMaterial.opacity = material.getAlphaMode() == "OPAQUE" ? 1 : material.getAlpha();
-                currentMaterial.isDefault = false;
-                var roughness = material.getRoughnessFactor();
-                var gray = (1 - roughness) * 255;
-                currentMaterial.specular = Color.fromArgb(255, gray, gray, gray);
-                var alpha = Math.max(roughness * roughness, 1e-3);
-                currentMaterial.specularSharpness = Math.max(10, (2 / alpha) - 2);
+            var color = material.getBaseColorFactor();
+            var wwtColor = Color.fromArgb(
+                color[3] * 255,
+                this._linearToSrgb(color[0]),
+                this._linearToSrgb(color[1]),
+                this._linearToSrgb(color[2]),
+            );
+            currentMaterial.diffuse = wwtColor;
+            currentMaterial.ambient = wwtColor;
+            currentMaterial.opacity = material.getAlphaMode() == "OPAQUE" ? 1 : material.getAlpha();
+            currentMaterial.isDefault = false;
+            var roughness = material.getRoughnessFactor();
+            var gray = (1 - roughness) * 255;
+            currentMaterial.specular = Color.fromArgb(255, gray, gray, gray);
+            var alpha = Math.max(roughness * roughness, 1e-3);
+            currentMaterial.specularSharpness = Math.max(10, (2 / alpha) - 2);
 
-                var baseTex = material.getBaseColorTexture();
-                wwtBaseTex = baseTex ? this._textureFromGLTFTexture(baseTex) : Object3d._textureFromColor(wwtColor);
+            var baseTex = material.getBaseColorTexture();
+            var wwtBaseTex = baseTex ? this._textureFromGLTFTexture(baseTex) : Object3d._textureFromColor(wwtColor);
 
-                var normTex = material.getNormalTexture();
-                if (normTex) {
-                    wwtNormTex = this._textureFromGLTFTexture(normTex);
-                }
-            } else {
-                wwtBaseTex = Object3d._textureFromColor(this.color);
-            }
-
+            var normTex = material.getNormalTexture();
+            var wwtNormTex = normTex ? this._textureFromGLTFTexture(normTex) : null;
             this._meshTextures.push(wwtBaseTex);
             this._meshNormalMaps.push(wwtNormTex);
             this._meshSpecularTextures.push(null);
             this._addMaterial(currentMaterial);
+        }
+
+        // Only add a default material if there's at least one prim that doesn't have a material
+        if (needsDefaultMaterial) {
+            this._addMaterial(this._createDefaultMaterial());
         }
         
         
