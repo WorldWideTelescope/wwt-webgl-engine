@@ -1766,8 +1766,13 @@ var Object3d$ = {
         var materials = root.listMaterials();
         var materialsCount = materials.length;
         let wwtNormTex = null;
-        let wwtBaseTex = Object3d._textureFromColor(this.color);
+        let wwtBaseTex = null;
         for (var i = 0; i < materialsCount; i++) {
+
+            // Reset textures
+            wwtNormTex = null;
+            wwtBaseTex = Object3d._textureFromColor(this.color);
+
             var material = materials[i];
             currentMaterial = this._createDefaultMaterial();
             if (material != null) {
