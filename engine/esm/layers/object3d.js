@@ -260,10 +260,21 @@ Object3dLayer._initRotateUI$1 = function () {
     }
 };
 
+Object3d._format = function (path) {
+    var formats = ['obj', 'gltf', 'glb', '3ds'];
+    for (var i = 0; i < formats.length; i++) {
+        var format = formats[i];
+        if (path.endsWith('.' + format)) {
+            return format;
+        }
+    }
+    return '3ds';
+}
+
 Object3dLayer.fromUrl = function (url, format) {
     if (!format) {
         var path = new URL(url, window.location.href).pathname.toLowerCase();
-        format = ss.endsWith(path, '.obj') ? 'obj' : '3ds';
+        format = Object3d._format(url);
     }
     var mainName = 'model.' + format;
     var layer = new Object3dLayer();
@@ -1169,6 +1180,17 @@ var Object3d$ = {
         }
     },
 
+    _createDefaultMaterial: function () {
+        var material = new Material();
+        material.diffuse = this.color;
+        material.ambient = this.color;
+        material.specular = Colors.get_white();
+        material.specularSharpness = 30;
+        material.opacity = 1;
+        material.isDefault = true;
+        return material;
+    },
+
     // Calculate per-vertex normals by averaging face normals. Normals of adjacent faces with an
     // angle of greater than crease angle are not included in the average. CalculateVertexNormalsMerged
     // is slower than the other normal generation method, CalculateVertexNormals, but it produces better
@@ -1563,11 +1585,12 @@ var Object3d$ = {
         this.filename = filename;
         this._document = doc;
         this._readFile(filename, false, function (buffer) {
-            new WebIO().readBinary(buffer).then(
+            new WebIO().readBinary(new Uint8Array(buffer)).then(
               function (document) {
-                  $this._readGLTFToMesh(document);
+                  $this._readGLTFToMesh.bind($this)(document);
               },
               function (error) {
+                console.error(error);
                 // TODO: Implement this
               }
             );
@@ -1585,26 +1608,25 @@ var Object3d$ = {
             return;
         }
 
-        var handednessMultiplier = this.get_flipHandedness() ? -1 : 1;
+        var handednessMultiplier = this.flipHandedness ? -1 : 1;
 
         var positions = [];
         var normals = [];
         var texcoord0s = [];
         var indexList = [];
+        var vertexList = [];
 
         var topLevelObjects = [];
         var vertexIndexOffsetForPrimitives = [];
         var vertexCountForPrimitives = [];
         var nodesWithMesh = [];
 
-        var objectFound = false;
-        var objects = [];
         var currentObject = null;
         var currentIndex = 0;
 
         var map = {};
 
-        var nodes = root.listChildren();
+        var nodes = root.listNodes();
         for (var i = 0; i < nodes.length; i++) {
             var node = nodes[i];
             currentObject = new ObjectNode();
@@ -1612,15 +1634,15 @@ var Object3d$ = {
             var mat = node.getMatrix();
             currentObject.localMat = Matrix3d.create(
               mat[0], mat[1], mat[2], mat[3],
-              mat[5], mat[6], mat[7], mat[8],
-              mat[9], mat[10], mat[11], mat[12],
-              mat[13], mat[14], mat[15], mat[16],
+              mat[4], mat[5], mat[6], mat[7],
+              mat[8], mat[9], mat[10], mat[11],
+              mat[12], mat[13], mat[14], mat[15],
             );
 
             // If the primitive has a mesh, add its geometry
             var mesh = node.getMesh();
             if (mesh != null) {
-                var primitives = mesh.getPrimitives();
+                var primitives = mesh.listPrimitives();
                 
                 for (var j = 0; j < primitives.length; j++) {
                     var primitive = primitives[j];
@@ -1644,7 +1666,7 @@ var Object3d$ = {
                         normals.push(Vector3d.create(handednessMultiplier * normalBuffer[start], normalBuffer[start + 1], normalBuffer[start + 2]));
                         var texStart = 2 * k;
                         var t = texCoord0Buffer[texStart + 1];
-                        if (this.get_flipV()) {
+                        if (this.flipV) {
                             t = 1 - t;
                         }
                         texcoord0s.push(Vector2d.create(texCoord0Buffer[texStart], t));
@@ -1654,11 +1676,11 @@ var Object3d$ = {
                     nodesWithMesh.push(currentObject);
 
                     // Populate index list
-                    var indicesCount = indicesAttr.getCount();
+                    var indicesCount = indices.getCount();
                     var polygonCount = indicesCount / 3;
-                    for (var k = 0; i < polygonCount; k++) {
+                    for (var k = 0; k < polygonCount; k++) {
                         var start = 3 * k;
-                        var indices = this.get_flipHandedness() ? [start, start + 2, start + 1] : [start, start + 1, start + 2];
+                        var indices = this.flipHandedness ? [start, start + 2, start + 1] : [start, start + 1, start + 2];
                         for (var l = 0; l < 3; l++) {
                             indexList.push(indicesBuffer[indices[l]]);
                         }
@@ -1706,21 +1728,44 @@ var Object3d$ = {
             for (var i = startId; i < endId; i++) {
                 var transformedPosition = transformToWorld.transform(positions[i]);
                 transformedPosition.x *= handednessMultiplier;
-                var positionNormalTextured = PositionNormalTextured.create(
+                var positionNormalTextured = PositionNormalTextured.createUV(
                   transformedPosition,
                   normals[i],
                   texcoord0s[i],
                 );
+                vertexList.push(positionNormalTextured);
             }
         }
+
+        // Texture
         
+        // Material - this currently uses the default material
+        var currentMaterial = this._createDefaultMaterial();
+        this._addMaterial(currentMaterial);
+
+        // Root object
+        var rootDummy = new ObjectNode();
+        rootDummy.name = "Root";
+        rootDummy.parent = null;
+        rootDummy.level = -1;
+        rootDummy.drawGroup = null;
+        rootDummy.children = topLevelObjects;
+        
+        this.objects = [rootDummy];
+
+        // Setting mesh to device
+        this._mesh = Mesh.create(vertexList, indexList);
+        this._mesh.setObjects(this.objects);
+        this._mesh.commitToDevice();
+        this._dirty = false;
+        this._readyToRender = true;
     },
 
     _getTransformMatrixToWorld: function (node) {
         if (node == null) {
             return Matrix3d.get_identity();
         } else {
-            return Matrix3d.multiplyMatrix(node.localMat * this._getTransformMatrixToWorld(node.parent));
+            return Matrix3d.multiplyMatrix(node.localMat, this._getTransformMatrixToWorld(node.parent));
         }
     },
 
@@ -1794,18 +1839,9 @@ var Object3d$ = {
         var applyListsIndex = [];
         var materialNames = [];
         var currentMaterialIndex = -1;
-        var currentMaterial = new Material();
+        var currentMaterial = this._createDefaultMaterial();
         var currentGroup = new Group();
         var currentIndex = 0;
-
-        // initialize the default material
-        currentMaterial = new Material();
-        currentMaterial.diffuse = this.color;
-        currentMaterial.ambient = this.color;
-        currentMaterial.specular = Colors.get_white();
-        currentMaterial.specularSharpness = 30;
-        currentMaterial.opacity = 1;
-        currentMaterial.isDefault = true;
 
         // initialize the group
         currentGroup.startIndex = 0;
