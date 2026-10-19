@@ -1170,7 +1170,7 @@ Object3d._textureFromColor = function (color) {
 Object3d._isGLB = function (bytes) {
     // The first 4 bytes of a glB file represent the ASCII characters for "glTF"
     // https://filesignature.org/glb
-    bytes[0] === 0x67 && bytes[1] === 0x6C && bytes[2] === 0x54 && bytes[3] === 0x46;
+    return bytes[0] === 0x67 && bytes[1] === 0x6C && bytes[2] === 0x54 && bytes[3] === 0x46;
 };
 
 var Object3d$ = {
@@ -1672,7 +1672,7 @@ var Object3d$ = {
         for (var i = 0; i < lists.length; i++) {
             var list = lists[i];
             for (var j = 0; j < list.length; j++) {
-                var uri = list[j];
+                var uri = list[j].uri;
                 // Images stored in buffer views don't have a URI
                 // `data` URIs are decoded by gltf-transform
                 if (uri == null || ss.startsWith(uri, 'data:') || ss.keyExists(alreadySeen, uri)) {
