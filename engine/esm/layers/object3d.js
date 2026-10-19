@@ -273,11 +273,11 @@ Object3d._format = function (path) {
 
 Object3dLayer.fromUrl = function (url, format) {
     if (!format) {
-        var path = new URL(url, window.location.href).pathname.toLowerCase();
         format = Object3d._format(url);
     }
     var mainName = 'model.' + format;
     var layer = new Object3dLayer();
+    layer._flipHandedness$1 = (format !='3ds');
     layer.objType = (format === 'obj');
     layer.object3d = new Object3d(
         new Object3dUrlSource(url, mainName), mainName,
@@ -1081,9 +1081,11 @@ export function Object3d(doc, filename, flipV, flipHandedness, smooth, color) {
 
     var filenameLC = this.filename.toLowerCase();
     if (ss.endsWith(filenameLC, '.obj')) {
+        this.flipHandedness = true;
         this._loadMeshFromObj(doc, this.filename);
     } else if (ss.endsWith(filenameLC, '.gltf') || ss.endsWith(filenameLC, '.glb')) {
-      this._loadMeshFromGLTF(doc, this.filename);
+        this.flipHandedness = true;
+        this._loadMeshFromGLTF(doc, this.filename);
     } else {
         this._loadMeshFrom3ds(doc, this.filename, 1);
     }
@@ -1156,6 +1158,13 @@ Object3d._disposeTextureList = function (textures) {
     }
 };
 
+Object3d._textureFromColor = function (color) {
+    var texture = new Texture();
+    texture.texture2d = Texture.fromColor(color);
+    texture._ready = true;
+    return texture;
+};
+
 var Object3d$ = {
 
     get_color: function () {
@@ -1171,10 +1180,12 @@ var Object3d$ = {
     _reload: function () {
         if (!this.issLayer) {
             this.dispose();
-            if (ss.endsWith(this.filename.toLowerCase(), '.obj')) {
+            var filenameLC = this.filename.toLowerCase();
+            if (ss.endsWith(filenameLC, '.obj')) {
                 this._loadMeshFromObj(this._document, this.filename);
-            }
-            else {
+            } else if (ss.endsWith(filenameLC, '.glb') || ss.endsWith(filenameLC, '.gltf')) {
+                this._loadMeshFromGLTF(this._document, this.filename);
+            } else {
                 this._loadMeshFrom3ds(this._document, this.filename, 1);
             }
         }
@@ -1194,7 +1205,7 @@ var Object3d$ = {
     // Calculate per-vertex normals by averaging face normals. Normals of adjacent faces with an
     // angle of greater than crease angle are not included in the average. CalculateVertexNormalsMerged
     // is slower than the other normal generation method, CalculateVertexNormals, but it produces better
-    // results. Vertices with identical positions (bot possibly different texture coordinates) are treated
+    // results. Vertices with identical positions (but possibly different texture coordinates) are treated
     // as the same vertex for purposes of normal calculation. This allows smooth normals across texture
     // wrap seams.
     //
@@ -1596,6 +1607,16 @@ var Object3d$ = {
             );
         });
     },
+    
+    _textureFromGLTFTexture: function (gltfTex) {
+        var blob = new Blob([gltfTex.getImage()], { type: gltfTex.getMimeType() });
+        return Texture.fromUrl(URL.createObjectURL(blob));
+    },
+
+    _linearToSrgb: function (c) {
+      var s = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+      return Math.round(Math.min(Math.max(s, 0), 1) * 255);
+    },
 
     _readGLTFToMesh: function (doc) {
         var root = doc.getRoot();
@@ -1622,6 +1643,7 @@ var Object3d$ = {
         var nodesWithMesh = [];
 
         var currentObject = null;
+        var currentMaterial = null;
         var currentIndex = 0;
 
         var map = {};
@@ -1738,11 +1760,45 @@ var Object3d$ = {
         }
 
         // Texture
-        
-        // Material - this currently uses the default material
-        var currentMaterial = this._createDefaultMaterial();
-        this._addMaterial(currentMaterial);
+      
+        var materials = root.listMaterials();
+        var materialsCount = materials.length;
+        let wwtNormTex = null;
+        let wwtBaseTex = Object3d._textureFromColor(this.color);
+        for (var i = 0; i < materialsCount; i++) {
+            var material = materials[i];
+            currentMaterial = this._createDefaultMaterial();
+            if (material != null) {
+                var color = material.getBaseColorFactor();
+                var wwtColor = Color.fromArgb(
+                    color[3] * 255,
+                    this._linearToSrgb(color[0]),
+                    this._linearToSrgb(color[1]),
+                    this._linearToSrgb(color[2]),
+                );
+                currentMaterial.diffuse = wwtColor;
+                currentMaterial.ambient = wwtColor;
+                currentMaterial.opacity = material.getAlphaMode() == "OPAQUE" ? 1 : material.getAlpha();
+                currentMaterial.isDefault = false;
+                var roughness = material.getRoughnessFactor();
+                currentMaterial.specular = 1 - roughness;
+                currentMaterial.specularSharpness = Math.max(10, (2 / (roughness * roughness)) - 2);
 
+                var baseTex = material.getBaseColorTexture();
+                wwtBaseTex = baseTex ? this._textureFromGLTFTexture(baseTex) : Object3d._textureFromColor(wwtColor);
+
+                var normTex = material.getNormalTexture();
+                if (normTex) {
+                    wwtNormTex = this._textureFromGLTFTexture(normTex);
+                }
+            }
+            this._meshTextures.push(wwtBaseTex);
+            this._meshNormalMaps.push(wwtNormTex);
+            this._meshSpecularTextures.push(null);
+            this._addMaterial(currentMaterial);
+        }
+        
+        
         // Root object
         var rootDummy = new ObjectNode();
         rootDummy.name = "Root";
