@@ -1083,10 +1083,8 @@ export function Object3d(doc, filename, flipV, flipHandedness, smooth, color) {
 
     var filenameLC = this.filename.toLowerCase();
     if (ss.endsWith(filenameLC, '.obj')) {
-        this.flipHandedness = true;
         this._loadMeshFromObj(doc, this.filename);
     } else if (ss.endsWith(filenameLC, '.gltf') || ss.endsWith(filenameLC, '.glb')) {
-        this.flipHandedness = true;
         this._loadMeshFromGLTF(doc, this.filename);
     } else {
         this._loadMeshFrom3ds(doc, this.filename, 1);
@@ -1800,9 +1798,9 @@ var Object3d$ = {
                     var polygonCount = indicesCount / 3;
                     for (var k = 0; k < polygonCount; k++) {
                         var start = 3 * k;
-                        var indices = this.flipHandedness ? [start, start + 2, start + 1] : [start, start + 1, start + 2];
+                        var indexOrder = this.flipHandedness ? [start, start + 2, start + 1] : [start, start + 1, start + 2];
                         for (var l = 0; l < 3; l++) {
-                            indexList.push(indicesBuffer[indices[l] + vertexIndexOffset]);
+                            indexList.push(indicesBuffer[indexOrder[l]] + vertexIndexOffset);
                         }
                     }
 
@@ -1832,7 +1830,7 @@ var Object3d$ = {
 
         var sceneChildren = scene.listChildren();
         for (var i = 0; i < sceneChildren.length; i++) {
-            var rootNode = nodes[i];
+            var rootNode = sceneChildren[i];
             var rootObjectNode = map[rootNode.getExtras().id];
             rootObjectNode.level = 0;
             this._setGLTFLevel(map, rootNode, nodes, rootObjectNode.level); 
