@@ -578,14 +578,16 @@ var Object3dLayer$ = {
     },
 
     loadData: function (doc, filename) {
-        if (ss.endsWith(filename.toLowerCase(), '.obj')) {
+        var filenameLC = filename.toLowerCase();
+        if (ss.endsWith(filenameLC, '.obj')) {
             this.objType = true;
         }
         if (!this._lightID$1) {
             if (this.objType) {
                 this.object3d = new Object3d(doc, ss.replaceString(filename, '.txt', '.obj'), this.get_flipV(), this._flipHandedness$1, true, this.get_color());
-            }
-            else {
+            } else if (ss.endsWith(filenameLC, '.gltf') || ss.endsWith(filenameLC, '.glb')) {
+                this.object3d = new Object3d(doc, ss.replaceString(ss.replaceString(filename, '.txt', '.glb'), '.txt', '.gltf'), this.get_flipV(), this._flipHandedness$1, true, this.get_color());
+            } else {
                 this.object3d = new Object3d(doc, ss.replaceString(filename, '.txt', '.3ds'), this.get_flipV(), this._flipHandedness$1, true, this.get_color());
             }
         }
@@ -1688,7 +1690,7 @@ var Object3d$ = {
                         normals.push(Vector3d.create(handednessMultiplier * normalBuffer[start], normalBuffer[start + 1], normalBuffer[start + 2]));
                         var texStart = 2 * k;
                         var t = texCoord0Buffer[texStart + 1];
-                        if (this.flipV) {
+                        if (!this.flipV) {
                             t = 1 - t;
                         }
                         texcoord0s.push(Vector2d.create(texCoord0Buffer[texStart], t));
@@ -1704,7 +1706,7 @@ var Object3d$ = {
                         var start = 3 * k;
                         var indices = this.flipHandedness ? [start, start + 2, start + 1] : [start, start + 1, start + 2];
                         for (var l = 0; l < 3; l++) {
-                            indexList.push(indicesBuffer[indices[l]]);
+                            indexList.push(indicesBuffer[indices[l] + vertexIndexOffset]);
                         }
                     }
 
@@ -1781,8 +1783,10 @@ var Object3d$ = {
                 currentMaterial.opacity = material.getAlphaMode() == "OPAQUE" ? 1 : material.getAlpha();
                 currentMaterial.isDefault = false;
                 var roughness = material.getRoughnessFactor();
-                currentMaterial.specular = 1 - roughness;
-                currentMaterial.specularSharpness = Math.max(10, (2 / (roughness * roughness)) - 2);
+                var gray = (1 - roughness) * 255;
+                currentMaterial.specular = Color.fromArgb(255, gray, gray, gray);
+                var alpha = Math.max(roughness * roughness, 1e-3);
+                currentMaterial.specularSharpness = Math.max(10, (2 / alpha) - 2);
 
                 var baseTex = material.getBaseColorTexture();
                 wwtBaseTex = baseTex ? this._textureFromGLTFTexture(baseTex) : Object3d._textureFromColor(wwtColor);
