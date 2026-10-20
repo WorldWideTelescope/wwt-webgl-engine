@@ -1734,7 +1734,7 @@ var Object3d$ = {
         }
 
         var count = positionAttr.getCount();
-        var positions = positionAttr.getrray();
+        var positions = positionAttr.getArray();
         var normalAttr = primitive.getAttribute("NORMAL");
         var texCoordAttr = primitive.getAttribute("TEXCOORD_0");
         var normals = normalAttr ? normalAttr.getArray() : null;
@@ -1757,7 +1757,7 @@ var Object3d$ = {
                 vertexList[i] = PositionNormalTextured._create(
                     positions[3 * i], positions[3 * i + 1], positions[3 * i + 2],
                     0, 0, 0,
-                    uvs[2 * i], uvs[2 * i + 1]
+                    texCoords[2 * i], texCoords[2 * i + 1]
                 );
             }
 
@@ -1778,8 +1778,8 @@ var Object3d$ = {
                 flatNormals[3 * dst] = vertexNormals[dst].x;
                 flatNormals[3 * dst + 1] = vertexNormals[dst].y;
                 flatNormals[3 * dst + 2] = vertexNormals[dst].z;
-                flatTexCoords[2 * dst] = uvs[2 * src];
-                flatTexCoords[2 * dst + 1] = uvs[2 * src + 1];
+                flatTexCoords[2 * dst] = texCoords[2 * src];
+                flatTexCoords[2 * dst + 1] = texCoords[2 * src + 1];
                 flatIndices[dst] = dst;
             }
             positions = flatPositions;
@@ -1825,6 +1825,7 @@ var Object3d$ = {
 
         var materials = root.listMaterials();
         var materialsCount = materials.length;
+        var defaultMaterialIndex = materialsCount;
 
         var nodes = root.listNodes();
         for (var i = 0; i < nodes.length; i++) {
@@ -1853,11 +1854,11 @@ var Object3d$ = {
 
                     // Populate vertex list
                     var vertexIndexOffset = normals.length;
-                    var vertexCount = normalAttr.getCount();
+                    var vertexCount = data.count;
                     for (var k = 0; k < vertexCount; k++) {
                         var start = 3 * k;
-                        positions.push(Vector3d.create(data.positions[p], data.positions[p + 1], data.positions[p + 2]));
-                        normals.push(Vector3d.create(data.normals[p], data.normals[p + 1], data.normals[p + 2]));
+                        positions.push(Vector3d.create(data.positions[start], data.positions[start + 1], data.positions[start + 2]));
+                        normals.push(Vector3d.create(data.normals[start], data.normals[start + 1], data.normals[start + 2]));
                         var texStart = 2 * k;
                         var t = data.texCoords[texStart + 1];
                         if (!this.flipV) {
@@ -1870,13 +1871,13 @@ var Object3d$ = {
                     nodesWithMesh.push(currentObject);
 
                     // Populate index list
-                    var indicesCount = indices.getCount();
+                    var indicesCount = data.indices.length - (data.indices.length % 3);
                     var polygonCount = indicesCount / 3;
                     for (var k = 0; k < polygonCount; k++) {
                         var start = 3 * k;
                         var indexOrder = this.flipHandedness ? [start, start + 2, start + 1] : [start, start + 1, start + 2];
                         for (var l = 0; l < 3; l++) {
-                            indexList.push(indicesBuffer[indexOrder[l]] + vertexIndexOffset);
+                            indexList.push(data.indices[indexOrder[l]] + vertexIndexOffset);
                         }
                     }
 
