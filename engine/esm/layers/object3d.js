@@ -1185,6 +1185,7 @@ var Object3d$ = {
     },
 
     _reload: function () {
+        this._readyToRender = false;
         if (!this.issLayer) {
             this.dispose();
             var filenameLC = this.filename.toLowerCase();

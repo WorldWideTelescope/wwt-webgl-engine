@@ -1315,7 +1315,7 @@ export namespace LayerManager {
    * */
   export function addVoTableLayerWithPlotType(table: VoTable, title: string, plotType: PlotTypes): VoTableLayer;
 
-  export function addObject3dLayerFromUrl(frame: string, name: string, url: string, format: string): Object3dLayer;
+  export function addObject3dLayerFromUrl(frame: string, name: string, url: string, format?: string): Object3dLayer;
 
   export function getMoonFile(url: string): void;
   export function initLayers(): void;
@@ -1365,6 +1365,9 @@ export class Object3d {
 export class Object3dLayer extends Layer {
     objType: boolean;
     object3d: Object3d | null;
+
+    set_scale(scale: Vector3d): Vector3d;
+    set_translate(translate: Vector3d): Vector3d;
 }
 
 export namespace Object3dLayer {
