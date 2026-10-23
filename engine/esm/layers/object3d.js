@@ -30,6 +30,9 @@ import { Cursor, Cursors } from "../util.js";
 import { Layer } from "./layer.js";
 import { LayerUI, LayerUITreeNode } from "./layer_ui.js";
 
+import { v4 } from "uuid";
+import { WebIO } from "@gltf-transform/core";
+
 
 // wwtlib.Material
 //
@@ -257,13 +260,25 @@ Object3dLayer._initRotateUI$1 = function () {
     }
 };
 
+Object3d._format = function (path) {
+    var formats = ['obj', 'gltf', 'glb', '3ds'];
+    for (var i = 0; i < formats.length; i++) {
+        var format = formats[i];
+        if (path.endsWith('.' + format)) {
+            return format;
+        }
+    }
+    return '3ds';
+}
+
 Object3dLayer.fromUrl = function (url, format) {
     if (!format) {
         var path = new URL(url, window.location.href).pathname.toLowerCase();
-        format = ss.endsWith(path, '.obj') ? 'obj' : '3ds';
+        format = Object3d._format(path);
     }
     var mainName = 'model.' + format;
     var layer = new Object3dLayer();
+    layer._flipHandedness$1 = (format !='3ds');
     layer.objType = (format === 'obj');
     layer.object3d = new Object3d(
         new Object3dUrlSource(url, mainName), mainName,
@@ -564,14 +579,16 @@ var Object3dLayer$ = {
     },
 
     loadData: function (doc, filename) {
-        if (ss.endsWith(filename.toLowerCase(), '.obj')) {
+        var filenameLC = filename.toLowerCase();
+        if (ss.endsWith(filenameLC, '.obj')) {
             this.objType = true;
         }
         if (!this._lightID$1) {
             if (this.objType) {
                 this.object3d = new Object3d(doc, ss.replaceString(filename, '.txt', '.obj'), this.get_flipV(), this._flipHandedness$1, true, this.get_color());
-            }
-            else {
+            } else if (ss.endsWith(filenameLC, '.gltf') || ss.endsWith(filenameLC, '.glb')) {
+                this.object3d = new Object3d(doc, ss.replaceString(ss.replaceString(filename, '.txt', '.glb'), '.txt', '.gltf'), this.get_flipV(), this._flipHandedness$1, true, this.get_color());
+            } else {
                 this.object3d = new Object3d(doc, ss.replaceString(filename, '.txt', '.3ds'), this.get_flipV(), this._flipHandedness$1, true, this.get_color());
             }
         }
@@ -1064,10 +1081,13 @@ export function Object3d(doc, filename, flipV, flipHandedness, smooth, color) {
     this.flipV = flipV;
     this.flipHandedness = flipHandedness;
     this.filename = filename;
-    if (ss.endsWith(this.filename.toLowerCase(), '.obj')) {
+
+    var filenameLC = this.filename.toLowerCase();
+    if (ss.endsWith(filenameLC, '.obj')) {
         this._loadMeshFromObj(doc, this.filename);
-    }
-    else {
+    } else if (ss.endsWith(filenameLC, '.gltf') || ss.endsWith(filenameLC, '.glb')) {
+        this._loadMeshFromGLTF(doc, this.filename);
+    } else {
         this._loadMeshFrom3ds(doc, this.filename, 1);
     }
 }
@@ -1139,6 +1159,19 @@ Object3d._disposeTextureList = function (textures) {
     }
 };
 
+Object3d._textureFromColor = function (color) {
+    var texture = new Texture();
+    texture.texture2d = Texture.fromColor(color);
+    texture._ready = true;
+    return texture;
+};
+
+Object3d._isGLB = function (bytes) {
+    // The first 4 bytes of a glB file represent the ASCII characters for "glTF"
+    // https://filesignature.org/glb
+    return bytes[0] === 0x67 && bytes[1] === 0x6C && bytes[2] === 0x54 && bytes[3] === 0x46;
+};
+
 var Object3d$ = {
 
     get_color: function () {
@@ -1152,21 +1185,35 @@ var Object3d$ = {
     },
 
     _reload: function () {
+        this._readyToRender = false;
         if (!this.issLayer) {
             this.dispose();
-            if (ss.endsWith(this.filename.toLowerCase(), '.obj')) {
+            var filenameLC = this.filename.toLowerCase();
+            if (ss.endsWith(filenameLC, '.obj')) {
                 this._loadMeshFromObj(this._document, this.filename);
-            }
-            else {
+            } else if (ss.endsWith(filenameLC, '.glb') || ss.endsWith(filenameLC, '.gltf')) {
+                this._loadMeshFromGLTF(this._document, this.filename);
+            } else {
                 this._loadMeshFrom3ds(this._document, this.filename, 1);
             }
         }
     },
 
+    _createDefaultMaterial: function () {
+        var material = new Material();
+        material.diffuse = this.color;
+        material.ambient = this.color;
+        material.specular = Colors.get_white();
+        material.specularSharpness = 30;
+        material.opacity = 1;
+        material.isDefault = true;
+        return material;
+    },
+
     // Calculate per-vertex normals by averaging face normals. Normals of adjacent faces with an
     // angle of greater than crease angle are not included in the average. CalculateVertexNormalsMerged
     // is slower than the other normal generation method, CalculateVertexNormals, but it produces better
-    // results. Vertices with identical positions (bot possibly different texture coordinates) are treated
+    // results. Vertices with identical positions (but possibly different texture coordinates) are treated
     // as the same vertex for purposes of normal calculation. This allows smooth normals across texture
     // wrap seams.
     //
@@ -1521,8 +1568,15 @@ var Object3d$ = {
         return percentage;
     },
 
-    _readFile: function (filename, asText, onLoaded) {
+    _readFile: function (filename, asText, onLoaded, onError) {
         var doc = this._document;
+
+        var fail = function (message) {
+            console.error(message);
+            if (onError != null) {
+                onError(message);
+            }
+        }
 
         var withBlob = function (blob) {
             if (blob == null) {
@@ -1532,7 +1586,7 @@ var Object3d$ = {
             var reader = new FileReader();
             reader.onloadend = function () {
                 if (reader.error != null) {
-                    console.error('Error reading model file ' + filename + ': ' + reader.error);
+                    fail('Error reading model file ' + filename + ': ' + reader.error);
                     return;
                 }
                 onLoaded(reader.result);
@@ -1551,10 +1605,430 @@ var Object3d$ = {
         }
     },
 
+    _loadMeshFromGLTF: function (doc, filename) {
+        var $this = this;
+
+        this.filename = filename;
+        this._document = doc;
+
+        var onError = function (error) {
+            console.error('Error loading glTF model ' + filename + ': ' + error);
+        };
+
+        this._readFile(filename, false, function (buffer) {
+            var bytes = new Uint8Array(buffer);
+            var io = new WebIO();
+
+            var onDocument = function (document) {
+                $this._readGLTFToMesh.bind($this)(document);
+            };
+            
+            if (Object3d._isGLB(bytes)) {
+                io.readBinary(bytes).then(onDocument, onError);
+                return;
+            }
+
+            var json;
+            try {
+                json = JSON.parse(new TextDecoder().decode(bytes));
+            } catch (error) {
+                onError(error);
+                return;
+            }
+
+            $this._loadGLTFResources(json, function (resources) {
+                io.readJSON({ json: json, resources: resources }).then(onDocument, onError);
+            }, onError);
+        });
+    },
+    
+    _textureFromGLTFTexture: function (gltfTex) {
+        var blob = new Blob([gltfTex.getImage()], { type: gltfTex.getMimeType() });
+        return Texture.fromUrl(URL.createObjectURL(blob));
+    },
+
+    _linearToSrgb: function (c) {
+        var s = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+        return Math.round(Math.min(Math.max(s, 0), 1) * 255);
+    },
+
+    _gltfResourcePath: function (uri) {
+        // For e.g. a URL source: keep "textures/foo.png",
+        // so it resolves relative to the model's location.
+        if (this._document.preserveRelativePaths) {
+            return uri;
+        }
+
+        // Tour cabinets are flat, so we drop any directories.
+        var name = ss.replaceString(decodeURIComponent(uri), '/', '\\');
+        name = name.substring(name.lastIndexOf('\\') + 1);
+        var path = this.filename.substring(0, this.filename.lastIndexOf('\\') + 1);
+        return path + name;
+    },
+
+    _loadGLTFResources: function (json, onLoaded, onError) {
+        var uris = [];
+        // This is really just a `Set`, but we can't use that in IE
+        var alreadySeen = {};
+        var lists = [
+            json.buffers || [],
+            json.images || [],
+        ];
+
+        // Gather up all of the URIs whose data we need to fetch
+        for (var i = 0; i < lists.length; i++) {
+            var list = lists[i];
+            for (var j = 0; j < list.length; j++) {
+                var uri = list[j].uri;
+                // Images stored in buffer views don't have a URI
+                // `data` URIs are decoded by gltf-transform
+                if (uri == null || ss.startsWith(uri, 'data:') || ss.keyExists(alreadySeen, uri)) {
+                    continue;
+                }
+                alreadySeen[uri] = true;
+                uris.push(uri);
+            }
+        }
+
+        var resources = {};
+        var pending = uris.length;
+        var failed = false;
+        if (!pending) {
+            onLoaded(resources);
+            return;
+        }
+
+        var $this = this;
+        var fetchURI = function (uri) {
+            $this._readFile($this._gltfResourcePath(uri), false, function (buffer) {
+                if (failed) {
+                    return;
+                }
+
+                resources[uri] = new Uint8Array(buffer);
+                pending -= 1;
+                if (pending == 0) {
+                    onLoaded(resources);
+                }
+            }, function (error) {
+                if (!failed) {
+                    failed = true;
+                    onError('Missing glTF resource ' + uri + ': ' + error);
+                }
+            });
+        };
+
+        for (var k = 0; k < uris.length; k++) {
+            fetchURI(uris[k]);
+        }
+    },
+
+    _dataForGLTFPrimitive: function (primitive) {
+        // For now, we're only drawing triangles
+        if (primitive.getMode() !== 4) {
+            return null;
+        }
+        
+        var positionAttr = primitive.getAttribute("POSITION");
+        if (positionAttr == null) {
+            return null;
+        }
+
+        var count = positionAttr.getCount();
+        var positions = positionAttr.getArray();
+        var normalAttr = primitive.getAttribute("NORMAL");
+        var texCoordAttr = primitive.getAttribute("TEXCOORD_0");
+        var normals = normalAttr ? normalAttr.getArray() : null;
+        var texCoords = texCoordAttr ? texCoordAttr.getArray() : new Float32Array(2 * count);
+
+        var indices;
+        var indexAccessor = primitive.getIndices();
+        if (indexAccessor != null) {
+            indices = indexAccessor.getArray();
+        } else {
+            indices = new Uint32Array(count);
+            for (var i = 0; i < count; i++) {
+                indices[i] = i;
+            }
+        }
+
+        if (normals == null) {
+            var vertexList = new Array(count);
+            for (var i = 0; i < count; i++) {
+                vertexList[i] = PositionNormalTextured._create(
+                    positions[3 * i], positions[3 * i + 1], positions[3 * i + 2],
+                    0, 0, 0,
+                    texCoords[2 * i], texCoords[2 * i + 1]
+                );
+            }
+
+            var n = indices.length - (indices.length % 3);
+            var creaseAngleRad = (this.smooth ? 70 : 0) * Math.PI / 180;
+            var vertexNormals = this._calculateVertexNormalsMerged(vertexList, indices.subarray(0, n), creaseAngleRad);
+
+            // The result has one normal per index entry, so give each index its own vertex
+            var flatPositions = new Float32Array(3 * n);
+            var flatNormals = new Float32Array(3 * n);
+            var flatTexCoords = new Float32Array(2 * n);
+            var flatIndices = new Uint32Array(n);
+            for (var dst = 0; dst < n; dst++) {
+                var src = indices[dst];
+                flatPositions[3 * dst] = positions[3 * src];
+                flatPositions[3 * dst + 1] = positions[3 * src + 1];
+                flatPositions[3 * dst + 2] = positions[3 * src + 2];
+                flatNormals[3 * dst] = vertexNormals[dst].x;
+                flatNormals[3 * dst + 1] = vertexNormals[dst].y;
+                flatNormals[3 * dst + 2] = vertexNormals[dst].z;
+                flatTexCoords[2 * dst] = texCoords[2 * src];
+                flatTexCoords[2 * dst + 1] = texCoords[2 * src + 1];
+                flatIndices[dst] = dst;
+            }
+            positions = flatPositions;
+            normals = flatNormals;
+            texCoords = flatTexCoords;
+            indices = flatIndices;
+            count = n;
+        }
+
+        return { positions: positions, normals: normals, texCoords: texCoords, indices: indices, count: count };
+    },
+
+    _readGLTFToMesh: function (doc) {
+        var root = doc.getRoot();
+        if (root == null) {
+            return;
+        }
+        // For now, assume that we have one scene
+        var scene = root.getDefaultScene();
+        if (scene == null) {
+            return;
+        }
+
+        var handednessMultiplier = this.flipHandedness ? -1 : 1;
+
+        var positions = [];
+        var normals = [];
+        var texcoord0s = [];
+        var indexList = [];
+        var vertexList = [];
+
+        var topLevelObjects = [];
+        var vertexIndexOffsetForPrimitives = [];
+        var vertexCountForPrimitives = [];
+        var nodesWithMesh = [];
+
+        var currentObject = null;
+        var currentMaterial = null;
+        var currentIndex = 0;
+        var needsDefaultMaterial = false;
+
+        var map = {};
+
+        var materials = root.listMaterials();
+        var materialsCount = materials.length;
+        var defaultMaterialIndex = materialsCount;
+
+        var nodes = root.listNodes();
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            currentObject = new ObjectNode();
+            currentObject.name = node.getName();
+            var mat = node.getMatrix();
+            currentObject.localMat = Matrix3d.create(
+              mat[0], mat[1], mat[2], mat[3],
+              mat[4], mat[5], mat[6], mat[7],
+              mat[8], mat[9], mat[10], mat[11],
+              mat[12], mat[13], mat[14], mat[15],
+            );
+
+            // If the primitive has a mesh, add its geometry
+            var mesh = node.getMesh();
+            if (mesh != null) {
+                var primitives = mesh.listPrimitives();
+                
+                for (var j = 0; j < primitives.length; j++) {
+                    var primitive = primitives[j];
+                    var data = this._dataForGLTFPrimitive(primitive);
+                    if (data == null) {
+                        continue;
+                    }
+
+                    // Populate vertex list
+                    var vertexIndexOffset = normals.length;
+                    var vertexCount = data.count;
+                    for (var k = 0; k < vertexCount; k++) {
+                        var start = 3 * k;
+                        positions.push(Vector3d.create(data.positions[start], data.positions[start + 1], data.positions[start + 2]));
+                        normals.push(Vector3d.create(data.normals[start], data.normals[start + 1], data.normals[start + 2]));
+                        var texStart = 2 * k;
+                        var t = data.texCoords[texStart + 1];
+                        if (!this.flipV) {
+                            t = 1 - t;
+                        }
+                        texcoord0s.push(Vector2d.create(data.texCoords[texStart], t));
+                    }
+                    vertexIndexOffsetForPrimitives.push(vertexIndexOffset);
+                    vertexCountForPrimitives.push(vertexCount);
+                    nodesWithMesh.push(currentObject);
+
+                    // Populate index list
+                    var indicesCount = data.indices.length - (data.indices.length % 3);
+                    var polygonCount = indicesCount / 3;
+                    for (var k = 0; k < polygonCount; k++) {
+                        var start = 3 * k;
+                        var indexOrder = this.flipHandedness ? [start, start + 2, start + 1] : [start, start + 1, start + 2];
+                        for (var l = 0; l < 3; l++) {
+                            indexList.push(data.indices[indexOrder[l]] + vertexIndexOffset);
+                        }
+                    }
+
+                    // Create and add group
+                    var group = new Group(); 
+                    group.startIndex = currentIndex;
+                    group.indexCount = indicesCount;
+
+                    var material = primitive.getMaterial();
+                    if (material == null) {
+                        group.materialIndex = defaultMaterialIndex;
+                        needsDefaultMaterial = true;
+                    } else {
+                        group.materialIndex = root.listMaterials().indexOf(material);
+                    }
+
+                    currentObject.drawGroup.push(group);
+                    currentIndex += group.indexCount;
+                }
+            }
+
+           // We want WWT to still support IE, so we can't use a JS Map.
+            // Nodes don't have a built-in ID, so let's do it ourselves
+            // We use the node's `extras` member to store a UUID
+            var uuid = v4();
+            node.setExtras({ id: uuid });
+            map[uuid] = currentObject;
+
+        }
+
+        var sceneChildren = scene.listChildren();
+        for (var i = 0; i < sceneChildren.length; i++) {
+            var rootNode = sceneChildren[i];
+            var rootObjectNode = map[rootNode.getExtras().id];
+            rootObjectNode.level = 0;
+            this._setGLTFLevel(map, rootNode, nodes, rootObjectNode.level); 
+            topLevelObjects.push(rootObjectNode);
+        }
+
+        var nodesWithMeshCount = nodesWithMesh.length;
+        for (var nodeId = 0; nodeId < nodesWithMeshCount; nodeId++) {
+            currentObject = nodesWithMesh[nodeId];
+            var transformToWorld = this._getTransformMatrixToWorld(currentObject);
+            var startId = vertexIndexOffsetForPrimitives[nodeId];
+            var endId = startId + vertexCountForPrimitives[nodeId];
+            for (var i = startId; i < endId; i++) {
+                var transformedPosition = transformToWorld.transform(positions[i]);
+                transformedPosition.x *= handednessMultiplier;
+                var normal = normals[i];
+                var transformedNormal = Vector3d.create(
+                    normal.x * transformToWorld.get_m11() + normal.y * transformToWorld.get_m21() + normal.z * transformToWorld.get_m31(),
+                    normal.x * transformToWorld.get_m12() + normal.y * transformToWorld.get_m22() + normal.z * transformToWorld.get_m32(),
+                    normal.x * transformToWorld.get_m13() + normal.y * transformToWorld.get_m23() + normal.z * transformToWorld.get_m33(),
+                );
+                transformedNormal.normalize();
+                transformedNormal.x *= handednessMultiplier;
+                var positionNormalTextured = PositionNormalTextured.createUV(
+                  transformedPosition,
+                  transformedNormal,
+                  texcoord0s[i],
+                );
+                vertexList.push(positionNormalTextured);
+            }
+        }
+
+        // Texture
+
+        for (var i = 0; i < materialsCount; i++) {
+            var material = materials[i];
+            currentMaterial = this._createDefaultMaterial();
+            var color = material.getBaseColorFactor();
+            var wwtColor = Color.fromArgb(
+                color[3] * 255,
+                this._linearToSrgb(color[0]),
+                this._linearToSrgb(color[1]),
+                this._linearToSrgb(color[2]),
+            );
+            currentMaterial.diffuse = wwtColor;
+            currentMaterial.ambient = wwtColor;
+            currentMaterial.opacity = material.getAlphaMode() == "OPAQUE" ? 1 : material.getAlpha();
+            currentMaterial.isDefault = false;
+            var roughness = material.getRoughnessFactor();
+            var gray = (1 - roughness) * 255;
+            currentMaterial.specular = Color.fromArgb(255, gray, gray, gray);
+            var alpha = Math.max(roughness * roughness, 1e-3);
+            currentMaterial.specularSharpness = Math.max(10, (2 / alpha) - 2);
+
+            var baseTex = material.getBaseColorTexture();
+            var wwtBaseTex = baseTex ? this._textureFromGLTFTexture(baseTex) : Object3d._textureFromColor(wwtColor);
+
+            var normTex = material.getNormalTexture();
+            var wwtNormTex = normTex ? this._textureFromGLTFTexture(normTex) : null;
+            this._meshTextures.push(wwtBaseTex);
+            this._meshNormalMaps.push(wwtNormTex);
+            this._meshSpecularTextures.push(null);
+            this._addMaterial(currentMaterial);
+        }
+
+        // Only add a default material if there's at least one prim that doesn't have a material
+        if (needsDefaultMaterial) {
+            this._addMaterial(this._createDefaultMaterial());
+        }
+        
+        
+        // Root object
+        var rootDummy = new ObjectNode();
+        rootDummy.name = "Root";
+        rootDummy.parent = null;
+        rootDummy.level = -1;
+        rootDummy.drawGroup = null;
+        rootDummy.children = topLevelObjects;
+        
+        this.objects = [rootDummy];
+
+        // Setting mesh to device
+        this._mesh = Mesh.create(vertexList, indexList);
+        this._mesh.setObjects(this.objects);
+        this._mesh.commitToDevice();
+        this._dirty = false;
+        this._readyToRender = true;
+    },
+
+    _getTransformMatrixToWorld: function (node) {
+        if (node == null) {
+            return Matrix3d.get_identity();
+        } else {
+            return Matrix3d.multiplyMatrix(node.localMat, this._getTransformMatrixToWorld(node.parent));
+        }
+    },
+
+    _setGLTFLevel: function (map, parent, nodes, parentLevel) {
+        var parentObjectNode = map[parent.getExtras().id];
+        var children = parent.listChildren();
+        if (children.length > 0) {
+            var childLevel = parentLevel + 1;
+            for (var n = 0; n < children.length; n++) {
+                var child = children[n];
+                var childObjectNode = map[child.getExtras().id];
+                parentObjectNode.children.push(childObjectNode);
+                childObjectNode.parent = parentObjectNode;
+                childObjectNode.level = childLevel;
+
+                this._setGLTFLevel(map, child, nodes, childLevel);
+            }
+        }
+    },
+
     _loadMeshFromObj: function (doc, filename) {
         var $this = this;
 
-        var $this = this;
         this.filename = filename;
         this._document = doc;
         this._readFile(filename, true, function (text) {
@@ -1605,18 +2079,9 @@ var Object3d$ = {
         var applyListsIndex = [];
         var materialNames = [];
         var currentMaterialIndex = -1;
-        var currentMaterial = new Material();
+        var currentMaterial = this._createDefaultMaterial();
         var currentGroup = new Group();
         var currentIndex = 0;
-
-        // initialize the default material
-        currentMaterial = new Material();
-        currentMaterial.diffuse = this.color;
-        currentMaterial.ambient = this.color;
-        currentMaterial.specular = Colors.get_white();
-        currentMaterial.specularSharpness = 30;
-        currentMaterial.opacity = 1;
-        currentMaterial.isDefault = true;
 
         // initialize the group
         currentGroup.startIndex = 0;
