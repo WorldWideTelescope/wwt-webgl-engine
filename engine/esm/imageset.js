@@ -354,6 +354,7 @@ Imageset.createGeneric = function (dataSetType, bandPass) {
     temp._centerY = 0;
     temp._rotation = 0;
     temp._thumbnailUrl = '';
+    temp._fallbackUrls = [];
     temp._matrix = Matrix3d.get_identity();
     temp._matrix._multiply(Matrix3d._rotationX((temp.get_rotation() / 180 * Math.PI)));
     temp._matrix._multiply(Matrix3d._rotationZ((temp.get_centerY() / 180 * Math.PI)));
