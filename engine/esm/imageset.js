@@ -114,6 +114,7 @@ export function Imageset() {
     this._offsetX = 0;
     this._offsetY = 0;
     this._fallbackUrls = [];
+    this._activeUrl = null;
 }
 
 Imageset.getNewTile = function (imageset, level, x, y, parent) {
@@ -949,6 +950,16 @@ var Imageset$ = {
 
     set_fallbackUrls: function (urls) {
         this._fallbackUrls = urls;
+        return urls;
+    },
+
+    get_activeUrl: function () {
+        return this._activeUrl || this.get_url();
+    },
+
+    set_activeUrl: function (url) {
+        this._activeUrl = url;
+        return url;
     }
 };
 
