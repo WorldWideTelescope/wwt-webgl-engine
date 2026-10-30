@@ -128,6 +128,18 @@ Util.selectSingleNode = function (parent, name) {
     return node;
 };
 
+Util.selectChildNodes = function (parent, name) {
+    var nodes = [];
+    var $enum1 = ss.enumerate(parent.childNodes);
+    while ($enum1.moveNext()) {
+        var child = $enum1.current;
+        if (child.nodeName === name) {
+            nodes.push(child);
+        }
+    }
+    return nodes;
+};
+
 Util.getInnerText = function (node) {
     if (ss.emptyString(node.text)) {
         var cn = node;
