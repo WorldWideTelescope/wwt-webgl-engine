@@ -113,6 +113,7 @@ export function Imageset() {
     this._elevationModel = false;
     this._offsetX = 0;
     this._offsetY = 0;
+    this._fallbackUrls = [];
 }
 
 Imageset.getNewTile = function (imageset, level, x, y, parent) {
@@ -210,6 +211,18 @@ Imageset.fromXMLNode = function (node) {
             if (credits != null) {
                 creditsUrl = Util.getInnerText(credits);
             }
+            var fallbackUrls = [];
+            var fallbacks = Util.selectSingleNode(node, 'FallbackUrls');
+            if (fallbacks != null) {
+                var fallbackNodes = Util.selectChildNodes(fallbacks, 'Url');
+                for (var i = 0; i < fallbackNodes.length; i++) {
+                    var fallbackNode = fallbackNodes[i];
+                    var fallbackUrl = Util.getInnerText(fallbackNode);
+                    if (fallbackUrl) {
+                        fallbackUrls.push(fallbackUrl);
+                    }
+                }
+            }
             var meanRadius = 0;
             if (node.attributes.getNamedItem('MeanRadius') != null) {
                 meanRadius = parseFloat(node.attributes.getNamedItem('MeanRadius').nodeValue);
@@ -262,7 +275,7 @@ Imageset.fromXMLNode = function (node) {
             if (node.attributes.getNamedItem('Sparse') != null) {
                 sparse = ss.boolean(node.attributes.getNamedItem('Sparse').nodeValue);
             }
-            return Imageset.create(name, url, type, bandPass, projection, Math.abs(Util.getHashCode(url)), baseTileLevel, tileLevels, 256, baseDegreesPerTile, fileType, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, stockSet, elevationModel, wf, offsetX, offsetY, creditText, creditsUrl, demUrl, alturl, meanRadius, referenceFrame);
+            return Imageset.create(name, url, type, bandPass, projection, Math.abs(Util.getHashCode(url)), baseTileLevel, tileLevels, 256, baseDegreesPerTile, fileType, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, stockSet, elevationModel, wf, offsetX, offsetY, creditText, creditsUrl, demUrl, alturl, meanRadius, referenceFrame, fallbackUrls);
         } else {
             return Imageset.createGeneric(type, bandPass);
         }
@@ -308,6 +321,14 @@ Imageset.saveToXml = function (xmlWriter, imageset, alternateUrl) {
         } else {
             xmlWriter._writeElementString('ThumbnailUrl', imageset.get_url());
         }
+        if (this._fallbackUrls.length > 0) {
+            xmlWriter._writeStartElement('FallbackUrls');
+            for (var i = 0; i < this._fallbackUrls.length; i++) {
+                var fallbackUrl = this._fallbackUrls[i];
+                xmlWriter._writeElementString('Url', fallbackUrl);
+            }
+            xmlWriter._writeEndElement();
+        }
     }
     xmlWriter._writeEndElement();
 };
@@ -340,9 +361,9 @@ Imageset.createGeneric = function (dataSetType, bandPass) {
     return temp;
 };
 
-Imageset.create = function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, tileSize, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame) {
+Imageset.create = function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, tileSize, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls) {
     var temp = new Imageset();
-    temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame);
+    temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls);
     return temp;
 };
 
@@ -785,7 +806,7 @@ var Imageset$ = {
         }
     },
 
-    setInitialParameters: function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame) {
+    setInitialParameters: function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls) {
         this.set_referenceFrame(referenceFrame);
         this.set_meanRadius(meanRadius);
         this._altUrl = alturl;
@@ -815,6 +836,7 @@ var Imageset$ = {
         this._centerY = centerY;
         this._rotation = rotation;
         this._thumbnailUrl = thumbnailUrl;
+        this._fallbackUrls = fallbackUrls || [];
         this._computeMatrix();
     },
 
