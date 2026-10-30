@@ -927,6 +927,28 @@ var Imageset$ = {
 
     get_children: function () {
         return [];
+    },
+
+    add_fallbackUrl: function (url) {
+        if (this._fallbackUrls.indexOf(url) == -1) {
+            this._fallbackUrls.push(url);
+        }
+    },
+
+    remove_fallbackUrl: function (url) {
+        for (var i = this._fallbackUrls.length - 1; i >= 0; i--) {
+            if (this._fallbackUrls[i] === url) {
+                this._fallbackUrls.splice(i, 1);
+            }
+        }
+    },
+
+    get_fallbackUrls: function () {
+        return this._fallbackUrls;
+    },
+
+    set_fallbackUrls: function (urls) {
+        this._fallbackUrls = urls;
     }
 };
 
