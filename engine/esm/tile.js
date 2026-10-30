@@ -689,7 +689,7 @@ var Tile$ = {
     //{Q} - Quad Key ID
     //{S} - Last Digit of Quadkey
     get_URL: function () {
-        var rewritten_url = URLHelpers.singleton.rewrite(this.dataset.get_url(), 0);
+        var rewritten_url = URLHelpers.singleton.rewrite(this.dataset.get_activeUrl(), 0);
         var returnUrl = rewritten_url;
         if (rewritten_url.indexOf('{1}') > -1) {
             // Old style URL
