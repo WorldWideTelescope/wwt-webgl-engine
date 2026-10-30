@@ -8,7 +8,7 @@ export function downloadImageData(url, onLoad, onError) {
             imageElement.setAttribute('proxyattempt', true);
             var new_url = URLHelpers.singleton.activateProxy(url);
             if (new_url != null) {  // null => don't bother: we know that the proxy won't help
-                imageElement.rc = new_url;
+                imageElement.src = new_url;
                 return;
             }
         }
