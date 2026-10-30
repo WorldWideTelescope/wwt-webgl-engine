@@ -227,6 +227,70 @@ Util.sign = function (num) {
     return 1;
 };
 
+// Try each URL in `urls` in priority order. Calls `onSuccess(url, webFile)`
+// with the first one that loads successfully, or `onFailure(messages)` if
+// none do.
+Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
+    var results = [];
+    var messages = [];
+    var settled = false;
+
+    if (!urls.length) {
+        onFailure(messages);
+        return;
+    }
+
+    var check = function () {
+        if (settled) {
+            return;
+        }
+
+        for (var i = 0; i < urls.length; i++) {
+            if (results[i] === undefined) {
+                return;  // a higher-priority URL is still pending
+            }
+            if (results[i]) {
+                settled = true;
+                onSuccess(urls[i]);
+                return;
+            }
+        }
+
+        settled = true;  // everything failed
+        onFailure(messages);
+    };
+
+    urls.forEach(function (url, i) {
+        var file = new WebFile(url);
+
+        var finish = function (ok) {
+            if (results[i] !== undefined) {
+                return;
+            }
+            results[i] = ok;
+            if (!ok) {
+                messages[i] = file.get_message() || ('Error loading ' + url);
+            }
+            check();
+        };
+
+        file.onStateChange = function () {
+            var state = file.get_state();
+            if (state === StateType.received) {
+                finish(true);
+            } else if (state === StateType.error) {
+                finish(false);
+            }
+        };
+
+        try {
+            file.send();
+        } catch (e) {
+            finish(false);
+        }
+    });
+}
+
 var Util$ = {};
 
 registerType("Util", [Util, Util$, null]);

@@ -6,13 +6,14 @@
 import { ss } from "../ss.js";
 import { registerType, Enums } from "../typesystem.js";
 import { Util } from "../baseutil.js";
-import { useGlVersion2 } from "../render_globals.js";
+import { tileCacheGetTile, useGlVersion2 } from "../render_globals.js";
 import { Histogram } from "../utilities/histogram.js";
 import { ColorMapContainer } from "./color_map_container.js";
 import { FitsImage } from "./fits_image.js";
 import { FitsImageJs } from "./fits_image_js.js";
 import { Imageset } from "../imageset.js";
 import { Layer } from "./layer.js";
+import { HipsProperties } from "../hips_properties.js";
 
 
 // wwtlib.ImageSetLayer
@@ -23,6 +24,7 @@ export function ImageSetLayer() {
     this._overrideDefaultLayer$1 = false;
     this._loaded$1 = false;
     this._renderSmooth = true;
+    this._urlToUse = null;
     Layer.call(this);
 }
 
@@ -241,7 +243,35 @@ var ImageSetLayer$ = {
 
     doneLoading: function (wcsImage) {
         this._loaded$1 = true;
-    }
+    },
+
+    _determineUrlToUse: function() {
+        
+        var urls = [];
+        var fallbackUrls = this._imageSet$1.get_fallbackUrls();
+
+        if (fallbackUrls.length === 0) {
+            return this._imageSet$1.url;
+        }
+        
+        // For HEALPix, we check the properties file
+        if (this._imageSet$1.get_projection() === 7) {
+            var hipsProperties = this._imageSet$1.get_hipsProperties();
+            if (hipsProperties == null) {
+                return this._imageSet$1.url;
+            } else {
+                urls.push(hipsProperties.get_url());
+                for (var i = 0; i < fallbackUrls.length; i++) {
+                    urls.push(HipsProperties.adjustedUrl(fallbackUrls[i]));
+                }
+            }
+        // Otherwise, we need some sort of standard way to check whether the server hosting the imageset is working
+        // This is not trivial, because we typically don't have any sort of "index file", and we can't just try a
+        // a random tile as the imageset may not have full coverage on the sky
+        } else {
+            var tile = tileCacheGetTile(this._imageSet$1.get_baseLevel(), 0, 0, null);
+        }
+    },
 };
 
 registerType("ImageSetLayer", [ImageSetLayer, ImageSetLayer$, Layer]);
