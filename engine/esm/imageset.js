@@ -1111,7 +1111,7 @@ var Imageset$ = {
             function (_errorMessages) {
                 console.warn(`No working URLs for imageset ${$this._imageSet$1.get_imageSetID()}`);
             }
-        ),
+        );
     },
 };
 
