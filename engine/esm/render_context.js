@@ -14,7 +14,7 @@ import { TileShader } from "./graphics/shaders.js";
 import { CameraParameters } from "./camera_parameters.js";
 import { Colors } from "./color.js";
 import { Coordinates } from "./coordinates.js";
-import { ProjectionType, ImageSetType } from "./imageset.js";
+import { ImageSetType } from "./imageset.js";
 import { Planets } from "./planets.js";
 import { RenderTriangle } from "./render_triangle.js";
 import { Settings } from "./settings.js";

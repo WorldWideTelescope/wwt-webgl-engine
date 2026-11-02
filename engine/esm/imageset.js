@@ -6,6 +6,7 @@
 import { ss } from "./ss.js";
 import { registerType, registerEnum, Enums } from "./typesystem.js";
 import { freestandingMode, makeNewHipsProperties } from "./data_globals.js";
+import { tileCacheGetTile } from "./render_globals.js";
 import { Matrix3d } from "./double3d.js";
 import { Util } from "./baseutil.js";
 import { IThumbnail } from "./interfaces.js";
@@ -118,21 +119,32 @@ export function Imageset() {
     this._activeUrl = null;
 }
 
+// Note: "spherical" projection type not handled in the WebGL engine.
+// Also, we can't do { [key]: value } for a variable `key` in IE
+Imageset._tileTypes = {};
+Imageset._tileTypes[ProjectionType.mercator] = MercatorTile;
+Imageset._tileTypes[ProjectionType.equirectangular] = EquirectangularTile;
+Imageset._tileTypes[ProjectionType.toast] = ToastTile;
+Imageset._tileTypes[ProjectionType.skyImage] = SkyImageTile;
+Imageset._tileTypes[ProjectionType.plotted] = PlotTile;
+Imageset._tileTypes[ProjectionType.healpix] = HealpixTile;
+Imageset._tileTypes[ProjectionType.tangent] = TangentTile;
+
+Imageset.tileType = function (imageset) {
+    return Imageset._tileTypes[imageset.get_projection()] || ToastTile;
+};
+
 Imageset.getNewTile = function (imageset, level, x, y, parent) {
     // Note: "spherical" projection type not handled in the WebGL engine.
     switch (imageset.get_projection()) {
         case ProjectionType.mercator:
-            var newTile = MercatorTile.create(level, x, y, imageset, parent);
-            return newTile;
         case ProjectionType.equirectangular:
-            return EquirectangularTile.create(level, x, y, imageset, parent);
         case ProjectionType.toast:
-        default:
-            return ToastTile.create(level, x, y, imageset, parent);
         case ProjectionType.skyImage:
-            return new SkyImageTile(level, x, y, imageset, parent);
         case ProjectionType.plotted:
-            return PlotTile.create(level, x, y, imageset, parent);
+        case ProjectionType.tangent:
+            var type = Imageset.tileType(imageset);
+            return type.create(level, x, y, imageset, parent);
         case ProjectionType.healpix:
             if (imageset.get_hipsProperties() == null) {
                 imageset.set_hipsProperties(makeNewHipsProperties(imageset));
@@ -143,10 +155,30 @@ Imageset.getNewTile = function (imageset, level, x, y, parent) {
             else {
                 return null;
             }
-        case ProjectionType.tangent:
-            var newTile = new TangentTile(level, x, y, imageset, parent);
-            return newTile;
+        default:
+            return ToastTile.create(level, x, y, imageset, parent);
     }
+};
+
+Imageset.createGenericTile = function (imageset, level, x, y, parent) {
+    // Note: "spherical" projection type not handled in the WebGL engine.
+    var type = Imageset.tileType(imageset);
+    return type.create(level, x, y, imageset, parent);
+};
+
+Imageset.getTileXYAtLatLong = function (imageset, viewLat, viewLong) {
+    var baseLevel = imageset.get_baseLevel();
+    var maxX = imageset.getTilesXForLevel(baseLevel);
+    var maxY = imageset.getTilesYForLevel(baseLevel);
+    for (var x = 0; x < maxX; x++) {
+        for (var y = 0; y < maxY; y++) {
+            var tile = Imageset.createGenericTile(imageset, baseLevel, x, y, null);
+            if (tile.isPointInTile(viewLat, viewLong)) {
+                    return tile;
+            }
+        }
+    }
+    return [tile.tileX, tile.tileY];
 };
 
 Imageset.fromXMLNode = function (node) {
@@ -367,19 +399,6 @@ Imageset.createGeneric = function (dataSetType, bandPass) {
 Imageset.create = function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, tileSize, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls) {
     var temp = new Imageset();
     temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls);
-    return temp;
-};
-
-Imageset.clone = function (iset) {
-    var temp = new Imageset();
-    temp.setInitialParameters(
-      iset.get_name(), iset.get_url(), iset.get_dataSetType(), iset.get_bandPass(), iset.get_projection(),
-      iset.get_imageSetID(), iset.get_baseLevel(), iset.get_levels(), iset.get_tileSize(), iset.get_baseTileDegrees(),
-      iset.get_extension(), iset.get_bottomsUp(), iset.get_quadTreeTileMap(), iset.get_centerX(), iset.get_centerY(),
-      iset.get_rotation(), iset.get_sparse(), iset.get_thumbnailUrl(), iset.get_defaultSet(), iset.get_elevationModel(),
-      iset.get_widthFactor(), iset.get_offsetX(), iset.get_offsetY(), iset.get_creditsText(), iset.get_creditsUrl(),
-      iset.get_demUrl(), iset.get_altUrl(), iset.get_meanRadius(), iset.get_referenceFrame(), iset.get_fallbackUrls().slice()
-    );
     return temp;
 };
 
@@ -976,6 +995,20 @@ var Imageset$ = {
         return url;
     },
 
+
+    clone: function () {
+        var temp = new Imageset();
+        temp.setInitialParameters(
+          this.get_name(), this.get_url(), this.get_dataSetType(), this.get_bandPass(), this.get_projection(),
+          this.get_imageSetID(), this.get_baseLevel(), this.get_levels(), null, this.get_baseTileDegrees(),
+          this.get_extension(), this.get_bottomsUp(), this.get_quadTreeTileMap(), this.get_centerX(), this.get_centerY(),
+          this.get_rotation(), this.get_sparse(), this.get_thumbnailUrl(), this.get_defaultSet(), this.get_elevationModel(),
+          this.get_widthFactor(), this.get_offsetX(), this.get_offsetY(), this.get_creditsText(), this.get_creditsUrl(),
+          this.get_demUrl(), this.get_altUrl(), this.get_meanRadius(), this.get_referenceFrame(), this.get_fallbackUrls().slice()
+        );
+        return temp;
+    },
+
     getTilesXForLevel: function (level) {
         var maxX = 1;
         switch (this.get_projection()) {
@@ -1060,6 +1093,8 @@ var Imageset$ = {
 
     determineUrlToUse: function() {
 
+        console.log("Let's determine the URL");
+
         var urls = [];
         var fallbackUrls = this.get_fallbackUrls();
 
@@ -1087,29 +1122,36 @@ var Imageset$ = {
             // The imageset defines a centerX, centerY, and base level
             // We check the tile for the base level at the center X and Y
             // Hopefully the base-level tile centered on this location is non-empty?
-            var baseTile = this.getTileAtLatLong(this.get_centerX(), this.get_centerY());
-            var x = baseTile ? baseTile.tileX : 0;
-            var y = baseTile ? baseTile.tileY : 0;
+            var xy = Imageset.getTileXYAtLatLong(this, this.get_centerX(), this.get_centerY());
+            var x = xy[0];
+            var y = xy[1];
+            var baseLevel = this.get_baseLevel();
+            var baseTile = tileCacheGetTile(baseLevel, x, y, this, null);
             urls.push(baseTile.get_URL());
+            console.log(baseTile.get_URL());
             if (fallbackUrls.length > 0) {
                 var iset = this.clone();
                 for (var i = 0; i < fallbackUrls.length; i++) {
                     iset.set_url(fallbackUrls[i]);
                     iset.set_fallbackUrls([]);
-                    var fallbackTile = tileCacheGetTile(iset, x, y, null);
+                    console.log(iset.get_url());
+                    var fallbackTile = tileCacheGetTile(baseLevel, x, y, iset, null);
+                    console.log(fallbackTile.get_URL());
                     urls.push(fallbackTile.get_URL());
                 }
             }
         }
+        console.log(urls);
 
         var $this = this;
         Util.fetchFirstAvailable(
             urls,
             function (url) {
+                console.log("First URL available: ", url);
                 $this._imageSet$1.set_activeUrl(url);
             },
             function (_errorMessages) {
-                console.warn(`No working URLs for imageset ${$this._imageSet$1.get_imageSetID()}`);
+                console.warn(`No working URLs for imageset ${$this.get_imageSetID()}`);
             }
         );
     },

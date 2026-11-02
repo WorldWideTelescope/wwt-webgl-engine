@@ -30,7 +30,7 @@ ImageSetLayer.create = function (set) {
     var isl = new ImageSetLayer();
     isl._imageSet$1 = set;
     isl._renderSmooth = set.get_extension().toLowerCase().indexOf('fits') == -1;
-    set._determineUrlToUse();
+    set.determineUrlToUse();
     return isl;
 };
 

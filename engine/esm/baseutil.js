@@ -5,6 +5,7 @@
 
 import { registerType } from "./typesystem.js";
 import { ss } from "./ss.js";
+import { StateType, WebFile } from "./web_file.js";
 
 // wwtlib.Util
 

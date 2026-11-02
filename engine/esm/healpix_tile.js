@@ -181,7 +181,7 @@ var HealpixTile$ = {
         }
         var sb = new ss.StringBuilder();
         var subDirIndex = Math.floor(tileTextureIndex / 10000) * 10000;
-        return ss.format(dataset.get_url(), level.toString(), subDirIndex.toString(), tileTextureIndex.toString() + extension);
+        return ss.format(dataset.get_activeURL(), level.toString(), subDirIndex.toString(), tileTextureIndex.toString() + extension);
     },
 
     _getHipsFileExtension$1: function () {
