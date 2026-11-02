@@ -15,6 +15,7 @@ import { FitsProperties } from "./fits_properties.js";
 import { FitsImage } from "./layers/fits_image.js";
 import { EquirectangularTile } from "./equirectangular_tile.js";
 import { HealpixTile } from "./healpix_tile.js";
+import { HipsProperties } from "./hips_properties.js";
 import { MercatorTile } from "./mercator_tile.js";
 import { PlotTile } from "./plot_tile.js";
 import { TangentTile } from "./tangent_tile.js";
@@ -366,6 +367,19 @@ Imageset.createGeneric = function (dataSetType, bandPass) {
 Imageset.create = function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, tileSize, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls) {
     var temp = new Imageset();
     temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls);
+    return temp;
+};
+
+Imageset.clone = function (iset) {
+    var temp = new Imageset();
+    temp.setInitialParameters(
+      iset.get_name(), iset.get_url(), iset.get_dataSetType(), iset.get_bandPass(), iset.get_projection(),
+      iset.get_imageSetID(), iset.get_baseLevel(), iset.get_levels(), iset.get_tileSize(), iset.get_baseTileDegrees(),
+      iset.get_extension(), iset.get_bottomsUp(), iset.get_quadTreeTileMap(), iset.get_centerX(), iset.get_centerY(),
+      iset.get_rotation(), iset.get_sparse(), iset.get_thumbnailUrl(), iset.get_defaultSet(), iset.get_elevationModel(),
+      iset.get_widthFactor(), iset.get_offsetX(), iset.get_offsetY(), iset.get_creditsText(), iset.get_creditsUrl(),
+      iset.get_demUrl(), iset.get_altUrl(), iset.get_meanRadius(), iset.get_referenceFrame(), iset.get_fallbackUrls().slice()
+    );
     return temp;
 };
 
@@ -960,7 +974,145 @@ var Imageset$ = {
     set_activeUrl: function (url) {
         this._activeUrl = url;
         return url;
-    }
+    },
+
+    getTilesXForLevel: function (level) {
+        var maxX = 1;
+        switch (this.get_projection()) {
+            case ProjectionType.plotted:
+            case ProjectionType.toast:
+                maxX = Math.pow(2, level);
+                break;
+            case ProjectionType.mercator:
+                maxX = Math.pow(2, level) * ss.truncate((this.get_baseTileDegrees() / 360));
+                break;
+            case ProjectionType.equirectangular:
+                maxX = Math.pow(2, level) * ss.truncate((360 / this.get_baseTileDegrees()));
+                break;
+            case ProjectionType.tangent:
+                if (layer.get_widthFactor() === 1) {
+                    maxX = Math.pow(2, level) * 2;
+                }
+                else {
+                    maxX = Math.pow(2, level);
+                }
+                break;
+            case ProjectionType.skyImage:
+                maxX = 1;
+                break;
+            case ProjectionType.spherical:
+                maxX = 1;
+                break;
+            case ProjectionType.healpix:
+                maxX = Math.pow(2, level) * 3;
+                break;
+            default:
+                maxX = Math.pow(2, level) * 2;
+                break;
+        }
+        return maxX;
+    },
+
+    getTilesYForLevel: function (level) {
+        var maxY = 1;
+        switch (this.get_projection()) {
+            case ProjectionType.mercator:
+                maxY = Math.pow(2, level);
+                break;
+            case ProjectionType.equirectangular:
+                maxY = (Math.pow(2, level) * (180 / this.get_baseTileDegrees()));
+                break;
+            case ProjectionType.tangent:
+                maxY = Math.pow(2, level);
+                break;
+            case ProjectionType.spherical:
+                maxY = 1;
+                break;
+            case ProjectionType.healpix:
+                maxY = 4 * Math.pow(2, level);
+                break;
+            default:
+                maxY = Math.pow(2, level);
+                break;
+        }
+        if (maxY === Number.POSITIVE_INFINITY) {
+            maxY = 1;
+        }
+        return maxY;
+    },
+
+    getTileAtLatLong: function (viewLat, viewLong) {
+        var baseLevel = this.get_baseLevel();
+        var maxX = this.getTilesXForLevel(baseLevel);
+        var maxY = this.getTilesYForLevel(baseLevel);
+        for (var x = 0; x < maxX; x++) {
+            for (var y = 0; y < maxY; y++) {
+                var tile = tileCacheGetTile(baseLevel, x, y, this, null);
+                if (tile != null) {
+                    if (tile.isPointInTile(viewLat, viewLong)) {
+                        return tile;
+                    }
+                }
+            }
+        }
+        return null;
+    },
+
+    determineUrlToUse: function() {
+
+        var urls = [];
+        var fallbackUrls = this.get_fallbackUrls();
+
+        if (fallbackUrls.length === 0) {
+            return this._imageSet$1.url;
+        }
+
+        // For HEALPix, we check the properties file
+        if (this.get_projection() === 7) {
+            var hipsProperties = this.get_hipsProperties();
+            if (hipsProperties == null) {
+                return this.url;
+            } else {
+                urls.push(hipsProperties.get_url());
+                for (var i = 0; i < fallbackUrls.length; i++) {
+                    urls.push(HipsProperties.adjustedUrl(fallbackUrls[i]));
+                }
+            }
+        } else {
+            // Otherwise, we need some sort of standard way to check whether the server hosting the imageset is working
+            // This is not trivial, because we typically don't have any sort of "index file", and we can't just try a
+            // a random tile as the imageset may not have full coverage on the sky
+            //
+            // So, we use the following heuristic:
+            // The imageset defines a centerX, centerY, and base level
+            // We check the tile for the base level at the center X and Y
+            // Hopefully the base-level tile centered on this location is non-empty?
+            var baseTile = this.getTileAtLatLong(this.get_centerX(), this.get_centerY());
+            var x = baseTile ? baseTile.tileX : 0;
+            var y = baseTile ? baseTile.tileY : 0;
+            urls.push(baseTile.get_URL());
+            if (fallbackUrls.length > 0) {
+                var iset = this.clone();
+                for (var i = 0; i < fallbackUrls.length; i++) {
+                    iset.set_url(fallbackUrls[i]);
+                    iset.set_fallbackUrls([]);
+                    var fallbackTile = tileCacheGetTile(iset, x, y, null);
+                    urls.push(fallbackTile.get_URL());
+                }
+            }
+        }
+
+        var $this = this;
+        Util.fetchFirstAvailable(
+            urls,
+            function (url) {
+                $this._imageSet$1.set_activeUrl(url);
+            },
+            function (_errorMessages) {
+                console.warn(`No working URLs for imageset ${$this._imageSet$1.get_imageSetID()}`);
+            }
+        ),
+    },
 };
 
 registerType("Imageset", [Imageset, Imageset$, null, IThumbnail]);

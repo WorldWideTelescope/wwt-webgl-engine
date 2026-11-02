@@ -181,6 +181,9 @@ Place._fromXml = function (place) {
     if (backgroundImageSet != null) {
         var imageSet = Util.selectSingleNode(backgroundImageSet, 'ImageSet');
         newPlace._backgroundImageSet = Imageset.fromXMLNode(imageSet);
+        if (newPlace._backgroundImageSet) {
+            newPlace._backgroundImageSet.determineUrlToUse();
+        }
     }
     var study = Util.selectSingleNode(place, 'ForegroundImageSet');
     if (study != null) {
@@ -190,6 +193,9 @@ Place._fromXml = function (place) {
     study = Util.selectSingleNode(place, 'ImageSet');
     if (study != null) {
         newPlace._studyImageset = Imageset.fromXMLNode(study);
+        if (newPlace._studyImageset) {
+            newPlace._studyImageset.determineUrlToUse();
+        }
     }
     return newPlace;
 };
@@ -374,6 +380,9 @@ var Place$ = {
 
     set_studyImageset: function (value) {
         this._studyImageset = value;
+        if (value) {
+            value.determineUrlToUse();
+        }
         return value;
     },
 
@@ -384,6 +393,7 @@ var Place$ = {
     set_backgroundImageset: function (value) {
         if (value != null) {
             this.set_type(value.get_dataSetType());
+            value.determineUrlToUse();
         }
         this._backgroundImageSet = value;
         return value;
