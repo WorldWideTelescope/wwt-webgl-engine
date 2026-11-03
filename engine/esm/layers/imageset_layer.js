@@ -42,7 +42,7 @@ var ImageSetLayer$ = {
     set_imageSet: function (value) {
         this._imageSet$1 = value;
         if (value) {
-            value._determineUrlToUse();
+            value.determineUrlToUse();
         }
         return value;
     },
