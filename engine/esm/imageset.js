@@ -1011,10 +1011,8 @@ var Imageset$ = {
 
     set_activeUrl: function (url) {
         this._activeUrl = url;
-        Imageset.clearTilesFromCache(this);
         return url;
     },
-
 
     clone: function () {
         var temp = new Imageset();
