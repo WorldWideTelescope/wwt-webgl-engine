@@ -1126,7 +1126,8 @@ var Imageset$ = {
         var mirrorUrls = this.get_mirrorUrls();
 
         if (mirrorUrls.length === 0) {
-            return this._imageSet$1.url;
+            this.set_activeUrl(null);
+            return this.url;
         }
 
         // For HEALPix, we check the properties file
