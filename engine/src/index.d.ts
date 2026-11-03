@@ -1116,10 +1116,10 @@ export class Imageset implements Thumbnail {
   get_widthFactor(): number;
   set_widthFactor(f: number): number;
 
-  get_fallbackUrls(): string[];
-  set_fallbackUrls(urls: string[]): string[];
-  add_fallbackUrl(url: string): void;
-  remove_fallbackUrl(url: string): void;
+  get_mirrorUrls(): string[];
+  set_mirrorUrls(urls: string[]): string[];
+  add_mirrorUrl(url: string): void;
+  remove_mirrorUrl(url: string): void;
 
   getHashCode(): number;
 }

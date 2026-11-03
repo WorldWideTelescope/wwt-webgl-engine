@@ -117,7 +117,7 @@ export function Imageset() {
     this._elevationModel = false;
     this._offsetX = 0;
     this._offsetY = 0;
-    this._fallbackUrls = [];
+    this._mirrorUrls = [];
     this._activeUrl = null;
 }
 
@@ -264,15 +264,15 @@ Imageset.fromXMLNode = function (node) {
             if (credits != null) {
                 creditsUrl = Util.getInnerText(credits);
             }
-            var fallbackUrls = [];
-            var fallbacks = Util.selectSingleNode(node, 'FallbackUrls');
-            if (fallbacks != null) {
-                var fallbackNodes = Util.selectChildNodes(fallbacks, 'Url');
-                for (var i = 0; i < fallbackNodes.length; i++) {
-                    var fallbackNode = fallbackNodes[i];
-                    var fallbackUrl = Util.getInnerText(fallbackNode);
-                    if (fallbackUrl) {
-                        fallbackUrls.push(fallbackUrl);
+            var mirrorUrls = [];
+            var mirrors = Util.selectSingleNode(node, 'MirrorUrls');
+            if (mirrors != null) {
+                var mirrorNodes = Util.selectChildNodes(mirrors, 'Url');
+                for (var i = 0; i < mirrorNodes.length; i++) {
+                    var mirrorNode = mirrorNodes[i];
+                    var mirrorUrl = Util.getInnerText(mirrorNode);
+                    if (mirrorUrl) {
+                        mirrorUrls.push(mirrorUrl);
                     }
                 }
             }
@@ -328,7 +328,7 @@ Imageset.fromXMLNode = function (node) {
             if (node.attributes.getNamedItem('Sparse') != null) {
                 sparse = ss.boolean(node.attributes.getNamedItem('Sparse').nodeValue);
             }
-            return Imageset.create(name, url, type, bandPass, projection, Math.abs(Util.getHashCode(url)), baseTileLevel, tileLevels, 256, baseDegreesPerTile, fileType, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, stockSet, elevationModel, wf, offsetX, offsetY, creditText, creditsUrl, demUrl, alturl, meanRadius, referenceFrame, fallbackUrls);
+            return Imageset.create(name, url, type, bandPass, projection, Math.abs(Util.getHashCode(url)), baseTileLevel, tileLevels, 256, baseDegreesPerTile, fileType, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, stockSet, elevationModel, wf, offsetX, offsetY, creditText, creditsUrl, demUrl, alturl, meanRadius, referenceFrame, mirrorUrls);
         } else {
             return Imageset.createGeneric(type, bandPass);
         }
@@ -374,11 +374,11 @@ Imageset.saveToXml = function (xmlWriter, imageset, alternateUrl) {
         } else {
             xmlWriter._writeElementString('ThumbnailUrl', imageset.get_url());
         }
-        if (this._fallbackUrls.length > 0) {
-            xmlWriter._writeStartElement('FallbackUrls');
-            for (var i = 0; i < this._fallbackUrls.length; i++) {
-                var fallbackUrl = this._fallbackUrls[i];
-                xmlWriter._writeElementString('Url', fallbackUrl);
+        if (this._mirrorUrls.length > 0) {
+            xmlWriter._writeStartElement('MirrorUrls');
+            for (var i = 0; i < this._mirrorUrls.length; i++) {
+                var mirrorUrl = this._mirrorUrls[i];
+                xmlWriter._writeElementString('Url', mirrorUrl);
             }
             xmlWriter._writeEndElement();
         }
@@ -407,7 +407,7 @@ Imageset.createGeneric = function (dataSetType, bandPass) {
     temp._centerY = 0;
     temp._rotation = 0;
     temp._thumbnailUrl = '';
-    temp._fallbackUrls = [];
+    temp._mirrorUrls = [];
     temp._matrix = Matrix3d.get_identity();
     temp._matrix._multiply(Matrix3d._rotationX((temp.get_rotation() / 180 * Math.PI)));
     temp._matrix._multiply(Matrix3d._rotationZ((temp.get_centerY() / 180 * Math.PI)));
@@ -415,9 +415,9 @@ Imageset.createGeneric = function (dataSetType, bandPass) {
     return temp;
 };
 
-Imageset.create = function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, tileSize, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls) {
+Imageset.create = function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, tileSize, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, mirrorUrls) {
     var temp = new Imageset();
-    temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls);
+    temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, mirrorUrls);
     return temp;
 };
 
@@ -860,7 +860,7 @@ var Imageset$ = {
         }
     },
 
-    setInitialParameters: function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, fallbackUrls) {
+    setInitialParameters: function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, mirrorUrls) {
         this.set_referenceFrame(referenceFrame);
         this.set_meanRadius(meanRadius);
         this._altUrl = alturl;
@@ -890,7 +890,7 @@ var Imageset$ = {
         this._centerY = centerY;
         this._rotation = rotation;
         this._thumbnailUrl = thumbnailUrl;
-        this._fallbackUrls = fallbackUrls || [];
+        this._mirrorUrls = mirrorUrls || [];
         this._computeMatrix();
     },
 
@@ -982,26 +982,26 @@ var Imageset$ = {
         return [];
     },
 
-    add_fallbackUrl: function (url) {
-        if (this._fallbackUrls.indexOf(url) == -1) {
-            this._fallbackUrls.push(url);
+    add_mirrorUrl: function (url) {
+        if (this._mirrorUrls.indexOf(url) == -1) {
+            this._mirrorUrls.push(url);
         }
     },
 
-    remove_fallbackUrl: function (url) {
-        for (var i = this._fallbackUrls.length - 1; i >= 0; i--) {
-            if (this._fallbackUrls[i] === url) {
-                this._fallbackUrls.splice(i, 1);
+    remove_mirrorUrl: function (url) {
+        for (var i = this._mirrorUrls.length - 1; i >= 0; i--) {
+            if (this._mirrorUrls[i] === url) {
+                this._mirrorUrls.splice(i, 1);
             }
         }
     },
 
-    get_fallbackUrls: function () {
-        return this._fallbackUrls;
+    get_mirrorUrls: function () {
+        return this._mirrorUrls;
     },
 
-    set_fallbackUrls: function (urls) {
-        this._fallbackUrls = urls;
+    set_mirrorUrls: function (urls) {
+        this._mirrorUrls = urls;
         return urls;
     },
 
@@ -1022,7 +1022,7 @@ var Imageset$ = {
           this.get_extension(), this.get_bottomsUp(), this.get_quadTreeTileMap(), this.get_centerX(), this.get_centerY(),
           this.get_rotation(), this.get_sparse(), this.get_thumbnailUrl(), this.get_defaultSet(), this.get_elevationModel(),
           this.get_widthFactor(), this.get_offsetX(), this.get_offsetY(), this.get_creditsText(), this.get_creditsUrl(),
-          this.get_demUrl(), this.get_altUrl(), this.get_meanRadius(), this.get_referenceFrame(), this.get_fallbackUrls().slice()
+          this.get_demUrl(), this.get_altUrl(), this.get_meanRadius(), this.get_referenceFrame(), this.get_mirrorUrls().slice()
         );
         return temp;
     },
@@ -1114,9 +1114,9 @@ var Imageset$ = {
         console.log("Let's determine the URL");
 
         var urls = [];
-        var fallbackUrls = this.get_fallbackUrls();
+        var mirrorUrls = this.get_mirrorUrls();
 
-        if (fallbackUrls.length === 0) {
+        if (mirrorUrls.length === 0) {
             return this._imageSet$1.url;
         }
 
@@ -1127,8 +1127,8 @@ var Imageset$ = {
                 return this.url;
             } else {
                 urls.push(hipsProperties.get_url());
-                for (var i = 0; i < fallbackUrls.length; i++) {
-                    urls.push(HipsProperties.adjustedUrl(fallbackUrls[i]));
+                for (var i = 0; i < mirrorUrls.length; i++) {
+                    urls.push(HipsProperties.adjustedUrl(mirrorUrls[i]));
                 }
             }
         } else {
@@ -1147,19 +1147,19 @@ var Imageset$ = {
             var baseTile = tileCacheGetTile(baseLevel, x, y, this, null);
             urls.push(baseTile.get_URL());
             console.log(baseTile.get_URL());
-            if (fallbackUrls.length > 0) {
+            if (mirrorUrls.length > 0) {
                 var iset = this.clone();
-                for (var i = 0; i < fallbackUrls.length; i++) {
-                    var url = fallbackUrls[i];
+                for (var i = 0; i < mirrorUrls.length; i++) {
+                    var url = mirrorUrls[i];
                     iset.set_url(url);
-                    iset.set_fallbackUrls([]);
+                    iset.set_mirrorUrls([]);
                     iset.set_name(Guid.create().toString());
                     iset.set_imageSetID(Util.getHashCode(url));
                     console.log(Util.getHashCode(url));
                     console.log(iset.get_url());
-                    var fallbackTile = Imageset.createGenericTile(iset, baseLevel, x, y, null);
-                    console.log(fallbackTile.get_URL());
-                    urls.push(fallbackTile.get_URL());
+                    var mirrorTile = Imageset.createGenericTile(iset, baseLevel, x, y, null);
+                    console.log(mirrorTile.get_URL());
+                    urls.push(mirrorTile.get_URL());
                 }
             }
         }
@@ -1169,7 +1169,7 @@ var Imageset$ = {
         Util.fetchFirstAvailable(
             urls,
             function (url, index) {
-                var activeUrl = index == 0 ? this.url : fallbackUrls[index - 1];
+                var activeUrl = index == 0 ? this.url : mirrorUrls[index - 1];
                 console.log(`Active URL index: ${index}`);
                 console.log(`The active URL is ${activeUrl}`);
                 $this.set_activeUrl(activeUrl);
