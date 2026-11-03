@@ -889,7 +889,7 @@ var Imageset$ = {
         this._centerY = centerY;
         this._rotation = rotation;
         this._thumbnailUrl = thumbnailUrl;
-        this._mirrorUrls = mirrorUrls || [];
+        this._mirrorUrls = mirrorUrls != null ? mirrorUrls : [];
         this._computeMatrix();
     },
 
