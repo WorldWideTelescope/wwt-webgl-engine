@@ -135,6 +135,7 @@ Imageset.tileType = function (imageset) {
 };
 
 Imageset.getNewTile = function (imageset, level, x, y, parent) {
+    console.log(imageset, level, x, y, parent);
     // Note: "spherical" projection type not handled in the WebGL engine.
     switch (imageset.get_projection()) {
         case ProjectionType.mercator:
@@ -174,11 +175,11 @@ Imageset.getTileXYAtLatLong = function (imageset, viewLat, viewLong) {
         for (var y = 0; y < maxY; y++) {
             var tile = Imageset.createGenericTile(imageset, baseLevel, x, y, null);
             if (tile.isPointInTile(viewLat, viewLong)) {
-                    return tile;
+                return [tile.tileX, tile.tileY];
             }
         }
     }
-    return [tile.tileX, tile.tileY];
+    return [0, 0];
 };
 
 Imageset.fromXMLNode = function (node) {
@@ -1000,7 +1001,7 @@ var Imageset$ = {
         var temp = new Imageset();
         temp.setInitialParameters(
           this.get_name(), this.get_url(), this.get_dataSetType(), this.get_bandPass(), this.get_projection(),
-          this.get_imageSetID(), this.get_baseLevel(), this.get_levels(), null, this.get_baseTileDegrees(),
+          this.get_imageSetID(), this.get_baseLevel(), this.get_levels(), this.get_baseTileDegrees(),
           this.get_extension(), this.get_bottomsUp(), this.get_quadTreeTileMap(), this.get_centerX(), this.get_centerY(),
           this.get_rotation(), this.get_sparse(), this.get_thumbnailUrl(), this.get_defaultSet(), this.get_elevationModel(),
           this.get_widthFactor(), this.get_offsetX(), this.get_offsetY(), this.get_creditsText(), this.get_creditsUrl(),
@@ -1132,8 +1133,10 @@ var Imageset$ = {
             if (fallbackUrls.length > 0) {
                 var iset = this.clone();
                 for (var i = 0; i < fallbackUrls.length; i++) {
-                    iset.set_url(fallbackUrls[i]);
+                    var url = fallbackUrls[i];
+                    iset.set_url(url);
                     iset.set_fallbackUrls([]);
+                    iset.set_imageSetID(Util.getHashCode(url));
                     console.log(iset.get_url());
                     var fallbackTile = tileCacheGetTile(baseLevel, x, y, iset, null);
                     console.log(fallbackTile.get_URL());
@@ -1146,9 +1149,10 @@ var Imageset$ = {
         var $this = this;
         Util.fetchFirstAvailable(
             urls,
-            function (url) {
-                console.log("First URL available: ", url);
-                $this._imageSet$1.set_activeUrl(url);
+            function (url, index) {
+                var imagesetUrl = index == 0 ? this.url : fallbackUrls[index - 1];
+                $this.set_activeUrl(imagesetUrl);
+                $this.set_imageSetID(Util.getHashCode(imagesetUrl));
             },
             function (_errorMessages) {
                 console.warn(`No working URLs for imageset ${$this.get_imageSetID()}`);

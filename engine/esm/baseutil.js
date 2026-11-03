@@ -252,7 +252,7 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
             }
             if (results[i]) {
                 settled = true;
-                onSuccess(urls[i]);
+                onSuccess(urls[i], i);
                 return;
             }
         }
@@ -261,6 +261,7 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
         onFailure(messages);
     };
 
+    // TODO: We can't use this in IE
     urls.forEach(function (url, i) {
         var file = new WebFile(url);
 
