@@ -6,7 +6,7 @@
 import { ss } from "./ss.js";
 import { registerType, registerEnum, Enums } from "./typesystem.js";
 import { freestandingMode, makeNewHipsProperties } from "./data_globals.js";
-import { tileCacheGetTile } from "./render_globals.js";
+import { tileCacheGetTile, tileCacheRemoveFromQueue } from "./render_globals.js";
 import { Matrix3d } from "./double3d.js";
 import { Util } from "./baseutil.js";
 import { IThumbnail } from "./interfaces.js";
@@ -22,6 +22,8 @@ import { PlotTile } from "./plot_tile.js";
 import { TangentTile } from "./tangent_tile.js";
 import { SkyImageTile } from "./sky_image_tile.js";
 import { ToastTile } from "./toast_tile.js";
+import { getTileKey, Guid } from "./util.js";
+import { TileCache } from "./tile_cache.js";
 
 
 // wwtlib.ProjectionType
@@ -135,7 +137,6 @@ Imageset.tileType = function (imageset) {
 };
 
 Imageset.getNewTile = function (imageset, level, x, y, parent) {
-    console.log(imageset, level, x, y, parent);
     // Note: "spherical" projection type not handled in the WebGL engine.
     switch (imageset.get_projection()) {
         case ProjectionType.mercator:
@@ -180,6 +181,23 @@ Imageset.getTileXYAtLatLong = function (imageset, viewLat, viewLong) {
         }
     }
     return [0, 0];
+};
+
+Imageset.clearTilesFromCache = function (imageset) {
+    var baseLevel = imageset.get_baseLevel();
+    var maxX = imageset.getTilesXForLevel(baseLevel);
+    var maxY = imageset.getTilesYForLevel(baseLevel);
+    for (var level = baseLevel; level < baseLevel + imageset.get_levels(); level++) {
+        for (var x = 0; x < maxX; x++) {
+            for (var y = 0; y < maxY; y++) {
+                var tileKey = getTileKey(imageset, level, x, y, parent);
+                console.log(tileKey);
+                tileCacheRemoveFromQueue(tileKey, true);
+                TileCache.clearTile(level, x, y, imageset, parent);
+            }
+        }
+    }
+    console.log(TileCache._tiles);
 };
 
 Imageset.fromXMLNode = function (node) {
@@ -993,6 +1011,7 @@ var Imageset$ = {
 
     set_activeUrl: function (url) {
         this._activeUrl = url;
+        Imageset.clearTilesFromCache(this);
         return url;
     },
 
@@ -1136,9 +1155,11 @@ var Imageset$ = {
                     var url = fallbackUrls[i];
                     iset.set_url(url);
                     iset.set_fallbackUrls([]);
+                    iset.set_name(Guid.create().toString());
                     iset.set_imageSetID(Util.getHashCode(url));
+                    console.log(Util.getHashCode(url));
                     console.log(iset.get_url());
-                    var fallbackTile = tileCacheGetTile(baseLevel, x, y, iset, null);
+                    var fallbackTile = Imageset.createGenericTile(iset, baseLevel, x, y, null);
                     console.log(fallbackTile.get_URL());
                     urls.push(fallbackTile.get_URL());
                 }
@@ -1150,9 +1171,11 @@ var Imageset$ = {
         Util.fetchFirstAvailable(
             urls,
             function (url, index) {
-                var imagesetUrl = index == 0 ? this.url : fallbackUrls[index - 1];
-                $this.set_activeUrl(imagesetUrl);
-                $this.set_imageSetID(Util.getHashCode(imagesetUrl));
+                var activeUrl = index == 0 ? this.url : fallbackUrls[index - 1];
+                console.log(`Active URL index: ${index}`);
+                console.log(`The active URL is ${activeUrl}`);
+                $this.set_activeUrl(activeUrl);
+                $this.set_imageSetID(Util.getHashCode(activeUrl));
             },
             function (_errorMessages) {
                 console.warn(`No working URLs for imageset ${$this.get_imageSetID()}`);

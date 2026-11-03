@@ -74,6 +74,15 @@ TileCache.getCachedTile = function (level, x, y, dataset, parent) {
 
 set_tileCacheGetCachedTile(TileCache.getCachedTile);
 
+TileCache.clearTile = function (level, x, y, dataset, parent) {
+    var tileKey = getTileKey(dataset, level, x, y, parent);
+    var tile = TileCache._tiles[tileKey];
+    if (tile) {
+        tile.cleanUp(true);
+        delete TileCache._tiles[tileKey];
+    }
+};
+
 TileCache.clearCache = function() {
   for (const tile of Object.values(TileCache._tiles)) {
     try {
