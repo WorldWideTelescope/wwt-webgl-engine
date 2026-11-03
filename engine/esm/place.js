@@ -182,7 +182,7 @@ Place._fromXml = function (place) {
         var imageSet = Util.selectSingleNode(backgroundImageSet, 'ImageSet');
         newPlace._backgroundImageSet = Imageset.fromXMLNode(imageSet);
         if (newPlace._backgroundImageSet) {
-            newPlace._backgroundImageSet.determineUrlToUse();
+            newPlace._backgroundImageSet.determineUrlToUse(this.get_lng(), this.get_lat());
         }
     }
     var study = Util.selectSingleNode(place, 'ForegroundImageSet');
@@ -194,7 +194,7 @@ Place._fromXml = function (place) {
     if (study != null) {
         newPlace._studyImageset = Imageset.fromXMLNode(study);
         if (newPlace._studyImageset) {
-            newPlace._studyImageset.determineUrlToUse();
+            newPlace._studyImageset.determineUrlToUse(this.get_lng(), this.get_lat());
         }
     }
     return newPlace;
@@ -380,8 +380,8 @@ var Place$ = {
 
     set_studyImageset: function (value) {
         this._studyImageset = value;
-        if (value) {
-            value.determineUrlToUse();
+        if (value != null) {
+            value.determineUrlToUse(this.get_lng(), this.get_lat());
         }
         return value;
     },
@@ -393,7 +393,7 @@ var Place$ = {
     set_backgroundImageset: function (value) {
         if (value != null) {
             this.set_type(value.get_dataSetType());
-            value.determineUrlToUse();
+            value.determineUrlToUse(this.get_lng(), this.get_lat());
         }
         this._backgroundImageSet = value;
         return value;

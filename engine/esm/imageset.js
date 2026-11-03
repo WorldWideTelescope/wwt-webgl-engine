@@ -1120,7 +1120,7 @@ var Imageset$ = {
         return null;
     },
 
-    determineUrlToUse: function() {
+    determineUrlToUse: function(lat, lng) {
 
         var urls = [];
         var mirrorUrls = this.get_mirrorUrls();
@@ -1128,6 +1128,8 @@ var Imageset$ = {
         if (mirrorUrls.length === 0) {
             this.set_activeUrl(null);
             return this.url;
+        } else if (this._activeUrl != null) {
+            return this._activeUrl;
         }
 
         // For HEALPix, we check the properties file
@@ -1150,7 +1152,9 @@ var Imageset$ = {
             // The imageset defines a centerX, centerY, and base level
             // We check the tile for the base level at the center X and Y
             // Hopefully the base-level tile centered on this location is non-empty?
-            var xy = Imageset.getTileXYAtLatLong(this, this.get_centerX(), this.get_centerY());
+            var centerX = lng != null ? lng : this.get_centerX();
+            var centerY = lat != null ? lat : this.get_centerY();
+            var xy = Imageset.getTileXYAtLatLong(this, centerX, centerY);
             var x = xy[0];
             var y = xy[1];
             var baseLevel = this.get_baseLevel();
