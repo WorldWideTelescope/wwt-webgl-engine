@@ -192,13 +192,11 @@ Imageset.clearTilesFromCache = function (imageset) {
         for (var x = 0; x < maxX; x++) {
             for (var y = 0; y < maxY; y++) {
                 var tileKey = getTileKey(imageset, level, x, y, parent);
-                console.log(tileKey);
                 tileCacheRemoveFromQueue(tileKey, true);
                 TileCache.clearTile(level, x, y, imageset, parent);
             }
         }
     }
-    console.log(TileCache._tiles);
 };
 
 Imageset.fromXMLNode = function (node) {
@@ -1017,10 +1015,14 @@ var Imageset$ = {
 
     add_urlResolved: function (value) {
         if (this._activeUrl === undefined) {
-            this._urlResolved = ss.bindSub(this._urlResolved, value);
+            this._urlResolved = ss.bindAdd(this._urlResolved, value);
         } else {
             value(this._activeUrl);
         }
+    },
+
+    remove_urlResolved: function (value) {
+        this._urlResolved = ss.bindSub(this._urlResolved, value);
     },
 
     clone: function () {
@@ -1120,8 +1122,6 @@ var Imageset$ = {
 
     determineUrlToUse: function() {
 
-        console.log("Let's determine the URL");
-
         var urls = [];
         var mirrorUrls = this.get_mirrorUrls();
 
@@ -1156,7 +1156,6 @@ var Imageset$ = {
             var baseLevel = this.get_baseLevel();
             var baseTile = tileCacheGetTile(baseLevel, x, y, this, null);
             urls.push(baseTile.get_URL());
-            console.log(baseTile.get_URL());
             if (mirrorUrls.length > 0) {
                 var iset = this.clone();
                 for (var i = 0; i < mirrorUrls.length; i++) {
@@ -1165,15 +1164,11 @@ var Imageset$ = {
                     iset.set_mirrorUrls([]);
                     iset.set_name(Guid.create().toString());
                     iset.set_imageSetID(Util.getHashCode(url));
-                    console.log(Util.getHashCode(url));
-                    console.log(iset.get_url());
                     var mirrorTile = Imageset.createGenericTile(iset, baseLevel, x, y, null);
-                    console.log(mirrorTile.get_URL());
                     urls.push(mirrorTile.get_URL());
                 }
             }
         }
-        console.log(urls);
 
         var $this = this;
         var onResolved = function (url) {
@@ -1186,8 +1181,6 @@ var Imageset$ = {
             urls,
             function (url, index) {
                 var activeUrl = index == 0 ? this.url : mirrorUrls[index - 1];
-                console.log(`Active URL index: ${index}`);
-                console.log(`The active URL is ${activeUrl}`);
                 $this.set_activeUrl(activeUrl);
                 $this.set_imageSetID(Util.getHashCode(activeUrl));
                 onResolved(activeUrl);
