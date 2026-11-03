@@ -1122,6 +1122,8 @@ export class Imageset implements Thumbnail {
   remove_mirrorUrl(url: string): void;
 
   getHashCode(): number;
+
+  add_urlResolved(fn: (activeUrl: string) => void): void;
 }
 
 export namespace Imageset {

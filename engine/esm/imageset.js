@@ -118,7 +118,8 @@ export function Imageset() {
     this._offsetX = 0;
     this._offsetY = 0;
     this._mirrorUrls = [];
-    this._activeUrl = null;
+    this._activeUrl = undefined;
+    this._urlResolved = null;
 }
 
 // Note: "spherical" projection type not handled in the WebGL engine.
@@ -1014,6 +1015,14 @@ var Imageset$ = {
         return url;
     },
 
+    add_urlResolved: function (value) {
+        if (this._activeUrl === undefined) {
+            this._urlResolved = ss.bindSub(this._urlResolved, value);
+        } else {
+            value(this._activeUrl);
+        }
+    },
+
     clone: function () {
         var temp = new Imageset();
         temp.setInitialParameters(
@@ -1166,6 +1175,12 @@ var Imageset$ = {
         console.log(urls);
 
         var $this = this;
+        var onResolved = function (url) {
+            if ($this._urlResolved) {
+                $this._urlResolved(url, new ss.EventArgs());
+            }
+        }
+
         Util.fetchFirstAvailable(
             urls,
             function (url, index) {
@@ -1174,9 +1189,12 @@ var Imageset$ = {
                 console.log(`The active URL is ${activeUrl}`);
                 $this.set_activeUrl(activeUrl);
                 $this.set_imageSetID(Util.getHashCode(activeUrl));
+                onResolved(activeUrl);
             },
             function (_errorMessages) {
                 console.warn(`No working URLs for imageset ${$this.get_imageSetID()}`);
+                $this.set_activeUrl(null);
+                onResolved(null);
             }
         );
     },
