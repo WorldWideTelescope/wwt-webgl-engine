@@ -212,6 +212,18 @@ Imageset.fromXMLNode = function (node) {
         if (node.attributes.getNamedItem('WidthFactor') != null) {
             wf = parseInt(node.attributes.getNamedItem('WidthFactor').nodeValue);
         }
+        var mirrorUrls = [];
+        var mirrors = Util.selectSingleNode(node, 'MirrorUrls');
+        if (mirrors != null) {
+            var mirrorNodes = Util.selectChildNodes(mirrors, 'Url');
+            for (var i = 0; i < mirrorNodes.length; i++) {
+                var mirrorNode = mirrorNodes[i];
+                var mirrorUrl = ss.trim(Util.getInnerText(mirrorNode));
+                if (mirrorUrl) {
+                    mirrorUrls.push(mirrorUrl);
+                }
+            }
+        }
         if (node.attributes.getNamedItem('Generic') == null || !ss.boolean(node.attributes.getNamedItem('Generic').nodeValue)) {
             projection = Enums.parse('ProjectionType', node.attributes.getNamedItem('Projection').nodeValue);
             var fileType = node.attributes.getNamedItem('FileType').nodeValue;
@@ -262,19 +274,7 @@ Imageset.fromXMLNode = function (node) {
             credits = Util.selectSingleNode(node, 'CreditsUrl');
             if (credits != null) {
                 creditsUrl = Util.getInnerText(credits);
-            }
-            var mirrorUrls = [];
-            var mirrors = Util.selectSingleNode(node, 'MirrorUrls');
-            if (mirrors != null) {
-                var mirrorNodes = Util.selectChildNodes(mirrors, 'Url');
-                for (var i = 0; i < mirrorNodes.length; i++) {
-                    var mirrorNode = mirrorNodes[i];
-                    var mirrorUrl = ss.trim(Util.getInnerText(mirrorNode));
-                    if (mirrorUrl) {
-                        mirrorUrls.push(mirrorUrl);
-                    }
-                }
-            }
+            } 
             var meanRadius = 0;
             if (node.attributes.getNamedItem('MeanRadius') != null) {
                 meanRadius = parseFloat(node.attributes.getNamedItem('MeanRadius').nodeValue);

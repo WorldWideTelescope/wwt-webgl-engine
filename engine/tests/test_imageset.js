@@ -82,7 +82,8 @@ describe('ImageSetLayer', function () {
 
     var parser = new DOMParser();
     var xml = parser.parseFromString(data, 'text/xml');
-    var iset = wwtlib.Imageset.fromXMLNode(xml);
+    var root = xml.getElementsByTagName('ImageSet')[0];
+    var iset = wwtlib.Imageset.fromXMLNode(root);
 
     var mirrorUrls = iset.get_mirrorUrls();
     assert.equal(mirrorUrls.length, 2);
@@ -125,7 +126,8 @@ describe('ImageSetLayer', function () {
 
     var parser = new DOMParser();
     var xml = parser.parseFromString(data, 'text/xml');
-    var iset = wwtlib.Imageset.fromXMLNode(xml);
+    var root = xml.getElementsByTagName('ImageSet')[0];
+    var iset = wwtlib.Imageset.fromXMLNode(root);
 
     var mirrorUrls = iset.get_mirrorUrls();
     assert.equal(mirrorUrls.length, 0);
