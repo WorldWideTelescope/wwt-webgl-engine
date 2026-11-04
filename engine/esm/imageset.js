@@ -269,7 +269,7 @@ Imageset.fromXMLNode = function (node) {
                 var mirrorNodes = Util.selectChildNodes(mirrors, 'Url');
                 for (var i = 0; i < mirrorNodes.length; i++) {
                     var mirrorNode = mirrorNodes[i];
-                    var mirrorUrl = Util.getInnerText(mirrorNode);
+                    var mirrorUrl = ss.trim(Util.getInnerText(mirrorNode));
                     if (mirrorUrl) {
                         mirrorUrls.push(mirrorUrl);
                     }
@@ -373,15 +373,14 @@ Imageset.saveToXml = function (xmlWriter, imageset, alternateUrl) {
         } else {
             xmlWriter._writeElementString('ThumbnailUrl', imageset.get_url());
         }
-        var mirrorUrls = imageset.get_mirrorUrls();
-        if (mirrorUrls.length > 0) {
-            xmlWriter._writeStartElement('MirrorUrls');
-            for (var i = 0; i < mirrorUrls.length; i++) {
-                var mirrorUrl = mirrorUrls[i];
-                xmlWriter._writeElementString('Url', mirrorUrl);
-            }
-            xmlWriter._writeEndElement();
+    }
+    var mirrorUrls = imageset.get_mirrorUrls();
+    if (mirrorUrls.length > 0) {
+        xmlWriter._writeStartElement('MirrorUrls');
+        for (var i = 0; i < mirrorUrls.length; i++) {
+            xmlWriter._writeElementString('Url', mirrorUrls[i]);
         }
+        xmlWriter._writeEndElement();
     }
     xmlWriter._writeEndElement();
 };
