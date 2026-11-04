@@ -1874,6 +1874,18 @@ export const engineStore = defineStore('wwt-engine', {
       this.activeLayers = activeLayersList(this.$wwt);
     },
 
+    async waitForUrlResolved(imageset: Imageset): Promise<string> {
+      return new Promise((resolve, _reject) => {
+        if (imageset.get_urlResolvedFired()) {
+          resolve(imageset.get_activeUrl());
+        } else {
+          imageset.add_urlResolved(url => {
+            resolve(url);
+          });
+        }
+      });
+    },
+
     /** Alter the "stretch" of a FITS image layer according to
      * [the options](../../engine-helpers/interfaces/StretchFitsLayerOptions.html).
      */
