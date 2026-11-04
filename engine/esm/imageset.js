@@ -1014,7 +1014,7 @@ var Imageset$ = {
     },
 
     add_urlResolved: function (value) {
-        if (this._activeUrl === undefined) {
+        if (!this.get_urlResolvedFired()) {
             this._urlResolved = ss.bindAdd(this._urlResolved, value);
         } else {
             value(this._activeUrl);
@@ -1126,7 +1126,7 @@ var Imageset$ = {
         var mirrorUrls = this.get_mirrorUrls();
 
         if (mirrorUrls.length === 0) {
-            this.set_activeUrl(null);
+            this.set_activeUrl(this.url);
             return this.url;
         } else if (this._activeUrl != null) {
             return this._activeUrl;
@@ -1184,6 +1184,7 @@ var Imageset$ = {
         Util.fetchFirstAvailable(
             urls,
             function (url, index) {
+                console.log(url, index);
                 var activeUrl = index == 0 ? this.url : mirrorUrls[index - 1];
                 $this.set_activeUrl(activeUrl);
                 $this.set_imageSetID(Util.getHashCode(activeUrl));
@@ -1195,6 +1196,10 @@ var Imageset$ = {
                 onResolved(null);
             }
         );
+    },
+
+    get_urlResolvedFired: function () {
+        return this._activeUrl !== undefined;
     },
 };
 
