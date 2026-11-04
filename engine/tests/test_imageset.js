@@ -72,7 +72,7 @@ describe('ImageSetLayer', function () {
       >
         <MirrorUrls>
           <Url>http://example.com</Url>
-          <url>http://example2.com</Url>
+          <Url>http://example2.com</Url>
         </MirrorUrls>
         <Credits>Bing Maps Copyright Microsoft Corp. and Suppliers</Credits>
         <CreditsUrl>http://maps.live.com/help/en-us/About.htm</CreditsUrl>
