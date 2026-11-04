@@ -1052,7 +1052,7 @@ var Imageset$ = {
                 maxX = Math.pow(2, level) * ss.truncate((360 / this.get_baseTileDegrees()));
                 break;
             case ProjectionType.tangent:
-                if (layer.get_widthFactor() === 1) {
+                if (this.get_widthFactor() === 1) {
                     maxX = Math.pow(2, level) * 2;
                 }
                 else {
