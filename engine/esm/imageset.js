@@ -6,6 +6,7 @@
 import { ss } from "./ss.js";
 import { registerType, registerEnum, Enums } from "./typesystem.js";
 import { freestandingMode, makeNewHipsProperties } from "./data_globals.js";
+import { tileCacheGetTile, tileCacheRemoveFromQueue } from "./render_globals.js";
 import { Matrix3d } from "./double3d.js";
 import { Util } from "./baseutil.js";
 import { IThumbnail } from "./interfaces.js";
@@ -15,11 +16,14 @@ import { FitsProperties } from "./fits_properties.js";
 import { FitsImage } from "./layers/fits_image.js";
 import { EquirectangularTile } from "./equirectangular_tile.js";
 import { HealpixTile } from "./healpix_tile.js";
+import { HipsProperties } from "./hips_properties.js";
 import { MercatorTile } from "./mercator_tile.js";
 import { PlotTile } from "./plot_tile.js";
 import { TangentTile } from "./tangent_tile.js";
 import { SkyImageTile } from "./sky_image_tile.js";
 import { ToastTile } from "./toast_tile.js";
+import { getTileKey, Guid } from "./util.js";
+import { TileCache } from "./tile_cache.js";
 
 
 // wwtlib.ProjectionType
@@ -113,23 +117,39 @@ export function Imageset() {
     this._elevationModel = false;
     this._offsetX = 0;
     this._offsetY = 0;
+    this._mirrorUrls = [];
+    this._activeUrl = undefined;
+    this._urlResolved = null;
 }
+
+// Note: "spherical" projection type not handled in the WebGL engine.
+// Also, we can't do { [key]: value } for a variable `key` in IE
+Imageset._tileTypes = {};
+Imageset._tileTypes[ProjectionType.mercator] = MercatorTile;
+Imageset._tileTypes[ProjectionType.equirectangular] = EquirectangularTile;
+Imageset._tileTypes[ProjectionType.toast] = ToastTile;
+Imageset._tileTypes[ProjectionType.skyImage] = SkyImageTile;
+Imageset._tileTypes[ProjectionType.plotted] = PlotTile;
+Imageset._tileTypes[ProjectionType.healpix] = HealpixTile;
+Imageset._tileTypes[ProjectionType.tangent] = TangentTile;
+
+Imageset.tileType = function (imageset) {
+    return Imageset._tileTypes[imageset.get_projection()] || ToastTile;
+};
 
 Imageset.getNewTile = function (imageset, level, x, y, parent) {
     // Note: "spherical" projection type not handled in the WebGL engine.
     switch (imageset.get_projection()) {
         case ProjectionType.mercator:
-            var newTile = MercatorTile.create(level, x, y, imageset, parent);
-            return newTile;
         case ProjectionType.equirectangular:
-            return EquirectangularTile.create(level, x, y, imageset, parent);
         case ProjectionType.toast:
-        default:
-            return ToastTile.create(level, x, y, imageset, parent);
+        case ProjectionType.plotted:
+            var type = Imageset.tileType(imageset);
+            return type.create(level, x, y, imageset, parent);
         case ProjectionType.skyImage:
             return new SkyImageTile(level, x, y, imageset, parent);
-        case ProjectionType.plotted:
-            return PlotTile.create(level, x, y, imageset, parent);
+        case ProjectionType.tangent:
+            return new TangentTile(level, x, y, imageset, parent);
         case ProjectionType.healpix:
             if (imageset.get_hipsProperties() == null) {
                 imageset.set_hipsProperties(makeNewHipsProperties(imageset));
@@ -140,9 +160,51 @@ Imageset.getNewTile = function (imageset, level, x, y, parent) {
             else {
                 return null;
             }
+        default:
+            return ToastTile.create(level, x, y, imageset, parent);
+    }
+};
+
+Imageset.createGenericTile = function (imageset, level, x, y, parent) {
+    // Note: "spherical" projection type not handled in the WebGL engine.
+    var type = Imageset.tileType(imageset);
+    switch (imageset.get_projection()) {
+        case ProjectionType.healpix:
         case ProjectionType.tangent:
-            var newTile = new TangentTile(level, x, y, imageset, parent);
-            return newTile;
+        case ProjectionType.skyImage:
+            return new type(level, x, y, imageset, parent);
+        default:
+            return type.create(level, x, y, imageset, parent);
+    }
+};
+
+Imageset.getTileXYAtLatLong = function (imageset, viewLat, viewLong) {
+    var baseLevel = imageset.get_baseLevel();
+    var maxX = imageset.getTilesXForLevel(baseLevel);
+    var maxY = imageset.getTilesYForLevel(baseLevel);
+    for (var x = 0; x < maxX; x++) {
+        for (var y = 0; y < maxY; y++) {
+            var tile = Imageset.createGenericTile(imageset, baseLevel, x, y, null);
+            if (tile.isPointInTile(viewLat, viewLong)) {
+                return [tile.tileX, tile.tileY];
+            }
+        }
+    }
+    return [0, 0];
+};
+
+Imageset.clearTilesFromCache = function (imageset) {
+    var baseLevel = imageset.get_baseLevel();
+    var maxX = imageset.getTilesXForLevel(baseLevel);
+    var maxY = imageset.getTilesYForLevel(baseLevel);
+    for (var level = baseLevel; level < baseLevel + imageset.get_levels(); level++) {
+        for (var x = 0; x < maxX; x++) {
+            for (var y = 0; y < maxY; y++) {
+                var tileKey = getTileKey(imageset, level, x, y, parent);
+                tileCacheRemoveFromQueue(tileKey, true);
+                TileCache.clearTile(level, x, y, imageset, parent);
+            }
+        }
     }
 };
 
@@ -158,6 +220,18 @@ Imageset.fromXMLNode = function (node) {
         var wf = 1;
         if (node.attributes.getNamedItem('WidthFactor') != null) {
             wf = parseInt(node.attributes.getNamedItem('WidthFactor').nodeValue);
+        }
+        var mirrorUrls = [];
+        var mirrors = Util.selectSingleNode(node, 'MirrorUrls');
+        if (mirrors != null) {
+            var mirrorNodes = Util.selectChildNodes(mirrors, 'Url');
+            for (var i = 0; i < mirrorNodes.length; i++) {
+                var mirrorNode = mirrorNodes[i];
+                var mirrorUrl = ss.trim(Util.getInnerText(mirrorNode));
+                if (mirrorUrl) {
+                    mirrorUrls.push(mirrorUrl);
+                }
+            }
         }
         if (node.attributes.getNamedItem('Generic') == null || !ss.boolean(node.attributes.getNamedItem('Generic').nodeValue)) {
             projection = Enums.parse('ProjectionType', node.attributes.getNamedItem('Projection').nodeValue);
@@ -209,7 +283,7 @@ Imageset.fromXMLNode = function (node) {
             credits = Util.selectSingleNode(node, 'CreditsUrl');
             if (credits != null) {
                 creditsUrl = Util.getInnerText(credits);
-            }
+            } 
             var meanRadius = 0;
             if (node.attributes.getNamedItem('MeanRadius') != null) {
                 meanRadius = parseFloat(node.attributes.getNamedItem('MeanRadius').nodeValue);
@@ -262,7 +336,7 @@ Imageset.fromXMLNode = function (node) {
             if (node.attributes.getNamedItem('Sparse') != null) {
                 sparse = ss.boolean(node.attributes.getNamedItem('Sparse').nodeValue);
             }
-            return Imageset.create(name, url, type, bandPass, projection, Math.abs(Util.getHashCode(url)), baseTileLevel, tileLevels, 256, baseDegreesPerTile, fileType, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, stockSet, elevationModel, wf, offsetX, offsetY, creditText, creditsUrl, demUrl, alturl, meanRadius, referenceFrame);
+            return Imageset.create(name, url, type, bandPass, projection, Math.abs(Util.getHashCode(url)), baseTileLevel, tileLevels, 256, baseDegreesPerTile, fileType, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, stockSet, elevationModel, wf, offsetX, offsetY, creditText, creditsUrl, demUrl, alturl, meanRadius, referenceFrame, mirrorUrls);
         } else {
             return Imageset.createGeneric(type, bandPass);
         }
@@ -309,6 +383,14 @@ Imageset.saveToXml = function (xmlWriter, imageset, alternateUrl) {
             xmlWriter._writeElementString('ThumbnailUrl', imageset.get_url());
         }
     }
+    var mirrorUrls = imageset.get_mirrorUrls();
+    if (mirrorUrls.length > 0) {
+        xmlWriter._writeStartElement('MirrorUrls');
+        for (var i = 0; i < mirrorUrls.length; i++) {
+            xmlWriter._writeElementString('Url', mirrorUrls[i]);
+        }
+        xmlWriter._writeEndElement();
+    }
     xmlWriter._writeEndElement();
 };
 
@@ -333,6 +415,7 @@ Imageset.createGeneric = function (dataSetType, bandPass) {
     temp._centerY = 0;
     temp._rotation = 0;
     temp._thumbnailUrl = '';
+    temp._mirrorUrls = [];
     temp._matrix = Matrix3d.get_identity();
     temp._matrix._multiply(Matrix3d._rotationX((temp.get_rotation() / 180 * Math.PI)));
     temp._matrix._multiply(Matrix3d._rotationZ((temp.get_centerY() / 180 * Math.PI)));
@@ -340,9 +423,9 @@ Imageset.createGeneric = function (dataSetType, bandPass) {
     return temp;
 };
 
-Imageset.create = function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, tileSize, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame) {
+Imageset.create = function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, tileSize, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, mirrorUrls) {
     var temp = new Imageset();
-    temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame);
+    temp.setInitialParameters(name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, mirrorUrls);
     return temp;
 };
 
@@ -785,7 +868,7 @@ var Imageset$ = {
         }
     },
 
-    setInitialParameters: function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame) {
+    setInitialParameters: function (name, url, dataSetType, bandPass, projection, imageSetID, baseLevel, levels, baseTileDegrees, extension, bottomsUp, quadTreeMap, centerX, centerY, rotation, sparse, thumbnailUrl, defaultSet, elevationModel, wf, offsetX, offsetY, credits, creditsUrl, demUrlIn, alturl, meanRadius, referenceFrame, mirrorUrls) {
         this.set_referenceFrame(referenceFrame);
         this.set_meanRadius(meanRadius);
         this._altUrl = alturl;
@@ -815,6 +898,7 @@ var Imageset$ = {
         this._centerY = centerY;
         this._rotation = rotation;
         this._thumbnailUrl = thumbnailUrl;
+        this._mirrorUrls = mirrorUrls != null ? mirrorUrls : [];
         this._computeMatrix();
     },
 
@@ -904,7 +988,231 @@ var Imageset$ = {
 
     get_children: function () {
         return [];
-    }
+    },
+
+    add_mirrorUrl: function (url) {
+        if (this._mirrorUrls.indexOf(url) == -1) {
+            this._mirrorUrls.push(url);
+        }
+    },
+
+    remove_mirrorUrl: function (url) {
+        for (var i = this._mirrorUrls.length - 1; i >= 0; i--) {
+            if (this._mirrorUrls[i] === url) {
+                this._mirrorUrls.splice(i, 1);
+            }
+        }
+    },
+
+    get_mirrorUrls: function () {
+        return this._mirrorUrls;
+    },
+
+    set_mirrorUrls: function (urls) {
+        this._mirrorUrls = urls;
+        return urls;
+    },
+
+    get_activeUrl: function () {
+        return this._activeUrl || this.get_url();
+    },
+
+    set_activeUrl: function (url) {
+        this._activeUrl = url;
+        return url;
+    },
+
+    add_urlResolved: function (value) {
+        if (!this.get_urlResolvedFired()) {
+            this._urlResolved = ss.bindAdd(this._urlResolved, value);
+        } else {
+            value(this._activeUrl);
+        }
+    },
+
+    remove_urlResolved: function (value) {
+        this._urlResolved = ss.bindSub(this._urlResolved, value);
+    },
+
+    clone: function () {
+        var temp = new Imageset();
+        temp.setInitialParameters(
+          this.get_name(), this.get_url(), this.get_dataSetType(), this.get_bandPass(), this.get_projection(),
+          this.get_imageSetID(), this.get_baseLevel(), this.get_levels(), this.get_baseTileDegrees(),
+          this.get_extension(), this.get_bottomsUp(), this.get_quadTreeTileMap(), this.get_centerX(), this.get_centerY(),
+          this.get_rotation(), this.get_sparse(), this.get_thumbnailUrl(), this.get_defaultSet(), this.get_elevationModel(),
+          this.get_widthFactor(), this.get_offsetX(), this.get_offsetY(), this.get_creditsText(), this.get_creditsUrl(),
+          this.get_demUrl(), this.get_altUrl(), this.get_meanRadius(), this.get_referenceFrame(), this.get_mirrorUrls().slice()
+        );
+        return temp;
+    },
+
+    getTilesXForLevel: function (level) {
+        var maxX = 1;
+        switch (this.get_projection()) {
+            case ProjectionType.plotted:
+            case ProjectionType.toast:
+                maxX = Math.pow(2, level);
+                break;
+            case ProjectionType.mercator:
+                maxX = Math.pow(2, level) * ss.truncate((this.get_baseTileDegrees() / 360));
+                break;
+            case ProjectionType.equirectangular:
+                maxX = Math.pow(2, level) * ss.truncate((360 / this.get_baseTileDegrees()));
+                break;
+            case ProjectionType.tangent:
+                if (this.get_widthFactor() === 1) {
+                    maxX = Math.pow(2, level) * 2;
+                }
+                else {
+                    maxX = Math.pow(2, level);
+                }
+                break;
+            case ProjectionType.skyImage:
+                maxX = 1;
+                break;
+            case ProjectionType.spherical:
+                maxX = 1;
+                break;
+            case ProjectionType.healpix:
+                maxX = Math.pow(2, level) * 3;
+                break;
+            default:
+                maxX = Math.pow(2, level) * 2;
+                break;
+        }
+        if (maxX === Number.POSITIVE_INFINITY) {
+            maxX = 1;
+        }
+        return maxX;
+    },
+
+    getTilesYForLevel: function (level) {
+        var maxY = 1;
+        switch (this.get_projection()) {
+            case ProjectionType.mercator:
+                maxY = Math.pow(2, level);
+                break;
+            case ProjectionType.equirectangular:
+                maxY = (Math.pow(2, level) * (180 / this.get_baseTileDegrees()));
+                break;
+            case ProjectionType.tangent:
+                maxY = Math.pow(2, level);
+                break;
+            case ProjectionType.spherical:
+                maxY = 1;
+                break;
+            case ProjectionType.healpix:
+                maxY = 4 * Math.pow(2, level);
+                break;
+            default:
+                maxY = Math.pow(2, level);
+                break;
+        }
+        if (maxY === Number.POSITIVE_INFINITY) {
+            maxY = 1;
+        }
+        return maxY;
+    },
+
+    getTileAtLatLong: function (viewLat, viewLong) {
+        var baseLevel = this.get_baseLevel();
+        var maxX = this.getTilesXForLevel(baseLevel);
+        var maxY = this.getTilesYForLevel(baseLevel);
+        for (var x = 0; x < maxX; x++) {
+            for (var y = 0; y < maxY; y++) {
+                var tile = tileCacheGetTile(baseLevel, x, y, this, null);
+                if (tile != null) {
+                    if (tile.isPointInTile(viewLat, viewLong)) {
+                        return tile;
+                    }
+                }
+            }
+        }
+        return null;
+    },
+
+    determineUrlToUse: function(lat, lng) {
+
+        var urls = [];
+        var mirrorUrls = this.get_mirrorUrls();
+
+        var $this = this;
+        var onResolved = function (url) {
+            $this.set_activeUrl(url);
+            if ($this._urlResolved) {
+                $this._urlResolved(url, new ss.EventArgs());
+            }
+        }
+
+        if (mirrorUrls.length === 0) {
+            onResolved(this.url);
+            return;
+        } else if (this._activeUrl != null) {
+            onResolved(this._activeUrl);
+            return;
+        }
+
+        // For HEALPix, we check the properties file
+        if (this.get_projection() === 7) {
+            var hipsProperties = this.get_hipsProperties();
+            if (hipsProperties == null) {
+                onResolved(this.url);
+                return;
+            } else {
+                urls.push(hipsProperties.get_url());
+                for (var i = 0; i < mirrorUrls.length; i++) {
+                    urls.push(HipsProperties.adjustedUrl(mirrorUrls[i]));
+                }
+            }
+        } else {
+            // Otherwise, we need some sort of standard way to check whether the server hosting the imageset is working
+            // This is not trivial, because we typically don't have any sort of "index file", and we can't just try a
+            // a random tile as the imageset may not have full coverage on the sky
+            //
+            // So, we use the following heuristic:
+            // The imageset defines a centerX, centerY, and base level
+            // We check the tile for the base level at the center X and Y
+            // Hopefully the base-level tile centered on this location is non-empty?
+            var centerX = lng != null ? lng : this.get_centerX();
+            var centerY = lat != null ? lat : this.get_centerY();
+            var xy = Imageset.getTileXYAtLatLong(this, centerX, centerY);
+            var x = xy[0];
+            var y = xy[1];
+            var baseLevel = this.get_baseLevel();
+            var baseTile = Imageset.createGenericTile(this, baseLevel, x, y, null);
+            urls.push(baseTile.get_URL());
+            if (mirrorUrls.length > 0) {
+                var iset = this.clone();
+                for (var i = 0; i < mirrorUrls.length; i++) {
+                    var url = mirrorUrls[i];
+                    iset.set_url(url);
+                    iset.set_mirrorUrls([]);
+                    iset.set_name(Guid.create().toString());
+                    iset.set_imageSetID(Util.getHashCode(url));
+                    var mirrorTile = Imageset.createGenericTile(iset, baseLevel, x, y, null);
+                    urls.push(mirrorTile.get_URL());
+                }
+            }
+        }
+
+        Util.fetchFirstAvailable(
+            urls,
+            function (url, index) {
+                var activeUrl = index == 0 ? $this.url : mirrorUrls[index - 1];
+                $this.set_imageSetID(Util.getHashCode(activeUrl));
+                onResolved(activeUrl);
+            },
+            function (_errorMessages) {
+                console.warn(`No working URLs for imageset ${$this.get_imageSetID()}`);
+                onResolved(null);
+            }
+        );
+    },
+
+    get_urlResolvedFired: function () {
+        return this._activeUrl !== undefined;
+    },
 };
 
 registerType("Imageset", [Imageset, Imageset$, null, IThumbnail]);

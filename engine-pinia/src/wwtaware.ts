@@ -190,6 +190,7 @@ export const WWTAwareComponent = defineComponent({
       "move",
       "tilt",
       "clearTileCache",
+      "waitForUrlResolved",
     ]),
   }
 });

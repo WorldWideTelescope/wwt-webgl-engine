@@ -22,13 +22,17 @@ export function HipsProperties(dataset) {
     this._downloadComplete = false;
     this.dataset = dataset;
     this._datasetName = dataset.get_name();
-    this._url = dataset.get_url();
-    if (this._url.toLowerCase().indexOf('norder') > -1) {
-        this._url = this._url.substring(0, this._url.toLowerCase().indexOf('norder'));
-    }
-    this._url += 'properties';
+    this._url = HipsProperties.adjustedUrl(dataset.get_url());
     this._download();
 }
+
+HipsProperties.adjustedUrl = function (url) {
+    if (url.toLowerCase().indexOf('norder') > -1) {
+        url = url.substring(0, url.toLowerCase().indexOf('norder'));
+    }
+    url += 'properties';
+    return url;
+};
 
 var HipsProperties$ = {
     get_properties: function () {
@@ -55,6 +59,10 @@ var HipsProperties$ = {
 
     get_downloadComplete: function () {
         return this._downloadComplete;
+    },
+    
+    get_url: function () {
+        return this._url;
     },
 
     _download: function () {
