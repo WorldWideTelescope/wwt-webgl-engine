@@ -1,7 +1,7 @@
 var assert = chai.assert;
 
 
-describe('ImageSetLayer', function () {
+describe('Imageset', function () {
   
   it('should export XML with mirror URLs included', function (done) {
     var iset = wwtlib.Imageset.createGeneric(wwtlib.ImageSetType.sky, wwtlib.BandPass.visible);
