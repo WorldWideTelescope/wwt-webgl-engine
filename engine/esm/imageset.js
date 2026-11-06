@@ -143,11 +143,13 @@ Imageset.getNewTile = function (imageset, level, x, y, parent) {
         case ProjectionType.mercator:
         case ProjectionType.equirectangular:
         case ProjectionType.toast:
-        case ProjectionType.skyImage:
         case ProjectionType.plotted:
-        case ProjectionType.tangent:
             var type = Imageset.tileType(imageset);
             return type.create(level, x, y, imageset, parent);
+        case ProjectionType.skyImage:
+            return new SkyImageTile(level, x, y, imageset, parent);
+        case ProjectionType.tangent:
+            return new TangentTile(level, x, y, imageset, parent);
         case ProjectionType.healpix:
             if (imageset.get_hipsProperties() == null) {
                 imageset.set_hipsProperties(makeNewHipsProperties(imageset));
@@ -166,7 +168,14 @@ Imageset.getNewTile = function (imageset, level, x, y, parent) {
 Imageset.createGenericTile = function (imageset, level, x, y, parent) {
     // Note: "spherical" projection type not handled in the WebGL engine.
     var type = Imageset.tileType(imageset);
-    return type.create(level, x, y, imageset, parent);
+    switch (imageset.get_projection()) {
+        case ProjectionType.healpix:
+        case ProjectionType.tangent:
+        case ProjectionType.skyImage:
+            return new type(level, x, y, imageset, parent);
+        default:
+            return type.create(level, x, y, imageset, parent);
+    }
 };
 
 Imageset.getTileXYAtLatLong = function (imageset, viewLat, viewLong) {
