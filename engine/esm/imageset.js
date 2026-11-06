@@ -1072,6 +1072,9 @@ var Imageset$ = {
                 maxX = Math.pow(2, level) * 2;
                 break;
         }
+        if (maxX === Number.POSITIVE_INFINITY) {
+            maxX = 1;
+        }
         return maxX;
     },
 
@@ -1125,18 +1128,28 @@ var Imageset$ = {
         var urls = [];
         var mirrorUrls = this.get_mirrorUrls();
 
+        var $this = this;
+        var onResolved = function (url) {
+            $this.set_activeUrl(url);
+            if ($this._urlResolved) {
+                $this._urlResolved(url, new ss.EventArgs());
+            }
+        }
+
         if (mirrorUrls.length === 0) {
-            this.set_activeUrl(this.url);
-            return this.url;
+            onResolved(this.url);
+            return;
         } else if (this._activeUrl != null) {
-            return this._activeUrl;
+            onResolved(this._activeUrl);
+            return;
         }
 
         // For HEALPix, we check the properties file
         if (this.get_projection() === 7) {
             var hipsProperties = this.get_hipsProperties();
             if (hipsProperties == null) {
-                return this.url;
+                onResolved(this.url);
+                return;
             } else {
                 urls.push(hipsProperties.get_url());
                 for (var i = 0; i < mirrorUrls.length; i++) {
@@ -1158,7 +1171,7 @@ var Imageset$ = {
             var x = xy[0];
             var y = xy[1];
             var baseLevel = this.get_baseLevel();
-            var baseTile = tileCacheGetTile(baseLevel, x, y, this, null);
+            var baseTile = Imageset.createGenericTile(this, baseLevel, x, y, null);
             urls.push(baseTile.get_URL());
             if (mirrorUrls.length > 0) {
                 var iset = this.clone();
@@ -1174,25 +1187,15 @@ var Imageset$ = {
             }
         }
 
-        var $this = this;
-        var onResolved = function (url) {
-            if ($this._urlResolved) {
-                $this._urlResolved(url, new ss.EventArgs());
-            }
-        }
-
         Util.fetchFirstAvailable(
             urls,
             function (url, index) {
-                console.log(url, index);
-                var activeUrl = index == 0 ? this.url : mirrorUrls[index - 1];
-                $this.set_activeUrl(activeUrl);
+                var activeUrl = index == 0 ? $this.url : mirrorUrls[index - 1];
                 $this.set_imageSetID(Util.getHashCode(activeUrl));
                 onResolved(activeUrl);
             },
             function (_errorMessages) {
                 console.warn(`No working URLs for imageset ${$this.get_imageSetID()}`);
-                $this.set_activeUrl(null);
                 onResolved(null);
             }
         );
