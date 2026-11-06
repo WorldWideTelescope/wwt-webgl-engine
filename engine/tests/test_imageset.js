@@ -135,4 +135,74 @@ describe('ImageSetLayer', function () {
     done();
   });
 
+  it('should have the default URL as active if no mirrors are present', function (done) {
+    this.timeout(10_000);
+    var iset = wwtlib.Imageset.createGeneric(wwtlib.ImageSetType.sky, wwtlib.BandPass.visible);
+    var imagesetUrl = "https://httpbin.org/404";
+    iset.set_url(imagesetUrl);
+    iset.add_urlResolved(url => {
+      try {
+        assert.equal(url, imagesetUrl);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    iset.determineUrlToUse();
+  });
+
+  it('should have the default URL as active if it works', function (done) {
+    this.timeout(10_000);
+    var iset = wwtlib.Imageset.createGeneric(wwtlib.ImageSetType.sky, wwtlib.BandPass.visible);
+    var imagesetUrl = "https://httpbin.org/status/200";
+    var mirrorUrls = ["https://httpbin.org/status/201", "https://httpbin.org/status/400"];
+    iset.set_url(imagesetUrl);
+    iset.set_mirrorUrls(mirrorUrls);
+    iset.add_urlResolved(url => {
+      try {
+        assert.equal(url, imagesetUrl);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    iset.determineUrlToUse();
+  });
+
+  it('should use the first mirror URL as active', function (done) {
+    this.timeout(10_000);
+    var iset = wwtlib.Imageset.createGeneric(wwtlib.ImageSetType.sky, wwtlib.BandPass.visible);
+    var imagesetUrl = "https://httpbin.org/status/400";
+    var mirrorUrls = ["https://httpbin.org/status/200", "https://httpbin.org/status/404"];
+    iset.set_url(imagesetUrl);
+    iset.set_mirrorUrls(mirrorUrls);
+    iset.add_urlResolved(url => {
+      try {
+        assert.equal(url, mirrorUrls[0]);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    iset.determineUrlToUse();
+  });
+
+  it('should use the second mirror URL as active', function (done) {
+    this.timeout(10_000);
+    var iset = wwtlib.Imageset.createGeneric(wwtlib.ImageSetType.sky, wwtlib.BandPass.visible);
+    var imagesetUrl = "https://httpbin.org/status/404";
+    var mirrorUrls = ["https://httpbin.org/status/500", "https://httpbin.org/status/200"];
+    iset.set_url(imagesetUrl);
+    iset.set_mirrorUrls(mirrorUrls);
+    iset.add_urlResolved(url => {
+      try {
+        assert.equal(url, mirrorUrls[1]);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    iset.determineUrlToUse();
+  });
+
 });
