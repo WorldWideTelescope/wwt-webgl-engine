@@ -1132,7 +1132,7 @@ var Imageset$ = {
         return null;
     },
 
-    determineUrlToUse: function(lat, lng) {
+    determineUrlToUse: function(lng, lat) {
 
         var urls = [];
         var mirrorUrls = this.get_mirrorUrls();
