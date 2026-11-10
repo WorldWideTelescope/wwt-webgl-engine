@@ -5,6 +5,7 @@
 
 import { registerType } from "./typesystem.js";
 import { ss } from "./ss.js";
+import { StateType, WebFile } from "./web_file.js";
 
 // wwtlib.Util
 
@@ -128,6 +129,18 @@ Util.selectSingleNode = function (parent, name) {
     return node;
 };
 
+Util.selectChildNodes = function (parent, name) {
+    var nodes = [];
+    var $enum1 = ss.enumerate(parent.childNodes);
+    while ($enum1.moveNext()) {
+        var child = $enum1.current;
+        if (child.nodeName === name) {
+            nodes.push(child);
+        }
+    }
+    return nodes;
+};
+
 Util.getInnerText = function (node) {
     if (ss.emptyString(node.text)) {
         var cn = node;
@@ -214,6 +227,71 @@ Util.sign = function (num) {
     }
     return 1;
 };
+
+// Try each URL in `urls` in priority order. Calls `onSuccess(url, webFile)`
+// with the first one that loads successfully, or `onFailure(messages)` if
+// none do.
+Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
+    var results = [];
+    var messages = [];
+    var settled = false;
+
+    if (!urls.length) {
+        onFailure(messages);
+        return;
+    }
+
+    var check = function () {
+        if (settled) {
+            return;
+        }
+
+        for (var i = 0; i < urls.length; i++) {
+            if (results[i] === undefined) {
+                return;  // a higher-priority URL is still pending
+            }
+            if (results[i]) {
+                settled = true;
+                onSuccess(urls[i], i);
+                return;
+            }
+        }
+
+        settled = true;  // everything failed
+        onFailure(messages);
+    };
+
+    // TODO: We can't use this in IE
+    urls.forEach(function (url, i) {
+        var file = new WebFile(url);
+
+        var finish = function (ok) {
+            if (results[i] !== undefined) {
+                return;
+            }
+            results[i] = ok;
+            if (!ok) {
+                messages[i] = file.get_message() || ('Error loading ' + url);
+            }
+            check();
+        };
+
+        file.onStateChange = function () {
+            var state = file.get_state();
+            if (state === StateType.received) {
+                finish(true);
+            } else if (state === StateType.error) {
+                finish(false);
+            }
+        };
+
+        try {
+            file.send();
+        } catch (e) {
+            finish(false);
+        }
+    });
+}
 
 var Util$ = {};
 

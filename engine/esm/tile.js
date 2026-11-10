@@ -272,8 +272,8 @@ var Tile$ = {
                     $this.makeTexture();
                 }, false);
                 this.texture.addEventListener('error', function (e) {
-                    if (!$this.texture.hasAttribute('proxyattempt')) {
-                        $this.texture.setAttribute('proxyattempt', true);
+                    if (!e.target.hasAttribute('proxyattempt')) {
+                        e.target.setAttribute('proxyattempt', true);
                         // NOTE: `this.URL` is dynamically generated using
                         // URLHelpers.rewrite(). Say that we request tiles from
                         // example.com, which requires CORS proxying. Say also
@@ -288,10 +288,10 @@ var Tile$ = {
                         // The solution: make sure to check proxy activation
                         // with the *original* request URL, `texture.Src`, not
                         // the one that may have been updated, `this.URL`.
-                        var new_url = URLHelpers.singleton.activateProxy($this.texture.src);
+                        var new_url = URLHelpers.singleton.activateProxy(e.target.src);
                         if (new_url != null) {
                             // null => don't bother: we know that the proxy won't help
-                            $this.texture.src = new_url;
+                            e.target.src = new_url;
                             return;
                         }
                     }
@@ -689,7 +689,7 @@ var Tile$ = {
     //{Q} - Quad Key ID
     //{S} - Last Digit of Quadkey
     get_URL: function () {
-        var rewritten_url = URLHelpers.singleton.rewrite(this.dataset.get_url(), 0);
+        var rewritten_url = URLHelpers.singleton.rewrite(this.dataset.get_activeUrl(), 0);
         var returnUrl = rewritten_url;
         if (rewritten_url.indexOf('{1}') > -1) {
             // Old style URL

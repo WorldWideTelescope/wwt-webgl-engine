@@ -1116,7 +1116,17 @@ export class Imageset implements Thumbnail {
   get_widthFactor(): number;
   set_widthFactor(f: number): number;
 
+  get_activeUrl(): string;
+
+  get_mirrorUrls(): string[];
+  set_mirrorUrls(urls: string[]): string[];
+  add_mirrorUrl(url: string): void;
+  remove_mirrorUrl(url: string): void;
+
   getHashCode(): number;
+
+  add_urlResolved(fn: (activeUrl: string) => void): void;
+  get_urlResolvedFired(): boolean;
 }
 
 export namespace Imageset {
@@ -1151,6 +1161,8 @@ export namespace Imageset {
     meanRadius: number,
     referenceFrame: string
   ): Imageset;
+
+  export function clone(): Imageset;
 }
 
 /** An imageset renderable as its own independent layer. */

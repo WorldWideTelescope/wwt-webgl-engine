@@ -10,7 +10,9 @@
     <div id="mocha"></div>
     <script src="../../node_modules/mocha/mocha.js"></script>
     <script src="../../node_modules/chai/chai.js"></script>
-    <script>mocha.setup('bdd')</script>
+    <script class="mocha-init">
+      mocha.setup({ ui: 'bdd' })
+    </script>
 
     <script src="../src/index.js"></script>
     <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
@@ -21,8 +23,9 @@
     <script src="test_table.js"></script>
     <script src="test_layer.js"></script>
     <script src="test_spreadsheetlayer.js"></script>
+    <script src="test_imageset.js"></script>
 
-    <script>
+    <script class="mocha-exec">
       mocha.run();
     </script>
   </body>
