@@ -290,7 +290,7 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
         } catch (e) {
             finish(false);
         }
-    });
+    };
 }
 
 var Util$ = {};
