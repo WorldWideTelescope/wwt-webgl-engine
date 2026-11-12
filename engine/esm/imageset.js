@@ -1146,7 +1146,15 @@ var Imageset$ = {
         }
 
         if (mirrorUrls.length === 0) {
-            onResolved(this.url);
+            Util.fetchFirstAvailable([this.url],
+                function (url, index) {
+                    onResolved(this.url);
+                },
+                function (_errorMessages) {
+                    console.warn("Default URL is not working: " + this.url);
+                    onResolved(null);
+                }
+            );
             return;
         } else if (this._activeUrl != null) {
             onResolved(this._activeUrl);
@@ -1204,7 +1212,7 @@ var Imageset$ = {
                 onResolved(activeUrl);
             },
             function (_errorMessages) {
-                console.warn(`No working URLs for imageset ${$this.get_imageSetID()}`);
+                console.warn("No working URLs for imageset " + $this.get_imageSetID());
                 onResolved(null);
             }
         );
