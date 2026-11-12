@@ -1145,7 +1145,7 @@ var Imageset$ = {
             }
         }
 
-        if (this._activeUrl != null) {
+        if (this._activeUrl !== undefined) {
             onResolved(this._activeUrl);
             return;
         } else if (mirrorUrls.length === 0) {
