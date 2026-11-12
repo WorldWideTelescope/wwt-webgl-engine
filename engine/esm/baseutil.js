@@ -261,8 +261,8 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
         onFailure(messages);
     };
 
-    // TODO: We can't use this in IE
-    urls.forEach(function (url, i) {
+    for (var i = 0; i < urls.length; i++) {
+        var url = urls[i];
         var file = new WebFile(url);
 
         var finish = function (ok) {
