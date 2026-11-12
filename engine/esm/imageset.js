@@ -1145,7 +1145,10 @@ var Imageset$ = {
             }
         }
 
-        if (mirrorUrls.length === 0) {
+        if (this._activeUrl != null) {
+            onResolved(this._activeUrl);
+            return;
+        } else if (mirrorUrls.length === 0) {
             Util.fetchFirstAvailable([this.url],
                 function (url, index) {
                     onResolved(this.url);
@@ -1155,9 +1158,6 @@ var Imageset$ = {
                     onResolved(null);
                 }
             );
-            return;
-        } else if (this._activeUrl != null) {
-            onResolved(this._activeUrl);
             return;
         }
 
