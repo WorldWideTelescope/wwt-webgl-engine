@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 var config = {
     entry: "./esm/index.js",
@@ -10,6 +11,15 @@ var config = {
             type: "umd"
         }
     },
+    plugins: [
+      // Strips the 'node:' protocol prefix so Webpack can match standard fallbacks
+      new webpack.NormalModuleReplacementPlugin(
+        /^node:/,
+        (resource) => {
+          resource.request = resource.request.replace(/^node:/, '');
+        }
+      )
+    ],
 };
 
 module.exports = (_env, argv) => {
