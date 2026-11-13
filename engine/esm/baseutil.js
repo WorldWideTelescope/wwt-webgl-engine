@@ -246,7 +246,8 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
             return;
         }
 
-        for (var j = 0; j < urls.length; j++) {
+        for (let j = 0; j < urls.length; j++) {
+            console.log("check", j, results[j]);
             if (results[j] === undefined) {
                 return;  // a higher-priority URL is still pending
             }
@@ -261,35 +262,38 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
         onFailure(messages);
     };
 
-    for (var i = 0; i < urls.length; i++) {
+    var finish = function (index, ok) {
+        console.log('finish', index);
+        if (results[index] !== undefined) {
+            return;
+        }
+        results[index] = ok;
+        if (!ok) {
+            messages[index] = file.get_message() || ('Error loading ' + url);
+        }
+        check();
+    };
+
+    var onStateChange = function (index) {
+        var state = this.get_state();
+        if (state === StateType.received) {
+            finish(index, true);
+        } else if (state === StateType.error) {
+            finish(index, false);
+        }
+    };
+
+    for (let i = 0; i < urls.length; i++) {
         var url = urls[i];
         var file = new WebFile(url);
+        console.log(i, file);
 
-        var index = i;
-        var finish = function (ok) {
-            if (results[index] !== undefined) {
-                return;
-            }
-            results[index] = ok;
-            if (!ok) {
-                messages[index] = file.get_message() || ('Error loading ' + url);
-            }
-            check();
-        };
-
-        file.onStateChange = function () {
-            var state = file.get_state();
-            if (state === StateType.received) {
-                finish(true);
-            } else if (state === StateType.error) {
-                finish(false);
-            }
-        };
+        file.onStateChange = onStateChange.bind(file, i);
 
         try {
             file.send();
         } catch (e) {
-            finish(false);
+            finish(i, false);
         }
     }
 }
