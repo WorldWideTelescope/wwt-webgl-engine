@@ -247,7 +247,6 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
         }
 
         for (let j = 0; j < urls.length; j++) {
-            console.log("check", j, results[j]);
             if (results[j] === undefined) {
                 return;  // a higher-priority URL is still pending
             }
@@ -263,7 +262,6 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
     };
 
     var finish = function (index, ok) {
-        console.log('finish', index);
         if (results[index] !== undefined) {
             return;
         }
@@ -286,7 +284,6 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
     for (let i = 0; i < urls.length; i++) {
         var url = urls[i];
         var file = new WebFile(url);
-        console.log(i, file);
 
         file.onStateChange = onStateChange.bind(file, i);
 
