@@ -246,13 +246,13 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
             return;
         }
 
-        for (var i = 0; i < urls.length; i++) {
-            if (results[i] === undefined) {
+        for (var j = 0; j < urls.length; j++) {
+            if (results[j] === undefined) {
                 return;  // a higher-priority URL is still pending
             }
-            if (results[i]) {
+            if (results[j]) {
                 settled = true;
-                onSuccess(urls[i], i);
+                onSuccess(urls[j], j);
                 return;
             }
         }
@@ -265,13 +265,14 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
         var url = urls[i];
         var file = new WebFile(url);
 
+        var index = i;
         var finish = function (ok) {
-            if (results[i] !== undefined) {
+            if (results[index] !== undefined) {
                 return;
             }
-            results[i] = ok;
+            results[index] = ok;
             if (!ok) {
-                messages[i] = file.get_message() || ('Error loading ' + url);
+                messages[index] = file.get_message() || ('Error loading ' + url);
             }
             check();
         };
@@ -290,7 +291,7 @@ Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
         } catch (e) {
             finish(false);
         }
-    };
+    }
 }
 
 var Util$ = {};

@@ -1148,17 +1148,6 @@ var Imageset$ = {
         if (this._activeUrl !== undefined) {
             onResolved(this._activeUrl);
             return;
-        } else if (mirrorUrls.length === 0) {
-            Util.fetchFirstAvailable([this.url],
-                function (url, index) {
-                    onResolved(this.url);
-                },
-                function (_errorMessages) {
-                    console.warn("Default URL is not working: " + this.url);
-                    onResolved(null);
-                }
-            );
-            return;
         }
 
         // For HEALPix, we check the properties file
