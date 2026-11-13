@@ -1145,10 +1145,7 @@ var Imageset$ = {
             }
         }
 
-        if (mirrorUrls.length === 0) {
-            onResolved(this.url);
-            return;
-        } else if (this._activeUrl != null) {
+        if (this._activeUrl !== undefined) {
             onResolved(this._activeUrl);
             return;
         }
@@ -1204,7 +1201,7 @@ var Imageset$ = {
                 onResolved(activeUrl);
             },
             function (_errorMessages) {
-                console.warn(`No working URLs for imageset ${$this.get_imageSetID()}`);
+                console.warn("No working URLs for imageset " + $this.get_imageSetID());
                 onResolved(null);
             }
         );
