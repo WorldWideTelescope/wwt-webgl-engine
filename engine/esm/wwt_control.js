@@ -2117,6 +2117,12 @@ var WWTControl$ = {
         this._trackingObject = null;
         this._targetStudyImageset = studyImageSet;
         this._targetBackgroundImageset = backgroundImageSet;
+        if (studyImageSet != null) {
+            studyImageSet.determineUrlToUse(cameraParams.lng, cameraParams.lat);
+        }
+        if (backgroundImageSet != null) {
+            backgroundImageSet.determineUrlToUse(cameraParams.lng, cameraParams.lat);
+        }
         if (noZoom) {
             cameraParams.zoom = this.renderContext.viewCamera.zoom;
             cameraParams.angle = this.renderContext.viewCamera.angle;
