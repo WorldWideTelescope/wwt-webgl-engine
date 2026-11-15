@@ -71,6 +71,7 @@ export var PlotTypes = {
     pushPin: 4,
     custom: 5,
     filledCircle: 6,
+    filledSquare: 7,
 };
 
 registerType("PlotTypes", PlotTypes);
