@@ -3115,7 +3115,7 @@ FilledNGonShader.nLoc = 0;
 FilledNGonShader.init = function (renderContext) {
     var gl = renderContext.gl;
     var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
-    var borderWidth = derivatives ? "fwidth(distance)" : "0.012";
+    var borderWidth = derivatives ? "fwidth(r)" : "0.012";
     var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
     var keywords = shaderKeywords(useGlVersion2);
     var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : ""; 
@@ -3171,16 +3171,21 @@ FilledNGonShader.init = function (renderContext) {
         float k = floor(angle / sliceSize);
         float mid = (k + 0.5) * sliceSize;
         float apothem = cos(pi / n);
-        float distance = dot(p, vec2(cos(mid), sin(mid))) - apothem;
+        float r = 0.5 * dot(p, vec2(cos(mid), sin(mid))) / apothem;
 
         float borderWidth = ${borderWidth};
-        float alpha = 1.0 - smoothstep(-borderWidth * 0.5, borderWidth * 0.5, distance);
-        float core = smoothstep(0.50, 0.30, distance);
+        float alpha = 1.0;
+        float core = smoothstep(0.50, 0.30, r);
         vec3 col = vColor.rgb * mix(0.85, 1.15, core);
         if (border > 0.5) 
         {
-          float borderMix = smoothstep(0.40 - borderWidth, 0.40 + borderWidth, distance);
+          float borderMix = smoothstep(0.40 - borderWidth, 0.40 + borderWidth, r);
           col = mix(col, vec3(0.0), borderMix);
+          alpha = 1.0 - smoothstep(0.50 - borderWidth, 0.50 + borderWidth, r);
+        }
+        else
+        {
+          alpha = smoothstep(0.5, 0.46, r);
         }
 
         ${fragOutVar} = vec4(col, opacity * alpha * vColor.a);
@@ -3291,7 +3296,6 @@ FilledNGonShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, 
     var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
     gl.uniformMatrix4fv(FilledNGonShader.mvMatrixLoc, false, mvMat.floatArray());
     gl.uniformMatrix4fv(FilledNGonShader.pMatrixLoc, false, renderContext.get_projection().floatArray());
-    console.log("N", n);
     gl.uniform1f(FilledNGonShader.nLoc, n);
     gl.uniform1f(FilledNGonShader.nowLoc, jNow);
     gl.uniform1f(FilledNGonShader.decayLoc, decay);
