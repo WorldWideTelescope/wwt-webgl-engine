@@ -135,14 +135,31 @@ describe('Imageset', function () {
     done();
   });
 
-  it('should have the default URL as active if no mirrors are present', function (done) {
+  it('should have the default URL as active if no mirrors are present and it returns OK', function (done) {
     this.timeout(10_000);
     var iset = wwtlib.Imageset.createGeneric(wwtlib.ImageSetType.sky, wwtlib.BandPass.visible);
-    var imagesetUrl = "https://httpbin.org/404";
+    var imagesetUrl = "https://httpbin.org/status/200";
     iset.set_url(imagesetUrl);
     iset.add_urlResolved(url => {
       try {
         assert.equal(url, imagesetUrl);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    iset.determineUrlToUse();
+  });
+
+
+  it('should have an empty URL if no mirrors are present and it doesn\'t return OK', function (done) {
+    this.timeout(10_000);
+    var iset = wwtlib.Imageset.createGeneric(wwtlib.ImageSetType.sky, wwtlib.BandPass.visible);
+    var imagesetUrl = "https://httpbin.org/status/404";
+    iset.set_url(imagesetUrl);
+    iset.add_urlResolved(url => {
+      try {
+        assert.equal(url, null);
         done();
       } catch (e) {
         done(e);

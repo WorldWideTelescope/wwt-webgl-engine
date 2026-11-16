@@ -380,9 +380,6 @@ var Place$ = {
 
     set_studyImageset: function (value) {
         this._studyImageset = value;
-        if (value != null) {
-            value.determineUrlToUse(this.get_lng(), this.get_lat());
-        }
         return value;
     },
 
@@ -391,10 +388,6 @@ var Place$ = {
     },
 
     set_backgroundImageset: function (value) {
-        if (value != null) {
-            this.set_type(value.get_dataSetType());
-            value.determineUrlToUse(this.get_lng(), this.get_lat());
-        }
         this._backgroundImageSet = value;
         return value;
     },
