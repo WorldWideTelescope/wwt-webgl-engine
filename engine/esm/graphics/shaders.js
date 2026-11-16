@@ -3570,7 +3570,7 @@ FilledNGonQuadShader.use = function (renderContext, vertex, opacity, zBuffer, jN
     gl.enableVertexAttribArray(FilledNGonQuadShader.colorLoc);
     gl.enableVertexAttribArray(FilledNGonQuadShader.pointSizeLoc);
     gl.enableVertexAttribArray(FilledNGonQuadShader.timeLoc);
-    gl.enableVertexAttribArray(FilledCircleQuadShader.texLoc);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.texLoc);
     gl.vertexAttribPointer(FilledNGonQuadShader.vertLoc, 3, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 0);
     gl.vertexAttribPointer(FilledNGonQuadShader.texLoc, 2, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 12);
     gl.vertexAttribPointer(FilledNGonQuadShader.colorLoc, 4, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 20);
