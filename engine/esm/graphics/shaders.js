@@ -2654,7 +2654,6 @@ FilledCircleShader.init = function (renderContext) {
         ${fragOutDeclaration}
         uniform float opacity;
         uniform float border;
-        uniform vec4 borderColor;
 
         void main() {
           vec2 p = gl_PointCoord - vec2(0.5);
@@ -2888,7 +2887,6 @@ FilledCircleQuadShader.init = function (renderContext) {
         ${fragOutDeclaration}
         uniform float opacity;
         uniform float border;
-        uniform vec4 borderColor;
 
         void main() {
           vec2 p = vTextureCoord - vec2(0.5);
@@ -3130,7 +3128,6 @@ FilledNGonShader.init = function (renderContext) {
       uniform float opacity;
       uniform float border;
       uniform float n;
-      uniform vec4 borderColor;
 
       // The idea here is that the complex roots of unity form a regular n-gon
       // so we can use the canonical map into R^2 to get an n-gon in the plane.
@@ -3333,3 +3330,267 @@ FilledNGonShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, 
 var FilledNGonShader$ = {};
 
 registerType("FilledNGonShader", [FilledNGonShader, FilledNGonShader$, null]);
+
+export function FilledNGonQuadShader() { }
+
+FilledNGonQuadShader.initialized = false;
+FilledNGonQuadShader._prog = null;
+FilledNGonQuadShader.vertLoc = 0;
+FilledNGonQuadShader.texLoc = 0;
+FilledNGonQuadShader.colorLoc = 0;
+FilledNGonQuadShader.opacityLoc = 0;
+FilledNGonQuadShader.pointSizeLoc = 0;
+FilledNGonQuadShader.timeLoc = 0;
+FilledNGonQuadShader.showLoc = 0;
+FilledNGonQuadShader.mvMatrixLoc = 0;
+FilledNGonQuadShader.pMatrixLoc = 0;
+FilledNGonQuadShader.nowLoc = 0;
+FilledNGonQuadShader.cameraPosLoc = 0;
+FilledNGonQuadShader.decayLoc = 0;
+FilledNGonQuadShader.scaleLoc = 0;
+FilledNGonQuadShader.minSizeLoc = 0;
+FilledNGonQuadShader.skyLoc = 0;
+FilledNGonQuadShader.showFarSideLoc = 0;
+FilledNGonQuadShader.borderLoc = 0;
+FilledNGonQuadShader.nLoc = 0;
+FilledNGonQuadShader.viewportHeightLoc = 0;
+FilledNGonQuadShader.viewportWidthLoc = 0;
+
+FilledNGonQuadShader._itemSize = 12 * 4;
+
+FilledNGonQuadShader.init = function (renderContext) {
+    var gl = renderContext.gl;
+    var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
+    var borderWidth = derivatives ? "fwidth(r)" : "0.012";
+    var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
+    var keywords = shaderKeywords(useGlVersion2);
+    var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : ""; 
+    var fragOutVar = useGlVersion2 ? "fragColor" : "gl_FragColor";
+    
+    var fragShaderText = `\
+      ${keywords.versionDeclaration}
+      ${extensionDeclaration}
+      precision mediump float;
+      ${keywords.fragmentInKeyword} vec4 vColor;
+      ${keywords.fragmentInKeyword} vec2 vTextureCoord;
+      ${fragOutDeclaration}
+      uniform float opacity;
+      uniform float border;
+      uniform float n;
+
+      // The idea here is that the complex roots of unity form a regular n-gon
+      // so we can use the canonical map into R^2 to get an n-gon in the plane.
+      // Additionally, if our point has standard position angle theta,
+      // the closest side will be the one between the two roots whose angles
+      // theta lies between
+  
+      // Also, for aesthetic reasons - the roots of unit n-gon always has a vertex at (1, 0)
+      // (corresponding to theta = 0).
+      // But we typically would prefer to always have a horizontal side along the bottom instead
+      // so we modify our angles to account for that
+
+      mat2 rotate2d(float angle) {
+        float s = sin(angle);
+        float c = cos(angle);
+        return mat2(c, s, -s, c);
+      }
+
+      void main() {
+        float pi = 3.1415926;
+        float twoPi = 2.0 * pi;
+        float sliceSize = twoPi / n;
+        float rotation = 0.5 * (pi - sliceSize);
+        vec2 p = 2.0 * vTextureCoord - vec2(1.0);  // [0, 1]^2 -> [-1, 1]^2
+        // y runs top-down, but we want bottom-up
+        p.y = -p.y;
+        p = rotate2d(rotation) * p;
+        float angle = mod(atan(p.y, p.x), twoPi);
+        
+        float k = floor(angle / sliceSize);
+        float mid = (k + 0.5) * sliceSize;
+        float apothem = cos(pi / n);
+        float r = 0.51 * dot(p, vec2(cos(mid), sin(mid))) / apothem;
+
+        float borderWidth = ${borderWidth};
+        float alpha = 1.0;
+        float core = smoothstep(0.50, 0.30, r);
+        vec3 col = vColor.rgb * mix(0.85, 1.15, core);
+        if (border > 0.5) 
+        {
+          float borderMix = smoothstep(0.40 - borderWidth, 0.40 + borderWidth, r);
+          col = mix(col, vec3(0.0), borderMix);
+          alpha = 1.0 - smoothstep(0.50 - borderWidth, 0.50 + borderWidth, r);
+        }
+        else
+        {
+          alpha = smoothstep(0.5, 0.46, r);
+        }
+
+        ${fragOutVar} = vec4(col, opacity * alpha * vColor.a);
+      }
+    `;
+
+    // TODO: Aside from the version considerations necessitated by the fragment shader,
+    // this is the same as the TimeSeriesPointSpriteShader vertex shader.
+    // Maybe this can be extracted into a function that returns the shader text
+    // based on a (passed-in) version flag
+    var vertShaderText = `\
+      ${keywords.versionDeclaration}
+      ${keywords.vertexInKeyword} vec3 aVertexPosition;
+      ${keywords.vertexInKeyword} vec2 aTextureCoord;
+      ${keywords.vertexInKeyword} vec4 aVertexColor;
+      ${keywords.vertexInKeyword} vec2 aTime;
+      ${keywords.vertexInKeyword} float aPointSize;
+      ${keywords.vertexInKeyword} float aShow;
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      uniform float jNow;
+      uniform vec3 cameraPosition;
+      uniform float decay;
+      uniform float scale;
+      uniform float minSize;
+      uniform float sky;
+      uniform float showFarSide;
+      uniform float viewportHeight;
+      uniform float viewportWidth;
+
+      ${keywords.vertexOutKeyword} lowp vec4 vColor;
+      ${keywords.vertexOutKeyword} vec2 vTextureCoord;
+
+      void main(void)
+      {
+          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
+          float dist = distance(aVertexPosition, cameraPosition);
+          vec4 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+          float dAlpha = aShow;
+
+          if ( dAlpha > 0.0 && decay > 0.0 )
+          {
+                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
+                  if (dAlpha > 1.0 )
+                  {
+                      dAlpha = 1.0;
+                  }
+          }
+
+          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
+          {
+              vColor = vec4(0.0, 0.0, 0.0, 0.0);
+          }
+          else
+          {
+              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
+          }
+
+          float lSize = scale;
+
+          if (scale < 0.0)
+          {
+              lSize = -scale;
+              dist = 1.0;
+          }
+
+          float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
+          vec2 offset = 2.0 * sideLength * vec2((aTextureCoord.x - 0.5) / viewportWidth, (0.5 - aTextureCoord.y) / viewportHeight);
+          gl_Position = position + vec4(offset * position.w, 0.0, 0.0);
+
+          vTextureCoord = aTextureCoord;
+      }
+    `;
+
+    FilledNGonQuadShader._frag = createFragmentShader(gl, fragShaderText);
+    displayShaderCompileError(gl, FilledNGonQuadShader._frag);
+
+    FilledNGonQuadShader._vert = createVertexShader(gl, vertShaderText);
+    displayShaderCompileError(gl, FilledNGonQuadShader._vert);
+
+    var program = createProgram(gl, FilledNGonQuadShader._vert, FilledNGonQuadShader._frag);
+    FilledNGonQuadShader._prog = program;
+    displayProgramLinkError(gl, program);
+
+    gl.useProgram(FilledNGonQuadShader._prog);
+    FilledNGonQuadShader.vertLoc = gl.getAttribLocation(program, "aVertexPosition");
+    FilledNGonQuadShader.texLoc = gl.getAttribLocation(program, "aTextureCoord");
+    FilledNGonQuadShader.colorLoc = gl.getAttribLocation(program, "aVertexColor");
+    FilledNGonQuadShader.pointSizeLoc = gl.getAttribLocation(program, "aPointSize");
+    FilledNGonQuadShader.timeLoc = gl.getAttribLocation(program, "aTime");
+    FilledNGonQuadShader.showLoc = gl.getAttribLocation(program, "aShow");
+    FilledNGonQuadShader.mvMatrixLoc = gl.getUniformLocation(program, "uMVMatrix");
+    FilledNGonQuadShader.pMatrixLoc = gl.getUniformLocation(program, "uPMatrix");
+    FilledNGonQuadShader.nowLoc = gl.getUniformLocation(program, "jNow");
+    FilledNGonQuadShader.cameraPosLoc = gl.getUniformLocation(program, "cameraPosition");
+    FilledNGonQuadShader.decayLoc = gl.getUniformLocation(program, "decay");
+    FilledNGonQuadShader.scaleLoc = gl.getUniformLocation(program, "scale");
+    FilledNGonQuadShader.minSizeLoc = gl.getUniformLocation(program, "minSize");
+    FilledNGonQuadShader.opacityLoc = gl.getUniformLocation(program, "opacity");
+    FilledNGonQuadShader.skyLoc = gl.getUniformLocation(program, "sky");
+    FilledNGonQuadShader.showFarSideLoc = gl.getUniformLocation(program, "showFarSide");
+    FilledNGonQuadShader.borderLoc = gl.getUniformLocation(program, "border");
+    FilledNGonQuadShader.nLoc = gl.getUniformLocation(program, "n");
+    FilledNGonQuadShader.viewportHeightLoc = gl.getUniformLocation(program, "viewportHeight");
+    FilledNGonQuadShader.viewportWidthLoc = gl.getUniformLocation(program, "viewportWidth");
+
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+    FilledNGonQuadShader.initialized = true;
+};
+
+FilledNGonQuadShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, border, mask, n) {
+    if (!FilledNGonQuadShader.initialized) {
+      FilledNGonQuadShader.init(renderContext);
+    }
+
+    var gl = renderContext.gl;
+    gl.useProgram(FilledNGonQuadShader._prog);
+    var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
+    gl.uniformMatrix4fv(FilledNGonQuadShader.mvMatrixLoc, false, mvMat.floatArray());
+    gl.uniformMatrix4fv(FilledNGonQuadShader.pMatrixLoc, false, renderContext.get_projection().floatArray());
+    gl.uniform1f(FilledNGonQuadShader.nLoc, n);
+    gl.uniform1f(FilledNGonQuadShader.nowLoc, jNow);
+    gl.uniform1f(FilledNGonQuadShader.decayLoc, decay);
+    gl.uniform1f(FilledNGonQuadShader.scaleLoc, scale);
+    gl.uniform1f(FilledNGonQuadShader.minSizeLoc, minSize);
+    gl.uniform1f(FilledNGonQuadShader.showFarSideLoc, showFarSide ? 1 : 0);
+    gl.uniform1f(FilledNGonQuadShader.skyLoc, sky ? -1 : 1);
+    gl.uniform1f(FilledNGonQuadShader.opacityLoc, opacity);
+    gl.uniform1f(FilledNGonQuadShader.borderLoc, border);
+    gl.uniform1f(FilledNGonQuadShader.viewportHeightLoc, renderContext.height);
+    gl.uniform1f(FilledNGonQuadShader.viewportWidthLoc, renderContext.width);
+    gl.uniform3f(FilledNGonQuadShader.cameraPosLoc, camera.x, camera.y, camera.z);
+
+    if (zBuffer) {
+        gl.enable(WEBGL.DEPTH_TEST);
+    } else {
+        gl.disable(WEBGL.DEPTH_TEST);
+    }
+    disableVertexAttribArrays(gl);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.vertLoc);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.colorLoc);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.pointSizeLoc);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.timeLoc);
+    gl.enableVertexAttribArray(FilledCircleQuadShader.texLoc);
+    gl.vertexAttribPointer(FilledNGonQuadShader.vertLoc, 3, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 0);
+    gl.vertexAttribPointer(FilledNGonQuadShader.texLoc, 2, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 12);
+    gl.vertexAttribPointer(FilledNGonQuadShader.colorLoc, 4, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 20);
+    gl.vertexAttribPointer(FilledNGonQuadShader.timeLoc, 2, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 36);
+    gl.vertexAttribPointer(FilledNGonQuadShader.pointSizeLoc, 1, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 44);
+
+    if (mask != null) {
+        gl.bindBuffer(WEBGL.ARRAY_BUFFER, mask);
+        gl.enableVertexAttribArray(FilledNGonQuadShader.showLoc);
+        gl.vertexAttribPointer(FilledNGonQuadShader.showLoc, 1, WEBGL.UNSIGNED_BYTE, false, 0, 0);
+    } else {
+        gl.disableVertexAttribArray(FilledNGonQuadShader.showLoc);
+        gl.vertexAttrib1f(FilledNGonQuadShader.showLoc, 1.0);
+    }
+
+    gl.lineWidth(1);
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+};
+
+var FilledNGonQuadShader$ = {};
+
+registerType("FilledNGonQuadShader", [FilledNGonQuadShader, FilledNGonQuadShader$, null]);

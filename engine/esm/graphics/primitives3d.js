@@ -29,6 +29,7 @@ import {
     FilledCircleShader,
     FilledCircleQuadShader,
     FilledNGonShader,
+    FilledNGonQuadShader,
 } from "./shaders.js";
 
 
@@ -953,6 +954,10 @@ var PointList$ = {
         FilledNGonShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null, n);
     },
 
+    _useFilledNGonQuadShader: function (n, pointBuffer, renderContext, opacity, cull, _color, cam) {
+        FilledNGonQuadShader.use(renderContext, pointBuffer.vertexBuffer, opacity, this.depthBuffered, this.jNow, this.timeSeries ? this.decay : 0, cam, this.scale * renderContext.height / 960, this.minSize, this.showFarSide, this.sky, this.bordered, this._masked ? this._mask.buffer : null, n);
+    },
+
     _drawWithShader: function (renderContext, useShader, opacity, cull, color, depthMask=false) {
         this._initBuffer(renderContext);
         var originalDepthMask = renderContext.gl.getParameter(renderContext.gl.DEPTH_WRITEMASK);
@@ -1021,7 +1026,7 @@ var PointList$ = {
     },
 
     drawFilledNGon: function (renderContext, opacity, n, depthMask=false) {
-        var useShader = this._drawAsQuads ? this._useFilledCircleQuadShader.bind(this) : this._useFilledNGonShader.bind(this, n);
+        var useShader = this._drawAsQuads ? this._useFilledNGonQuadShader.bind(this, n) : this._useFilledNGonShader.bind(this, n);
         this._drawWithShader(renderContext, useShader, opacity, false, null, depthMask);
     },
 };
