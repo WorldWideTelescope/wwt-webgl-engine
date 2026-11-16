@@ -3159,19 +3159,11 @@ FilledNGonShader.init = function (renderContext) {
         p.y = -p.y;
         p = rotate2d(rotation) * p;
         float angle = mod(atan(p.y, p.x), twoPi);
-
-        // 2*pi*k/n < angle
-        // k < (n * angle) / (2 * pi)
-
-        // angle < 2 * pi * (k + 1) / n
-        // (n * angle) / (2 * pi) < k + 1
-        
-        // k = floor((n * angle) / (2 * pi))
         
         float k = floor(angle / sliceSize);
         float mid = (k + 0.5) * sliceSize;
         float apothem = cos(pi / n);
-        float r = 0.5 * dot(p, vec2(cos(mid), sin(mid))) / apothem;
+        float r = 0.51 * dot(p, vec2(cos(mid), sin(mid))) / apothem;
 
         float borderWidth = ${borderWidth};
         float alpha = 1.0;
