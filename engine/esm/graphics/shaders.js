@@ -3137,12 +3137,27 @@ FilledNGonShader.init = function (renderContext) {
       // Additionally, if our point has standard position angle theta,
       // the closest side will be the one between the two roots whose angles
       // theta lies between
+  
+      // Also, for aesthetic reasons - the roots of unit n-gon always has a vertex at (1, 0)
+      // (corresponding to theta = 0).
+      // But we typically would prefer to always have a horizontal side along the bottom instead
+      // so we modify our angles to account for that
+
+      mat2 rotate2d(float angle) {
+        float s = sin(angle);
+        float c = cos(angle);
+        return mat2(c, s, -s, c);
+      }
+
       void main() {
         float pi = 3.1415926;
         float twoPi = 2.0 * pi;
+        float sliceSize = twoPi / n;
+        float rotation = 0.5 * (pi - sliceSize);
         vec2 p = 2.0 * gl_PointCoord - vec2(1.0);  // [0, 1]^2 -> [-1, 1]^2
         // y runs top-down, but we want bottom-up
         p.y = -p.y;
+        p = rotate2d(rotation) * p;
         float angle = mod(atan(p.y, p.x), twoPi);
 
         // 2*pi*k/n < angle
@@ -3153,7 +3168,6 @@ FilledNGonShader.init = function (renderContext) {
         
         // k = floor((n * angle) / (2 * pi))
         
-        float sliceSize = twoPi / n;
         float k = floor(angle / sliceSize);
         float mid = (k + 0.5) * sliceSize;
         float apothem = cos(pi / n);

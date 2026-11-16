@@ -2073,6 +2073,9 @@ var SpreadSheetLayer$ = {
                 case 8:
                     this.pointList.drawFilledNGon(renderContext, opacity * this.get_opacity(), 6);
                     break;
+                case 9:
+                    this.pointList.drawFilledNGon(renderContext, opacity * this.get_opacity(), 7);
+                    break;
                 default:
                     break;
             }
