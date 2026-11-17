@@ -59,3 +59,15 @@ export function displayProgramLinkError(gl, program) {
     console.error(gl.getProgramInfoLog(program));
   }
 }
+
+export function setupShadersAndProgram(cls, gl, vertShaderSrc, fragShaderSrc) {
+    cls._vert = createVertexShader(gl, vertShaderSrc);
+    displayShaderCompileError(gl, cls._vert);
+
+    cls._frag = createFragmentShader(gl, fragShaderSrc);
+    displayShaderCompileError(gl, cls._frag) ;
+
+    const program = createProgram(gl, cls._vert, cls._frag);
+    cls._prog = program;
+    displayProgramLinkError(gl, program);
+}
