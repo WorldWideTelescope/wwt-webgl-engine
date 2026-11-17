@@ -468,6 +468,96 @@ registerType("LineShaderNormalDates2D", [LineShaderNormalDates2D, LineShaderNorm
 
 // wwtlib.TimeSeriesPointSpriteShader
 
+function timeSeriesPointVertexShaderText(needGLVersion2, quads) {
+    var keywords = shaderKeywords(needGLVersion2);
+
+    var inDeclarations = `\
+      ${keywords.versionDeclaration}
+      ${keywords.vertexIn} vec3 aVertexPosition;
+      ${keywords.vertexIn} vec4 aVertexColor;
+      ${keywords.vertexIn} vec2 aTime;
+      ${keywords.vertexIn} float aPointSize;
+      ${keywords.vertexIn} float aShow;
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      uniform float jNow;
+      uniform vec3 cameraPosition;
+      uniform float decay;
+      uniform float scale;
+      uniform float minSize;
+      uniform float sky;
+      uniform float showFarSide;
+    `;
+
+     var outDeclarations =`${keywords.vertexOut} lowp vec4 vColor;`
+
+    if (quads) {
+        inDeclarations += `\
+          ${keywords.vertexIn} vec2 aTextureCoord;
+          uniform float viewportHeight;
+          uniform float viewportWidth;
+        `;
+        outDeclarations += `\n${keywords.vertexOut} vec2 vTextureCoord`;
+    }
+
+    var outBlock = quads ?
+        "gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));" :
+        `\
+        float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
+        vec2 offset = 2.0 * sideLength * vec2((aTextureCoord.x - 0.5) / viewportWidth, (0.5 - aTextureCoord.y) / viewportHeight);
+        gl_Position = position + vec4(offset * position.w, 0.0, 0.0);
+
+        vTextureCoord = aTextureCoord;
+        `;
+
+    var main = `
+      void main(void)
+      {
+          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
+          float dist = distance(aVertexPosition, cameraPosition);
+          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+          float dAlpha = aShow;
+
+          if ( dAlpha > 0.0 && decay > 0.0 )
+          {
+                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
+                  if (dAlpha > 1.0 )
+                  {
+                      dAlpha = 1.0;
+                  }
+          }
+
+          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
+          {
+              vColor = vec4(0.0, 0.0, 0.0, 0.0);
+          }
+          else
+          {
+              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
+          }
+
+          float lSize = scale;
+
+          if (scale < 0.0)
+          {
+              lSize = -scale;
+              dist = 1.0;
+          }
+
+          ${outBlock}
+      }
+    `;
+
+    return `\
+      ${keywords.versionDeclaration}
+      ${inDeclarations}
+      ${outDeclarations}
+
+      ${main}
+    `;
+
+}
+
 export function TimeSeriesPointSpriteShader() { }
 
 TimeSeriesPointSpriteShader.vertLoc = 0;
@@ -496,61 +586,7 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
         }
     `;
 
-    var vertexShaderText = `\
-        attribute vec3 aVertexPosition;
-        attribute vec4 aVertexColor;
-        attribute vec2 aTime;
-        attribute float aPointSize;
-        attribute float aShow;
-        uniform mat4 uMVMatrix;
-        uniform mat4 uPMatrix;
-        uniform float jNow;
-        uniform vec3 cameraPosition;
-        uniform float decay;
-        uniform float scale;
-        uniform float minSize;
-        uniform float sky;
-        uniform float showFarSide;
-
-        varying lowp vec4 vColor;
-
-        void main(void)
-        {
-            float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-            float dist = distance(aVertexPosition, cameraPosition);
-            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-            float dAlpha = aShow;
-
-            if ( dAlpha > 0.0 && decay > 0.0 )
-            {
-                    dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                    if (dAlpha > 1.0 )
-                    {
-                        dAlpha = 1.0;
-                    }
-            }
-
-            if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-            {
-                vColor = vec4(0.0, 0.0, 0.0, 0.0);
-            }
-            else
-            {
-                vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-            }
-
-            float lSize = scale;
-
-            if (scale < 0.0)
-            {
-                lSize = -scale;
-                dist = 1.0;
-            }
-
-            gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));
-        }
-    `;
-
+    var vertexShaderText = timeSeriesPointVertexShaderText(false, false);
     setupShadersAndProgram(TimeSeriesPointSpriteShader, gl, vertexShaderText, fragShaderText);
 
     gl.useProgram(TimeSeriesPointSpriteShader._prog);
@@ -670,69 +706,7 @@ TimeSeriesPointQuadShader.init = function (renderContext) {
         }
     `;
 
-    var vertexShaderText = `\
-        attribute vec3 aVertexPosition;
-        attribute vec2 aTextureCoord;
-        attribute vec4 aVertexColor;
-        attribute vec2 aTime;
-        attribute float aPointSize;
-        attribute float aShow;
-        uniform mat4 uMVMatrix;
-        uniform mat4 uPMatrix;
-        uniform float jNow;
-        uniform vec3 cameraPosition;
-        uniform float decay;
-        uniform float scale;
-        uniform float minSize;
-        uniform float sky;
-        uniform float showFarSide;
-        uniform float viewportHeight;
-        uniform float viewportWidth;
-
-        varying lowp vec4 vColor;
-        varying vec2 vTextureCoord;
-
-        void main(void)
-        {
-            float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-            float dist = distance(aVertexPosition, cameraPosition);
-            vec4 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-            float dAlpha = aShow;
-
-            if ( dAlpha > 0.0 && decay > 0.0 )
-            {
-                    dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                    if (dAlpha > 1.0 )
-                    {
-                        dAlpha = 1.0;
-                    }
-            }
-
-            if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-            {
-                vColor = vec4(0.0, 0.0, 0.0, 0.0);
-            }
-            else
-            {
-                vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-            }
-
-            float lSize = scale;
-
-            if (scale < 0.0)
-            {
-                lSize = -scale;
-                dist = 1.0;
-            }
-
-            float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
-            vec2 offset = 2.0 * sideLength * vec2((aTextureCoord.x - 0.5) / viewportWidth, (0.5 - aTextureCoord.y) / viewportHeight);
-            gl_Position = position + vec4(offset * position.w, 0.0, 0.0);
-  
-            vTextureCoord = aTextureCoord;
-        }
-    `;
-
+    var vertexShaderText = timeSeriesPointVertexShaderText(false, true);
     setupShadersAndProgram(TimeSeriesPointQuadShader, gl, vertexShaderText, fragShaderText);
 
     gl.useProgram(TimeSeriesPointQuadShader._prog);
@@ -2406,66 +2380,7 @@ FilledCircleShader.init = function (renderContext) {
         }
       `;
 
-    // TODO: Aside from the version considerations necessitated by the fragment shader,
-    // this is the same as the TimeSeriesPointSpriteShader vertex shader.
-    // Maybe this can be extracted into a function that returns the shader text
-    // based on a (passed-in) version flag
-    var vertexShaderText = `\
-      ${keywords.versionDeclaration}
-      ${keywords.vertexIn} vec3 aVertexPosition;
-      ${keywords.vertexIn} vec4 aVertexColor;
-      ${keywords.vertexIn} vec2 aTime;
-      ${keywords.vertexIn} float aPointSize;
-      ${keywords.vertexIn} float aShow;
-      uniform mat4 uMVMatrix;
-      uniform mat4 uPMatrix;
-      uniform float jNow;
-      uniform vec3 cameraPosition;
-      uniform float decay;
-      uniform float scale;
-      uniform float minSize;
-      uniform float sky;
-      uniform float showFarSide;
-
-      ${keywords.vertexOut} lowp vec4 vColor;
-
-      void main(void)
-      {
-          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-          float dist = distance(aVertexPosition, cameraPosition);
-          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-          float dAlpha = aShow;
-
-          if ( dAlpha > 0.0 && decay > 0.0 )
-          {
-                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                  if (dAlpha > 1.0 )
-                  {
-                      dAlpha = 1.0;
-                  }
-          }
-
-          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-          {
-              vColor = vec4(0.0, 0.0, 0.0, 0.0);
-          }
-          else
-          {
-              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-          }
-
-          float lSize = scale;
-
-          if (scale < 0.0)
-          {
-              lSize = -scale;
-              dist = 1.0;
-          }
-
-          gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));
-      }
-    `;
-
+    var vertexShaderText = timeSeriesPointVertexShaderText(useGlVersion2, false);
     setupShadersAndProgram(FilledCircleShader, gl, vertexShaderText, fragShaderText);
 
     gl.useProgram(FilledCircleShader._prog);
@@ -2613,74 +2528,7 @@ FilledCircleQuadShader.init = function (renderContext) {
         }
       `;
 
-    // TODO: Aside from the version considerations necessitated by the fragment shader,
-    // this is the same as the TimeSeriesPointSpriteShader vertex shader.
-    // Maybe this can be extracted into a function that returns the shader text
-    // based on a (passed-in) version flag
-    var vertexShaderText = `\
-      ${keywords.versionDeclaration}
-      ${keywords.vertexIn} vec3 aVertexPosition;
-      ${keywords.vertexIn} vec2 aTextureCoord;
-      ${keywords.vertexIn} vec4 aVertexColor;
-      ${keywords.vertexIn} vec2 aTime;
-      ${keywords.vertexIn} float aPointSize;
-      ${keywords.vertexIn} float aShow;
-      uniform mat4 uMVMatrix;
-      uniform mat4 uPMatrix;
-      uniform float jNow;
-      uniform vec3 cameraPosition;
-      uniform float decay;
-      uniform float scale;
-      uniform float minSize;
-      uniform float sky;
-      uniform float showFarSide;
-      uniform float viewportHeight;
-      uniform float viewportWidth;
-
-      ${keywords.vertexOut} lowp vec4 vColor;
-      ${keywords.vertexOut} vec2 vTextureCoord;
-
-      void main(void)
-      {
-          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-          float dist = distance(aVertexPosition, cameraPosition);
-          vec4 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-          float dAlpha = aShow;
-
-          if ( dAlpha > 0.0 && decay > 0.0 )
-          {
-                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                  if (dAlpha > 1.0 )
-                  {
-                      dAlpha = 1.0;
-                  }
-          }
-
-          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-          {
-              vColor = vec4(0.0, 0.0, 0.0, 0.0);
-          }
-          else
-          {
-              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-          }
-
-          float lSize = scale;
-
-          if (scale < 0.0)
-          {
-              lSize = -scale;
-              dist = 1.0;
-          }
-
-          float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
-          vec2 offset = 2.0 * sideLength * vec2((aTextureCoord.x - 0.5) / viewportWidth, (0.5 - aTextureCoord.y) / viewportHeight);
-          gl_Position = position + vec4(offset * position.w, 0.0, 0.0);
-
-          vTextureCoord = aTextureCoord;
-      }
-    `;
-
+    var vertexShaderText = timeSeriesPointVertexShaderText(useGlVersion2, true);
     setupShadersAndProgram(FilledCircleQuadShader, gl, vertexShaderText, fragShaderText);
 
     gl.useProgram(FilledCircleQuadShader._prog);
@@ -2860,66 +2708,7 @@ FilledNGonShader.init = function (renderContext) {
       }
     `;
 
-    // TODO: Aside from the version considerations necessitated by the fragment shader,
-    // this is the same as the TimeSeriesPointSpriteShader vertex shader.
-    // Maybe this can be extracted into a function that returns the shader text
-    // based on a (passed-in) version flag
-    var vertexShaderText = `\
-      ${keywords.versionDeclaration}
-      ${keywords.vertexIn} vec3 aVertexPosition;
-      ${keywords.vertexIn} vec4 aVertexColor;
-      ${keywords.vertexIn} vec2 aTime;
-      ${keywords.vertexIn} float aPointSize;
-      ${keywords.vertexIn} float aShow;
-      uniform mat4 uMVMatrix;
-      uniform mat4 uPMatrix;
-      uniform float jNow;
-      uniform vec3 cameraPosition;
-      uniform float decay;
-      uniform float scale;
-      uniform float minSize;
-      uniform float sky;
-      uniform float showFarSide;
-
-      ${keywords.vertexOut} lowp vec4 vColor;
-
-      void main(void)
-      {
-          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-          float dist = distance(aVertexPosition, cameraPosition);
-          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-          float dAlpha = aShow;
-
-          if ( dAlpha > 0.0 && decay > 0.0 )
-          {
-                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                  if (dAlpha > 1.0 )
-                  {
-                      dAlpha = 1.0;
-                  }
-          }
-
-          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-          {
-              vColor = vec4(0.0, 0.0, 0.0, 0.0);
-          }
-          else
-          {
-              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-          }
-
-          float lSize = scale;
-
-          if (scale < 0.0)
-          {
-              lSize = -scale;
-              dist = 1.0;
-          }
-
-          gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));
-      }
-    `;
-
+    var vertexShaderText = timeSeriesPointVertexShaderText(useGlVersion2, false); 
     setupShadersAndProgram(FilledNGonShader, gl, vertexShaderText, fragShaderText);
 
     gl.useProgram(FilledNGonShader._prog);
@@ -3101,74 +2890,7 @@ FilledNGonQuadShader.init = function (renderContext) {
       }
     `;
 
-    // TODO: Aside from the version considerations necessitated by the fragment shader,
-    // this is the same as the TimeSeriesPointSpriteShader vertex shader.
-    // Maybe this can be extracted into a function that returns the shader text
-    // based on a (passed-in) version flag
-    var vertexShaderText = `\
-      ${keywords.versionDeclaration}
-      ${keywords.vertexIn} vec3 aVertexPosition;
-      ${keywords.vertexIn} vec2 aTextureCoord;
-      ${keywords.vertexIn} vec4 aVertexColor;
-      ${keywords.vertexIn} vec2 aTime;
-      ${keywords.vertexIn} float aPointSize;
-      ${keywords.vertexIn} float aShow;
-      uniform mat4 uMVMatrix;
-      uniform mat4 uPMatrix;
-      uniform float jNow;
-      uniform vec3 cameraPosition;
-      uniform float decay;
-      uniform float scale;
-      uniform float minSize;
-      uniform float sky;
-      uniform float showFarSide;
-      uniform float viewportHeight;
-      uniform float viewportWidth;
-
-      ${keywords.vertexOut} lowp vec4 vColor;
-      ${keywords.vertexOut} vec2 vTextureCoord;
-
-      void main(void)
-      {
-          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-          float dist = distance(aVertexPosition, cameraPosition);
-          vec4 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-          float dAlpha = aShow;
-
-          if ( dAlpha > 0.0 && decay > 0.0 )
-          {
-                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                  if (dAlpha > 1.0 )
-                  {
-                      dAlpha = 1.0;
-                  }
-          }
-
-          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-          {
-              vColor = vec4(0.0, 0.0, 0.0, 0.0);
-          }
-          else
-          {
-              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-          }
-
-          float lSize = scale;
-
-          if (scale < 0.0)
-          {
-              lSize = -scale;
-              dist = 1.0;
-          }
-
-          float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
-          vec2 offset = 2.0 * sideLength * vec2((aTextureCoord.x - 0.5) / viewportWidth, (0.5 - aTextureCoord.y) / viewportHeight);
-          gl_Position = position + vec4(offset * position.w, 0.0, 0.0);
-
-          vTextureCoord = aTextureCoord;
-      }
-    `;
-
+    var vertexShaderText = timeSeriesPointVertexShaderText(useGlVersion2, true); 
     setupShadersAndProgram(FilledNGonQuadShader, gl, vertexShaderText, fragShaderText);
 
     gl.useProgram(program);
