@@ -2,18 +2,18 @@ export function shaderKeywords(webGL2) {
     if (webGL2) {
         return {
             versionDeclaration: "#version 300 es",
-            fragmentInKeyword: "in",
-            fragmentOutKeyword: "out",
-            vertexInKeyword: "in",
-            vertexOutKeyword: "out",
+            fragmentIn: "in",
+            fragmentOut: "out",
+            vertexIn: "in",
+            vertexOut: "out",
         };
     } else {
         return {
             versionDeclaration: "",
-            fragmentInKeyword: "varying",
-            fragmentOutKeyword: "",
-            vertexInKeyword: "attribute",
-            vertexOutKeyword: "varying",
+            fragmentIn: "varying",
+            fragmentOut: "",
+            vertexIn: "attribute",
+            vertexOut: "varying",
         };
     }
 }
