@@ -12,11 +12,7 @@ import { Texture } from "./texture.js";
 import { TextureArray } from "./texture_array.js";
 import {
   shaderKeywords,
-  createFragmentShader,
-  createVertexShader,
-  createProgram,
-  displayProgramLinkError,
-  displayShaderCompileError,
+  setupShadersAndProgram,
 } from "./webgl_utils.js";
 
 
@@ -58,19 +54,8 @@ SimpleLineShader.init = function (renderContext) {
         }
     `;
 
-    SimpleLineShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(SimpleLineShader._frag, fragShaderText);
-    gl.compileShader(SimpleLineShader._frag);
-    var stat = gl.getShaderParameter(SimpleLineShader._frag, WEBGL.COMPILE_STATUS);
-    SimpleLineShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(SimpleLineShader._vert, vertexShaderText);
-    gl.compileShader(SimpleLineShader._vert);
-    var stat1 = gl.getShaderParameter(SimpleLineShader._vert, WEBGL.COMPILE_STATUS);
-    SimpleLineShader._prog = gl.createProgram();
-    gl.attachShader(SimpleLineShader._prog, SimpleLineShader._vert);
-    gl.attachShader(SimpleLineShader._prog, SimpleLineShader._frag);
-    gl.linkProgram(SimpleLineShader._prog);
-    var errcode = gl.getProgramParameter(SimpleLineShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(SimpleLineShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(SimpleLineShader._prog);
     SimpleLineShader.vertLoc = gl.getAttribLocation(SimpleLineShader._prog, 'aVertexPosition');
     SimpleLineShader.lineColorLoc = gl.getUniformLocation(SimpleLineShader._prog, 'lineColor');
@@ -141,19 +126,8 @@ SimpleLineShader2D.init = function (renderContext) {
         }
     `;
 
-    SimpleLineShader2D._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(SimpleLineShader2D._frag, fragShaderText);
-    gl.compileShader(SimpleLineShader2D._frag);
-    var stat = gl.getShaderParameter(SimpleLineShader2D._frag, WEBGL.COMPILE_STATUS);
-    SimpleLineShader2D._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(SimpleLineShader2D._vert, vertexShaderText);
-    gl.compileShader(SimpleLineShader2D._vert);
-    var stat1 = gl.getShaderParameter(SimpleLineShader2D._vert, WEBGL.COMPILE_STATUS);
-    SimpleLineShader2D._prog = gl.createProgram();
-    gl.attachShader(SimpleLineShader2D._prog, SimpleLineShader2D._vert);
-    gl.attachShader(SimpleLineShader2D._prog, SimpleLineShader2D._frag);
-    gl.linkProgram(SimpleLineShader2D._prog);
-    var errcode = gl.getProgramParameter(SimpleLineShader2D._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(SimpleLineShader2D, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(SimpleLineShader2D._prog);
     SimpleLineShader2D.vertLoc = gl.getAttribLocation(SimpleLineShader2D._prog, 'aVertexPosition');
     SimpleLineShader2D.lineColorLoc = gl.getUniformLocation(SimpleLineShader2D._prog, 'lineColor');
@@ -198,6 +172,7 @@ export function OrbitLineShader() { }
 
 OrbitLineShader.vertLoc = 0;
 OrbitLineShader.colorLoc = 0;
+OrbitLineShader.lineColorLoc = 0;
 OrbitLineShader.initialized = false;
 OrbitLineShader._prog = null;
 
@@ -228,19 +203,8 @@ OrbitLineShader.init = function (renderContext) {
         }
     `;
 
-    OrbitLineShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(OrbitLineShader._frag, fragShaderText);
-    gl.compileShader(OrbitLineShader._frag);
-    var stat = gl.getShaderParameter(OrbitLineShader._frag, WEBGL.COMPILE_STATUS);
-    OrbitLineShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(OrbitLineShader._vert, vertexShaderText);
-    gl.compileShader(OrbitLineShader._vert);
-    var stat1 = gl.getShaderParameter(OrbitLineShader._vert, WEBGL.COMPILE_STATUS);
-    OrbitLineShader._prog = gl.createProgram();
-    gl.attachShader(OrbitLineShader._prog, OrbitLineShader._vert);
-    gl.attachShader(OrbitLineShader._prog, OrbitLineShader._frag);
-    gl.linkProgram(OrbitLineShader._prog);
-    var errcode = gl.getProgramParameter(OrbitLineShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(OrbitLineShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(OrbitLineShader._prog);
     OrbitLineShader.vertLoc = gl.getAttribLocation(OrbitLineShader._prog, 'aVertexPosition');
     OrbitLineShader.colorLoc = gl.getAttribLocation(OrbitLineShader._prog, 'aVertexColor');
@@ -293,6 +257,7 @@ export function LineShaderNormalDates() { }
 LineShaderNormalDates.vertLoc = 0;
 LineShaderNormalDates.colorLoc = 0;
 LineShaderNormalDates.timeLoc = 0;
+LineShaderNormalDates.lineColorLoc = 0;
 LineShaderNormalDates.initialized = false;
 LineShaderNormalDates._prog = null;
 
@@ -346,19 +311,8 @@ LineShaderNormalDates.init = function (renderContext) {
         }
     `;
 
-    LineShaderNormalDates._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(LineShaderNormalDates._frag, fragShaderText);
-    gl.compileShader(LineShaderNormalDates._frag);
-    var stat = gl.getShaderParameter(LineShaderNormalDates._frag, WEBGL.COMPILE_STATUS);
-    LineShaderNormalDates._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(LineShaderNormalDates._vert, vertexShaderText);
-    gl.compileShader(LineShaderNormalDates._vert);
-    var stat1 = gl.getShaderParameter(LineShaderNormalDates._vert, WEBGL.COMPILE_STATUS);
-    LineShaderNormalDates._prog = gl.createProgram();
-    gl.attachShader(LineShaderNormalDates._prog, LineShaderNormalDates._vert);
-    gl.attachShader(LineShaderNormalDates._prog, LineShaderNormalDates._frag);
-    gl.linkProgram(LineShaderNormalDates._prog);
-    var errcode = gl.getProgramParameter(LineShaderNormalDates._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(LineShaderNormalDates, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(LineShaderNormalDates._prog);
     LineShaderNormalDates.vertLoc = gl.getAttribLocation(LineShaderNormalDates._prog, 'aVertexPosition');
     LineShaderNormalDates.colorLoc = gl.getAttribLocation(LineShaderNormalDates._prog, 'aVertexColor');
@@ -367,7 +321,7 @@ LineShaderNormalDates.init = function (renderContext) {
     LineShaderNormalDates.projMatLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'uPMatrix');
     LineShaderNormalDates.mvMatLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'uMVMatrix');
     LineShaderNormalDates.jNowLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'jNow');
-    LineShaderNormalDates.decayLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'decay');
+    LineShaderNormalDates.decayLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'decay'),
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     LineShaderNormalDates.initialized = true;
@@ -424,7 +378,7 @@ LineShaderNormalDates2D.initialized = false;
 LineShaderNormalDates2D._prog = null;
 
 LineShaderNormalDates2D.init = function (renderContext) {
-  var gl = renderContext.gl;
+  var gl = renderContext.gl;Hey Azme,
 
   const fragShaderText = `\
       precision highp float;
@@ -471,19 +425,8 @@ LineShaderNormalDates2D.init = function (renderContext) {
         }
     `;
 
-    LineShaderNormalDates2D._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(LineShaderNormalDates2D._frag, fragShaderText);
-    gl.compileShader(LineShaderNormalDates2D._frag);
-    var stat = gl.getShaderParameter(LineShaderNormalDates2D._frag, WEBGL.COMPILE_STATUS);
-    LineShaderNormalDates2D._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(LineShaderNormalDates2D._vert, vertexShaderText);
-    gl.compileShader(LineShaderNormalDates2D._vert);
-    var stat1 = gl.getShaderParameter(LineShaderNormalDates2D._vert, WEBGL.COMPILE_STATUS);
-    LineShaderNormalDates2D._prog = gl.createProgram();
-    gl.attachShader(LineShaderNormalDates2D._prog, LineShaderNormalDates2D._vert);
-    gl.attachShader(LineShaderNormalDates2D._prog, LineShaderNormalDates2D._frag);
-    gl.linkProgram(LineShaderNormalDates2D._prog);
-    var errcode = gl.getProgramParameter(LineShaderNormalDates2D._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(LineShaderNormalDates2D, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(LineShaderNormalDates2D._prog);
     LineShaderNormalDates2D.vertLoc = gl.getAttribLocation(LineShaderNormalDates2D._prog, 'aVertexPosition');
     LineShaderNormalDates2D.colorLoc = gl.getAttribLocation(LineShaderNormalDates2D._prog, 'aVertexColor');
@@ -536,6 +479,8 @@ export function TimeSeriesPointSpriteShader() { }
 TimeSeriesPointSpriteShader.vertLoc = 0;
 TimeSeriesPointSpriteShader.colorLoc = 0;
 TimeSeriesPointSpriteShader.pointSizeLoc = 0;
+TimeSeriesPointSpriteShader.lineColorLoc = 0;
+TimeSeriesPointSpriteShader.minSizeLoc = 0;
 TimeSeriesPointSpriteShader.timeLoc = 0;
 TimeSeriesPointSpriteShader.initialized = false;
 TimeSeriesPointSpriteShader._prog = null;
@@ -612,20 +557,8 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
         }
     `;
 
-    TimeSeriesPointSpriteShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(TimeSeriesPointSpriteShader._frag, fragShaderText);
-    gl.compileShader(TimeSeriesPointSpriteShader._frag);
-    var stat = gl.getShaderParameter(TimeSeriesPointSpriteShader._frag, WEBGL.COMPILE_STATUS);
-    TimeSeriesPointSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(TimeSeriesPointSpriteShader._vert, vertexShaderText);
-    gl.compileShader(TimeSeriesPointSpriteShader._vert);
-    var stat1 = gl.getShaderParameter(TimeSeriesPointSpriteShader._vert, WEBGL.COMPILE_STATUS);
-    var compilationLog = gl.getShaderInfoLog(TimeSeriesPointSpriteShader._vert);
-    TimeSeriesPointSpriteShader._prog = gl.createProgram();
-    gl.attachShader(TimeSeriesPointSpriteShader._prog, TimeSeriesPointSpriteShader._vert);
-    gl.attachShader(TimeSeriesPointSpriteShader._prog, TimeSeriesPointSpriteShader._frag);
-    gl.linkProgram(TimeSeriesPointSpriteShader._prog);
-    var errcode = gl.getProgramParameter(TimeSeriesPointSpriteShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(TimeSeriesPointSpriteShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(TimeSeriesPointSpriteShader._prog);
     TimeSeriesPointSpriteShader.vertLoc = gl.getAttribLocation(TimeSeriesPointSpriteShader._prog, 'aVertexPosition');
     TimeSeriesPointSpriteShader.colorLoc = gl.getAttribLocation(TimeSeriesPointSpriteShader._prog, 'aVertexColor');
@@ -720,6 +653,7 @@ TimeSeriesPointQuadShader.colorLoc = 0;
 TimeSeriesPointQuadShader.pointSizeLoc = 0;
 TimeSeriesPointQuadShader.lineColorLoc = 0;
 TimeSeriesPointQuadShader.timeLoc = 0;
+TimeSeriesPointQuadShader.minSizeLoc = 0;
 TimeSeriesPointQuadShader.viewportHeightLoc = 0;
 TimeSeriesPointQuadShader.viewportWidthLoc = 0;
 
@@ -805,31 +739,8 @@ TimeSeriesPointQuadShader.init = function (renderContext) {
         }
     `;
 
-    TimeSeriesPointQuadShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(TimeSeriesPointQuadShader._frag, fragShaderText);
-    gl.compileShader(TimeSeriesPointQuadShader._frag);
-    var fragStat = gl.getShaderParameter(TimeSeriesPointQuadShader._frag, WEBGL.COMPILE_STATUS);
-    if (!fragStat) {
-        var errorF = gl.getShaderInfoLog(TimeSeriesPointQuadShader._frag);
-        console.log(errorF);
-    }
-    TimeSeriesPointQuadShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(TimeSeriesPointQuadShader._vert, vertexShaderText);
-    gl.compileShader(TimeSeriesPointQuadShader._vert);
-    var vertStat = gl.getShaderParameter(TimeSeriesPointQuadShader._vert, WEBGL.COMPILE_STATUS);
-    if (!vertStat) {
-        var errorV = gl.getShaderInfoLog(TimeSeriesPointQuadShader._vert);
-        console.log(errorV);
-    }
-    TimeSeriesPointQuadShader._prog = gl.createProgram();
-    gl.attachShader(TimeSeriesPointQuadShader._prog, TimeSeriesPointQuadShader._vert);
-    gl.attachShader(TimeSeriesPointQuadShader._prog, TimeSeriesPointQuadShader._frag);
-    gl.linkProgram(TimeSeriesPointQuadShader._prog);
-    var linkSuccess = gl.getProgramParameter(TimeSeriesPointQuadShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(TimeSeriesPointQuadShader._prog);
-        console.log(errorP);
-    }
+    setupShadersAndProgram(TimeSeriesPointQuadShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(TimeSeriesPointQuadShader._prog);
     TimeSeriesPointQuadShader.vertLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aVertexPosition");
     TimeSeriesPointQuadShader.texLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aTextureCoord");
@@ -930,6 +841,8 @@ KeplerPointSpriteShader.weLoc = 0;
 KeplerPointSpriteShader.nTLoc = 0;
 KeplerPointSpriteShader.azLoc = 0;
 KeplerPointSpriteShader.orbitLoc = 0;
+KeplerPointSpriteShader.minSizeLoc = 0;
+KeplerPointSpriteShader.lineColorLoc = 0;
 KeplerPointSpriteShader.initialized = false;
 KeplerPointSpriteShader._prog = null;
 
@@ -1035,20 +948,8 @@ KeplerPointSpriteShader.init = function (renderContext) {
         }
     `;
 
-    KeplerPointSpriteShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(KeplerPointSpriteShader._frag, fragShaderText);
-    gl.compileShader(KeplerPointSpriteShader._frag);
-    var stat = gl.getShaderParameter(KeplerPointSpriteShader._frag, WEBGL.COMPILE_STATUS);
-    KeplerPointSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(KeplerPointSpriteShader._vert, vertexShaderText);
-    gl.compileShader(KeplerPointSpriteShader._vert);
-    var stat1 = gl.getShaderParameter(KeplerPointSpriteShader._vert, WEBGL.COMPILE_STATUS);
-    var compilationLog = gl.getShaderInfoLog(KeplerPointSpriteShader._vert);
-    KeplerPointSpriteShader._prog = gl.createProgram();
-    gl.attachShader(KeplerPointSpriteShader._prog, KeplerPointSpriteShader._vert);
-    gl.attachShader(KeplerPointSpriteShader._prog, KeplerPointSpriteShader._frag);
-    gl.linkProgram(KeplerPointSpriteShader._prog);
-    var errcode = gl.getProgramParameter(KeplerPointSpriteShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(KeplerPointSpriteShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(KeplerPointSpriteShader._prog);
     KeplerPointSpriteShader.abcLoc1 = gl.getAttribLocation(KeplerPointSpriteShader._prog, 'abc');
     KeplerPointSpriteShader.abcLoc = gl.getAttribLocation(KeplerPointSpriteShader._prog, 'ABC');
@@ -1179,20 +1080,8 @@ EllipseShader.init = function (renderContext) {
         }
     `;
 
-    EllipseShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(EllipseShader._frag, fragShaderText);
-    gl.compileShader(EllipseShader._frag);
-    var stat = gl.getShaderParameter(EllipseShader._frag, WEBGL.COMPILE_STATUS);
-    EllipseShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(EllipseShader._vert, vertexShaderText);
-    gl.compileShader(EllipseShader._vert);
-    var stat1 = gl.getShaderParameter(EllipseShader._vert, WEBGL.COMPILE_STATUS);
-    var compilationLog = gl.getShaderInfoLog(EllipseShader._vert);
-    EllipseShader._prog = gl.createProgram();
-    gl.attachShader(EllipseShader._prog, EllipseShader._vert);
-    gl.attachShader(EllipseShader._prog, EllipseShader._frag);
-    gl.linkProgram(EllipseShader._prog);
-    var errcode = gl.getProgramParameter(EllipseShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(EllipseShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(EllipseShader._prog);
     EllipseShader.angleLoc = gl.getAttribLocation(EllipseShader._prog, 'Angle');
     EllipseShader.matWVPLoc = gl.getUniformLocation(EllipseShader._prog, 'matWVP');
@@ -1252,6 +1141,7 @@ ModelShader._prog = null;
 ModelShader.sunPosition = Vector3d.create(-1, -1, -1);
 ModelShader.minLightingBrightness = 1;
 ModelShader.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
+ModelShader.atmosphereColorLoc = 0;
 
 ModelShader.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -1305,25 +1195,8 @@ ModelShader.init = function (renderContext) {
         }
     `;
 
-    ModelShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ModelShader._frag, fragShaderText);
-    gl.compileShader(ModelShader._frag);
-    var stat = gl.getShaderParameter(ModelShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(ModelShader._frag);
-    }
-    ModelShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ModelShader._vert, vertexShaderText);
-    gl.compileShader(ModelShader._vert);
-    var stat1 = gl.getShaderParameter(ModelShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(ModelShader._vert);
-    }
-    ModelShader._prog = gl.createProgram();
-    gl.attachShader(ModelShader._prog, ModelShader._vert);
-    gl.attachShader(ModelShader._prog, ModelShader._frag);
-    gl.linkProgram(ModelShader._prog);
-    var errcode = gl.getProgramParameter(ModelShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ModelShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ModelShader._prog);
     ModelShader.vertLoc = gl.getAttribLocation(ModelShader._prog, 'aVertexPosition');
     ModelShader.normalLoc = gl.getAttribLocation(ModelShader._prog, 'aNormal');
@@ -1416,6 +1289,7 @@ ModelShaderTan._prog = null;
 ModelShaderTan.sunPosition = Vector3d.create(-1, -1, -1);
 ModelShaderTan.minLightingBrightness = 1;
 ModelShaderTan.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
+ModelShaderTan.atmosphereColorLoc = 0;
 
 ModelShaderTan.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -1469,25 +1343,8 @@ ModelShaderTan.init = function (renderContext) {
         }
     `;
 
-    ModelShaderTan._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ModelShaderTan._frag, fragShaderText);
-    gl.compileShader(ModelShaderTan._frag);
-    var stat = gl.getShaderParameter(ModelShaderTan._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(ModelShaderTan._frag);
-    }
-    ModelShaderTan._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ModelShaderTan._vert, vertexShaderText);
-    gl.compileShader(ModelShaderTan._vert);
-    var stat1 = gl.getShaderParameter(ModelShaderTan._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(ModelShaderTan._vert);
-    }
-    ModelShaderTan._prog = gl.createProgram();
-    gl.attachShader(ModelShaderTan._prog, ModelShaderTan._vert);
-    gl.attachShader(ModelShaderTan._prog, ModelShaderTan._frag);
-    gl.linkProgram(ModelShaderTan._prog);
-    var errcode = gl.getProgramParameter(ModelShaderTan._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ModelShaderTan, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ModelShaderTan._prog);
     ModelShaderTan.vertLoc = gl.getAttribLocation(ModelShaderTan._prog, 'aVertexPosition');
     ModelShaderTan.normalLoc = gl.getAttribLocation(ModelShaderTan._prog, 'aNormal');
@@ -1579,6 +1436,7 @@ TileShader._prog = null;
 TileShader.sunPosition = Vector3d.create(-1, -1, -1);
 TileShader.minLightingBrightness = 1;
 TileShader.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
+TileShader.atmosphereColorLoc = 0;
 
 TileShader.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -1643,25 +1501,8 @@ TileShader.init = function (renderContext) {
         }
     `;
 
-    TileShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(TileShader._frag, fragShaderText);
-    gl.compileShader(TileShader._frag);
-    var stat = gl.getShaderParameter(TileShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(TileShader._frag);
-    }
-    TileShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(TileShader._vert, vertexShaderText);
-    gl.compileShader(TileShader._vert);
-    var stat1 = gl.getShaderParameter(TileShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(TileShader._vert);
-    }
-    TileShader._prog = gl.createProgram();
-    gl.attachShader(TileShader._prog, TileShader._vert);
-    gl.attachShader(TileShader._prog, TileShader._frag);
-    gl.linkProgram(TileShader._prog);
-    var errcode = gl.getProgramParameter(TileShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(TileShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(TileShader._prog);
     TileShader.vertLoc = gl.getAttribLocation(TileShader._prog, 'aVertexPosition');
     TileShader.textureLoc = gl.getAttribLocation(TileShader._prog, 'aTextureCoord');
@@ -1858,31 +1699,8 @@ FitsShader.init = function (renderContext) {
         }
     `;
 
-    FitsShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(FitsShader._frag, fragShaderText);
-    gl.compileShader(FitsShader._frag);
-    var stat = gl.getShaderParameter(FitsShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(FitsShader._frag);
-        console.log(errorF);
-    }
-    FitsShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(FitsShader._vert, vertexShaderText);
-    gl.compileShader(FitsShader._vert);
-    var stat1 = gl.getShaderParameter(FitsShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(FitsShader._vert);
-        console.log(errorV);
-    }
-    FitsShader._prog = gl.createProgram();
-    gl.attachShader(FitsShader._prog, FitsShader._vert);
-    gl.attachShader(FitsShader._prog, FitsShader._frag);
-    gl.linkProgram(FitsShader._prog);
-    var linkSuccess = gl.getProgramParameter(FitsShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(FitsShader._prog);
-        console.log(errorP);
-    }
+    setupShadersAndProgram(FitsShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(FitsShader._prog);
     FitsShader.vertLoc = gl.getAttribLocation(FitsShader._prog, 'aVertexPosition');
     FitsShader.textureLoc = gl.getAttribLocation(FitsShader._prog, 'aTextureCoord');
@@ -2015,25 +1833,8 @@ ImageShader.init = function (renderContext) {
         }
     `;
 
-    ImageShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ImageShader._frag, fragShaderText);
-    gl.compileShader(ImageShader._frag);
-    var stat = gl.getShaderParameter(ImageShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(ImageShader._frag);
-    }
-    ImageShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ImageShader._vert, vertexShaderText);
-    gl.compileShader(ImageShader._vert);
-    var stat1 = gl.getShaderParameter(ImageShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(ImageShader._vert);
-    }
-    ImageShader._prog = gl.createProgram();
-    gl.attachShader(ImageShader._prog, ImageShader._vert);
-    gl.attachShader(ImageShader._prog, ImageShader._frag);
-    gl.linkProgram(ImageShader._prog);
-    var errcode = gl.getProgramParameter(ImageShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ImageShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ImageShader._prog);
     ImageShader.vertLoc = gl.getAttribLocation(ImageShader._prog, 'aVertexPosition');
     ImageShader.textureLoc = gl.getAttribLocation(ImageShader._prog, 'aTextureCoord');
@@ -2136,25 +1937,8 @@ ImageShader2.init = function (renderContext) {
         }
     `;
 
-    ImageShader2._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ImageShader2._frag, fragShaderText);
-    gl.compileShader(ImageShader2._frag);
-    var stat = gl.getShaderParameter(ImageShader2._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(ImageShader2._frag);
-    }
-    ImageShader2._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ImageShader2._vert, vertexShaderText);
-    gl.compileShader(ImageShader2._vert);
-    var stat1 = gl.getShaderParameter(ImageShader2._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(ImageShader2._vert);
-    }
-    ImageShader2._prog = gl.createProgram();
-    gl.attachShader(ImageShader2._prog, ImageShader2._vert);
-    gl.attachShader(ImageShader2._prog, ImageShader2._frag);
-    gl.linkProgram(ImageShader2._prog);
-    var errcode = gl.getProgramParameter(ImageShader2._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ImageShader2, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ImageShader2._prog);
     ImageShader2.vertLoc = gl.getAttribLocation(ImageShader2._prog, 'aVertexPosition');
     ImageShader2.textureLoc = gl.getAttribLocation(ImageShader2._prog, 'aTextureCoord');
@@ -2258,19 +2042,8 @@ SpriteShader.init = function (renderContext) {
         }
     `;
 
-    SpriteShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(SpriteShader._frag, fragShaderText);
-    gl.compileShader(SpriteShader._frag);
-    var stat = gl.getShaderParameter(SpriteShader._frag, WEBGL.COMPILE_STATUS);
-    SpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(SpriteShader._vert, vertexShaderText);
-    gl.compileShader(SpriteShader._vert);
-    var stat1 = gl.getShaderParameter(SpriteShader._vert, WEBGL.COMPILE_STATUS);
-    SpriteShader._prog = gl.createProgram();
-    gl.attachShader(SpriteShader._prog, SpriteShader._vert);
-    gl.attachShader(SpriteShader._prog, SpriteShader._frag);
-    gl.linkProgram(SpriteShader._prog);
-    var errcode = gl.getProgramParameter(SpriteShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(SpriteShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(SpriteShader._prog);
     SpriteShader.vertLoc = gl.getAttribLocation(SpriteShader._prog, 'aVertexPosition');
     SpriteShader.textureLoc = gl.getAttribLocation(SpriteShader._prog, 'aTextureCoord');
@@ -2364,19 +2137,8 @@ ShapeSpriteShader.init = function (renderContext) {
         }
     `;
 
-    ShapeSpriteShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ShapeSpriteShader._frag, fragShaderText);
-    gl.compileShader(ShapeSpriteShader._frag);
-    var stat = gl.getShaderParameter(ShapeSpriteShader._frag, WEBGL.COMPILE_STATUS);
-    ShapeSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ShapeSpriteShader._vert, vertexShaderText);
-    gl.compileShader(ShapeSpriteShader._vert);
-    var stat1 = gl.getShaderParameter(ShapeSpriteShader._vert, WEBGL.COMPILE_STATUS);
-    ShapeSpriteShader._prog = gl.createProgram();
-    gl.attachShader(ShapeSpriteShader._prog, ShapeSpriteShader._vert);
-    gl.attachShader(ShapeSpriteShader._prog, ShapeSpriteShader._frag);
-    gl.linkProgram(ShapeSpriteShader._prog);
-    var errcode = gl.getProgramParameter(ShapeSpriteShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ShapeSpriteShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ShapeSpriteShader._prog);
     ShapeSpriteShader.vertLoc = gl.getAttribLocation(ShapeSpriteShader._prog, 'aVertexPosition');
     ShapeSpriteShader.colorLoc = gl.getAttribLocation(ShapeSpriteShader._prog, 'aColor');
@@ -2510,31 +2272,8 @@ TextShader.init = function (renderContext) {
         }
     `;
 
-    TextShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(TextShader._frag, fragShaderText);
-    gl.compileShader(TextShader._frag);
-    var stat = gl.getShaderParameter(TextShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(TextShader._frag);
-        console.log(errorF);
-    }
-    TextShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(TextShader._vert, vertexShaderText);
-    gl.compileShader(TextShader._vert);
-    var stat1 = gl.getShaderParameter(TextShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(TextShader._vert);
-        console.log(errorV);
-    }
-    TextShader._prog = gl.createProgram();
-    gl.attachShader(TextShader._prog, TextShader._vert);
-    gl.attachShader(TextShader._prog, TextShader._frag);
-    gl.linkProgram(TextShader._prog);
-    var linkSuccess = gl.getProgramParameter(TextShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(TextShader._prog);
-        console.log(errorP);
-    }
+    setupShadersAndProgram(TextShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(TextShader._prog);
     TextShader.vertLoc = gl.getAttribLocation(TextShader._prog, 'aVertexPosition');
     TextShader.textureLoc = gl.getAttribLocation(TextShader._prog, 'aTextureCoord');
@@ -2682,7 +2421,7 @@ FilledCircleShader.init = function (renderContext) {
     // this is the same as the TimeSeriesPointSpriteShader vertex shader.
     // Maybe this can be extracted into a function that returns the shader text
     // based on a (passed-in) version flag
-    var vertShaderText = `\
+    var vertexShaderText = `\
       ${versionDeclaration}
       ${vertexInKeyword} vec3 aVertexPosition;
       ${vertexInKeyword} vec4 aVertexColor;
@@ -2738,31 +2477,8 @@ FilledCircleShader.init = function (renderContext) {
       }
     `;
 
-    FilledCircleShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(FilledCircleShader._frag, fragShaderText);
-    gl.compileShader(FilledCircleShader._frag);
-    var fragStat = gl.getShaderParameter(FilledCircleShader._frag, WEBGL.COMPILE_STATUS);
-    if (!fragStat) {
-        var errorF = gl.getShaderInfoLog(FilledCircleShader._frag);
-        console.log(errorF);
-    }
-    FilledCircleShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(FilledCircleShader._vert, vertShaderText);
-    gl.compileShader(FilledCircleShader._vert);
-    var vertStat = gl.getShaderParameter(FilledCircleShader._vert, WEBGL.COMPILE_STATUS);
-    if (!vertStat) {
-        var errorV = gl.getShaderInfoLog(FilledCircleShader._vert);
-        console.log(errorV);
-    }
-    FilledCircleShader._prog = gl.createProgram();
-    gl.attachShader(FilledCircleShader._prog, FilledCircleShader._vert);
-    gl.attachShader(FilledCircleShader._prog, FilledCircleShader._frag);
-    gl.linkProgram(FilledCircleShader._prog);
-    var linkSuccess = gl.getProgramParameter(FilledCircleShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(FilledCircleShader._prog);
-        console.log(errorP);
-    }
+    setupShadersAndProgram(FilledCircleShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(FilledCircleShader._prog);
     FilledCircleShader.posLoc = gl.getAttribLocation(FilledCircleShader._prog, "aVertexPosition");
     FilledCircleShader.colorLoc = gl.getAttribLocation(FilledCircleShader._prog, "aVertexColor");
@@ -2915,7 +2631,7 @@ FilledCircleQuadShader.init = function (renderContext) {
     // this is the same as the TimeSeriesPointSpriteShader vertex shader.
     // Maybe this can be extracted into a function that returns the shader text
     // based on a (passed-in) version flag
-    var vertShaderText = `\
+    var vertexShaderText = `\
       ${versionDeclaration}
       ${vertexInKeyword} vec3 aVertexPosition;
       ${vertexInKeyword} vec2 aTextureCoord;
@@ -2979,31 +2695,8 @@ FilledCircleQuadShader.init = function (renderContext) {
       }
     `;
 
-    FilledCircleQuadShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(FilledCircleQuadShader._frag, fragShaderText);
-    gl.compileShader(FilledCircleQuadShader._frag);
-    var fragStat = gl.getShaderParameter(FilledCircleQuadShader._frag, WEBGL.COMPILE_STATUS);
-    if (!fragStat) {
-        var errorF = gl.getShaderInfoLog(FilledCircleQuadShader._frag);
-        console.log(errorF);
-    }
-    FilledCircleQuadShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(FilledCircleQuadShader._vert, vertShaderText);
-    gl.compileShader(FilledCircleQuadShader._vert);
-    var vertStat = gl.getShaderParameter(FilledCircleQuadShader._vert, WEBGL.COMPILE_STATUS);
-    if (!vertStat) {
-        var errorV = gl.getShaderInfoLog(FilledCircleQuadShader._vert);
-        console.log(errorV);
-    }
-    FilledCircleQuadShader._prog = gl.createProgram();
-    gl.attachShader(FilledCircleQuadShader._prog, FilledCircleQuadShader._vert);
-    gl.attachShader(FilledCircleQuadShader._prog, FilledCircleQuadShader._frag);
-    gl.linkProgram(FilledCircleQuadShader._prog);
-    var linkSuccess = gl.getProgramParameter(FilledCircleQuadShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(FilledCircleQuadShader._prog);
-        console.log(errorP);
-    }
+    setupShadersAndProgram(FilledCircleQuadShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(FilledCircleQuadShader._prog);
     FilledCircleQuadShader.vertLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aVertexPosition");
     FilledCircleQuadShader.texLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aTextureCoord");
@@ -3185,7 +2878,7 @@ FilledNGonShader.init = function (renderContext) {
     // this is the same as the TimeSeriesPointSpriteShader vertex shader.
     // Maybe this can be extracted into a function that returns the shader text
     // based on a (passed-in) version flag
-    var vertShaderText = `\
+    var vertexShaderText = `\
       ${keywords.versionDeclaration}
       ${keywords.vertexInKeyword} vec3 aVertexPosition;
       ${keywords.vertexInKeyword} vec4 aVertexColor;
@@ -3241,15 +2934,7 @@ FilledNGonShader.init = function (renderContext) {
       }
     `;
 
-    FilledNGonShader._frag = createFragmentShader(gl, fragShaderText);
-    displayShaderCompileError(gl, FilledNGonShader._frag);
-
-    FilledNGonShader._vert = createVertexShader(gl, vertShaderText);
-    displayShaderCompileError(gl, FilledNGonShader._vert);
-
-    var program = createProgram(gl, FilledNGonShader._vert, FilledNGonShader._frag);
-    FilledNGonShader._prog = program;
-    displayProgramLinkError(gl, program);
+    setupShadersAndProgram(FilledNGonShader, gl, vertexShaderText, fragShaderText);
 
     gl.useProgram(FilledNGonShader._prog);
     FilledNGonShader.posLoc = gl.getAttribLocation(program, "aVertexPosition");
@@ -3434,7 +3119,7 @@ FilledNGonQuadShader.init = function (renderContext) {
     // this is the same as the TimeSeriesPointSpriteShader vertex shader.
     // Maybe this can be extracted into a function that returns the shader text
     // based on a (passed-in) version flag
-    var vertShaderText = `\
+    var vertexShaderText = `\
       ${keywords.versionDeclaration}
       ${keywords.vertexInKeyword} vec3 aVertexPosition;
       ${keywords.vertexInKeyword} vec2 aTextureCoord;
@@ -3498,17 +3183,9 @@ FilledNGonQuadShader.init = function (renderContext) {
       }
     `;
 
-    FilledNGonQuadShader._frag = createFragmentShader(gl, fragShaderText);
-    displayShaderCompileError(gl, FilledNGonQuadShader._frag);
+    setupShadersAndProgram(FilledNGonQuadShader, gl, vertexShaderText, fragShaderText);
 
-    FilledNGonQuadShader._vert = createVertexShader(gl, vertShaderText);
-    displayShaderCompileError(gl, FilledNGonQuadShader._vert);
-
-    var program = createProgram(gl, FilledNGonQuadShader._vert, FilledNGonQuadShader._frag);
-    FilledNGonQuadShader._prog = program;
-    displayProgramLinkError(gl, program);
-
-    gl.useProgram(FilledNGonQuadShader._prog);
+    gl.useProgram(program);
     FilledNGonQuadShader.vertLoc = gl.getAttribLocation(program, "aVertexPosition");
     FilledNGonQuadShader.texLoc = gl.getAttribLocation(program, "aTextureCoord");
     FilledNGonQuadShader.colorLoc = gl.getAttribLocation(program, "aVertexColor");
