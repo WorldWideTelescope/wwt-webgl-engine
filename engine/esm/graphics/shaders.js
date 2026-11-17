@@ -11,16 +11,10 @@ import { WEBGL } from "./webgl_constants.js";
 import { Texture } from "./texture.js";
 import { TextureArray } from "./texture_array.js";
 import {
+  disableVertexAttribArrays,
   shaderKeywords,
   setupShadersAndProgram,
 } from "./webgl_utils.js";
-
-
-function disableVertexAttribArrays(gl, count=6) {
-    for (var i = 0; i < count; i++) {
-        gl.disableVertexAttribArray(i);
-    }
-}
 
 
 // wwtlib.SimpleLineShader
@@ -378,7 +372,7 @@ LineShaderNormalDates2D.initialized = false;
 LineShaderNormalDates2D._prog = null;
 
 LineShaderNormalDates2D.init = function (renderContext) {
-  var gl = renderContext.gl;Hey Azme,
+  var gl = renderContext.gl;,
 
   const fragShaderText = `\
       precision highp float;
@@ -2195,9 +2189,7 @@ TextShader.textureCount = 1;
 TextShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    var versionDeclaration = useGlVersion2 ? "#version 300 es" : "";
-    var vertexInKeyword = useGlVersion2 ? "in" : "attribute";
-    var vertexOutKeyword = useGlVersion2 ? "out" : "varying";
+    var keywords = shaderKeywords(useGlVersion2);
 
     let fragShaderText;
     if (useGlVersion2) {
@@ -2254,16 +2246,16 @@ TextShader.init = function (renderContext) {
     }
 
     const vertexShaderText = `\
-        ${versionDeclaration}
-        ${vertexInKeyword} vec3 aVertexPosition;
-        ${vertexInKeyword} vec2 aTextureCoord;
-        ${vertexInKeyword} float aTextureLayer;
+        ${keywords.versionDeclaration}
+        ${keywords.vertexIn} vec3 aVertexPosition;
+        ${keywords.vertexIn} vec2 aTextureCoord;
+        ${keywords.vertexIn} float aTextureLayer;
 
         uniform mat4 uMVMatrix;
         uniform mat4 uPMatrix;
 
-        ${vertexOutKeyword} vec2 vTextureCoord;
-        ${vertexOutKeyword} float vTextureLayer;
+        ${keywords.vertexOut} vec2 vTextureCoord;
+        ${keywords.vertexOut} float vTextureLayer;
 
         void main(void) {
             gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
@@ -2378,18 +2370,15 @@ FilledCircleShader.init = function (renderContext) {
     var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
     var borderWidth = derivatives ? "fwidth(r)" : "0.012";
     var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
-    var versionDeclaration = useGlVersion2 ? "#version 300 es" : "";
-    var fragInKeyword = useGlVersion2 ? "in" : "varying";
+    var keywords = shaderKeywords(useGlVersion2);
     var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : "";
     var fragOutVar = useGlVersion2 ? "fragColor" : "gl_FragColor";
-    var vertexInKeyword = useGlVersion2 ? "in" : "attribute";
-    var vertexOutKeyword = useGlVersion2 ? "out" : "varying";
 
     var fragShaderText = `\
-        ${versionDeclaration}
+        ${keywords.versionDeclaration}
         ${extensionDeclaration}
         precision mediump float;
-        ${fragInKeyword} vec4 vColor;
+        ${keywords.fragmentIn} vec4 vColor;
         ${fragOutDeclaration}
         uniform float opacity;
         uniform float border;
@@ -2422,12 +2411,12 @@ FilledCircleShader.init = function (renderContext) {
     // Maybe this can be extracted into a function that returns the shader text
     // based on a (passed-in) version flag
     var vertexShaderText = `\
-      ${versionDeclaration}
-      ${vertexInKeyword} vec3 aVertexPosition;
-      ${vertexInKeyword} vec4 aVertexColor;
-      ${vertexInKeyword} vec2 aTime;
-      ${vertexInKeyword} float aPointSize;
-      ${vertexInKeyword} float aShow;
+      ${keywords.versionDeclaration}
+      ${keywords.vertexIn} vec3 aVertexPosition;
+      ${keywords.vertexIn} vec4 aVertexColor;
+      ${keywords.vertexIn} vec2 aTime;
+      ${keywords.vertexIn} float aPointSize;
+      ${keywords.vertexIn} float aShow;
       uniform mat4 uMVMatrix;
       uniform mat4 uPMatrix;
       uniform float jNow;
@@ -2438,7 +2427,7 @@ FilledCircleShader.init = function (renderContext) {
       uniform float sky;
       uniform float showFarSide;
 
-      ${vertexOutKeyword} lowp vec4 vColor;
+      ${keywords.vertexOut} lowp vec4 vColor;
 
       void main(void)
       {
@@ -2587,19 +2576,16 @@ FilledCircleQuadShader.init = function (renderContext) {
     var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
     var borderWidth = derivatives ? "fwidth(r)" : "0.012";
     var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
-    var versionDeclaration = useGlVersion2 ? "#version 300 es" : "";
-    var fragInKeyword = useGlVersion2 ? "in" : "varying";
+    var keywords = shaderKeywords(useGlVersion2);
     var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : "";
     var fragOutVar = useGlVersion2 ? "fragColor" : "gl_FragColor";
-    var vertexInKeyword = useGlVersion2 ? "in" : "attribute";
-    var vertexOutKeyword = useGlVersion2 ? "out" : "varying";
 
     var fragShaderText = `\
-        ${versionDeclaration}
+        ${keywords.versionDeclaration}
         ${extensionDeclaration}
         precision mediump float;
-        ${fragInKeyword} vec4 vColor;
-        ${fragInKeyword} vec2 vTextureCoord;
+        ${keywords.fragmentIn} vec4 vColor;
+        ${keywords.fragmentIn} vec2 vTextureCoord;
         ${fragOutDeclaration}
         uniform float opacity;
         uniform float border;
@@ -2632,13 +2618,13 @@ FilledCircleQuadShader.init = function (renderContext) {
     // Maybe this can be extracted into a function that returns the shader text
     // based on a (passed-in) version flag
     var vertexShaderText = `\
-      ${versionDeclaration}
-      ${vertexInKeyword} vec3 aVertexPosition;
-      ${vertexInKeyword} vec2 aTextureCoord;
-      ${vertexInKeyword} vec4 aVertexColor;
-      ${vertexInKeyword} vec2 aTime;
-      ${vertexInKeyword} float aPointSize;
-      ${vertexInKeyword} float aShow;
+      ${keywords.versionDeclaration}
+      ${keywords.vertexIn} vec3 aVertexPosition;
+      ${keywords.vertexIn} vec2 aTextureCoord;
+      ${keywords.vertexIn} vec4 aVertexColor;
+      ${keywords.vertexIn} vec2 aTime;
+      ${keywords.vertexIn} float aPointSize;
+      ${keywords.vertexIn} float aShow;
       uniform mat4 uMVMatrix;
       uniform mat4 uPMatrix;
       uniform float jNow;
@@ -2651,8 +2637,8 @@ FilledCircleQuadShader.init = function (renderContext) {
       uniform float viewportHeight;
       uniform float viewportWidth;
 
-      ${vertexOutKeyword} lowp vec4 vColor;
-      ${vertexOutKeyword} vec2 vTextureCoord;
+      ${keywords.vertexOut} lowp vec4 vColor;
+      ${keywords.vertexOut} vec2 vTextureCoord;
 
       void main(void)
       {
@@ -2816,7 +2802,7 @@ FilledNGonShader.init = function (renderContext) {
       ${keywords.versionDeclaration}
       ${extensionDeclaration}
       precision mediump float;
-      ${keywords.fragmentInKeyword} vec4 vColor;
+      ${keywords.fragmentIn} vec4 vColor;
       ${fragOutDeclaration}
       uniform float opacity;
       uniform float border;
@@ -2880,11 +2866,11 @@ FilledNGonShader.init = function (renderContext) {
     // based on a (passed-in) version flag
     var vertexShaderText = `\
       ${keywords.versionDeclaration}
-      ${keywords.vertexInKeyword} vec3 aVertexPosition;
-      ${keywords.vertexInKeyword} vec4 aVertexColor;
-      ${keywords.vertexInKeyword} vec2 aTime;
-      ${keywords.vertexInKeyword} float aPointSize;
-      ${keywords.vertexInKeyword} float aShow;
+      ${keywords.vertexIn} vec3 aVertexPosition;
+      ${keywords.vertexIn} vec4 aVertexColor;
+      ${keywords.vertexIn} vec2 aTime;
+      ${keywords.vertexIn} float aPointSize;
+      ${keywords.vertexIn} float aShow;
       uniform mat4 uMVMatrix;
       uniform mat4 uPMatrix;
       uniform float jNow;
@@ -2895,7 +2881,7 @@ FilledNGonShader.init = function (renderContext) {
       uniform float sky;
       uniform float showFarSide;
 
-      ${keywords.vertexOutKeyword} lowp vec4 vColor;
+      ${keywords.vertexOut} lowp vec4 vColor;
 
       void main(void)
       {
@@ -3056,8 +3042,8 @@ FilledNGonQuadShader.init = function (renderContext) {
       ${keywords.versionDeclaration}
       ${extensionDeclaration}
       precision mediump float;
-      ${keywords.fragmentInKeyword} vec4 vColor;
-      ${keywords.fragmentInKeyword} vec2 vTextureCoord;
+      ${keywords.fragmentIn} vec4 vColor;
+      ${keywords.fragmentIn} vec2 vTextureCoord;
       ${fragOutDeclaration}
       uniform float opacity;
       uniform float border;
@@ -3121,12 +3107,12 @@ FilledNGonQuadShader.init = function (renderContext) {
     // based on a (passed-in) version flag
     var vertexShaderText = `\
       ${keywords.versionDeclaration}
-      ${keywords.vertexInKeyword} vec3 aVertexPosition;
-      ${keywords.vertexInKeyword} vec2 aTextureCoord;
-      ${keywords.vertexInKeyword} vec4 aVertexColor;
-      ${keywords.vertexInKeyword} vec2 aTime;
-      ${keywords.vertexInKeyword} float aPointSize;
-      ${keywords.vertexInKeyword} float aShow;
+      ${keywords.vertexIn} vec3 aVertexPosition;
+      ${keywords.vertexIn} vec2 aTextureCoord;
+      ${keywords.vertexIn} vec4 aVertexColor;
+      ${keywords.vertexIn} vec2 aTime;
+      ${keywords.vertexIn} float aPointSize;
+      ${keywords.vertexIn} float aShow;
       uniform mat4 uMVMatrix;
       uniform mat4 uPMatrix;
       uniform float jNow;
@@ -3139,8 +3125,8 @@ FilledNGonQuadShader.init = function (renderContext) {
       uniform float viewportHeight;
       uniform float viewportWidth;
 
-      ${keywords.vertexOutKeyword} lowp vec4 vColor;
-      ${keywords.vertexOutKeyword} vec2 vTextureCoord;
+      ${keywords.vertexOut} lowp vec4 vColor;
+      ${keywords.vertexOut} vec2 vTextureCoord;
 
       void main(void)
       {
