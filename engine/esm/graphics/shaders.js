@@ -372,7 +372,7 @@ LineShaderNormalDates2D.initialized = false;
 LineShaderNormalDates2D._prog = null;
 
 LineShaderNormalDates2D.init = function (renderContext) {
-  var gl = renderContext.gl;,
+  var gl = renderContext.gl;
 
   const fragShaderText = `\
       precision highp float;
