@@ -377,7 +377,7 @@ var SpreadSheetLayer$ = {
         // Take a shortcut to avoid copying the table if possible
         if ((this.sizeColumn === -1 || !this.get_normalizeSize()) && (this.colorMapColumn === -1 || !this.get_dynamicColor())) {
             this._lastNormalizeSizeColumnIndex$1 = -1;
-            this._lastDynamicColorCoCirclelumnIndex$1 = -1;
+            this._lastDynamicColorColumnIndex$1 = -1;
             return;
         }
         this._table_backcompat$1 = this._table$1.clone();
