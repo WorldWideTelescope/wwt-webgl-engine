@@ -1152,15 +1152,9 @@ var Imageset$ = {
 
         // For HEALPix, we check the properties file
         if (this.get_projection() === 7) {
-            var hipsProperties = this.get_hipsProperties();
-            if (hipsProperties == null) {
-                onResolved(this.url);
-                return;
-            } else {
-                urls.push(hipsProperties.get_url());
-                for (var i = 0; i < mirrorUrls.length; i++) {
-                    urls.push(HipsProperties.adjustedUrl(mirrorUrls[i]));
-                }
+            urls.push(HipsProperties.adjustedUrl(this.url));
+            for (var i = 0; i < mirrorUrls.length; i++) {
+                urls.push(HipsProperties.adjustedUrl(mirrorUrls[i]));
             }
         } else {
             // Otherwise, we need some sort of standard way to check whether the server hosting the imageset is working
