@@ -383,6 +383,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@gltf-transform/core@npm:^4.5.1":
+  version: 4.5.1
+  resolution: "@gltf-transform/core@npm:4.5.1"
+  dependencies:
+    property-graph: ^4.1.0
+  checksum: e44d4dbd473cb33ecc940d81320728611a1c1494f76530fbf27bc3d79bc00e2c419986e4892655ac525d033ae6afb0a40cc7c298a869ee7e4d1aa725285fea0a
+  languageName: node
+  linkType: hard
+
 "@hapi/hoek@npm:^9.0.0, @hapi/hoek@npm:^9.3.0":
   version: 9.3.0
   resolution: "@hapi/hoek@npm:9.3.0"
@@ -1883,6 +1892,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine@workspace:engine"
   dependencies:
+    "@gltf-transform/core": ^4.5.1
     "@typescript-eslint/eslint-plugin": ^5.38.1
     "@typescript-eslint/parser": ^5.38.1
     "@wwtelescope/engine-types": "workspace:0.0.0-dev.0"
@@ -9306,6 +9316,13 @@ __metadata:
     err-code: ^2.0.2
     retry: ^0.12.0
   checksum: f96a3f6d90b92b568a26f71e966cbbc0f63ab85ea6ff6c81284dc869b41510e6cdef99b6b65f9030f0db422bf7c96652a3fff9f2e8fb4a0f069d8f4430359429
+  languageName: node
+  linkType: hard
+
+"property-graph@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "property-graph@npm:4.1.0"
+  checksum: fbd734b6f4eeb5e6e4809dca5e509f8e8b592e62074a222f1ecf6d6ccba9bed9318e350c47983205935c167772f65a6d32fae9aff2ebce3699d0032bf301f84a
   languageName: node
   linkType: hard
 
