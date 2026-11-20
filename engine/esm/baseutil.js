@@ -5,6 +5,7 @@
 
 import { registerType } from "./typesystem.js";
 import { ss } from "./ss.js";
+import { StateType, WebFile } from "./web_file.js";
 
 // wwtlib.Util
 
@@ -128,6 +129,18 @@ Util.selectSingleNode = function (parent, name) {
     return node;
 };
 
+Util.selectChildNodes = function (parent, name) {
+    var nodes = [];
+    var $enum1 = ss.enumerate(parent.childNodes);
+    while ($enum1.moveNext()) {
+        var child = $enum1.current;
+        if (child.nodeName === name) {
+            nodes.push(child);
+        }
+    }
+    return nodes;
+};
+
 Util.getInnerText = function (node) {
     if (ss.emptyString(node.text)) {
         var cn = node;
@@ -214,6 +227,73 @@ Util.sign = function (num) {
     }
     return 1;
 };
+
+// Try each URL in `urls` in priority order. Calls `onSuccess(url, webFile)`
+// with the first one that loads successfully, or `onFailure(messages)` if
+// none do.
+Util.fetchFirstAvailable = function(urls, onSuccess, onFailure) {
+    var results = [];
+    var messages = [];
+    var settled = false;
+
+    if (!urls.length) {
+        onFailure(messages);
+        return;
+    }
+
+    var check = function () {
+        if (settled) {
+            return;
+        }
+
+        for (let j = 0; j < urls.length; j++) {
+            if (results[j] === undefined) {
+                return;  // a higher-priority URL is still pending
+            }
+            if (results[j]) {
+                settled = true;
+                onSuccess(urls[j], j);
+                return;
+            }
+        }
+
+        settled = true;  // everything failed
+        onFailure(messages);
+    };
+
+    var finish = function (index, ok) {
+        if (results[index] !== undefined) {
+            return;
+        }
+        results[index] = ok;
+        if (!ok) {
+            messages[index] = file.get_message() || ('Error loading ' + url);
+        }
+        check();
+    };
+
+    var onStateChange = function (index) {
+        var state = this.get_state();
+        if (state === StateType.received) {
+            finish(index, true);
+        } else if (state === StateType.error) {
+            finish(index, false);
+        }
+    };
+
+    for (let i = 0; i < urls.length; i++) {
+        var url = urls[i];
+        var file = new WebFile(url);
+
+        file.onStateChange = onStateChange.bind(file, i);
+
+        try {
+            file.send();
+        } catch (e) {
+            finish(i, false);
+        }
+    }
+}
 
 var Util$ = {};
 

@@ -1116,7 +1116,17 @@ export class Imageset implements Thumbnail {
   get_widthFactor(): number;
   set_widthFactor(f: number): number;
 
+  get_activeUrl(): string;
+
+  get_mirrorUrls(): string[];
+  set_mirrorUrls(urls: string[]): string[];
+  add_mirrorUrl(url: string): void;
+  remove_mirrorUrl(url: string): void;
+
   getHashCode(): number;
+
+  add_urlResolved(fn: (activeUrl: string) => void): void;
+  get_urlResolvedFired(): boolean;
 }
 
 export namespace Imageset {
@@ -1151,6 +1161,8 @@ export namespace Imageset {
     meanRadius: number,
     referenceFrame: string
   ): Imageset;
+
+  export function clone(): Imageset;
 }
 
 /** An imageset renderable as its own independent layer. */
@@ -1315,6 +1327,8 @@ export namespace LayerManager {
    * */
   export function addVoTableLayerWithPlotType(table: VoTable, title: string, plotType: PlotTypes): VoTableLayer;
 
+  export function addObject3dLayerFromUrl(frame: string, name: string, url: string, format: string): Object3dLayer;
+
   export function getMoonFile(url: string): void;
   export function initLayers(): void;
   export function mergeToursLayers(): void;
@@ -1352,6 +1366,22 @@ export class LayerMap {
 // NOTE: isLayerSetting in engine-helpers needs to be kept in sync.
 export type LayerSetting = BaseLayerSetting |
 ["color", Color];
+
+export class Object3d {
+    flipHandedness: boolean;
+    flipV: boolean;
+    smooth: true;
+    color: Color;
+}
+
+export class Object3dLayer extends Layer {
+    objType: boolean;
+    object3d: Object3d | null;
+}
+
+export namespace Object3dLayer {
+    export function fromUrl(url: string, format: string): Object3dLayer;
+}
 
 export class Place implements Thumbnail {
   annotation: string;

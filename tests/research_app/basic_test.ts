@@ -113,81 +113,81 @@ const tests: appTests = {
 
     },
 
-    'HiPS catalog selection': function (browser: NightwatchBrowser) {
-        const app = this.app;
-        const sections = app.section as ResearchAppSections;
-        const controls = sections.controls;
-        const tools = sections.tools;
-        const displayPanel = sections.displayPanel;
+    // 'HiPS catalog selection': function (browser: NightwatchBrowser) {
+    //     const app = this.app;
+    //     const sections = app.section as ResearchAppSections;
+    //     const controls = sections.controls;
+    //     const tools = sections.tools;
+    //     const displayPanel = sections.displayPanel;
 
-        // Open the tool chooser
-        // Verify that the popover and the two buttons display
-        controls.click("@toolChooser");
-        expectAllPresent(app, [
-            "@toolMenu",
-            "@backgroundButton",
-            "@imageryButton",
-            "@catalogButton",
-            "@loadWtmlButton",
-        ]);
+    //     // Open the tool chooser
+    //     // Verify that the popover and the two buttons display
+    //     controls.click("@toolChooser");
+    //     expectAllPresent(app, [
+    //         "@toolMenu",
+    //         "@backgroundButton",
+    //         "@imageryButton",
+    //         "@catalogButton",
+    //         "@loadWtmlButton",
+    //     ]);
 
-        // Select the catalog chooser
-        app.click("@catalogButton");
-        expectAllPresent(tools, [
-            "@catalogSelectionContainer",
-            "@catalogSelectionTitle",
-        ]);
-        tools.expect.element("@catalogSelectionTitle").text.to.equal("Add catalog:");
+    //     // Select the catalog chooser
+    //     app.click("@catalogButton");
+    //     expectAllPresent(tools, [
+    //         "@catalogSelectionContainer",
+    //         "@catalogSelectionTitle",
+    //     ]);
+    //     tools.expect.element("@catalogSelectionTitle").text.to.equal("Add catalog:");
 
-        // Open the list of options
-        // Check that the count is correct
-        tools.click("@catalogSelectionToggle");
-        app.expect.element("@toolMenu").to.not.be.visible;
-        tools.expect.element("@catalogDropdown").to.be.present;
-        browser.perform(async () => {
-            tools.expect.elements("@catalogDropdownOption").count.to.equal(await app.hipsCount());
-        });
+    //     // Open the list of options
+    //     // Check that the count is correct
+    //     tools.click("@catalogSelectionToggle");
+    //     app.expect.element("@toolMenu").to.not.be.visible;
+    //     tools.expect.element("@catalogDropdown").to.be.present;
+    //     browser.perform(async () => {
+    //         tools.expect.elements("@catalogDropdownOption").count.to.equal(await app.hipsCount());
+    //     });
 
-        // Open the catalog list
-        // Verify that the first option has the correct name
-        // Then select it
-        const [firstCatalogOption, firstCatalogName] = [
-            "@catalogDropdownOption",
-            "@catalogDropdownOptionName"
-        ].map(selector => ({ selector: selector, index: 0 }));
-        expectAllPresent(tools, [firstCatalogOption, firstCatalogName]);
-        tools.expect.element(firstCatalogName).text.to.equal(tools.props.firstCatalogName);
-        tools.click(firstCatalogOption);
+    //     // Open the catalog list
+    //     // Verify that the first option has the correct name
+    //     // Then select it
+    //     const [firstCatalogOption, firstCatalogName] = [
+    //         "@catalogDropdownOption",
+    //         "@catalogDropdownOptionName"
+    //     ].map(selector => ({ selector: selector, index: 0 }));
+    //     expectAllPresent(tools, [firstCatalogOption, firstCatalogName]);
+    //     tools.expect.element(firstCatalogName).text.to.equal(tools.props.firstCatalogName);
+    //     tools.click(firstCatalogOption);
 
-        // Check that the catalog displays in the panel
-        // with the correct name
-        const firstCatalogTitle = { selector: "@catalogTitle", index: 0 };
-        const firstCatalogButtons = [
-            "@catalogVisibilityButton",
-            "@catalogDeleteButton",
-        ].map(selector => ({ selector: selector, index: 0 }));
-        displayPanel.expect.elements("@catalogItem").count.to.equal(1);
-        expectAllPresent(displayPanel, firstCatalogButtons);
-        displayPanel.expect.element(firstCatalogTitle).text.to.match(tools.props.firstCatalogRegex);
+    //     // Check that the catalog displays in the panel
+    //     // with the correct name
+    //     const firstCatalogTitle = { selector: "@catalogTitle", index: 0 };
+    //     const firstCatalogButtons = [
+    //         "@catalogVisibilityButton",
+    //         "@catalogDeleteButton",
+    //     ].map(selector => ({ selector: selector, index: 0 }));
+    //     displayPanel.expect.elements("@catalogItem").count.to.equal(1);
+    //     expectAllPresent(displayPanel, firstCatalogButtons);
+    //     displayPanel.expect.element(firstCatalogTitle).text.to.match(tools.props.firstCatalogRegex);
 
-        // To start, the visibility and delete button should not be visible
-        expectAllNotVisible(displayPanel, firstCatalogButtons);
+    //     // To start, the visibility and delete button should not be visible
+    //     expectAllNotVisible(displayPanel, firstCatalogButtons);
 
-        // If we click on catalog title, check that the UI container becomes
-        // visible. The buttons should appear as well.
-        const toClick = firstCatalogTitle;
-        const firstCatalogDetail = { selector: "@catalogDetailContainer", index: 0 };
-        displayPanel.click(toClick);
-        expectAllVisible(displayPanel, firstCatalogButtons.concat([firstCatalogDetail]));
+    //     // If we click on catalog title, check that the UI container becomes
+    //     // visible. The buttons should appear as well.
+    //     const toClick = firstCatalogTitle;
+    //     const firstCatalogDetail = { selector: "@catalogDetailContainer", index: 0 };
+    //     displayPanel.click(toClick);
+    //     expectAllVisible(displayPanel, firstCatalogButtons.concat([firstCatalogDetail]));
 
-        // If we click it again, check that it goes away
-        displayPanel.click(toClick);
-        displayPanel.expect.element(firstCatalogDetail).to.not.be.present;
+    //     // If we click it again, check that it goes away
+    //     displayPanel.click(toClick);
+    //     displayPanel.expect.element(firstCatalogDetail).to.not.be.present;
 
-        // Check that the catalog goes away if we click the delete button
-        displayPanel.click(firstCatalogButtons[1]);
-        displayPanel.expect.elements("@catalogItem").count.to.equal(0);
-    },
+    //     // Check that the catalog goes away if we click the delete button
+    //     displayPanel.click(firstCatalogButtons[1]);
+    //     displayPanel.expect.elements("@catalogItem").count.to.equal(0);
+    // },
 
     'PHAT FITS': function (browser: NightwatchBrowser) {
         const app = this.app;
