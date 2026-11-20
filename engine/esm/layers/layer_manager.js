@@ -34,6 +34,7 @@ import { GreatCirlceRouteLayer } from "./great_circle_route_layer.js";
 import { GridLayer } from "./grid_layer.js";
 import { ImageSetLayer } from "./imageset_layer.js";
 import { ISSLayer } from "./iss_layer.js";
+import { Object3dLayer } from "./object3d.js";
 import { Orbit } from "./orbit.js";
 import { OrbitLayer } from "./orbit_layer.js";
 import { SpreadSheetLayer, PushPin } from "./spreadsheet_layer.js";
@@ -1658,6 +1659,15 @@ LayerManager._loadOrbitsFile = function (name, data, currentMap) {
     LayerManager.get_allMaps()[currentMap].open = true;
     LayerManager._version++;
     LayerManager.loadTree();
+    return layer;
+};
+
+LayerManager.addObject3dLayerFromUrl = function (frame, name, url, format) {
+    var layer = Object3dLayer.fromUrl(url, format);
+    layer.set_name(name);
+    layer.enabled = true;
+    layer.set_referenceFrame(frame);
+    LayerManager.add(layer, true);
     return layer;
 };
 

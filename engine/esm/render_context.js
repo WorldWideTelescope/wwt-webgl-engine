@@ -14,7 +14,7 @@ import { TileShader } from "./graphics/shaders.js";
 import { CameraParameters } from "./camera_parameters.js";
 import { Colors } from "./color.js";
 import { Coordinates } from "./coordinates.js";
-import { ProjectionType, ImageSetType } from "./imageset.js";
+import { ImageSetType } from "./imageset.js";
 import { Planets } from "./planets.js";
 import { RenderTriangle } from "./render_triangle.js";
 import { Settings } from "./settings.js";
@@ -98,68 +98,11 @@ RenderContext.create = function (device) {
 };
 
 RenderContext.getTilesYForLevel = function (layer, level) {
-    var maxY = 1;
-    switch (layer.get_projection()) {
-        case ProjectionType.mercator:
-            maxY = Math.pow(2, level);
-            break;
-        case ProjectionType.equirectangular:
-            maxY = (Math.pow(2, level) * (180 / layer.get_baseTileDegrees()));
-            break;
-        case ProjectionType.tangent:
-            maxY = Math.pow(2, level);
-            break;
-        case ProjectionType.spherical:
-            maxY = 1;
-            break;
-        case ProjectionType.healpix:
-            maxY = 4 * Math.pow(2, level);
-            break;
-        default:
-            maxY = Math.pow(2, level);
-            break;
-    }
-    if (maxY === Number.POSITIVE_INFINITY) {
-        maxY = 1;
-    }
-    return maxY;
+    return layer.getTilesYForLevel(level);
 };
 
 RenderContext.getTilesXForLevel = function (layer, level) {
-    var maxX = 1;
-    switch (layer.get_projection()) {
-        case ProjectionType.plotted:
-        case ProjectionType.toast:
-            maxX = Math.pow(2, level);
-            break;
-        case ProjectionType.mercator:
-            maxX = Math.pow(2, level) * ss.truncate((layer.get_baseTileDegrees() / 360));
-            break;
-        case ProjectionType.equirectangular:
-            maxX = Math.pow(2, level) * ss.truncate((360 / layer.get_baseTileDegrees()));
-            break;
-        case ProjectionType.tangent:
-            if (layer.get_widthFactor() === 1) {
-                maxX = Math.pow(2, level) * 2;
-            }
-            else {
-                maxX = Math.pow(2, level);
-            }
-            break;
-        case ProjectionType.skyImage:
-            maxX = 1;
-            break;
-        case ProjectionType.spherical:
-            maxX = 1;
-            break;
-        case ProjectionType.healpix:
-            maxX = Math.pow(2, level) * 3;
-            break;
-        default:
-            maxX = Math.pow(2, level) * 2;
-            break;
-    }
-    return maxX;
+    return layer.getTilesXForLevel(level);
 };
 
 var RenderContext$ = {
@@ -492,19 +435,7 @@ var RenderContext$ = {
         if (layer == null) {
             return null;
         }
-        var maxX = RenderContext.getTilesXForLevel(layer, layer.get_baseLevel());
-        var maxY = RenderContext.getTilesYForLevel(layer, layer.get_baseLevel());
-        for (var x = 0; x < maxX; x++) {
-            for (var y = 0; y < maxY; y++) {
-                var tile = tileCacheGetTile(layer.get_baseLevel(), x, y, layer, null);
-                if (tile != null) {
-                    if (tile.isPointInTile(viewLat, viewLong)) {
-                        return tile;
-                    }
-                }
-            }
-        }
-        return null;
+        return layer.getTileAtLatLong(viewLat, viewLong);
     },
 
     getScaledAltitudeForLatLong: function (viewLat, viewLong) {

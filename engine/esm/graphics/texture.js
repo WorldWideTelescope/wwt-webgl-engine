@@ -23,6 +23,7 @@ export function Texture() {
 }
 
 Texture.empty = null;
+Texture.white = null;
 
 Texture.getEmpty = function () {
     if (Texture.empty == null) {
@@ -33,6 +34,24 @@ Texture.getEmpty = function () {
     }
     return Texture.empty;
 };
+
+Texture.getWhite = function () {
+    if (Texture.white == null) {
+        Texture.white = tilePrepDevice.createTexture();
+        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, Texture.white);
+        tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([255, 255, 255, 255]));
+        tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
+    }
+    return Texture.white;
+};
+
+Texture.fromColor = function (color) {
+    var texture = tilePrepDevice.createTexture();
+    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, texture);
+    tilePrepDevice.texImage2D(WEBGL.TEXTURE_2D, 0, WEBGL.RGBA, 1, 1, 0, WEBGL.RGBA, WEBGL.UNSIGNED_BYTE, new Uint8Array([color.r, color.g, color.b, color.a]));
+    tilePrepDevice.bindTexture(WEBGL.TEXTURE_2D, null);
+    return texture;
+}
 
 Texture.fromUrl = function (url) {
     var tex = new Texture();

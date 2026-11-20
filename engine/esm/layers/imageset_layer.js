@@ -30,6 +30,7 @@ ImageSetLayer.create = function (set) {
     var isl = new ImageSetLayer();
     isl._imageSet$1 = set;
     isl._renderSmooth = set.get_extension().toLowerCase().indexOf('fits') == -1;
+    set.determineUrlToUse();
     return isl;
 };
 
@@ -40,6 +41,9 @@ var ImageSetLayer$ = {
 
     set_imageSet: function (value) {
         this._imageSet$1 = value;
+        if (value) {
+            value.determineUrlToUse();
+        }
         return value;
     },
 
@@ -241,7 +245,8 @@ var ImageSetLayer$ = {
 
     doneLoading: function (wcsImage) {
         this._loaded$1 = true;
-    }
+    },
+
 };
 
 registerType("ImageSetLayer", [ImageSetLayer, ImageSetLayer$, Layer]);

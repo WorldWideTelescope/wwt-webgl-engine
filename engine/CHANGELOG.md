@@ -1,3 +1,12 @@
+# @wwtelescope/engine 7.42.0 (2026-11-20)
+
+- Allow imagesets to have mirror URLs that can be used when the imageset's primary URL
+  is not working. This also adds an event that is fired when the URL to use is
+  resolved, allowing clients to respond to the result (#476, #483, @Carifio24).
+- Add an API allowing 3D models to be loaded into the engine without a tour
+  document (#470, #471, @Carifio24).
+
+
 # @wwtelescope/engine 7.41.0 (2026-10-09)
 
 - Allow drawing imagesets with or without WebGL linear smoothing. Before this, FITS imagesets

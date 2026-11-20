@@ -1335,8 +1335,10 @@ ModelShader.init = function (renderContext) {
 };
 
 ModelShader.use = function (renderContext, vertex, index, texture, opacity, noDepth, stride) {
+    // An empty texture isn't helpful - that results in the model not being rendered
+    // Use a plain white texture instead
     if (texture == null) {
-        texture = Texture.getEmpty();
+        texture = Texture.getWhite();
     }
     var gl = renderContext.gl;
     if (gl != null) {
@@ -1497,8 +1499,10 @@ ModelShaderTan.init = function (renderContext) {
 };
 
 ModelShaderTan.use = function (renderContext, vertex, index, texture, opacity, noDepth, stride) {
+    // An empty texture isn't helpful - that results in the model not being rendered
+    // Use a plain white texture instead
     if (texture == null) {
-        texture = Texture.getEmpty();
+        texture = Texture.getWhite();
     }
     var gl = renderContext.gl;
     if (gl != null) {

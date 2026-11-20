@@ -1,3 +1,9 @@
+# @wwtelescope/engine-pinia 0.18.0 (2026-11-20)
+
+- Add API to the Pinia store for awaiting an imageset's URL resolution, and expose it
+  to the WWTAware component (#476, @Carifio24).
+
+
 # @wwtelescope/engine-pinia 0.17.0 (2026-10-09)
 
 - Add methods to the Pinia store and WWT-aware component for drawing annotations in
