@@ -2067,6 +2067,15 @@ var SpreadSheetLayer$ = {
                 case 6:
                     this.pointList.drawFilledCircle(renderContext, opacity * this.get_opacity());
                     break;
+                case 7:
+                    this.pointList.drawFilledNGon(renderContext, opacity * this.get_opacity(), 3);
+                    break;
+                case 8:
+                    this.pointList.drawFilledNGon(renderContext, opacity * this.get_opacity(), 4);
+                    break;
+                case 9:
+                    this.pointList.drawFilledNGon(renderContext, opacity * this.get_opacity(), 6);
+                    break;
                 default:
                     break;
             }

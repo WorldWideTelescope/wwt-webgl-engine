@@ -2088,7 +2088,7 @@ export class SpreadSheetLayer extends Layer implements SpreadSheetLayerSettingsI
   get_beginRange(): Date;
   set_beginRange(v: Date): Date;
   /** 
-    * Note: borders are only supported by the "filled circle" plot type.
+    * Note: borders are only supported by the "filled" plot types.
     * When using other plot types, this setting will have no effect
     */
   get_bordered(): boolean;
