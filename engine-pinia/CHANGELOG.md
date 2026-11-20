@@ -1,4 +1,9 @@
-# rc: minor bump
+# rc: micro bump
+
+- No code changes; bump internal version of engine dependency.
+
+
+# @wwtelescope/engine-pinia 0.18.0 (2026-11-20)
 
 - Add API to the Pinia store for awaiting an imageset's URL resolution, and expose it
   to the WWTAware component (#476, @Carifio24).

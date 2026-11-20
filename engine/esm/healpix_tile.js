@@ -179,9 +179,8 @@ var HealpixTile$ = {
         } else {
             tileTextureIndex = this._face$1 * this._nside$1 * this._nside$1 / 4 + this._tileIndex$1;
         }
-        var sb = new ss.StringBuilder();
         var subDirIndex = Math.floor(tileTextureIndex / 10000) * 10000;
-        return ss.format(dataset.get_activeURL(), level.toString(), subDirIndex.toString(), tileTextureIndex.toString() + extension);
+        return ss.format(dataset.get_activeUrl(), level.toString(), subDirIndex.toString(), tileTextureIndex.toString() + extension);
     },
 
     _getHipsFileExtension$1: function () {

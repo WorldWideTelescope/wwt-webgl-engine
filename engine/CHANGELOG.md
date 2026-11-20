@@ -1,4 +1,9 @@
-# rc: minor bump
+# rc: micro bump
+
+- Fix issues with URL resolution for Healpix imagesets (#488, @Carifio24).
+
+
+# @wwtelescope/engine 7.42.0 (2026-11-20)
 
 - Allow imagesets to have mirror URLs that can be used when the imageset's primary URL
   is not working. This also adds an event that is fired when the URL to use is
