@@ -377,7 +377,7 @@ var SpreadSheetLayer$ = {
         // Take a shortcut to avoid copying the table if possible
         if ((this.sizeColumn === -1 || !this.get_normalizeSize()) && (this.colorMapColumn === -1 || !this.get_dynamicColor())) {
             this._lastNormalizeSizeColumnIndex$1 = -1;
-            this._lastDynamicColorColumnIndex$1 = -1;
+            this._lastDynamicColorCoCirclelumnIndex$1 = -1;
             return;
         }
         this._table_backcompat$1 = this._table$1.clone();
@@ -2066,6 +2066,15 @@ var SpreadSheetLayer$ = {
                     break;
                 case 6:
                     this.pointList.drawFilledCircle(renderContext, opacity * this.get_opacity());
+                    break;
+                case 7:
+                    this.pointList.drawFilledNGon(renderContext, opacity * this.get_opacity(), 3);
+                    break;
+                case 8:
+                    this.pointList.drawFilledNGon(renderContext, opacity * this.get_opacity(), 4);
+                    break;
+                case 9:
+                    this.pointList.drawFilledNGon(renderContext, opacity * this.get_opacity(), 6);
                     break;
                 default:
                     break;

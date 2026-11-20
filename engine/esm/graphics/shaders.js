@@ -10,13 +10,11 @@ import { set_tileUvMultiple, set_tileDemEnabled, useGlVersion2 } from "../render
 import { WEBGL } from "./webgl_constants.js";
 import { Texture } from "./texture.js";
 import { TextureArray } from "./texture_array.js";
-
-
-function disableVertexAttribArrays(gl, count=6) {
-    for (var i = 0; i < count; i++) {
-        gl.disableVertexAttribArray(i);
-    }
-}
+import {
+  disableVertexAttribArrays,
+  shaderKeywords,
+  setupShadersAndProgram,
+} from "./webgl_utils.js";
 
 
 // wwtlib.SimpleLineShader
@@ -50,19 +48,8 @@ SimpleLineShader.init = function (renderContext) {
         }
     `;
 
-    SimpleLineShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(SimpleLineShader._frag, fragShaderText);
-    gl.compileShader(SimpleLineShader._frag);
-    var stat = gl.getShaderParameter(SimpleLineShader._frag, WEBGL.COMPILE_STATUS);
-    SimpleLineShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(SimpleLineShader._vert, vertexShaderText);
-    gl.compileShader(SimpleLineShader._vert);
-    var stat1 = gl.getShaderParameter(SimpleLineShader._vert, WEBGL.COMPILE_STATUS);
-    SimpleLineShader._prog = gl.createProgram();
-    gl.attachShader(SimpleLineShader._prog, SimpleLineShader._vert);
-    gl.attachShader(SimpleLineShader._prog, SimpleLineShader._frag);
-    gl.linkProgram(SimpleLineShader._prog);
-    var errcode = gl.getProgramParameter(SimpleLineShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(SimpleLineShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(SimpleLineShader._prog);
     SimpleLineShader.vertLoc = gl.getAttribLocation(SimpleLineShader._prog, 'aVertexPosition');
     SimpleLineShader.lineColorLoc = gl.getUniformLocation(SimpleLineShader._prog, 'lineColor');
@@ -133,19 +120,8 @@ SimpleLineShader2D.init = function (renderContext) {
         }
     `;
 
-    SimpleLineShader2D._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(SimpleLineShader2D._frag, fragShaderText);
-    gl.compileShader(SimpleLineShader2D._frag);
-    var stat = gl.getShaderParameter(SimpleLineShader2D._frag, WEBGL.COMPILE_STATUS);
-    SimpleLineShader2D._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(SimpleLineShader2D._vert, vertexShaderText);
-    gl.compileShader(SimpleLineShader2D._vert);
-    var stat1 = gl.getShaderParameter(SimpleLineShader2D._vert, WEBGL.COMPILE_STATUS);
-    SimpleLineShader2D._prog = gl.createProgram();
-    gl.attachShader(SimpleLineShader2D._prog, SimpleLineShader2D._vert);
-    gl.attachShader(SimpleLineShader2D._prog, SimpleLineShader2D._frag);
-    gl.linkProgram(SimpleLineShader2D._prog);
-    var errcode = gl.getProgramParameter(SimpleLineShader2D._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(SimpleLineShader2D, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(SimpleLineShader2D._prog);
     SimpleLineShader2D.vertLoc = gl.getAttribLocation(SimpleLineShader2D._prog, 'aVertexPosition');
     SimpleLineShader2D.lineColorLoc = gl.getUniformLocation(SimpleLineShader2D._prog, 'lineColor');
@@ -190,6 +166,7 @@ export function OrbitLineShader() { }
 
 OrbitLineShader.vertLoc = 0;
 OrbitLineShader.colorLoc = 0;
+OrbitLineShader.lineColorLoc = 0;
 OrbitLineShader.initialized = false;
 OrbitLineShader._prog = null;
 
@@ -220,19 +197,8 @@ OrbitLineShader.init = function (renderContext) {
         }
     `;
 
-    OrbitLineShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(OrbitLineShader._frag, fragShaderText);
-    gl.compileShader(OrbitLineShader._frag);
-    var stat = gl.getShaderParameter(OrbitLineShader._frag, WEBGL.COMPILE_STATUS);
-    OrbitLineShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(OrbitLineShader._vert, vertexShaderText);
-    gl.compileShader(OrbitLineShader._vert);
-    var stat1 = gl.getShaderParameter(OrbitLineShader._vert, WEBGL.COMPILE_STATUS);
-    OrbitLineShader._prog = gl.createProgram();
-    gl.attachShader(OrbitLineShader._prog, OrbitLineShader._vert);
-    gl.attachShader(OrbitLineShader._prog, OrbitLineShader._frag);
-    gl.linkProgram(OrbitLineShader._prog);
-    var errcode = gl.getProgramParameter(OrbitLineShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(OrbitLineShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(OrbitLineShader._prog);
     OrbitLineShader.vertLoc = gl.getAttribLocation(OrbitLineShader._prog, 'aVertexPosition');
     OrbitLineShader.colorLoc = gl.getAttribLocation(OrbitLineShader._prog, 'aVertexColor');
@@ -285,6 +251,7 @@ export function LineShaderNormalDates() { }
 LineShaderNormalDates.vertLoc = 0;
 LineShaderNormalDates.colorLoc = 0;
 LineShaderNormalDates.timeLoc = 0;
+LineShaderNormalDates.lineColorLoc = 0;
 LineShaderNormalDates.initialized = false;
 LineShaderNormalDates._prog = null;
 
@@ -338,19 +305,8 @@ LineShaderNormalDates.init = function (renderContext) {
         }
     `;
 
-    LineShaderNormalDates._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(LineShaderNormalDates._frag, fragShaderText);
-    gl.compileShader(LineShaderNormalDates._frag);
-    var stat = gl.getShaderParameter(LineShaderNormalDates._frag, WEBGL.COMPILE_STATUS);
-    LineShaderNormalDates._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(LineShaderNormalDates._vert, vertexShaderText);
-    gl.compileShader(LineShaderNormalDates._vert);
-    var stat1 = gl.getShaderParameter(LineShaderNormalDates._vert, WEBGL.COMPILE_STATUS);
-    LineShaderNormalDates._prog = gl.createProgram();
-    gl.attachShader(LineShaderNormalDates._prog, LineShaderNormalDates._vert);
-    gl.attachShader(LineShaderNormalDates._prog, LineShaderNormalDates._frag);
-    gl.linkProgram(LineShaderNormalDates._prog);
-    var errcode = gl.getProgramParameter(LineShaderNormalDates._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(LineShaderNormalDates, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(LineShaderNormalDates._prog);
     LineShaderNormalDates.vertLoc = gl.getAttribLocation(LineShaderNormalDates._prog, 'aVertexPosition');
     LineShaderNormalDates.colorLoc = gl.getAttribLocation(LineShaderNormalDates._prog, 'aVertexColor');
@@ -359,7 +315,7 @@ LineShaderNormalDates.init = function (renderContext) {
     LineShaderNormalDates.projMatLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'uPMatrix');
     LineShaderNormalDates.mvMatLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'uMVMatrix');
     LineShaderNormalDates.jNowLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'jNow');
-    LineShaderNormalDates.decayLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'decay');
+    LineShaderNormalDates.decayLoc = gl.getUniformLocation(LineShaderNormalDates._prog, 'decay'),
     gl.enable(WEBGL.BLEND);
     gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
     LineShaderNormalDates.initialized = true;
@@ -463,19 +419,8 @@ LineShaderNormalDates2D.init = function (renderContext) {
         }
     `;
 
-    LineShaderNormalDates2D._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(LineShaderNormalDates2D._frag, fragShaderText);
-    gl.compileShader(LineShaderNormalDates2D._frag);
-    var stat = gl.getShaderParameter(LineShaderNormalDates2D._frag, WEBGL.COMPILE_STATUS);
-    LineShaderNormalDates2D._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(LineShaderNormalDates2D._vert, vertexShaderText);
-    gl.compileShader(LineShaderNormalDates2D._vert);
-    var stat1 = gl.getShaderParameter(LineShaderNormalDates2D._vert, WEBGL.COMPILE_STATUS);
-    LineShaderNormalDates2D._prog = gl.createProgram();
-    gl.attachShader(LineShaderNormalDates2D._prog, LineShaderNormalDates2D._vert);
-    gl.attachShader(LineShaderNormalDates2D._prog, LineShaderNormalDates2D._frag);
-    gl.linkProgram(LineShaderNormalDates2D._prog);
-    var errcode = gl.getProgramParameter(LineShaderNormalDates2D._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(LineShaderNormalDates2D, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(LineShaderNormalDates2D._prog);
     LineShaderNormalDates2D.vertLoc = gl.getAttribLocation(LineShaderNormalDates2D._prog, 'aVertexPosition');
     LineShaderNormalDates2D.colorLoc = gl.getAttribLocation(LineShaderNormalDates2D._prog, 'aVertexColor');
@@ -523,11 +468,103 @@ registerType("LineShaderNormalDates2D", [LineShaderNormalDates2D, LineShaderNorm
 
 // wwtlib.TimeSeriesPointSpriteShader
 
+function timeSeriesPointVertexShaderText(needGLVersion2, quads) {
+    var keywords = shaderKeywords(needGLVersion2);
+
+    var inDeclarations = `\
+      ${keywords.versionDeclaration}
+      ${keywords.vertexIn} vec3 aVertexPosition;
+      ${keywords.vertexIn} vec4 aVertexColor;
+      ${keywords.vertexIn} vec2 aTime;
+      ${keywords.vertexIn} float aPointSize;
+      ${keywords.vertexIn} float aShow;
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+      uniform float jNow;
+      uniform vec3 cameraPosition;
+      uniform float decay;
+      uniform float scale;
+      uniform float minSize;
+      uniform float sky;
+      uniform float showFarSide;
+    `;
+
+     var outDeclarations =`${keywords.vertexOut} lowp vec4 vColor;`
+
+    if (quads) {
+        inDeclarations += `\
+          ${keywords.vertexIn} vec2 aTextureCoord;
+          uniform float viewportHeight;
+          uniform float viewportWidth;
+        `;
+        outDeclarations += `\n${keywords.vertexOut} vec2 vTextureCoord`;
+    }
+
+    var outBlock = quads ?
+        "gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));" :
+        `\
+        float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
+        vec2 offset = 2.0 * sideLength * vec2((aTextureCoord.x - 0.5) / viewportWidth, (0.5 - aTextureCoord.y) / viewportHeight);
+        gl_Position = position + vec4(offset * position.w, 0.0, 0.0);
+
+        vTextureCoord = aTextureCoord;
+        `;
+
+    var main = `
+      void main(void)
+      {
+          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
+          float dist = distance(aVertexPosition, cameraPosition);
+          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+          float dAlpha = aShow;
+
+          if ( dAlpha > 0.0 && decay > 0.0 )
+          {
+                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
+                  if (dAlpha > 1.0 )
+                  {
+                      dAlpha = 1.0;
+                  }
+          }
+
+          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
+          {
+              vColor = vec4(0.0, 0.0, 0.0, 0.0);
+          }
+          else
+          {
+              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
+          }
+
+          float lSize = scale;
+
+          if (scale < 0.0)
+          {
+              lSize = -scale;
+              dist = 1.0;
+          }
+
+          ${outBlock}
+      }
+    `;
+
+    return `\
+      ${keywords.versionDeclaration}
+      ${inDeclarations}
+      ${outDeclarations}
+
+      ${main}
+    `;
+
+}
+
 export function TimeSeriesPointSpriteShader() { }
 
 TimeSeriesPointSpriteShader.vertLoc = 0;
 TimeSeriesPointSpriteShader.colorLoc = 0;
 TimeSeriesPointSpriteShader.pointSizeLoc = 0;
+TimeSeriesPointSpriteShader.lineColorLoc = 0;
+TimeSeriesPointSpriteShader.minSizeLoc = 0;
 TimeSeriesPointSpriteShader.timeLoc = 0;
 TimeSeriesPointSpriteShader.initialized = false;
 TimeSeriesPointSpriteShader._prog = null;
@@ -549,75 +586,9 @@ TimeSeriesPointSpriteShader.init = function (renderContext) {
         }
     `;
 
-    var vertexShaderText = `\
-        attribute vec3 aVertexPosition;
-        attribute vec4 aVertexColor;
-        attribute vec2 aTime;
-        attribute float aPointSize;
-        attribute float aShow;
-        uniform mat4 uMVMatrix;
-        uniform mat4 uPMatrix;
-        uniform float jNow;
-        uniform vec3 cameraPosition;
-        uniform float decay;
-        uniform float scale;
-        uniform float minSize;
-        uniform float sky;
-        uniform float showFarSide;
+    var vertexShaderText = timeSeriesPointVertexShaderText(false, false);
+    setupShadersAndProgram(TimeSeriesPointSpriteShader, gl, vertexShaderText, fragShaderText);
 
-        varying lowp vec4 vColor;
-
-        void main(void)
-        {
-            float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-            float dist = distance(aVertexPosition, cameraPosition);
-            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-            float dAlpha = aShow;
-
-            if ( dAlpha > 0.0 && decay > 0.0 )
-            {
-                    dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                    if (dAlpha > 1.0 )
-                    {
-                        dAlpha = 1.0;
-                    }
-            }
-
-            if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-            {
-                vColor = vec4(0.0, 0.0, 0.0, 0.0);
-            }
-            else
-            {
-                vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-            }
-
-            float lSize = scale;
-
-            if (scale < 0.0)
-            {
-                lSize = -scale;
-                dist = 1.0;
-            }
-
-            gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));
-        }
-    `;
-
-    TimeSeriesPointSpriteShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(TimeSeriesPointSpriteShader._frag, fragShaderText);
-    gl.compileShader(TimeSeriesPointSpriteShader._frag);
-    var stat = gl.getShaderParameter(TimeSeriesPointSpriteShader._frag, WEBGL.COMPILE_STATUS);
-    TimeSeriesPointSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(TimeSeriesPointSpriteShader._vert, vertexShaderText);
-    gl.compileShader(TimeSeriesPointSpriteShader._vert);
-    var stat1 = gl.getShaderParameter(TimeSeriesPointSpriteShader._vert, WEBGL.COMPILE_STATUS);
-    var compilationLog = gl.getShaderInfoLog(TimeSeriesPointSpriteShader._vert);
-    TimeSeriesPointSpriteShader._prog = gl.createProgram();
-    gl.attachShader(TimeSeriesPointSpriteShader._prog, TimeSeriesPointSpriteShader._vert);
-    gl.attachShader(TimeSeriesPointSpriteShader._prog, TimeSeriesPointSpriteShader._frag);
-    gl.linkProgram(TimeSeriesPointSpriteShader._prog);
-    var errcode = gl.getProgramParameter(TimeSeriesPointSpriteShader._prog, WEBGL.LINK_STATUS);
     gl.useProgram(TimeSeriesPointSpriteShader._prog);
     TimeSeriesPointSpriteShader.vertLoc = gl.getAttribLocation(TimeSeriesPointSpriteShader._prog, 'aVertexPosition');
     TimeSeriesPointSpriteShader.colorLoc = gl.getAttribLocation(TimeSeriesPointSpriteShader._prog, 'aVertexColor');
@@ -712,6 +683,7 @@ TimeSeriesPointQuadShader.colorLoc = 0;
 TimeSeriesPointQuadShader.pointSizeLoc = 0;
 TimeSeriesPointQuadShader.lineColorLoc = 0;
 TimeSeriesPointQuadShader.timeLoc = 0;
+TimeSeriesPointQuadShader.minSizeLoc = 0;
 TimeSeriesPointQuadShader.viewportHeightLoc = 0;
 TimeSeriesPointQuadShader.viewportWidthLoc = 0;
 
@@ -734,94 +706,9 @@ TimeSeriesPointQuadShader.init = function (renderContext) {
         }
     `;
 
-    var vertexShaderText = `\
-        attribute vec3 aVertexPosition;
-        attribute vec2 aTextureCoord;
-        attribute vec4 aVertexColor;
-        attribute vec2 aTime;
-        attribute float aPointSize;
-        attribute float aShow;
-        uniform mat4 uMVMatrix;
-        uniform mat4 uPMatrix;
-        uniform float jNow;
-        uniform vec3 cameraPosition;
-        uniform float decay;
-        uniform float scale;
-        uniform float minSize;
-        uniform float sky;
-        uniform float showFarSide;
-        uniform float viewportHeight;
-        uniform float viewportWidth;
+    var vertexShaderText = timeSeriesPointVertexShaderText(false, true);
+    setupShadersAndProgram(TimeSeriesPointQuadShader, gl, vertexShaderText, fragShaderText);
 
-        varying lowp vec4 vColor;
-        varying vec2 vTextureCoord;
-
-        void main(void)
-        {
-            float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-            float dist = distance(aVertexPosition, cameraPosition);
-            vec4 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-            float dAlpha = aShow;
-
-            if ( dAlpha > 0.0 && decay > 0.0 )
-            {
-                    dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                    if (dAlpha > 1.0 )
-                    {
-                        dAlpha = 1.0;
-                    }
-            }
-
-            if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-            {
-                vColor = vec4(0.0, 0.0, 0.0, 0.0);
-            }
-            else
-            {
-                vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-            }
-
-            float lSize = scale;
-
-            if (scale < 0.0)
-            {
-                lSize = -scale;
-                dist = 1.0;
-            }
-
-            float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
-            vec2 offset = 2.0 * sideLength * vec2((aTextureCoord.x - 0.5) / viewportWidth, (0.5 - aTextureCoord.y) / viewportHeight);
-            gl_Position = position + vec4(offset * position.w, 0.0, 0.0);
-  
-            vTextureCoord = aTextureCoord;
-        }
-    `;
-
-    TimeSeriesPointQuadShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(TimeSeriesPointQuadShader._frag, fragShaderText);
-    gl.compileShader(TimeSeriesPointQuadShader._frag);
-    var fragStat = gl.getShaderParameter(TimeSeriesPointQuadShader._frag, WEBGL.COMPILE_STATUS);
-    if (!fragStat) {
-        var errorF = gl.getShaderInfoLog(TimeSeriesPointQuadShader._frag);
-        console.log(errorF);
-    }
-    TimeSeriesPointQuadShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(TimeSeriesPointQuadShader._vert, vertexShaderText);
-    gl.compileShader(TimeSeriesPointQuadShader._vert);
-    var vertStat = gl.getShaderParameter(TimeSeriesPointQuadShader._vert, WEBGL.COMPILE_STATUS);
-    if (!vertStat) {
-        var errorV = gl.getShaderInfoLog(TimeSeriesPointQuadShader._vert);
-        console.log(errorV);
-    }
-    TimeSeriesPointQuadShader._prog = gl.createProgram();
-    gl.attachShader(TimeSeriesPointQuadShader._prog, TimeSeriesPointQuadShader._vert);
-    gl.attachShader(TimeSeriesPointQuadShader._prog, TimeSeriesPointQuadShader._frag);
-    gl.linkProgram(TimeSeriesPointQuadShader._prog);
-    var linkSuccess = gl.getProgramParameter(TimeSeriesPointQuadShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(TimeSeriesPointQuadShader._prog);
-        console.log(errorP);
-    }
     gl.useProgram(TimeSeriesPointQuadShader._prog);
     TimeSeriesPointQuadShader.vertLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aVertexPosition");
     TimeSeriesPointQuadShader.texLoc = gl.getAttribLocation(TimeSeriesPointQuadShader._prog, "aTextureCoord");
@@ -922,6 +809,8 @@ KeplerPointSpriteShader.weLoc = 0;
 KeplerPointSpriteShader.nTLoc = 0;
 KeplerPointSpriteShader.azLoc = 0;
 KeplerPointSpriteShader.orbitLoc = 0;
+KeplerPointSpriteShader.minSizeLoc = 0;
+KeplerPointSpriteShader.lineColorLoc = 0;
 KeplerPointSpriteShader.initialized = false;
 KeplerPointSpriteShader._prog = null;
 
@@ -1027,20 +916,8 @@ KeplerPointSpriteShader.init = function (renderContext) {
         }
     `;
 
-    KeplerPointSpriteShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(KeplerPointSpriteShader._frag, fragShaderText);
-    gl.compileShader(KeplerPointSpriteShader._frag);
-    var stat = gl.getShaderParameter(KeplerPointSpriteShader._frag, WEBGL.COMPILE_STATUS);
-    KeplerPointSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(KeplerPointSpriteShader._vert, vertexShaderText);
-    gl.compileShader(KeplerPointSpriteShader._vert);
-    var stat1 = gl.getShaderParameter(KeplerPointSpriteShader._vert, WEBGL.COMPILE_STATUS);
-    var compilationLog = gl.getShaderInfoLog(KeplerPointSpriteShader._vert);
-    KeplerPointSpriteShader._prog = gl.createProgram();
-    gl.attachShader(KeplerPointSpriteShader._prog, KeplerPointSpriteShader._vert);
-    gl.attachShader(KeplerPointSpriteShader._prog, KeplerPointSpriteShader._frag);
-    gl.linkProgram(KeplerPointSpriteShader._prog);
-    var errcode = gl.getProgramParameter(KeplerPointSpriteShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(KeplerPointSpriteShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(KeplerPointSpriteShader._prog);
     KeplerPointSpriteShader.abcLoc1 = gl.getAttribLocation(KeplerPointSpriteShader._prog, 'abc');
     KeplerPointSpriteShader.abcLoc = gl.getAttribLocation(KeplerPointSpriteShader._prog, 'ABC');
@@ -1171,20 +1048,8 @@ EllipseShader.init = function (renderContext) {
         }
     `;
 
-    EllipseShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(EllipseShader._frag, fragShaderText);
-    gl.compileShader(EllipseShader._frag);
-    var stat = gl.getShaderParameter(EllipseShader._frag, WEBGL.COMPILE_STATUS);
-    EllipseShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(EllipseShader._vert, vertexShaderText);
-    gl.compileShader(EllipseShader._vert);
-    var stat1 = gl.getShaderParameter(EllipseShader._vert, WEBGL.COMPILE_STATUS);
-    var compilationLog = gl.getShaderInfoLog(EllipseShader._vert);
-    EllipseShader._prog = gl.createProgram();
-    gl.attachShader(EllipseShader._prog, EllipseShader._vert);
-    gl.attachShader(EllipseShader._prog, EllipseShader._frag);
-    gl.linkProgram(EllipseShader._prog);
-    var errcode = gl.getProgramParameter(EllipseShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(EllipseShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(EllipseShader._prog);
     EllipseShader.angleLoc = gl.getAttribLocation(EllipseShader._prog, 'Angle');
     EllipseShader.matWVPLoc = gl.getUniformLocation(EllipseShader._prog, 'matWVP');
@@ -1244,6 +1109,7 @@ ModelShader._prog = null;
 ModelShader.sunPosition = Vector3d.create(-1, -1, -1);
 ModelShader.minLightingBrightness = 1;
 ModelShader.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
+ModelShader.atmosphereColorLoc = 0;
 
 ModelShader.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -1297,25 +1163,8 @@ ModelShader.init = function (renderContext) {
         }
     `;
 
-    ModelShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ModelShader._frag, fragShaderText);
-    gl.compileShader(ModelShader._frag);
-    var stat = gl.getShaderParameter(ModelShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(ModelShader._frag);
-    }
-    ModelShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ModelShader._vert, vertexShaderText);
-    gl.compileShader(ModelShader._vert);
-    var stat1 = gl.getShaderParameter(ModelShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(ModelShader._vert);
-    }
-    ModelShader._prog = gl.createProgram();
-    gl.attachShader(ModelShader._prog, ModelShader._vert);
-    gl.attachShader(ModelShader._prog, ModelShader._frag);
-    gl.linkProgram(ModelShader._prog);
-    var errcode = gl.getProgramParameter(ModelShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ModelShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ModelShader._prog);
     ModelShader.vertLoc = gl.getAttribLocation(ModelShader._prog, 'aVertexPosition');
     ModelShader.normalLoc = gl.getAttribLocation(ModelShader._prog, 'aNormal');
@@ -1408,6 +1257,7 @@ ModelShaderTan._prog = null;
 ModelShaderTan.sunPosition = Vector3d.create(-1, -1, -1);
 ModelShaderTan.minLightingBrightness = 1;
 ModelShaderTan.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
+ModelShaderTan.atmosphereColorLoc = 0;
 
 ModelShaderTan.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -1461,25 +1311,8 @@ ModelShaderTan.init = function (renderContext) {
         }
     `;
 
-    ModelShaderTan._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ModelShaderTan._frag, fragShaderText);
-    gl.compileShader(ModelShaderTan._frag);
-    var stat = gl.getShaderParameter(ModelShaderTan._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(ModelShaderTan._frag);
-    }
-    ModelShaderTan._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ModelShaderTan._vert, vertexShaderText);
-    gl.compileShader(ModelShaderTan._vert);
-    var stat1 = gl.getShaderParameter(ModelShaderTan._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(ModelShaderTan._vert);
-    }
-    ModelShaderTan._prog = gl.createProgram();
-    gl.attachShader(ModelShaderTan._prog, ModelShaderTan._vert);
-    gl.attachShader(ModelShaderTan._prog, ModelShaderTan._frag);
-    gl.linkProgram(ModelShaderTan._prog);
-    var errcode = gl.getProgramParameter(ModelShaderTan._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ModelShaderTan, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ModelShaderTan._prog);
     ModelShaderTan.vertLoc = gl.getAttribLocation(ModelShaderTan._prog, 'aVertexPosition');
     ModelShaderTan.normalLoc = gl.getAttribLocation(ModelShaderTan._prog, 'aNormal');
@@ -1571,6 +1404,7 @@ TileShader._prog = null;
 TileShader.sunPosition = Vector3d.create(-1, -1, -1);
 TileShader.minLightingBrightness = 1;
 TileShader.atmosphereColor = Color.fromArgb(0, 0, 0, 0);
+TileShader.atmosphereColorLoc = 0;
 
 TileShader.init = function (renderContext) {
     var gl = renderContext.gl;
@@ -1635,25 +1469,8 @@ TileShader.init = function (renderContext) {
         }
     `;
 
-    TileShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(TileShader._frag, fragShaderText);
-    gl.compileShader(TileShader._frag);
-    var stat = gl.getShaderParameter(TileShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(TileShader._frag);
-    }
-    TileShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(TileShader._vert, vertexShaderText);
-    gl.compileShader(TileShader._vert);
-    var stat1 = gl.getShaderParameter(TileShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(TileShader._vert);
-    }
-    TileShader._prog = gl.createProgram();
-    gl.attachShader(TileShader._prog, TileShader._vert);
-    gl.attachShader(TileShader._prog, TileShader._frag);
-    gl.linkProgram(TileShader._prog);
-    var errcode = gl.getProgramParameter(TileShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(TileShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(TileShader._prog);
     TileShader.vertLoc = gl.getAttribLocation(TileShader._prog, 'aVertexPosition');
     TileShader.textureLoc = gl.getAttribLocation(TileShader._prog, 'aTextureCoord');
@@ -1850,31 +1667,8 @@ FitsShader.init = function (renderContext) {
         }
     `;
 
-    FitsShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(FitsShader._frag, fragShaderText);
-    gl.compileShader(FitsShader._frag);
-    var stat = gl.getShaderParameter(FitsShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(FitsShader._frag);
-        console.log(errorF);
-    }
-    FitsShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(FitsShader._vert, vertexShaderText);
-    gl.compileShader(FitsShader._vert);
-    var stat1 = gl.getShaderParameter(FitsShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(FitsShader._vert);
-        console.log(errorV);
-    }
-    FitsShader._prog = gl.createProgram();
-    gl.attachShader(FitsShader._prog, FitsShader._vert);
-    gl.attachShader(FitsShader._prog, FitsShader._frag);
-    gl.linkProgram(FitsShader._prog);
-    var linkSuccess = gl.getProgramParameter(FitsShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(FitsShader._prog);
-        console.log(errorP);
-    }
+    setupShadersAndProgram(FitsShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(FitsShader._prog);
     FitsShader.vertLoc = gl.getAttribLocation(FitsShader._prog, 'aVertexPosition');
     FitsShader.textureLoc = gl.getAttribLocation(FitsShader._prog, 'aTextureCoord');
@@ -2007,25 +1801,8 @@ ImageShader.init = function (renderContext) {
         }
     `;
 
-    ImageShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ImageShader._frag, fragShaderText);
-    gl.compileShader(ImageShader._frag);
-    var stat = gl.getShaderParameter(ImageShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(ImageShader._frag);
-    }
-    ImageShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ImageShader._vert, vertexShaderText);
-    gl.compileShader(ImageShader._vert);
-    var stat1 = gl.getShaderParameter(ImageShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(ImageShader._vert);
-    }
-    ImageShader._prog = gl.createProgram();
-    gl.attachShader(ImageShader._prog, ImageShader._vert);
-    gl.attachShader(ImageShader._prog, ImageShader._frag);
-    gl.linkProgram(ImageShader._prog);
-    var errcode = gl.getProgramParameter(ImageShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ImageShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ImageShader._prog);
     ImageShader.vertLoc = gl.getAttribLocation(ImageShader._prog, 'aVertexPosition');
     ImageShader.textureLoc = gl.getAttribLocation(ImageShader._prog, 'aTextureCoord');
@@ -2128,25 +1905,8 @@ ImageShader2.init = function (renderContext) {
         }
     `;
 
-    ImageShader2._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ImageShader2._frag, fragShaderText);
-    gl.compileShader(ImageShader2._frag);
-    var stat = gl.getShaderParameter(ImageShader2._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(ImageShader2._frag);
-    }
-    ImageShader2._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ImageShader2._vert, vertexShaderText);
-    gl.compileShader(ImageShader2._vert);
-    var stat1 = gl.getShaderParameter(ImageShader2._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(ImageShader2._vert);
-    }
-    ImageShader2._prog = gl.createProgram();
-    gl.attachShader(ImageShader2._prog, ImageShader2._vert);
-    gl.attachShader(ImageShader2._prog, ImageShader2._frag);
-    gl.linkProgram(ImageShader2._prog);
-    var errcode = gl.getProgramParameter(ImageShader2._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ImageShader2, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ImageShader2._prog);
     ImageShader2.vertLoc = gl.getAttribLocation(ImageShader2._prog, 'aVertexPosition');
     ImageShader2.textureLoc = gl.getAttribLocation(ImageShader2._prog, 'aTextureCoord');
@@ -2250,19 +2010,8 @@ SpriteShader.init = function (renderContext) {
         }
     `;
 
-    SpriteShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(SpriteShader._frag, fragShaderText);
-    gl.compileShader(SpriteShader._frag);
-    var stat = gl.getShaderParameter(SpriteShader._frag, WEBGL.COMPILE_STATUS);
-    SpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(SpriteShader._vert, vertexShaderText);
-    gl.compileShader(SpriteShader._vert);
-    var stat1 = gl.getShaderParameter(SpriteShader._vert, WEBGL.COMPILE_STATUS);
-    SpriteShader._prog = gl.createProgram();
-    gl.attachShader(SpriteShader._prog, SpriteShader._vert);
-    gl.attachShader(SpriteShader._prog, SpriteShader._frag);
-    gl.linkProgram(SpriteShader._prog);
-    var errcode = gl.getProgramParameter(SpriteShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(SpriteShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(SpriteShader._prog);
     SpriteShader.vertLoc = gl.getAttribLocation(SpriteShader._prog, 'aVertexPosition');
     SpriteShader.textureLoc = gl.getAttribLocation(SpriteShader._prog, 'aTextureCoord');
@@ -2356,19 +2105,8 @@ ShapeSpriteShader.init = function (renderContext) {
         }
     `;
 
-    ShapeSpriteShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(ShapeSpriteShader._frag, fragShaderText);
-    gl.compileShader(ShapeSpriteShader._frag);
-    var stat = gl.getShaderParameter(ShapeSpriteShader._frag, WEBGL.COMPILE_STATUS);
-    ShapeSpriteShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(ShapeSpriteShader._vert, vertexShaderText);
-    gl.compileShader(ShapeSpriteShader._vert);
-    var stat1 = gl.getShaderParameter(ShapeSpriteShader._vert, WEBGL.COMPILE_STATUS);
-    ShapeSpriteShader._prog = gl.createProgram();
-    gl.attachShader(ShapeSpriteShader._prog, ShapeSpriteShader._vert);
-    gl.attachShader(ShapeSpriteShader._prog, ShapeSpriteShader._frag);
-    gl.linkProgram(ShapeSpriteShader._prog);
-    var errcode = gl.getProgramParameter(ShapeSpriteShader._prog, WEBGL.LINK_STATUS);
+    setupShadersAndProgram(ShapeSpriteShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(ShapeSpriteShader._prog);
     ShapeSpriteShader.vertLoc = gl.getAttribLocation(ShapeSpriteShader._prog, 'aVertexPosition');
     ShapeSpriteShader.colorLoc = gl.getAttribLocation(ShapeSpriteShader._prog, 'aColor');
@@ -2425,9 +2163,7 @@ TextShader.textureCount = 1;
 TextShader.init = function (renderContext) {
     var gl = renderContext.gl;
 
-    var versionDeclaration = useGlVersion2 ? "#version 300 es" : "";
-    var vertexInKeyword = useGlVersion2 ? "in" : "attribute";
-    var vertexOutKeyword = useGlVersion2 ? "out" : "varying";
+    var keywords = shaderKeywords(useGlVersion2);
 
     let fragShaderText;
     if (useGlVersion2) {
@@ -2484,16 +2220,16 @@ TextShader.init = function (renderContext) {
     }
 
     const vertexShaderText = `\
-        ${versionDeclaration}
-        ${vertexInKeyword} vec3 aVertexPosition;
-        ${vertexInKeyword} vec2 aTextureCoord;
-        ${vertexInKeyword} float aTextureLayer;
+        ${keywords.versionDeclaration}
+        ${keywords.vertexIn} vec3 aVertexPosition;
+        ${keywords.vertexIn} vec2 aTextureCoord;
+        ${keywords.vertexIn} float aTextureLayer;
 
         uniform mat4 uMVMatrix;
         uniform mat4 uPMatrix;
 
-        ${vertexOutKeyword} vec2 vTextureCoord;
-        ${vertexOutKeyword} float vTextureLayer;
+        ${keywords.vertexOut} vec2 vTextureCoord;
+        ${keywords.vertexOut} float vTextureLayer;
 
         void main(void) {
             gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
@@ -2502,31 +2238,8 @@ TextShader.init = function (renderContext) {
         }
     `;
 
-    TextShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(TextShader._frag, fragShaderText);
-    gl.compileShader(TextShader._frag);
-    var stat = gl.getShaderParameter(TextShader._frag, WEBGL.COMPILE_STATUS);
-    if (!stat) {
-        var errorF = gl.getShaderInfoLog(TextShader._frag);
-        console.log(errorF);
-    }
-    TextShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(TextShader._vert, vertexShaderText);
-    gl.compileShader(TextShader._vert);
-    var stat1 = gl.getShaderParameter(TextShader._vert, WEBGL.COMPILE_STATUS);
-    if (!stat1) {
-        var errorV = gl.getShaderInfoLog(TextShader._vert);
-        console.log(errorV);
-    }
-    TextShader._prog = gl.createProgram();
-    gl.attachShader(TextShader._prog, TextShader._vert);
-    gl.attachShader(TextShader._prog, TextShader._frag);
-    gl.linkProgram(TextShader._prog);
-    var linkSuccess = gl.getProgramParameter(TextShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(TextShader._prog);
-        console.log(errorP);
-    }
+    setupShadersAndProgram(TextShader, gl, vertexShaderText, fragShaderText);
+
     gl.useProgram(TextShader._prog);
     TextShader.vertLoc = gl.getAttribLocation(TextShader._prog, 'aVertexPosition');
     TextShader.textureLoc = gl.getAttribLocation(TextShader._prog, 'aTextureCoord');
@@ -2631,22 +2344,18 @@ FilledCircleShader.init = function (renderContext) {
     var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
     var borderWidth = derivatives ? "fwidth(r)" : "0.012";
     var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
-    var versionDeclaration = useGlVersion2 ? "#version 300 es" : "";
-    var fragInKeyword = useGlVersion2 ? "in" : "varying";
+    var keywords = shaderKeywords(useGlVersion2);
     var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : "";
     var fragOutVar = useGlVersion2 ? "fragColor" : "gl_FragColor";
-    var vertexInKeyword = useGlVersion2 ? "in" : "attribute";
-    var vertexOutKeyword = useGlVersion2 ? "out" : "varying";
 
     var fragShaderText = `\
-        ${versionDeclaration}
+        ${keywords.versionDeclaration}
         ${extensionDeclaration}
         precision mediump float;
-        ${fragInKeyword} vec4 vColor;
+        ${keywords.fragmentIn} vec4 vColor;
         ${fragOutDeclaration}
         uniform float opacity;
         uniform float border;
-        uniform vec4 borderColor;
 
         void main() {
           vec2 p = gl_PointCoord - vec2(0.5);
@@ -2671,91 +2380,9 @@ FilledCircleShader.init = function (renderContext) {
         }
       `;
 
-    // TODO: Aside from the version considerations necessitated by the fragment shader,
-    // this is the same as the TimeSeriesPointSpriteShader vertex shader.
-    // Maybe this can be extracted into a function that returns the shader text
-    // based on a (passed-in) version flag
-    var vertShaderText = `\
-      ${versionDeclaration}
-      ${vertexInKeyword} vec3 aVertexPosition;
-      ${vertexInKeyword} vec4 aVertexColor;
-      ${vertexInKeyword} vec2 aTime;
-      ${vertexInKeyword} float aPointSize;
-      ${vertexInKeyword} float aShow;
-      uniform mat4 uMVMatrix;
-      uniform mat4 uPMatrix;
-      uniform float jNow;
-      uniform vec3 cameraPosition;
-      uniform float decay;
-      uniform float scale;
-      uniform float minSize;
-      uniform float sky;
-      uniform float showFarSide;
+    var vertexShaderText = timeSeriesPointVertexShaderText(useGlVersion2, false);
+    setupShadersAndProgram(FilledCircleShader, gl, vertexShaderText, fragShaderText);
 
-      ${vertexOutKeyword} lowp vec4 vColor;
-
-      void main(void)
-      {
-          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-          float dist = distance(aVertexPosition, cameraPosition);
-          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-          float dAlpha = aShow;
-
-          if ( dAlpha > 0.0 && decay > 0.0 )
-          {
-                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                  if (dAlpha > 1.0 )
-                  {
-                      dAlpha = 1.0;
-                  }
-          }
-
-          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-          {
-              vColor = vec4(0.0, 0.0, 0.0, 0.0);
-          }
-          else
-          {
-              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-          }
-
-          float lSize = scale;
-
-          if (scale < 0.0)
-          {
-              lSize = -scale;
-              dist = 1.0;
-          }
-
-          gl_PointSize = max(minSize, (lSize * ( aPointSize ) / dist));
-      }
-    `;
-
-    FilledCircleShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(FilledCircleShader._frag, fragShaderText);
-    gl.compileShader(FilledCircleShader._frag);
-    var fragStat = gl.getShaderParameter(FilledCircleShader._frag, WEBGL.COMPILE_STATUS);
-    if (!fragStat) {
-        var errorF = gl.getShaderInfoLog(FilledCircleShader._frag);
-        console.log(errorF);
-    }
-    FilledCircleShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(FilledCircleShader._vert, vertShaderText);
-    gl.compileShader(FilledCircleShader._vert);
-    var vertStat = gl.getShaderParameter(FilledCircleShader._vert, WEBGL.COMPILE_STATUS);
-    if (!vertStat) {
-        var errorV = gl.getShaderInfoLog(FilledCircleShader._vert);
-        console.log(errorV);
-    }
-    FilledCircleShader._prog = gl.createProgram();
-    gl.attachShader(FilledCircleShader._prog, FilledCircleShader._vert);
-    gl.attachShader(FilledCircleShader._prog, FilledCircleShader._frag);
-    gl.linkProgram(FilledCircleShader._prog);
-    var linkSuccess = gl.getProgramParameter(FilledCircleShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(FilledCircleShader._prog);
-        console.log(errorP);
-    }
     gl.useProgram(FilledCircleShader._prog);
     FilledCircleShader.posLoc = gl.getAttribLocation(FilledCircleShader._prog, "aVertexPosition");
     FilledCircleShader.colorLoc = gl.getAttribLocation(FilledCircleShader._prog, "aVertexColor");
@@ -2864,23 +2491,19 @@ FilledCircleQuadShader.init = function (renderContext) {
     var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
     var borderWidth = derivatives ? "fwidth(r)" : "0.012";
     var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
-    var versionDeclaration = useGlVersion2 ? "#version 300 es" : "";
-    var fragInKeyword = useGlVersion2 ? "in" : "varying";
+    var keywords = shaderKeywords(useGlVersion2);
     var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : "";
     var fragOutVar = useGlVersion2 ? "fragColor" : "gl_FragColor";
-    var vertexInKeyword = useGlVersion2 ? "in" : "attribute";
-    var vertexOutKeyword = useGlVersion2 ? "out" : "varying";
 
     var fragShaderText = `\
-        ${versionDeclaration}
+        ${keywords.versionDeclaration}
         ${extensionDeclaration}
         precision mediump float;
-        ${fragInKeyword} vec4 vColor;
-        ${fragInKeyword} vec2 vTextureCoord;
+        ${keywords.fragmentIn} vec4 vColor;
+        ${keywords.fragmentIn} vec2 vTextureCoord;
         ${fragOutDeclaration}
         uniform float opacity;
         uniform float border;
-        uniform vec4 borderColor;
 
         void main() {
           vec2 p = vTextureCoord - vec2(0.5);
@@ -2905,99 +2528,9 @@ FilledCircleQuadShader.init = function (renderContext) {
         }
       `;
 
-    // TODO: Aside from the version considerations necessitated by the fragment shader,
-    // this is the same as the TimeSeriesPointSpriteShader vertex shader.
-    // Maybe this can be extracted into a function that returns the shader text
-    // based on a (passed-in) version flag
-    var vertShaderText = `\
-      ${versionDeclaration}
-      ${vertexInKeyword} vec3 aVertexPosition;
-      ${vertexInKeyword} vec2 aTextureCoord;
-      ${vertexInKeyword} vec4 aVertexColor;
-      ${vertexInKeyword} vec2 aTime;
-      ${vertexInKeyword} float aPointSize;
-      ${vertexInKeyword} float aShow;
-      uniform mat4 uMVMatrix;
-      uniform mat4 uPMatrix;
-      uniform float jNow;
-      uniform vec3 cameraPosition;
-      uniform float decay;
-      uniform float scale;
-      uniform float minSize;
-      uniform float sky;
-      uniform float showFarSide;
-      uniform float viewportHeight;
-      uniform float viewportWidth;
+    var vertexShaderText = timeSeriesPointVertexShaderText(useGlVersion2, true);
+    setupShadersAndProgram(FilledCircleQuadShader, gl, vertexShaderText, fragShaderText);
 
-      ${vertexOutKeyword} lowp vec4 vColor;
-      ${vertexOutKeyword} vec2 vTextureCoord;
-
-      void main(void)
-      {
-          float dotCam = dot( normalize(cameraPosition-aVertexPosition), normalize(aVertexPosition));
-          float dist = distance(aVertexPosition, cameraPosition);
-          vec4 position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-          float dAlpha = aShow;
-
-          if ( dAlpha > 0.0 && decay > 0.0 )
-          {
-                  dAlpha = 1.0 - ((jNow - aTime.y) / decay);
-                  if (dAlpha > 1.0 )
-                  {
-                      dAlpha = 1.0;
-                  }
-          }
-
-          if ( showFarSide == 0.0 && (dotCam * sky) < 0.0 || (jNow < aTime.x && decay > 0.0))
-          {
-              vColor = vec4(0.0, 0.0, 0.0, 0.0);
-          }
-          else
-          {
-              vColor = vec4(aVertexColor.r, aVertexColor.g, aVertexColor.b, aVertexColor.a * dAlpha);
-          }
-
-          float lSize = scale;
-
-          if (scale < 0.0)
-          {
-              lSize = -scale;
-              dist = 1.0;
-          }
-
-          float sideLength = max(minSize, (lSize * ( aPointSize ) / dist));
-          vec2 offset = 2.0 * sideLength * vec2((aTextureCoord.x - 0.5) / viewportWidth, (0.5 - aTextureCoord.y) / viewportHeight);
-          gl_Position = position + vec4(offset * position.w, 0.0, 0.0);
-
-          vTextureCoord = aTextureCoord;
-      }
-    `;
-
-    FilledCircleQuadShader._frag = gl.createShader(WEBGL.FRAGMENT_SHADER);
-    gl.shaderSource(FilledCircleQuadShader._frag, fragShaderText);
-    gl.compileShader(FilledCircleQuadShader._frag);
-    var fragStat = gl.getShaderParameter(FilledCircleQuadShader._frag, WEBGL.COMPILE_STATUS);
-    if (!fragStat) {
-        var errorF = gl.getShaderInfoLog(FilledCircleQuadShader._frag);
-        console.log(errorF);
-    }
-    FilledCircleQuadShader._vert = gl.createShader(WEBGL.VERTEX_SHADER);
-    gl.shaderSource(FilledCircleQuadShader._vert, vertShaderText);
-    gl.compileShader(FilledCircleQuadShader._vert);
-    var vertStat = gl.getShaderParameter(FilledCircleQuadShader._vert, WEBGL.COMPILE_STATUS);
-    if (!vertStat) {
-        var errorV = gl.getShaderInfoLog(FilledCircleQuadShader._vert);
-        console.log(errorV);
-    }
-    FilledCircleQuadShader._prog = gl.createProgram();
-    gl.attachShader(FilledCircleQuadShader._prog, FilledCircleQuadShader._vert);
-    gl.attachShader(FilledCircleQuadShader._prog, FilledCircleQuadShader._frag);
-    gl.linkProgram(FilledCircleQuadShader._prog);
-    var linkSuccess = gl.getProgramParameter(FilledCircleQuadShader._prog, WEBGL.LINK_STATUS);
-    if (!linkSuccess) {
-        var errorP = gl.getProgramInfoLog(FilledCircleQuadShader._prog);
-        console.log(errorP);
-    }
     gl.useProgram(FilledCircleQuadShader._prog);
     FilledCircleQuadShader.vertLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aVertexPosition");
     FilledCircleQuadShader.texLoc = gl.getAttribLocation(FilledCircleQuadShader._prog, "aTextureCoord");
@@ -3081,3 +2614,368 @@ FilledCircleQuadShader.use = function (renderContext, vertex, opacity, zBuffer, 
 var FilledCircleQuadShader$ = {};
 
 registerType("FilledCircleQuadShader", [FilledCircleQuadShader, FilledCircleQuadShader$, null]);
+
+export function FilledNGonShader() { }
+
+FilledNGonShader.initialized = false;
+FilledNGonShader._prog = null;
+FilledNGonShader.posLoc = 0;
+FilledNGonShader.colorLoc = 0;
+FilledNGonShader.opacityLoc = 0;
+FilledNGonShader.pointSizeLoc = 0;
+FilledNGonShader.timeLoc = 0;
+FilledNGonShader.showLoc = 0;
+FilledNGonShader.mvMatrixLoc = 0;
+FilledNGonShader.pMatrixLoc = 0;
+FilledNGonShader.nowLoc = 0;
+FilledNGonShader.cameraPosLoc = 0;
+FilledNGonShader.decayLoc = 0;
+FilledNGonShader.scaleLoc = 0;
+FilledNGonShader.minSizeLoc = 0;
+FilledNGonShader.skyLoc = 0;
+FilledNGonShader.showFarSideLoc = 0;
+FilledNGonShader.borderLoc = 0;
+FilledNGonShader.nLoc = 0;
+
+FilledNGonShader.init = function (renderContext) {
+    var gl = renderContext.gl;
+    var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
+    var borderWidth = derivatives ? "fwidth(r)" : "0.012";
+    var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
+    var keywords = shaderKeywords(useGlVersion2);
+    var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : ""; 
+    var fragOutVar = useGlVersion2 ? "fragColor" : "gl_FragColor";
+    
+    var fragShaderText = `\
+      ${keywords.versionDeclaration}
+      ${extensionDeclaration}
+      precision mediump float;
+      ${keywords.fragmentIn} vec4 vColor;
+      ${fragOutDeclaration}
+      uniform float opacity;
+      uniform float border;
+      uniform float n;
+
+      // The idea here is that the complex roots of unity form a regular n-gon
+      // so we can use the canonical map into R^2 to get an n-gon in the plane.
+      // Additionally, if our point has standard position angle theta,
+      // the closest side will be the one between the two roots whose angles
+      // theta lies between
+  
+      // Also, for aesthetic reasons - the roots of unit n-gon always has a vertex at (1, 0)
+      // (corresponding to theta = 0).
+      // But we typically would prefer to always have a horizontal side along the bottom instead
+      // so we modify our angles to account for that
+
+      mat2 rotate2d(float angle) {
+        float s = sin(angle);
+        float c = cos(angle);
+        return mat2(c, s, -s, c);
+      }
+
+      void main() {
+        float pi = 3.1415926;
+        float twoPi = 2.0 * pi;
+        float sliceSize = twoPi / n;
+        float rotation = 0.5 * (pi - sliceSize);
+        vec2 p = 2.0 * gl_PointCoord - vec2(1.0);  // [0, 1]^2 -> [-1, 1]^2
+        // y runs top-down, but we want bottom-up
+        p.y = -p.y;
+        p = rotate2d(rotation) * p;
+        float angle = mod(atan(p.y, p.x), twoPi);
+        
+        float k = floor(angle / sliceSize);
+        float mid = (k + 0.5) * sliceSize;
+        float apothem = cos(pi / n);
+        float r = 0.51 * dot(p, vec2(cos(mid), sin(mid))) / apothem;
+
+        float borderWidth = ${borderWidth};
+        float alpha = 1.0;
+        float core = smoothstep(0.50, 0.30, r);
+        vec3 col = vColor.rgb * mix(0.85, 1.15, core);
+        if (border > 0.5) 
+        {
+          float borderMix = smoothstep(0.40 - borderWidth, 0.40 + borderWidth, r);
+          col = mix(col, vec3(0.0), borderMix);
+          alpha = 1.0 - smoothstep(0.50 - borderWidth, 0.50 + borderWidth, r);
+        }
+        else
+        {
+          alpha = smoothstep(0.5, 0.46, r);
+        }
+
+        ${fragOutVar} = vec4(col, opacity * alpha * vColor.a);
+      }
+    `;
+
+    var vertexShaderText = timeSeriesPointVertexShaderText(useGlVersion2, false); 
+    setupShadersAndProgram(FilledNGonShader, gl, vertexShaderText, fragShaderText);
+
+    gl.useProgram(FilledNGonShader._prog);
+    FilledNGonShader.posLoc = gl.getAttribLocation(FilledNGonShader._prog, "aVertexPosition");
+    FilledNGonShader.colorLoc = gl.getAttribLocation(FilledNGonShader._prog, "aVertexColor");
+    FilledNGonShader.pointSizeLoc = gl.getAttribLocation(FilledNGonShader._prog, "aPointSize");
+    FilledNGonShader.timeLoc = gl.getAttribLocation(FilledNGonShader._prog, "aTime");
+    FilledNGonShader.showLoc = gl.getAttribLocation(FilledNGonShader._prog, "aShow");
+    FilledNGonShader.mvMatrixLoc = gl.getUniformLocation(FilledNGonShader._prog, "uMVMatrix");
+    FilledNGonShader.pMatrixLoc = gl.getUniformLocation(FilledNGonShader._prog, "uPMatrix");
+    FilledNGonShader.nowLoc = gl.getUniformLocation(FilledNGonShader._prog, "jNow");
+    FilledNGonShader.cameraPosLoc = gl.getUniformLocation(FilledNGonShader._prog, "cameraPosition");
+    FilledNGonShader.decayLoc = gl.getUniformLocation(FilledNGonShader._prog, "decay");
+    FilledNGonShader.scaleLoc = gl.getUniformLocation(FilledNGonShader._prog, "scale");
+    FilledNGonShader.minSizeLoc = gl.getUniformLocation(FilledNGonShader._prog, "minSize");
+    FilledNGonShader.opacityLoc = gl.getUniformLocation(FilledNGonShader._prog, "opacity");
+    FilledNGonShader.skyLoc = gl.getUniformLocation(FilledNGonShader._prog, "sky");
+    FilledNGonShader.showFarSideLoc = gl.getUniformLocation(FilledNGonShader._prog, "showFarSide");
+    FilledNGonShader.borderLoc = gl.getUniformLocation(FilledNGonShader._prog, "border");
+    FilledNGonShader.nLoc = gl.getUniformLocation(FilledNGonShader._prog, "n");
+
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+    FilledNGonShader.initialized = true;
+};
+
+FilledNGonShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, border, mask, n) {
+    if (!FilledNGonShader.initialized) {
+      FilledNGonShader.init(renderContext);
+    }
+
+    var gl = renderContext.gl;
+    gl.useProgram(FilledNGonShader._prog);
+    var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
+    gl.uniformMatrix4fv(FilledNGonShader.mvMatrixLoc, false, mvMat.floatArray());
+    gl.uniformMatrix4fv(FilledNGonShader.pMatrixLoc, false, renderContext.get_projection().floatArray());
+    gl.uniform1f(FilledNGonShader.nLoc, n);
+    gl.uniform1f(FilledNGonShader.nowLoc, jNow);
+    gl.uniform1f(FilledNGonShader.decayLoc, decay);
+    gl.uniform1f(FilledNGonShader.scaleLoc, scale);
+    gl.uniform1f(FilledNGonShader.minSizeLoc, minSize);
+    gl.uniform1f(FilledNGonShader.showFarSideLoc, showFarSide ? 1 : 0);
+    gl.uniform1f(FilledNGonShader.skyLoc, sky ? -1 : 1);
+    gl.uniform1f(FilledNGonShader.opacityLoc, opacity);
+    gl.uniform1f(FilledNGonShader.borderLoc, border);
+    gl.uniform3f(FilledNGonShader.cameraPosLoc, camera.x, camera.y, camera.z);
+
+    if (zBuffer) {
+        gl.enable(WEBGL.DEPTH_TEST);
+    } else {
+        gl.disable(WEBGL.DEPTH_TEST);
+    }
+    disableVertexAttribArrays(gl);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
+    gl.enableVertexAttribArray(FilledNGonShader.vertLoc);
+    gl.enableVertexAttribArray(FilledNGonShader.colorLoc);
+    gl.enableVertexAttribArray(FilledNGonShader.pointSizeLoc);
+    gl.enableVertexAttribArray(FilledNGonShader.timeLoc);
+    gl.vertexAttribPointer(FilledNGonShader.vertLoc, 3, WEBGL.FLOAT, false, 40, 0);
+    gl.vertexAttribPointer(FilledNGonShader.colorLoc, 4, WEBGL.FLOAT, false, 40, 12);
+    gl.vertexAttribPointer(FilledNGonShader.timeLoc, 2, WEBGL.FLOAT, false, 40, 28);
+    gl.vertexAttribPointer(FilledNGonShader.pointSizeLoc, 1, WEBGL.FLOAT, false, 40, 36);
+
+    if (mask != null) {
+        gl.bindBuffer(WEBGL.ARRAY_BUFFER, mask);
+        gl.enableVertexAttribArray(FilledNGonShader.showLoc);
+        gl.vertexAttribPointer(FilledNGonShader.showLoc, 1, WEBGL.UNSIGNED_BYTE, false, 0, 0);
+    } else {
+        gl.disableVertexAttribArray(FilledNGonShader.showLoc);
+        gl.vertexAttrib1f(FilledNGonShader.showLoc, 1.0);
+    }
+
+    gl.lineWidth(1);
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+};
+
+var FilledNGonShader$ = {};
+
+registerType("FilledNGonShader", [FilledNGonShader, FilledNGonShader$, null]);
+
+export function FilledNGonQuadShader() { }
+
+FilledNGonQuadShader.initialized = false;
+FilledNGonQuadShader._prog = null;
+FilledNGonQuadShader.vertLoc = 0;
+FilledNGonQuadShader.texLoc = 0;
+FilledNGonQuadShader.colorLoc = 0;
+FilledNGonQuadShader.opacityLoc = 0;
+FilledNGonQuadShader.pointSizeLoc = 0;
+FilledNGonQuadShader.timeLoc = 0;
+FilledNGonQuadShader.showLoc = 0;
+FilledNGonQuadShader.mvMatrixLoc = 0;
+FilledNGonQuadShader.pMatrixLoc = 0;
+FilledNGonQuadShader.nowLoc = 0;
+FilledNGonQuadShader.cameraPosLoc = 0;
+FilledNGonQuadShader.decayLoc = 0;
+FilledNGonQuadShader.scaleLoc = 0;
+FilledNGonQuadShader.minSizeLoc = 0;
+FilledNGonQuadShader.skyLoc = 0;
+FilledNGonQuadShader.showFarSideLoc = 0;
+FilledNGonQuadShader.borderLoc = 0;
+FilledNGonQuadShader.nLoc = 0;
+FilledNGonQuadShader.viewportHeightLoc = 0;
+FilledNGonQuadShader.viewportWidthLoc = 0;
+
+FilledNGonQuadShader._itemSize = 12 * 4;
+
+FilledNGonQuadShader.init = function (renderContext) {
+    var gl = renderContext.gl;
+    var derivatives = useGlVersion2 || gl.getExtension("OES_standard_derivatives");
+    var borderWidth = derivatives ? "fwidth(r)" : "0.012";
+    var extensionDeclaration = (derivatives && !useGlVersion2) ? "#extension GL_OES_standard_derivatives : enable" : "";
+    var keywords = shaderKeywords(useGlVersion2);
+    var fragOutDeclaration = useGlVersion2 ? "out vec4 fragColor;" : ""; 
+    var fragOutVar = useGlVersion2 ? "fragColor" : "gl_FragColor";
+    
+    var fragShaderText = `\
+      ${keywords.versionDeclaration}
+      ${extensionDeclaration}
+      precision mediump float;
+      ${keywords.fragmentIn} vec4 vColor;
+      ${keywords.fragmentIn} vec2 vTextureCoord;
+      ${fragOutDeclaration}
+      uniform float opacity;
+      uniform float border;
+      uniform float n;
+
+      // The idea here is that the complex roots of unity form a regular n-gon
+      // so we can use the canonical map into R^2 to get an n-gon in the plane.
+      // Additionally, if our point has standard position angle theta,
+      // the closest side will be the one between the two roots whose angles
+      // theta lies between
+  
+      // Also, for aesthetic reasons - the roots of unit n-gon always has a vertex at (1, 0)
+      // (corresponding to theta = 0).
+      // But we typically would prefer to always have a horizontal side along the bottom instead
+      // so we modify our angles to account for that
+
+      mat2 rotate2d(float angle) {
+        float s = sin(angle);
+        float c = cos(angle);
+        return mat2(c, s, -s, c);
+      }
+
+      void main() {
+        float pi = 3.1415926;
+        float twoPi = 2.0 * pi;
+        float sliceSize = twoPi / n;
+        float rotation = 0.5 * (pi - sliceSize);
+        vec2 p = 2.0 * vTextureCoord - vec2(1.0);  // [0, 1]^2 -> [-1, 1]^2
+        // y runs top-down, but we want bottom-up
+        p.y = -p.y;
+        p = rotate2d(rotation) * p;
+        float angle = mod(atan(p.y, p.x), twoPi);
+        
+        float k = floor(angle / sliceSize);
+        float mid = (k + 0.5) * sliceSize;
+        float apothem = cos(pi / n);
+        float r = 0.51 * dot(p, vec2(cos(mid), sin(mid))) / apothem;
+
+        float borderWidth = ${borderWidth};
+        float alpha = 1.0;
+        float core = smoothstep(0.50, 0.30, r);
+        vec3 col = vColor.rgb * mix(0.85, 1.15, core);
+        if (border > 0.5) 
+        {
+          float borderMix = smoothstep(0.40 - borderWidth, 0.40 + borderWidth, r);
+          col = mix(col, vec3(0.0), borderMix);
+          alpha = 1.0 - smoothstep(0.50 - borderWidth, 0.50 + borderWidth, r);
+        }
+        else
+        {
+          alpha = smoothstep(0.5, 0.46, r);
+        }
+
+        ${fragOutVar} = vec4(col, opacity * alpha * vColor.a);
+      }
+    `;
+
+    var vertexShaderText = timeSeriesPointVertexShaderText(useGlVersion2, true); 
+    setupShadersAndProgram(FilledNGonQuadShader, gl, vertexShaderText, fragShaderText);
+
+    gl.useProgram(FilledNGonQuadShader._prog);
+    FilledNGonQuadShader.vertLoc = gl.getAttribLocation(FilledNGonQuadShader._prog, "aVertexPosition");
+    FilledNGonQuadShader.texLoc = gl.getAttribLocation(FilledNGonQuadShader._prog, "aTextureCoord");
+    FilledNGonQuadShader.colorLoc = gl.getAttribLocation(FilledNGonQuadShader._prog, "aVertexColor");
+    FilledNGonQuadShader.pointSizeLoc = gl.getAttribLocation(FilledNGonQuadShader._prog, "aPointSize");
+    FilledNGonQuadShader.timeLoc = gl.getAttribLocation(FilledNGonQuadShader._prog, "aTime");
+    FilledNGonQuadShader.showLoc = gl.getAttribLocation(FilledNGonQuadShader._prog, "aShow");
+    FilledNGonQuadShader.mvMatrixLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "uMVMatrix");
+    FilledNGonQuadShader.pMatrixLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "uPMatrix");
+    FilledNGonQuadShader.nowLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "jNow");
+    FilledNGonQuadShader.cameraPosLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "cameraPosition");
+    FilledNGonQuadShader.decayLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "decay");
+    FilledNGonQuadShader.scaleLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "scale");
+    FilledNGonQuadShader.minSizeLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "minSize");
+    FilledNGonQuadShader.opacityLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "opacity");
+    FilledNGonQuadShader.skyLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "sky");
+    FilledNGonQuadShader.showFarSideLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "showFarSide");
+    FilledNGonQuadShader.borderLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "border");
+    FilledNGonQuadShader.nLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "n");
+    FilledNGonQuadShader.viewportHeightLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "viewportHeight");
+    FilledNGonQuadShader.viewportWidthLoc = gl.getUniformLocation(FilledNGonQuadShader._prog, "viewportWidth");
+
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+    FilledNGonQuadShader.initialized = true;
+};
+
+FilledNGonQuadShader.use = function (renderContext, vertex, opacity, zBuffer, jNow, decay, camera, scale, minSize, showFarSide, sky, border, mask, n) {
+    if (!FilledNGonQuadShader.initialized) {
+      FilledNGonQuadShader.init(renderContext);
+    }
+
+    var gl = renderContext.gl;
+    gl.useProgram(FilledNGonQuadShader._prog);
+    var mvMat = Matrix3d.multiplyMatrix(renderContext.get_world(), renderContext.get_view());
+    gl.uniformMatrix4fv(FilledNGonQuadShader.mvMatrixLoc, false, mvMat.floatArray());
+    gl.uniformMatrix4fv(FilledNGonQuadShader.pMatrixLoc, false, renderContext.get_projection().floatArray());
+    gl.uniform1f(FilledNGonQuadShader.nLoc, n);
+    gl.uniform1f(FilledNGonQuadShader.nowLoc, jNow);
+    gl.uniform1f(FilledNGonQuadShader.decayLoc, decay);
+    gl.uniform1f(FilledNGonQuadShader.scaleLoc, scale);
+    gl.uniform1f(FilledNGonQuadShader.minSizeLoc, minSize);
+    gl.uniform1f(FilledNGonQuadShader.showFarSideLoc, showFarSide ? 1 : 0);
+    gl.uniform1f(FilledNGonQuadShader.skyLoc, sky ? -1 : 1);
+    gl.uniform1f(FilledNGonQuadShader.opacityLoc, opacity);
+    gl.uniform1f(FilledNGonQuadShader.borderLoc, border);
+    gl.uniform1f(FilledNGonQuadShader.viewportHeightLoc, renderContext.height);
+    gl.uniform1f(FilledNGonQuadShader.viewportWidthLoc, renderContext.width);
+    gl.uniform3f(FilledNGonQuadShader.cameraPosLoc, camera.x, camera.y, camera.z);
+
+    if (zBuffer) {
+        gl.enable(WEBGL.DEPTH_TEST);
+    } else {
+        gl.disable(WEBGL.DEPTH_TEST);
+    }
+    disableVertexAttribArrays(gl);
+    gl.bindBuffer(WEBGL.ARRAY_BUFFER, vertex);
+    gl.bindBuffer(WEBGL.ELEMENT_ARRAY_BUFFER, null);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.vertLoc);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.colorLoc);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.pointSizeLoc);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.timeLoc);
+    gl.enableVertexAttribArray(FilledNGonQuadShader.texLoc);
+    gl.vertexAttribPointer(FilledNGonQuadShader.vertLoc, 3, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 0);
+    gl.vertexAttribPointer(FilledNGonQuadShader.texLoc, 2, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 12);
+    gl.vertexAttribPointer(FilledNGonQuadShader.colorLoc, 4, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 20);
+    gl.vertexAttribPointer(FilledNGonQuadShader.timeLoc, 2, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 36);
+    gl.vertexAttribPointer(FilledNGonQuadShader.pointSizeLoc, 1, WEBGL.FLOAT, false, FilledNGonQuadShader._itemSize, 44);
+
+    if (mask != null) {
+        gl.bindBuffer(WEBGL.ARRAY_BUFFER, mask);
+        gl.enableVertexAttribArray(FilledNGonQuadShader.showLoc);
+        gl.vertexAttribPointer(FilledNGonQuadShader.showLoc, 1, WEBGL.UNSIGNED_BYTE, false, 0, 0);
+    } else {
+        gl.disableVertexAttribArray(FilledNGonQuadShader.showLoc);
+        gl.vertexAttrib1f(FilledNGonQuadShader.showLoc, 1.0);
+    }
+
+    gl.lineWidth(1);
+    gl.enable(WEBGL.BLEND);
+    gl.blendFunc(WEBGL.SRC_ALPHA, WEBGL.ONE_MINUS_SRC_ALPHA);
+};
+
+var FilledNGonQuadShader$ = {};
+
+registerType("FilledNGonQuadShader", [FilledNGonQuadShader, FilledNGonQuadShader$, null]);
