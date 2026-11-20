@@ -1,3 +1,8 @@
+# @wwtelescope/engine 7.42.1 (2026-11-20)
+
+- Fix issues with URL resolution for Healpix imagesets (#488, @Carifio24).
+
+
 # @wwtelescope/engine 7.42.0 (2026-11-20)
 
 - Allow imagesets to have mirror URLs that can be used when the imageset's primary URL

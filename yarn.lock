@@ -1852,7 +1852,7 @@ __metadata:
     "@vue/cli-service": ^5.0.8
     "@vue/eslint-config-typescript": ^11.0.2
     "@wwtelescope/astro": "workspace:>=0.2.2"
-    "@wwtelescope/engine": "workspace:^7.41.0"
+    "@wwtelescope/engine": "workspace:^7.42.1"
     "@wwtelescope/engine-helpers": "workspace:>=0.18.0"
     "@wwtelescope/engine-types": "workspace:>=0.10.0"
     eslint: ^8.24.0
@@ -1879,7 +1879,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wwtelescope/engine@workspace:*, @wwtelescope/engine@workspace:^7.29.1, @wwtelescope/engine@workspace:^7.32.0, @wwtelescope/engine@workspace:^7.40.0, @wwtelescope/engine@workspace:^7.41.0, @wwtelescope/engine@workspace:engine":
+"@wwtelescope/engine@workspace:*, @wwtelescope/engine@workspace:^7.29.1, @wwtelescope/engine@workspace:^7.32.0, @wwtelescope/engine@workspace:^7.40.0, @wwtelescope/engine@workspace:^7.41.0, @wwtelescope/engine@workspace:^7.42.1, @wwtelescope/engine@workspace:engine":
   version: 0.0.0-use.local
   resolution: "@wwtelescope/engine@workspace:engine"
   dependencies:
